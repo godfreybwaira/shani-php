@@ -1,0 +1,89 @@
+@use 'vars';
+@use 'extensions';
+@use 'callables' as cb;
+@use 'sass:math';
+@use 'colors';
+
+body {
+    overflow: hidden;
+    @extend %theme-color, %fullHeight;
+}
+
+input,
+textarea,
+button,
+select {
+    accent-color: colors.primary();
+}
+
+::selection {
+    @extend %color-primary;
+}
+
+::-webkit-scrollbar {
+    width: map-get(vars.$paddingSquare, 'xs')*0.5;
+}
+
+::-webkit-scrollbar-thumb {
+    @extend %color-primary;
+}
+
+a:only-child {
+    color: currentColor;
+}
+
+a:not(:only-child) {
+    color: colors.primary();
+}
+
+.no-gaps {
+    @extend %no-gaps;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.font-italic {
+    font-style: italic;
+}
+
+.border-around {
+    @extend %borderAround;
+}
+
+.round-corner {
+    @extend %roundCorner;
+}
+
+@mixin _gridSystem {
+    $gridColumns: 24;
+    $ratio: math.div(100%, $gridColumns);
+
+    @each $key,
+    $val in vars.$breakpoints {
+        @include cb.media($val) {
+            @for $col from 1 through $gridColumns {
+                .width-#{$key}-#{$col} {
+                    width: $ratio * $col;
+                }
+            }
+        }
+    }
+}
+
+@mixin _print {
+    @media print {
+        .d-pt-none {
+            display: none;
+        }
+
+        @page {
+            margin: 0;
+            page-break-after: always;
+        }
+    }
+}
+
+@include _print;
+@include _gridSystem;

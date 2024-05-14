@@ -1,0 +1,18 @@
+## Shani SERVER CONFIGURATION.
+---
+IP: "0.0.0.0"
+PORTS:
+  HTTP: 8008
+  HTTPS: 44380
+# SCHEDULING_ALGORITHM: "PREEMPTIVE, ROUND_ROBIN, FIXED"
+SCHEDULING_ALGORITHM: "PREEMPTIVE"
+# maximum number of concurrent connections
+MAX_CONNECTIONS: 1024
+# maximum number of requests a worker process should execute
+# before it is automatically restarted by the server
+REQ_PER_WORKER: 100
+SSL:
+  KEY: "${SSL_DIR}/server.key"
+  CERT: "${SSL_DIR}/server.crt"
+DAEMON: false
+ERROR_LOG: "${SERVER_LOGS}/error"

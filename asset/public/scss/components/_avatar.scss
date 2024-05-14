@@ -1,0 +1,61 @@
+@use '../global/vars';
+@use '../global/extensions';
+@use '../global/callables' as cb;
+@use '../global/colors';
+
+.avatar {
+    color: colors.getTextColor();
+    @extend %greyBorder, %posRelative, %inlineFlex, %roundCorner, %shadow-inset, %flexCenter;
+
+    &:hover {
+        text-decoration: none;
+    }
+
+    &-stack>&:not(:first-child) {
+        margin-left: map-get(vars.$paddingSquare, 'md') * -1;
+    }
+
+    &-stack>&:hover {
+        @extend %zIndex-xs;
+    }
+
+    &-on:before {
+        @extend %emptyContent;
+        background-color: lime;
+    }
+
+    &-off:before {
+        @extend %emptyContent;
+        background-color: colors.get('danger');
+    }
+
+    &:before {
+        width: 20%;
+        height: 20%;
+        left: 4%;
+        bottom: 4%;
+        outline: cb.px2rem(1px) solid currentColor;
+        @extend %roundCorner, %posAbsolute;
+    }
+
+    $_avatarSizes: vars.size('sm', 'md', 'lg', 'xl', 'xxl');
+    $_factor: 1;
+
+    @each $key,
+    $val in $_avatarSizes {
+        &-size-#{$key} {
+            width: $val * $_factor;
+            height: $val * $_factor;
+            $_factor: if($key == 'sm',1, $_factor * 1.25);
+            @extend %font-#{$key};
+        }
+    }
+
+    &>img {
+        @extend %roundCorner, %fullHeight;
+    }
+
+    &>picture {
+        @extend %roundCorner, %fullHeight;
+    }
+}

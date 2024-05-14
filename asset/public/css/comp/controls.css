@@ -1,0 +1,185 @@
+.input-type{
+    transform: translate(0);
+}
+textarea{
+    --height-sm:2rem;
+    --height-md:2.5rem;
+    --height-lg:3.5rem;
+    overflow-x:hidden;
+}
+.input-type.input-size-sm>textarea,.input-type.input-size-sm{
+    min-height: var(--size-sm);
+}
+.input-type.input-size-md>textarea,.input-type:not(.input-size-sm,.input-size-lg,.input-size-xl){
+    min-height: var(--size-md);
+}
+.input-type.input-size-lg>textarea,.input-type.input-size-lg{
+    min-height: var(--size-lg);
+}
+.input-type.input-size-xl>textarea,.input-type.input-size-xl{
+    min-height: var(--size-xl);
+}
+.input-type.input-size-sm>textarea{
+    padding-top: .2rem;
+}
+.input-type.input-size-md>textarea{
+    padding-top: .4rem;
+}
+.input-type.input-size-lg>textarea,.input-type.input-size-xl>textarea{
+    padding-top: .55rem;
+}
+.input-group,.button-block,.choice-inputs label{
+    display: flex;
+}
+.input-group>select,.input-group>input,.input-group>textarea,
+.input-group>.choice-inputs,.choice-inputs label,.choice-inputs-stretch>*{
+    flex: 1;
+}
+.input-group>:not(select,textarea,input){
+    white-space: nowrap;
+}
+/*..............input-1...............*/
+.input-type-1>:not(:last-child,.input-type-1-mask){
+    margin-right: -1px;
+}
+.input-type-1>:not([type=radio],[type=checkbox],[type=button],[type=submit],[type=reset]),
+.input-type-2>input,.input-type-2>select,.input-type-2>textarea{
+    border: var(--grey-border);
+}
+.input-type-1>:first-child:not(:only-child),.input-type-2>:not(select,input,textarea){
+    border-radius: var(--md-quarter) 0 0 var(--md-quarter) !important;
+}
+.input-type-1>:last-child:not(:only-child){
+    border-radius: 0 var(--md-quarter) var(--md-quarter) 0 !important;
+}
+.input-type-1{
+    overflow: hidden;
+}
+.input-type-1:hover .input-type-1-mask,.input-type-1:focus-within .input-type-1-mask{
+    transform: translateY(-100%);
+}
+.input-type-1>select:not(:placeholder-shown)~.input-type-1-mask,
+.input-type-1>textarea:not(:placeholder-shown)~.input-type-1-mask,
+.input-type-1>input:not(:placeholder-shown)~.input-type-1-mask{
+    border-color: var(--theme-bg);
+}
+/*..............input-2...............*/
+.input-type-2>:not(select,input,textarea,.choice-inputs){
+    pointer-events: none;
+}
+.input-type-2>input,.input-type-2>textarea,.input-type-2>select,
+.input-type-1-mask,.button:not(.button-2),.choice-inputs:only-child,
+.choice-inputs label{
+    border-radius: var(--md-quarter);
+}
+.input-type-2>:focus,.input-type-2>select:not(:placeholder-shown),.input-type-2>.choice-inputs,
+.input-type-2>textarea:not(:placeholder-shown),.input-type-2>input:not(:placeholder-shown){
+    outline: none;
+    border: 1px solid transparent;
+    border-bottom-color: var(--theme-bg);
+    border-radius: 0;
+}
+.input-type-2>:focus::placeholder{
+    color: currentColor;
+}
+.input-type-2>::placeholder{
+    color: transparent;
+}
+.input-type-2>:not(select,input,textarea,.choice-inputs),.input-type-1-mask{
+    position: fixed;
+    height: 100%;
+}
+.input-type>:not(select,input,textarea),.button:not(.button-block){
+    display: inline-flex;
+}
+.input-type>:not(select,input,textarea,.choice-inputs),.button,
+.choice-inputs label{
+    align-items: center;
+}
+.button{
+    border: none;
+}
+/*................button..............*/
+.button:hover{
+    text-decoration: none;
+    opacity: .9;
+}
+.button-2{
+    border-radius: 50rem;
+}
+.button-3{
+    outline: 1px solid currentColor;
+    outline-offset: -3px;
+}
+.button-4{
+    border: 1px solid currentColor;
+    color: var(--theme-bg);
+}
+/*..............input-1-mask...........*/
+.input-type-1-mask,.button-block{
+    width: 100%;
+}
+/*..............input-size...........*/
+.input-type.input-size-sm>:not(.choice-inputs),.button.input-size-sm{
+    padding-left: var(--md-half);
+    padding-right: var(--md-half);
+}
+.input-type.input-size-sm>*,.button.input-size-sm{
+    font-size: var(--font-sm);
+}
+.input-type.input-size-sm>textarea,.button.input-size-sm{
+    height: var(--size-sm);
+}
+.input-type:not(.input-size-sm,.input-size-lg,.input-size-xl)>textarea,
+.button:not(.input-size-sm,.input-size-lg,.input-size-xl){
+    height: var(--size-md);
+}
+.input-type.input-size-lg>textarea,.button.input-size-lg{
+    height: var(--size-lg);
+}
+.input-type.input-size-xl>textarea,.button.input-size-xl{
+    height: var(--size-xl);
+}
+.input-type.input-size-lg>*,.button.input-size-lg{
+    font-size: calc(var(--rem-md)*1.4);
+}
+.input-type.input-size-xl>*,.button.input-size-xl{
+    font-size: calc(var(--rem-md)*1.8);
+}
+.input-type:not(.input-size-sm)>:not(.choice-inputs),.button:not(.input-size-sm){
+    padding-left: var(--rem-md);
+    padding-right: var(--rem-md);
+}
+.input-type-2>:focus+*,.input-type-2>:not(:placeholder-shown)+*{
+    height: auto;
+    background: none;
+    color: var(--theme-bg);
+    transform: translateY(-70%);
+    font-size: var(--font-sm);
+}
+/*................choice-inputs................*/
+.choice-inputs{
+    margin:0;
+    list-style: none;
+    gap: calc(var(--rem-md) / 5);
+    padding: calc(var(--rem-md) / 5);
+    flex-wrap: wrap;
+}
+.choice-inputs input{
+    display: none;
+}
+.choice-inputs label{
+    height: 100%;
+    padding: 0 var(--rem-md);
+    justify-content: center;
+}
+.choice-inputs input:checked+label{
+    background-color: var(--theme-bg);
+    color: var(--theme-txt);
+}
+.choice-inputs label:hover,.button:hover{
+    cursor: pointer;
+}
+.choice-inputs label:hover{
+    box-shadow: var(--shadow-sm);
+}

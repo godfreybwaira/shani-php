@@ -1,0 +1,31 @@
+@use '../global/vars';
+@use '../global/colors';
+@use '../global/extensions';
+@use '../global/callables' as cb;
+@use 'sass:color';
+
+@mixin _mixer($color) {
+    color: color.scale($color, $lightness: -55%);
+    background-color: color.scale($color, $lightness: 75%);
+    outline: cb.px2rem(1px) dashed $color;
+}
+
+.callout {
+    margin-bottom: map-get(vars.$paddingSquare, 'md');
+    outline-offset: cb.px2rem(-5px);
+
+    &:not(.no-gaps) {
+        @extend %paddingXY-md;
+    }
+
+    &-color {
+        $colors: colors.get('alert', 'info', 'success', 'danger');
+
+        @each $key,
+        $val in $colors {
+            &-#{$key} {
+                @include _mixer($val);
+            }
+        }
+    }
+}

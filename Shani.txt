@@ -1,0 +1,22 @@
+Shani
+
+1. Scalable
+2. Robust (Error torelant)
+3. Secure (CSRF, Session Mgt, Authentication & Authorization)
+4. Fast
+5. Multiprosess
+6. Multithreaded
+7. Event driven
+8. Non-blocking
+9. HMVC
+10. Zero dependency
+11. Dynamic Routing
+12. Built-in web server
+13. Web service supports
+14. Stateful application
+15. Third-party library support
+16. Best practices API supports
+17. Supports JSON, XML, YAML, CSV
+18. Load balancing (Round robin, preemtive, fixed)
+19. Memory Management
+20. Asynchronous

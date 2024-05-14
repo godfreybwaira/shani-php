@@ -1,0 +1,133 @@
+$_duration: 0.2s;
+$_timing: ease-in;
+
+@function _getProps($duration) {
+    @return if($duration ==null, $_duration, $duration) $_timing;
+}
+
+// @keyframes slideUp {
+//     0% {
+//         opacity: 0;
+//         transform: translateY(100%);
+//     }
+
+//     100% {
+//         opacity: 1;
+//         transform: none;
+//     }
+// }
+
+// @keyframes slideDown {
+//     0% {
+//         opacity: 0;
+//         transform: translateY(-100%);
+//     }
+
+//     100% {
+//         opacity: 1;
+//         transform: none;
+//     }
+// }
+
+// @keyframes slideLeft {
+//     0% {
+//         opacity: 0;
+//         transform: translateX(100%);
+//     }
+
+//     100% {
+//         opacity: 1;
+//         transform: none;
+//     }
+// }
+
+@keyframes slideRight {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+// @keyframes shrink {
+//     100% {
+//         opacity: 0;
+//         transform: rotateX(90deg);
+//     }
+// }
+
+// @keyframes grow {
+//     0% {
+//         opacity: 0;
+//         transform: rotateX(90deg);
+//     }
+
+//     100% {
+//         opacity: 1;
+//         transform: none;
+//     }
+// }
+
+// @keyframes riseUp {
+//     0% {
+//         opacity: 0;
+//         transform: rotate(90deg);
+//     }
+
+//     100% {
+//         opacity: 1;
+//         transform: none;
+//     }
+// }
+
+@keyframes zoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+// @keyframes zoomOut {
+//     100% {
+//         opacity: 0;
+//         transform: scale(1.2);
+//     }
+// }
+
+// @mixin riseUp($duration: null) {
+//     transform-origin: bottom left;
+//     animation: riseUp _getProps($duration);
+// }
+
+// @mixin zoomOut($duration: null) {
+//     animation: zoomOut _getProps($duration);
+// }
+
+@mixin zoomIn($duration: null) {
+    animation: zoomIn _getProps($duration);
+}
+
+// @mixin slideLeft($duration: null) {
+//     animation: slideLeft _getProps($duration);
+// }
+
+@mixin slideRight($duration: null) {
+    animation: slideRight _getProps($duration);
+}
+
+// @mixin slideUp($duration: null) {
+//     animation: slideUp _getProps($duration);
+// }
+
+// @mixin slideDown($duration: null) {
+//     animation: slideDown _getProps($duration);
+// }

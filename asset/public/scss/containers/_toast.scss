@@ -1,0 +1,45 @@
+@use '../global/vars';
+@use '../global/colors';
+@use '../global/extensions';
+@use '../global/callables' as cb;
+
+.toast {
+    @extend %posAbsolute, %zIndex-lg;
+    top: 0;
+    right: 50%;
+    transform: translateX(50%);
+    width: max-content;
+    max-height: 70%;
+    overflow-y: auto;
+    max-width: calc(100% - map-get(vars.$paddingSquare, 'md') * 2);
+    box-shadow: 0 cb.px2rem(2px) cb.px2rem(2px) 0 rgba(0, 0, 0, .14),
+        0 cb.px2rem(3px) cb.px2rem(1px) cb.px2rem(-2px) colors.shadow(),
+        0 cb.px2rem(1px) cb.px2rem(5px) 0 rgba(0, 0, 0, .12);
+    animation: slide .2s;
+
+    &-body {
+        @extend %padding-md;
+    }
+
+    &-header {
+        align-items: center;
+        border-bottom: colors.line();
+        @extend %flexible, %height-md, %paddingY-md;
+    }
+
+    @keyframes slide {
+        0% {
+            transform: translate(50%, -100%);
+        }
+
+        100% {
+            transform: translate(50%, 0);
+        }
+    }
+}
+
+@include cb.media(map-get(vars.$breakpoints, lg)) {
+    .toast {
+        max-width: 50%;
+    }
+}
