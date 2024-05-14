@@ -14,14 +14,14 @@ namespace gui\v1\components {
     final class Badge extends Component
     {
 
-        private bool $wrapped = false;
-        private ?Component $parent = null;
+        private const NAME = 'badge';
+
         private ?string $position = null;
 
         public function __construct(string $text = null)
         {
             parent::__construct('div', $text);
-            $this->setProps(['badge']);
+            $this->setProps([self::NAME]);
         }
 
         public function setPosition(int $position): self
@@ -30,20 +30,17 @@ namespace gui\v1\components {
             return $this;
         }
 
-        public function setParent(Component $parent): self
+        public function setParent(Component &$parent): self
         {
-            $this->parent = $parent;
-            $this->parent->setProps(['pos-relative'])->appendChildren($this);
+            $parent->setProps(['relative-pos'])->appendChildren($this);
             return $this;
         }
 
         public function build(): string
         {
-            if ($this->parent !== null && !$this->wrapped) {
-                $this->wrapped = true;
-                return $this->parent->build();
+            if ($this->position !== null) {
+                $this->setProps([$this->position]);
             }
-            $this->setProps(['badge-' . $this->position]);
             return parent::build();
         }
     }
