@@ -13,21 +13,21 @@ namespace gui\v1 {
     {
 
         private string $tag;
-        private array $children, $attributes, $classList;
-        private ?string $text, $markup, $gap, $fontSize, $padding, $shadow;
+        private array $children, $attributes, $classList, $props;
+        private ?string $text, $markup, $gap, $fontSize, $padding, $shadow, $corner;
 
-        protected const SIZES = ['sm', 'md', 'lg', 'xl'], COLORS = [ 'danger', 'success', 'alert', 'info'];
+        protected const SIZES = ['sm', 'md', 'lg', 'xl'], COLORS = [ 'danger', 'success', 'alert', 'info', 'primary', 'secondary'];
         protected const POSITIONS = ['pos-tl', 'pos-tc', 'pos-tr', 'pos-cl', 'pos-cc', 'pos-cr', 'pos-bl', 'pos-bc', 'pos-br'];
-        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3;
-        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
-        public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6, POS_BC = 7, POS_BR = 8;
+        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_NONE = -1;
+        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3, COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_NONE = -1;
+        public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6, POS_BC = 7, POS_BR = 8, POS_NONE = -1;
 
         public function __construct(string $tag, ?string $text = null)
         {
             $this->tag = $tag;
             $this->text = $text;
-            $this->children = $this->classList = $this->attributes = [];
-            $this->markup = $this->gap = $this->fontSize = $this->padding = $this->shadow = null;
+            $this->children = $this->classList = $this->attributes = $this->props = [];
+            $this->markup = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
         }
 
         public function __toString(): string
@@ -37,17 +37,8 @@ namespace gui\v1 {
 
         public function build(): string
         {
-            if ($this->gap !== null) {
-                $this->setProps(['gap-' . $this->gap]);
-            }
-            if ($this->fontSize !== null) {
-                $this->setProps(['font-' . $this->fontSize]);
-            }
-            if ($this->padding !== null) {
-                $this->setProps(['padding-' . $this->padding]);
-            }
-            if ($this->shadow !== null) {
-                $this->setProps(['shadow-' . $this->shadow]);
+            foreach ($this->props as $key => $value) {
+                $this->setProps([$key . '-' . $value]);
             }
             $css = $this->stringifyClass();
             if ($this->text !== null || !empty($this->children) || $this->markup !== null) {
@@ -188,20 +179,17 @@ namespace gui\v1 {
 
         public function setGap(int $size): self
         {
-            $this->gap = self::SIZES[$size];
-            return $this;
+            return $this->initProp('gap', $size);
         }
 
         public function setPadding(int $size): self
         {
-            $this->padding = self::SIZES[$size];
-            return $this;
+            return $this->initProp('padding', $size);
         }
 
         public function setFontSize(int $size): self
         {
-            $this->fontSize = self::SIZES[$size];
-            return $this;
+            return $this->initProp('font', $size);
         }
 
         public function setBorder(): self
@@ -211,8 +199,22 @@ namespace gui\v1 {
 
         public function setShadow(int $size): self
         {
-            $this->shadow = self::SIZES[$size];
+            return $this->initProp('shadow', $size);
+        }
+
+        private function initProp(string $prop, int $size): self
+        {
+            if ($size !== self::SIZE_NONE) {
+                $this->props[$prop] = self::SIZES[$size];
+            } elseif (isset($this->props[$prop])) {
+                unset($this->props[$prop]);
+            }
             return $this;
+        }
+
+        public function setCorners(int $size): self
+        {
+            return $this->initProp('corner', $size);
         }
 
         public function setSize(int $size): self

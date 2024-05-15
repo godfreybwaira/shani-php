@@ -19,7 +19,7 @@ namespace gui\v1\components {
         public function __construct(bool $openMultiple = false)
         {
             parent::__construct('ul');
-            $size = parent::SIZE_MD;
+            $size = \gui\v1\Theme::DEFAULT_SIZE;
             $this->setProps([self::NAME])->setPadding($size)->setFontSize($size);
             if ($openMultiple) {
                 $this->setProps([self::NAME . '-multiopen']);

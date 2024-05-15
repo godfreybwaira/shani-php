@@ -15,7 +15,6 @@ namespace gui\v1\components {
         private const NAME = 'avatar', STATES = ['off', 'on'];
         public const STATE_ON = 1, STATE_OFF = 0;
 
-        private string $size = 'md';
         private ?string $state = null;
 
         public function __construct(string $content = null)

@@ -21,8 +21,9 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('div');
+            $size = \gui\v1\Theme::DEFAULT_SIZE;
+            $this->setProps([self::NAME])->setPadding($size)->setFontSize($size);
             $this->header = $this->body = $this->footer = null;
-            $this->setProps([self::NAME]);
         }
 
         public function setHeader(Component $header): self

@@ -12,6 +12,8 @@ namespace gui\v1 {
     final class Theme
     {
 
+        public const DEFAULT_SIZE = Component::SIZE_MD;
+
         private static array $styles;
 
         public static function setStyles(array $styles)
