@@ -21,6 +21,7 @@ namespace gui\v1 {
         public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_NONE = -1;
         public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3, COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_NONE = -1;
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6, POS_BC = 7, POS_BR = 8, POS_NONE = -1;
+        public const SIZE_DEFAULT = self::SIZE_MD;
 
         public function __construct(string $tag, ?string $text = null)
         {
@@ -177,6 +178,12 @@ namespace gui\v1 {
             return $this;
         }
 
+        protected function setColor(int $color): self
+        {
+            $this->props['color'] = self::COLORS[$color];
+            return $this;
+        }
+
         public function setGap(int $size): self
         {
             return $this->initProp('gap', $size);
@@ -202,10 +209,10 @@ namespace gui\v1 {
             return $this->initProp('shadow', $size);
         }
 
-        private function initProp(string $prop, int $size): self
+        private function initProp(string $prop, int $value): self
         {
-            if ($size !== self::SIZE_NONE) {
-                $this->props[$prop] = self::SIZES[$size];
+            if ($value !== self::SIZE_NONE) {
+                $this->props[$prop] = self::SIZES[$value];
             } elseif (isset($this->props[$prop])) {
                 unset($this->props[$prop]);
             }

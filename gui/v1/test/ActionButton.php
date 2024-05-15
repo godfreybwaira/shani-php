@@ -14,7 +14,7 @@ namespace gui\v1\components {
 
         private const NAME = 'action-btn';
         private const TYPES = ['prev', 'next', 'times', 'maximize', 'plus'];
-        public const TYPE_PREV = 0, TYPE_NEXT = 1, TYPE_TIMES = 2, TYPE_MAX = 3, TYPE_PLUS = 4;
+        public const TYPE_PREV = 0, TYPE_NEXT = 1, TYPE_TIMES = 2, TYPE_MAXIMIZE = 3, TYPE_PLUS = 4;
 
         private string $type;
 
@@ -27,12 +27,6 @@ namespace gui\v1\components {
         public function setType(int $type): self
         {
             $this->type = self::TYPES[$type];
-            return $this;
-        }
-
-        public function setBlock(): self
-        {
-            $this->setProps([self::NAME . '-block']);
             return $this;
         }
     }

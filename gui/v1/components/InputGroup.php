@@ -23,6 +23,7 @@ namespace gui\v1\components {
         {
             parent::__construct('div');
             $this->setProps([self::NAME]);
+            $this->setType(self::TYPE_1);
         }
 
         public function setType(int $type): self
@@ -63,9 +64,7 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            if ($this->type !== null) {
-                $this->setProps(['input-' . $this->type]);
-            }
+            $this->setProps(['input-' . $this->type]);
             return parent::build();
         }
     }

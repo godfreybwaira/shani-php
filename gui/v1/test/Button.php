@@ -12,14 +12,16 @@ namespace gui\v1\components {
     final class Button extends \gui\v1\Component
     {
 
-        private const NAME = 'button';
-        private const TYPES = ['', 'type-2', 'type-3'];
-        public const TYPE_2 = 1, TYPE_3 = 2;
+        private const NAME = 'button', TYPES = ['bold', 'outline'];
+        public const TYPE_BOLD = 0, TYPE_OUTLINE = 1;
+
+        private string $type;
 
         public function __construct(string $text = null)
         {
             parent::__construct('button', $text);
-            $this->setProps([self::NAME]);
+            $this->setType(self::TYPE_BOLD);
+            $this->setProps([self::NAME])->setColor(parent::COLOR_PRIMARY);
         }
 
         public function setType(int $type): self
@@ -32,6 +34,12 @@ namespace gui\v1\components {
         {
             $this->setProps([self::NAME . '-block']);
             return $this;
+        }
+
+        public function build(): string
+        {
+            $this->setProps([self::NAME . '-' . $this->type]);
+            return parent::build();
         }
     }
 

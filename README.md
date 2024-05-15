@@ -1,6 +1,8 @@
 # Shani Web Application Framework
 
-Shani is an open source web framework designed to enable fast application development with minimal efforts while performance, security, creativity and modern web practices coexists.
+Shani is an open source web framework designed to enable fast application
+development with minimal efforts while performance, security, creativity
+and modern web development practices coexists.
 
 ## Main Features
 
@@ -27,7 +29,9 @@ Shani is an open source web framework designed to enable fast application develo
 
 ## System requirements
 
-**Shani** framework works well on Linux and Mac OS, however for Windows users they can use Windows Subsystem  for Linux (WSL)
+To run **Shani** framework you need to install PHP swoole extension.
+The framework runs well on Linux and Mac OS, However for Windows users they can
+use Windows Subsystem  for Linux (WSL)
 
 ## Installation
 
