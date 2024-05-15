@@ -1,5 +1,6 @@
-Shani
-
+---------------------------------------------
+Shani Web Application Framework Main Features
+---------------------------------------------
 1. Scalable
 2. Robust (Error torelant)
 3. Secure (CSRF, Session Mgt, Authentication & Authorization)
