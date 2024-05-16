@@ -24,7 +24,7 @@ namespace gui\v1\components {
 
         public function addItem(Component $item, bool $current, bool $complete = false): self
         {
-            $list = new Component('li', null, false);
+            $list = new Component('li', false);
             if ($complete) {
                 $list->setProps([self::NAME . '-complete']);
             } elseif ($current) {

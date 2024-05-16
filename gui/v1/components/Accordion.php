@@ -27,9 +27,10 @@ namespace gui\v1\components {
 
         public function addItem(string $title, Component $body, bool $open = false, bool $disabled = false): self
         {
-            $item = new Component('li', null, false);
-            $node = new Component('a', $title, false);
-            $wrapper = new Component('div', null, false);
+            $item = new Component('li', false);
+            $node = new Component('a', false);
+            $node->setContent($title);
+            $wrapper = new Component('div', false);
             $item->setProps([self::NAME . '-item']);
             $wrapper->setProps([self::NAME . '-body']);
             $node->setProps([self::NAME . '-title'])->setAttr('href', '#');

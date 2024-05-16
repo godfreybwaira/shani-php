@@ -25,7 +25,7 @@ namespace gui\v1\components {
             parent::__construct('div');
             $this->setProps([self::NAME]);
             $this->bottomNav = $bottomNav;
-            $this->slides = new Component('ul', null, false);
+            $this->slides = new Component('ul', false);
             $this->slides->setProps([self::NAME . '-slides']);
         }
 
@@ -33,7 +33,7 @@ namespace gui\v1\components {
         {
             foreach ($items as $item) {
                 $id = 'id' . rand(100, 10000);
-                $slide = new Component('li', null, false);
+                $slide = new Component('li', false);
                 $slide->appendChildren($item);
                 $slide->setAttr('id', $id);
                 $this->slides->appendChildren($slide);
@@ -44,7 +44,7 @@ namespace gui\v1\components {
         private function makeNavigation(int $count): self
         {
             $pos = $this->bottomNav ? parent::POS_BC : parent::POS_TC;
-            $nav = new Component('ul', null, false);
+            $nav = new Component('ul', false);
             $nav->setProps([self::NAME . '-nav'])->setPosition($pos);
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li', '&nbsp;');

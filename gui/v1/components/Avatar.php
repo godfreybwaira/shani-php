@@ -19,8 +19,8 @@ namespace gui\v1\components {
 
         public function __construct(string $content = null)
         {
-            parent::__construct('div', $content);
-            $this->setProps([self::NAME]);
+            parent::__construct('div');
+            $this->setContent($content)->setProps([self::NAME]);
         }
 
         public function setStack(): self

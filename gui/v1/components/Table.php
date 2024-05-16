@@ -26,7 +26,7 @@ namespace gui\v1\components {
 
         private static function wrap(Table $table): Component
         {
-            $wrapper = new Component('div', null, false);
+            $wrapper = new Component('div', false);
             $wrapper->setProps(['table-wrapper']);
             return $wrapper->appendChildren($table);
         }
@@ -34,32 +34,33 @@ namespace gui\v1\components {
         public function setCaption(?string $caption): self
         {
             if (!$this->caption && $caption !== null) {
-                $this->caption = new Component('caption', $caption, false);
+                $this->caption = new Component('caption', false);
+                $this->caption->setContent($caption);
             }
             return $this;
         }
 
         public function setRow(Component ...$td): self
         {
-            return $this->setContent('tbody', $this->body, ...$td);
+            return $this->setData('tbody', $this->body, ...$td);
         }
 
         public function setHeader(Component ...$th): self
         {
-            return $this->setContent('thead', $this->header, ...$th);
+            return $this->setData('thead', $this->header, ...$th);
         }
 
         public function setFooter(Component ...$td): self
         {
-            return $this->setContent('tfoot', $this->footer, ...$td);
+            return $this->setData('tfoot', $this->footer, ...$td);
         }
 
-        private function setContent(string $tag, ?Component &$wrapper, Component ...$cells): self
+        private function setData(string $tag, ?Component &$wrapper, Component ...$cells): self
         {
             if (!$wrapper) {
-                $wrapper = new Component($tag, null, false);
+                $wrapper = new Component($tag, false);
             }
-            $row = new Component('tr', null, false);
+            $row = new Component('tr', false);
             $row->appendChildren(...$cells);
             $wrapper->appendChildren($row);
             return $this;

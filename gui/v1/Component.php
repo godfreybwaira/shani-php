@@ -14,24 +14,24 @@ namespace gui\v1 {
 
         private string $tag;
         private array $children, $attributes, $classList, $props;
-        private ?string $text, $markup, $gap, $fontSize, $padding, $shadow, $corner;
+        private ?string $content, $gap, $fontSize, $padding, $shadow, $corner;
 
-        protected const SIZES = ['sm', 'md', 'lg', 'xl'], COLORS = [ 'danger', 'success', 'alert', 'info', 'primary', 'secondary'];
+        protected const SIZES = ['sm', 'md', 'lg', 'xl', 'full'], COLORS = [ 'danger', 'success', 'alert', 'info', 'primary', 'secondary'];
         protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
-        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3;
+        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
         public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3, COLOR_PRIMARY = 4, COLOR_SECONDARY = 5;
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
         public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
         public const SIZE_DEFAULT = self::SIZE_MD;
 
-        public function __construct(string $tag, ?string $text = null, bool $gutters = true)
+        public function __construct(string $tag, ?string $content = null, bool $gutters = true)
         {
             $this->tag = $tag;
-            $this->text = $text;
+            $this->content = $content;
             $this->children = $this->classList = $this->attributes = $this->props = [];
-            $this->markup = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
+            $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
             if ($gutters) {
-                $this->setSize(self::SIZE_DEFAULT);
+                $this->setGutter(self::SIZE_DEFAULT);
             }
         }
 
@@ -46,9 +46,9 @@ namespace gui\v1 {
                 $this->setProps([$key . '-' . $value]);
             }
             $css = $this->stringifyClass();
-            if ($this->text !== null || !empty($this->children) || $this->markup !== null) {
-                $texts = '<' . $this->tag . $css . $this->stringifyAttr() . '>' . $this->text;
-                return $texts . $this->markup . $this->stringifyChildren() . '</' . $this->tag . '>';
+            if ($this->content !== null || !empty($this->children)) {
+                $texts = '<' . $this->tag . $css . $this->stringifyAttr() . '>' . $this->content;
+                return $texts . $this->stringifyChildren() . '</' . $this->tag . '>';
             }
             return '<' . $this->tag . $css . $this->stringifyAttr() . '/>';
         }
@@ -69,9 +69,9 @@ namespace gui\v1 {
             return $this->children[$index] ?? null;
         }
 
-        public function text(): ?string
+        public function content(): ?string
         {
-            return $this->text;
+            return $this->content;
         }
 
         public function addClass(string ...$values): self
@@ -169,9 +169,9 @@ namespace gui\v1 {
             return $this->addClass(...Theme::styles(...$props));
         }
 
-        public function setMarkup(string $markup): self
+        public function setContent(?string $content): self
         {
-            $this->markup = $markup;
+            $this->content = $content;
             return $this;
         }
 
@@ -227,7 +227,7 @@ namespace gui\v1 {
             return $this->initProp('corner', $size);
         }
 
-        public function setSize(?int $size): self
+        public function setGutter(?int $size): self
         {
             return $this->setGap($size)->setPadding($size)->setFontSize($size);
         }

@@ -18,12 +18,12 @@ namespace gui\v1\components {
 
         public function __construct(string $text = null)
         {
-            parent::__construct('span', $text);
-            $this->setProps([self::NAME]);
+            parent::__construct('span');
+            $this->setContent($text)->setProps([self::NAME]);
             if (parent::SIZE_DEFAULT === parent::SIZE_SM) {
-                $this->setSize(parent::SIZE_SM);
+                $this->setGutter(parent::SIZE_SM);
             } else {
-                $this->setSize(parent::SIZE_DEFAULT - 1);
+                $this->setGutter(parent::SIZE_DEFAULT - 1);
             }
         }
     }

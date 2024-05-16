@@ -21,7 +21,7 @@ namespace gui\v1\components {
 
         public function __construct(Component $media)
         {
-            parent::__construct('div', null, false);
+            parent::__construct('div', false);
             $this->setProps([self::NAME]);
             $this->appendChildren($media);
         }
@@ -36,7 +36,7 @@ namespace gui\v1\components {
         public function build(): string
         {
             if ($this->caption !== null) {
-                $wrapper = new Component('div', null, false);
+                $wrapper = new Component('div', false);
                 $wrapper->appendChildren($this->caption);
                 if ($this->position === null) {
                     $wrapper->setProps([self::NAME . '-caption-full']);

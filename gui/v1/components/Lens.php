@@ -14,30 +14,24 @@ namespace gui\v1\components {
     final class Lens extends Component
     {
 
-        private static ?string $script = null;
-        private bool $wrapped = false, $scriptSent = false;
+        private ?string $script;
+        private bool $wrapped = false;
 
         private const NAME = 'lens';
 
-        public function __construct(?string $script = null)
+        public function __construct(string $script = null)
         {
-            if ($script !== null) {
-                self::$script = $script;
-            } elseif (self::$script === null) {
-                throw new \RuntimeException('No script source provided');
-            }
             parent::__construct('div');
             $this->setProps([self::NAME]);
+            if ($script !== null) {
+                $this->script = '<script defer src="' . $script . '"></script>';
+            }
         }
 
         private static function wrap(self $lens): Component
         {
-            $src = null;
-            if (!self::$scriptSent) {
-                self::$scriptSent = true;
-                $src = '<script defer src="' . self::$script . '"></script>';
-            }
-            $wrapper = new Component('div', $src, false);
+            $wrapper = new Component('div', false);
+            $wrapper->setContent($lens->script);
             $wrapper->setProps([self::NAME . '-container']);
             return $wrapper->appendChildren($lens);
         }

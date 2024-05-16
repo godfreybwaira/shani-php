@@ -24,7 +24,7 @@ namespace gui\v1\components {
 
         public function addItem(Component $item, bool $active = false): self
         {
-            $list = new Component('li', null, false);
+            $list = new Component('li', false);
             if ($active) {
                 $list->addClass('active');
             }

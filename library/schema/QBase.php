@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Description of QBaseORM
+ * Description of QBase
  *
  * @author coder
  */
 
 namespace library\schema {
 
-    abstract class QBaseORM
+    abstract class QBase
     {
 
         private $query, $con, $join, $having, $data, $columns, $table, $joinOn;
@@ -44,7 +44,7 @@ namespace library\schema {
             return static::$table;
         }
 
-        protected final function orderBy(array $columns): QBaseORM
+        protected final function orderBy(array $columns): QBase
         {
             foreach ($columns as $key => $value) {
                 $this->order .= ',`' . static::$table . "`.`$key` " . $value;
@@ -53,7 +53,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function columns(array $columns, bool $escape = true): QBaseORM
+        protected final function columns(array $columns, bool $escape = true): QBase
         {
             $this->columns = null;
             if ($escape) {
@@ -77,7 +77,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function groupBy(array $columns, bool $withRollup = false): QBaseORM
+        protected final function groupBy(array $columns, bool $withRollup = false): QBase
         {
             foreach ($columns as $key) {
                 $this->group .= ',`' . static::$table . "`.`$key`";
@@ -87,7 +87,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function maximum(string $column): QBaseORM
+        protected final function maximum(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -97,7 +97,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function average(string $column): QBaseORM
+        protected final function average(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -107,7 +107,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function minimum(string $column): QBaseORM
+        protected final function minimum(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -117,7 +117,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function sum(string $column): QBaseORM
+        protected final function sum(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -127,7 +127,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function variance(string $column): QBaseORM
+        protected final function variance(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -137,7 +137,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function count(string $column): QBaseORM
+        protected final function count(string $column): QBase
         {
             if ($this->columns === '*') {
                 $this->columns = null;
@@ -147,7 +147,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function uniteWith(QBaseORM ...$models): QBaseORM
+        protected final function uniteWith(QBase ...$models): QBase
         {
             $this->query = 'FROM `' . static::$table . '`';
             $sql = '(' . $this->preview() . ')';
@@ -160,13 +160,13 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function intersectWith(QBaseORM ...$models): QBaseORM
+        protected final function intersectWith(QBase ...$models): QBase
         {
             $this->columns = 'DISTINCT ' . $this->columns;
             return $this->joinWith(...$models);
         }
 
-        protected final function getDistinct(array $columns, int $itemsPerPage = null, int $currentPage = null): QBaseORM
+        protected final function getDistinct(array $columns, int $itemsPerPage = null, int $currentPage = null): QBase
         {
             $this->columns($columns);
             $this->limit = $itemsPerPage ?? $this->limit;
@@ -177,7 +177,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function getFirst(?int $numRows, string $column = null, int $position = 1): QBaseORM
+        protected final function getFirst(?int $numRows, string $column = null, int $position = 1): QBase
         {
             if ($column !== null & $column !== static::$primaryKey) {
                 $this->order = '`' . static::$table . '`.`' . $column . '` ASC';
@@ -189,7 +189,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function getLast(?int $numRows, string $column = null, int $position = 1): QBaseORM
+        protected final function getLast(?int $numRows, string $column = null, int $position = 1): QBase
         {
             $this->order = '`' . static::$table . '`.`' . ($column ? $column : static::$primaryKey) . '` DESC';
             $this->limit = $numRows;
@@ -199,7 +199,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function getById(int $id, array $columns = null): QBaseORM
+        protected final function getById(int $id, array $columns = null): QBase
         {
             $this->byId($id);
             if ($columns !== null) {
@@ -212,7 +212,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function get(array $columns = null, int $itemsPerPage = null, int $currentPage = null): QBaseORM
+        protected final function get(array $columns = null, int $itemsPerPage = null, int $currentPage = null): QBase
         {
             if ($columns !== null) {
                 $this->columns($columns);
@@ -226,13 +226,13 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function set(string $variable, $value): QBaseORM
+        protected final function set(string $variable, $value): QBase
         {
             $this->con->runQuery('SET SESSION ' . $variable . ' = ' . $value);
             return $this;
         }
 
-        protected final function insertBatch(array $data, ?array $fillable): QBaseORM
+        protected final function insertBatch(array $data, ?array $fillable): QBase
         {
             $i = 0;
             $this->reset();
@@ -255,7 +255,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function insert(array $data, ?array $fillable): QBaseORM
+        protected final function insert(array $data, ?array $fillable): QBase
         {
             $this->reset();
             if ($fillable !== null) {
@@ -271,7 +271,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function delete(?int $id): QBaseORM
+        protected final function delete(?int $id): QBase
         {
             if ($id !== null) {
                 $this->byId($id);
@@ -280,7 +280,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function update(?int $id, array $data, ?array $updatable): QBaseORM
+        protected final function update(?int $id, array $data, ?array $updatable): QBase
         {
             if ($updatable !== null) {
                 $data = array_intersect_key($data, array_flip($updatable));
@@ -298,14 +298,14 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function having(array $condition, bool $useAnd = true): QBaseORM
+        protected final function having(array $condition, bool $useAnd = true): QBase
         {
             $cnc = $useAnd ? ' AND ' : ' OR ';
             $this->having = ($this->having ? $this->having . $cnc : null) . $this->condition($condition, $useAnd);
             return $this;
         }
 
-        protected final function where(array $condition, bool $useAnd = true): QBaseORM
+        protected final function where(array $condition, bool $useAnd = true): QBase
         {
             $cnc = $useAnd ? ' AND ' : ' OR ';
             $this->where = ($this->where ? $this->where . $cnc : null) . $this->condition($condition, $useAnd);
@@ -325,7 +325,7 @@ namespace library\schema {
             return ltrim($str, $cnc);
         }
 
-        protected final function toggle(?int $id, array $data): QBaseORM
+        protected final function toggle(?int $id, array $data): QBase
         {
             $str = null;
             if ($id !== null) {
@@ -340,7 +340,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function increment(?int $id, array $data): QBaseORM
+        protected final function increment(?int $id, array $data): QBase
         {
             $str = null;
             if ($id !== null) {
@@ -355,7 +355,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function whereNull(array $condition, bool $useAnd = null, $isNull = true): QBaseORM
+        protected final function whereNull(array $condition, bool $useAnd = null, $isNull = true): QBase
         {
             $str = null;
             $cnc = $useAnd ? ' AND ' : ' OR ';
@@ -368,7 +368,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function whereBetween(array $condition, bool $useAnd = true, $isNot = false): QBaseORM
+        protected final function whereBetween(array $condition, bool $useAnd = true, $isNot = false): QBase
         {
             $str = null;
             $cnc = $useAnd ? ' AND ' : ' OR ';
@@ -382,13 +382,13 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function byId(int $id): QBaseORM
+        protected final function byId(int $id): QBase
         {
             $this->where = ('`' . static::$table . '`.`' . static::$primaryKey . '` = ' . $id) . ($this->where ? ' AND ' . $this->where : null);
             return $this;
         }
 
-        protected final function whereIn(string $column, array $possibleValues, bool $notIn = false): QBaseORM
+        protected final function whereIn(string $column, array $possibleValues, bool $notIn = false): QBase
         {
             $values = null;
             foreach ($possibleValues as $k => $val) {
@@ -400,7 +400,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinWith(QBaseORM ...$models): QBaseORM
+        protected final function joinWith(QBase ...$models): QBase
         {
             $thisColumn = $this->joinOn[0] ?? static::$primaryKey;
             $modelColumn = $this->joinOn[1] ?? $this->foreignKey;
@@ -414,7 +414,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinRight(QBaseORM ...$models): QBaseORM
+        protected final function joinRight(QBase ...$models): QBase
         {
             foreach ($models as $model) {
                 $this->prepareJoin($model, 'RIGHT');
@@ -422,7 +422,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinRightUnmatch(QBaseORM ...$models): QBaseORM
+        protected final function joinRightUnmatch(QBase ...$models): QBase
         {
             foreach ($models as $model) {
                 $this->where .= ' AND `' . static::$table . '`.`' . static::$primaryKey . '` IS NULL';
@@ -432,7 +432,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinLeft(QBaseORM ...$models): QBaseORM
+        protected final function joinLeft(QBase ...$models): QBase
         {
             foreach ($models as $model) {
                 $this->prepareJoin($model, 'LEFT');
@@ -440,7 +440,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinLeftUnmatch(QBaseORM ...$models): QBaseORM
+        protected final function joinLeftUnmatch(QBase ...$models): QBase
         {
             foreach ($models as $model) {
                 $this->where .= ' AND `' . $model::$table . '`.`' . $model::$primaryKey . '` IS NULL';
@@ -450,7 +450,7 @@ namespace library\schema {
             return $this;
         }
 
-        protected final function joinCross(QBaseORM ...$models): QBaseORM
+        protected final function joinCross(QBase ...$models): QBase
         {
             $tbl = null;
             foreach ($models as $model) {
@@ -461,7 +461,7 @@ namespace library\schema {
             return $this;
         }
 
-        private function prepareJoin(QBaseORM $model, string $type = null): void
+        private function prepareJoin(QBase $model, string $type = null): void
         {
             if ($type) {
                 $thisColumn = $this->joinOn[0] ?? static::$primaryKey;
@@ -475,7 +475,7 @@ namespace library\schema {
             $this->order .= $model->order ? ', ' . $model->order : null;
         }
 
-        protected final function joinOn(string $key, string $value = null): QBaseORM
+        protected final function joinOn(string $key, string $value = null): QBase
         {
             $this->joinOn[] = $key;
             $this->joinOn[] = $value ?? $key;

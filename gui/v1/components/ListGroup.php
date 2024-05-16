@@ -47,7 +47,7 @@ namespace gui\v1\components {
         public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
-                $list = new Component('li', null, false);
+                $list = new Component('li', false);
                 $list->setProps([self::NAME . '-item'])->appendChildren($item);
             }
             return $this;

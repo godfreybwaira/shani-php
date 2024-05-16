@@ -19,8 +19,8 @@ namespace gui\v1\components {
 
         public function __construct(string $text = null)
         {
-            parent::__construct('button', $text);
-            $this->setType(self::TYPE_BOLD);
+            parent::__construct('button');
+            $this->setContent($text)->setType(self::TYPE_BOLD);
             $this->setProps([self::NAME])->setColor(parent::COLOR_PRIMARY);
         }
 

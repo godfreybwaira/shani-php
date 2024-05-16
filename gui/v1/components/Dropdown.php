@@ -44,8 +44,8 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $title = new Component('li', null, false);
-            $body = new Component('li', null, false);
+            $title = new Component('li', false);
+            $body = new Component('li', false);
             $title->appendChildren($this->header);
             $body->appendChildren($this->body);
             $this->appendChildren($title, $body);

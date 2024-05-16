@@ -26,7 +26,7 @@ namespace gui\v1\components {
 
         public function addLink(Component $link, bool $active = false): self
         {
-            $list = new Component('li', null, false);
+            $list = new Component('li', false);
             if ($active) {
                 $list->addClass('active');
             }
@@ -46,8 +46,8 @@ namespace gui\v1\components {
         {
             if (!$this->wrapped) {
                 $this->wrapped = true;
-                $container = new Component('div', null, false);
-                $body = new Component('div', null, false);
+                $container = new Component('div', false);
+                $body = new Component('div', false);
                 return $container->appendChildren($this, $body)->build();
             }
             return parent::build();

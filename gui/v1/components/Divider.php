@@ -9,15 +9,15 @@
 
 namespace gui\v1\components {
 
-    final class Divider
+    final class Divider extends \gui\v1\Component
     {
 
         private const NAME = 'divider';
 
         public function __construct(string $text = null)
         {
-            parent::__construct('div', $text);
-            $this->setProps([self::NAME]);
+            parent::__construct('div');
+            $this->setContent($text)->setProps([self::NAME]);
         }
 
         public function setAlign(bool $vertical): self

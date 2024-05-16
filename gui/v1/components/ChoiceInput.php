@@ -41,7 +41,7 @@ namespace gui\v1\components {
             $input->setAttr('id', $id)->setAttr('value', $value)->setGap(null);
             $label = new Component('label', $text ?? $value);
             $label->setAttr('for', $id)->setGap(null);
-            $listItem->appendChildren($input, $label)->setSize(null);
+            $listItem->appendChildren($input, $label)->setGutter(null);
             return $this->appendChildren($listItem);
         }
 
@@ -56,9 +56,9 @@ namespace gui\v1\components {
             return $this->setProps([self::NAME . '-stretch']);
         }
 
-        public function setSize(int $size): self
+        public function setGutter(int $size): self
         {
-            $this->group->setSize($size);
+            $this->group->setGutter($size);
             return $this;
         }
 
