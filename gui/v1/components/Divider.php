@@ -20,10 +20,10 @@ namespace gui\v1\components {
             $this->setProps([self::NAME]);
         }
 
-        public function setAlign(bool $horizontal): self
+        public function setAlign(bool $vertical): self
         {
-            if ($horizontal) {
-                return $this->setProps([self::NAME . '-h']);
+            if ($vertical) {
+                return $this->setProps([self::NAME . '-align-v']);
             }
             return $this;
         }

@@ -17,8 +17,8 @@ namespace gui\v1\components {
         public function __construct(int $color, string $text = null)
         {
             parent::__construct('div', $text);
-            $this->setProps([self::NAME, self::NAME . '-' . parent::COLORS[$color]]);
-            $this->setSize(parent::SIZE_MD);
+            $this->setProps([self::NAME]);
+            $this->setSize(parent::SIZE_DEFAULT)->setColor($color);
         }
     }
 

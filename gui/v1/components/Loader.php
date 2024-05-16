@@ -20,7 +20,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('div');
-            $this->type = self::TYPES[self::TYPE_1];
+            $this->setType(self::TYPE_1);
             $this->setProps([self::NAME, 'animate']);
         }
 

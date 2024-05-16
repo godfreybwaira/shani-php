@@ -22,7 +22,7 @@ namespace gui\v1\components {
 
         public function addItem(Component $item): self
         {
-            $listItem = new Component('li');
+            $listItem = new Component('li', null, false);
             $listItem->appendChildren($item);
             $this->appendChildren($listItem);
         }

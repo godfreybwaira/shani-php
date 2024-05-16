@@ -16,30 +16,56 @@ namespace gui\v1\components {
 
         private const NAME = 'carousel';
 
-        private Component $items, $nav;
+        private Component $slides;
+        private bool $bottomNav;
+        private array $slideIds = [];
 
-        public function __construct()
+        public function __construct(bool $bottomNav = true)
         {
             parent::__construct('div');
             $this->setProps([self::NAME]);
-            $this->items = new Component('ul');
-            $this->nav = new Component('div');
-            $this->items->setProps([self::NAME . '-items']);
-            $this->nav->setProps([self::NAME . '-nav']);
+            $this->bottomNav = $bottomNav;
+            $this->slides = new Component('ul', null, false);
+            $this->slides->setProps([self::NAME . '-slides']);
         }
 
-        public function addItems(Component ...$items): self
+        public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
-                $listItem = new Component('li');
-                $listItem->appendChildren($item);
-                $this->items->appendChildren($listItem);
+                $id = 'id' . rand(100, 10000);
+                $slide = new Component('li', null, false);
+                $slide->appendChildren($item);
+                $slide->setAttr('id', $id);
+                $this->slides->appendChildren($slide);
+                $this->slideIds[] = $id;
             }
+        }
+
+        private function makeNavigation(int $count): self
+        {
+            $pos = $this->bottomNav ? parent::POS_BC : parent::POS_TC;
+            $nav = new Component('ul', null, false);
+            $nav->setProps([self::NAME . '-nav'])->setPosition($pos);
+            for ($i = 0; $i < $count; $i++) {
+                $dot = new Component('li', '&nbsp;');
+                $dot->setAttr('for', $this->slideIds[$i]);
+                $nav->appendChildren($dot);
+            }
+            $prevBtn = new ActionButton(ActionButton::TYPE_PREV);
+            $nextBtn = new ActionButton(ActionButton::TYPE_NEXT);
+            $nextBtn->setPosition(parent::POS_CR);
+            $prevBtn->setPosition(parent::POS_CL);
+            $this->appendChildren($prevBtn, $nextBtn, $nav);
+            return $this;
         }
 
         public function build(): string
         {
-            $this->appendChildren($this->items, $this->nav);
+            $this->appendChildren($this->slides);
+            $kids = $this->slides->children();
+            if (count($kids) > 1) {
+                $this->makeNavigation($kids);
+            }
             return parent::build();
         }
     }

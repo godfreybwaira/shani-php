@@ -26,7 +26,7 @@ namespace gui\v1\components {
 
         private static function wrap(Table $table): Component
         {
-            $wrapper = new Component('div');
+            $wrapper = new Component('div', null, false);
             $wrapper->setProps(['table-wrapper']);
             return $wrapper->appendChildren($table);
         }
@@ -34,7 +34,7 @@ namespace gui\v1\components {
         public function setCaption(?string $caption): self
         {
             if (!$this->caption && $caption !== null) {
-                $this->caption = new Component('caption', $caption);
+                $this->caption = new Component('caption', $caption, false);
             }
             return $this;
         }
@@ -57,9 +57,9 @@ namespace gui\v1\components {
         private function setContent(string $tag, ?Component &$wrapper, Component ...$cells): self
         {
             if (!$wrapper) {
-                $wrapper = new Component($tag);
+                $wrapper = new Component($tag, null, false);
             }
-            $row = new Component('tr');
+            $row = new Component('tr', null, false);
             $row->appendChildren(...$cells);
             $wrapper->appendChildren($row);
             return $this;

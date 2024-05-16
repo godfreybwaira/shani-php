@@ -14,22 +14,26 @@ namespace gui\v1\components {
     final class Dropdown extends Component
     {
 
-        public const ALIGN_HORIZONTAL = 0;
-
-        private Component $body;
+        private ?Component $body, $header;
 
         private const NAME = 'dropdown';
 
-        public function __construct(string $text = null)
+        public function __construct()
         {
-            parent::__construct('div', $text);
+            parent::__construct('ul');
             $this->setProps([self::NAME]);
+            $this->header = $this->body = null;
+        }
+
+        public function setHeader(Component $header): self
+        {
+            $this->header = $header;
+            return $this;
         }
 
         public function setBody(Component $body): self
         {
             $this->body = $body;
-            $this->body->setProps([self::NAME . '-body']);
             return $this;
         }
 
@@ -40,7 +44,11 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $this->appendChildren($this->body);
+            $title = new Component('li', null, false);
+            $body = new Component('li', null, false);
+            $title->appendChildren($this->header);
+            $body->appendChildren($this->body);
+            $this->appendChildren($title, $body);
             return parent::build();
         }
     }

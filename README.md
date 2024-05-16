@@ -1,8 +1,15 @@
 # Shani Web Application Framework
 
-Shani is an open source web framework designed to enable fast application
+**Shani** is an open source web framework designed to enable fast application
 development with minimal efforts while performance, security, creativity
-and modern web development practices coexists.
+and modern web application development practices coexists.
+
+
+## Use Cases
+
+Use **Shani** to build cilent-side or server-side application. You can also use
+your favorite front-end framework while **Shani** stands on back-end, or vice versa.
+
 
 ## Main Features
 
@@ -29,9 +36,8 @@ and modern web development practices coexists.
 
 ## System requirements
 
-To run **Shani** framework you need to install PHP swoole extension.
-The framework runs well on Linux and Mac OS, However for Windows users they can
-use Windows Subsystem  for Linux (WSL)
+**Shani** runs well on Linux and Mac OS, However for Windows users they can use
+Windows Subsystem  for Linux (WSL).
 
 ## Installation
 
@@ -42,7 +48,7 @@ No installation is required.
 Run the following command on terminal to start **Shani** web server.
 
 ```bash
-php index.php
+$ php index.php
 ```
 
 ## Contributing

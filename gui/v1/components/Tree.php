@@ -14,10 +14,7 @@ namespace gui\v1\components {
     final class Tree extends Component
     {
 
-        private const NAME = 'tree', TYPES = ['lines'];
-        public const TYPE_1 = 0;
-
-        private string $type = 'lines';
+        private const NAME = 'tree';
 
         public function __construct()
         {
@@ -25,25 +22,14 @@ namespace gui\v1\components {
             $this->setProps([self::NAME]);
         }
 
-        public function addItem(ListItem $item, bool $active = false): self
+        public function addItem(Component $item, bool $active = false): self
         {
+            $list = new Component('li', null, false);
             if ($active) {
-                $item->addClass('active');
+                $list->addClass('active');
             }
-            $item->title()->setProps([self::NAME . '-title']);
-            $this->appendChildren($item);
-        }
-
-        public function setType(int $type): self
-        {
-            $this->type = self::TYPES[$type];
-            return $this;
-        }
-
-        public function build(): string
-        {
-            $this->setProps([self::NAME . '-type-' . $this->type]);
-            return parent::build();
+            $list->setProps([self::NAME . '-title'])->appendChildren($item);
+            $this->appendChildren($list);
         }
     }
 

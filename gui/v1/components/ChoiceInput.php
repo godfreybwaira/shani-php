@@ -38,10 +38,10 @@ namespace gui\v1\components {
             $input = new Component('input');
             $input->setAttr('type', $this->type)->setAttr('name', $this->name);
             $id = 'id' . rand(100, 10000);
-            $input->setAttr('id', $id)->setAttr('value', $value);
+            $input->setAttr('id', $id)->setAttr('value', $value)->setGap(null);
             $label = new Component('label', $text ?? $value);
-            $label->setAttr('for', $id);
-            $listItem->appendChildren($input, $label);
+            $label->setAttr('for', $id)->setGap(null);
+            $listItem->appendChildren($input, $label)->setSize(null);
             return $this->appendChildren($listItem);
         }
 

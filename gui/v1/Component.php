@@ -17,18 +17,22 @@ namespace gui\v1 {
         private ?string $text, $markup, $gap, $fontSize, $padding, $shadow, $corner;
 
         protected const SIZES = ['sm', 'md', 'lg', 'xl'], COLORS = [ 'danger', 'success', 'alert', 'info', 'primary', 'secondary'];
-        protected const POSITIONS = ['pos-tl', 'pos-tc', 'pos-tr', 'pos-cl', 'pos-cc', 'pos-cr', 'pos-bl', 'pos-bc', 'pos-br'];
-        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_NONE = -1;
-        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3, COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_NONE = -1;
-        public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6, POS_BC = 7, POS_BR = 8, POS_NONE = -1;
+        protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
+        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3;
+        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3, COLOR_PRIMARY = 4, COLOR_SECONDARY = 5;
+        public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
+        public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
         public const SIZE_DEFAULT = self::SIZE_MD;
 
-        public function __construct(string $tag, ?string $text = null)
+        public function __construct(string $tag, ?string $text = null, bool $gutters = true)
         {
             $this->tag = $tag;
             $this->text = $text;
             $this->children = $this->classList = $this->attributes = $this->props = [];
             $this->markup = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
+            if ($gutters) {
+                $this->setSize(self::SIZE_DEFAULT);
+            }
         }
 
         public function __toString(): string
@@ -100,13 +104,6 @@ namespace gui\v1 {
         public function attr(string $name)
         {
             return $this->attributes[$name] ?? null;
-        }
-
-        public function withoutChildren(): self
-        {
-            $copy = clone $this;
-            $copy->children = [];
-            return $copy;
         }
 
         public function withoutAttr(): self
@@ -184,17 +181,23 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setGap(int $size): self
+        protected function setPosition(int $position): self
+        {
+            $this->props['pos'] = self::POSITIONS[$position];
+            return $this;
+        }
+
+        public function setGap(?int $size): self
         {
             return $this->initProp('gap', $size);
         }
 
-        public function setPadding(int $size): self
+        public function setPadding(?int $size): self
         {
             return $this->initProp('padding', $size);
         }
 
-        public function setFontSize(int $size): self
+        public function setFontSize(?int $size): self
         {
             return $this->initProp('font', $size);
         }
@@ -204,14 +207,14 @@ namespace gui\v1 {
             return $this->setProps(['with-borders']);
         }
 
-        public function setShadow(int $size): self
+        public function setShadow(?int $size): self
         {
             return $this->initProp('shadow', $size);
         }
 
-        private function initProp(string $prop, int $value): self
+        private function initProp(string $prop, ?int $value): self
         {
-            if ($value !== self::SIZE_NONE) {
+            if ($value !== null) {
                 $this->props[$prop] = self::SIZES[$value];
             } elseif (isset($this->props[$prop])) {
                 unset($this->props[$prop]);
@@ -219,12 +222,12 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setCorners(int $size): self
+        public function setCorners(?int $size): self
         {
             return $this->initProp('corner', $size);
         }
 
-        public function setSize(int $size): self
+        public function setSize(?int $size): self
         {
             return $this->setGap($size)->setPadding($size)->setFontSize($size);
         }
@@ -242,10 +245,19 @@ namespace gui\v1 {
             return $this->children;
         }
 
+        public function setParent(Component &$parent): self
+        {
+            $parent->setProps(['relative-pos'])->appendChildren($this);
+            return $this;
+        }
+
         public function setChildren(?Component ...$children): self
         {
             $this->children = [];
-            return $this->appendChildren(...$children);
+            if ($children !== null) {
+                return $this->appendChildren(...$children);
+            }
+            return $this;
         }
 
         public function appendChildren(?Component ...$children): self

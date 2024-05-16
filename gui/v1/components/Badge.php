@@ -16,32 +16,15 @@ namespace gui\v1\components {
 
         private const NAME = 'badge';
 
-        private ?string $position = null;
-
         public function __construct(string $text = null)
         {
-            parent::__construct('div', $text);
+            parent::__construct('span', $text);
             $this->setProps([self::NAME]);
-        }
-
-        public function setPosition(int $position): self
-        {
-            $this->position = parent::POSITIONS[$position];
-            return $this;
-        }
-
-        public function setParent(Component &$parent): self
-        {
-            $parent->setProps(['relative-pos'])->appendChildren($this);
-            return $this;
-        }
-
-        public function build(): string
-        {
-            if ($this->position !== null) {
-                $this->setProps([$this->position]);
+            if (parent::SIZE_DEFAULT === parent::SIZE_SM) {
+                $this->setSize(parent::SIZE_SM);
+            } else {
+                $this->setSize(parent::SIZE_DEFAULT - 1);
             }
-            return parent::build();
         }
     }
 
