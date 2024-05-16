@@ -142,7 +142,7 @@ namespace gui\v1 {
         {
             $result = null;
             foreach ($this->attributes as $name => $value) {
-                $result .= ' ' . $name . (empty($value) ? null : '="' . $value . '"');
+                $result .= ' ' . $name . ($value !== null ? '="' . $value . '"' : null);
             }
             return $result;
         }

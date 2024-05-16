@@ -37,7 +37,7 @@ namespace gui\v1\components {
         public function setAlign(bool $horizontal): self
         {
             if ($horizontal) {
-                return $this->setProps([self::NAME . '-align-h']);
+                return $this->setProps(['display-row']);
             }
             return $this;
         }

@@ -19,14 +19,6 @@ namespace gui\v1\components {
             parent::__construct('div');
             $this->setContent($text)->setProps([self::NAME]);
         }
-
-        public function setAlign(bool $vertical): self
-        {
-            if ($vertical) {
-                return $this->setProps([self::NAME . '-align-v']);
-            }
-            return $this;
-        }
     }
 
 }

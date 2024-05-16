@@ -37,7 +37,7 @@ namespace gui\v1\components {
         public function setAlign(bool $vertical): self
         {
             if ($vertical) {
-                return $this->setProps([self::NAME . '-align-v']);
+                return $this->setProps([self::NAME . '-vertical']);
             }
             return $this;
         }
