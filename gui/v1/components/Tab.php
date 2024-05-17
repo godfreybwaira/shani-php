@@ -34,14 +34,6 @@ namespace gui\v1\components {
             $this->appendChildren($list);
         }
 
-        public function setAlign(bool $vertical): self
-        {
-            if ($vertical) {
-                return $this->setProps([self::NAME . '-vertical']);
-            }
-            return $this;
-        }
-
         public function build(): string
         {
             if (!$this->wrapped) {

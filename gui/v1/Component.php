@@ -19,14 +19,14 @@ namespace gui\v1 {
         protected const SIZES = ['sm', 'md', 'lg', 'xl', 'full'];
         protected const COLORS = ['danger', 'success', 'alert', 'info', 'primary', 'secondary', 'transluscent'];
         protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
-        protected const DIRECTIONS = ['x', 'y', 'top', 'bottom'];
+        protected const DIRECTIONS = ['x', 'y', 'top', 'bottom'], ALIGNS = [ 'x', 'y'];
         public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
         public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
         public const COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_TRANSLUSCENT = 6;
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
         public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
         public const DIRECTION_X = 0, DIRECTION_Y = 1, DIRECTION_TOP = 2, DIRECTION_BOTTOM = 3;
-        public const SIZE_DEFAULT = self::SIZE_MD;
+        public const SIZE_DEFAULT = self::SIZE_MD, ALIGN_X = 0, ALIGN_Y = 1;
 
         public function __construct(string $tag, bool $gutters = true)
         {
@@ -178,15 +178,33 @@ namespace gui\v1 {
             return $this;
         }
 
-        protected function setColor(int $color): self
+        protected function setColor(?int $color): self
         {
-            $this->props['color'] = self::COLORS[$color];
+            if ($color !== null) {
+                $this->props['color'] = self::COLORS[$color];
+            } elseif (isset($this->props['color'])) {
+                unset($this->props['color']);
+            }
             return $this;
         }
 
-        protected function setPosition(int $position): self
+        protected function setPosition(?int $position): self
         {
-            $this->props['pos'] = self::POSITIONS[$position];
+            if ($position !== null) {
+                $this->props['pos'] = self::POSITIONS[$position];
+            } elseif (isset($this->props['pos'])) {
+                unset($this->props['pos']);
+            }
+            return $this;
+        }
+
+        public function setAlign(?int $align): self
+        {
+            if ($align !== null) {
+                $this->props['align'] = self::ALIGNS[$align];
+            } elseif (isset($this->props['align'])) {
+                unset($this->props['align']);
+            }
             return $this;
         }
 

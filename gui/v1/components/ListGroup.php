@@ -25,14 +25,6 @@ namespace gui\v1\components {
             $this->setProps([self::NAME]);
         }
 
-        public function setAlign(bool $horizontal): self
-        {
-            if ($horizontal) {
-                return $this->setProps(['display-row']);
-            }
-            return $this;
-        }
-
         public function setStripes(int $stripes): self
         {
             $this->stripes = self::STRIPES[$stripes];

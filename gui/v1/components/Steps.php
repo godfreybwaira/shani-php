@@ -33,14 +33,6 @@ namespace gui\v1\components {
             $list->appendChildren($item);
             return $this->appendChildren($list);
         }
-
-        public function setAlign(bool $horizontal): self
-        {
-            if ($horizontal) {
-                return $this->setProps(['display-row']);
-            }
-            return $this;
-        }
     }
 
 }
