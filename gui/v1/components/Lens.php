@@ -32,7 +32,7 @@ namespace gui\v1\components {
         {
             $wrapper = new Component('div', false);
             $wrapper->setContent($lens->script);
-            $wrapper->setProps([self::NAME . '-container']);
+            $wrapper->setProps([self::NAME . '-wrapper']);
             return $wrapper->appendChildren($lens);
         }
 

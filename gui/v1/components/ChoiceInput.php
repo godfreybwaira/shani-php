@@ -16,16 +16,14 @@ namespace gui\v1\components {
 
         private const NAME = 'choice-input';
 
-        private string $name;
-        private InputGroup $group;
         private bool $wrapped = false;
-        private string $type = 'radio';
+        private ?InputGroup $group = null;
+        private string $name, $type = 'radio';
 
         public function __construct(string $name, bool $multiSelect = false)
         {
             parent::__construct('ul');
             $this->name = $name;
-            $this->group = new InputGroup();
             if ($multiSelect) {
                 $this->type = 'checkbox';
             }
@@ -45,9 +43,9 @@ namespace gui\v1\components {
             return $this->appendChildren($listItem);
         }
 
-        public function setType(int $type): self
+        public function setInputGroup(InputGroup $group): self
         {
-            $this->group->setType($type);
+            $this->group = $group;
             return $this;
         }
 
@@ -56,21 +54,9 @@ namespace gui\v1\components {
             return $this->setProps([self::NAME . '-stretch']);
         }
 
-        public function setGutter(int $size): self
-        {
-            $this->group->setGutter($size);
-            return $this;
-        }
-
-        public function setMask(string $label): self
-        {
-            $this->group->setMask($label);
-            return $this;
-        }
-
         public function build(): string
         {
-            if (!$this->wrapped) {
+            if ($this->group !== null && !$this->wrapped) {
                 $this->wrapped = true;
                 return $this->group->appendChildren($this)->build();
             }

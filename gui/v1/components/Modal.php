@@ -42,8 +42,8 @@ namespace gui\v1\components {
 
         private static function wrap(self $modal): Component
         {
-            $container = new Component('div', false);
-            $container->setProps([self::NAME . '-container']);
+            $wrapper = new Component('div', false);
+            $wrapper->setProps([self::NAME . '-wrapper']);
             $nav = new Component('ul', false);
             $nav->setProps([self::NAME . '-nav']);
 
@@ -52,7 +52,7 @@ namespace gui\v1\components {
             $listMax = new Component('li', false);
             $listTimes = new Component('li', false);
             $nav->appendChildren($listMax->appendChildren($maximize), $listTimes->appendChildren($times));
-            return $container->appendChildren($nav, $modal);
+            return $wrapper->appendChildren($nav, $modal);
         }
 
         public function build(): string

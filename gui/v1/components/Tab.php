@@ -38,9 +38,9 @@ namespace gui\v1\components {
         {
             if (!$this->wrapped) {
                 $this->wrapped = true;
-                $container = new Component('div', false);
+                $wrapper = new Component('div', false);
                 $body = new Component('div', false);
-                return $container->appendChildren($this, $body)->build();
+                return $wrapper->appendChildren($this, $body)->build();
             }
             return parent::build();
         }
