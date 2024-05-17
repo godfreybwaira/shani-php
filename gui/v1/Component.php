@@ -89,11 +89,6 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function nthChild(int $index): ?Component
-        {
-            return $this->children[$index] ?? null;
-        }
-
         public function content(): ?string
         {
             return $this->content;
@@ -289,7 +284,7 @@ namespace gui\v1 {
             return $this->setAttr($name, $value);
         }
 
-        public function getChild(int $index): ?self
+        public function getChild(int $index): ?Component
         {
             return $this->children[$index] ?? null;
         }
