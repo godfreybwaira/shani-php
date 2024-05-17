@@ -16,6 +16,7 @@ namespace gui\v1 {
         private array $children, $attributes, $classList, $props;
         private ?string $content, $gap, $fontSize, $padding, $shadow, $corner;
 
+        private const MAX_COLUMNS = 24;
         protected const SIZES = ['sm', 'md', 'lg', 'xl', 'full'];
         protected const COLORS = ['danger', 'success', 'alert', 'info', 'primary', 'secondary', 'transluscent'];
         protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
@@ -54,6 +55,27 @@ namespace gui\v1 {
                 return $texts . $this->stringifyChildren() . '</' . $this->tag . '>';
             }
             return '<' . $this->tag . $css . $this->stringifyAttr() . '/>';
+        }
+
+        public function setColumnSize(int $column, int $size): self
+        {
+            if ($column <= self::MAX_COLUMNS) {
+                $this->props['width'] = self::SIZES[$size] . '-' . $column;
+                return $this;
+            }
+            throw new \InvalidArgumentException('Maximum column size is ' . self::MAX_COLUMNS);
+        }
+
+        public function fillHeight(): self
+        {
+            $this->props['height'] = 'fill';
+            return $this;
+        }
+
+        public function fillWidth(): self
+        {
+            $this->props['width'] = 'fill';
+            return $this;
         }
 
         public function hasClass(string $value): bool
@@ -104,7 +126,7 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function attr(string $name)
+        public function getAttr(string $name)
         {
             return $this->attributes[$name] ?? null;
         }
@@ -267,9 +289,9 @@ namespace gui\v1 {
             return $this->setAttr($name, $value);
         }
 
-        public function children(): array
+        public function getChild(int $index): ?self
         {
-            return $this->children;
+            return $this->children[$index] ?? null;
         }
 
         public function setParent(Component &$parent): self

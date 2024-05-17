@@ -37,11 +37,6 @@ namespace gui\v1\components {
             return $this;
         }
 
-        public function setStretch(): self
-        {
-            return $this->setProps([self::NAME . '-stretch']);
-        }
-
         public function build(): string
         {
             $title = new Component('li', false);
