@@ -35,7 +35,7 @@ namespace gui\v1\components {
         public function setMask(string $text): self
         {
             $mask = new Component('span', $text);
-            $mask->setProps(['input-mask'])->setGap(null);
+            $mask->setProps(['input-mask'])->setMargin(null);
             $this->appendChildren($mask);
             return $this;
         }
@@ -44,7 +44,7 @@ namespace gui\v1\components {
         {
             $tag = ($type === 'select' || $type === 'textarea') ? $type : 'input';
             $input = new Component($tag);
-            $input->setAttr('type', $type)->setAttr('name', $name)->setAttr('id', $name)->setGap(null);
+            $input->setAttr('type', $type)->setAttr('name', $name)->setAttr('id', $name)->setMargin(null);
             if ($placeholder !== null) {
                 $input->setAttr('placeholder', $placeholder);
             }
@@ -58,7 +58,7 @@ namespace gui\v1\components {
             if ($refId !== null) {
                 $label->setAttr('for', $refId);
             }
-            $this->appendChildren($label->setGap(null));
+            $this->appendChildren($label->setMargin(null));
             return $this;
         }
 

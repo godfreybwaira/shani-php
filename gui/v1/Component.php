@@ -193,6 +193,11 @@ namespace gui\v1 {
             return $this->initProp('gap', $size);
         }
 
+        public function setMargin(?int $size): self
+        {
+            return $this->initProp('margin', $size);
+        }
+
         public function setPadding(?int $size): self
         {
             return $this->initProp('padding', $size);
@@ -230,7 +235,7 @@ namespace gui\v1 {
 
         public function setGutter(?int $size): self
         {
-            return $this->setGap($size)->setPadding($size)->setFontSize($size);
+            return $this->setMargin($size)->setPadding($size)->setGap($size);
         }
 
         public function toggleAttr(string $name, $value = null): self
