@@ -19,11 +19,13 @@ namespace gui\v1 {
         protected const SIZES = ['sm', 'md', 'lg', 'xl', 'full'];
         protected const COLORS = ['danger', 'success', 'alert', 'info', 'primary', 'secondary', 'transluscent'];
         protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
+        protected const DIRECTIONS = ['x', 'y', 'top', 'bottom'];
         public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
         public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
         public const COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_TRANSLUSCENT = 6;
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
         public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
+        public const DIRECTION_X = 0, DIRECTION_Y = 1, DIRECTION_TOP = 2, DIRECTION_BOTTOM = 3;
         public const SIZE_DEFAULT = self::SIZE_MD;
 
         public function __construct(string $tag, bool $gutters = true)
@@ -188,19 +190,19 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setGap(?int $size): self
+        public function setGap(?int $size, int $direction = null): self
         {
-            return $this->initProp('gap', $size);
+            return $this->initProp('gap', $size, $direction);
         }
 
-        public function setMargin(?int $size): self
+        public function setMargin(?int $size, int $direction = null): self
         {
-            return $this->initProp('margin', $size);
+            return $this->initProp('margin', $size, $direction);
         }
 
-        public function setPadding(?int $size): self
+        public function setPadding(?int $size, int $direction = null): self
         {
-            return $this->initProp('padding', $size);
+            return $this->initProp('padding', $size, $direction);
         }
 
         public function setFontSize(?int $size): self
@@ -213,24 +215,25 @@ namespace gui\v1 {
             return $this->setProps(['with-borders']);
         }
 
-        public function setShadow(?int $size): self
+        public function setShadow(?int $size, int $direction = null): self
         {
-            return $this->initProp('shadow', $size);
+            return $this->initProp('shadow', $size, $direction);
         }
 
-        private function initProp(string $prop, ?int $value): self
+        private function initProp(string $prop, ?int $value, ?int $direction = null): self
         {
             if ($value !== null) {
-                $this->props[$prop] = self::SIZES[$value];
+                $dir = $direction !== null ? '-' . self::DIRECTIONS[$direction] : null;
+                $this->props[$prop] = $dir . self::SIZES[$value];
             } elseif (isset($this->props[$prop])) {
                 unset($this->props[$prop]);
             }
             return $this;
         }
 
-        public function setCorners(?int $size): self
+        public function setCorners(?int $size, int $direction = null): self
         {
-            return $this->initProp('corner', $size);
+            return $this->initProp('corner', $size, $direction);
         }
 
         public function setGutter(?int $size): self
