@@ -39,6 +39,12 @@ namespace gui\v1\components {
         {
             return $this->rows[$index] ?? null;
         }
+
+        public function build(): string
+        {
+            $this->appendChildren(...$this->rows);
+            return parent::build();
+        }
     }
 
 }
