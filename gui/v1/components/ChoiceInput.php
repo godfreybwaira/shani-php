@@ -27,7 +27,7 @@ namespace gui\v1\components {
             if ($multiSelect) {
                 $this->type = 'checkbox';
             }
-            $this->setProps([self::NAME]);
+            $this->addProps([self::NAME]);
         }
 
         public function addItem(mixed $value, ?string $text = null): self

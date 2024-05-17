@@ -21,7 +21,7 @@ namespace gui\v1\components {
         {
             parent::__construct('button');
             $this->setContent($text)->setType(self::TYPE_BOLD);
-            $this->setProps([self::NAME])->setColor(parent::COLOR_PRIMARY);
+            $this->addProps([self::NAME])->setColor(parent::COLOR_PRIMARY);
         }
 
         public function setType(int $type): self
@@ -32,13 +32,13 @@ namespace gui\v1\components {
 
         public function setBlock(): self
         {
-            $this->setProps([self::NAME . '-block']);
+            $this->addProps([self::NAME . '-block']);
             return $this;
         }
 
         public function build(): string
         {
-            $this->setProps([self::NAME . '-' . $this->type]);
+            $this->addProps([self::NAME . '-' . $this->type]);
             return parent::build();
         }
     }

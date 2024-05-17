@@ -21,7 +21,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->setProps([self::NAME]);
+            $this->addProps([self::NAME]);
         }
 
         public function addRows(int $rows, int $columns = 1): self

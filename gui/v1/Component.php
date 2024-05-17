@@ -47,7 +47,7 @@ namespace gui\v1 {
         public function build(): string
         {
             foreach ($this->props as $key => $value) {
-                $this->setProps([$key . '-' . $value]);
+                $this->addProps([$key . '-' . $value]);
             }
             $css = $this->stringifyClass();
             if ($this->content !== null || !empty($this->children)) {
@@ -184,7 +184,7 @@ namespace gui\v1 {
             return $this->addClass(...$values);
         }
 
-        public function setProps(array $props): Component
+        public function addProps(array $props): Component
         {
             return $this->addClass(...Theme::styles(...$props));
         }
@@ -247,7 +247,7 @@ namespace gui\v1 {
 
         public function setBorder(): Component
         {
-            return $this->setProps(['with-borders']);
+            return $this->addProps(['with-borders']);
         }
 
         public function setShadow(?int $size, int $direction = null): Component
@@ -307,7 +307,7 @@ namespace gui\v1 {
 
         public function setParent(Component &$parent): Component
         {
-            $parent->setProps(['relative-pos'])->appendChildren($this);
+            $parent->addProps(['relative-pos'])->appendChildren($this);
             return $this;
         }
 

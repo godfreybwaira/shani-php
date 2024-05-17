@@ -19,16 +19,16 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->setProps([self::NAME, self::NAME . '-round']);
+            $this->addProps([self::NAME, self::NAME . '-round']);
         }
 
         public function addItem(Component $item, bool $current, bool $complete = false): self
         {
             $list = new Component('li', false);
             if ($complete) {
-                $list->setProps([self::NAME . '-complete']);
+                $list->addProps([self::NAME . '-complete']);
             } elseif ($current) {
-                $list->setProps([self::NAME . '-current']);
+                $list->addProps([self::NAME . '-current']);
             }
             $list->appendChildren($item);
             return $this->appendChildren($list);

@@ -25,7 +25,7 @@ namespace gui\v1\components {
             parent::__construct('div', false);
             $this->size = parent::SIZES[parent::SIZE_DEFAULT];
             $this->type = self::TYPES[self::TYPE_SOLID];
-            $this->setProps([self::NAME]);
+            $this->addProps([self::NAME]);
         }
 
         public function setType(int $type): self
@@ -43,9 +43,9 @@ namespace gui\v1\components {
         private static function wrap(self $modal): Component
         {
             $wrapper = new Component('div', false);
-            $wrapper->setProps([self::NAME . '-wrapper']);
+            $wrapper->addProps([self::NAME . '-wrapper']);
             $nav = new Component('ul', false);
-            $nav->setProps([self::NAME . '-nav']);
+            $nav->addProps([self::NAME . '-nav']);
 
             $times = new ActionButton(ActionButton::TYPE_TIMES);
             $maximize = new ActionButton(ActionButton::TYPE_MAXIMIZE);
@@ -61,7 +61,7 @@ namespace gui\v1\components {
                 $this->wrapped = true;
                 return self::wrap($this)->build();
             }
-            $this->setProps([self::NAME . '-' . $this->size, self::NAME . '-type-' . $this->type]);
+            $this->addProps([self::NAME . '-' . $this->size, self::NAME . '-type-' . $this->type]);
             return parent::build();
         }
     }

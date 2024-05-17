@@ -17,7 +17,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->setProps(['breadcrumb']);
+            $this->addProps(['breadcrumb']);
         }
 
         public function addItem(Component $item): self

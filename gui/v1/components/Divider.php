@@ -17,7 +17,7 @@ namespace gui\v1\components {
         public function __construct(string $text = null)
         {
             parent::__construct('div');
-            $this->setContent($text)->setProps([self::NAME]);
+            $this->setContent($text)->addProps([self::NAME]);
         }
     }
 

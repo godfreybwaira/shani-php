@@ -22,7 +22,7 @@ namespace gui\v1\components {
         public function __construct(string $script = null)
         {
             parent::__construct('div');
-            $this->setProps([self::NAME]);
+            $this->addProps([self::NAME]);
             if ($script !== null) {
                 $this->script = '<script defer src="' . $script . '"></script>';
             }
@@ -32,7 +32,7 @@ namespace gui\v1\components {
         {
             $wrapper = new Component('div', false);
             $wrapper->setContent($lens->script);
-            $wrapper->setProps([self::NAME . '-wrapper']);
+            $wrapper->addProps([self::NAME . '-wrapper']);
             return $wrapper->appendChildren($lens);
         }
 

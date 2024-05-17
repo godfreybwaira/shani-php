@@ -21,7 +21,7 @@ namespace gui\v1\components {
         public function __construct(int $type)
         {
             parent::__construct('button');
-            $this->setProps([self::NAME])->setType($type);
+            $this->addProps([self::NAME])->setType($type);
         }
 
         public function setType(int $type): self
@@ -32,7 +32,7 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $this->setProps([self::NAME . '-' . $this->type]);
+            $this->addProps([self::NAME . '-' . $this->type]);
             return parent::build();
         }
     }

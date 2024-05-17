@@ -23,10 +23,10 @@ namespace gui\v1\components {
         public function __construct(bool $bottomNav = true)
         {
             parent::__construct('div');
-            $this->setProps([self::NAME]);
+            $this->addProps([self::NAME]);
             $this->bottomNav = $bottomNav;
             $this->slides = new Component('ul', false);
-            $this->slides->setProps([self::NAME . '-slides']);
+            $this->slides->addProps([self::NAME . '-slides']);
         }
 
         public function addItem(Component ...$items): self
@@ -45,7 +45,7 @@ namespace gui\v1\components {
         {
             $pos = $this->bottomNav ? parent::POS_BC : parent::POS_TC;
             $nav = new Component('ul', false);
-            $nav->setProps([self::NAME . '-nav'])->setPosition($pos);
+            $nav->addProps([self::NAME . '-nav'])->setPosition($pos);
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li', '&nbsp;');
                 $dot->setAttr('for', $this->slideIds[$i]);

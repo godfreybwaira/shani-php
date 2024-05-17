@@ -19,7 +19,7 @@ namespace gui\v1\components {
         public function __construct(string $text = null)
         {
             parent::__construct('span');
-            $this->setContent($text)->setProps([self::NAME]);
+            $this->setContent($text)->addProps([self::NAME]);
             if (parent::SIZE_DEFAULT === parent::SIZE_SM) {
                 $this->setGutter(parent::SIZE_SM);
             } else {
