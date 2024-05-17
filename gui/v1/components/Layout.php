@@ -33,7 +33,7 @@ namespace gui\v1\components {
                     $this->rows[$r + $i]->appendChildren(new Component('div', false));
                 }
             }
-            return $this->appendChildren(...$this->rows);
+            return $this->setChildren(...$this->rows);
         }
 
         public function &getRow(int $index): ?Component

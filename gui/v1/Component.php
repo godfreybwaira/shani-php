@@ -60,7 +60,7 @@ namespace gui\v1 {
         public function setColumnSize(int $column, int $size): Component
         {
             if ($column <= self::MAX_COLUMNS) {
-                $this->props['width'] = self::SIZES[$size] . '-' . $column;
+                $this->props['width-' . self::SIZES[$size]] = $column;
                 return $this;
             }
             throw new \InvalidArgumentException('Maximum column size is ' . self::MAX_COLUMNS);

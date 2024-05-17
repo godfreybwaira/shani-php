@@ -17,26 +17,20 @@ namespace gui\v1\components {
         private const NAME = 'modal', TYPES = ['solid', 'drawer'];
         public const TYPE_DRAWER = 1, TYPE_SOLID = 0;
 
-        private string $size, $type;
+        private string $type;
         private bool $wrapped = false;
 
         public function __construct()
         {
             parent::__construct('div', false);
-            $this->size = parent::SIZES[parent::SIZE_DEFAULT];
-            $this->type = self::TYPES[self::TYPE_SOLID];
             $this->addProps([self::NAME]);
+            $this->setColumnSize(8, parent::SIZE_DEFAULT);
+            $this->setType(self::TYPE_SOLID);
         }
 
         public function setType(int $type): self
         {
             $this->type = self::TYPES[$type];
-            return $this;
-        }
-
-        public function setSize(?int $size): self
-        {
-            $this->size = parent::SIZES[$size ?? self::SIZE_FULL];
             return $this;
         }
 
@@ -61,7 +55,7 @@ namespace gui\v1\components {
                 $this->wrapped = true;
                 return self::wrap($this)->build();
             }
-            $this->addProps([self::NAME . '-' . $this->size, self::NAME . '-type-' . $this->type]);
+            $this->addProps([self::NAME . '-type-' . $this->type]);
             return parent::build();
         }
     }
