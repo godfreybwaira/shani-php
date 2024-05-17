@@ -57,7 +57,7 @@ namespace gui\v1 {
             return '<' . $this->tag . $css . $this->stringifyAttr() . '/>';
         }
 
-        public function setColumnSize(int $column, int $size): self
+        public function setColumnSize(int $column, int $size): Component
         {
             if ($column <= self::MAX_COLUMNS) {
                 $this->props['width'] = self::SIZES[$size] . '-' . $column;
@@ -66,13 +66,13 @@ namespace gui\v1 {
             throw new \InvalidArgumentException('Maximum column size is ' . self::MAX_COLUMNS);
         }
 
-        public function fillHeight(): self
+        public function fillHeight(): Component
         {
             $this->props['height'] = 'fill';
             return $this;
         }
 
-        public function fillWidth(): self
+        public function fillWidth(): Component
         {
             $this->props['width'] = 'fill';
             return $this;
@@ -83,7 +83,7 @@ namespace gui\v1 {
             return in_array($value, $this->classList);
         }
 
-        public function removeClass(string ...$value): self
+        public function removeClass(string ...$value): Component
         {
             $this->classList = array_diff($this->classList, $value);
             return $this;
@@ -94,7 +94,7 @@ namespace gui\v1 {
             return $this->content;
         }
 
-        public function addClass(string ...$values): self
+        public function addClass(string ...$values): Component
         {
             foreach ($values as $value) {
                 if (!$this->hasClass($value)) {
@@ -109,13 +109,13 @@ namespace gui\v1 {
             return in_array($name, $this->attributes);
         }
 
-        public function removeAttr(string $name): self
+        public function removeAttr(string $name): Component
         {
             unset($this->attributes[$name]);
             return $this;
         }
 
-        public function setAttr(string $name, $value = null): self
+        public function setAttr(string $name, $value = null): Component
         {
             $this->attributes[$name] = $value;
             return $this;
@@ -126,14 +126,14 @@ namespace gui\v1 {
             return $this->attributes[$name] ?? null;
         }
 
-        public function withoutAttr(): self
+        public function withoutAttr(): Component
         {
             $copy = clone $this;
             $copy->attributes = [];
             return $copy;
         }
 
-        public function withoutClasses(): self
+        public function withoutClasses(): Component
         {
             $copy = clone $this;
             $copy->classList = [];
@@ -166,7 +166,7 @@ namespace gui\v1 {
             return $result;
         }
 
-        public function toggleClass(string ...$classes): self
+        public function toggleClass(string ...$classes): Component
         {
             foreach ($classes as $css) {
                 if ($this->hasClass($css)) {
@@ -178,24 +178,24 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setClass(string ...$values): self
+        public function setClass(string ...$values): Component
         {
             $this->classList = [];
             return $this->addClass(...$values);
         }
 
-        public function setProps(array $props): self
+        public function setProps(array $props): Component
         {
             return $this->addClass(...Theme::styles(...$props));
         }
 
-        public function setContent(?string $content): self
+        public function setContent(?string $content): Component
         {
             $this->content = $content;
             return $this;
         }
 
-        protected function setColor(?int $color): self
+        protected function setColor(?int $color): Component
         {
             if ($color !== null) {
                 $this->props['color'] = self::COLORS[$color];
@@ -205,7 +205,7 @@ namespace gui\v1 {
             return $this;
         }
 
-        protected function setPosition(?int $position): self
+        protected function setPosition(?int $position): Component
         {
             if ($position !== null) {
                 $this->props['pos'] = self::POSITIONS[$position];
@@ -215,7 +215,7 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setAlign(?int $align): self
+        public function setAlign(?int $align): Component
         {
             if ($align !== null) {
                 $this->props['align'] = self::ALIGNS[$align];
@@ -225,37 +225,37 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setGap(?int $size, int $direction = null): self
+        public function setGap(?int $size, int $direction = null): Component
         {
             return $this->initProp('gap', $size, $direction);
         }
 
-        public function setMargin(?int $size, int $direction = null): self
+        public function setMargin(?int $size, int $direction = null): Component
         {
             return $this->initProp('margin', $size, $direction);
         }
 
-        public function setPadding(?int $size, int $direction = null): self
+        public function setPadding(?int $size, int $direction = null): Component
         {
             return $this->initProp('padding', $size, $direction);
         }
 
-        public function setFontSize(?int $size): self
+        public function setFontSize(?int $size): Component
         {
             return $this->initProp('font', $size);
         }
 
-        public function setBorder(): self
+        public function setBorder(): Component
         {
             return $this->setProps(['with-borders']);
         }
 
-        public function setShadow(?int $size, int $direction = null): self
+        public function setShadow(?int $size, int $direction = null): Component
         {
             return $this->initProp('shadow', $size, $direction);
         }
 
-        private function initProp(string $prop, ?int $value, ?int $direction = null): self
+        private function initProp(string $prop, ?int $value, ?int $direction = null): Component
         {
             if ($value !== null) {
                 $dir = $direction !== null ? '-' . self::DIRECTIONS[$direction] : null;
@@ -266,17 +266,17 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function setCorners(?int $size, int $direction = null): self
+        public function setCorners(?int $size, int $direction = null): Component
         {
             return $this->initProp('corner', $size, $direction);
         }
 
-        public function setGutter(?int $size): self
+        public function setGutter(?int $size): Component
         {
             return $this->setMargin($size)->setPadding($size)->setGap($size);
         }
 
-        public function toggleAttr(string $name, $value = null): self
+        public function toggleAttr(string $name, $value = null): Component
         {
             if ($this->hasAttr($name)) {
                 return $this->removeAttr($name);
@@ -289,13 +289,29 @@ namespace gui\v1 {
             return $this->children[$index] ?? null;
         }
 
-        public function setParent(Component &$parent): self
+        public function removeChild(int $index): Component
+        {
+            if (isset($this->children[$index])) {
+                unset($this->children[$index]);
+            }
+            return $this;
+        }
+
+        public function replaceChild(int $oldChild, Component $newChild): Component
+        {
+            if (isset($this->children[$oldChild])) {
+                $this->children[$oldChild] = $newChild;
+            }
+            return $this;
+        }
+
+        public function setParent(Component &$parent): Component
         {
             $parent->setProps(['relative-pos'])->appendChildren($this);
             return $this;
         }
 
-        public function setChildren(?Component ...$children): self
+        public function setChildren(?Component ...$children): Component
         {
             $this->children = [];
             if ($children !== null) {
@@ -304,7 +320,7 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function appendChildren(?Component ...$children): self
+        public function appendChildren(?Component ...$children): Component
         {
             foreach ($children as $child) {
                 if ($child !== null) {

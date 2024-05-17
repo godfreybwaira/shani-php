@@ -24,26 +24,21 @@ namespace gui\v1\components {
             $this->setProps([self::NAME]);
         }
 
-        public function setLayout(int $rows, int $columns = 1): self
+        public function addRows(int $rows, int $columns = 1): self
         {
+            $i = count($this->rows);
             for ($r = 0; $r < $rows; $r++) {
-                $this->rows[$r] = new Component('li', false);
+                $this->rows[$r + $i] = new Component('li', false);
                 for ($c = 0; $c < $columns; $c++) {
-                    $this->rows[$r]->appendChildren(new Component('div', false));
+                    $this->rows[$r + $i]->appendChildren(new Component('div', false));
                 }
             }
-            return $this;
+            return $this->appendChildren(...$this->rows);
         }
 
-        public function getRow(int $index): ?Component
+        public function &getRow(int $index): ?Component
         {
             return $this->rows[$index] ?? null;
-        }
-
-        public function build(): string
-        {
-            $this->appendChildren(...$this->rows);
-            return parent::build();
         }
     }
 
