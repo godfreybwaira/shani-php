@@ -185,7 +185,7 @@ namespace gui\v1 {
             return $this->addClass(...$values);
         }
 
-        public function addProperty(string $key, ?string $value = null): Component
+        public function addProperty(string $key, $value = null): Component
         {
             $this->props[$key] = $value;
             return $this;
