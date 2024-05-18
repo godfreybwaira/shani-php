@@ -19,7 +19,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('div');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
         }
     }
 

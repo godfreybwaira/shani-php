@@ -35,7 +35,7 @@ namespace gui\v1\components {
         public function build(): string
         {
             if ($this->type !== null) {
-                $this->addProps([self::NAME . '-' . $this->type]);
+                $this->addProperty(self::NAME, $this->type);
             }
             return parent::build();
         }

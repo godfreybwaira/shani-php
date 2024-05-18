@@ -21,7 +21,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
         }
 
         public function addLink(Component $link, bool $active = false): self

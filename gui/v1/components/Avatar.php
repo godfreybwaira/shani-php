@@ -20,12 +20,12 @@ namespace gui\v1\components {
         public function __construct(string $content = null)
         {
             parent::__construct('div');
-            $this->setContent($content)->addProps([self::NAME]);
+            $this->setContent($content)->addProperty(self::NAME);
         }
 
         public function setStack(): self
         {
-            return $this->addProps([self::NAME . '-stack']);
+            return $this->addProperty(self::NAME, 'stack');
         }
 
         public function setState(int $state): self
@@ -37,7 +37,7 @@ namespace gui\v1\components {
         public function build(): string
         {
             if ($this->state !== null) {
-                $this->addProps([self::NAME . '-' . $this->state]);
+                $this->addProperty(self::NAME, $this->state);
             }
             return parent::build();
         }

@@ -22,7 +22,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('div');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
             $this->setType(self::TYPE_1);
         }
 
@@ -35,7 +35,7 @@ namespace gui\v1\components {
         public function setMask(string $text): self
         {
             $mask = new Component('span', $text);
-            $mask->addProps(['input-mask'])->setMargin(null);
+            $mask->addProperty('input-mask')->setMargin(null);
             $this->appendChildren($mask);
             return $this;
         }
@@ -64,7 +64,7 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $this->addProps(['input-' . $this->type]);
+            $this->addProperty('input', $this->type);
             return parent::build();
         }
     }

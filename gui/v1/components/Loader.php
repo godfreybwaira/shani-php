@@ -21,7 +21,7 @@ namespace gui\v1\components {
         {
             parent::__construct('div');
             $this->setType(self::TYPE_1);
-            $this->addProps([self::NAME, 'animate']);
+            $this->addProperty(self::NAME)->addProperty('animate');
         }
 
         public function setType(int $type): self
@@ -32,7 +32,7 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $this->addProps([self::NAME . '-type-' . $this->type]);
+            $this->addProperty(self::NAME, 'type-' . $this->type);
             return parent::build();
         }
     }

@@ -19,9 +19,9 @@ namespace gui\v1\components {
         public function __construct(bool $openMultiple = false)
         {
             parent::__construct('ul');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
             if ($openMultiple) {
-                $this->addProps([self::NAME . '-multiopen']);
+                $this->addProperty(self::NAME . '-multiopen');
             }
         }
 
@@ -31,9 +31,9 @@ namespace gui\v1\components {
             $node = new Component('a', false);
             $node->setContent($title);
             $wrapper = new Component('div', false);
-            $item->addProps([self::NAME . '-item']);
-            $wrapper->addProps([self::NAME . '-body']);
-            $node->addProps([self::NAME . '-title'])->setAttr('href', '#');
+            $item->addProperty(self::NAME . '-item');
+            $wrapper->addProperty(self::NAME . '-body');
+            $node->addProperty(self::NAME . '-title')->setAttr('href', '#');
             $wrapper->appendChildren($body);
             $item->appendChildren($node, $wrapper);
             if ($open) {

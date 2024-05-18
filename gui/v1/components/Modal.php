@@ -23,7 +23,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('div', false);
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
             $this->setColumnSize(8, parent::SIZE_DEFAULT);
             $this->setType(self::TYPE_SOLID);
         }
@@ -37,9 +37,9 @@ namespace gui\v1\components {
         private static function wrap(self $modal): Component
         {
             $wrapper = new Component('div', false);
-            $wrapper->addProps([self::NAME . '-wrapper']);
+            $wrapper->addProperty(self::NAME, 'wrapper');
             $nav = new Component('ul', false);
-            $nav->addProps([self::NAME . '-nav']);
+            $nav->addProperty(self::NAME, 'nav');
 
             $times = new ActionButton(ActionButton::TYPE_TIMES);
             $maximize = new ActionButton(ActionButton::TYPE_MAXIMIZE);
@@ -55,7 +55,7 @@ namespace gui\v1\components {
                 $this->wrapped = true;
                 return self::wrap($this)->build();
             }
-            $this->addProps([self::NAME . '-type-' . $this->type]);
+            $this->addProperty(self::NAME, 'type-' . $this->type);
             return parent::build();
         }
     }

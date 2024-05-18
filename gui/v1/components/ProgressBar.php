@@ -19,7 +19,7 @@ namespace gui\v1\components {
         public function __construct(int $percent)
         {
             parent::__construct('div');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
             $bar = new Component('span', $percent . '%');
             $bar->setAttr('style', 'width:' . $percent . '%');
             $this->appendChildren($bar);

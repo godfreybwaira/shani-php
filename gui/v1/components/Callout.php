@@ -17,7 +17,7 @@ namespace gui\v1\components {
         public function __construct(int $color, string $text = null)
         {
             parent::__construct('div');
-            $this->setContent($text)->addProps([self::NAME]);
+            $this->setContent($text)->addProperty(self::NAME);
             $this->setGutter(parent::SIZE_DEFAULT)->setColor($color);
         }
     }

@@ -19,7 +19,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
         }
 
         public function addItem(Component $item, bool $active = false): self
@@ -28,7 +28,7 @@ namespace gui\v1\components {
             if ($active) {
                 $list->addClass('active');
             }
-            $list->addProps([self::NAME . '-title'])->appendChildren($item);
+            $list->addProperty(self::NAME, 'title')->appendChildren($item);
             $this->appendChildren($list);
         }
     }

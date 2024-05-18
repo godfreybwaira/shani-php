@@ -22,7 +22,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul');
-            $this->addProps([self::NAME]);
+            $this->addProperty(self::NAME);
         }
 
         public function setStripes(int $stripes): self
@@ -35,7 +35,7 @@ namespace gui\v1\components {
         {
             foreach ($items as $item) {
                 $list = new Component('li', false);
-                $list->addProps([self::NAME . '-item'])->appendChildren($item);
+                $list->addProperty(self::NAME, 'item')->appendChildren($item);
             }
             return $this;
         }
@@ -43,7 +43,7 @@ namespace gui\v1\components {
         public function build(): string
         {
             if ($this->stripes !== null) {
-                $this->addProps([self::NAME . '-' . $this->stripes]);
+                $this->addProperty(self::NAME, $this->stripes);
             }
             return parent::build();
         }
