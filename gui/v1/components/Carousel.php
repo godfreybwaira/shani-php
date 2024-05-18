@@ -45,17 +45,17 @@ namespace gui\v1\components {
         {
             $pos = $this->bottomNav ? parent::POS_BC : parent::POS_TC;
             $nav = new Component('ul', false);
-            $nav->addProps([self::NAME . '-nav'])->setPosition($pos);
+            $nav->addProps([self::NAME . '-nav']);
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li', '&nbsp;');
                 $dot->setAttr('for', $this->slideIds[$i]);
                 $nav->appendChildren($dot);
             }
-            $prevBtn = new ActionButton(ActionButton::TYPE_PREV);
             $nextBtn = new ActionButton(ActionButton::TYPE_NEXT);
-            $nextBtn->setPosition(parent::POS_CR);
-            $prevBtn->setPosition(parent::POS_CL);
-            $this->appendChildren($prevBtn, $nextBtn, $nav);
+            $prevBtn = new ActionButton(ActionButton::TYPE_PREV);
+            $nextBtn->setPosition(parent::POS_CR)->setParent($this);
+            $prevBtn->setPosition(parent::POS_CL)->setParent($this);
+            $this->appendChildren($nav->setPosition($pos));
             return $this;
         }
 
