@@ -57,7 +57,7 @@ namespace gui\v1 {
         public function setColumnSize(int $column, int $size): Component
         {
             if ($column <= self::MAX_COLUMNS) {
-                return $this->addProperty('width', self::SIZES[$size] . '-' . $column);
+                return $this->addProperty('width-' . self::SIZES[$size], $column);
             }
             throw new \InvalidArgumentException('Maximum column size is ' . self::MAX_COLUMNS);
         }
@@ -119,13 +119,11 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function copyAttr(Component &$source, bool $skipDuplicates = true): Component
+        public function copyAttributes(Component &$source, bool $skipDuplicates = true): Component
         {
             $attrs = $source->getAttributes();
             foreach ($attrs as $name => $value) {
-                if (!$skipDuplicates) {
-                    $this->setAttribute($name, $value);
-                } elseif (!$this->hasAttribute($name)) {
+                if (!$skipDuplicates || !$this->hasAttribute($name)) {
                     $this->setAttribute($name, $value);
                 }
             }

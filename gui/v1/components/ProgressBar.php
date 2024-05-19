@@ -16,7 +16,7 @@ namespace gui\v1\components {
 
         private const NAME = 'progress-bar';
 
-        public function __construct(int $percent)
+        public function __construct(float $percent)
         {
             parent::__construct('div');
             $this->addProperty(self::NAME);
