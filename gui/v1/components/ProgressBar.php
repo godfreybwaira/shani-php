@@ -21,7 +21,7 @@ namespace gui\v1\components {
             parent::__construct('div');
             $this->addProperty(self::NAME);
             $bar = new Component('span', $percent . '%');
-            $bar->setAttr('style', 'width:' . $percent . '%');
+            $bar->setAttribute('style', 'width:' . $percent . '%');
             $this->appendChildren($bar);
         }
     }

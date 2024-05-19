@@ -35,7 +35,7 @@ namespace gui\v1\components {
                 $id = 'id' . rand(100, 10000);
                 $slide = new Component('li', false);
                 $slide->appendChildren($item);
-                $slide->setAttr('id', $id);
+                $slide->setAttribute('id', $id);
                 $this->slides->appendChildren($slide);
                 $this->slideIds[] = $id;
             }
@@ -48,7 +48,7 @@ namespace gui\v1\components {
             $nav->addProperty(self::NAME, 'nav');
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li', '&nbsp;');
-                $dot->setAttr('for', $this->slideIds[$i]);
+                $dot->setAttribute('for', $this->slideIds[$i]);
                 $nav->appendChildren($dot);
             }
             $nextBtn = new ActionButton(ActionButton::TYPE_NEXT);

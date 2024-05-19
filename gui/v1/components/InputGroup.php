@@ -44,9 +44,9 @@ namespace gui\v1\components {
         {
             $tag = ($type === 'select' || $type === 'textarea') ? $type : 'input';
             $input = new Component($tag);
-            $input->setAttr('type', $type)->setAttr('name', $name)->setAttr('id', $name)->setMargin(null);
+            $input->setAttribute('type', $type)->setAttribute('name', $name)->setAttribute('id', $name)->setMargin(null);
             if ($placeholder !== null) {
-                $input->setAttr('placeholder', $placeholder);
+                $input->setAttribute('placeholder', $placeholder);
             }
             $this->appendChildren($input);
             return $this;
@@ -56,7 +56,7 @@ namespace gui\v1\components {
         {
             $label = new Component('label', $text);
             if ($refId !== null) {
-                $label->setAttr('for', $refId);
+                $label->setAttribute('for', $refId);
             }
             $this->appendChildren($label->setMargin(null));
             return $this;

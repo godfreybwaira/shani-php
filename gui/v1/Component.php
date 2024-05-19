@@ -98,18 +98,22 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function hasAttr(string $name): bool
+        public function hasAttribute(string $name): bool
         {
             return in_array($name, $this->attributes);
         }
 
-        public function removeAttr(string $name): Component
+        public function removeAttribute(string ...$names): Component
         {
-            unset($this->attributes[$name]);
+            foreach ($names as $value) {
+                if (isset($this->attributes[$value])) {
+                    unset($this->attributes[$value]);
+                }
+            }
             return $this;
         }
 
-        public function setAttr(string $name, $value = null): Component
+        public function setAttribute(string $name, $value = null): Component
         {
             $this->attributes[$name] = $value;
             return $this;
@@ -120,15 +124,15 @@ namespace gui\v1 {
             $attrs = $source->getAttributes();
             foreach ($attrs as $name => $value) {
                 if (!$skipDuplicates) {
-                    $this->setAttr($name, $value);
-                } elseif (!$this->hasAttr($name)) {
-                    $this->setAttr($name, $value);
+                    $this->setAttribute($name, $value);
+                } elseif (!$this->hasAttribute($name)) {
+                    $this->setAttribute($name, $value);
                 }
             }
             return $this;
         }
 
-        public function getAttr(string $name)
+        public function getAttribute(string $name)
         {
             return $this->attributes[$name] ?? null;
         }
@@ -224,7 +228,9 @@ namespace gui\v1 {
         public function removeProperty(string ...$names): Component
         {
             foreach ($names as $key) {
-                unset($this->props[$key]);
+                if (isset($this->props[$key])) {
+                    unset($this->props[$key]);
+                }
             }
             return $this;
         }
@@ -310,10 +316,10 @@ namespace gui\v1 {
 
         public function toggleAttr(string $name, $value = null): Component
         {
-            if ($this->hasAttr($name)) {
-                return $this->removeAttr($name);
+            if ($this->hasAttribute($name)) {
+                return $this->removeAttribute($name);
             }
-            return $this->setAttr($name, $value);
+            return $this->setAttribute($name, $value);
         }
 
         public function toggleProperty(string $name, $value = null): Component
@@ -329,10 +335,12 @@ namespace gui\v1 {
             return $this->children[$index] ?? null;
         }
 
-        public function removeChild(int $index): Component
+        public function removeChild(int ...$index): Component
         {
-            if (isset($this->children[$index])) {
-                unset($this->children[$index]);
+            foreach ($index as $value) {
+                if (isset($this->children[$value])) {
+                    unset($this->children[$value]);
+                }
             }
             return $this;
         }

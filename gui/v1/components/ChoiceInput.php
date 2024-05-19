@@ -34,11 +34,11 @@ namespace gui\v1\components {
         {
             $listItem = new Component('li');
             $input = new Component('input');
-            $input->setAttr('type', $this->type)->setAttr('name', $this->name);
+            $input->setAttribute('type', $this->type)->setAttribute('name', $this->name);
             $id = 'id' . rand(100, 10000);
-            $input->setAttr('id', $id)->setAttr('value', $value)->setMargin(null);
+            $input->setAttribute('id', $id)->setAttribute('value', $value)->setMargin(null);
             $label = new Component('label', $text ?? $value);
-            $label->setAttr('for', $id)->setMargin(null);
+            $label->setAttribute('for', $id)->setMargin(null);
             $listItem->appendChildren($input, $label)->setGutters(null);
             return $this->appendChildren($listItem);
         }

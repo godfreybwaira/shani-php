@@ -33,14 +33,14 @@ namespace gui\v1\components {
             $wrapper = new Component('div', false);
             $item->addProperty(self::NAME . '-item');
             $wrapper->addProperty(self::NAME . '-body');
-            $node->addProperty(self::NAME . '-title')->setAttr('href', '#');
+            $node->addProperty(self::NAME . '-title')->setAttribute('href', '#');
             $wrapper->appendChildren($body);
             $item->appendChildren($node, $wrapper);
             if ($open) {
                 $item->addClass('active');
             }
             if ($disabled) {
-                $item->setAttr('disabled');
+                $item->setAttribute('disabled');
             }
             return $this->appendChildren($item);
         }

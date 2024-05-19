@@ -22,7 +22,7 @@ namespace gui\v1\components {
         public function __construct(string $name)
         {
             parent::__construct('input');
-            $this->setAttr('type', 'checkbox');
+            $this->setAttribute('type', 'checkbox');
             $this->name = $name;
         }
 
