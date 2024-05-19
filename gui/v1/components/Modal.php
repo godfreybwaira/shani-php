@@ -24,7 +24,6 @@ namespace gui\v1\components {
         {
             parent::__construct('div', false);
             $this->addProperty(self::NAME);
-            $this->setColumnSize(8, parent::SIZE_DEFAULT);
             $this->setType(self::TYPE_SOLID);
         }
 

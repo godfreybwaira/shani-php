@@ -54,7 +54,7 @@ namespace gui\v1 {
             return '<' . $this->tag . $css . $this->stringifyAttr() . '/>';
         }
 
-        public function setColumnSize(int $column, int $size): self
+        public function addColumnSize(int $column, int $size): self
         {
             if ($column <= self::MAX_COLUMNS) {
                 return $this->addProperty('width-' . self::SIZES[$size], $column);
