@@ -140,20 +140,6 @@ namespace gui\v1 {
             return $this->attributes;
         }
 
-        public function withoutAttr(): Component
-        {
-            $copy = clone $this;
-            $copy->attributes = [];
-            return $copy;
-        }
-
-        public function withoutClasses(): Component
-        {
-            $copy = clone $this;
-            $copy->classList = [];
-            return $copy;
-        }
-
         private function stringifyChildren(): ?string
         {
             $result = null;
@@ -203,6 +189,12 @@ namespace gui\v1 {
         {
             $this->classList = [];
             return $this->addClass(...$values);
+        }
+
+        public function setProperty(string $name, $value = null): Component
+        {
+            $this->props = [];
+            return $this->addProperty($name, $value);
         }
 
         public function addProperty(string $name, $value = null): Component
