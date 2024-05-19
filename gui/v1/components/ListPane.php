@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ListGroup
+ * Description of ListPane
  * @author coder
  *
  * Created on: May 11, 2024 at 8:05:45 PM
@@ -11,10 +11,10 @@ namespace gui\v1\components {
 
     use gui\v1\Component;
 
-    final class ListGroup extends Component
+    final class ListPane extends Component
     {
 
-        private const NAME = 'list-group', STRIPES = ['even', 'odd'];
+        private const NAME = 'list-pane', STRIPES = ['even', 'odd'];
         public const STRIPES_EVEN = 0, STRIPES_ODD = 1;
 
         public function __construct()
@@ -30,11 +30,11 @@ namespace gui\v1\components {
 
         public function addItem(Component ...$items): self
         {
+            $list = new Component('li', false);
             foreach ($items as $item) {
-                $list = new Component('li', false);
-                $list->addProperty(self::NAME . '-item')->appendChildren($item);
+                $list->appendChildren($item);
             }
-            return $this;
+            return $this->appendChildren($list);
         }
     }
 
