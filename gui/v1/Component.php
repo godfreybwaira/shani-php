@@ -35,7 +35,7 @@ namespace gui\v1 {
             $this->children = $this->classList = $this->attributes = $this->props = [];
             $this->content = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
             if ($gutters) {
-                $this->setGutter(self::SIZE_DEFAULT);
+                $this->setGutters(self::SIZE_DEFAULT);
             }
         }
 
@@ -46,13 +46,6 @@ namespace gui\v1 {
 
         public function build(): string
         {
-            foreach ($this->props as $key => $value) {
-                if ($value !== null) {
-                    $this->addClass(...Theme::styles($key . '-' . $value));
-                } else {
-                    $this->addClass(...Theme::styles($key));
-                }
-            }
             $css = $this->stringifyClass();
             if ($this->content !== null || !empty($this->children)) {
                 $texts = '<' . $this->tag . $css . $this->stringifyAttr() . '>' . $this->content;
@@ -122,9 +115,27 @@ namespace gui\v1 {
             return $this;
         }
 
+        public function copyAttr(Component &$source, bool $skipDuplicates = true): Component
+        {
+            $attrs = $source->getAttributes();
+            foreach ($attrs as $name => $value) {
+                if (!$skipDuplicates) {
+                    $this->setAttr($name, $value);
+                } elseif (!$this->hasAttr($name)) {
+                    $this->setAttr($name, $value);
+                }
+            }
+            return $this;
+        }
+
         public function getAttr(string $name)
         {
             return $this->attributes[$name] ?? null;
+        }
+
+        public function getAttributes(): array
+        {
+            return $this->attributes;
         }
 
         public function withoutAttr(): Component
@@ -152,6 +163,13 @@ namespace gui\v1 {
 
         private function stringifyClass(): ?string
         {
+            foreach ($this->props as $key => $value) {
+                if ($value !== null) {
+                    $this->addClass(...Theme::styles($key . '-' . $value));
+                } else {
+                    $this->addClass(...Theme::styles($key));
+                }
+            }
             if (empty($this->classList)) {
                 return null;
             }
@@ -185,15 +203,27 @@ namespace gui\v1 {
             return $this->addClass(...$values);
         }
 
-        public function addProperty(string $key, $value = null): Component
+        public function addProperty(string $name, $value = null): Component
         {
-            $this->props[$key] = $value;
+            $this->props[$name] = $value;
             return $this;
         }
 
-        public function removeProperty(string ...$keys): Component
+        public function clearStyles(): Component
         {
-            foreach ($keys as $key) {
+            $this->props = [];
+            $this->classList = [];
+            return $this;
+        }
+
+        public function hasProperty(string $name): bool
+        {
+            return array_key_exists($name, $this->props);
+        }
+
+        public function removeProperty(string ...$names): Component
+        {
+            foreach ($names as $key) {
                 unset($this->props[$key]);
             }
             return $this;
@@ -249,7 +279,7 @@ namespace gui\v1 {
             return $this->initProp('font', $size);
         }
 
-        public function setBorder(): Component
+        public function setBorders(): Component
         {
             return $this->addProperty('with-borders');
         }
@@ -273,7 +303,7 @@ namespace gui\v1 {
             return $this->initProp('corner', $size, $direction);
         }
 
-        public function setGutter(?int $size): Component
+        public function setGutters(?int $size): Component
         {
             return $this->setMargin($size)->setPadding($size)->setGap($size);
         }
@@ -284,6 +314,14 @@ namespace gui\v1 {
                 return $this->removeAttr($name);
             }
             return $this->setAttr($name, $value);
+        }
+
+        public function toggleProperty(string $name, $value = null): Component
+        {
+            if ($this->hasProperty($name)) {
+                return $this->removeProperty($name);
+            }
+            return $this->addProperty($name, $value);
         }
 
         public function getChild(int $index): ?Component

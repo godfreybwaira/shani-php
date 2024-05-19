@@ -39,7 +39,7 @@ namespace gui\v1\components {
             $input->setAttr('id', $id)->setAttr('value', $value)->setMargin(null);
             $label = new Component('label', $text ?? $value);
             $label->setAttr('for', $id)->setMargin(null);
-            $listItem->appendChildren($input, $label)->setGutter(null);
+            $listItem->appendChildren($input, $label)->setGutters(null);
             return $this->appendChildren($listItem);
         }
 

@@ -8,7 +8,7 @@
     'avatar-stack' => ['stack'],
 ]);
 $node = new gui\v1\components\Avatar();
-$node->setGutter(gui\v1\components\Avatar::SIZE_MD)
+$node->setGutters(gui\v1\components\Avatar::SIZE_MD)
         ->setStack()->setState(gui\v1\components\Avatar::STATE_OFF)
         ->appendChildren(new gui\v1\Component('img'));
 
