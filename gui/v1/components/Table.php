@@ -17,17 +17,19 @@ namespace gui\v1\components {
         private bool $wrapped = false;
         private ?Component $header, $body, $footer, $caption = null;
 
+        private const NAME = 'table';
+
         public function __construct(string $caption = null)
         {
             parent::__construct('table');
             $this->header = $this->body = $this->footer = null;
-            $this->setCaption($caption)->addProperty('table');
+            $this->setCaption($caption)->addProperty(self::NAME);
         }
 
         private static function wrap(Table $table): Component
         {
             $wrapper = new Component('div', false);
-            $wrapper->addProperty('table-wrapper');
+            $wrapper->addProperty(self::NAME . '-wrapper');
             return $wrapper->appendChildren($table);
         }
 

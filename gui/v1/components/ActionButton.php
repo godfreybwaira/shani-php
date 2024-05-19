@@ -16,8 +16,6 @@ namespace gui\v1\components {
         private const TYPES = ['prev', 'next', 'times', 'maximize', 'plus'];
         public const TYPE_PREV = 0, TYPE_NEXT = 1, TYPE_TIMES = 2, TYPE_MAXIMIZE = 3, TYPE_PLUS = 4;
 
-        private string $type;
-
         public function __construct(int $type)
         {
             parent::__construct('button');
@@ -26,14 +24,7 @@ namespace gui\v1\components {
 
         public function setType(int $type): self
         {
-            $this->type = self::TYPES[$type];
-            return $this;
-        }
-
-        public function build(): string
-        {
-            $this->addProperty(self::NAME, $this->type);
-            return parent::build();
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
         }
     }
 

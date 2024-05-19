@@ -15,8 +15,6 @@ namespace gui\v1\components {
         private const NAME = 'avatar', STATES = ['off', 'on'];
         public const STATE_ON = 1, STATE_OFF = 0;
 
-        private ?string $state = null;
-
         public function __construct(string $content = null)
         {
             parent::__construct('div');
@@ -25,21 +23,12 @@ namespace gui\v1\components {
 
         public function setStack(): self
         {
-            return $this->addProperty(self::NAME, 'stack');
+            return $this->addProperty(self::NAME . '-stack');
         }
 
         public function setState(int $state): self
         {
-            $this->state = self::STATES[$state];
-            return $this;
-        }
-
-        public function build(): string
-        {
-            if ($this->state !== null) {
-                $this->addProperty(self::NAME, $this->state);
-            }
-            return parent::build();
+            return $this->addProperty(self::NAME . '-state', self::STATES[$state]);
         }
     }
 

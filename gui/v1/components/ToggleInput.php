@@ -14,30 +14,18 @@ namespace gui\v1\components {
     final class ToggleInput extends Component
     {
 
-        private const NAME = 'toggle', TYPES = ['type-1', 'type-2'];
+        private const NAME = 'toggle', TYPES = ['1', '2'];
         public const TYPE_1 = 0, TYPE_2 = 1;
-
-        private string $name;
 
         public function __construct(string $name)
         {
             parent::__construct('input');
-            $this->setAttribute('type', 'checkbox');
-            $this->name = $name;
+            $this->setAttribute('type', 'checkbox')->setAttribute('name', $name);
         }
 
         public function setType(int $type): self
         {
-            $this->type = self::TYPES[$type];
-            return $this;
-        }
-
-        public function build(): string
-        {
-            if ($this->type !== null) {
-                $this->addProperty(self::NAME, $this->type);
-            }
-            return parent::build();
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
         }
     }
 

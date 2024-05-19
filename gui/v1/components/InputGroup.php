@@ -14,10 +14,8 @@ namespace gui\v1\components {
     final class InputGroup extends Component
     {
 
-        private const NAME = 'input-group', TYPES = ['type-1', 'type-2'];
+        private const NAME = 'input-group', TYPES = ['1', '2'];
         public const TYPE_1 = 0, TYPE_2 = 1;
-
-        private ?string $type = null;
 
         public function __construct()
         {
@@ -28,7 +26,7 @@ namespace gui\v1\components {
 
         public function setType(int $type): self
         {
-            $this->type = self::TYPES[$type];
+            $this->addProperty('input-type', self::TYPES[$type]);
             return $this;
         }
 
@@ -60,12 +58,6 @@ namespace gui\v1\components {
             }
             $this->appendChildren($label->setMargin(null));
             return $this;
-        }
-
-        public function build(): string
-        {
-            $this->addProperty('input', $this->type);
-            return parent::build();
         }
     }
 

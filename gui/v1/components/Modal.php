@@ -29,16 +29,15 @@ namespace gui\v1\components {
 
         public function setType(int $type): self
         {
-            $this->type = self::TYPES[$type];
-            return $this;
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
         }
 
         private static function wrap(self $modal): Component
         {
             $wrapper = new Component('div', false);
-            $wrapper->addProperty(self::NAME, 'wrapper');
+            $wrapper->addProperty(self::NAME . '-wrapper');
             $nav = new Component('ul', false);
-            $nav->addProperty(self::NAME, 'nav');
+            $nav->addProperty(self::NAME . '-nav');
 
             $times = new ActionButton(ActionButton::TYPE_TIMES);
             $maximize = new ActionButton(ActionButton::TYPE_MAXIMIZE);
@@ -54,7 +53,6 @@ namespace gui\v1\components {
                 $this->wrapped = true;
                 return self::wrap($this)->build();
             }
-            $this->addProperty(self::NAME, 'type-' . $this->type);
             return parent::build();
         }
     }

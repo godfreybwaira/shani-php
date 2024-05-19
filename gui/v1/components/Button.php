@@ -15,8 +15,6 @@ namespace gui\v1\components {
         private const NAME = 'button', TYPES = ['bold', 'outline'];
         public const TYPE_BOLD = 0, TYPE_OUTLINE = 1;
 
-        private string $type;
-
         public function __construct(string $text = null)
         {
             parent::__construct('button');
@@ -26,20 +24,13 @@ namespace gui\v1\components {
 
         public function setType(int $type): self
         {
-            $this->type = self::TYPES[$type];
-            return $this;
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
         }
 
         public function setBlock(): self
         {
-            $this->addProperty(self::NAME, 'block');
+            $this->addProperty(self::NAME . '-' . 'block');
             return $this;
-        }
-
-        public function build(): string
-        {
-            $this->addProperty(self::NAME, $this->type);
-            return parent::build();
         }
     }
 

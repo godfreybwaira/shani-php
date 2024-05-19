@@ -17,8 +17,6 @@ namespace gui\v1\components {
         private const NAME = 'list-group', STRIPES = ['even', 'odd'];
         public const STRIPES_EVEN = 0, STRIPES_ODD = 1;
 
-        private ?string $stripes = null;
-
         public function __construct()
         {
             parent::__construct('ul');
@@ -27,25 +25,16 @@ namespace gui\v1\components {
 
         public function setStripes(int $stripes): self
         {
-            $this->stripes = self::STRIPES[$stripes];
-            return $this;
+            return $this->addProperty(self::NAME . '-stripes', self::STRIPES[$stripes]);
         }
 
         public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
                 $list = new Component('li', false);
-                $list->addProperty(self::NAME, 'item')->appendChildren($item);
+                $list->addProperty(self::NAME . '-item')->appendChildren($item);
             }
             return $this;
-        }
-
-        public function build(): string
-        {
-            if ($this->stripes !== null) {
-                $this->addProperty(self::NAME, $this->stripes);
-            }
-            return parent::build();
         }
     }
 

@@ -16,7 +16,7 @@ namespace gui\v1\components {
 
         private const NAME = 'media';
 
-        private ?int $position = null;
+        private ?string $position = null;
         private Component $caption;
 
         public function __construct(Component $media)
@@ -29,7 +29,7 @@ namespace gui\v1\components {
         public function setCaption(Component $caption, ?int $position = null): self
         {
             $this->caption = $caption;
-            $this->position = $position;
+            $this->position = parent::POSITIONS[$position];
             return $this;
         }
 
@@ -38,11 +38,9 @@ namespace gui\v1\components {
             if ($this->caption !== null) {
                 $wrapper = new Component('div', false);
                 $wrapper->appendChildren($this->caption);
-                if ($this->position === null) {
-                    $wrapper->addProperty(self::NAME, 'caption-full');
-                } else {
-                    $this->caption->setPosition($this->position);
-                }
+                $wrapperName = self::NAME . '-caption';
+                $wrapper->addProperty($wrapperName);
+                $wrapper->addProperty($wrapperName . '-pos', $this->position ?? 'full');
                 $this->appendChildren($wrapper);
             }
             return parent::build();
