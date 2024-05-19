@@ -320,9 +320,17 @@ namespace gui\v1 {
             return $this->addProperty($name, $value);
         }
 
+        public function getChildren(): array
+        {
+            return $this->children;
+        }
+
         public function getChild(int $index): ?Component
         {
-            return $this->children[$index] ?? null;
+            if ($index < 0) {
+                return $this->children[$index] ?? null;
+            }
+            return $this->children[count($this->children) + $index] ?? null;
         }
 
         public function removeChild(int ...$index): self

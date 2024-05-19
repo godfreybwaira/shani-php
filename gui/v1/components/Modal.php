@@ -14,17 +14,20 @@ namespace gui\v1\components {
     final class Modal extends Component
     {
 
-        private const NAME = 'modal', TYPES = ['solid', 'drawer'];
-        public const TYPE_DRAWER = 1, TYPE_SOLID = 0;
+        private const NAME = 'modal', TYPES = ['card', 'drawer'];
+        public const TYPE_DRAWER = 1, TYPE_CARD = 0;
 
-        private string $type;
         private bool $wrapped = false;
+        private ?Component $navbar = null;
+        private Component $wrapper;
 
         public function __construct()
         {
             parent::__construct('div', false);
             $this->addProperty(self::NAME);
-            $this->setType(self::TYPE_SOLID);
+            $this->setType(self::TYPE_CARD);
+            $this->wrapper = new Component('div', false);
+            $this->wrapper->addProperty(self::NAME . '-wrapper');
         }
 
         public function setType(int $type): self
@@ -32,26 +35,26 @@ namespace gui\v1\components {
             return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
         }
 
-        private static function wrap(self $modal): Component
+        public function addNavbar(Component ...$items): self
         {
-            $wrapper = new Component('div', false);
-            $wrapper->addProperty(self::NAME . '-wrapper');
-            $nav = new Component('ul', false);
-            $nav->addProperty(self::NAME . '-nav');
-
-            $times = new ActionButton(ActionButton::TYPE_TIMES);
-            $maximize = new ActionButton(ActionButton::TYPE_MAXIMIZE);
-            $listMax = new Component('li', false);
-            $listTimes = new Component('li', false);
-            $nav->appendChildren($listMax->appendChildren($maximize), $listTimes->appendChildren($times));
-            return $wrapper->appendChildren($nav, $modal);
+            if ($this->navbar === null) {
+                $this->navbar = new Component('ul', false);
+                $this->navbar->addProperty(self::NAME . '-nav');
+                $this->wrapper->appendChildren($this->navbar);
+            }
+            foreach ($items as $item) {
+                $list = new Component('li', false);
+                $list->appendChildren($item);
+            }
+            $this->navbar->appendChildren($list);
+            return $this;
         }
 
         public function build(): string
         {
             if (!$this->wrapped) {
                 $this->wrapped = true;
-                return self::wrap($this)->build();
+                return $this->wrapper->appendChildren($this)->build();
             }
             return parent::build();
         }

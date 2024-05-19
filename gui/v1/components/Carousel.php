@@ -62,7 +62,7 @@ namespace gui\v1\components {
         public function build(): string
         {
             $this->appendChildren($this->slides);
-            $kids = $this->slides->children();
+            $kids = $this->slides->getChildren();
             if (count($kids) > 1) {
                 $this->makeNavigation($kids);
             }

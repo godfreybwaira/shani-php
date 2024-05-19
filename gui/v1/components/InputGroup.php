@@ -32,31 +32,33 @@ namespace gui\v1\components {
 
         public function setMask(string $text): self
         {
-            $mask = new Component('span', $text);
-            $mask->addProperty('input-mask')->setMargin(null);
+            $mask = new Component('span', false);
+            $mask->addProperty('input-mask')->setContent($text)->setPadding(parent::SIZE_DEFAULT);
             $this->appendChildren($mask);
             return $this;
         }
 
-        public function setInput(string $type, string $name, ?string $placeholder = null): self
+        public function setInput(string $name, string $type, ?string $id = null): self
         {
             $tag = ($type === 'select' || $type === 'textarea') ? $type : 'input';
-            $input = new Component($tag);
-            $input->setAttribute('type', $type)->setAttribute('name', $name)->setAttribute('id', $name)->setMargin(null);
-            if ($placeholder !== null) {
-                $input->setAttribute('placeholder', $placeholder);
+            $input = new Component($tag, false);
+            if ($tag === 'input') {
+                $input->setAttribute('type', $type);
             }
+            $input->setAttribute('name', $name);
+            $input->setAttribute('id', $id ?? $name)->setPadding(parent::SIZE_DEFAULT);
             $this->appendChildren($input);
             return $this;
         }
 
         public function setLabel(string $text, ?string $refId = null): self
         {
-            $label = new Component('label', $text);
+            $label = new Component('label', false);
             if ($refId !== null) {
                 $label->setAttribute('for', $refId);
             }
-            $this->appendChildren($label->setMargin(null));
+            $label->setContent($text)->setPadding(parent::SIZE_DEFAULT);
+            $this->appendChildren($label);
             return $this;
         }
     }
