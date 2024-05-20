@@ -220,12 +220,14 @@ namespace shani\engine\http {
                 $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
                 if (is_callable([$obj, $cb])) {
                     $obj->$cb();
-                } else {
+                } elseif (class_exists($Class)) {
                     $this->error(HttpStatus::NOT_FOUND, $trials);
+                } else {
+                    $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
                 }
             } catch (\Exception $e) {
-                echo $e->getMessage();
-                $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
+                $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
+                \library\Logger::error($e, $this->asset()->private());
             }
         }
 

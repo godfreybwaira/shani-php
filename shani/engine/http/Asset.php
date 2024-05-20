@@ -48,6 +48,11 @@ namespace shani\engine\http {
             return true;
         }
 
+        public function private(?string $path = null): string
+        {
+            return \shani\engine\core\Path::ASSET_PRIVATE . $this->app->host()->storage() . $path;
+        }
+
         public function storage(string $path): string
         {
             return $this->public(Directory::ASSET_STORAGE . $this->app->host()->storage() . $path);

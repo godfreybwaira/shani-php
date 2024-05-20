@@ -21,7 +21,7 @@ namespace app\test\v1\modules\users\src\get {
 
         public function activity()
         {
-            $this->app->render();
+            $this->app->render('from Shani');
         }
 
         public function sample()
