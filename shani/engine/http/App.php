@@ -33,8 +33,18 @@ namespace shani\engine\http {
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
             if (!Asset::tryServe($this)) {
+                self::catchErrors($this);
                 $this->start();
             }
+        }
+
+        private static function catchErrors(App &$app): void
+        {
+            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline)use (&$app) {
+                \library\Logger::logError($app, $errno, $errstr, $errfile, $errline);
+                return true;
+            });
+            set_exception_handler(fn(\Throwable $e) => \library\Logger::logException($app, $e));
         }
 
         public function web(callable $cb): self
@@ -215,6 +225,7 @@ namespace shani\engine\http {
         private function submit(string $method, int $trials = 1): void
         {
             try {
+                $a = 2 * $b;
                 $Class = $this->getClass($this->req->resource(), $method);
                 $obj = new $Class($this);
                 $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
@@ -227,7 +238,6 @@ namespace shani\engine\http {
                 }
             } catch (\Exception $e) {
                 $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
-                \library\Logger::error($e, $this->asset()->private());
             }
         }
 

@@ -14,7 +14,7 @@ your favorite front-end framework while **Shani** stands on back-end, or vice ve
 ## Main Features
 
 1. Scalability
-2. Robust (Error torelant)
+2. Robust (Error torelancy)
 3. Secure (CSRF, Session Mgt, Authentication & Authorization)
 4. Fast
 5. Multiprosess
@@ -25,8 +25,8 @@ your favorite front-end framework while **Shani** stands on back-end, or vice ve
 10. Zero dependency
 11. Dynamic Routing
 12. Built-in web server
-13. Web service supports
-14. Stateful application
+13. Web socket supports
+14. State Management
 15. Third-party library support
 16. Best practices API supports
 17. Supports JSON, XML, YAML, CSV and HTML
