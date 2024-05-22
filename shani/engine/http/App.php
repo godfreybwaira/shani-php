@@ -225,7 +225,6 @@ namespace shani\engine\http {
         private function submit(string $method, int $trials = 1): void
         {
             try {
-                $a = 2 * $b;
                 $Class = $this->getClass($this->req->resource(), $method);
                 $obj = new $Class($this);
                 $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
@@ -237,6 +236,7 @@ namespace shani\engine\http {
                     $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
                 }
             } catch (\Exception $e) {
+                \library\Logger::logException($this, $e);
                 $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
             }
         }
