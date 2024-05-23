@@ -40,11 +40,20 @@ namespace shani\engine\http {
 
         private static function catchErrors(App &$app): void
         {
-            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline)use (&$app) {
-                \library\Logger::logError($app, $errno, $errstr, $errfile, $errline);
+            $logger = $app->logger();
+            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use (&$logger) {
+                $logger->logError($errno, $errstr, $errfile, $errline);
                 return true;
             });
-            set_exception_handler(fn(\Throwable $e) => \library\Logger::logException($app, $e));
+            set_exception_handler(fn(\Throwable $e) => $logger->logException($e));
+        }
+
+        public function logger(): \library\Logger
+        {
+            if (!isset($this->logger)) {
+                $this->logger = new \library\Logger($this->asset()->private());
+            }
+            return $this->logger;
         }
 
         public function web(callable $cb): self
