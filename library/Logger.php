@@ -21,36 +21,42 @@ namespace library {
 
         public function alert(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/alerts', $text, '/alert-');
             return $this;
         }
 
         public function error(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/user-errors', $text, '/user-error-');
             return $this;
         }
 
         public function emergency(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/emergencies', $text, '/emergency-');
             return $this;
         }
 
         public function warning(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/warnings', $text, '/warning-');
             return $this;
         }
 
         public function info(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/infos', $text, '/info-');
             return $this;
         }
 
         public function debug(string $text): self
         {
+            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
             self::writer($this->destination . '/debugs', $text, '/debug-');
             return $this;
         }
@@ -61,7 +67,7 @@ namespace library {
             $content .= 'Code: ' . $errno . PHP_EOL;
             $content .= 'Message: ' . $errstr . PHP_EOL;
             $content .= 'Source: ' . $errfile . PHP_EOL;
-            $content .= 'Line: ' . $errline . PHP_EOL . PHP_EOL;
+            $content .= 'Line: ' . $errline . PHP_EOL;
             self::writer($this->destination . '/app-errors', $content, '/app-error-');
             echo 'Error has occured, please check logs.' . PHP_EOL;
             return $this;
@@ -78,7 +84,7 @@ namespace library {
                 if (is_dir($destination) || mkdir($destination, 0744, true)) {
                     $filename = $destination . $prefix . date('Y-m-d') . '.log';
                     $file = fopen($filename, 'a');
-                    fwrite($file, $content);
+                    fwrite($file, $content . PHP_EOL);
                     fclose($file);
                 }
             });
