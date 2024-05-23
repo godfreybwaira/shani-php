@@ -57,7 +57,7 @@ namespace library {
 
         private static function text(string $text): string
         {
-            return 'Time: ' . date('H:i:s') . PHP_EOL . 'Message: ' . $text . PHP_EOL;
+            return 'Time: ' . date('H:i:s O') . PHP_EOL . 'Message: ' . $text . PHP_EOL;
         }
 
         public function appError(int $errno, string $errstr, string $errfile, int $errline): self

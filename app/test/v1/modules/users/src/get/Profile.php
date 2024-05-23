@@ -21,6 +21,7 @@ namespace app\test\v1\modules\users\src\get {
 
         public function activity()
         {
+            $this->app->logger()->info('info...');
             $this->app->render('from Shani');
         }
 
