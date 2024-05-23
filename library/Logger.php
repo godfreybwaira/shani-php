@@ -21,51 +21,49 @@ namespace library {
 
         public function alert(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/alerts', $text, '/alert-');
+            self::writer($this->destination . '/alerts', self::text($text), '/alert-');
             return $this;
         }
 
         public function error(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/user-errors', $text, '/user-error-');
+            self::writer($this->destination . '/user-errors', self::text($text), '/user-error-');
             return $this;
         }
 
         public function emergency(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/emergencies', $text, '/emergency-');
+            self::writer($this->destination . '/emergencies', self::text($text), '/emergency-');
             return $this;
         }
 
         public function warning(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/warnings', $text, '/warning-');
+            self::writer($this->destination . '/warnings', self::text($text), '/warning-');
             return $this;
         }
 
         public function info(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/infos', $text, '/info-');
+            self::writer($this->destination . '/infos', self::text($text), '/info-');
             return $this;
         }
 
         public function debug(string $text): self
         {
-            $text = 'Time: ' . date('H:i:s') . PHP_EOL . $text . PHP_EOL;
-            self::writer($this->destination . '/debugs', $text, '/debug-');
+            self::writer($this->destination . '/debugs', self::text($text), '/debug-');
             return $this;
+        }
+
+        private static function text(string $text): string
+        {
+            return 'Time: ' . date('H:i:s') . PHP_EOL . 'Message: ' . $text . PHP_EOL;
         }
 
         public function appError(int $errno, string $errstr, string $errfile, int $errline): self
         {
-            $content = 'Time: ' . date('H:i:s') . PHP_EOL;
+            $content = self::text($errstr);
             $content .= 'Code: ' . $errno . PHP_EOL;
-            $content .= 'Message: ' . $errstr . PHP_EOL;
             $content .= 'Source: ' . $errfile . PHP_EOL;
             $content .= 'Line: ' . $errline . PHP_EOL;
             self::writer($this->destination . '/app-errors', $content, '/app-error-');

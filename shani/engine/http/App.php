@@ -21,6 +21,7 @@ namespace shani\engine\http {
         private Request $req;
         private Response $res;
         private AppConfig $config;
+        private \library\Logger $logger;
         private array $cart = [], $dict = [];
         private ?string $lang, $root, $sessId;
 
