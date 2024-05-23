@@ -42,10 +42,10 @@ namespace shani\engine\http {
         {
             $logger = $app->logger();
             set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use (&$logger) {
-                $logger->logError($errno, $errstr, $errfile, $errline);
+                $logger->appError($errno, $errstr, $errfile, $errline);
                 return true;
             });
-            set_exception_handler(fn(\Throwable $e) => $logger->logException($e));
+            set_exception_handler(fn(\Throwable $e) => $logger->exception($e));
         }
 
         public function logger(): \library\Logger
@@ -245,7 +245,7 @@ namespace shani\engine\http {
                     $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
                 }
             } catch (\Exception $e) {
-                \library\Logger::logException($this, $e);
+                \library\Logger::exception($this, $e);
                 $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
             }
         }

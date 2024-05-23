@@ -55,7 +55,7 @@ namespace library {
             return $this;
         }
 
-        public function logError(int $errno, string $errstr, string $errfile, int $errline): self
+        public function appError(int $errno, string $errstr, string $errfile, int $errline): self
         {
             $content = 'Time: ' . date('H:i:s') . PHP_EOL;
             $content .= 'Code: ' . $errno . PHP_EOL;
@@ -67,9 +67,9 @@ namespace library {
             return $this;
         }
 
-        public function logException(\Exception &$e): self
+        public function exception(\Exception &$e): self
         {
-            return $this->logError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+            return $this->appError($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
         }
 
         private static function writer(string $destination, string $content, string $prefix): void
