@@ -40,8 +40,7 @@ namespace library\test {
                 }
                 echo $this->lines . PHP_EOL;
                 $title = 'Total Tests: ' . $this->total . ' (100%)';
-                echo 'Results:' . PHP_EOL;
-                echo $title . PHP_EOL;
+                echo 'Results:' . PHP_EOL . $title . PHP_EOL;
                 echo 'Test Passed: ' . $this->pass . ' (' . round($this->pass * 100 / $this->total, 2) . '%)' . PHP_EOL;
                 $diff = $this->total - $this->pass;
                 echo 'Test Failed: ' . $diff . ' (' . round($diff * 100 / $this->total, 2) . '%)' . PHP_EOL;
