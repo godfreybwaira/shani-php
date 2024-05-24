@@ -13,95 +13,133 @@ namespace library\test {
     {
 
         private $value = null;
-        private ?string $details = null;
+        private int $pass = 0, $total = 0;
 
-        public function __constructor(string $description = null)
+        public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
+        public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
+        public const TYPE_NULL = 'NULL', TYPE_RESOURCE_CLOSED = 'resource (closed)';
+        public const TYPE_RESOURCE = 'resource', TYPE_UNKNOWN = 'unknown type';
+        private const COLOR_BLACK = 0, COLOR_GREEN = 2, COLOR_RED = 1, COLOR_CYAN = 6;
+        private const COLOR_BROWN = 3, COLOR_BLUE = 4, COLOR_PURPLE = 5, COLOR_GREY = 7;
+
+        public function __construct(string $description = null)
         {
             if ($description !== null) {
                 $count = strlen($description);
-                $str = str_repeat('-', $count + 3) . PHP_EOL;
-                echo $str . strtoupper($description) . PHP_EOL . $str;
+                $str = '+' . str_repeat('-', $count + 2) . '+' . PHP_EOL;
+                echo $str . '| ' . strtoupper($description) . ' |' . PHP_EOL . $str;
             }
         }
 
-        public function checkIf(mixed $value, string $details = null): self
+        public function __destruct()
         {
-            $this->details = $details;
+            if ($this->total > 1) {
+                $diff = $this->total - $this->pass;
+                $title = 'Total Tests: ' . $this->total . ' (100%)';
+                echo str_repeat('-', strlen($title) + 2) . PHP_EOL;
+                echo $title . PHP_EOL;
+                echo 'Test Passed: ' . $this->pass . ' (' . round($this->pass * 100 / $this->total, 2) . '%)' . PHP_EOL;
+                echo 'Test Failed: ' . $diff . ' (' . round($diff * 100 / $this->total, 2) . '%)' . PHP_EOL;
+            }
+        }
+
+        public function testIf(mixed $value): self
+        {
             $this->value = $value;
+            return $this;
         }
 
-        public function has($value): self
+        public function isNotType(string $type, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && in_array($value, $this->value));
+            return $this->compare(gettype($this->value) !== $type, $details);
         }
 
-        public function missing($value): self
+        public function isType(string $type, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && !in_array($value, $this->value));
+            return $this->compare(gettype($this->value) === $type, $details);
         }
 
-        public function isGreaterThan($value): self
+        public function has($value, string $details = null): self
         {
-            return $this->compare($this->value > $value);
+            return $this->compare(is_array($this->value) && in_array($value, $this->value), $details);
         }
 
-        public function isLessThan($value): self
+        public function missing($value, string $details = null): self
         {
-            return $this->compare($this->value < $value);
+            return $this->compare(is_array($this->value) && !in_array($value, $this->value), $details);
         }
 
-        public function isEmpty(): self
+        public function isGreaterThan($value, string $details = null): self
         {
-            return $this->compare($this->value === '' || $this->value === null);
+            return $this->compare($this->value > $value, $details);
         }
 
-        public function isNotEmpty(): self
+        public function isLessThan($value, string $details = null): self
         {
-            return $this->compare($this->value !== '' || $this->value !== null);
+            return $this->compare($this->value < $value, $details);
         }
 
-        public function isFalsy(): self
+        public function isEmpty(string $details = null): self
         {
-            return $this->compare(empty($this->value));
+            return $this->compare($this->value === '' || $this->value === null, $details);
         }
 
-        public function isTruthy(): self
+        public function isNotEmpty(string $details = null): self
         {
-            return $this->compare(!empty($this->value));
+            return $this->compare($this->value == 0 || !empty($this->value), $details);
         }
 
-        public function is($value): self
+        public function isFalsy(string $details = null): self
         {
-            return $this->compare($this->value == $value);
+            return $this->compare(empty($this->value), $details);
         }
 
-        public function isExact($value): self
+        public function isTruthy(string $details = null): self
         {
-            return $this->compare($this->value === $value);
+            return $this->compare(!empty($this->value), $details);
         }
 
-        public function isNotExact($value): self
+        public function is($value, string $details = null): self
         {
-            return $this->compare($this->value !== $value);
+            return $this->compare($this->value == $value, $details);
         }
 
-        public function isNot($value): self
+        public function isExact($value, string $details = null): self
         {
-            return $this->compare($this->value != $value);
+            return $this->compare($this->value === $value, $details);
         }
 
-        private function compare(bool $value): self
+        public function isNotExact($value, string $details = null): self
         {
-            if ($value) {
-                echo $this->details . PHP_EOL;
-                echo 'Pass' . PHP_EOL;
+            return $this->compare($this->value !== $value, $details);
+        }
+
+        public function isNot($value, string $details = null): self
+        {
+            return $this->compare($this->value != $value, $details);
+        }
+
+        private function compare(bool $pass, string $details = null): self
+        {
+            $this->total++;
+            if ($pass) {
+                $this->pass++;
+                echo self::setColor($this->total . '.Pass ', self::COLOR_BLACK, self::COLOR_GREEN);
             } else {
-                echo 'Fail' . PHP_EOL;
+                echo self::setColor($this->total . '.Fail ', self::COLOR_BLACK, self::COLOR_RED);
+            }
+            if ($details !== null) {
+                echo' ' . $details . PHP_EOL;
             }
             return $this;
         }
+
+        private static function setColor(string $text, int $fontColor, ?int $bgColor = null, int $bold = 0): string
+        {
+            $font = 30 + $fontColor;
+            $bg = $bgColor !== null ? ';' . (40 + $bgColor) . 'm' : 'm';
+            return "\033[$bold;$font{$bg}$text\033[0m";
+        }
     }
 
-    $test = new TestCase();
-    $test->checkIf(2 + 3, 'Check if 2 + 3 gives 5')->is(5);
 }

@@ -211,7 +211,7 @@ namespace library\client {
         {
             stream_filter_append($src, 'convert.base64-encode');
             while (!feof($src)) {
-                fwrite($dst, chunk_split(fread($src, \library\Utils::BUFFER_SIZE_1MB)));
+                fwrite($dst, chunk_split(fread($src, \library\Utils::BUFFER_SIZE)));
             }
         }
     }

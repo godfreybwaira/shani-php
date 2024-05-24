@@ -21,7 +21,11 @@ namespace app\test\v1\modules\users\src\get {
 
         public function activity()
         {
-            $this->app->logger()->info('info...');
+
+            $test = new \library\test\UnitTest('Unit Test');
+            $test->testIf(2 + 3)->is(5, 'Check if 2 + 3 gives 5');
+            $test->testIf(2)->isGreaterThan(3, 'Check if 2 is greater than 3');
+            $test->testIf(2)->isGreaterThan(1, 'Check if 2 is greater than 1');
             $this->app->render('from Shani');
         }
 

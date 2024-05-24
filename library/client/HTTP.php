@@ -30,8 +30,8 @@ namespace library\client {
                 CURLOPT_SSL_VERIFYPEER => true, CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true, CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_HEADER => true, CURLOPT_CONNECTTIMEOUT => $timeout,
-                CURLOPT_UPLOAD_BUFFERSIZE => \library\Utils::BUFFER_SIZE_1MB,
-                CURLOPT_BUFFERSIZE => \library\Utils::BUFFER_SIZE_1MB
+                CURLOPT_UPLOAD_BUFFERSIZE => \library\Utils::BUFFER_SIZE,
+                CURLOPT_BUFFERSIZE => \library\Utils::BUFFER_SIZE
             ];
         }
 

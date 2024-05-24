@@ -64,7 +64,7 @@ namespace library\client {
             $data = null;
             fseek($stream, $offset);
             while (!feof($stream)) {
-                $data .= fread($stream, \library\Utils::BUFFER_SIZE_1MB);
+                $data .= fread($stream, \library\Utils::BUFFER_SIZE);
             }
             return $data;
         }

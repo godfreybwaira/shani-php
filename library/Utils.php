@@ -13,7 +13,7 @@ namespace library {
     final class Utils
     {
 
-        public const BUFFER_SIZE_1MB = 1048576;
+        public const BUFFER_SIZE = 1048576;
         private const MIN_TO_SEC = 60, DAY_TO_HOURS = 24, SEC_TO_HOURS = 3600,
                 MONTH_TO_DAYS = 30, WEEK_TO_DAYS = 7, DAYS_TO_YEARS = 365;
 
