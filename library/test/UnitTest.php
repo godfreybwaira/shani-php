@@ -13,7 +13,8 @@ namespace library\test {
     {
 
         private $value = null;
-        private int $pass = 0, $total = 0;
+        private int $pass = 0, $total = 0, $length;
+        private ?string $description, $lines = null;
 
         public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
         public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
@@ -24,21 +25,25 @@ namespace library\test {
 
         public function __construct(string $description = null)
         {
-            if ($description !== null) {
-                $count = strlen($description);
-                $str = '+' . str_repeat('-', $count + 2) . '+' . PHP_EOL;
-                echo $str . '| ' . strtoupper($description) . ' |' . PHP_EOL . $str;
-            }
+            $this->length = strlen($description);
+            $this->description = $description;
         }
 
         public function __destruct()
         {
             if ($this->total > 1) {
-                $diff = $this->total - $this->pass;
+                if ($this->description !== null) {
+                    $halfLen = ceil(($this->length - strlen($this->description)) / 2);
+                    $space = str_repeat(' ', $halfLen);
+                    $str = '+' . str_repeat('-', $this->length) . '+' . PHP_EOL;
+                    echo $str . '|' . $space . strtoupper($this->description) . $space . '|' . PHP_EOL . $str;
+                }
+                echo $this->lines . PHP_EOL;
                 $title = 'Total Tests: ' . $this->total . ' (100%)';
-                echo str_repeat('-', strlen($title) + 2) . PHP_EOL;
+                echo 'Results:' . PHP_EOL;
                 echo $title . PHP_EOL;
                 echo 'Test Passed: ' . $this->pass . ' (' . round($this->pass * 100 / $this->total, 2) . '%)' . PHP_EOL;
+                $diff = $this->total - $this->pass;
                 echo 'Test Failed: ' . $diff . ' (' . round($diff * 100 / $this->total, 2) . '%)' . PHP_EOL;
             }
         }
@@ -124,12 +129,23 @@ namespace library\test {
             $this->total++;
             if ($pass) {
                 $this->pass++;
-                echo self::setColor($this->total . '.Pass ', self::COLOR_BLACK, self::COLOR_GREEN);
+                $str = ' ' . $this->total . '.Pass ';
+                $len = strlen($str);
+                $this->lines .= $str;
             } else {
-                echo self::setColor($this->total . '.Fail ', self::COLOR_BLACK, self::COLOR_RED);
+                $str = ' ' . $this->total . '.Fail ';
+                $len = strlen($str);
+                $this->lines .= self::setColor($str, self::COLOR_BLACK, self::COLOR_RED);
             }
             if ($details !== null) {
-                echo' ' . $details . PHP_EOL;
+                $count = strlen($details) + $len + 1;
+                if ($this->length < $count) {
+                    $this->length = $count;
+                }
+                if (!$pass) {
+                    $details = self::setColor($details, self::COLOR_RED);
+                }
+                $this->lines .= ' ' . $details . PHP_EOL;
             }
             return $this;
         }
