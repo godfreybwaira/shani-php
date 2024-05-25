@@ -86,14 +86,14 @@ namespace library\test {
             return $this->compare(is_array($this->value) && in_array($value, $this->value), $details);
         }
 
-        public function hasKey($key, string $details = null): self
+        public function hasKey($keys, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && \library\Map::has($this->value, $key), $details);
+            return $this->compare(is_array($this->value) && \library\Map::has($this->value, $keys), $details);
         }
 
-        public function missingKey($key, string $details = null): self
+        public function missingKey($keys, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && !\library\Map::has($this->value, $key), $details);
+            return $this->compare(is_array($this->value) && !\library\Map::has($this->value, $keys), $details);
         }
 
         public function missingValue($value, string $details = null): self
