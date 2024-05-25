@@ -71,6 +71,26 @@ namespace library\test {
             }
         }
 
+        public function matchesWith(string $pattern, string $details = null): self
+        {
+            return $this->compare(preg_match($pattern, $this->value) === 1, $details);
+        }
+
+        public function notMatchesWith(string $pattern, string $details = null): self
+        {
+            return $this->compare(preg_match($pattern, $this->value) === 0, $details);
+        }
+
+        public function contains(string $needle, string $details = null): self
+        {
+            return $this->compare(stripos($this->value, $needle) !== false, $details);
+        }
+
+        public function notContains(string $needle, string $details = null): self
+        {
+            return $this->compare(stripos($this->value, $needle) === false, $details);
+        }
+
         public function isNotType(string $type, string $details = null): self
         {
             return $this->compare(gettype($this->value) !== $type, $details);
