@@ -246,7 +246,7 @@ namespace shani\engine\http {
                     $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
                 }
             } catch (\Exception $e) {
-                \library\Logger::exception($this, $e);
+                $this->logger()->exception($e);
                 $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
             }
         }

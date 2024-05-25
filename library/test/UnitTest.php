@@ -31,7 +31,7 @@ namespace library\test {
 
         public function __destruct()
         {
-            if ($this->total > 1) {
+            if ($this->total > 0) {
                 if ($this->description !== null) {
                     $halfLen = ceil(($this->length - strlen($this->description)) / 2);
                     $space = str_repeat(' ', $halfLen);
@@ -51,6 +51,19 @@ namespace library\test {
         {
             $this->value = $value;
             return $this;
+        }
+
+        public function throws(string $throwable, string $details = null): self
+        {
+            $ex = null;
+            try {
+                $cb = $this->value;
+                $cb();
+            } catch (\Exception $tr) {
+                $ex = $tr;
+            } finally {
+                return $this->compare($ex instanceof $throwable, $details);
+            }
         }
 
         public function isNotType(string $type, string $details = null): self
@@ -128,29 +141,32 @@ namespace library\test {
             $this->total++;
             if ($pass) {
                 $this->pass++;
-                $str = ' ' . $this->total . '.Pass ';
+                $str = $this->total . '.Pass ';
                 $len = strlen($str);
                 $this->lines .= $str;
             } else {
-                $str = ' ' . $this->total . '.Fail ';
+                $str = $this->total . '.Fail ';
                 $len = strlen($str);
                 $this->lines .= self::setColor($str, self::COLOR_BLACK, self::COLOR_RED);
             }
             if ($details !== null) {
-                $count = strlen($details) + $len + 1;
+                $count = strlen($details) + $len;
                 if ($this->length < $count) {
                     $this->length = $count;
                 }
                 if (!$pass) {
                     $details = self::setColor($details, self::COLOR_RED);
                 }
-                $this->lines .= ' ' . $details . PHP_EOL;
+                $this->lines .= $details . PHP_EOL;
             }
             return $this;
         }
 
-        private static function setColor(string $text, int $fontColor, ?int $bgColor = null, int $bold = 0): string
+        private static function setColor(?string $text, int $fontColor, ?int $bgColor = null, int $bold = 0): ?string
         {
+            if ($text === null) {
+                return null;
+            }
             $font = 30 + $fontColor;
             $bg = $bgColor !== null ? ';' . (40 + $bgColor) . 'm' : 'm';
             return "\033[$bold;$font{$bg}$text\033[0m";
