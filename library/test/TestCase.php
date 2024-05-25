@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UnitTest
+ * Description of TestCase
  * @author coder
  *
  * Created on: May 24, 2024 at 9:47:15 AM
@@ -9,7 +9,7 @@
 
 namespace library\test {
 
-    final class UnitTest
+    final class TestCase
     {
 
         private $value = null;
