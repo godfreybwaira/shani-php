@@ -81,12 +81,22 @@ namespace library\test {
             return $this->compare(gettype($this->value) === $type, $details);
         }
 
-        public function has($value, string $details = null): self
+        public function hasValue($value, string $details = null): self
         {
             return $this->compare(is_array($this->value) && in_array($value, $this->value), $details);
         }
 
-        public function missing($value, string $details = null): self
+        public function hasKey($key, string $details = null): self
+        {
+            return $this->compare(is_array($this->value) && \library\Map::has($this->value, $key), $details);
+        }
+
+        public function missingKey($key, string $details = null): self
+        {
+            return $this->compare(is_array($this->value) && !\library\Map::has($this->value, $key), $details);
+        }
+
+        public function missingValue($value, string $details = null): self
         {
             return $this->compare(is_array($this->value) && !in_array($value, $this->value), $details);
         }
