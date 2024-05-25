@@ -42,15 +42,11 @@ namespace shani\engine\http {
             if ($type === 'json') {
                 $this->inputs = json_decode($this->req->raw(), true);
             } elseif ($type === 'xml') {
-                if (($xml = simplexml_load_string($this->req->raw())) !== false) {
-                    $this->inputs = json_decode(json_encode($xml), true);
-                }
+                $this->inputs = \library\DataConvertor::xml2array($this->req->raw());
             } elseif ($type === 'x-www-form-urlencoded') {
                 parse_str($this->req->raw(), $this->inputs);
             } elseif ($type === 'yaml') {
-                if (($data = yaml_parse($this->req->raw())) !== false) {
-                    $this->inputs = $data;
-                }
+                $this->inputs = \library\DataConvertor::yaml2array($this->req->raw());
             } elseif ($type === 'csv') {
                 $this->inputs = str_getcsv($this->req->raw());
             }

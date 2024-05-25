@@ -54,6 +54,15 @@ namespace library\client {
             return $this->raw ??= self::read($this->stream, 0);
         }
 
+        public function asArray(): ?array
+        {
+            $type = \library\Mime::explode($this->headers('content-type'));
+            if (isset($type[1])) {
+                return \library\DataConvertor::convertFrom($this->body(), $type[1]);
+            }
+            return null;
+        }
+
         public function body(): string
         {
             return $this->body ??= self::read($this->stream, $this->headerSize);

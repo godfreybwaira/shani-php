@@ -132,12 +132,12 @@ namespace shani\engine\http {
 
         public function sendXml($data, string $encoding = null): self
         {
-            return $this->plainText(\library\DataConvertor::php2xml($data), 'application/xml', $encoding);
+            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml', $encoding);
         }
 
         public function sendCsv($data, string $encoding = null, string $separator = ','): self
         {
-            return $this->plainText(\library\DataConvertor::php2csv($data, $separator), 'text/csv', $encoding);
+            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv', $encoding);
         }
 
         public function sendYaml($data, string $encoding = null): self

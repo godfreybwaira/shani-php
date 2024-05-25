@@ -195,7 +195,7 @@ namespace library\client {
         {
             if (!empty($this->headers['content-type']) && is_array($body)) {
                 $type = \library\Mime::explode($this->headers['content-type'])[1];
-                return \library\DataConvertor::convert($body, $type);
+                return \library\DataConvertor::convertTo($body, $type);
             }
             return $body;
         }

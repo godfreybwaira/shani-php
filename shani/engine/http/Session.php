@@ -131,7 +131,7 @@ namespace shani\engine\http {
 
         public function compact(array $headers): array
         {
-            return \library\DataConvertor::php2compact($this->data(), $headers);
+            return \library\DataConvertor::array2compact($this->data(), $headers);
         }
 
         public function get($keys = null, bool $selected = true)

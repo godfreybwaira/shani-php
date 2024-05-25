@@ -106,7 +106,7 @@ namespace library\schema {
         public function getCompact(string $query, array $headers, ?array $data = null, bool $escapeHtml = true): array
         {
             $rows = $this->getResult($query, $data, $escapeHtml);
-            return \library\DataConvertor::php2compact($rows, $headers);
+            return \library\DataConvertor::array2compact($rows, $headers);
         }
     }
 
