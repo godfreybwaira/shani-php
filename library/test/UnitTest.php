@@ -31,6 +31,11 @@ namespace library\test {
 
         public function __destruct()
         {
+            $this->printResults();
+        }
+
+        private function printResults(): void
+        {
             if ($this->total > 0) {
                 if ($this->description !== null) {
                     $halfLen = ceil(($this->length - strlen($this->description)) / 2);
