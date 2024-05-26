@@ -15,6 +15,7 @@ namespace library\test {
         private $value = null;
         private int $pass = 0, $total = 0, $length;
         private ?string $description, $lines = null;
+        private $before = null, $after = null;
 
         public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
         public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
@@ -58,17 +59,21 @@ namespace library\test {
             return $this;
         }
 
-        public function throws(string $throwable, string $details = null): self
+        private function setup(callable $callback): self
         {
-            $ex = null;
-            try {
-                $cb = $this->value;
-                $cb();
-            } catch (\Exception $tr) {
-                $ex = $tr;
-            } finally {
-                return $this->compare($ex instanceof $throwable, $details);
+            if ($callback !== null) {
+                $callback();
             }
+        }
+
+        public function afterEachTest(callable $callback): self
+        {
+            $this->after = $callback;
+        }
+
+        public function beforeEachTest(callable $callback): self
+        {
+            $this->before = $callback;
         }
 
         public function matchesWith(string $pattern, string $details = null): self
@@ -173,6 +178,7 @@ namespace library\test {
 
         private function compare(bool $pass, string $details = null): self
         {
+            $this->setup($this->before);
             $this->total++;
             if ($pass) {
                 $this->pass++;
@@ -194,6 +200,7 @@ namespace library\test {
                 }
                 $this->lines .= $details . PHP_EOL;
             }
+            $this->setup($this->after);
             return $this;
         }
 
