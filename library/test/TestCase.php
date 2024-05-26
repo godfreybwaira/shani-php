@@ -59,7 +59,7 @@ namespace library\test {
             return $this;
         }
 
-        private function setup(callable $callback): self
+        private static function setup(?callable $callback): self
         {
             if ($callback !== null) {
                 $callback();
@@ -178,7 +178,7 @@ namespace library\test {
 
         private function compare(bool $pass, string $details = null): self
         {
-            $this->setup($this->before);
+            self::setup($this->before);
             $this->total++;
             if ($pass) {
                 $this->pass++;
@@ -200,7 +200,7 @@ namespace library\test {
                 }
                 $this->lines .= $details . PHP_EOL;
             }
-            $this->setup($this->after);
+            self::setup($this->after);
             return $this;
         }
 
