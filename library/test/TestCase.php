@@ -59,6 +59,20 @@ namespace library\test {
             return $this;
         }
 
+        private static function toReadable($value)
+        {
+            if (is_bool($value)) {
+                return $value ? 'true' : 'false';
+            }
+            if ($value === null) {
+                return 'NULL';
+            }
+            if (is_array($value)) {
+                return json_encode($value);
+            }
+            return $value;
+        }
+
         private static function setup(?callable $callback): self
         {
             if ($callback !== null) {
@@ -78,105 +92,105 @@ namespace library\test {
 
         public function matchesWith(string $pattern, string $details = null): self
         {
-            return $this->compare(preg_match($pattern, $this->value) === 1, $details);
+            return $this->compare($pattern, preg_match($pattern, $this->value) === 1, $details);
         }
 
         public function notMatchesWith(string $pattern, string $details = null): self
         {
-            return $this->compare(preg_match($pattern, $this->value) === 0, $details);
+            return $this->compare($pattern, preg_match($pattern, $this->value) === 0, $details);
         }
 
         public function contains(string $needle, string $details = null): self
         {
-            return $this->compare(stripos($this->value, $needle) !== false, $details);
+            return $this->compare($needle, stripos($this->value, $needle) !== false, $details);
         }
 
         public function notContains(string $needle, string $details = null): self
         {
-            return $this->compare(stripos($this->value, $needle) === false, $details);
+            return $this->compare($needle, stripos($this->value, $needle) === false, $details);
         }
 
         public function isNotType(string $type, string $details = null): self
         {
-            return $this->compare(gettype($this->value) !== $type, $details);
+            return $this->compare($type, gettype($this->value) !== $type, $details);
         }
 
         public function isType(string $type, string $details = null): self
         {
-            return $this->compare(gettype($this->value) === $type, $details);
+            return $this->compare($type, gettype($this->value) === $type, $details);
         }
 
         public function hasValue($value, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && in_array($value, $this->value), $details);
+            return $this->compare($value, is_array($this->value) && in_array($value, $this->value), $details);
         }
 
         public function hasKey($keys, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && \library\Map::has($this->value, $keys), $details);
+            return $this->compare($value, is_array($this->value) && \library\Map::has($this->value, $keys), $details);
         }
 
         public function missingKey($keys, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && !\library\Map::has($this->value, $keys), $details);
+            return $this->compare($keys, is_array($this->value) && !\library\Map::has($this->value, $keys), $details);
         }
 
         public function missingValue($value, string $details = null): self
         {
-            return $this->compare(is_array($this->value) && !in_array($value, $this->value), $details);
+            return $this->compare($value, is_array($this->value) && !in_array($value, $this->value), $details);
         }
 
         public function isGreaterThan($value, string $details = null): self
         {
-            return $this->compare($this->value > $value, $details);
+            return $this->compare($value, $this->value > $value, $details);
         }
 
         public function isLessThan($value, string $details = null): self
         {
-            return $this->compare($this->value < $value, $details);
+            return $this->compare($value, $this->value < $value, $details);
         }
 
         public function isEmpty(string $details = null): self
         {
-            return $this->compare($this->value === '' || $this->value === null, $details);
+            return $this->compare('(empty)', $this->value === '' || $this->value === null, $details);
         }
 
         public function isNotEmpty(string $details = null): self
         {
-            return $this->compare($this->value == 0 || !empty($this->value), $details);
+            return $this->compare('(not empty)', $this->value == 0 || !empty($this->value), $details);
         }
 
         public function isFalsy(string $details = null): self
         {
-            return $this->compare(empty($this->value), $details);
+            return $this->compare('falsy', empty($this->value), $details);
         }
 
         public function isTruthy(string $details = null): self
         {
-            return $this->compare(!empty($this->value), $details);
+            return $this->compare('truthy', !empty($this->value), $details);
         }
 
         public function is($value, string $details = null): self
         {
-            return $this->compare($this->value == $value, $details);
+            return $this->compare($value, $this->value == $value, $details);
         }
 
         public function isExact($value, string $details = null): self
         {
-            return $this->compare($this->value === $value, $details);
+            return $this->compare($value, $this->value === $value, $details);
         }
 
         public function isNotExact($value, string $details = null): self
         {
-            return $this->compare($this->value !== $value, $details);
+            return $this->compare($value, $this->value !== $value, $details);
         }
 
         public function isNot($value, string $details = null): self
         {
-            return $this->compare($this->value != $value, $details);
+            return $this->compare($value, $this->value != $value, $details);
         }
 
-        private function compare(bool $pass, string $details = null): self
+        private function compare($expected, bool $pass, string $details = null): self
         {
             self::setup($this->before);
             $this->total++;
@@ -190,16 +204,16 @@ namespace library\test {
                 $len = strlen($str);
                 $this->lines .= self::setColor($str, self::COLOR_BLACK, self::COLOR_RED);
             }
-            if ($details !== null) {
-                $count = strlen($details) + $len;
-                if ($this->length < $count) {
-                    $this->length = $count;
-                }
-                if (!$pass) {
-                    $details = self::setColor($details, self::COLOR_RED);
-                }
-                $this->lines .= $details . PHP_EOL;
+            $details . ' Expected: ' . self::toReadable($expected);
+            $details .= ', Found: ' . self::toReadable($this->value);
+            $count = strlen($details) + $len;
+            if ($this->length < $count) {
+                $this->length = $count;
             }
+            if (!$pass) {
+                $details = self::setColor($details, self::COLOR_RED);
+            }
+            $this->lines .= $details . PHP_EOL;
             self::setup($this->after);
             return $this;
         }
