@@ -167,6 +167,10 @@ namespace shani\engine\http {
                 ob_start();
                 $this->gui()->render($data, $state);
                 $this->res->sendHtml(ob_get_clean());
+            } else if ($type === 'event-stream') {
+                ob_start();
+                $this->gui()->render($data, $state);
+                $this->res->sendSse(ob_get_clean());
             } else {
                 $this->res->send($data);
             }

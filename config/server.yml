@@ -11,8 +11,9 @@ MAX_CONNECTIONS: 1024
 # maximum number of requests a worker process should execute
 # before it is automatically restarted by the server
 REQ_PER_WORKER: 100
+ENABLE_HTTP2: false
 SSL:
   KEY: "${SSL_DIR}/server.key"
   CERT: "${SSL_DIR}/server.crt"
-DAEMON: false
+RUNAS_DAEMON: false
 ERROR_LOG: "${SERVER_LOGS}/error"

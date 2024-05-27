@@ -24,7 +24,7 @@ namespace library\client {
 
         public function __construct(string $host, int $retries = 3, int $timeout = 500)
         {
-            $this->boundary = time() . substr(md5(random_bytes(9)), 0, 12);
+            $this->boundary = hrtime(true) . substr(md5(random_bytes(9)), 0, 12);
             $this->host = $host;
             $this->retries = $retries;
             $this->timeout = $timeout;

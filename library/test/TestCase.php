@@ -73,7 +73,7 @@ namespace library\test {
             return $value;
         }
 
-        private static function setup(?callable $callback): self
+        private static function setup(?callable $callback): void
         {
             if ($callback !== null) {
                 $callback();

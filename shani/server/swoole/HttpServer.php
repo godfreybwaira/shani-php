@@ -11,6 +11,7 @@ namespace shani\server\swoole {
 
     use shani\engine\http\Host;
     use shani\engine\http\App;
+    use Swoole\WebSocket\Server as WSocket;
 
     final class HttpServer
     {
@@ -18,7 +19,7 @@ namespace shani\server\swoole {
         private const SOCKET_TCP = 1, SSL = 512;
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'PREEMPTIVE' => 3, 'FIXED' => 2];
 
-        private static function configure(array $cnf): \Swoole\WebSocket\Server
+        private static function configure(array $cnf): WSocket
         {
             $maxCon = (int) $cnf['MAX_CONNECTIONS'];
             new \library\Concurrency(new Concurrency());
@@ -26,15 +27,16 @@ namespace shani\server\swoole {
             Host::setHandler(new Cache($maxCon, 150));
             \library\Mime::setHandler(new Cache(1500, 100));
             \shani\engine\http\Session::setHandler(new Cache($maxCon, 1000));
-            $server = new \Swoole\WebSocket\Server($cnf['IP'], $cnf['PORTS']['HTTP']);
+            $server = new WSocket($cnf['IP'], $cnf['PORTS']['HTTP']);
             $cores = swoole_cpu_num();
             $server->set([
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
+                'open_http2_protocol' => $cnf['ENABLE_HTTP2'],
                 'backlog' => $cores * 30, // number of connections in queue
                 'max_request' => (int) $cnf['REQ_PER_WORKER'], 'http_compression' => true,
                 'max_conn' => $maxCon, 'task_enable_coroutine' => true,
-                'http_compression_level' => 3, 'daemonize' => $cnf['DAEMON'],
+                'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
                 'ssl_cert_file' => str_replace('${SSL_DIR}', \shani\Config::SSL_DIR, $cnf['SSL']['CERT']),
@@ -73,8 +75,17 @@ namespace shani\server\swoole {
                 $scheme = $cnf['PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
                 self::handleHTTP($scheme, $req, $res);
             });
+            $requests = [];
+            $server->on('open', function (WSocket $server, \Swoole\Http\Request $req)use (&$requests) {
+                $requests[$req->fd] = $req;
+            });
+            $server->on('message', function (WSocket $server, \Swoole\WebSocket\Frame $frame)use (&$requests) {
+                print_r($requests[$frame->fd]);
+            });
+            $server->on('close', function (WSocket $server, int $fd)use (&$requests) {
+                unset($requests[$fd]);
+            });
             $server->on('task', fn() => null);
-            $server->on('message', fn() => null);
             $server->start();
         }
     }

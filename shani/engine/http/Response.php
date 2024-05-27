@@ -81,6 +81,9 @@ namespace shani\engine\http {
                         return $this->sendHtml($data, $encoding);
                     case'raw':
                         return $this->plainText($data, 'application/octet-stream', '');
+                    case'sse':
+                    case'event-stream':
+                        return $this->sendSse($data);
                     case'js':
                     case'jsonp':
                         return $this->sendJsonp($data, $this->req->query('callback') ?? 'callback', $encoding);
@@ -101,6 +104,15 @@ namespace shani\engine\http {
         public function sendHtml($data, string $encoding = null): self
         {
             return $this->plainText($data, 'text/html', $encoding);
+        }
+
+        public function sendSse($data, string $event = 'message'): self
+        {
+            $this->setHeaders('cache-control', 'no-cache');
+            $evt = 'id:idn' . hrtime(true) . PHP_EOL;
+            $evt .= 'event:' . $event . PHP_EOL;
+            $evt .= 'data:' . $data . PHP_EOL . PHP_EOL;
+            return $this->plainText($evt, 'text/event-stream', null);
         }
 
         public function sendJson($data, string $encoding = null): self

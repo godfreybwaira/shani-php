@@ -392,6 +392,9 @@
             if (req.scheme === 'ws') {
                 return WSocket(req);
             }
+            if (req.scheme === 'sse') {
+                return ServerEvent(req);
+            }
             let emi = req.emitter;
             if (emi.tagName === 'FORM') {
                 emi = req.emitter.querySelector('fieldset') || emi;
@@ -749,6 +752,45 @@
             const host = req.url.charAt(0) === '/' ? location.host : '';
             const socket = new WebSocket(scheme + '://' + host + req.url);
             loaders(req, socket);
+        };
+    })();
+    const ServerEvent = (function () {
+        const loaders = function (req, sse) {
+            const on = function (e, cb) {
+                sse.addEventListener(e, cb);
+                return on;
+            };
+            const cb = function (ev, e) {
+                const obj = Utils.object({req, resp: {data: ev.data || null, headers: null}});
+                if (e !== 'error' && e !== 'end') {
+                    HTML.handleData(obj);
+                }
+                Utils.dispatch(e, obj);
+                HTML.handleCSS(obj).handlePlugin(obj);
+            };
+            const evt = Utils.explode(req.emitter.getAttribute('shani-on') || 'message');
+            for (let e of evt) {
+                on(e[0], function (ev) {
+                    cb(ev, ev.type);
+                });
+            }
+            on('error', function (e) {
+                cb(e, e.type);
+            })('beforeunload', function (e) {
+                sse.close();
+                cb(e, 'end');
+            });
+        };
+        const createUrl = function (req) {
+            const fd = Convertor.input2form(req.emitter);
+            if (fd) {
+                const mark = req.url.indexOf('?') < 0 ? '?' : '&';
+                return req.url + mark + Convertor.urlencoded(fd);
+            }
+            return req.url;
+        };
+        return function (req) {
+            loaders(req, new EventSource(createUrl(req)));
         };
     })();
 })(document);

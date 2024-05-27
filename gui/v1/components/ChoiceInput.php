@@ -35,7 +35,7 @@ namespace gui\v1\components {
             $listItem = new Component('li');
             $input = new Component('input');
             $input->setAttribute('type', $this->type)->setAttribute('name', $this->name);
-            $id = 'id' . rand(100, 10000);
+            $id = 'id' . hrtime(true);
             $input->setAttribute('id', $id)->setAttribute('value', $value)->setMargin(null);
             $label = new Component('label', $text ?? $value);
             $label->setAttribute('for', $id)->setMargin(null);

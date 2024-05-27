@@ -32,7 +32,7 @@ namespace gui\v1\components {
         public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
-                $id = 'id' . rand(100, 10000);
+                $id = 'id' . hrtime(true);
                 $slide = new Component('li', false);
                 $slide->appendChildren($item);
                 $slide->setAttribute('id', $id);
