@@ -776,21 +776,12 @@
             }
             on('error', function (e) {
                 cb(e, e.type);
-            })('beforeunload', function (e) {
+            })('beforeunload', function () {
                 sse.close();
-                cb(e, 'end');
             });
         };
-        const createUrl = function (req) {
-            const fd = Convertor.input2form(req.emitter);
-            if (fd) {
-                const mark = req.url.indexOf('?') < 0 ? '?' : '&';
-                return req.url + mark + Convertor.urlencoded(fd);
-            }
-            return req.url;
-        };
         return function (req) {
-            loaders(req, new EventSource(createUrl(req)));
+            loaders(req, new EventSource(req.url));
         };
     })();
 })(document);
