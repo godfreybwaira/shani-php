@@ -761,7 +761,9 @@
                 return on;
             };
             const cb = function (ev, e) {
-                const obj = Utils.object({req, resp: {data: ev.data || null, headers: null}});
+                const obj = Utils.object({
+                    req, resp: {data: ev.data || null, headers: new Map().set('content-type', 'text/html')}
+                });
                 if (e !== 'error' && e !== 'end') {
                     HTML.handleData(obj);
                 }
@@ -781,7 +783,7 @@
             });
         };
         return function (req) {
-            loaders(req, new EventSource(req.url));
+            loaders(req, new EventSource(req.url, {withCredentials: true}));
         };
     })();
 })(document);
