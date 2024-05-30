@@ -7,9 +7,9 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace app\test\v1\modules\users\src\get {
+namespace app\test\v1\modules\users\src\post {
 
-    final class Profile
+    final class Staff
     {
 
         private \shani\engine\http\App $app;

@@ -9,7 +9,7 @@
 
 namespace app\test\v1\modules\users\src\get {
 
-    final class Profile
+    final class Accounts
     {
 
         private \shani\engine\http\App $app;

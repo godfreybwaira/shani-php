@@ -101,6 +101,11 @@ namespace app\test\v1\config {
             return App::NAME;
         }
 
+        public function appDescription(): ?string
+        {
+            return App::DESCRIPTION;
+        }
+
         public function homeGuest(): string
         {
             return Module::HOME_GUEST;

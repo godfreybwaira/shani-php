@@ -13,6 +13,7 @@ namespace app\test\v1\config {
     {
 
         public const NAME = 'Shani Foundation Framework v1.0';
+        public const DESCRIPTION = 'My app is awesome';
         public const DEVELOPMENT = true;
         public const ROOT_DIR = '/test/v1';
         public const COOKIE_MAX_AGE = '2 hours';

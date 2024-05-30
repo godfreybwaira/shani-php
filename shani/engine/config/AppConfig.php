@@ -52,6 +52,8 @@ namespace shani\engine\config {
 
         public function appName(): string;
 
+        public function appDescription(): ?string;
+
         public function development(): bool;
     }
 
