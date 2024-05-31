@@ -111,7 +111,8 @@ namespace shani\engine\http {
             $this->setHeaders('cache-control', 'no-cache');
             $evt = 'id:idn' . hrtime(true) . PHP_EOL;
             $evt .= 'event:' . $event . PHP_EOL;
-            $evt .= 'data:' . $data . PHP_EOL . PHP_EOL;
+            $evt .= 'data:' . (is_array($data) ? serialize($data) : $data);
+            $evt .= PHP_EOL . PHP_EOL;
             return $this->plainText($evt, 'text/event-stream', null);
         }
 

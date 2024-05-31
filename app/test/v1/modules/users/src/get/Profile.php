@@ -21,13 +21,13 @@ namespace app\test\v1\modules\users\src\get {
 
         public function activity()
         {
-            $this->app->documentation();
+            $data = $this->app->documentation();
 
 //            $test = new \library\test\TestCase('Unit Test');
 //            $test->testIf(2 + 3)->is(5, 'Check if 2 + 3 gives 5');
 //            $test->testIf(2)->isGreaterThan(3, 'Check if 2 is greater than 3')
 //                    ->isGreaterThan(1, 'Check if 2 is greater than 1');
-            $this->app->render('from Shani');
+            $this->app->response()->sendJson($data);
 //
         }
 
@@ -43,11 +43,6 @@ namespace app\test\v1\modules\users\src\get {
                 ['sn' => 6, 'name' => 'Rash', 'id' => 33, 'age' => 81]
             ];
             $this->app->response()->send($data);
-        }
-
-        public function data()
-        {
-
         }
     }
 

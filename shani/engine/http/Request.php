@@ -195,7 +195,7 @@ namespace shani\engine\http {
         {
             $parts = $name === null ? $this->url : self::explodePath($name);
             if (!empty($parts)) {
-                return $parts['module'] . '/' . $this->req->method() . $parts['resource'] . $parts['callback'];
+                return $this->req->method() . $parts['module'] . $parts['resource'] . $parts['callback'];
             }
             return null;
         }

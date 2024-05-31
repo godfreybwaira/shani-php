@@ -10,7 +10,6 @@
 namespace shani\engine\http {
 
     use library\HttpStatus;
-    use library\srcdoc\Documentation;
     use shani\engine\config\AppConfig;
 
     final class App
@@ -25,7 +24,6 @@ namespace shani\engine\http {
         private \library\Logger $logger;
         private array $cart = [], $dict = [];
         private ?string $lang, $root, $sessId;
-        private ?Documentation $srcdoc = null;
 
         private const USER_NAME = '_u0s4e5R0s$s', USER_ROLES = '_mGnUs$nrWM0', APP_TOKENS = '_gGOd2y$oNO6W';
 
@@ -238,12 +236,9 @@ namespace shani\engine\http {
             return str_replace('/', '\\', $class);
         }
 
-        public function documentation(): Documentation
+        public function documentation(): array
         {
-            if ($this->srcdoc === null) {
-                $this->srcdoc = new Documentation($this->config);
-            }
-            return $this->srcdoc;
+            return (new \shani\engine\core\SrcDoc($this->config))->generate();
         }
 
         private function submit(string $method, int $trials = 1): void
