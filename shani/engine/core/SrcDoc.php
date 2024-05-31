@@ -9,16 +9,14 @@
 
 namespace shani\engine\core {
 
-    use shani\engine\config\AppConfig;
-
     final class SrcDoc
     {
 
-        private AppConfig $config;
+        private \shani\engine\http\App $app;
 
-        public function __construct(AppConfig &$config)
+        public function __construct(\shani\engine\http\App &$app)
         {
-            $this->config = $config;
+            $this->app = $app;
         }
 
         private static function folderContent(string $rootPath, string $subDir = null)
@@ -39,9 +37,14 @@ namespace shani\engine\core {
 
         public function generate(): array
         {
-            $path = \shani\engine\core\Path::APP . $this->config->root() . $this->config->moduleDir();
-            $modules = self::folderContent($path, $this->config->sourceDir());
-            $docs = [];
+            $config = $this->app->config();
+            $path = \shani\engine\core\Path::APP . $config->root() . $config->moduleDir();
+            $modules = self::folderContent($path, $config->sourceDir());
+            $docs = [
+                'name' => $config->appName(),
+                'description' => $config->appDescription(),
+                'version' => $this->app->request()->version()
+            ];
             foreach ($modules as $module => $reqMethods) {
                 foreach ($reqMethods as $method => $classes) {
                     foreach ($classes as $class) {
@@ -54,7 +57,7 @@ namespace shani\engine\core {
                                 continue;
                             }
                             $id = strtolower($method . '/' . $module . '/' . $className . '/' . $name);
-                            $docs[$module][$className][$name][$method] = [
+                            $docs['modules'][$module][$className][$name][$method] = [
                                 'details' => ucwords(str_replace('/', ' ', $id)),
                                 'signature' => \library\Utils::digest($id)
                             ];

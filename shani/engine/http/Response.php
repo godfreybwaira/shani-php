@@ -155,7 +155,7 @@ namespace shani\engine\http {
 
         public function sendYaml($data, string $encoding = null): self
         {
-//            return $this->plainText(\library\DataConvertor::php2yaml($data), 'text/yaml', $encoding);
+//            return $this->plainText(\library\DataConvertor::array2yaml($data), 'text/yaml', $encoding);
             return $this->plainText(yaml_emit($data), 'text/yaml', $encoding);
         }
 
