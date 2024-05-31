@@ -118,9 +118,9 @@ namespace library {
             return $yaml;
         }
 
-        private static function tocsv(array $obj, string $separator): string
+        private static function tocsv(array $obj, string $separator): ?string
         {
-            $csv = '"' . implode('"' . $separator . '"', array_keys($obj[0])) . '"';
+            $csv = is_array($obj[0]) ? '"' . implode('"' . $separator . '"', array_keys($obj[0])) . '"' : null;
             foreach ($obj as $values) {
                 $row = null;
                 foreach ($values as $val) {

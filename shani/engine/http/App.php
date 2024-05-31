@@ -232,8 +232,7 @@ namespace shani\engine\http {
             $class = \shani\engine\core\Directory::APP . $this->root . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->sourceDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
-            $class .= '\\' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
-            return str_replace('/', '\\', $class);
+            return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
         }
 
         public function documentation(): array
@@ -243,20 +242,18 @@ namespace shani\engine\http {
 
         private function submit(string $method, int $trials = 1): void
         {
-            try {
-                $Class = $this->getClass($this->req->resource(), $method);
-                $obj = new $Class($this);
+            $classPath = $this->getClass($this->req->resource(), $method);
+            if (is_file(SERVER_ROOT . $classPath . '.php')) {
+                $className = str_replace('/', '\\', $classPath);
+                $obj = new $className($this);
                 $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
                 if (is_callable([$obj, $cb])) {
                     $obj->$cb();
-                } elseif (class_exists($Class)) {
-                    $this->error(HttpStatus::NOT_FOUND, $trials);
                 } else {
-                    $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
+                    $this->error(HttpStatus::NOT_FOUND, $trials);
                 }
-            } catch (\Exception $e) {
-                $this->logger()->exception($e);
-                $this->error(HttpStatus::INTERNAL_SERVER_ERROR, $trials);
+            } else {
+                $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
             }
         }
 
