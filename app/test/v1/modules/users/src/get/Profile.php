@@ -19,12 +19,6 @@ namespace app\test\v1\modules\users\src\get {
             $this->app = $app;
         }
 
-        /**
-         * Calculates the sum of two numbers.
-         *
-         * This method takes two integer parameters and returns their sum.
-         * It demonstrates the use of doc comments in PHP.
-         */
         public function activity()
         {
             $data = $this->app->documentation();
