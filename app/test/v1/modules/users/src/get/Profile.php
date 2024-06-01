@@ -19,6 +19,12 @@ namespace app\test\v1\modules\users\src\get {
             $this->app = $app;
         }
 
+        /**
+         * Calculates the sum of two numbers.
+         *
+         * This method takes two integer parameters and returns their sum.
+         * It demonstrates the use of doc comments in PHP.
+         */
         public function activity()
         {
             $data = $this->app->documentation();
@@ -27,7 +33,7 @@ namespace app\test\v1\modules\users\src\get {
 //            $test->testIf(2 + 3)->is(5, 'Check if 2 + 3 gives 5');
 //            $test->testIf(2)->isGreaterThan(3, 'Check if 2 is greater than 3')
 //                    ->isGreaterThan(1, 'Check if 2 is greater than 1');
-            $this->app->response()->sendXml($data);
+            $this->app->response()->sendJson($data);
 //
         }
 

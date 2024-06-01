@@ -35,6 +35,20 @@ namespace shani\engine\core {
             return $folders;
         }
 
+        private static function cleanComment($str): ?string
+        {
+            if ($str !== false) {
+                $comments = explode(PHP_EOL, $str);
+                $size = count($comments) - 1;
+                $result = ltrim($comments[1], " *\t\v\x00");
+                for ($i = 2; $i < $size; $i++) {
+                    $result .= PHP_EOL . ltrim($comments[$i], " *\t\v\x00");
+                }
+                return $result;
+            }
+            return null;
+        }
+
         public function generate(): array
         {
             $config = $this->app->config();
@@ -56,9 +70,10 @@ namespace shani\engine\core {
                             if (substr($name, 0, 2) === '__') {
                                 continue;
                             }
+                            $comments = self::cleanComment($fnobj->getDocComment());
                             $id = strtolower($method . '/' . $module . '/' . $className . '/' . $name);
                             $docs['modules'][$module][$className][$name][$method] = [
-                                'details' => ucwords(str_replace('/', ' ', $id)),
+                                'details' => $comments ?? ucwords(str_replace('/', ' ', $id)),
                                 'signature' => \library\Utils::digest($id)
                             ];
                         }
