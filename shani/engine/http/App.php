@@ -205,7 +205,7 @@ namespace shani\engine\http {
                     if ($code === HttpStatus::OK) {
                         return $this->submit($this->request()->method());
                     }
-                    $this->error($code);
+                    $this->showError($code);
                 }
             };
         }
@@ -250,14 +250,14 @@ namespace shani\engine\http {
                 if (is_callable([$obj, $cb])) {
                     $obj->$cb();
                 } else {
-                    $this->error(HttpStatus::NOT_FOUND, $trials);
+                    $this->showError(HttpStatus::NOT_FOUND, $trials);
                 }
             } else {
-                $this->error(HttpStatus::METHOD_NOT_ALLOWED, $trials);
+                $this->showError(HttpStatus::METHOD_NOT_ALLOWED, $trials);
             }
         }
 
-        private function error(int $statusCode, int $trials = 1): void
+        private function showError(int $statusCode, int $trials = 1): void
         {
             $this->res->setStatus($statusCode);
             $fallback = $this->config->fallback();
