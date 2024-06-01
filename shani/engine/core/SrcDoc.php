@@ -12,13 +12,6 @@ namespace shani\engine\core {
     final class SrcDoc
     {
 
-        private \shani\engine\http\App $app;
-
-        public function __construct(\shani\engine\http\App &$app)
-        {
-            $this->app = $app;
-        }
-
         private static function folderContent(string $rootPath, string $subDir = null)
         {
             $folders = [];
@@ -49,15 +42,15 @@ namespace shani\engine\core {
             return null;
         }
 
-        public function generate(): array
+        public static function generate(\shani\engine\http\App &$app): array
         {
-            $config = $this->app->config();
+            $config = $app->config();
             $path = \shani\engine\core\Path::APP . $config->root() . $config->moduleDir();
             $modules = self::folderContent($path, $config->sourceDir());
             $docs = [
                 'name' => $config->appName(),
                 'description' => $config->appDescription(),
-                'version' => $this->app->request()->version()
+                'version' => $app->request()->version()
             ];
             foreach ($modules as $module => $reqMethods) {
                 foreach ($reqMethods as $method => $classes) {

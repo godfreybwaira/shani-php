@@ -237,7 +237,7 @@ namespace shani\engine\http {
 
         public function documentation(): array
         {
-            return (new \shani\engine\core\SrcDoc($this))->generate();
+            return \shani\engine\core\SrcDoc::generate($this);
         }
 
         private function submit(string $method, int $trials = 1): void
