@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SrcDoc
+ * Description of Documentor
  * @author coder
  *
  * Created on: May 30, 2024 at 4:31:29 PM
@@ -9,7 +9,7 @@
 
 namespace shani\engine\core {
 
-    final class SrcDoc
+    final class Documentor
     {
 
         private static function folderContent(string $rootPath, string $subDir = null)
