@@ -24,12 +24,7 @@ namespace shani\engine\http {
             }
         }
 
-        public function storage(): string
-        {
-            return '/' . $this->host['ID'];
-        }
-
-        public function configuration(?string $version = null): ?string
+        public function getConfig(?string $version = null): ?string
         {
             if ($version === null) {
                 return $this->host['CONFIG_CLASS'][$this->host['DEFAULT_VERSION']];

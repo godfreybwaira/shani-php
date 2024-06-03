@@ -7,7 +7,7 @@
  * Created on: Feb 16, 2024 at 10:26:51 AM
  */
 
-namespace app\test\v1\modules\fallback\src\get {
+namespace apps\test\codes\v1\modules\fallback\src\get {
 
     final class Handlers
     {

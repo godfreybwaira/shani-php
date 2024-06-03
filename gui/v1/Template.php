@@ -20,12 +20,11 @@ namespace gui\v1 {
         private bool $showMenu = false;
         private mixed $data, $state;
         private ?array $scripts, $styles;
-        private ?string $title, $details, $icon, $view, $folder, $bottomType, $topType;
+        private ?string $title, $details, $icon, $view, $bottomType, $topType;
 
         public function __construct(App &$app)
         {
             $this->scripts = $this->styles = $this->data = $this->state = [];
-            $this->folder = $app->authenticated() ? '/auth' : '/guest';
             $this->view = $this->topType = $this->bottomType = null;
             $this->title = $this->details = $this->icon = null;
             $this->app = $app;
@@ -55,7 +54,7 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function root(string $path): string
+        public function html(string $path): string
         {
             return \shani\engine\core\Path::GUI . '/v1/html' . $path . '.php';
         }
@@ -88,7 +87,7 @@ namespace gui\v1 {
             if ($this->app->request()->isAjax()) {
                 self::load($this->view, $this->app);
             } else {
-                self::load($this->root('/main'), $this->app);
+                self::load($this->html('/main'), $this->app);
             }
         }
 
@@ -115,7 +114,7 @@ namespace gui\v1 {
         public function bottom(string $path = null, int $type = 2): self
         {
             if ($path === null) {
-                self::load($this->bottom ?? $this->root($this->folder . '/navbar'), $this->app);
+                self::load($this->bottom ?? $this->html('/navbar'), $this->app);
             } else {
                 $this->bottom = $path;
                 $this->bottomType = self::NAVBAR_TYPE[$type];
@@ -126,7 +125,7 @@ namespace gui\v1 {
         public function top(string $path = null, int $type = 2): self
         {
             if ($path === null) {
-                self::load($this->top ?? $this->root($this->folder . '/navbar'), $this->app);
+                self::load($this->top ?? $this->html('/navbar'), $this->app);
             } else {
                 $this->top = $path;
                 $this->topType = self::NAVBAR_TYPE[$type];
@@ -137,7 +136,7 @@ namespace gui\v1 {
         public function menu(string $path = null): self
         {
             if ($path === null) {
-                self::load($this->menu ?? $this->root($this->folder . '/menu'), $this->app);
+                self::load($this->menu ?? $this->html('/menu'), $this->app);
             } else {
                 $this->showMenu = true;
                 $this->menu = $path;
@@ -164,10 +163,10 @@ namespace gui\v1 {
         {
             $head = $this->icon;
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $this->app->asset()->js($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $this->app->asset()->url($url) . '"></script>';
             }
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->app->asset()->css($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->app->asset()->url($url) . '"/>';
             }
             return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
         }

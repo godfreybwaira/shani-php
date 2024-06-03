@@ -7,7 +7,7 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace app\test\v1\modules\users\src\get {
+namespace apps\test\codes\v1\modules\users\src\get {
 
     final class Profile
     {
@@ -27,7 +27,7 @@ namespace app\test\v1\modules\users\src\get {
 //            $test->testIf(2 + 3)->is(5, 'Check if 2 + 3 gives 5');
 //            $test->testIf(2)->isGreaterThan(3, 'Check if 2 is greater than 3')
 //                    ->isGreaterThan(1, 'Check if 2 is greater than 1');
-            $this->app->response()->sendXml($data);
+            $this->app->response()->send($data);
 //
         }
 

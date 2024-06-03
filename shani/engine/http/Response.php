@@ -34,7 +34,7 @@ namespace shani\engine\http {
             ];
         }
 
-        private function write(?string $content): self
+        private function write(?string $content = null): self
         {
             $this->sendHeaders(['content-length' => $content !== null ? mb_strlen($content) : 0]);
             $this->res->write($this->req->method() !== 'head' ? $content : null);
@@ -63,7 +63,7 @@ namespace shani\engine\http {
         public function send($data = null, string $encoding = null): self
         {
             if ($data === null || $data === '') {
-                return $this->write(null);
+                return $this->write();
             }
             $type = $this->type();
             if ($type !== null) {
@@ -234,7 +234,7 @@ namespace shani\engine\http {
         {
             $size = filesize($path);
             if ($size <= $start || ($end !== null && $start >= $end)) {
-                return $this->setStatus(HttpStatus::BAD_REQUEST)->sendHeaders();
+                return $this->setStatus(HttpStatus::BAD_REQUEST)->send();
             }
             $chunk = min($size, self::CHUNK_SIZE);
             $len = $size - $start;
@@ -277,7 +277,7 @@ namespace shani\engine\http {
         public function stream(string $filepath, int $chunkSize = null): self
         {
             if (!is_readable($filepath)) {
-                return $this->setStatus(HttpStatus::NOT_FOUND)->sendHeaders();
+                return $this->setStatus(HttpStatus::NOT_FOUND)->send();
             }
             $file = stat($filepath);
             $range = $this->req->headers('range') ?? '=0-';
@@ -292,7 +292,7 @@ namespace shani\engine\http {
         public function sendFile(string $path): self
         {
             if (!is_readable($path)) {
-                return $this->setStatus(HttpStatus::NOT_FOUND)->sendHeaders();
+                return $this->setStatus(HttpStatus::NOT_FOUND)->send();
             }
             $range = $this->req->headers('range');
             $start = $range ? (int) substr($range, strpos($range, '=') + 1, strpos($range, '-')) : 0;

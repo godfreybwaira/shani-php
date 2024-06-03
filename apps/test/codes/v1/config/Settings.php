@@ -7,7 +7,7 @@
  * Created on: Feb 18, 2024 at 2:20:26 PM
  */
 
-namespace app\test\v1\config {
+namespace apps\test\codes\v1\config {
 
     use shani\engine\config\AppConfig;
     use shani\engine\middleware\Register;
@@ -68,7 +68,7 @@ namespace app\test\v1\config {
 
         public function middleware(Register &$mw)
         {
-            \app\test\v1\middleware\Register::exec($this->app, $mw);
+            \apps\test\codes\v1\middleware\Register::exec($this->app, $mw);
         }
 
         public function moduleDir(): string
@@ -104,6 +104,11 @@ namespace app\test\v1\config {
         public function appDescription(): ?string
         {
             return App::DESCRIPTION;
+        }
+
+        public function assetDir(): ?string
+        {
+            return App::ASSET_DIR;
         }
 
         public function homeGuest(): string

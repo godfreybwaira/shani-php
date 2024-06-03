@@ -7,7 +7,7 @@
  * Created on: Feb 19, 2024 at 5:42:34 PM
  */
 
-namespace app\test\v1\config {
+namespace apps\test\codes\v1\config {
 
     interface Connections
     {

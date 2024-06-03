@@ -45,7 +45,7 @@ namespace shani\engine\core {
         public static function generate(\shani\engine\http\App &$app): array
         {
             $config = $app->config();
-            $path = \shani\engine\core\Path::APP . $config->root() . $config->moduleDir();
+            $path = \shani\engine\core\Path::APPS . $config->root() . $config->moduleDir();
             $modules = self::folderContent($path, $config->sourceDir());
             $docs = [
                 'name' => $config->appName(),
@@ -67,7 +67,7 @@ namespace shani\engine\core {
                             $id = strtolower($method . '/' . $module . '/' . $className . '/' . $name);
                             $docs['modules'][$module][$className][$name][$method] = [
                                 'details' => $comments ?? ucwords(str_replace('/', ' ', $id)),
-                                'signature' => \library\Utils::digest($id)
+                                'id' => \library\Utils::digest($id)
                             ];
                         }
                     }

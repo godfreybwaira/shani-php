@@ -54,6 +54,8 @@ namespace shani\engine\config {
 
         public function appDescription(): ?string;
 
+        public function assetDir(): ?string;
+
         public function development(): bool;
     }
 

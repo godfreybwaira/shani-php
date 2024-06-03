@@ -33,9 +33,15 @@ namespace shani\engine\http {
             $this->lang = $this->root = null;
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
-            if (!Asset::tryServe($this)) {
-                self::catchErrors($this);
-                $this->start();
+            $cnf = $host->getConfig($this->req->version());
+            if ($cnf !== null) {
+                $this->config = new $cnf($this);
+                if (!Asset::tryServe($this)) {
+                    self::catchErrors($this);
+                    $this->start();
+                }
+            } else {
+                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send('Unsupported application version');
             }
         }
 
@@ -52,7 +58,7 @@ namespace shani\engine\http {
         public function logger(): \library\Logger
         {
             if (!isset($this->logger)) {
-                $this->logger = new \library\Logger($this->asset()->private());
+                $this->logger = new \library\Logger($this->asset()->directory('/.logs'));
             }
             return $this->logger;
         }
@@ -194,7 +200,7 @@ namespace shani\engine\http {
 
         public function module(): string
         {
-            return \shani\engine\core\Path::APP . $this->root . $this->config->moduleDir() . $this->req->module();
+            return \shani\engine\core\Path::APPS . $this->root . $this->config->moduleDir() . $this->req->module();
         }
 
         private function boot(): callable
@@ -212,24 +218,18 @@ namespace shani\engine\http {
 
         private function start(): void
         {
-            $cnf = $this->host->configuration($this->req->version());
-            if ($cnf !== null) {
-                $path = $this->req->uri()->location();
-                $this->req->forward($path === '/' ? $this->homepage() : $path);
-                $this->config = new $cnf($this);
-                $this->root = $this->config->root();
-                $this->sessId = Session::start($this);
-                $middleware = new \shani\engine\middleware\Register($this, $this->boot());
-                $this->config->middleware($middleware);
-                $middleware->run();
-                return;
-            }
-            $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send('Unsupported application version');
+            $path = $this->req->uri()->location();
+            $this->req->forward($path === '/' ? $this->homepage() : $path);
+            $this->root = $this->config->root();
+            $this->sessId = Session::start($this);
+            $middleware = new \shani\engine\middleware\Register($this, $this->boot());
+            $this->config->middleware($middleware);
+            $middleware->run();
         }
 
         private function getClass(string $resource, string $method): string
         {
-            $class = \shani\engine\core\Directory::APP . $this->root . $this->config->moduleDir();
+            $class = \shani\engine\core\Path::DIR_APPS . $this->root . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->sourceDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
@@ -265,7 +265,7 @@ namespace shani\engine\http {
                 $this->req->forward($fallback . '/s' . $statusCode);
                 $this->submit('get', $trials + 1);
             } else {
-                $this->res->sendHeaders();
+                $this->res->send();
             }
         }
 

@@ -7,7 +7,7 @@
  * Created on: Feb 16, 2024 at 12:11:36 PM
  */
 
-namespace app\test\v1\config {
+namespace apps\test\codes\v1\config {
 
     interface Path
     {

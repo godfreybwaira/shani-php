@@ -7,7 +7,7 @@
  * Created on: Feb 12, 2024 at 1:42:54 PM
  */
 
-namespace app\test\v1\config {
+namespace apps\test\codes\v1\config {
 
     interface Module {
 
