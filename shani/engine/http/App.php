@@ -104,12 +104,7 @@ namespace shani\engine\http {
         public function auth(): Authorization
         {
             if ($this->auth === null) {
-                $choice = $this->config()->authorization();
-                if ($choice === Authorization::AUTH_JWT) {
-                    $this->auth = new \shani\engine\authorization\JWTAuth();
-                } else {
-                    $this->auth = new \shani\engine\authorization\SessionAuth();
-                }
+                $this->auth = new Authorization($this->config());
             }
             return $this->auth;
         }

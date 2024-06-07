@@ -111,6 +111,11 @@ namespace apps\test\codes\v1\config {
             return App::ASSET_DIR;
         }
 
+        public function tokenSecretKey(): string
+        {
+            return App::JWT_SECRET_KEY;
+        }
+
         public function homeGuest(): string
         {
             return Module::HOME_GUEST;
@@ -131,7 +136,7 @@ namespace apps\test\codes\v1\config {
             return Module::PUBS;
         }
 
-        public function authorization(): int
+        public function authorizationType(): int
         {
             return App::AUTHORIZATION;
         }

@@ -26,6 +26,7 @@ namespace apps\test\codes\v1\config {
         public const LANGUAGES = ['sw' => 'Kiswahili', 'en' => 'English'];
         public const CSRF = CSRF_CONFIG::PROTECTION_FLEXIBLE;
         public const AUTHORIZATION = Authorization::AUTH_SESSION;
+        public const JWT_SECRET_KEY = 'my_secret_key_here';
     }
 
 }

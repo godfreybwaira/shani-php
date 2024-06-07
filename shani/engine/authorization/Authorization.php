@@ -9,21 +9,27 @@
 
 namespace shani\engine\authorization {
 
-    abstract class Authorization
+    use shani\engine\config\AppConfig;
+    use shani\engine\http\Session;
+
+    final class Authorization
     {
 
         public const AUTH_SESSION = 0, AUTH_JWT = 1;
+        private const NAME = '_mGnUs$nrWM0';
 
-        private \shani\engine\http\Session $session;
+        private Session $session;
+        private AppConfig $config;
 
-        protected function __construct(string $sessionName)
+        public function __construct(AppConfig &$config)
         {
-            $this->session = new \shani\engine\http\Session($sessionName);
+            $this->config = $config;
+            $this->session = new Session(self::NAME);
         }
 
         public function verified(): bool
         {
-            return $this->session->get('validUser');
+            return $this->session->get('validUser') === true;
         }
 
         public function setPermission(string $list): self
@@ -35,11 +41,10 @@ namespace shani\engine\authorization {
         public function hasPermission(string $url): bool
         {
             $list = $this->session->get('permission');
-            if ($list === '*') {
-                return true;
+            if ($list === null) {
+                return false;
             }
-            $code = \library\Utils::digest($url);
-            return $list !== null && preg_match('/\b' . $code . '\b/', $list);
+            return $list === '*' || preg_match('/\b' . \library\Utils::digest($url) . '\b/', $list);
         }
     }
 
