@@ -104,7 +104,7 @@ namespace shani\engine\http {
         public function auth(): Authorization
         {
             if ($this->auth === null) {
-                $this->auth = new Authorization($this->config());
+                $this->auth = new Authorization($this->config);
             }
             return $this->auth;
         }
