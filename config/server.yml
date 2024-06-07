@@ -16,4 +16,5 @@ SSL:
   KEY: "${SSL_DIR}/server.key"
   CERT: "${SSL_DIR}/server.crt"
 RUNAS_DAEMON: false
+SHOW_ERRORS: false
 ERROR_LOG: "${SERVER_LOGS}/error"

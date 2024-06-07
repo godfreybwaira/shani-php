@@ -21,6 +21,7 @@ namespace shani\server\swoole {
 
         private static function configure(array $cnf): WSocket
         {
+            ini_set('display_errors', $cnf['SHOW_ERRORS']);
             $maxCon = (int) $cnf['MAX_CONNECTIONS'];
             new \library\Concurrency(new Concurrency());
             \library\Event::setHandler(new Event());

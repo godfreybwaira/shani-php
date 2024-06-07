@@ -11,6 +11,7 @@ namespace shani\engine\http {
 
     use library\HttpStatus;
     use shani\engine\config\AppConfig;
+    use shani\engine\authorization\Authorization;
 
     final class App
     {
@@ -20,17 +21,18 @@ namespace shani\engine\http {
         private Asset $asset;
         private Request $req;
         private Response $res;
+        private ?string $lang;
         private AppConfig $config;
+        private ?Authorization $auth;
         private \library\Logger $logger;
-        private array $cart = [], $dict = [];
-        private ?string $lang, $root, $sessId;
+        private array $appCart = [], $dict = [];
 
-        private const USER_NAME = '_u0s4e5R0s$s', USER_ROLES = '_mGnUs$nrWM0', APP_TOKENS = '_gGOd2y$oNO6W';
+        private const USER_NAME = '_u0s4e5R0s$s', CSRF_TOKENS = '_gGOd2y$oNO6W';
 
         public function __construct(\shani\adaptor\Request $req, \shani\adaptor\Response $res, Host $host)
         {
             $this->host = $host;
-            $this->lang = $this->root = null;
+            $this->lang = $this->auth = null;
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
             $cnf = $host->getConfig($this->req->version());
@@ -99,53 +101,46 @@ namespace shani\engine\http {
             return $this->host;
         }
 
-        public function authenticated(): bool
+        public function auth(): Authorization
         {
-            return $this->user()->exists();
+            if ($this->auth === null) {
+                $choice = $this->config()->authorization();
+                if ($choice === Authorization::AUTH_JWT) {
+                    $this->auth = new \shani\engine\authorization\JWTAuth();
+                } else {
+                    $this->auth = new \shani\engine\authorization\SessionAuth();
+                }
+            }
+            return $this->auth;
         }
 
         public function homepage(): string
         {
-            return $this->authenticated() ? $this->config->homeAuth() : $this->config->homeGuest();
+            return $this->auth()->verified() ? $this->config->homeAuth() : $this->config->homeGuest();
         }
 
-        public function authorized(string $path = null): bool
+        public function csrfToken(): Session
         {
-            $url = $path === '/' ? $this->homepage() : $path;
-            $code = \library\Utils::digest($this->req->path($url));
-            return strpos($this->roles(), $code) !== false;
-        }
-
-        public function roles(string $roles = null): ?string
-        {
-            if ($roles === null) {
-                return $this->session(self::USER_ROLES)->get();
-            }
-            $this->session(self::USER_ROLES)->put($roles);
-        }
-
-        public function user(): Session
-        {
-            return $this->session(self::USER_NAME);
-        }
-
-        public function token(): Session
-        {
-            return $this->session(self::APP_TOKENS);
+            return $this->cart(self::CSRF_TOKENS);
         }
 
         public function close(): void
         {
-            Session::stop($this);
+            Session::stop();
             $this->res->redirect('/');
         }
 
-        public function session(string $name): Session
+        public function user(): Session
         {
-            if (empty($this->cart[$name])) {
-                $this->cart[$name] = new Session($this->sessId, $name);
+            return $this->cart(self::USER_NAME);
+        }
+
+        public function cart(string $name): Session
+        {
+            if (empty($this->appCart[$name])) {
+                $this->appCart[$name] = new Session($name);
             }
-            return $this->cart[$name];
+            return $this->appCart[$name];
         }
 
         public function asset(): Asset
@@ -200,7 +195,7 @@ namespace shani\engine\http {
 
         public function module(): string
         {
-            return \shani\engine\core\Path::APPS . $this->root . $this->config->moduleDir() . $this->req->module();
+            return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module();
         }
 
         private function boot(): callable
@@ -220,8 +215,7 @@ namespace shani\engine\http {
         {
             $path = $this->req->uri()->location();
             $this->req->forward($path === '/' ? $this->homepage() : $path);
-            $this->root = $this->config->root();
-            $this->sessId = Session::start($this);
+            Session::start($this);
             $middleware = new \shani\engine\middleware\Register($this, $this->boot());
             $this->config->middleware($middleware);
             $middleware->run();
@@ -229,7 +223,7 @@ namespace shani\engine\http {
 
         private function getClass(string $resource, string $method): string
         {
-            $class = \shani\engine\core\Path::DIR_APPS . $this->root . $this->config->moduleDir();
+            $class = \shani\engine\core\Path::DIR_APPS . $this->config->root() . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->sourceDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
@@ -271,14 +265,14 @@ namespace shani\engine\http {
 
         public function csrf(string $path = null): string
         {
-            $csrf = $this->config->csrf();
+            $protection = $this->config->csrf();
             $url = $path ?? $this->req->uri()->path();
-            if ($csrf !== \shani\engine\config\CSRF::PROTECTION_OFF) {
+            if ($protection !== \shani\engine\config\CSRF::PROTECTION_OFF) {
                 $token = base64_encode(random_bytes(6));
-                if ($csrf === \shani\engine\config\CSRF::PROTECTION_STRICT) {
-                    $this->token()->add([\library\Utils::digest($url) => $token]);
+                if ($protection === \shani\engine\config\CSRF::PROTECTION_STRICT) {
+                    $this->csrfToken()->add([\library\Utils::digest($url) => $token]);
                 } else {
-                    $this->token()->add([$token => \library\Utils::digest($url)]);
+                    $this->csrfToken()->add([$token => \library\Utils::digest($url)]);
                 }
                 $cookie = (new \library\HttpCookie())->setName('csrf_token')
                         ->setSameSite(\library\HttpCookie::SAME_SITE_STRICT)

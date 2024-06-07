@@ -56,7 +56,7 @@ namespace shani\engine\config {
 
         public function assetDir(): ?string;
 
-        public function development(): bool;
+        public function authorization(): int;
     }
 
 }

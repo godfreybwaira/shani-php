@@ -100,7 +100,7 @@ namespace library\client {
         {
             try {
                 return hash_hmac($this->signatureAlgorithm, $data, $this->signatureKey);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 throw new \RuntimeException('Missing signature key.');
             }
         }
@@ -109,7 +109,7 @@ namespace library\client {
         {
             try {
                 return openssl_encrypt($data, $this->cipherAlgorithm, $this->cipherKey, 0, $this->initVector);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 throw new \RuntimeException('Missing encription key.');
             }
         }

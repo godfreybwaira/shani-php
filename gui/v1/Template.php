@@ -84,7 +84,7 @@ namespace gui\v1 {
             $this->data = $data;
             $this->state = $state;
             $this->view ??= $this->app->view();
-            if ($this->app->request()->isAjax()) {
+            if ($this->app->request()->isAsync()) {
                 self::load($this->view, $this->app);
             } else {
                 self::load($this->html('/main'), $this->app);

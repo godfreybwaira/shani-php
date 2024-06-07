@@ -131,9 +131,9 @@ namespace apps\test\codes\v1\config {
             return Module::PUBS;
         }
 
-        public function development(): bool
+        public function authorization(): int
         {
-            return App::DEVELOPMENT;
+            return App::AUTHORIZATION;
         }
 
         public function templateVersion(): string

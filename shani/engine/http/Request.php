@@ -104,9 +104,9 @@ namespace shani\engine\http {
             return $this->type;
         }
 
-        public function isAjax(): bool
+        public function isAsync(): bool
         {
-            return $this->headers('x-requested-with') === 'ajax';
+            return $this->headers('x-request-mode') === 'async';
         }
 
         public function platform(): ?string
