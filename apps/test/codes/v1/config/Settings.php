@@ -111,7 +111,7 @@ namespace apps\test\codes\v1\config {
             return App::ASSET_DIR;
         }
 
-        public function tokenSecretKey(): string
+        public function signatureSecretKey(): string
         {
             return App::JWT_SECRET_KEY;
         }

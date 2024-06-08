@@ -23,7 +23,7 @@ namespace shani\engine\authorization {
             if (!empty($parts[2])) {
                 $now = time();
                 $header = json_decode(base64_decode($parts[0]), true)[0];
-                $invalid = $header['exp'] <= $now || $header['nbf'] > $now;
+                $invalid = $header['exp'] <= $now || (!empty($header['nbf']) && $header['nbf'] > $now);
                 $signature = base64_decode($parts[2]);
                 $signed = hash_equals($secretKey, $signature);
                 return $signed && !$invalid;

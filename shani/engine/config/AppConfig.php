@@ -56,7 +56,7 @@ namespace shani\engine\config {
 
         public function assetDir(): ?string;
 
-        public function tokenSecretKey(): string;
+        public function signatureSecretKey(): string;
 
         public function authorizationType(): int;
     }
