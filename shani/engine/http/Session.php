@@ -42,17 +42,31 @@ namespace shani\engine\http {
             return $this;
         }
 
+        /**
+         * Remove all items in session object
+         * @return self
+         */
         public function clear(): self
         {
             self::$memory->remove(self::$storageId, $this->name);
             return $this;
         }
 
+        /**
+         * Change session id to new id
+         * @param string $newId New session Id
+         * @return self
+         */
         public function rename(string $newId): self
         {
             self::$memory->rename(self::$storageId, $newId);
         }
 
+        /**
+         * Check if session object has an item or items
+         * @param string|array $keys
+         * @return bool Returns true on success, false otherwise
+         */
         public function has($keys): bool
         {
             return Map::has($this->data(), $keys);
