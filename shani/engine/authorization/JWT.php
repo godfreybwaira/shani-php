@@ -40,7 +40,7 @@ namespace shani\engine\authorization {
         public static function extract(string $token, string $arrayKey = null): ?mixed
         {
             $parts = explode('.', $token, 2);
-            if (!empty($parts[1])) {
+            if (!empty($parts[2])) {
                 $content = json_decode(base64_decode($parts[1]), true)[0];
                 return $arrayKey !== null ? $content[$arrayKey] ?? null : $content;
             }

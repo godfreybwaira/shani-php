@@ -27,7 +27,7 @@ namespace shani\engine\http {
         private \library\Logger $logger;
         private array $appCart = [], $dict = [];
 
-        private const USER_NAME = '_u0s4e5R0s$s', CSRF_TOKENS = '_gGOd2y$oNO6W';
+        private const CSRF_TOKENS = '_gGOd2y$oNO6W';
 
         public function __construct(\shani\adaptor\Request $req, \shani\adaptor\Response $res, Host $host)
         {
@@ -104,7 +104,7 @@ namespace shani\engine\http {
         public function auth(): Authorization
         {
             if ($this->auth === null) {
-                $this->auth = new Authorization($this->config);
+                $this->auth = new Authorization($this);
             }
             return $this->auth;
         }
@@ -123,11 +123,6 @@ namespace shani\engine\http {
         {
             Session::stop();
             $this->res->redirect('/');
-        }
-
-        public function user(): Session
-        {
-            return $this->cart(self::USER_NAME);
         }
 
         public function cart(string $name): Session
