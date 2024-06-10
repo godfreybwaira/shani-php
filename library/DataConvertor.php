@@ -138,7 +138,8 @@ namespace library {
             $xml = '<' . $tag . '>';
             if (is_array($obj)) {
                 foreach ($obj as $key => $val) {
-                    $xml .= self::toxml($val, is_int($key) ? $tag . ($key + 1) : $key);
+                    $xml .= self::toxml($val, is_int($key) ? 'item' : $key);
+//                    $xml .= self::toxml($val, is_int($key) ? $tag . ($key + 1) : $key);
                 }
             } else if (is_bool($obj)) {
                 $xml .= $obj ? 'true' : 'false';
