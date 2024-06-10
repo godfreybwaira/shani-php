@@ -41,7 +41,7 @@ namespace shani\engine\authorization {
                 return;
             }
             if (JWT::verify($tokenString, $this->app->config()->signatureSecretKey())) {
-                $this->setPermission(array_values(JWT::extract($tokenString))[0]);
+                $this->permissions = array_values(JWT::extract($tokenString))[0];
             } else {
                 $this->session->clear();
             }

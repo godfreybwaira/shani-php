@@ -43,7 +43,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Remove all items in session object
+         * Remove session object and all it's content
          * @return self
          */
         public function clear(): self
@@ -72,7 +72,11 @@ namespace shani\engine\http {
             return Map::has($this->data(), $keys);
         }
 
-        public function exists(): bool
+        /**
+         * Check if session object is valid
+         * @return bool
+         */
+        public function valid(): bool
         {
             return self::$memory->exists(self::$storageId, $this->name);
         }
