@@ -52,6 +52,31 @@ namespace shani\engine\http {
             }
         }
 
+        /**
+         * Get all the columns that a user application wish to get values from.
+         * This function enable the application to fetch only needed data, no more, no less
+         * @param array $availableColumns Columns to choose from
+         * @param string $lookupHeader HTTP header contains the list of columns,
+         * or '*' to get values from all columns.
+         * separated by comma, default header being x-request-columns
+         * @return array Columns that user application wish to get values from
+         */
+        public function columns(array $availableColumns, string $lookupHeader = 'x-request-columns'): array
+        {
+            $headerString = $this->headers($lookupHeader);
+            if (empty($headerString)) {
+                return $availableColumns;
+            }
+            $collections = [];
+            foreach ($availableColumns as $key => $value) {
+                $col = is_int($key) ? $value : $key;
+                if (preg_match('/\b' . $col . '\b/i', $headerString) === 1) {
+                    $collections[$key] = $value;
+                }
+            }
+            return $collections;
+        }
+
         public function languages(): array
         {
             $accept = $this->headers('accept-language');

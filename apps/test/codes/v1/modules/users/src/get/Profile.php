@@ -19,7 +19,7 @@ namespace apps\test\codes\v1\modules\users\src\get {
             $this->app = $app;
         }
 
-        public function activity()
+        public function sample()
         {
             $data = $this->app->documentation();
 
@@ -31,7 +31,7 @@ namespace apps\test\codes\v1\modules\users\src\get {
 //
         }
 
-        public function sample()
+        public function activity()
         {
             $data = [
                 ['sn' => 1, 'name' => 'goddy', 'id' => 12, 'age' => 93],
@@ -42,7 +42,8 @@ namespace apps\test\codes\v1\modules\users\src\get {
                 ['sn' => 5, 'name' => 'mika', 'id' => 71, 'age' => 93],
                 ['sn' => 6, 'name' => 'Rash', 'id' => 33, 'age' => 81]
             ];
-            $this->app->response()->send($data);
+            $columns = $this->app->request()->columns(['sn', 'age', 'name']);
+            $this->app->response()->send(\library\Map::getAll($data, $columns));
         }
     }
 
