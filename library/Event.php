@@ -9,12 +9,12 @@
 
 namespace library {
 
-    final class Event implements \shani\adaptor\Handler
+    final class Event implements \shani\contracts\Handler
     {
 
         private $onDone = null;
         private array $callbacks = [], $events;
-        private static \shani\adaptor\Event $handler;
+        private static \shani\contracts\Event $handler;
 
         public function __construct(array $supportedEvents = [])
         {

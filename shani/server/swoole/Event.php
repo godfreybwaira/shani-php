@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    class Event implements \shani\adaptor\Event
+    class Event implements \shani\contracts\Event
     {
 
         public function dispatch(array $callbacks, callable $finish, ...$params): self

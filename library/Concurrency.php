@@ -9,7 +9,7 @@
 
 namespace library {
 
-    use shani\adaptor\Concurrency as ConcurrencyInterface;
+    use shani\contracts\Concurrency as ConcurrencyInterface;
 
     final class Concurrency
     {

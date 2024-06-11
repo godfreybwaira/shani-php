@@ -7,7 +7,7 @@
  * Created on: Mar 25, 2024 at 7:34:27 PM
  */
 
-namespace shani\adaptor {
+namespace shani\contracts {
 
     interface Event
     {

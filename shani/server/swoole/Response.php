@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Response implements \shani\adaptor\Response
+    final class Response implements \shani\contracts\Response
     {
 
         private \Swoole\Http\Response $res;

@@ -7,7 +7,7 @@
  * Created on: Mar 25, 2024 at 12:36:29 PM
  */
 
-namespace shani\adaptor {
+namespace shani\contracts {
 
     interface Request
     {

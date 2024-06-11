@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Request implements \shani\adaptor\Request
+    final class Request implements \shani\contracts\Request
     {
 
         private \library\URI $uri;

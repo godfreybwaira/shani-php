@@ -14,10 +14,12 @@ namespace shani\engine\http {
 
         private ?string $type = null;
         private ?array $url, $inputs = null;
-        private \shani\adaptor\Request $req;
+        private \shani\contracts\Request $req;
         private ?string $platform = null, $version = null, $accepted = null;
 
-        public function __construct(\shani\adaptor\Request &$req)
+        public const COLUMNS = 'x-request-columns';
+
+        public function __construct(\shani\contracts\Request &$req)
         {
             $this->url = self::explodePath($req->uri()->path());
             $files = $req->files();
@@ -61,9 +63,9 @@ namespace shani\engine\http {
          * separated by comma, default header being x-request-columns
          * @return array Columns that user application wish to get values from
          */
-        public function columns(array $availableColumns, string $lookupHeader = 'x-request-columns'): array
+        public function columns(array $availableColumns, ?string $lookupHeader = null): array
         {
-            $headerString = $this->headers($lookupHeader);
+            $headerString = $this->headers($lookupHeader ?? self::COLUMNS);
             if (empty($headerString)) {
                 return $availableColumns;
             }
@@ -212,8 +214,7 @@ namespace shani\engine\http {
 
         public function secure(): bool
         {
-            $scheme = $this->req->uri()->scheme();
-            return $scheme === 'https' || $scheme === 'wss';
+            return $this->req->uri()->scheme() === 'https';
         }
 
         public function path(string $name = null): ?string

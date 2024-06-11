@@ -29,7 +29,7 @@ namespace shani\engine\http {
 
         private const CSRF_TOKENS = '_gGOd2y$oNO6W';
 
-        public function __construct(\shani\adaptor\Request $req, \shani\adaptor\Response $res, Host $host)
+        public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res, Host $host)
         {
             $this->host = $host;
             $this->lang = $this->auth = null;

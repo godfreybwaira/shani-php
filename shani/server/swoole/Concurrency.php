@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Concurrency implements \shani\adaptor\Concurrency
+    final class Concurrency implements \shani\contracts\Concurrency
     {
 
         public function async(callable $callback): void

@@ -8,10 +8,10 @@
 
 namespace shani\engine\http {
 
-    final class Session implements \shani\adaptor\Handler
+    final class Session implements \shani\contracts\Handler
     {
 
-        private static \shani\adaptor\Cacheable $memory;
+        private static \shani\contracts\Cacheable $memory;
         private static string $storageId;
         private string $name;
 

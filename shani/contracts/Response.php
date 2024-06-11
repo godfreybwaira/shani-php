@@ -7,7 +7,7 @@
  * Created on: Mar 25, 2024 at 1:31:32 PM
  */
 
-namespace shani\adaptor {
+namespace shani\contracts {
 
     interface Response
     {

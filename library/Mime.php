@@ -9,10 +9,10 @@
 
 namespace library {
 
-    final class Mime implements \shani\adaptor\Handler
+    final class Mime implements \shani\contracts\Handler
     {
 
-        private static \shani\adaptor\Cacheable $mime;
+        private static \shani\contracts\Cacheable $mime;
 
         /**
          * Determines the mimetype of a file by looking at its extension.

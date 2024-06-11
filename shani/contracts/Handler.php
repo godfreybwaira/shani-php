@@ -7,7 +7,7 @@
  * Created on: Mar 26, 2024 at 8:37:58 AM
  */
 
-namespace shani\adaptor {
+namespace shani\contracts {
 
     interface Handler
     {

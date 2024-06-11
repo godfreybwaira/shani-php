@@ -18,11 +18,11 @@ namespace shani\engine\http {
         private int $statusCode;
         private ?string $type = null;
         private array $headers, $cookies;
-        private \shani\adaptor\Response $res;
+        private \shani\contracts\Response $res;
 
         private const CHUNK_SIZE = 1048576; //1MB
 
-        public function __construct(Request &$req, \shani\adaptor\Response &$res)
+        public function __construct(Request &$req, \shani\contracts\Response &$res)
         {
             $this->statusCode = HttpStatus::OK;
             $this->cookies = [];

@@ -9,11 +9,11 @@
 
 namespace shani\engine\http {
 
-    final class Host implements \shani\adaptor\Handler
+    final class Host implements \shani\contracts\Handler
     {
 
         private ?array $host;
-        private static \shani\adaptor\Cacheable $config;
+        private static \shani\contracts\Cacheable $config;
 
         public function __construct(string $name)
         {

@@ -7,7 +7,7 @@
  * Created on: Mar 26, 2024 at 1:39:50 PM
  */
 
-namespace shani\adaptor {
+namespace shani\contracts {
 
     interface Cacheable
     {
