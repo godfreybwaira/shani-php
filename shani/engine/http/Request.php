@@ -17,8 +17,6 @@ namespace shani\engine\http {
         private \shani\contracts\Request $req;
         private ?string $platform = null, $version = null, $accepted = null;
 
-        public const COLUMNS = 'x-request-columns';
-
         public function __construct(\shani\contracts\Request &$req)
         {
             $this->url = self::explodePath($req->uri()->path());
@@ -58,14 +56,13 @@ namespace shani\engine\http {
          * Get all the columns that a user application wish to get values from.
          * This function enable the application to fetch only needed data, no more, no less
          * @param array $availableColumns Columns to choose from
-         * @param string $lookupHeader HTTP header contains the list of columns,
-         * or '*' to get values from all columns.
+         * @param string $lookupHeader HTTP header contains the list of columns.
          * separated by comma, default header being x-request-columns
          * @return array Columns that user application wish to get values from
          */
-        public function columns(array $availableColumns, ?string $lookupHeader = null): array
+        public function columns(array $availableColumns, string $lookupHeader = 'x-request-columns'): array
         {
-            $headerString = $this->headers($lookupHeader ?? self::COLUMNS);
+            $headerString = $this->headers($lookupHeader);
             if (empty($headerString)) {
                 return $availableColumns;
             }
