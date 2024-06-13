@@ -40,8 +40,8 @@ namespace shani\server\swoole {
                 'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
-                'ssl_cert_file' => str_replace('${SSL_DIR}', \shani\Config::SSL_DIR, $cnf['SSL']['CERT']),
-                'ssl_key_file' => str_replace('${SSL_DIR}', \shani\Config::SSL_DIR, $cnf['SSL']['KEY'])
+                'ssl_cert_file' => str_replace('${SSL_DIR}', \shani\ServerConfig::SSL_DIR, $cnf['SSL']['CERT']),
+                'ssl_key_file' => str_replace('${SSL_DIR}', \shani\ServerConfig::SSL_DIR, $cnf['SSL']['KEY'])
             ]);
             $server->addListener($cnf['IP'], $cnf['PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
             return $server;
@@ -66,7 +66,7 @@ namespace shani\server\swoole {
                 exit('Please install PHP swoole extension' . PHP_EOL);
             }
             \library\Utils::errorHandler();
-            $cnf = \shani\Config::server();
+            $cnf = \shani\ServerConfig::server();
             $server = self::configure($cnf);
             $server->on('start', function () use (&$cnf) {
                 echo 'http://' . $cnf['IP'] . ':' . $cnf['PORTS']['HTTP'] . PHP_EOL;

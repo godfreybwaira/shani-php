@@ -32,7 +32,7 @@ namespace library {
             $ext = strtolower($extension);
             $type = self::$mime->get($ext);
             if (!$type) {
-                $type = \shani\Config::mime($ext);
+                $type = \shani\ServerConfig::mime($ext);
                 self::$mime->replace($ext, $type);
             }
             return $type;

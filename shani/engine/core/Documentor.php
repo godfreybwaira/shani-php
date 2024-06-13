@@ -46,7 +46,7 @@ namespace shani\engine\core {
         {
             $config = $app->config();
             $path = \shani\engine\core\Path::APPS . $config->root() . $config->moduleDir();
-            $modules = self::folderContent($path, $config->sourceDir());
+            $modules = self::folderContent($path, $config->requestMethodsDir());
             $docs = [
                 'name' => $config->appName(),
                 'description' => $config->appDescription(),

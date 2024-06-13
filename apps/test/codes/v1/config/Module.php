@@ -9,10 +9,9 @@
 
 namespace apps\test\codes\v1\config {
 
-    interface Module {
+    interface Module
+    {
 
-        public const PUBS = [];
-        public const GUESTS = ['guest'];
         public const FALLBACK = '/fallback/0/handlers/0';
         public const HOME_GUEST = '/users/0/profile/1/daily.html?from=Mwz&to=Geita?&time=13:00&dep=12:22&from=other';
 //        public const HOME_GUEST = '/guests/0/accounts';

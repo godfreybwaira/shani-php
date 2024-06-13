@@ -10,7 +10,7 @@
 namespace shani\engine\http {
 
     use library\HttpStatus;
-    use shani\engine\config\AppConfig;
+    use shani\engine\core\AutoConfig;
     use shani\engine\authorization\Authorization;
 
     final class App
@@ -22,7 +22,7 @@ namespace shani\engine\http {
         private Request $req;
         private Response $res;
         private ?string $lang;
-        private AppConfig $config;
+        private AutoConfig $config;
         private ?Authorization $auth;
         private \library\Logger $logger;
         private array $appCart = [], $dict = [];
@@ -81,7 +81,7 @@ namespace shani\engine\http {
             return $this;
         }
 
-        public function config(): AppConfig
+        public function config(): AutoConfig
         {
             return $this->config;
         }
@@ -107,11 +107,6 @@ namespace shani\engine\http {
                 $this->auth = new Authorization($this);
             }
             return $this->auth;
-        }
-
-        public function homepage(): string
-        {
-            return $this->auth()->verified() ? $this->config->homeAuth() : $this->config->homeGuest();
         }
 
         public function csrfToken(): Session
@@ -145,7 +140,7 @@ namespace shani\engine\http {
         {
             if (!isset($this->template)) {
                 $version = $this->config->templateVersion();
-                $controller = \shani\Config::template($version);
+                $controller = \shani\ServerConfig::template($version);
                 $this->template = new $controller($this);
             }
             return $this->template;
@@ -204,7 +199,7 @@ namespace shani\engine\http {
         private function start(): void
         {
             $path = $this->req->uri()->location();
-            $this->req->forward($path === '/' ? $this->homepage() : $path);
+            $this->req->forward($path === '/' ? $this->config->homepage() : $path);
             Session::start($this);
             $middleware = new \shani\engine\middleware\Register($this, $this->boot());
             $this->config->middleware($middleware);
@@ -214,7 +209,7 @@ namespace shani\engine\http {
         private function getClass(string $resource, string $method): string
         {
             $class = \shani\engine\core\Path::DIR_APPS . $this->config->root() . $this->config->moduleDir();
-            $class .= $this->req->module() . $this->config->sourceDir() . '/';
+            $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
         }
@@ -244,7 +239,7 @@ namespace shani\engine\http {
         private function showError(int $statusCode, int $trials = 1): void
         {
             $this->res->setStatus($statusCode);
-            $fallback = $this->config->fallback();
+            $fallback = $this->config->fallbackUrl();
             if ($fallback !== null && $trials < 3) {
                 $this->req->forward($fallback . '/s' . $statusCode);
                 $this->submit('get', $trials + 1);
@@ -257,9 +252,9 @@ namespace shani\engine\http {
         {
             $protection = $this->config->csrf();
             $url = $path ?? $this->req->uri()->path();
-            if ($protection !== \shani\engine\config\CSRF::PROTECTION_OFF) {
+            if ($protection !== AutoConfig::CSRF_OFF) {
                 $token = base64_encode(random_bytes(6));
-                if ($protection === \shani\engine\config\CSRF::PROTECTION_STRICT) {
+                if ($protection === AutoConfig::CSRF_STRICT) {
                     $this->csrfToken()->add([\library\Utils::digest($url) => $token]);
                 } else {
                     $this->csrfToken()->add([$token => \library\Utils::digest($url)]);
@@ -284,7 +279,7 @@ namespace shani\engine\http {
                         return $lang;
                     }
                 }
-                $this->lang = $this->config->languageDefault();
+                $this->lang = $this->config->defaultLanguage();
             }
             return $this->lang;
         }

@@ -19,7 +19,7 @@ namespace shani\engine\http {
         {
             $this->host = self::$config->get($name);
             if (empty($this->host)) {
-                $this->host = \shani\Config::host($name);
+                $this->host = \shani\ServerConfig::host($name);
                 self::$config->replace($name, $this->host);
             }
         }

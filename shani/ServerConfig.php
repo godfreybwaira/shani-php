@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Config
+ * Description of ServerConfig
  * @author coder
  *
  * Created on: Mar 6, 2024 at 4:06:33 PM
@@ -9,7 +9,7 @@
 
 namespace shani {
 
-    final class Config
+    final class ServerConfig
     {
 
         private const PATH = SERVER_ROOT . '/config';
