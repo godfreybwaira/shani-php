@@ -61,7 +61,7 @@ namespace shani\engine\core {
             return ['sw' => 'Kiswahili', 'en' => 'English'];
         }
 
-        public abstract function middleware(Register &$mw): void;
+        public abstract function middleware(\shani\engine\middleware\Register &$mw): void;
 
         public function moduleDir(): string
         {
