@@ -105,7 +105,7 @@ namespace library {
             $source = $keys !== null ? static::get($source, $keys, $selected) : null;
         }
 
-        public static function has(array $data, $keys): bool
+        public static function hasKeys(array $data, $keys): bool
         {
             if (is_array($keys)) {
                 foreach ($keys as $k) {
@@ -118,18 +118,10 @@ namespace library {
             return array_key_exists($keys, $data);
         }
 
-        public static function filled(array &$data, array $keys = null): bool
+        public static function hasValues(array $data, array $values): bool
         {
-            if ($keys !== null) {
-                foreach ($keys as $k) {
-                    if (empty($data[$k]) || ctype_space($data[$k])) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            foreach ($data as $value) {
-                if (empty($value) || ctype_space($value)) {
+            foreach ($values as $k => $v) {
+                if (!isset($data[$k]) || $data[$k] !== $v) {
                     return false;
                 }
             }

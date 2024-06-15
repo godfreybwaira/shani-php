@@ -7,7 +7,7 @@
  * Created on: May 24, 2024 at 9:47:15 AM
  */
 
-namespace library\test {
+namespace library {
 
     final class TestCase
     {
@@ -16,6 +16,7 @@ namespace library\test {
         private int $pass = 0, $total = 0, $length;
         private ?string $description, $lines = null;
         private $before = null, $after = null;
+        private bool $result;
 
         public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
         public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
@@ -26,7 +27,7 @@ namespace library\test {
 
         public function __construct(string $description = null)
         {
-            $this->length = strlen($description);
+            $this->length = strlen($description ?? '');
             $this->description = $description;
         }
 
@@ -57,6 +58,11 @@ namespace library\test {
         {
             $this->value = $value;
             return $this;
+        }
+
+        public function getResult(): bool
+        {
+            return $this->result;
         }
 
         private static function toReadable($value)
@@ -102,12 +108,12 @@ namespace library\test {
 
         public function contains(string $needle, string $details = null): self
         {
-            return $this->compare($needle, stripos($this->value, $needle) !== false, $details);
+            return $this->compare($needle, preg_match('/\b' . $this->value . '\b/', $needle) === 1, $details);
         }
 
         public function notContains(string $needle, string $details = null): self
         {
-            return $this->compare($needle, stripos($this->value, $needle) === false, $details);
+            return $this->compare($needle, preg_match('/\b' . $this->value . '\b/', $needle) !== 1, $details);
         }
 
         public function isNotType(string $type, string $details = null): self
@@ -120,24 +126,24 @@ namespace library\test {
             return $this->compare($type, gettype($this->value) === $type, $details);
         }
 
-        public function hasValue($value, string $details = null): self
+        public function hasValues(array $values, string $details = null): self
         {
-            return $this->compare($value, is_array($this->value) && in_array($value, $this->value), $details);
+            return $this->compare($values, \library\Map::hasValues($this->value, $values), $details);
         }
 
-        public function hasKey($keys, string $details = null): self
+        public function hasKeys($keys, string $details = null): self
         {
-            return $this->compare($value, is_array($this->value) && \library\Map::has($this->value, $keys), $details);
+            return $this->compare($keys, \library\Map::hasKeys($this->value, $keys), $details);
         }
 
-        public function missingKey($keys, string $details = null): self
+        public function missingKeys($keys, string $details = null): self
         {
-            return $this->compare($keys, is_array($this->value) && !\library\Map::has($this->value, $keys), $details);
+            return $this->compare($keys, !\library\Map::hasKeys($this->value, $keys), $details);
         }
 
-        public function missingValue($value, string $details = null): self
+        public function missingValues($values, string $details = null): self
         {
-            return $this->compare($value, is_array($this->value) && !in_array($value, $this->value), $details);
+            return $this->compare($values, !\library\Map::hasValues($this->value, $values), $details);
         }
 
         public function isGreaterThan($value, string $details = null): self
@@ -190,10 +196,31 @@ namespace library\test {
             return $this->compare($value, $this->value != $value, $details);
         }
 
+        public function isJson(string $details = null): self
+        {
+            return $this->compare($this->value, is_array(json_decode($this->value, true)), $details);
+        }
+
+        public function isXml(string $details = null): self
+        {
+            return $this->compare($this->value, simplexml_load_string($this->value) !== false, $details);
+        }
+
+        public function isYaml(string $details = null): self
+        {
+            return $this->compare($this->value, yaml_parse($this->value) !== false, $details);
+        }
+
+        public function isCsv(string $details = null): self
+        {
+            return $this->compare($this->value, is_array(str_getcsv($this->value)), $details);
+        }
+
         private function compare($expected, bool $pass, string $details = null): self
         {
             self::setup($this->before);
             $this->total++;
+            $this->result = $pass;
             if ($pass) {
                 $this->pass++;
                 $str = $this->total . '.Pass ';
@@ -204,7 +231,7 @@ namespace library\test {
                 $len = strlen($str);
                 $this->lines .= self::setColor($str, self::COLOR_BLACK, self::COLOR_RED);
             }
-            $details . ' Expected: ' . self::toReadable($expected);
+            $details .= ' Expected: ' . self::toReadable($expected);
             $details .= ', Found: ' . self::toReadable($this->value);
             $count = strlen($details) + $len;
             if ($this->length < $count) {

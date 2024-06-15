@@ -26,32 +26,32 @@ namespace apps\test\codes\v1\modules\fallback\src\get {
 //	url:"url"
 //}
 
-        public function s400()
+        public function status400()
         {
             $this->app->response()->send('Bad request!');
         }
 
-        public function s401()
+        public function status401()
         {
             $this->app->response()->send('Authorization failed!');
         }
 
-        public function s404()
+        public function status404()
         {
             $this->app->response()->send('Not found!');
         }
 
-        public function s403()
+        public function status403()
         {
             $this->app->response()->send('Forbidden!');
         }
 
-        public function s405()
+        public function status405()
         {
             $this->app->response()->send('Not allowed!');
         }
 
-        public function s500()
+        public function status500()
         {
             $this->app->response()->send('Server error!');
         }

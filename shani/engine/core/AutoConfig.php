@@ -39,6 +39,14 @@ namespace shani\engine\core {
             return '2 hours';
         }
 
+        /**
+         * Set directory inside application module where module controllers with
+         * be resides.
+         * <p>It is in this directory you will create GET, POST, PUT, DELETE
+         * or any other custom http method directories, These directories must be
+         * in lowercase.</p>
+         * @return string Directory name
+         */
         public function requestMethodsDir(): string
         {
             return '/src';
@@ -49,18 +57,39 @@ namespace shani\engine\core {
             return self::CSRF_FLEXIBLE;
         }
 
+        /**
+         * Set default application language.
+         * @return string Application language
+         */
         public function defaultLanguage(): string
         {
             return 'sw';
         }
 
-        public abstract function fallbackUrl(): string;
+        /**
+         * Set relative URL of application to be used for error handling.
+         * This application should be able to handle all HTTP errors depending
+         * on status code provided.
+         * @return string|null URL to application resource
+         */
+        public function fallbackUrl(): ?string
+        {
+            return null;
+        }
 
+        /**
+         * Set all application supported languages where key being language code
+         * and value being language name.
+         * @return array Associative array of supported languages.
+         */
         public function languages(): array
         {
             return ['sw' => 'Kiswahili', 'en' => 'English'];
         }
 
+        /**
+         * Execute user defined middlewares
+         */
         public abstract function middleware(\shani\engine\middleware\Register &$mw): void;
 
         public function moduleDir(): string
@@ -100,7 +129,10 @@ namespace shani\engine\core {
 
         public abstract function assetDir(): ?string;
 
-        public abstract function signatureSecretKey(): string;
+        public function signatureSecretKey(): string
+        {
+            return '';
+        }
 
         public abstract function homepage(): string;
 

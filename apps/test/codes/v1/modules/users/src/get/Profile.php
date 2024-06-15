@@ -19,19 +19,19 @@ namespace apps\test\codes\v1\modules\users\src\get {
             $this->app = $app;
         }
 
-        public function sample()
+        public function activity()
         {
-            $data = $this->app->documentation();
-
-//            $test = new \library\test\TestCase('Unit Test');
-//            $test->testIf(2 + 3)->is(5, 'Check if 2 + 3 gives 5');
-//            $test->testIf(2)->isGreaterThan(3, 'Check if 2 is greater than 3')
-//                    ->isGreaterThan(1, 'Check if 2 is greater than 1');
-            $this->app->response()->send($data);
-//
+            $http = new \library\client\HTTP('http://dev.shani.v2.local:8008');
+            $http->headers(['accept' => 'application/json']);
+            $http->get('/users/0/profile/0/sample', null, function (\library\client\Response $res) {
+                $test = new \library\TestCase();
+                $length = $res->headers('content-length');
+                $result = $test->testIf($res->bodySize())->is($length)->getResult();
+                $this->app->response()->send($result);
+            });
         }
 
-        public function activity()
+        public function sample()
         {
             $data = [
                 ['sn' => 1, 'name' => 'goddy', 'id' => 12, 'age' => 93],
@@ -43,7 +43,8 @@ namespace apps\test\codes\v1\modules\users\src\get {
                 ['sn' => 6, 'name' => 'Rash', 'id' => 33, 'age' => 81]
             ];
             $columns = $this->app->request()->columns(['sn', 'age', 'name']);
-            $this->app->response()->send(\library\Map::getAll($data, $columns));
+            $this->app->response()->setStatus(201);
+            $this->app->response()->send(\library\Map::get($data[0], $columns));
         }
     }
 

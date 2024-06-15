@@ -41,7 +41,7 @@ namespace shani\server\swoole {
             }
             $data = $this->table->get($id, 'data');
             if (!empty($data)) {
-                return \library\Map::has(unserialize($data), $keys);
+                return \library\Map::hasKeys(unserialize($data), $keys);
             }
             return false;
         }

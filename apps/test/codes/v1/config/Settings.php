@@ -45,11 +45,6 @@ namespace apps\test\codes\v1\config {
             return $this->app->auth()->verified() ? Module::HOME_AUTH : Module::HOME_GUEST;
         }
 
-        public function signatureSecretKey(): string
-        {
-            return '';
-        }
-
         public function templateVersion(): string
         {
             return App::TEMPLATE_VERSION;

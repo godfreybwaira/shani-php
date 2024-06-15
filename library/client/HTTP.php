@@ -134,9 +134,9 @@ namespace library\client {
             return $copy;
         }
 
-        public function send(?string $reqMethod, string $endpoint, $body = null, callable $cb = null): self
+        public function send(?string $reqMethod, string $endpoint, $body = null, callable $callback = null): self
         {
-            Concurrency::async(function ()use (&$reqMethod, &$endpoint, &$body, &$cb) {
+            Concurrency::async(function ()use (&$reqMethod, &$endpoint, &$body, &$callback) {
                 $stream = null;
                 $this->finalize($reqMethod, $body);
                 if (!isset(self::$specialOptions[CURLOPT_FILE])) {
@@ -145,14 +145,14 @@ namespace library\client {
                     $stream = fopen(self::$specialOptions[CURLOPT_FILE], 'a+b');
                     self::$specialOptions[CURLOPT_RESUME_FROM] = fstat($stream)['size'];
                 }
-                $this->done($stream, $endpoint, $cb);
+                $this->done($stream, $endpoint, $callback);
                 fclose($stream);
                 self::$specialOptions = [];
             });
             return $this;
         }
 
-        private function done(&$stream, string $endpoint, ?callable &$cb): void
+        private function done(&$stream, string $endpoint, ?callable &$callback): void
         {
             $retry = 0;
             $curl = curl_init($this->host . $endpoint);
@@ -162,8 +162,8 @@ namespace library\client {
             while (curl_exec($curl) === false && $retry < $this->retries) {
                 Concurrency::sleep(++$retry);
             }
-            if ($cb !== null) {
-                $cb(new Response($curl, $stream));
+            if ($callback !== null) {
+                $callback(new Response($curl, $stream));
             }
             curl_close($curl);
         }
@@ -290,51 +290,51 @@ namespace library\client {
             return $this;
         }
 
-        public function get(string $endpoint, $body = null, callable $cb = null): self
+        public function get(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('GET', self::merge($endpoint, $body), null, $cb);
+            return $this->send('GET', self::merge($endpoint, $body), null, $callback);
         }
 
-        public function post(string $endpoint, $body = null, callable $cb = null): self
+        public function post(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('POST', $endpoint, $body, $cb);
+            return $this->send('POST', $endpoint, $body, $callback);
         }
 
-        public function put(string $endpoint, $body = null, callable $cb = null): self
+        public function put(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('PUT', $endpoint, $body, $cb);
+            return $this->send('PUT', $endpoint, $body, $callback);
         }
 
-        public function patch(string $endpoint, $body = null, callable $cb = null): self
+        public function patch(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('PATCH', $endpoint, $body, $cb);
+            return $this->send('PATCH', $endpoint, $body, $callback);
         }
 
-        public function delete(string $endpoint, $body = null, callable $cb = null): self
+        public function delete(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('DELETE', $endpoint, $body, $cb);
+            return $this->send('DELETE', $endpoint, $body, $callback);
         }
 
-        public function head(string $endpoint, $body = null, callable $cb = null): self
+        public function head(string $endpoint, $body = null, callable $callback = null): self
         {
-            return $this->send('HEAD', $endpoint, $body, $cb);
+            return $this->send('HEAD', $endpoint, $body, $callback);
         }
 
-        public function download(string $endpoint, string $destination, callable $cb = null): self
+        public function download(string $endpoint, string $destination, callable $callback = null): self
         {
             self::$specialOptions = [
                 CURLOPT_FILE => $destination, CURLOPT_HEADER => false
             ];
-            if ($cb !== null) {
+            if ($callback !== null) {
                 self::$specialOptions[CURLOPT_NOPROGRESS] = true;
-                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $total, $loaded) use (&$cb) {
-                    $cb($total, $loaded);
+                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $total, $loaded) use (&$callback) {
+                    $callback($total, $loaded);
                 };
             }
             return $this->get($endpoint);
         }
 
-        public function upload(string $endpoint, string $source, callable $cb = null): self
+        public function upload(string $endpoint, string $source, callable $callback = null): self
         {
             $fp = fopen($source, 'rb');
             self::$specialOptions = [
@@ -342,10 +342,10 @@ namespace library\client {
                 CURLOPT_BINARYTRANSFER => true,
                 CURLOPT_INFILESIZE => fstat($fp)['size']
             ];
-            if ($cb !== null) {
+            if ($callback !== null) {
                 self::$specialOptions[CURLOPT_NOPROGRESS] = true;
-                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $dt, $dl, $total, $loaded) use (&$cb) {
-                    $cb($total, $loaded);
+                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $dt, $dl, $total, $loaded) use (&$callback) {
+                    $callback($total, $loaded);
                 };
             }
             return $this->send(null, $endpoint);
@@ -353,7 +353,7 @@ namespace library\client {
 
         private static function merge(string $endpoint, $body): string
         {
-            if ($body !== null) {
+            if ($body !== null && !is_callable($body)) {
                 $connector = strpos($endpoint, '?') !== false ? '&' : '?';
                 $endpoint .= $connector . (is_array($body) ? http_build_query($body) : $body);
             }

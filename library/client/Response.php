@@ -14,18 +14,23 @@ namespace library\client {
 
         private \CurlHandle $curl;
         private array $headers = [];
-        private int $code, $headerSize;
+        private int $code, $headerSize, $bodySize;
         private ?string $body = null, $raw = null;
         private $stream;
 
         public function __construct(\CurlHandle &$curl, &$stream)
         {
             $this->headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+            $this->bodySize = curl_getinfo($curl, CURLINFO_SIZE_DOWNLOAD);
             $this->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             $this->stream = $stream;
             $this->curl = $curl;
         }
 
+        /**
+         * Get error returned by remote server
+         * @return string|null error or null if no error returned
+         */
         public function error(): ?string
         {
             $error = curl_error($this->curl);
@@ -61,6 +66,16 @@ namespace library\client {
                 return \library\DataConvertor::convertFrom($this->body(), $type[1]);
             }
             return null;
+        }
+
+        public function bodySize(): int
+        {
+            return $this->bodySize;
+        }
+
+        public function size(): int
+        {
+            return $this->bodySize + $this->headerSize;
         }
 
         public function body(): string

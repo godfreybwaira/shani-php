@@ -241,7 +241,7 @@ namespace shani\engine\http {
             $this->res->setStatus($statusCode);
             $fallback = $this->config->fallbackUrl();
             if ($fallback !== null && $trials < 3) {
-                $this->req->forward($fallback . '/s' . $statusCode);
+                $this->req->forward($fallback . '/status' . $statusCode);
                 $this->submit('get', $trials + 1);
             } else {
                 $this->res->send();
