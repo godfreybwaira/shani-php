@@ -25,7 +25,7 @@ namespace shani\server\swoole {
             $maxCon = (int) $cnf['MAX_CONNECTIONS'];
             new \library\Concurrency(new Concurrency());
             \library\Event::setHandler(new Event());
-            Host::setHandler(new Cache($maxCon, 150));
+            Host::setHandler(new Cache($maxCon, 350));
             \library\Mime::setHandler(new Cache(1500, 100));
             \shani\engine\http\Session::setHandler(new Cache($maxCon, 1000));
             $server = new WSocket($cnf['IP'], $cnf['PORTS']['HTTP']);

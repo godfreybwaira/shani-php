@@ -27,9 +27,14 @@ namespace shani\engine\http {
         public function getConfig(?string $version = null): ?string
         {
             if ($version === null) {
-                return $this->host['CONFIG_CLASS'][$this->host['DEFAULT_VERSION']];
+                $env = $this->host['VERSIONS'][$this->host['DEFAULT_VERSION']];
+                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
             }
-            return $this->host['CONFIG_CLASS'][$version] ?? null;
+            if (!empty($this->host['VERSIONS'][$version])) {
+                $env = $this->host['VERSIONS'][$version];
+                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
+            }
+            return null;
         }
 
         public static function setHandler($handler): void

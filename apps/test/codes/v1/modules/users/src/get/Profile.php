@@ -27,7 +27,7 @@ namespace apps\test\codes\v1\modules\users\src\get {
                 $test = new \library\TestCase();
                 $length = $res->headers('content-length');
                 $result = $test->testIf($res->bodySize())->is($length)->getResult();
-                $this->app->response()->send($result);
+                $this->app->response()->send($res->asArray());
             });
         }
 
@@ -44,7 +44,7 @@ namespace apps\test\codes\v1\modules\users\src\get {
             ];
             $columns = $this->app->request()->columns(['sn', 'age', 'name']);
             $this->app->response()->setStatus(201);
-            $this->app->response()->send(\library\Map::get($data[0], $columns));
+            $this->app->response()->send(\library\Map::getAll($data, $columns));
         }
     }
 
