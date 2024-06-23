@@ -25,7 +25,6 @@ namespace shani\server\swoole {
             $maxCon = (int) $cnf['MAX_CONNECTIONS'];
             new \library\Concurrency(new Concurrency());
             \library\Event::setHandler(new Event());
-            Host::setHandler(new Cache($maxCon, 350));
             \library\Mime::setHandler(new Cache(1500, 100));
             \shani\engine\http\Session::setHandler(new Cache($maxCon, 1000));
             $server = new WSocket($cnf['IP'], $cnf['PORTS']['HTTP']);
@@ -78,13 +77,13 @@ namespace shani\server\swoole {
             });
             $requests = [];
             $server->on('open', function (WSocket $server, \Swoole\Http\Request $req)use (&$requests) {
-                $requests[$req->fd] = $req;
+//                $requests[$req->fd] = $req;
             });
             $server->on('message', function (WSocket $server, \Swoole\WebSocket\Frame $frame)use (&$requests) {
-                print_r($requests[$frame->fd]);
+//                print_r($requests[$frame->fd]);
             });
             $server->on('close', function (WSocket $server, int $fd)use (&$requests) {
-                unset($requests[$fd]);
+//                unset($requests[$fd]);
             });
             $server->on('task', fn() => null);
             $server->start();

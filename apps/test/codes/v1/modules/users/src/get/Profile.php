@@ -22,7 +22,7 @@ namespace apps\test\codes\v1\modules\users\src\get {
         public function activity()
         {
             $http = new \library\client\HTTP('http://dev.shani.v2.local:8008');
-            $http->headers(['accept' => 'application/json']);
+            $http->headers(['accept' => 'application/json', 'x-request-columns' => 'sn']);
             $http->get('/users/0/profile/0/sample', null, function (\library\client\Response $res) {
                 $test = new \library\TestCase();
                 $length = $res->headers('content-length');

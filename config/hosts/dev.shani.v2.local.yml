@@ -1,6 +1,6 @@
 DEFAULT_VERSION: "1.0"
 VERSIONS:
   "1.0":
-    ACTIVE_ENVIRONMENT: DEVELOPMENT
+    ACTIVE_ENVIRONMENT: DEV
     ENVIRONMENTS:
-      DEVELOPMENT: \apps\test\codes\v1\config\Settings
+      DEV: \apps\test\codes\v1\config\Settings

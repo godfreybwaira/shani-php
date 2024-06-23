@@ -9,22 +9,17 @@
 
 namespace shani\engine\http {
 
-    final class Host implements \shani\contracts\Handler
+    final class Host
     {
 
-        private ?array $host;
-        private static \shani\contracts\Cacheable $config;
+        private array $host;
 
         public function __construct(string $name)
         {
-            $this->host = self::$config->get($name);
-            if (empty($this->host)) {
-                $this->host = \shani\ServerConfig::host($name);
-                self::$config->replace($name, $this->host);
-            }
+            $this->host = \shani\ServerConfig::host($name);
         }
 
-        public function getConfig(?string $version = null): ?string
+        public function getEnvironment(?string $version = null): ?string
         {
             if ($version === null) {
                 $env = $this->host['VERSIONS'][$this->host['DEFAULT_VERSION']];
@@ -35,11 +30,6 @@ namespace shani\engine\http {
                 return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
             }
             return null;
-        }
-
-        public static function setHandler($handler): void
-        {
-            self::$config = $handler;
         }
     }
 

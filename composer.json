@@ -1,0 +1,7 @@
+{
+    "name": "godfreybwaira/shani-php",
+    "description": "an open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!",
+    "require": {
+        "php": ">=7.4"
+    }
+}

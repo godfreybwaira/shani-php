@@ -35,7 +35,7 @@ namespace shani\engine\http {
             $this->lang = $this->auth = null;
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
-            $cnf = $host->getConfig($this->req->version());
+            $cnf = $host->getEnvironment($this->req->version());
             if ($cnf !== null) {
                 $this->config = new $cnf($this);
                 if (!Asset::tryServe($this)) {
