@@ -1,0 +1,116 @@
+@use '../global/vars';
+@use '../global/colors';
+@use '../global/extensions';
+@use '../global/callables' as cb;
+@use '../global/animation';
+
+$length: 30%;
+$_gap: map-get(vars.$paddingSquare, 'md');
+$modalSize: join(map-keys(map-remove(vars.size(), 'xs')), 'full');
+
+%_default-size {
+    width: calc(100% - $_gap * 2);
+    margin: 0 auto;
+    @extend %radiusDefault;
+}
+
+%_lg-height {
+    height: $length * 2.8;
+}
+
+.cover {
+    @extend %posAbsolute, %topLeft-0, %fullHeight, %fullWidth;
+}
+
+.modal {
+    $modal: &;
+    overflow-x: hidden;
+    @extend %shadow-sm, %theme-color;
+
+    &-container {
+        align-items: center;
+        background-color: rgba(0,0,0, 0.6);
+        @extend %zIndex-md, %flexible;
+    }
+
+    &-nav {
+        top: 0;
+        z-index: -1;
+        color: #fff;
+        gap: $_gap * 0.4;
+        align-items: center;
+        justify-content: flex-end;
+        background: linear-gradient(colors.shadow(), transparent);
+        @extend %height-md, %paddingY-md, %posAbsolute, %fullWidth, %flexible;
+    }
+
+    &:not(&-type-drawer, &-type-solid) {
+        max-height: 80%;
+    }
+    &:not(&-type-drawer) {
+        @include animation.zoomIn;
+    }
+
+    &-type-drawer {
+        max-width: 70%;
+        min-width: $length;
+        @extend %fullHeight;
+        @include animation.slideRight;
+    }
+
+    @each $val in $modalSize {
+        &-size-#{$val} {
+            @extend %_default-size;
+
+            &#{$modal}-type-solid {
+                @if($val =='sm') {
+                    height: $length * 2;
+                }
+
+                @else if($val =='md') {
+                    height: $length * 2.5;
+                }
+
+                @else if($val =='full') {
+                    @extend %fullHeight, %fullWidth;
+                }
+
+                @else {
+                    @extend %_lg-height;
+                }
+            }
+        }
+    }
+
+    @include cb.media (map-get(vars.$breakpoints, 'sm')) {
+        $factor: 1;
+
+        @each $val in $modalSize {
+            @if($val !='full') {
+                &-size-#{$val} {
+                    width: $length * $factor;
+                }
+
+                $factor: $factor + 0.5;
+            }
+        }
+    }
+
+    @include cb.media (map-get(vars.$breakpoints, 'md')) {
+        &:not(&-type-drawer, &-type-solid) {
+            max-height: 90%;
+        }
+
+        &-type {
+            &-drawer {
+                max-width: 50%;
+            }
+
+            &-solid {
+                &:not(#{$modal}-size-full, #{$modal}-size-sm, #{$modal}-size-xl) {
+                    height: $length * 3;
+                }
+            }
+        }
+    }
+}

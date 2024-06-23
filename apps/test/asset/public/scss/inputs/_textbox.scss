@@ -1,0 +1,236 @@
+@use '../global/vars';
+@use '../global/extensions' as gxt;
+@use '../global/callables' as cb;
+@use '../global/colors';
+@use 'sass:color';
+
+$radius: map-get(vars.$borderRadius, 'xs');
+
+%_border-left-radius {
+    border-radius: $radius 0 0 $radius;
+}
+
+%_border-radius {
+    border-radius: $radius;
+}
+
+%_border-color-primary {
+    border-color: colors.primary();
+}
+
+%_hide-borders {
+    border-color: transparent;
+    border-bottom-color: colors.primary();
+    border-radius: 0;
+}
+
+%_translate-label {
+    left: 0;
+    height: auto;
+    background: none;
+    color: colors.primary();
+    transform: translateY(-75%);
+    border-color: transparent;
+    font-weight: bold;
+    @extend %font-sm, %posAbsolute;
+}
+
+@each $key,
+$val in vars.$inputSize {
+    %_min-height-#{$key} {
+        min-height: $val;
+    }
+}
+
+
+.input {
+    $input: &;
+    $cover: null;
+
+    &-cover {
+        $cover: &;
+        @extend %fullWidth, %posAbsolute, %fullHeight, %color-primary, %_border-radius;
+    }
+
+    $_factor: 1;
+
+    @each $key,
+    $val in vars.$inputSize {
+        &-size-#{$key} {
+            @extend %font-#{$key}, %_min-height-#{$key};
+
+            &>textarea {
+                padding-top: map-get(vars.$paddingSquare, 'md') * $_factor * 0.22;
+                $_factor: $_factor + 1;
+                $size: null;
+
+                @if($key =='sm') {
+                    $size: map-get(vars.$paddingSquare, 'sm');
+                }
+
+                @else {
+                    $size: map-get(vars.$paddingSquare, 'md');
+                }
+
+                padding-left: $size;
+                padding-right: $size;
+                height: $val;
+                @extend %_min-height-#{$key};
+            }
+
+            &>:not(textarea, .choice-input) {
+                @if($key =='sm') {
+                    @extend %paddingY-sm;
+                }
+            }
+        }
+    }
+
+    &-type {
+        @extend %flexible, %posRelative;
+
+        &>* {
+            @extend %greyBorder;
+        }
+
+        &:not(#{$input}-size-sm)>:not(.choice-input,textarea) {
+            @extend %paddingY-md;
+        }
+
+        &:hover>#{$cover},
+        &:focus-within>#{$cover} {
+            opacity: 0;
+            height: 0;
+            transform: translateY(-100%);
+        }
+
+        &> {
+            :not(select, input, textarea) {
+                white-space: nowrap;
+                @extend %inlineFlex;
+
+                &:not(.choice-input) {
+                    align-items: center;
+                }
+            }
+
+            :only-child {
+                @extend %_border-radius, %greyBorder;
+            }
+
+            select,
+            input,
+            textarea {
+                &:invalid {
+                    color: color.scale(colors.get('danger'), $lightness: -40%);
+                }
+            }
+
+            select {
+                @extend %flex-1;
+
+                &:not(:placeholder-shown)~#{$cover} {
+                    @extend %_border-color-primary;
+                }
+            }
+
+            input {
+                @extend %flex-1;
+
+                &:not(:placeholder-shown)~#{$cover} {
+                    @extend %_border-color-primary;
+                }
+            }
+
+            textarea {
+                @extend %flex-1;
+                overflow-x: hidden;
+
+                &:not(:placeholder-shown)~#{$cover} {
+                    @extend %_border-color-primary;
+                }
+            }
+        }
+
+        &-1 {
+            overflow: hidden;
+            &> {
+                :focus {
+                    outline: cb.px2rem(1px) solid colors.primary();
+                    outline-offset: cb.px2rem(-1px);
+                }
+
+                :first-child:not(:only-child) {
+                    @extend %_border-left-radius;
+                }
+
+                :last-child {
+                    border-radius: 0 $radius $radius 0;
+                }
+
+                :not(:only-child, :first-child, #{$cover}) {
+                    border-left: none;
+                }
+            }
+        }
+
+        &-2 {
+            flex-direction: row-reverse;
+
+            &> {
+                :last-child:not(:only-child, #{$cover}) {
+                    @extend %_border-left-radius;
+                }
+
+                :first-child:not(#{$cover}) {
+                    border-radius: 0 $radius $radius 0;
+                }
+
+                :not(:only-child, :last-child, #{$cover}) {
+                    border-left: none;
+                }
+
+                /////////////////////
+                :focus {
+                    outline: none;
+                    @extend %_hide-borders;
+
+                    &~:not(#{$cover}) {
+                        @extend %_translate-label;
+                    }
+                }
+
+                .choice-input {
+                    @extend %_hide-borders;
+                    &~:not(#{$cover}) {
+                        @extend %_translate-label;
+                    }
+                }
+
+                input:not(:placeholder-shown) {
+                    @extend %_hide-borders;
+
+                    &~:not(#{$cover}) {
+                        @extend %_translate-label;
+                    }
+                }
+
+                textarea:not(:placeholder-shown) {
+                    @extend %_hide-borders;
+
+                    &~:not(#{$cover}) {
+                        @extend %_translate-label;
+                    }
+                }
+
+                select:not(:placeholder-shown) {
+                    @extend %_hide-borders;
+
+                    &~:not(#{$cover}) {
+                        @extend %_translate-label;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,41 @@
+@use '../global/vars';
+@use '../global/extensions';
+@use '../global/colors';
+
+.table {
+    @extend %fullWidth, %radiusDefault;
+
+    &-container {
+        overflow-x: auto;
+    }
+
+    &-bordered {
+        td {
+            border-top: colors.line();
+        }
+    }
+
+    td {
+        @extend %paddingXY-md;
+    }
+
+    th {
+        @extend %paddingXY-md;
+    }
+
+    tr:hover {
+        @extend %hoverShadow;
+    }
+
+    &-even {
+        tr:not(:hover):nth-of-type(2n)>td {
+            @extend %theme-color-l1;
+        }
+    }
+
+    &-odd {
+        tr:not(:hover):nth-of-type(2n+1)>td {
+            @extend %theme-color-l1;
+        }
+    }
+}

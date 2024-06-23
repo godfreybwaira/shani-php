@@ -1,0 +1,139 @@
+@use '../global/vars';
+@use '../global/extensions' as xt;
+@use '../global/callables' as cb;
+@use '../global/colors';
+@use 'sass:math';
+
+@function _getDimension($val) {
+    @return math.div($val * 8, 100);
+}
+
+@function _getPosition($val, $dimension) {
+    @return math.div($val - $dimension, 2);
+}
+
+@mixin _outline($style, $color) {
+    outline: cb.px2rem(2px) $style $color;
+}
+
+.step {
+    list-style: none;
+    counter-reset: num;
+    @extend %no-gaps;
+    $_step: &;
+    $_gap: map-get(vars.$paddingSquare, 'md');
+    $size: vars.size();
+
+    @each $key,
+    $val in $size {
+        &-size-#{$key} {
+            $dimension: _getDimension($val);
+            $pos: _getPosition($val, $dimension);
+
+            &:not(#{$_step}-h)>* {
+                @extend %flexible;
+                gap: $_gap;
+
+                &:not(:last-child) {
+                    padding-bottom: ($_gap * 2);
+                }
+
+                &:after {
+                    left: $pos;
+                    width: $dimension;
+                    @extend %fullHeight;
+                }
+
+                &:before {
+                    flex-shrink: 0;
+                }
+            }
+
+            &>:after {
+                top: $pos;
+            }
+
+            &>:before {
+                width: $val;
+                @extend %height-#{$key};
+            }
+
+            &#{$_step}-h>* {
+                &:after {
+                    height: $dimension;
+                    left: 50%;
+                    @extend %fullWidth;
+                }
+            }
+        }
+    }
+
+    &-h {
+        @extend %flexible;
+        overflow: auto hidden;
+
+        &>:before {
+            margin: 0 auto $_gap;
+        }
+
+        &>:not(:last-child) {
+            padding-right: $_gap;
+        }
+    }
+
+    &>* {
+        @extend %flex-1, %posRelative;
+    }
+
+    &>:not(:last-child) {
+        &:after {
+            z-index: -1;
+            @extend %emptyContent, %posAbsolute;
+        }
+    }
+
+    &>:before {
+        @extend %flexible, %counter-num, %flexCenter;
+    }
+
+    &-complete {
+        &:before {
+            @extend %color-primary;
+        }
+
+        &:after {
+            @extend %color-primary;
+        }
+
+        @at-root #{$_step}>:not(&) {
+            &:after {
+                @extend %colorShadow;
+            }
+
+            &:before {
+                @extend %color-primary;
+            }
+        }
+    }
+
+    &-current {
+        &:before {
+            color: colors.primary();
+            @include _outline(dashed, colors.primary());
+        }
+    }
+
+    &>:not(&-current, &-complete) {
+        &:before {
+            @include _outline(solid, colors.shadow());
+        }
+    }
+
+    &-type {
+        &-1 {
+            &>:before {
+                @extend %roundCorner;
+            }
+        }
+    }
+}

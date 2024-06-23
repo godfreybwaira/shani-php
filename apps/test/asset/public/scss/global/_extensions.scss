@@ -1,0 +1,307 @@
+@use 'vars';
+@use 'colors';
+@use 'sass:math';
+@use 'callables' as cb;
+
+$themeColor: colors.selectedTheme();
+$size: vars.size();
+
+@mixin _radius($radius) {
+    border-radius: map-get(vars.$borderRadius, $radius);
+}
+
+%cursorPointer {
+    cursor: pointer;
+}
+
+%counter-num {
+    counter-increment: num;
+    content: counter(num, decimal);
+}
+
+%theme-color {
+    color: colors.getTextColor();
+    background-color: $themeColor;
+}
+
+%radiusDefault {
+    @include _radius('xs');
+}
+
+%roundCorner {
+    @include _radius('xxl');
+}
+
+%fullHeight {
+    height: 100%;
+}
+
+%fullWidth {
+    width: 100%;
+}
+
+%inlineFlex {
+    display: inline-flex;
+}
+
+%flexible {
+    display: flex;
+}
+
+%flex-1 {
+    flex: 1 1 auto;
+}
+
+%emptyContent {
+    content: '';
+}
+
+%posAbsolute {
+    position: absolute;
+}
+
+%topLeft-0 {
+    top: 0;
+    left: 0;
+}
+
+%flexCenter {
+    align-items: center;
+    justify-content: center;
+}
+
+%hoverShadow {
+    background-color: rgba(colors.mixPrimary(black), 0.2);
+    text-decoration: none;
+}
+
+%color-primary {
+    background-color: colors.primary();
+    color: colors.getTextColor(colors.primary());
+}
+
+%colorShadow {
+    background-color: colors.shadow();
+    color: colors.getTextColor(colors.shadow());
+}
+
+%greyBorder {
+    border: colors.line();
+}
+
+%borderAround {
+    @extend %greyBorder, %radiusDefault;
+}
+
+%posRelative {
+    // transform: translate(0);
+    position: relative;
+}
+
+%resetList {
+    margin: 0;
+    list-style: none;
+}
+
+%no-gaps {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+@mixin _textAlign {
+    @each $val in (center,left,right,justify) {
+        %align-#{$val} {
+            text-align: $val;
+        }
+        .align-#{$val} {
+            @extend %align-#{$val};
+        }
+    }
+}
+
+@mixin _height {
+
+    @each $key,
+    $val in $size {
+        %height-#{$key} {
+            height: $val;
+            @extend %font-#{$key};
+        }
+    }
+}
+
+@mixin _paddingXY {
+
+    @each $key,
+    $val in vars.$paddingXY {
+        %paddingXY-#{$key} {
+            padding: $val;
+        }
+        .padding-xy-#{$key} {
+            @extend %paddingXY-#{$key};
+        }
+    }
+}
+
+@mixin _paddingSquare {
+
+    @each $key,
+    $val in vars.$paddingSquare {
+        %padding-#{$key} {
+            padding: $val;
+        }
+
+        %paddingX-#{$key} {
+            padding: $val 0;
+        }
+
+        %paddingY-#{$key} {
+            padding: 0 $val;
+        }
+        .padding-#{$key} {
+            @extend %padding-#{$key};
+        }
+
+        .padding-x-#{$key} {
+            @extend %paddingX-#{$key};
+        }
+
+        .padding-y-#{$key} {
+            @extend %paddingY-#{$key};
+        }
+    }
+}
+
+@mixin _zIndex {
+
+    @each $key,
+    $val in vars.$zindex {
+        %zIndex-#{$key} {
+            z-index: $val;
+        }
+        .z-index-#{$key} {
+            @extend %zIndex-#{$key};
+        }
+    }
+}
+
+@mixin _boxShadow {
+
+    @each $key,
+    $val in vars.$boxShadow {
+        %shadow-#{$key} {
+            box-shadow: $val;
+        }
+        .shadow-#{$key} {
+            @extend %shadow-#{$key};
+        }
+    }
+}
+
+@mixin _fontSize {
+    $font: vars.fontSize();
+
+    @each $key,
+    $val in $font {
+        %font-#{$key} {
+            font-size: $val;
+        }
+        .font-#{$key} {
+            @extend %font-#{$key};
+        }
+    }
+}
+
+@mixin _setColors {
+
+    $colors: colors.get();
+
+    @each $key,
+    $val in $colors {
+        %color-#{$key} {
+            background-color: $val;
+            color: colors.getTextColor($val);
+        }
+        .color {
+            &-#{$key},
+            &-#{$key}-hover:hover {
+                @extend %color-#{$key};
+            }
+        }
+    }
+}
+
+@mixin setHeight($height_size: $size) {
+
+    @each $key,
+    $val in $height_size {
+        &-size-#{$key} {
+            @extend %height-#{$key};
+        }
+    }
+}
+
+@mixin _setColorClass($class, $prefix, $color, $step) {
+    $cssClass: #{$class}-#{$prefix + math.abs($step)};
+
+    %#{$cssClass} {
+        background-color: $color;
+        color: colors.getTextColor($color);
+    }
+
+    .#{$cssClass} {
+        @extend %#{$cssClass};
+    }
+
+}
+
+@mixin _createPrimaryColors {
+    $range: colors.$classRange;
+    $class: 'color-primary';
+
+    .#{$class} {
+        @extend %#{$class};
+    }
+
+    @for $step from -$range through $range {
+        @if($step !=0) {
+            $prefix: if($step < 0, 'd', 'l');
+            $color: colors.lightenPrimary($step);
+            @include _setColorClass($class, $prefix , $color , $step);
+        }
+    }
+}
+
+@mixin _createThemeColors {
+    $enabled: colors.selectionEnabled();
+    $range: colors.$classRange;
+    $class: 'theme-color';
+    $color: #fff;
+
+    .#{$class} {
+        @extend %#{$class};
+    }
+
+    @for $step from -$range through $range {
+        @if($step !=0) {
+            $prefix: if($step < 0, 'd', 'l');
+
+            @if($enabled) {
+                $color: colors.changeLightness($themeColor, $step * colors.$themeMixInterval);
+            }
+
+            @include _setColorClass($class, $prefix, $color, $step);
+        }
+    }
+}
+
+@include _setColors;
+@include _textAlign;
+@include _height;
+@include _paddingSquare;
+@include _paddingXY;
+@include _zIndex;
+@include _boxShadow;
+@include _fontSize;
+@include _createPrimaryColors;
+@include _createThemeColors;

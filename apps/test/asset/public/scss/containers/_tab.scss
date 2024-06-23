@@ -1,0 +1,157 @@
+@use '../global/vars';
+@use '../global/extensions' as xt;
+@use '../global/callables' as cb;
+@use '../global/colors';
+@use 'sass:math';
+
+%_before {
+    @extend %posAbsolute, %emptyContent, %fullWidth;
+}
+
+.tab {
+    $tab: &;
+    padding: 0;
+    gap: map-get(vars.$paddingSquare, 'xs');
+    @extend %flexible, %posRelative, %fullWidth, %resetList;
+
+    &:before {
+        @extend %_before;
+    }
+
+    @include cb.media(map-get(vars.$breakpoints, 'md')) {
+        &-pos-center {
+            justify-content: center;
+        }
+
+        &-pos-right {
+            justify-content: flex-end;
+        }
+
+        &:not(&-stretch)>* {
+            flex: none;
+        }
+
+        &-stretch>* {
+            flex: 1 1 auto;
+        }
+    }
+
+    &-column>*>a {
+        flex-direction: column;
+        @extend %padding-sm;
+
+        #{$tab}-label {
+            @extend %font-xs, %align-center;
+        }
+    }
+
+    &>* {
+        @extend %flexible, %posRelative, %flex-1;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        &.active {
+            color: colors.primary();
+        }
+
+        &>a {
+            color: currentColor;
+            text-decoration: none;
+            @extend %flexible, %fullWidth, %flexCenter;
+
+            &:hover {
+                color: colors.primary();
+            }
+        }
+    }
+
+    &-type {
+        &-1 {
+
+            @include cb.media (map-get(vars.$breakpoints, 'sm'), max-width) {
+                & {
+                    overflow: auto hidden;
+                }
+            }
+            
+            &>:not(.active):before {
+                width: 0;
+            }
+
+            &>:before {
+                left: 50%;
+                height: cb.px2rem(2px);
+                transform: translateX(-50%);
+                background-color: currentColor;
+                @extend %_before;
+            }
+
+            &#{$tab}-border-top {
+                &:before {
+                    border-top: colors.line('md');
+                }
+
+                &>:before,
+                &:before {
+                    top: 0;
+                }
+            }
+
+            &:not(#{$tab}-border-top) {
+                &:before {
+                    border-bottom: colors.line('md');
+                }
+
+                &>:before,
+                &:before {
+                    bottom: 0;
+                }
+            }
+        }
+
+        &-2 {
+
+            @include cb.media (map-get(vars.$breakpoints, 'sm'), max-width) {
+                & {
+                    overflow: auto hidden;
+                }
+            }
+
+            &:before {
+                bottom: 0;
+                border-bottom: colors.line();
+            }
+
+            &>.active:before {
+                bottom: cb.px2rem(-2px);
+                height: cb.px2rem(2px);
+                @extend %theme-color;
+            }
+
+            &>:not(.active) {
+                @extend %theme-color-d1;
+            }
+
+            &>:before {
+                left: 0;
+                @extend %_before;
+            }
+
+            &>* {
+                @extend %greyBorder;
+                $quarter: map-get(vars.$borderRadius, 'xs');
+                border-radius: $quarter $quarter 0 0;
+            }
+        }
+    }
+
+
+    @each $key,
+    $val in vars.$inputSize {
+        &-size-#{$key}>*>* {
+            @extend %height-#{$key}, %paddingY-md;
+        }
+    }
+}
