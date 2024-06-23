@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # shani-php
 =======
 # Shani Web Application Framework
@@ -64,4 +63,3 @@ Please make sure to update tests as appropriate.
 ## License
 
 [GPL-3.0](https://choosealicense.com/licenses/gpl-3.0/)
->>>>>>> master

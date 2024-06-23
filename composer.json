@@ -2,7 +2,7 @@
     "name": "godfreybwaira/shani",
     "type": "framework",
     "homepage": "https://github.com/godfreybwaira/shani-php",
-    "license": "GPL",
+    "license": "GPL-3.0",
     "description": "an open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!",
     "require": {
         "php": ">=7.4"
