@@ -27,7 +27,10 @@ namespace shani\engine\core {
          * <p>Get the application root directory with trailing /</p>
          * @return string Return application root directory relative to App directory
          */
-        public abstract function root(): string;
+        public function root(): ?string
+        {
+            return null;
+        }
 
         public function sessionName(): string
         {
@@ -67,15 +70,9 @@ namespace shani\engine\core {
         }
 
         /**
-         * Set relative URL of application to be used for error handling.
-         * This application should be able to handle all HTTP errors depending
-         * on status code provided.
-         * @return string|null URL to application resource
+         * Handle all HTTP errors that may occur during program execution.
          */
-        public function fallbackUrl(): ?string
-        {
-            return null;
-        }
+        public abstract function httpErrorHandler(): void;
 
         /**
          * Set all application supported languages where key being language code
@@ -90,7 +87,7 @@ namespace shani\engine\core {
         /**
          * Execute user defined middlewares
          */
-        public abstract function middleware(\shani\engine\middleware\Register &$mw): void;
+        public abstract function middleware(\shani\engine\http\Middleware &$mw): void;
 
         public function moduleDir(): string
         {
@@ -127,31 +124,15 @@ namespace shani\engine\core {
             return null;
         }
 
+        /**
+         * Directory for static contents
+         */
         public abstract function assetDir(): ?string;
 
-        public function signatureSecretKey(): string
-        {
-            return '';
-        }
-
+        /**
+         * Default path to homepage if '/' is provided by user
+         */
         public abstract function homepage(): string;
-
-        public function guestModules(): array
-        {
-            return [];
-        }
-
-        public function publicModules(): array
-        {
-            return [];
-        }
-
-        public function authorizationType(): int
-        {
-            return \shani\engine\authorization\Authorization::AUTH_SESSION;
-        }
-
-        public abstract function templateVersion(): string;
     }
 
 }

@@ -62,9 +62,6 @@ namespace shani\engine\http {
 
         public function send($data = null, string $encoding = null): self
         {
-            if ($data === null || $data === '') {
-                return $this->write();
-            }
             $type = $this->type();
             if ($type !== null) {
                 switch ($type) {
@@ -118,7 +115,7 @@ namespace shani\engine\http {
 
         public function sendJson($data, string $encoding = null): self
         {
-            return $this->plainText(json_encode($data), 'application/json', $encoding);
+            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json', $encoding);
         }
 
         public function sendJsonp($data, string $callback, string $encoding = null): self

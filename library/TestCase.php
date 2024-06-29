@@ -16,7 +16,7 @@ namespace library {
         private int $pass = 0, $total = 0, $length;
         private ?string $description, $lines = null;
         private $before = null, $after = null;
-        private bool $result;
+        private array $results = [];
 
         public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
         public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
@@ -36,6 +36,14 @@ namespace library {
             $this->printResults();
         }
 
+        public function done(): array
+        {
+            $this->results['all'] = $this->total;
+            $this->results['passed'] = $this->pass;
+            $this->results['failed'] = $this->total - $this->pass;
+            return $this->results;
+        }
+
         private function printResults(): void
         {
             if ($this->total > 0) {
@@ -46,10 +54,10 @@ namespace library {
                     echo $str . '|' . $space . strtoupper($this->description) . $space . '|' . PHP_EOL . $str;
                 }
                 echo $this->lines . PHP_EOL;
+                $diff = $this->total - $this->pass;
                 $title = 'Total Tests: ' . $this->total . ' (100%)';
                 echo 'Results:' . PHP_EOL . $title . PHP_EOL;
                 echo 'Test Passed: ' . $this->pass . ' (' . round($this->pass * 100 / $this->total, 2) . '%)' . PHP_EOL;
-                $diff = $this->total - $this->pass;
                 echo 'Test Failed: ' . $diff . ' (' . round($diff * 100 / $this->total, 2) . '%)' . PHP_EOL;
             }
         }
@@ -58,11 +66,6 @@ namespace library {
         {
             $this->value = $value;
             return $this;
-        }
-
-        public function getResult(): bool
-        {
-            return $this->result;
         }
 
         private static function toReadable($value)
@@ -220,7 +223,6 @@ namespace library {
         {
             self::setup($this->before);
             $this->total++;
-            $this->result = $pass;
             if ($pass) {
                 $this->pass++;
                 $str = $this->total . '.Pass ';

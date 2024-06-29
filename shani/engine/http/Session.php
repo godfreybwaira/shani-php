@@ -12,7 +12,7 @@ namespace shani\engine\http {
     {
 
         private static \shani\contracts\Cacheable $memory;
-        private static string $storageId;
+        private static ?string $storageId;
         private string $name;
 
         public function __construct(string $name)
@@ -141,22 +141,25 @@ namespace shani\engine\http {
 
         public static function start(App &$app): void
         {
-            $sessId = $app->request()->cookies($app->config()->sessionName());
-            if (!$app->request()->isAsync() || $sessId === null) {
-                $newId = base64_encode(random_bytes(rand(14, 40)));
-                if ($sessId !== null) {
-                    self::$memory->rename($sessId, $newId);
-                }
-                $cookie = (new \library\HttpCookie())->setValue($newId)
-                        ->setSecure($app->request()->secure())->setHttpOnly(true)
-                        ->setDomain($app->request()->uri()->hostname())
-                        ->setMaxAge($app->config()->cookieMaxAge())
-                        ->setName($app->config()->sessionName());
-                $app->response()->setCookie($cookie);
-                self::$storageId = $newId;
-            } else {
-                self::$storageId = $sessId;
+            self::$storageId = $app->request()->cookies($app->config()->sessionName());
+            if (self::$storageId === null) {
+                self::refresh($app);
             }
+        }
+
+        public static function refresh(App &$app): void
+        {
+            $newId = base64_encode($app->request()->ip() . random_bytes(rand(7, 21)));
+            if (self::$storageId !== null) {
+                self::$memory->rename(self::$storageId, $newId);
+            }
+            self::$storageId = $newId;
+            $cookie = (new \library\HttpCookie())->setValue($newId)
+                    ->setSecure($app->request()->secure())->setHttpOnly(true)
+                    ->setDomain($app->request()->uri()->hostname())
+                    ->setMaxAge($app->config()->cookieMaxAge())
+                    ->setName($app->config()->sessionName());
+            $app->response()->setCookie($cookie);
         }
 
         public static function setHandler($handler): void

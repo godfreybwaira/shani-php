@@ -11,7 +11,6 @@ namespace shani\engine\http {
 
     use library\HttpStatus;
     use shani\engine\core\AutoConfig;
-    use shani\engine\authorization\Authorization;
 
     final class App
     {
@@ -23,7 +22,6 @@ namespace shani\engine\http {
         private Response $res;
         private ?string $lang;
         private AutoConfig $config;
-        private ?Authorization $auth;
         private \library\Logger $logger;
         private array $appCart = [], $dict = [];
 
@@ -31,8 +29,8 @@ namespace shani\engine\http {
 
         public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res, Host $host)
         {
+            $this->lang = null;
             $this->host = $host;
-            $this->lang = $this->auth = null;
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
             $cnf = $host->getEnvironment($this->req->version());
@@ -101,14 +99,6 @@ namespace shani\engine\http {
             return $this->host;
         }
 
-        public function auth(): Authorization
-        {
-            if ($this->auth === null) {
-                $this->auth = new Authorization($this);
-            }
-            return $this->auth;
-        }
-
         public function csrfToken(): Session
         {
             return $this->cart(self::CSRF_TOKENS);
@@ -136,10 +126,9 @@ namespace shani\engine\http {
             return $this->asset;
         }
 
-        public function gui()
+        public function gui(string $version = '1.0')
         {
-            if (!isset($this->template)) {
-                $version = $this->config->templateVersion();
+            if ($version !== null && !isset($this->template)) {
                 $controller = \shani\ServerConfig::template($version);
                 $this->template = new $controller($this);
             }
@@ -187,11 +176,10 @@ namespace shani\engine\http {
         {
             return function (string $event) {
                 if ($event === 'before') {
-                    $code = $this->response()->statusCode();
-                    if ($code === HttpStatus::OK) {
+                    if ($this->response()->statusCode() === HttpStatus::OK) {
                         return $this->submit($this->request()->method());
                     }
-                    $this->showError($code);
+                    $this->config->httpErrorHandler();
                 }
             };
         }
@@ -201,7 +189,7 @@ namespace shani\engine\http {
             $path = $this->req->uri()->location();
             $this->req->forward($path === '/' ? $this->config->homepage() : $path);
             Session::start($this);
-            $middleware = new \shani\engine\middleware\Register($this, $this->boot());
+            $middleware = new Middleware($this, $this->boot());
             $this->config->middleware($middleware);
             $middleware->run();
         }
@@ -219,7 +207,7 @@ namespace shani\engine\http {
             return \shani\engine\core\Documentor::generate($this);
         }
 
-        private function submit(string $method, int $trials = 1): void
+        private function submit(string $method): void
         {
             $classPath = $this->getClass($this->req->resource(), $method);
             if (is_file(SERVER_ROOT . $classPath . '.php')) {
@@ -229,22 +217,12 @@ namespace shani\engine\http {
                 if (is_callable([$obj, $cb])) {
                     $obj->$cb();
                 } else {
-                    $this->showError(HttpStatus::NOT_FOUND, $trials);
+                    $this->res->setStatus(HttpStatus::NOT_FOUND);
+                    $this->config->httpErrorHandler();
                 }
             } else {
-                $this->showError(HttpStatus::METHOD_NOT_ALLOWED, $trials);
-            }
-        }
-
-        private function showError(int $statusCode, int $trials = 1): void
-        {
-            $this->res->setStatus($statusCode);
-            $fallback = $this->config->fallbackUrl();
-            if ($fallback !== null && $trials < 3) {
-                $this->req->forward($fallback . '/status' . $statusCode);
-                $this->submit('get', $trials + 1);
-            } else {
-                $this->res->send();
+                $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
+                $this->config->httpErrorHandler();
             }
         }
 
