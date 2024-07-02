@@ -171,12 +171,12 @@ namespace library {
 
         public function isFalsy(string $details = null): self
         {
-            return $this->compare('falsy', empty($this->value), $details);
+            return $this->compare('(falsy)', empty($this->value), $details);
         }
 
         public function isTruthy(string $details = null): self
         {
-            return $this->compare('truthy', !empty($this->value), $details);
+            return $this->compare('(truthy)', !empty($this->value), $details);
         }
 
         public function is($value, string $details = null): self

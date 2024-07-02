@@ -33,19 +33,9 @@ namespace library {
             }
         }
 
-        public static function checkAuthentication(App &$app, bool $loggedIn, array $publicModules = [], array $guestModules = []): void
+        public static function checkAuthentication(App &$app, bool $loggedIn, array $exclusiveModules = []): void
         {
-            $module = $app->request()->module();
-            if (in_array($module, $publicModules)) {
-                return;
-            }
-            if ($loggedIn) {
-                if (in_array($module, $guestModules)) {
-                    $app->request()->forward($app->config()->homepage());
-                }
-                return;
-            }
-            if (in_array($module, $guestModules)) {
+            if ($loggedIn || in_array($app->request()->module(), $exclusiveModules)) {
                 return;
             }
             $app->response()->setStatus(HttpStatus::FORBIDDEN);

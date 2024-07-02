@@ -13,8 +13,8 @@ namespace shani\engine\http {
     {
 
         private ?string $type = null;
-        private ?array $url, $inputs = null;
         private \shani\contracts\Request $req;
+        private ?array $url, $inputs, $queryValues = null;
         private ?string $platform = null, $version = null, $accepted = null;
 
         public function __construct(\shani\contracts\Request &$req)
@@ -24,32 +24,32 @@ namespace shani\engine\http {
             $post = $req->post();
             $this->req = $req;
             if (empty($post)) {
-                $this->parseRawData();
+                $this->inputs = $this->parseRawData();
                 if ($files !== null) {
-                    $this->inputs = $this->inputs ? array_merge($this->inputs, $files) : $files;
+                    $this->inputs = !empty($this->inputs) ? array_merge($this->inputs, $files) : $files;
                 }
             } else {
-                $this->inputs = $files ? array_merge($post, $files) : $post;
+                $post = \library\Map::normalize($post);
+                $this->inputs = !empty($files) ? array_merge($post, $files) : $post;
             }
         }
 
-        private function parseRawData(): void
+        private function parseRawData(): ?array
         {
             $type = $this->type();
-            if ($type === null) {
-                return;
-            }
             if ($type === 'json') {
-                $this->inputs = json_decode($this->req->raw(), true);
-            } elseif ($type === 'xml') {
-                $this->inputs = \library\DataConvertor::xml2array($this->req->raw());
-            } elseif ($type === 'x-www-form-urlencoded') {
-                parse_str($this->req->raw(), $this->inputs);
-            } elseif ($type === 'yaml') {
-                $this->inputs = \library\DataConvertor::yaml2array($this->req->raw());
-            } elseif ($type === 'csv') {
-                $this->inputs = str_getcsv($this->req->raw());
-            }
+                return json_decode($this->req->raw(), true);
+            } if ($type === 'xml') {
+                return \library\DataConvertor::xml2array($this->req->raw());
+            } if ($type === 'x-www-form-urlencoded') {
+                $rawData = null;
+                parse_str($this->req->raw(), $rawData);
+                return $rawData;
+            } if ($type === 'yaml') {
+                return \library\DataConvertor::yaml2array($this->req->raw());
+            } if ($type === 'csv') {
+                return str_getcsv($this->req->raw());
+            } return null;
         }
 
         /**
@@ -173,7 +173,10 @@ namespace shani\engine\http {
 
         public function query($names = null, bool $selected = true)
         {
-            return \library\Map::get($this->req->get(), $names, $selected);
+            if (empty($this->queryValues)) {
+                $this->queryValues = \library\Map::normalize($this->req->get());
+            }
+            return \library\Map::get($this->queryValues, $names, $selected);
         }
 
         public function cookies($names = null, bool $selected = true)

@@ -15,13 +15,19 @@ namespace shani\engine\http {
     {
 
         private Event $listener;
-        private App $app;
 
-        public function __construct(App &$app, callable $done)
+        public function __construct(App &$app)
         {
             $this->listener = new Event(['before', 'after']);
-            $this->listener->done($done);
-            $this->app = $app;
+            $this->listener->done(function (string $event) use (&$app) {
+                if ($event !== 'before') {
+                    return;
+                }
+                if ($app->response()->statusCode() < 300) {
+                    return $app->submit();
+                }
+                $app->config()->handleHttpErrors();
+            });
         }
 
         /**

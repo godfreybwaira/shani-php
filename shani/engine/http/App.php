@@ -22,7 +22,6 @@ namespace shani\engine\http {
         private Response $res;
         private ?string $lang;
         private AutoConfig $config;
-        private \library\Logger $logger;
         private array $appCart = [], $dict = [];
 
         private const CSRF_TOKENS = '_gGOd2y$oNO6W';
@@ -37,7 +36,7 @@ namespace shani\engine\http {
             if ($cnf !== null) {
                 $this->config = new $cnf($this);
                 if (!Asset::tryServe($this)) {
-                    self::catchErrors($this);
+                    $this->catchErrors();
                     $this->start();
                 }
             } else {
@@ -45,22 +44,13 @@ namespace shani\engine\http {
             }
         }
 
-        private static function catchErrors(App &$app): void
+        private function catchErrors(): void
         {
-            $logger = $app->logger();
-            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) use (&$logger) {
-                $logger->appError($errno, $errstr, $errfile, $errline);
+            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
+                $this->config->handleApplicationErrors(new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline));
                 return true;
             });
-            set_exception_handler(fn(\Throwable $e) => $logger->exception($e));
-        }
-
-        public function logger(): \library\Logger
-        {
-            if (!isset($this->logger)) {
-                $this->logger = new \library\Logger($this->asset()->directory('/.logs'));
-            }
-            return $this->logger;
+            set_exception_handler(fn(\Throwable $e) => $this->config->handleApplicationErrors($e));
         }
 
         public function web(callable $cb): self
@@ -172,24 +162,12 @@ namespace shani\engine\http {
             return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module();
         }
 
-        private function boot(): callable
-        {
-            return function (string $event) {
-                if ($event === 'before') {
-                    if ($this->response()->statusCode() === HttpStatus::OK) {
-                        return $this->submit($this->request()->method());
-                    }
-                    $this->config->httpErrorHandler();
-                }
-            };
-        }
-
         private function start(): void
         {
             $path = $this->req->uri()->location();
             $this->req->forward($path === '/' ? $this->config->homepage() : $path);
             Session::start($this);
-            $middleware = new Middleware($this, $this->boot());
+            $middleware = new Middleware($this);
             $this->config->middleware($middleware);
             $middleware->run();
         }
@@ -207,9 +185,9 @@ namespace shani\engine\http {
             return \shani\engine\core\Documentor::generate($this);
         }
 
-        private function submit(string $method): void
+        public function submit(): void
         {
-            $classPath = $this->getClass($this->req->resource(), $method);
+            $classPath = $this->getClass($this->req->resource(), $this->req->method());
             if (is_file(SERVER_ROOT . $classPath . '.php')) {
                 $className = str_replace('/', '\\', $classPath);
                 $obj = new $className($this);
@@ -218,11 +196,11 @@ namespace shani\engine\http {
                     $obj->$cb();
                 } else {
                     $this->res->setStatus(HttpStatus::NOT_FOUND);
-                    $this->config->httpErrorHandler();
+                    $this->config->handleHttpErrors();
                 }
             } else {
                 $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-                $this->config->httpErrorHandler();
+                $this->config->handleHttpErrors();
             }
         }
 

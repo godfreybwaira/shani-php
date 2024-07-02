@@ -72,7 +72,12 @@ namespace shani\engine\core {
         /**
          * Handle all HTTP errors that may occur during program execution.
          */
-        public abstract function httpErrorHandler(): void;
+        public abstract function handleHttpErrors(): void;
+
+        /**
+         * Handle all application errors
+         */
+        public abstract function handleApplicationErrors(\Throwable $t): void;
 
         /**
          * Set all application supported languages where key being language code

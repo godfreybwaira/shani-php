@@ -64,6 +64,51 @@ namespace library {
             return $result;
         }
 
+        public static function filter(array $rows, array $filters = null): array
+        {
+            if (empty($filters)) {
+                return $rows;
+            }
+            $data = [];
+            self::find($rows, function ($row) use (&$filters, &$data) {
+                if (self::hasValues($row, $filters)) {
+                    $data[] = $row;
+                }
+            });
+            return $data;
+        }
+
+        /**
+         * Convert array string values to their internal representation. For example
+         * a string value 'null' is converted to NULL, string 'true' or 'false' is
+         * converted to boolean value true and false respectively etc.
+         * @param array|null $values array to normalize
+         * @return array|null normalized array
+         */
+        public static function normalize(?array $values): ?array
+        {
+            if ($values === null) {
+                return $values;
+            }
+            $content = [];
+            foreach ($values as $key => $val) {
+                if (is_array($val)) {
+                    $content[$key] = self::normalize($val);
+                } elseif ($val === 'null') {
+                    $content[$key] = null;
+                } elseif ($val === 'true' || $val === 'false') {
+                    $content[$key] = ($val === 'true');
+                } elseif (preg_match('/^\d+$/', $val)) {
+                    $content[$key] = (int) $val;
+                } elseif (preg_match('/^\d*\.\d+/$', $val)) {
+                    $content[$key] = (double) $val;
+                } else {
+                    $content[$key] = $val;
+                }
+            }
+            return $content;
+        }
+
         public static function getAll(array $rows, array $keys, bool $selected = true): array
         {
             $result = [];
@@ -118,10 +163,10 @@ namespace library {
             return array_key_exists($keys, $data);
         }
 
-        public static function hasValues(array $data, array $values): bool
+        public static function hasValues(array $row, array $values): bool
         {
-            foreach ($values as $k => $v) {
-                if (!isset($data[$k]) || $data[$k] !== $v) {
+            foreach ($values as $key => $val) {
+                if (!array_key_exists($key, $row) || $row[$key] !== $val) {
                     return false;
                 }
             }
@@ -143,15 +188,6 @@ namespace library {
                 $row = $cb($row);
             }
             return $rows;
-        }
-
-        public static function average(array &$data, string $key, int $precision = 2): float
-        {
-            $sum = array_sum($data[$key]);
-            if ($sum !== 0) {
-                return round($sum / count($data[$key]), $precision);
-            }
-            return 0.00;
         }
     }
 
