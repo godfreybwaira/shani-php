@@ -14,11 +14,23 @@ namespace gui\v1 {
 
         private static array $styles;
 
-        public static function setStyles(array $styles)
+        /**
+         * Set CSS classes to be used in styling a component.
+         * @param array $styles Associative array where key is the name representing
+         * a style class(es) or list of classes and values is an array of actual
+         * CSS class(es) defined in a CSS file
+         * @return void
+         */
+        public static function setStyles(array $styles): void
         {
             self::$styles = $styles;
         }
 
+        /**
+         * Get all CSS style class(es) of a component.
+         * @param string $classList
+         * @return array CSS class(es) used to style a component
+         */
         public static function styles(string ...$classList): array
         {
             $list = [];

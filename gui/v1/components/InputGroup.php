@@ -24,9 +24,9 @@ namespace gui\v1\components {
             $this->setType(self::TYPE_1);
         }
 
-        public function setType(int $type): self
+        public function setType(int $inputType): self
         {
-            $this->addProperty('input-type', self::TYPES[$type]);
+            $this->addProperty('input-type', self::TYPES[$inputType]);
             return $this;
         }
 

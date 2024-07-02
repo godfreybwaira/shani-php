@@ -21,17 +21,6 @@ namespace shani {
             return $mime[$extension] ?? null;
         }
 
-        public static function template(string $version): ?string
-        {
-            try {
-                $cnf = yaml_parse_file(self::PATH . '/template.yml');
-                return $cnf['VERSION'][$version];
-            } catch (\RuntimeException $exc) {
-                echo 'Template version "' . $version . '" not found.';
-                return null;
-            }
-        }
-
         public static function host(string $name): array
         {
             try {

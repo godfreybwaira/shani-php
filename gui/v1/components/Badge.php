@@ -21,9 +21,9 @@ namespace gui\v1\components {
             parent::__construct('span');
             $this->setContent($text)->addProperty(self::NAME);
             if (parent::SIZE_DEFAULT === parent::SIZE_SM) {
-                $this->setGutters(parent::SIZE_SM);
+                $this->setSpacing(parent::SIZE_SM);
             } else {
-                $this->setGutters(parent::SIZE_DEFAULT - 1);
+                $this->setSpacing(parent::SIZE_DEFAULT - 1);
             }
         }
     }

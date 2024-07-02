@@ -60,50 +60,60 @@ namespace shani\engine\http {
             return $this->type;
         }
 
-        public function send($data = null, string $encoding = null): self
+        public function sendFilter(array $data, ?array $availableColumns = null, ?array $filters = null): self
+        {
+            $values = \library\Map::filter($data, $filters ?? $this->req->query());
+            if (empty($availableColumns)) {
+                return $this->send($values);
+            }
+            $userColumns = $this->req->columns($availableColumns);
+            return $this->send(\library\Map::getAll($values, $userColumns));
+        }
+
+        public function send($data = null): self
         {
             $type = $this->type();
             if ($type !== null) {
                 switch ($type) {
                     case'json':
-                        return $this->sendJson($data, $encoding);
+                        return $this->sendAsJson($data);
                     case'xml':
-                        return $this->sendXml($data, $encoding);
+                        return $this->sendAsXml($data);
                     case'csv':
-                        return $this->sendCsv($data, $encoding);
+                        return $this->sendAsCsv($data);
                     case'yaml':
                     case'yml':
-                        return $this->sendYaml($data, $encoding);
+                        return $this->sendAsYaml($data);
                     case'html':
-                        return $this->sendHtml($data, $encoding);
+                        return $this->sendAsHtml($data);
                     case'raw':
-                        return $this->plainText($data, 'application/octet-stream', '');
+                        return $this->plainText($data, 'application/octet-stream');
                     case'sse':
                     case'event-stream':
-                        return $this->sendSse($data);
+                        return $this->sendAsSse($data);
                     case'js':
                     case'jsonp':
-                        return $this->sendJsonp($data, $this->req->query('callback') ?? 'callback', $encoding);
+                        return $this->sendAsJsonp($data, $this->req->query('callback') ?? 'callback');
                 }
             }
-            return $this->plainText($data, 'text/plain', $encoding);
+            return $this->plainText($data, 'text/plain; charset=utf-8');
         }
 
-        private function plainText($data, string $type, ?string $encoding): self
+        private function plainText($data, string $type): self
         {
-            $this->setHeaders('content-type', $type . ($encoding ??= '; charset=utf-8'));
+            $this->setHeaders('content-type', $type);
             if (is_array($data)) {
                 return $this->write(serialize($data));
             }
             return $this->write($data);
         }
 
-        public function sendHtml($data, string $encoding = null): self
+        public function sendAsHtml($data): self
         {
-            return $this->plainText($data, 'text/html', $encoding);
+            return $this->plainText($data, 'text/html; charset=utf-8');
         }
 
-        public function sendSse($data, string $event = 'message'): self
+        public function sendAsSse($data, string $event = 'message'): self
         {
             $this->setHeaders('cache-control', 'no-cache');
             $evt = 'id:idn' . hrtime(true) . PHP_EOL;
@@ -113,14 +123,14 @@ namespace shani\engine\http {
             return $this->plainText($evt, 'text/event-stream', null);
         }
 
-        public function sendJson($data, string $encoding = null): self
+        public function sendAsJson($data): self
         {
-            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json', $encoding);
+            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json; charset=utf-8');
         }
 
-        public function sendJsonp($data, string $callback, string $encoding = null): self
+        public function sendAsJsonp($data, string $callback): self
         {
-            $this->setHeaders('content-type', 'application/javascript; charset=' . ($encoding ?? 'utf-8'));
+            $this->setHeaders('content-type', 'application/javascript; charset=utf-8');
             $type = gettype($data);
             if ($type === 'array') {
                 return $this->write($callback . '(' . json_encode($data) . ');');
@@ -140,20 +150,20 @@ namespace shani\engine\http {
             return $this->write($callback . '();');
         }
 
-        public function sendXml($data, string $encoding = null): self
+        public function sendAsXml($data): self
         {
-            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml', $encoding);
+            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml; charset=utf-8');
         }
 
-        public function sendCsv($data, string $encoding = null, string $separator = ','): self
+        public function sendAsCsv($data, string $separator = ','): self
         {
-            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv', $encoding);
+            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv; charset=utf-8');
         }
 
-        public function sendYaml($data, string $encoding = null): self
+        public function sendAsYaml($data): self
         {
-//            return $this->plainText(\library\DataConvertor::array2yaml($data), 'text/yaml', $encoding);
-            return $this->plainText(yaml_emit($data), 'text/yaml', $encoding);
+//            return $this->plainText(\library\DataConvertor::array2yaml($data), 'text/yaml');
+            return $this->plainText(yaml_emit($data), 'text/yaml; charset=utf-8');
         }
 
         public function saveAs(string $filename = null): self

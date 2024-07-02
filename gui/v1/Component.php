@@ -12,7 +12,7 @@ namespace gui\v1 {
     class Component
     {
 
-        private string $tag;
+        private string $htmlTag;
         private array $children, $attributes, $classList, $props;
         private ?string $content, $gap, $fontSize, $padding, $shadow, $corner;
 
@@ -29,13 +29,13 @@ namespace gui\v1 {
         public const DIRECTION_X = 0, DIRECTION_Y = 1, DIRECTION_TOP = 2, DIRECTION_BOTTOM = 3;
         public const SIZE_DEFAULT = self::SIZE_MD, ALIGN_X = 0, ALIGN_Y = 1;
 
-        public function __construct(string $tag, bool $gutters = true)
+        public function __construct(string $tag, bool $spacing = true)
         {
-            $this->tag = $tag;
+            $this->htmlTag = $tag;
             $this->children = $this->classList = $this->attributes = $this->props = [];
             $this->content = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
-            if ($gutters) {
-                $this->setGutters(self::SIZE_DEFAULT);
+            if ($spacing) {
+                $this->setSpacing(self::SIZE_DEFAULT);
             }
         }
 
@@ -48,10 +48,10 @@ namespace gui\v1 {
         {
             $css = $this->stringifyClass();
             if ($this->content !== null || !empty($this->children)) {
-                $texts = '<' . $this->tag . $css . $this->stringifyAttr() . '>' . $this->content;
-                return $texts . $this->stringifyChildren() . '</' . $this->tag . '>';
+                $texts = '<' . $this->htmlTag . $css . $this->stringifyAttr() . '>' . $this->content;
+                return $texts . $this->stringifyChildren() . '</' . $this->htmlTag . '>';
             }
-            return '<' . $this->tag . $css . $this->stringifyAttr() . '/>';
+            return '<' . $this->htmlTag . $css . $this->stringifyAttr() . '/>';
         }
 
         public function addColumnSize(int $column, int $size): self
@@ -299,7 +299,7 @@ namespace gui\v1 {
             return $this->initProp('corner', $size, $direction);
         }
 
-        public function setGutters(?int $size): self
+        public function setSpacing(?int $size): self
         {
             return $this->setMargin($size)->setPadding($size)->setGap($size);
         }

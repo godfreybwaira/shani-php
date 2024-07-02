@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Map
+ * A map for manipulation of multidimensional and single-dimensional arrays
  * @author coder
  *
  * Created on: Feb 17, 2024 at 10:36:36 AM
@@ -48,6 +48,14 @@ namespace library {
             return $results;
         }
 
+        /**
+         * Find a row on multi-dimension array and apply a callback on it.
+         * @param array $rows
+         * @param callable $cb A callback to execute on each row of array. If a row
+         * matches a given condition, this callback must return true, otherwise false.
+         * @param int $limit number of records to return
+         * @return array Matched array
+         */
         public static function find(array $rows, callable $cb, int $limit = 0): array
         {
             $size = 0;
@@ -64,6 +72,12 @@ namespace library {
             return $result;
         }
 
+        /**
+         * Filter array and return the filtered array
+         * @param array $rows Array to filter from
+         * @param array $filters Array of keys and values to be used on filtering.
+         * @return array filtered array
+         */
         public static function filter(array $rows, array $filters = null): array
         {
             if (empty($filters)) {
@@ -109,6 +123,14 @@ namespace library {
             return $content;
         }
 
+        /**
+         * Get rows from a multidimensional array
+         * @param array $rows
+         * @param array $keys A key or array of keys to be used as filter
+         * @param bool $selected If true will mean getting only returning arrays
+         * with selected keys, otherwise will return arrays NOT from selected keys.
+         * @return array found arrays
+         */
         public static function getAll(array $rows, array $keys, bool $selected = true): array
         {
             $result = [];
@@ -118,26 +140,34 @@ namespace library {
             return $result;
         }
 
-        public static function get(?array $items, $keys = null, bool $selected = true)
+        /**
+         * Get a value from array
+         * @param array|null $row single-dimensional array of items to get values from
+         * @param type $keys A key or array of keys to be used as filter
+         * @param bool $selected If true will mean getting only returning arrays
+         * with selected keys, otherwise will return arrays NOT from selected keys.
+         * @return type A value(s) that was found in array
+         */
+        public static function get(?array $row, $keys = null, bool $selected = true)
         {
-            if ($keys === null || $items === null) {
-                return $selected ? $items : [];
+            if ($keys === null || $row === null) {
+                return $selected ? $row : [];
             }
             if (is_array($keys)) {
                 if (!$selected) {
-                    return array_filter($items, fn($key) => !in_array($key, $keys), ARRAY_FILTER_USE_KEY);
+                    return array_filter($row, fn($key) => !in_array($key, $keys), ARRAY_FILTER_USE_KEY);
                 }
                 $result = [];
                 foreach ($keys as $idx => $val) {
                     if (is_int($idx)) {
-                        $result[$val] = $items[$val] ?? null;
+                        $result[$val] = $row[$val] ?? null;
                     } else {
-                        $result[$idx] = $items[$idx] ?? $val;
+                        $result[$idx] = $row[$idx] ?? $val;
                     }
                 }
                 return $result;
             }
-            return $selected ? $items[$keys] ?? null : self::get($items, [$keys], $selected);
+            return $selected ? $row[$keys] ?? null : self::get($row, [$keys], $selected);
         }
 
         public static function add(array $source, array $destination, $keys = null, bool $selected = true): array

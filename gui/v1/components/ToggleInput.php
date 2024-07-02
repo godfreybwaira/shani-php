@@ -23,9 +23,9 @@ namespace gui\v1\components {
             $this->setAttribute('type', 'checkbox')->setAttribute('name', $name);
         }
 
-        public function setType(int $type): self
+        public function setType(int $toggleType): self
         {
-            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$toggleType]);
         }
     }
 

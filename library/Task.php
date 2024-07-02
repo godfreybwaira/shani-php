@@ -30,22 +30,42 @@ namespace library {
             $this->listener = new Event(self::EVENTS);
         }
 
+        /**
+         * Set start time when to execute a task
+         * @param \DateTimeImmutable $duration Duration from now
+         * @return void
+         */
         public function startAt(\DateTimeImmutable $duration): void
         {
             $this->startAfter($duration->getTimestamp() - time());
         }
 
+        /**
+         * Set handler for given task
+         * @param string $event Event name. Name must be from a list of supported events.
+         * @param callable $callback Function to execute when event is triggered.
+         * @return self
+         */
         public function on(string $event, callable $callback): self
         {
             $this->listener->on($event, $callback);
             return $this;
         }
 
+        /**
+         * Execute a task immediately.
+         * @return void
+         */
         public function startNow(): void
         {
             $this->startAfter(0);
         }
 
+        /**
+         * Execute a task after a given seconds from now
+         * @param int $seconds
+         * @return void
+         */
         public function startAfter(int $seconds): void
         {
             Concurrency::async(function ()use (&$seconds) {
@@ -92,6 +112,11 @@ namespace library {
             }
         }
 
+        /**
+         * Set number of steps to pause execution of a task before the next execution.
+         * @param int $seconds Number of seconds to pause.
+         * @return self
+         */
         public function steps(int $seconds): self
         {
             $this->steps = $seconds;
@@ -108,30 +133,54 @@ namespace library {
             return $this->repeat === -1 || $this->repeat > 1;
         }
 
+        /**
+         * Set how frequent the task should repeat before it stop. One frequency
+         * indicate one circle.
+         * @param int $frequency Number of times a task is allowed to repeat before
+         * ending.
+         * @return self
+         */
         public function frequency(int $frequency): self
         {
             $this->frequency = $frequency;
             return $this;
         }
 
+        /**
+         * Pause execution of a task
+         * @return self
+         */
         public function pause(): self
         {
             $this->paused = true;
             return $this->listener->trigger('pause');
         }
 
+        /**
+         * Resume execution of a task
+         * @return self
+         */
         public function resume(): self
         {
             $this->paused = false;
             return $this->listener->trigger('resume');
         }
 
+        /**
+         * Set how many a task is to be repeated in each circle or frequency.
+         * @param int $count
+         * @return self
+         */
         public function repeat(int $count = -1): self
         {
             $this->repeat = $count;
             return $this;
         }
 
+        /**
+         * Cancel task execution.
+         * @return void
+         */
         public function cancel(): void
         {
             $this->cancelled = true;

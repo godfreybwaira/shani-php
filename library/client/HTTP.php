@@ -339,7 +339,6 @@ namespace library\client {
             $fp = fopen($source, 'rb');
             self::$specialOptions = [
                 CURLOPT_INFILE => $fp, CURLOPT_UPLOAD => true,
-                CURLOPT_BINARYTRANSFER => true,
                 CURLOPT_INFILESIZE => fstat($fp)['size']
             ];
             if ($callback !== null) {

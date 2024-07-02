@@ -52,11 +52,19 @@ namespace library {
             return ($info ? $info . '@' : null ) . $this->hostname() . ($port ? ':' . $port : null);
         }
 
+        /**
+         * Get URL fragment
+         * @return string|null URL fragment
+         */
         public function fragment(): ?string
         {
             return self::value($this->parts['fragment']);
         }
 
+        /**
+         * Get hostname from URL
+         * @return string Hostname
+         */
         public function hostname(): string
         {
             return $this->parts['host'];
@@ -82,11 +90,19 @@ namespace library {
             return $this->hostname() . ($port ? ':' . $port : null);
         }
 
+        /**
+         * Get the URL path.
+         * @return string URL path
+         */
         public function path(): string
         {
             return $this->path;
         }
 
+        /**
+         * Get the URL path joined with query string.
+         * @return string URL path joined with query string.
+         */
         public function location(): string
         {
             $query = $this->query();
@@ -98,6 +114,10 @@ namespace library {
             return $this->parts['port'];
         }
 
+        /**
+         * Get query string part of a URL
+         * @return string|null Query string
+         */
         public function query(): ?string
         {
             return $this->parts['query'] ?? null;

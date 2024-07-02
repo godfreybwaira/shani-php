@@ -30,9 +30,9 @@ namespace gui\v1\components {
             $this->wrapper->addProperty(self::NAME . '-wrapper');
         }
 
-        public function setType(int $type): self
+        public function setType(int $modalType): self
         {
-            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$modalType]);
         }
 
         public function addNavbar(Component ...$items): self

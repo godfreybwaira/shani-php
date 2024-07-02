@@ -10,18 +10,19 @@
 namespace shani\engine\http {
 
     use library\HttpStatus;
+    use gui\Template;
     use shani\engine\core\AutoConfig;
 
     final class App
     {
 
-        private $template;
         private Host $host;
         private Asset $asset;
         private Request $req;
         private Response $res;
         private ?string $lang;
         private AutoConfig $config;
+        private ?Template $template = null;
         private array $appCart = [], $dict = [];
 
         private const CSRF_TOKENS = '_gGOd2y$oNO6W';
@@ -100,6 +101,11 @@ namespace shani\engine\http {
             $this->res->redirect('/');
         }
 
+        /**
+         * Create and return cart for storing session variables
+         * @param string $name Cart name
+         * @return Session
+         */
         public function cart(string $name): Session
         {
             if (empty($this->appCart[$name])) {
@@ -108,6 +114,10 @@ namespace shani\engine\http {
             return $this->appCart[$name];
         }
 
+        /**
+         * Get static assets from application static directory
+         * @return Asset
+         */
         public function asset(): Asset
         {
             if (!isset($this->asset)) {
@@ -116,32 +126,43 @@ namespace shani\engine\http {
             return $this->asset;
         }
 
-        public function gui(string $version = '1.0')
+        public function template(): \gui\Template
         {
-            if ($version !== null && !isset($this->template)) {
-                $controller = \shani\ServerConfig::template($version);
-                $this->template = new $controller($this);
+            if (!isset($this->template)) {
+                $this->template = new \gui\Template($this);
             }
             return $this->template;
         }
 
-        public function render($data = null, $state = null): void
+        /**
+         * Render HTML document to user agent
+         * @param array|null $data Values to be passed on view component
+         * @return void
+         */
+        public function render(?array $data = null): void
         {
             $type = $this->res->type();
             if ($type === null || $type === 'html') {
                 ob_start();
-                $this->gui()->render($data, $state);
-                $this->res->sendHtml(ob_get_clean());
+                $this->template()->render($data);
+                $this->res->sendAsHtml(ob_get_clean());
             } else if ($type === 'event-stream') {
                 ob_start();
-                $this->gui()->render($data, $state);
-                $this->res->sendSse(ob_get_clean());
+                $this->template()->render($data);
+                $this->res->sendAsSse(ob_get_clean());
             } else {
                 $this->res->send($data);
             }
         }
 
-        public function dictionary(string $path = null): array
+        /**
+         * Set and/or get array of words from language file.
+         * @param string|null $path Path to language file. The file must return
+         * array of have key-value pair where <code>key</code> is the value
+         * representing the word and <code>value</code> is the actual word
+         * @return array Words from language file
+         */
+        public function dictionary(?string $path = null): array
         {
             if ($path !== null) {
                 $this->dict = require $path;
@@ -152,11 +173,20 @@ namespace shani\engine\http {
             return $this->dict;
         }
 
+        /**
+         * Set and/or get current view file from disk to be rendered as HTML to user agent.
+         * @param string $path
+         * @return string Path to view file
+         */
         public function view(string $path = null): string
         {
             return $this->module() . $this->config->viewDir() . $this->req->resource() . ($path ?? $this->req->callback()) . '.php';
         }
 
+        /**
+         * Get path to current executing module directory
+         * @return string Path to module directory
+         */
         public function module(): string
         {
             return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module();
@@ -204,7 +234,14 @@ namespace shani\engine\http {
             }
         }
 
-        public function csrf(string $path = null): string
+        /**
+         * Set and/or get URL safe from CSRF attack. if CSRF is enabled, then the
+         * application will be protected against CSRF attack and the URL will be
+         * returned, otherwise the URL will be returned but CSRF will be turned off.
+         * @param string|null $path
+         * @return string URL safe from CSRF attack
+         */
+        public function csrf(?string $path = null): string
         {
             $protection = $this->config->csrf();
             $url = $path ?? $this->req->uri()->path();

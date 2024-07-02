@@ -16,15 +16,15 @@ namespace gui\v1\components {
         private const TYPES = ['prev', 'next', 'times', 'maximize', 'plus'];
         public const TYPE_PREV = 0, TYPE_NEXT = 1, TYPE_TIMES = 2, TYPE_MAXIMIZE = 3, TYPE_PLUS = 4;
 
-        public function __construct(int $type)
+        public function __construct(int $buttonType)
         {
             parent::__construct('button');
-            $this->addProperty(self::NAME)->setType($type);
+            $this->addProperty(self::NAME)->setType($buttonType);
         }
 
-        public function setType(int $type): self
+        public function setType(int $buttonType): self
         {
-            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$buttonType]);
         }
     }
 

@@ -7,25 +7,20 @@
  * Created on: Feb 19, 2024 at 1:07:12 PM
  */
 
-namespace gui\v1 {
+namespace gui {
 
     use shani\engine\http\App;
 
-    final class Template implements \gui\GUI
+    final class Template
     {
 
-        private const NAVBAR_TYPE = ['content-navbar-type-1', 'content-navbar-type-2'];
-
         private App $app;
-        private bool $showMenu = false;
-        private mixed $data, $state;
-        private ?array $scripts, $styles;
-        private ?string $title, $details, $icon, $view, $bottomType, $topType;
+        private ?string $title, $details, $icon;
+        private ?array $scripts, $styles, $data, $attributes;
 
         public function __construct(App &$app)
         {
-            $this->scripts = $this->styles = $this->data = $this->state = [];
-            $this->view = $this->topType = $this->bottomType = null;
+            $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->details = $this->icon = null;
             $this->app = $app;
         }
@@ -42,23 +37,35 @@ namespace gui\v1 {
             return $this;
         }
 
-        public function title(string $str): self
+        /**
+         * Set title to HTML document.
+         * @param string $name HTML title
+         * @return self
+         */
+        public function title(string $name): self
         {
-            $this->title = $str;
+            $this->title = $name;
             return $this;
         }
 
+        /**
+         * Set link to external script file for HTML document.
+         * @param type $srcs can be array where values are URL to script
+         * file, or string
+         * @return self
+         */
         public function scripts($srcs): self
         {
             self::createHeader($this->scripts, $srcs);
             return $this;
         }
 
-        public function html(string $path): string
-        {
-            return \shani\engine\core\Path::GUI . '/v1/html' . $path . '.php';
-        }
-
+        /**
+         * Set link to external CSS file for HTML document.
+         * @param type $hrefs can be array where values are URL to css
+         * file, or string
+         * @return self
+         */
         public function css($hrefs): self
         {
             self::createHeader($this->styles, $hrefs);
@@ -79,86 +86,49 @@ namespace gui\v1 {
             }
         }
 
-        public function render(mixed $data, mixed $state): void
+        /**
+         * Render HTML document to user agent
+         * @param array|null $data Values to be passed on view component
+         * @return void
+         */
+        public function render(?array $data): void
         {
             $this->data = $data;
-            $this->state = $state;
-            $this->view ??= $this->app->view();
             if ($this->app->request()->isAsync()) {
-                self::load($this->view, $this->app);
+                self::load($this->app, $this->app->view());
             } else {
-                self::load($this->html('/main'), $this->app);
+                self::load($this->app, \shani\engine\core\Path::GUI . '/html/main.php');
             }
         }
 
-        public function view(string $path = null): self
-        {
-            if ($path === null) {
-                self::load($this->view, $this->app);
-            } else {
-                $this->view = $path;
-            }
-            return $this;
-        }
-
-        public function data(): mixed
+        /**
+         * Read immutable data
+         * @return array|null Data read
+         */
+        public function data(): ?array
         {
             return $this->data;
         }
 
-        public function state(): mixed
+        /**
+         * Set or get mutable attribute
+         * @param string $name Attribute name
+         * @param type $value Attribute value
+         * @return type
+         */
+        public function attrib(string $name, $value = null)
         {
-            return $this->state;
-        }
-
-        public function bottom(string $path = null, int $type = 2): self
-        {
-            if ($path === null) {
-                self::load($this->bottom ?? $this->html('/navbar'), $this->app);
-            } else {
-                $this->bottom = $path;
-                $this->bottomType = self::NAVBAR_TYPE[$type];
+            if ($value === null) {
+                return $this->attributes[$name];
             }
-            return $this;
+            $this->attributes[$name] = $value;
         }
 
-        public function top(string $path = null, int $type = 2): self
-        {
-            if ($path === null) {
-                self::load($this->top ?? $this->html('/navbar'), $this->app);
-            } else {
-                $this->top = $path;
-                $this->topType = self::NAVBAR_TYPE[$type];
-            }
-            return $this;
-        }
-
-        public function menu(string $path = null): self
-        {
-            if ($path === null) {
-                self::load($this->menu ?? $this->html('/menu'), $this->app);
-            } else {
-                $this->showMenu = true;
-                $this->menu = $path;
-            }
-            return $this;
-        }
-
-        public function bottomType(): ?string
-        {
-            return $this->bottomType;
-        }
-
-        public function topType(): ?string
-        {
-            return $this->topType;
-        }
-
-        public function showMenu(): bool
-        {
-            return $this->showMenu;
-        }
-
+        /**
+         * Set HTML scripts, links and title elements to HTML head element.
+         * @return string HTML scripts, links and title elements that were set on
+         * HTML header tag.
+         */
         public function head(): string
         {
             $head = $this->icon;
@@ -171,7 +141,11 @@ namespace gui\v1 {
             return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
         }
 
-        public function breadcrumb(): ?string
+        /**
+         * Create and return breadcrumb.
+         * @return string Created breadcrumb
+         */
+        public function breadcrumb(): string
         {
             $rs = $this->app->request()->resource();
             $bc = $this->app->module() . $this->app->config()->breadcrumbDir();
@@ -181,9 +155,9 @@ namespace gui\v1 {
             return $str;
         }
 
-        private static function load(string $_loadedFile, App &$app): void
+        public static function load(App &$app, string $loadedFile): void
         {
-            require $_loadedFile;
+            require $loadedFile;
         }
 
         private static function loadFile($file): ?string

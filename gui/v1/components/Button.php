@@ -22,9 +22,9 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME)->setColor(parent::COLOR_PRIMARY);
         }
 
-        public function setType(int $type): self
+        public function setType(int $buttonType): self
         {
-            return $this->addProperty(self::NAME . '-type', self::TYPES[$type]);
+            return $this->addProperty(self::NAME . '-type', self::TYPES[$buttonType]);
         }
 
         public function setBlock(): self
