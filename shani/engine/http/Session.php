@@ -141,6 +141,16 @@ namespace shani\engine\http {
 
         public static function start(App &$app): void
         {
+//            if (session_status() === PHP_SESSION_NONE) {
+//                session_start([
+//                    'name' => 'mysess',
+//                    'cookie_secure' => $app->request()->secure(),
+//                    'cookie_httponly' => true,
+//                    'cookie_lifetime' => $app->config()->cookieMaxAge(),
+//                    'cookie_samesite' => \library\HttpCookie::SAME_SITE_LAX //Since PHP >=7.3. Possible values Strict|Lax|None
+//                ]);
+//                echo session_id();
+//            }
             self::$storageId = $app->request()->cookies($app->config()->sessionName());
             if (self::$storageId === null) {
                 self::refresh($app);
