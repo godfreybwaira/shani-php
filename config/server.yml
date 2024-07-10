@@ -1,7 +1,8 @@
 ## Shani SERVER CONFIGURATION.
 ---
+#The IP address server is running on.
 IP: "0.0.0.0"
-PORTS:
+SERVER_PORTS:
   HTTP: 8008
   HTTPS: 44380
 # SCHEDULING_ALGORITHM: "PREEMPTIVE, ROUND_ROBIN, FIXED"
@@ -15,6 +16,9 @@ ENABLE_HTTP2: false
 SSL:
   KEY: "${SSL_DIR}/server.key"
   CERT: "${SSL_DIR}/server.crt"
+# Run server as background process
 RUNAS_DAEMON: false
-SHOW_ERRORS: false
+# Display all application errors and server errors.
+# This variable can be overridden by application.
+DISPLAY_ERRORS: false
 ERROR_LOG: "${SERVER_LOGS}/error"

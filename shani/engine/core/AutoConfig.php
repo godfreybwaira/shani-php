@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of AutoConfig
+ * User predefined configuration class. All these methods are intended to be
+ * overridden, otherwise the defaults will be assumed.
  * @author coder
  *
  * Created on: Feb 18, 2024 at 2:05:46 PM
@@ -12,8 +13,22 @@ namespace shani\engine\core {
     abstract class AutoConfig
     {
 
+        /**
+         * Turn OFF CSRF signature verification.
+         */
         public const CSRF_OFF = 0;
+
+        /**
+         * Same CSRF signature is used on same form just once. Once the signature
+         * is verified the form becomes invalid on next use. This is the default
+         * CSRF protection mechanism.
+         */
         public const CSRF_STRICT = 1;
+
+        /**
+         * Different CSRF signature is used for the same form, each form submit
+         * comes with it's own CSRF signature.
+         */
         public const CSRF_FLEXIBLE = 2;
 
         protected \shani\engine\http\App $app;
@@ -24,19 +39,27 @@ namespace shani\engine\core {
         }
 
         /**
-         * <p>Get the application root directory with trailing /</p>
-         * @return string Return application root directory relative to App directory
+         * Get the application root directory with trailing /
+         * @return string Application root directory relative to Apps directory
          */
         public function root(): ?string
         {
             return null;
         }
 
+        /**
+         * Set or get Session cookie name.
+         * @return string Cookie name
+         */
         public function sessionName(): string
         {
             return 'sessionId';
         }
 
+        /**
+         * Get or set cookie max age before expiration.
+         * @return string A date/time string. Valid formats are explained in Date and Time Formats.
+         */
         public function cookieMaxAge()
         {
             return '2 hours';
@@ -48,16 +71,20 @@ namespace shani\engine\core {
          * <p>It is in this directory you will create GET, POST, PUT, DELETE
          * or any other custom http method directories, These directories must be
          * in lowercase.</p>
-         * @return string Directory name
+         * @return string Path relative to current module directory
          */
         public function requestMethodsDir(): string
         {
             return '/src';
         }
 
+        /**
+         * Get or set user defined CSRF protection mechanism.
+         * @return int CSRF protection mechanism.
+         */
         public function csrf(): int
         {
-            return self::CSRF_FLEXIBLE;
+            return self::CSRF_STRICT;
         }
 
         /**
@@ -90,52 +117,74 @@ namespace shani\engine\core {
         }
 
         /**
-         * Execute user defined middlewares
+         * Execute user defined middlewares. This function provide access to user to
+         * register and execute middlewares
          */
         public abstract function middleware(\shani\engine\http\Middleware &$mw): void;
 
+        /**
+         * Get or set application modules directory
+         * @return string Path relative to application root directory
+         */
         public function moduleDir(): string
         {
             return '/modules';
         }
 
+        /**
+         * Get or set user defined breadcrumb directory.
+         * @return string Path relative to current module directory
+         */
         public function breadcrumbDir(): string
         {
             return '/breadcrumb';
         }
 
+        /**
+         * Get or set user defined breadcrumb methods directory.
+         * @return string Path relative to current breadcrumb directory
+         */
         public function breadcrumbMethodsDir(): string
         {
             return '/functions';
         }
 
+        /**
+         * Get or set user defined view directory.
+         * @return string Path relative to current module directory
+         */
         public function viewDir(): string
         {
             return '/views';
         }
 
+        /**
+         * Get or set user defined language directory. This will be folder on every
+         * module where the language files will reside.
+         * @return string Path relative to current module directory
+         */
         public function languageDir(): string
         {
             return '/lang';
         }
 
+        /**
+         * Set and get user application name
+         * @return string Application name
+         */
         public function appName(): string
         {
             return 'Shani Foundation Framework v1.0';
         }
 
-        public function appDescription(): ?string
-        {
-            return null;
-        }
-
         /**
-         * Directory for static contents
+         * Get or set user defined static contents directory.
+         * @return string Path relative to application root directory
          */
         public abstract function assetDir(): ?string;
 
         /**
-         * Default path to homepage if '/' is provided by user
+         * Default path to homepage if '/' is provided by during http request
          */
         public abstract function homepage(): string;
     }

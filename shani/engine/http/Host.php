@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Host
+ * HTTP host class representing application hosted in this server
  * @author coder
  *
  * Created on: Feb 12, 2024 at 8:49:03 AM
@@ -19,6 +19,12 @@ namespace shani\engine\http {
             $this->host = \shani\ServerConfig::host($name);
         }
 
+        /**
+         * Get current running application environment. These values are provided
+         * from host configuration file.
+         * @param string|null $version
+         * @return string|null
+         */
         public function getEnvironment(?string $version = null): ?string
         {
             if ($version === null) {

@@ -24,7 +24,7 @@ namespace shani\engine\http {
                     return;
                 }
                 if ($app->response()->statusCode() < 300) {
-                    return $app->submit();
+                    return $app->route();
                 }
                 $app->config()->handleHttpErrors();
             });

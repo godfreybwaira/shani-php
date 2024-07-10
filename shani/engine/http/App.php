@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of Response
+ * Application class is the core application engine that run the entire user
+ * application. This is where application execution and routing takes place
  * @author coder
  *
  * Created on: Feb 11, 2024 at 6:50:02 PM
@@ -54,6 +55,14 @@ namespace shani\engine\http {
             set_exception_handler(fn(\Throwable $e) => $this->config->handleApplicationErrors($e));
         }
 
+        /**
+         * Execute a callback function only when a application is in web context.
+         * This occurs when user, via accept-version header selects 'web' as the
+         * default application context
+         * @param callable $cb A callback to execute that accept application object
+         * as argument.
+         * @return self
+         */
         public function web(callable $cb): self
         {
             if ($this->req->platform() === 'web') {
@@ -62,6 +71,13 @@ namespace shani\engine\http {
             return $this;
         }
 
+        /**
+         * Execute a callback function only when a application is in api context.
+         * This occurs when user, via accept-version header selects 'api' as the
+         * default application context
+         * @param callable $cb A callback to execute that accept application object
+         * as argument.
+         */
         public function api(callable $cb): self
         {
             if ($this->req->platform() === 'api') {
@@ -70,16 +86,28 @@ namespace shani\engine\http {
             return $this;
         }
 
+        /**
+         * Get current loaded application configurations.
+         * @return AutoConfig Current application loaded configurations
+         */
         public function config(): AutoConfig
         {
             return $this->config;
         }
 
+        /**
+         * Get HTTP request object
+         * @return Request Request object
+         */
         public function request(): Request
         {
             return $this->req;
         }
 
+        /**
+         * Get HTTP response object
+         * @return Response Response object
+         */
         public function response(): Response
         {
             return $this->res;
@@ -95,6 +123,11 @@ namespace shani\engine\http {
             return $this->cart(self::CSRF_TOKENS);
         }
 
+        /**
+         * Clears all user data. This application does not terminate the application,
+         * instead it terminate current online user.
+         * @return void
+         */
         public function close(): void
         {
             Session::stop();
@@ -102,14 +135,14 @@ namespace shani\engine\http {
         }
 
         /**
-         * Create and return cart for storing session variables
+         * Create and return cart for storing session values
          * @param string $name Cart name
          * @return Session
          */
         public function cart(string $name): Session
         {
             if (empty($this->appCart[$name])) {
-                $this->appCart[$name] = new Session($name);
+                $this->appCart[$name] = new Session($this, $name);
             }
             return $this->appCart[$name];
         }
@@ -126,6 +159,10 @@ namespace shani\engine\http {
             return $this->asset;
         }
 
+        /**
+         * Customize the HTML template to be sent to user.
+         * @return \gui\Template
+         */
         public function template(): \gui\Template
         {
             if (!isset($this->template)) {
@@ -175,7 +212,8 @@ namespace shani\engine\http {
 
         /**
          * Set and/or get current view file from disk to be rendered as HTML to user agent.
-         * @param string $path
+         * @param string $path Case sensitive Path to view file, if not provided then
+         * the view file will ne the same as current executing function name.
          * @return string Path to view file
          */
         public function view(string $path = null): string
@@ -192,6 +230,10 @@ namespace shani\engine\http {
             return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module();
         }
 
+        /**
+         * Start executing user application
+         * @return void
+         */
         private function start(): void
         {
             $path = $this->req->uri()->location();
@@ -210,12 +252,23 @@ namespace shani\engine\http {
             return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
         }
 
+        /**
+         * Generate current user application documentation
+         * @return array application documentation
+         */
         public function documentation(): array
         {
             return \shani\engine\core\Documentor::generate($this);
         }
 
-        public function submit(): void
+        /**
+         * Dynamically route a user request to mapped resource. The routing mechanism
+         * always depends on HTTP method and application endpoint provided by the user.
+         * If the destination resource is not found the HTTP status 404 or 405 will
+         * be raised.
+         * @return void
+         */
+        public function route(): void
         {
             $classPath = $this->getClass($this->req->resource(), $this->req->method());
             if (is_file(SERVER_ROOT . $classPath . '.php')) {
@@ -261,6 +314,11 @@ namespace shani\engine\http {
             return $this->req->uri()->hostname() . $url;
         }
 
+        /**
+         * Get request language code. The request language is obtained from HTTP
+         * header accept-language.
+         * @return string language code
+         */
         public function language(): string
         {
             if (!$this->lang) {

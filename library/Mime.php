@@ -15,7 +15,7 @@ namespace library {
         private static \shani\contracts\Cacheable $mime;
 
         /**
-         * Determines the mimetype of a file by looking at its extension.
+         * Determines the mime type of a file by looking at its extension.
          *
          */
         public static function fromFilename(string $filename): ?string
@@ -24,7 +24,7 @@ namespace library {
         }
 
         /**
-         * Maps a file extensions to a mimetype.
+         * Maps a file extensions to a mime type.
          *
          */
         public static function fromExtension(string $extension): ?string
@@ -38,6 +38,11 @@ namespace library {
             return $type;
         }
 
+        /**
+         * Parse MIME types and return array of content types and their character sets
+         * @param string|null $mimeStr A valid mime string separated by comma
+         * @return array|null
+         */
         public static function parse(?string $mimeStr): ?array
         {
             if ($mimeStr !== null) {
@@ -46,6 +51,12 @@ namespace library {
             return null;
         }
 
+        /**
+         * Explode a mime string and return array of two values where first value
+         * is the generic value and the second value is specific value
+         * @param string|null $mimeStr A valid mime string
+         * @return array|null
+         */
         public static function explode(?string $mimeStr): ?array
         {
             if ($mimeStr === null) {

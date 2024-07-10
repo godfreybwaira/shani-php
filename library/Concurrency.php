@@ -23,11 +23,23 @@ namespace library {
             }
         }
 
+        /**
+         * Call a callback function asynchronously which does not block the execution
+         * of program
+         * @param callable $callback A callback function to execute
+         * @return void
+         */
         public static function async(callable $callback): void
         {
             self::$obj->async($callback);
         }
 
+        /**
+         * Cause a program to sleep at a given interval before continuing
+         * execution.
+         * @param int $seconds Number of seconds to sleep
+         * @return void
+         */
         public static function sleep(int $seconds): void
         {
             if ($seconds > 0) {

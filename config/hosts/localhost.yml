@@ -1,0 +1,8 @@
+# Application must have version(s). The default application version is mentioned here
+DEFAULT_VERSION: "1.0"
+# Available application versions
+VERSIONS:
+  "1.0":
+    ENVIRONMENTS:
+      DEV: \apps\demo\codes\v1\config\Settings
+    ACTIVE_ENVIRONMENT: DEV

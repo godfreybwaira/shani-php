@@ -76,6 +76,11 @@ namespace shani\engine\http {
             return $collections;
         }
 
+        /**
+         * Get use request language codes. These values will be used for application
+         * language selection if the values are supported.
+         * @return array users accepted languages
+         */
         public function languages(): array
         {
             $accept = $this->headers('accept-language');
@@ -86,21 +91,38 @@ namespace shani\engine\http {
             return [];
         }
 
+        /**
+         * Get current application module name
+         * @return string Module name
+         */
         public function module(): string
         {
             return $this->url['module'];
         }
 
+        /**
+         * Get current application callback name
+         * @return string Callback name
+         */
         public function callback(): string
         {
             return $this->url['callback'];
         }
 
+        /**
+         * Get current application resource name
+         * @return string Resource name
+         */
         public function resource(): string
         {
             return $this->url['resource'];
         }
 
+        /**
+         * Check if HTTP user agent accept the given type.
+         * @param string $type MIME type or last part of MIME before /
+         * @return bool True on success, false otherwise.
+         */
         public function accept(string $type): bool
         {
             if ($this->accepted === null) {
@@ -120,6 +142,10 @@ namespace shani\engine\http {
             return false;
         }
 
+        /**
+         * Get request MIME type
+         * @return string|null content type
+         */
         public function type(): ?string
         {
             if (!$this->type) {
@@ -128,11 +154,25 @@ namespace shani\engine\http {
             return $this->type;
         }
 
+        /**
+         * Check if HTTP request is requested via asynchronous mode. This value can
+         * be set by HTTP x-request-mode request header. It is useful for example
+         * if the request is made via AJAX or any other same technologies
+         * @return bool True if the request is asynchronous, false otherwise
+         */
         public function isAsync(): bool
         {
             return $this->headers('x-request-mode') === 'async';
         }
 
+        /**
+         * Get HTTP preferred request context (platform) set by user agent. This
+         * value is set via HTTP accept-version header and the accepted values are
+         * 'web' and 'api' only. User can also set preferred application version
+         * after request context, separated by semicolon
+         * @example accept-version=web;1.0
+         * @return string|null
+         */
         public function platform(): ?string
         {
             if ($this->platform === null) {
@@ -148,6 +188,10 @@ namespace shani\engine\http {
             return $this->platform;
         }
 
+        /**
+         * Get user HTTP requested application version.
+         * @return string|null
+         */
         public function version(): ?string
         {
             if ($this->version === null) {
@@ -156,21 +200,41 @@ namespace shani\engine\http {
             return $this->version;
         }
 
+        /**
+         * Get user IP address
+         * @return string User IP address
+         */
         public function ip(): string
         {
             return $this->req->ip();
         }
 
+        /**
+         * Get user request time
+         * @return int
+         */
         public function time(): int
         {
             return $this->req->time();
         }
 
+        /**
+         * Get request parameters sent via HTTP request endpoint
+         * @param type $index Index of request parameter
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
         public function params($index = null, bool $selected = true)
         {
             return \library\Map::get($this->url['params'], $index, $selected);
         }
 
+        /**
+         * Get HTTP queries
+         * @param type $names query string name, can be array or string
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
         public function query($names = null, bool $selected = true)
         {
             if (empty($this->queryValues)) {
@@ -179,11 +243,23 @@ namespace shani\engine\http {
             return \library\Map::get($this->queryValues, $names, $selected);
         }
 
+        /**
+         * Get HTTP cookie value(s)
+         * @param type $names named key, can be string or array
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
         public function cookies($names = null, bool $selected = true)
         {
             return \library\Map::get($this->req->cookies(), $names, $selected);
         }
 
+        /**
+         * Get HTTP request values obtained via HTTP request body.
+         * @param type $names named key, can be string or array
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
         public function read($names = null, bool $selected = true)
         {
             if (!empty($this->inputs)) {
@@ -192,11 +268,21 @@ namespace shani\engine\http {
             return $this->req->raw();
         }
 
+        /**
+         * Get HTTP request headers
+         * @param type $names header name, can be string or array
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
         public function headers($names = null, bool $selected = true)
         {
             return \library\Map::get($this->req->headers(), $names, $selected);
         }
 
+        /**
+         * Get HTTP request method
+         * @return string HTTP request method
+         */
         public function method(): string
         {
             return $this->req->method();
@@ -212,6 +298,10 @@ namespace shani\engine\http {
             return $this->req->ip() === '127.0.0.1';
         }
 
+        /**
+         * Check if HTTP request was made via secure connection
+         * @return bool True on success, false otherwise
+         */
         public function secure(): bool
         {
             return $this->req->uri()->scheme() === 'https';

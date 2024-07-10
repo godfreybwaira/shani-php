@@ -42,6 +42,11 @@ namespace shani\engine\core {
             return null;
         }
 
+        /**
+         * Generate current user application documentation
+         * @param \shani\engine\http\App $app Application object
+         * @return array User application documentation
+         */
         public static function generate(\shani\engine\http\App &$app): array
         {
             $config = $app->config();
@@ -49,7 +54,6 @@ namespace shani\engine\core {
             $modules = self::folderContent($path, $config->requestMethodsDir());
             $docs = [
                 'name' => $config->appName(),
-                'description' => $config->appDescription(),
                 'version' => $app->request()->version()
             ];
             foreach ($modules as $module => $reqMethods) {

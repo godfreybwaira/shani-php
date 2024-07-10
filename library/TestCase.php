@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of TestCase
+ * A unit test API
  * @author coder
  *
  * Created on: May 24, 2024 at 9:47:15 AM
@@ -62,6 +62,11 @@ namespace library {
             }
         }
 
+        /**
+         * Create and start a unit test.
+         * @param mixed $value A target value to test
+         * @return self
+         */
         public function testIf(mixed $value): self
         {
             $this->value = $value;

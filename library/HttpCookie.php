@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Cookie
+ * Create and manage HTTP Cookie
  * @author coder
  *
  * Created on: Mar 27, 2024 at 1:44:06 PM
@@ -196,6 +196,11 @@ namespace library {
             return $this;
         }
 
+        /**
+         * Set cookie name
+         * @param string $name a cookie name
+         * @return self
+         */
         public function setName(string $name): self
         {
             $this->cookie['name'] = $name;
@@ -204,7 +209,6 @@ namespace library {
 
         /**
          * Whether the cookie should only be transmitted over a secure HTTPS connection.
-         *
          * @return bool
          */
         public function isSecure(): bool
@@ -215,7 +219,6 @@ namespace library {
         /**
          * Returns an instance with the specified enabling or
          * disabling cookie transmission over a secure HTTPS connection.
-
          * @param bool $secure
          * @return static
          */
@@ -227,7 +230,6 @@ namespace library {
 
         /**
          * Whether the cookie can be accessed only through the HTTP protocol.
-         *
          * @return bool
          */
         public function isHttpOnly(): bool

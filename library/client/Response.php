@@ -62,7 +62,7 @@ namespace library\client {
         public function asArray(): ?array
         {
             $type = \library\Mime::explode($this->headers('content-type'));
-            if (isset($type[1])) {
+            if (!empty($type[1])) {
                 return \library\DataConvertor::convertFrom($this->body(), $type[1]);
             }
             return null;

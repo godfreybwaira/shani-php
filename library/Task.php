@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Task
+ * A custom task scheduler API
  * @author coder
  *
  * Created on: Mar 5, 2024 at 10:22:08 AM
@@ -23,6 +23,10 @@ namespace library {
         public const TIME_HOUR = self::TIME_MINUTE * 60;
         public const TIME_DAY = self::TIME_HOUR * 24;
         public const TIME_WEEK = self::TIME_DAY * 7;
+
+        /**
+         * Supported task events
+         */
         public const EVENTS = ['start', 'running', 'pause', 'resume', 'error', 'complete', 'cancel', 'repeat'];
 
         public function __construct()
@@ -31,17 +35,17 @@ namespace library {
         }
 
         /**
-         * Set start time when to execute a task
+         * Set start time on when to execute a task
          * @param \DateTimeImmutable $duration Duration from now
-         * @return void
+         * @return self
          */
-        public function startAt(\DateTimeImmutable $duration): void
+        public function startAt(\DateTimeImmutable $duration): self
         {
-            $this->startAfter($duration->getTimestamp() - time());
+            return $this->startAfter($duration->getTimestamp() - time());
         }
 
         /**
-         * Set handler for given task
+         * Set handler for given task event
          * @param string $event Event name. Name must be from a list of supported events.
          * @param callable $callback Function to execute when event is triggered.
          * @return self
@@ -54,19 +58,19 @@ namespace library {
 
         /**
          * Execute a task immediately.
-         * @return void
+         * @return self
          */
-        public function startNow(): void
+        public function startNow(): self
         {
-            $this->startAfter(0);
+            return $this->startAfter(0);
         }
 
         /**
          * Execute a task after a given seconds from now
          * @param int $seconds
-         * @return void
+         * @return self
          */
-        public function startAfter(int $seconds): void
+        public function startAfter(int $seconds): self
         {
             Concurrency::async(function ()use (&$seconds) {
                 $this->listener->trigger('start');
@@ -81,6 +85,7 @@ namespace library {
                     }
                 } while (!$this->cancelled && ($this->repeated() || $counter < $this->frequency));
             });
+            return $this;
         }
 
         private function execTask(int &$counter): self
@@ -187,6 +192,10 @@ namespace library {
             $this->listener->trigger('cancel');
         }
 
+        /**
+         * Get any exception occurred during task execution
+         * @return \Exception
+         */
         public function getException(): \Exception
         {
             return $this->exception;

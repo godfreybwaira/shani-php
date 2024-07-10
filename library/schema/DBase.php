@@ -11,56 +11,16 @@ namespace library\schema {
     final class DBase
     {
 
-        private $pdo;
+        private \PDO $pdo;
 
-        private function __construct(array &$con)
+        public function __construct(string $driver, string $database, string $host, ?int $port = null, ?string $username = null, ?string $password = null)
         {
             try {
-                $dsn = static::{$con['driver']}($con);
-                $this->pdo = new \PDO($dsn, $con['user'], $con['pass']);
+                $connectionString = self::getConnectionString($driver, $database, $host, $port);
+                $this->pdo = new \PDO($connectionString, $username, $password);
             } catch (\Exception $ex) {
                 echo 'Database connection failed! ' . $ex->getMessage();
             }
-        }
-
-        public static function connect(array $connection): DBase
-        {
-            return new self($connection);
-        }
-
-        private static function mysql(array &$con): string
-        {
-            return "mysql:host={$con['host']}:{$con['port']};dbname={$con['dbname']};charset={$con['charset']}";
-        }
-
-        private static function pgsql(array &$con): string
-        {
-            return "pgsql:host={$con['host']}:{$con['port']};dbname={$con['dbname']};charset={$con['charset']}";
-        }
-
-        private static function sqlite(array &$con): string
-        {
-            return "sqlite:{$con['dbname']}";
-        }
-
-        private static function odbc(array &$con): string
-        {
-            return "odbc:Driver=ODBC Driver 11 for SQL Server;Server={$con['host']}:{$con['port']};Database={$con['dbname']}";
-        }
-
-        private static function sybase(array &$con): string
-        {
-            return "sybase:host={$con['host']}:{$con['port']};dbname={$con['dbname']};charset={$con['charset']}";
-        }
-
-        private static function dblib(array &$con): string
-        {
-            return "dblib:version=7.0;host={$con['host']}:{$con['port']};dbname={$con['dbname']};charset={$con['charset']}";
-        }
-
-        private static function mssql(array &$con): string
-        {
-            return "mssql:host={$con['host']}:{$con['port']};dbname={$con['dbname']};charset={$con['charset']}";
         }
 
         private static function escapeHTML(&$var): void
@@ -85,6 +45,12 @@ namespace library\schema {
             }
         }
 
+        /**
+         * Execute SQL query and return number of rows affected
+         * @param string $query A query to run
+         * @param array|null $data Data to run with query
+         * @return int Number of rows affected
+         */
         public function runQuery(string $query, ?array $data = null): int
         {
             $result = $this->processQuery($query, $data);
@@ -92,6 +58,15 @@ namespace library\schema {
             return $result->rowCount();
         }
 
+        /**
+         * Execute SQL query and all rows (if available) found
+         * @param string $query A query to execute
+         * @param array|null $data Data to run with query
+         * @param bool $escapeHtml Whether to escape HTML special characters on SQL
+         * output or not
+         * @return array Rows returned as the result of SQL query.
+         * @see DBase::getResultAsTable()
+         */
         public function getResult(string $query, ?array $data = null, bool $escapeHtml = true): array
         {
             $result = $this->processQuery($query, $data);
@@ -103,10 +78,41 @@ namespace library\schema {
             return $rows;
         }
 
-        public function getCompact(string $query, array $headers, ?array $data = null, bool $escapeHtml = true): array
+        /**
+         * Execute SQL query and all rows (if available) found as table like array
+         * @param string $query A query to execute
+         * @param array|null $data Data to run with query
+         * @param bool $escapeHtml Whether to escape HTML special characters on SQL
+         * output or not
+         * @return array Rows returned as the result of SQL query.
+         * @see DBase::getResult()
+         */
+        public function getResultAsTable(string $query, array $headers, ?array $data = null, bool $escapeHtml = true): array
         {
             $rows = $this->getResult($query, $data, $escapeHtml);
-            return \library\DataConvertor::array2compact($rows, $headers);
+            return \library\DataConvertor::array2table($rows, $headers);
+        }
+
+        private static function getConnectionString(string $driver, string $database, string $host, ?int $port): string
+        {
+            switch ($driver) {
+                case 'mysql':
+                case 'pgsql':
+                case 'sybase':
+                case 'mssql':
+                    return $driver . ':host=' . $host . ':' . $port . ';dbname=' . $database;
+                case 'dblib': //for sqlserver & sybase
+                    return "dblib:host=$host:dbname=" . $database;
+                case 'oci': //for oracle
+                    return 'oci:dbname=//' . $host . ':' . $port . '/' . $database;
+                case 'sqlite':
+                    return "sqlite:$database";
+                case 'sqlsrv'://for sqlserver
+                    return "sqlsrv:Server=$host;Database=" . $database;
+                case 'odbc'://for sqlserver
+                    return "odbc:Driver=FreeTDS;Server=$host:$port;Database=" . $database;
+            }
+            throw new \RuntimeException('Driver "' . $driver . '" not supported');
         }
     }
 

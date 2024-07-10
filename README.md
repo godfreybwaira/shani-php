@@ -32,7 +32,7 @@ your favorite front-end framework while **Shani** stands on back-end, or vice ve
 15. Third-party library support
 16. Best practices API supports
 17. Supports JSON, XML, YAML, CSV and HTML
-18. Load balancing (Round robin, preemtive, fixed)
+18. Load balancing (Round robin, preemptive, fixed)
 19. Memory Management
 20. Asynchronous
 

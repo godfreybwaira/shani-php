@@ -12,6 +12,13 @@ namespace library {
     final class Map
     {
 
+        /**
+         * Order an array by a given key, either ascending or descending
+         * @param array $rows Array to order
+         * @param string $key A key to use on sorting
+         * @param int $order order can be SORT_ASC or SORT_DESC
+         * @return array Ordered array
+         */
         public static function orderBy(array &$rows, string $key, int $order = SORT_ASC): array
         {
             $factor = $order === SORT_DESC ? -1 : 1;
@@ -170,16 +177,39 @@ namespace library {
             return $selected ? $row[$keys] ?? null : self::get($row, [$keys], $selected);
         }
 
+        /**
+         * Add source array and destination array based on keys provided and selection criteria
+         * @param array $source A source array
+         * @param array $destination Destination array
+         * @param type $keys Destination array keys to add to a new array
+         * @param bool $selected If set to true, only selected keys will be added,
+         * the rest will be ignored and vice versa.
+         * @return array new array
+         */
         public static function add(array $source, array $destination, $keys = null, bool $selected = true): array
         {
             return array_merge($destination, self::get($source, is_array($keys) ? $keys : [$keys], $selected));
         }
 
+        /**
+         * Remove items from array
+         * @param array $source Source array to remove items from.
+         * @param array|null $keys keys to remove
+         * @param bool $selected If set to true, only selected keys will be added,
+         * the rest will be ignored and vice versa.
+         * @return void
+         */
         public static function remove(array &$source, ?array $keys = null, bool $selected = true): void
         {
             $source = $keys !== null ? static::get($source, $keys, $selected) : null;
         }
 
+        /**
+         * Check if array has all the keys provided
+         * @param array $data Array to check for keys
+         * @param type $keys Keys to check in array
+         * @return bool True on success, false otherwise
+         */
         public static function hasKeys(array $data, $keys): bool
         {
             if (is_array($keys)) {
@@ -193,16 +223,31 @@ namespace library {
             return array_key_exists($keys, $data);
         }
 
-        public static function hasValues(array $row, array $values): bool
+        /**
+         * Check if array has all keys and values provided
+         * @param array $data Array to check for values
+         * @param array $values Associative array contains values and keys to check on
+         * @return bool True on success, false otherwise.
+         */
+        public static function hasValues(array $data, array $values): bool
         {
             foreach ($values as $key => $val) {
-                if (!array_key_exists($key, $row) || $row[$key] !== $val) {
+                if (!array_key_exists($key, $data) || $data[$key] !== $val) {
                     return false;
                 }
             }
             return true;
         }
 
+        /**
+         * Reduce an array to a scalar value, example when wanting to find sum or
+         * average of array
+         * @param array $rows A multidimensional array to reduce
+         * @param callable $cb a callback that accepts two arguments, a single array
+         * and accumulator where type of accumulator is same as that of <code>$initialValue</code>
+         * @param type $initialValue An initial accumulator value
+         * @return type A single scalar value
+         */
         public static function reduce(array &$rows, callable $cb, $initialValue = null)
         {
             $accumulator = $initialValue;
@@ -212,6 +257,13 @@ namespace library {
             return $accumulator;
         }
 
+        /**
+         * Perform a callback on each single dimension array. This function may
+         * change the original array, depending on wht callback does to array
+         * @param array $rows A multidimensional array to apply cakkback
+         * @param callable $cb A callback function
+         * @return array New array
+         */
         public static function each(array &$rows, callable $cb): array
         {
             foreach ($rows as &$row) {

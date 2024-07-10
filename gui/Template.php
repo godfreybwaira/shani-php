@@ -66,7 +66,7 @@ namespace gui {
          * file, or string
          * @return self
          */
-        public function css($hrefs): self
+        public function styles($hrefs): self
         {
             self::createHeader($this->styles, $hrefs);
             return $this;

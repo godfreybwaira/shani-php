@@ -34,6 +34,13 @@ namespace library\client {
             ];
         }
 
+        /**
+         * Choose security mechanism to use when transporting e-mail
+         * @param string $security Security mechanism, either 'tls' or 'ssl' while
+         * 'ssl' being the default.
+         * @return self
+         * @throws \InvalidArgumentException
+         */
         public function security(string $security = self::SECURITY_TLS): self
         {
             if ($security === self::SECURITY_SSL || $security === self::SECURITY_TLS) {
@@ -43,12 +50,23 @@ namespace library\client {
             throw new \InvalidArgumentException('Invalid security option');
         }
 
-        public function accessToken(string $token): self
+        /**
+         * Set authorization token if you are using bearer token authorization
+         * @param string $token Authorization token
+         * @return self
+         */
+        public function authToken(string $token): self
         {
             $this->token = $token;
             return $this;
         }
 
+        /**
+         * Set e-mail to reply to
+         * @param string $email Reply-to e-mail
+         * @param string $name Reply-to name
+         * @return self
+         */
         public function replyTo(string $email, string $name = null): self
         {
             if ($this->replyTo === null && self::validEmail($email)) {
@@ -58,6 +76,11 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Set authentication password if you are authenticate using username and password
+         * @param string $password Password to be used in authentication
+         * @return self
+         */
         public function auth(string $password): self
         {
             $this->password = $password;
@@ -72,6 +95,12 @@ namespace library\client {
             throw new \InvalidArgumentException('Invalid email address ' . $email);
         }
 
+        /**
+         * Set e-mail sender
+         * @param string $email sender e-mail
+         * @param string $name sender name
+         * @return self
+         */
         public function from(string $email, string $name = null): self
         {
             if ($this->from === null && self::validEmail($email)) {
@@ -81,21 +110,34 @@ namespace library\client {
             return $this;
         }
 
-        public function uri(): \library\URI
-        {
-            return new \library\URI($this->host);
-        }
-
+        /**
+         * Set e-mail receipient
+         * @param string $email Receipient e-mail
+         * @param string $name Receipient name
+         * @return self
+         */
         public function to(string $email, string $name = null): self
         {
             return $this->addRcpt($email, $name, 'To');
         }
 
+        /**
+         * Set CC (Carbon Copy) to e-mail
+         * @param string $email Receipient e-mail
+         * @param string $name Receipient name
+         * @return self
+         */
         public function cc(string $email, string $name = null): self
         {
             return $this->addRcpt($email, $name, 'Cc');
         }
 
+        /**
+         * Set BCC (Blind Carbon Copy) to e-mail
+         * @param string $email Receipient e-mail
+         * @param string $name Receipient name
+         * @return self
+         */
         public function bcc(string $email, string $name = null): self
         {
             return $this->addRcpt($email, $name);
@@ -112,12 +154,24 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Set e-mail subject
+         * @param string $content E-mail subject
+         * @return self
+         */
         public function subject(string $content): self
         {
             $this->subject = chunk_split('Subject: ' . $content);
             return $this;
         }
 
+        /**
+         * Add path to file as attachment to e-mail
+         * @param string $path Path to a valid file to be send as attachment
+         * @param string $filename Name of a file as it will appear to recepient.
+         * @param string $mime File mime type. If not provided file mime will be used instead
+         * @return self
+         */
         public function attachment(string $path, string $filename = null, string $mime = null): self
         {
             $mime ??= \library\Mime::fromFilename($path) ?? 'application/octet-stream';
@@ -125,6 +179,14 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Set e-mail message headers. This headers must follow the HTTP header
+         * standards
+         * @param type $headers Header(s) to send, can be a string or array. If
+         * is a string then $val must be set.
+         * @param type $val Header value if $headres is string.
+         * @return self
+         */
         public function setHeaders($headers, $val = null): self
         {
             if (is_array($headers)) {
@@ -137,6 +199,14 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Set the message body for an email.
+         * @param string|null $template If provided then the body will rendered
+         * from template
+         * @param type $data The data to send. This data will be available to template
+         * if the template was set.
+         * @return self
+         */
         public function setBody(?string $template, $data = null): self
         {
             if ($template !== null) {
@@ -149,9 +219,16 @@ namespace library\client {
             return $this;
         }
 
-        public function send(callable $cb = null): void
+        /**
+         * Send e-mail to destination(s)
+         * @param callable $callback A callback for error handling. The first argument
+         * of this callback is error code and the second is the error message.
+         * i.e $callback(int $errorCode, string $errorMessage)
+         * @return void
+         */
+        public function send(callable $callback = null): void
         {
-            \library\Concurrency::async(function () use (&$cb) {
+            \library\Concurrency::async(function () use (&$callback) {
                 $this->conn = SMTPConnection::connect($this->host, $this->security, $this->retries, $this->timeout);
                 $success = $this->conn->initialize($this->from, $this->password, $this->token);
                 if ($success) {
@@ -161,8 +238,8 @@ namespace library\client {
                     fwrite($socket, '--' . $this->boundary . '--' . self::EOL);
                     $this->conn->quit();
                 }
-                if ($cb !== null) {
-                    $cb($this->conn->errorCode(), $this->conn->errorMessage());
+                if ($callback !== null) {
+                    $callback($this->conn->errorCode(), $this->conn->errorMessage());
                 }
             });
         }

@@ -35,6 +35,11 @@ namespace library\client {
             ];
         }
 
+        /**
+         * Set HTTP request headers
+         * @param array $headers Associatve array of header and header-value
+         * @return self
+         */
         public function headers(array $headers): self
         {
             foreach ($headers as $key => $value) {
@@ -134,6 +139,14 @@ namespace library\client {
             return $copy;
         }
 
+        /**
+         * Send HTTP request using any request method
+         * @param string|null $reqMethod Request method e.g: GET, PUT, POST etc
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function send(?string $reqMethod, string $endpoint, $body = null, callable $callback = null): self
         {
             Concurrency::async(function ()use (&$reqMethod, &$endpoint, &$body, &$callback) {
@@ -200,6 +213,12 @@ namespace library\client {
             return $body;
         }
 
+        /**
+         * Set HTTP cookies
+         * @param \library\HttpCookie $cookie Cookie object to send
+         * @param string $cookieFile If given, the request cookies will be loaded from file
+         * @return self
+         */
         public function cookies(\library\HttpCookie $cookie, string $cookieFile = null): self
         {
             if ($cookieFile !== null) {
@@ -221,6 +240,12 @@ namespace library\client {
             return $copy;
         }
 
+        /**
+         * Send files as attachments
+         * @param array $filenames Associative array where key is the name of the file
+         * and value is the actual path to a file.
+         * @return self
+         */
         public function attachments(array $filenames): self
         {
             foreach ($filenames as $name => $path) {
@@ -229,6 +254,11 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Set additional CURL options to use during this HTTP session
+         * @param array $options CURL options
+         * @return self
+         */
         public function setOptions(array $options): self
         {
             foreach ($options as $key => $value) {
@@ -290,36 +320,87 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Send HTTP GET request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function get(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('GET', self::merge($endpoint, $body), null, $callback);
         }
 
+        /**
+         * Send HTTP POST request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function post(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('POST', $endpoint, $body, $callback);
         }
 
+        /**
+         * Send HTTP PUT request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function put(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('PUT', $endpoint, $body, $callback);
         }
 
+        /**
+         * Send HTTP PATCH request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function patch(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('PATCH', $endpoint, $body, $callback);
         }
 
+        /**
+         * Send HTTP DELETE request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function delete(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('DELETE', $endpoint, $body, $callback);
         }
 
+        /**
+         * Send HTTP HEAD request to destination
+         * @param string $endpoint Request destination endpoint
+         * @param type $body Request body
+         * @param callable $callback A callback that must accept Response object
+         * @return self
+         */
         public function head(string $endpoint, $body = null, callable $callback = null): self
         {
             return $this->send('HEAD', $endpoint, $body, $callback);
         }
 
+        /**
+         * Download HTTP response as a file
+         * @param string $endpoint Request destination endpoint
+         * @param string $destination Location on disk to save a file
+         * @param callable $callback A callback for showing progress during download
+         * where the first argument is total bytes to load and the second is
+         * total bytes loaded
+         * @return self
+         */
         public function download(string $endpoint, string $destination, callable $callback = null): self
         {
             self::$specialOptions = [
@@ -334,6 +415,15 @@ namespace library\client {
             return $this->get($endpoint);
         }
 
+        /**
+         * Upload a file to remote server
+         * @param string $endpoint Request destination endpoint
+         * @param string $source A path to a source file to upload
+         * @param callable $callback A callback for showing progress during upload
+         * where the first argument is total bytes to load and the second is
+         * total bytes loaded
+         * @return self
+         */
         public function upload(string $endpoint, string $source, callable $callback = null): self
         {
             $fp = fopen($source, 'rb');

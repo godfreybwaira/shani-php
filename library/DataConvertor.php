@@ -15,7 +15,16 @@ namespace library {
         private const SEARCH_STR = ['\\', "\"", "\n", "\r", "\t"];
         private const REPLACE_STR = ['\\\\', '\\"', "\\n", "\\r", "\\t"];
 
-        public static function array2compact(array $rows, array $headers): array
+        /**
+         * Convert normal array to table like array. A table like array has two values
+         * where value on index 0 has array keys as headers and index 1 has array
+         * values as table body.
+         * @param array $rows Array to convert
+         * @param array $headers Associative array whose keys must match with array keys
+         * and value becomes table headers (columns names)
+         * @return array A converted array
+         */
+        public static function array2table(array $rows, array $headers): array
         {
             $table = [];
             $isArray = isset($rows[0]) && is_array($rows[0]);
@@ -37,21 +46,41 @@ namespace library {
             return $table;
         }
 
+        /**
+         * Convert array to XML data format
+         * @param array|null $data Data to convert
+         * @return string|null converted data as XML
+         */
         public static function array2xml(?array $data): ?string
         {
             return $data !== null ? '<?xml version="1.0"?>' . self::toxml($data, 'data') : $data;
         }
 
+        /**
+         * Convert array to CSV data format
+         * @param array|null $data Data to convert
+         * @return string|null converted data as CSV
+         */
         public static function array2csv(?array $data, string $separator = ','): ?string
         {
             return $data !== null ? self::tocsv($data, $separator) : $data;
         }
 
+        /**
+         * Convert array to YAML data format
+         * @param array|null $data Data to convert
+         * @return string|null converted data as YAML
+         */
         public static function array2yaml(?array $data): ?string
         {
             return $data !== null ? '---' . PHP_EOL . self::toyaml($data) . '...' : $data;
         }
 
+        /**
+         * Convert XML data to array
+         * @param string|null $data XML data to convert
+         * @return array|null A result from conversion
+         */
         public static function xml2array(?string $data): ?array
         {
             if (($xml = simplexml_load_string($data)) !== false) {
@@ -60,6 +89,11 @@ namespace library {
             return null;
         }
 
+        /**
+         * Convert YAML data to array
+         * @param string|null $data YAML data to convert
+         * @return array|null A result from conversion
+         */
         public static function yaml2array(?string $data): ?array
         {
             if (($yaml = yaml_parse($data)) !== false) {
@@ -68,7 +102,14 @@ namespace library {
             return null;
         }
 
-        public static function convertFrom(?string $data, ?string $type): ?array
+        /**
+         * Convert string data to array.
+         * @param string|null $data Data to convert
+         * @param string $type target data type. Can be any of the following:
+         * json, xml, csv or yaml.
+         * @return array|null A result from conversion
+         */
+        public static function convertFrom(?string $data, string $type): ?array
         {
             switch ($type) {
                 case'json':
@@ -84,6 +125,13 @@ namespace library {
             return null;
         }
 
+        /**
+         * Convert array data to string data.
+         * @param array $data Data to convert
+         * @param string $type target data type. Can be any of the following:
+         * json, xml, csv or yaml.
+         * @return string A result from conversion
+         */
         public static function convertTo(array $data, string $type): string
         {
             switch ($type) {

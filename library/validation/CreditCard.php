@@ -9,7 +9,8 @@
 
 namespace library\validation {
 
-    final class CreditCard {
+    final class CreditCard
+    {
 
         private const ERROR = 'is not valid credit card number';
 
@@ -142,7 +143,8 @@ namespace library\validation {
             ],
         ];
 
-        public static function check(string $ccNumber, string $type): ?string {
+        public static function check(string $ccNumber, string $type): ?string
+        {
             $type = strtolower($type);
             $info = null;
 
@@ -187,7 +189,8 @@ namespace library\validation {
             return null;
         }
 
-        private static function isValidLuhn(string $number = null): bool {
+        private static function isValidLuhn(string $number = null): bool
+        {
             settype($number, 'string');
             $sumTable = [
                 [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,],
@@ -200,15 +203,17 @@ namespace library\validation {
             return $sum % 10 === 0;
         }
 
-        public static function getName(string $ccNumber): ?array {
+        public static function getName(string $ccNumber): ?array
+        {
             $possibles = null;
             $length = strlen(str_replace([' ', '-'], '', $ccNumber));
             foreach (static::$cards as $key => $card) {
-                if (in_array($length, $card['length'])) {
-                    foreach ($card['prefixes'] as $prefix) {
-                        if (strpos($ccNumber, (string) $prefix) === 0) {
-                            $possibles[$card['name']] = $key;
-                        }
+                if (!in_array($length, $card['length'])) {
+                    continue;
+                }
+                foreach ($card['prefixes'] as $prefix) {
+                    if (strpos($ccNumber, (string) $prefix) === 0) {
+                        $possibles[$card['name']] = $key;
                     }
                 }
             }
