@@ -25,12 +25,23 @@ namespace gui {
             $this->app = $app;
         }
 
+        /**
+         * Set HTML document icon (favicon)
+         * @param string $path Path to icon file
+         * @param string $mime MIME type of a file
+         * @return self
+         */
         public function icon(string $path, string $mime): self
         {
             $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mime . '"/>';
             return $this;
         }
 
+        /**
+         * Set meta description on a HTML document.
+         * @param string $content Descriptive content about your application
+         * @return self
+         */
         public function description(string $content): self
         {
             $this->details = '<meta name="description" content="' . $content . '"/>';
@@ -38,7 +49,8 @@ namespace gui {
         }
 
         /**
-         * Set title to HTML document.
+         * Set title to HTML document. If not set, thn the default title will be
+         * application name, or empty string.
          * @param string $name HTML title
          * @return self
          */
@@ -49,38 +61,41 @@ namespace gui {
         }
 
         /**
-         * Set link to external script file for HTML document.
-         * @param type $srcs can be array where values are URL to script
-         * file, or string
+         * Set link to external script file for HTML document relative to asset directory.
+         * @param type $srcs Path to Javascript file(s) relative to asset directory.
+         * Can be a string or an array
+         * @param array $attributes Script attributes, must conform to HTML
+         * attributes naming standard
          * @return self
          */
-        public function scripts($srcs): self
+        public function scripts($srcs, array $attributes = []): self
         {
-            self::createHeader($this->scripts, $srcs);
+            self::createHeader($this->scripts, $srcs, $attributes);
             return $this;
         }
 
         /**
-         * Set link to external CSS file for HTML document.
-         * @param type $hrefs can be array where values are URL to css
-         * file, or string
+         * Set link to external CSS file for HTML document relative to asset directory.
+         * @param type $hrefs Path to CSS file(s) relative to asset directory.
+         * Can be a string or an array
+         * @param array $attributes Style attributes, must conform to HTML
+         * attributes naming standard
          * @return self
          */
-        public function styles($hrefs): self
+        public function styles($hrefs, array $attributes = []): self
         {
-            self::createHeader($this->styles, $hrefs);
+            self::createHeader($this->styles, $hrefs, $attributes);
             return $this;
         }
 
-        private static function createHeader(array &$head, $urls): void
+        private static function createHeader(array &$head, $urls, array &$attributes): void
         {
             if (!is_array($urls)) {
-                $head[$urls] = null;
-                return;
+                $urls = [$urls];
             }
-            foreach ($urls as $url => $attr) {
+            foreach ($urls as $url) {
                 $head[$url] = null;
-                foreach ($attr as $key => $val) {
+                foreach ($attributes as $key => $val) {
                     $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
                 }
             }
@@ -102,7 +117,7 @@ namespace gui {
         }
 
         /**
-         * Read immutable data
+         * Get immutable data that will be available to all views.
          * @return array|null Data read
          */
         public function data(): ?array
@@ -111,10 +126,10 @@ namespace gui {
         }
 
         /**
-         * Set or get mutable attribute
+         * Set or get mutable data. Use this function to pass data from one view to another
          * @param string $name Attribute name
          * @param type $value Attribute value
-         * @return type
+         * @return type On get, returns attribute/data specified by $name
          */
         public function attrib(string $name, $value = null)
         {
@@ -155,7 +170,17 @@ namespace gui {
             return $str;
         }
 
-        public static function load(App &$app, string $loadedFile): void
+        /**
+         * Import a template file. The template imported also has access to $app object
+         * @param string $template Path to template file
+         * @return void
+         */
+        public function import(string $template): void
+        {
+            self::load($this->app, $template);
+        }
+
+        private static function load(App &$app, string $loadedFile): void
         {
             require $loadedFile;
         }

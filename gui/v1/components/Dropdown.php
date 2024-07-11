@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of Dropdown
+ * Dropdown is a user interface element that allows users to select one option
+ * from a list of options that "drops down" when the element is interacted with.
  * @author coder
  *
  * Created on: May 11, 2024 at 8:05:45 PM
@@ -25,12 +26,22 @@ namespace gui\v1\components {
             $this->header = $this->body = null;
         }
 
+        /**
+         * Set dropdown header
+         * @param Component $header Dropdown header
+         * @return self
+         */
         public function setHeader(Component $header): self
         {
             $this->header = $header;
             return $this;
         }
 
+        /**
+         * Set dropdown content
+         * @param Component $body Dropdown Content
+         * @return self
+         */
         public function setBody(Component $body): self
         {
             $this->body = $body;

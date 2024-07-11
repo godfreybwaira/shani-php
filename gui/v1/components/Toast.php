@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of Toast
+ * Toast is a small, temporary notification that appears on the user's screen to
+ * provide feedback or information. It's non-intrusive and usually disappears on
+ * its own after a few seconds.
  * @author coder
  *
  * Created on: May 12, 2024 at 11:01:53 PM

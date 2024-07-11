@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of ProgressBar
+ * ProgressBar  is a visual indicator that shows the progression of a task or
+ * process to the user. It's commonly used to display the status of a download,
+ * file upload, or any other operation that takes time to complete.
  * @author coder
  *
  * Created on: May 16, 2024 at 3:19:29 PM

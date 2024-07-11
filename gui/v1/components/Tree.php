@@ -22,13 +22,20 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME);
         }
 
-        public function addItem(Component $item, bool $active = false): self
+        /**
+         * Add tree child(ren)
+         * @param Component $item Tree component(s)
+         * @param bool $expanded If set to true, the content of a tree element will be shown
+         * by default
+         * @return self
+         */
+        public function addItem(Component $item, bool $expanded = false): self
         {
             $list = new Component('li', false);
-            if ($active) {
-                $list->addClass('active');
+            if ($expanded) {
+                $list->addClass('expanded');
             }
-            $list->addProperty(self::NAME, 'title')->appendChildren($item);
+            $list->addProperty(self::NAME, 'label')->appendChildren($item);
             $this->appendChildren($list);
         }
     }

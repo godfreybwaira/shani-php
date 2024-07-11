@@ -24,9 +24,7 @@ namespace shani\engine\http {
         private ?string $lang;
         private AutoConfig $config;
         private ?Template $template = null;
-        private array $appCart = [], $dict = [];
-
-        private const CSRF_TOKENS = '_gGOd2y$oNO6W';
+        private ?array $appCart = null, $dict = null;
 
         public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res, Host $host)
         {
@@ -120,7 +118,7 @@ namespace shani\engine\http {
 
         public function csrfToken(): Session
         {
-            return $this->cart(self::CSRF_TOKENS);
+            return $this->cart('_gGOd2y$oNO6W');
         }
 
         /**
@@ -148,7 +146,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get static assets from application static directory
+         * Get static assets from application static asset directory
          * @return Asset
          */
         public function asset(): Asset
@@ -193,41 +191,46 @@ namespace shani\engine\http {
         }
 
         /**
-         * Set and/or get array of words from language file.
-         * @param string|null $path Path to language file. The file must return
-         * array of have key-value pair where <code>key</code> is the value
-         * representing the word and <code>value</code> is the actual word
-         * @return array Words from language file
+         * Get dictionary of words/sentences from current application dictionary file.
+         * Current dictionary directory name must match with current executing function name
+         * and the dictionary file name must be language code supported by your application.
+         * @param array|null $data Data to pass to dictionary file. These data are
+         * available on dictionary file via $data variable
+         * @return array Associative array of words/sentences and code representation from dictionary
          */
-        public function dictionary(?string $path = null): array
+        public function dictionary(?array $data = null): array
         {
-            if ($path !== null) {
-                $this->dict = require $path;
-            } else if (empty($this->dict)) {
-                $file = $this->module() . $this->config->languageDir() . $this->req->resource();
-                $this->dict = require $file . $this->req->callback() . '/' . $this->language() . '.php';
+            if ($this->dict === null) {
+                $file = $this->module($this->config->languageDir() . $this->req->resource() . $this->req->callback() . '/' . $this->language() . '.php');
+                $this->dict = self::getFile($file, $data);
             }
             return $this->dict;
         }
 
+        private static function getFile(string $loadedFile, ?array &$data): array
+        {
+            return require $loadedFile;
+        }
+
         /**
          * Set and/or get current view file from disk to be rendered as HTML to user agent.
-         * @param string $path Case sensitive Path to view file, if not provided then
+         * @param string|null $path Case sensitive Path to view file, if not provided then
          * the view file will ne the same as current executing function name.
          * @return string Path to view file
          */
-        public function view(string $path = null): string
+        public function view(?string $path = null): string
         {
-            return $this->module() . $this->config->viewDir() . $this->req->resource() . ($path ?? $this->req->callback()) . '.php';
+            return $this->module($this->config->viewDir() . $this->req->resource() . ($path ?? $this->req->callback()) . '.php');
         }
 
         /**
          * Get path to current executing module directory
+         * @param string|null $path Path to other resource relative to current module directory
          * @return string Path to module directory
          */
-        public function module(): string
+        public function module(?string $path = null): string
         {
-            return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module();
+            return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
         }
 
         /**
@@ -244,12 +247,13 @@ namespace shani\engine\http {
             $middleware->run();
         }
 
-        private function getClass(string $resource, string $method): string
+        private function getClassPath(): string
         {
+            $method = $this->req->method();
             $class = \shani\engine\core\Path::DIR_APPS . $this->config->root() . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
-            return $class . '/' . str_replace('-', '', ucwords(substr($resource, 1), '-'));
+            return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));
         }
 
         /**
@@ -270,7 +274,7 @@ namespace shani\engine\http {
          */
         public function route(): void
         {
-            $classPath = $this->getClass($this->req->resource(), $this->req->method());
+            $classPath = $this->getClassPath();
             if (is_file(SERVER_ROOT . $classPath . '.php')) {
                 $className = str_replace('/', '\\', $classPath);
                 $obj = new $className($this);

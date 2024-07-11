@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of Badge
+ * Badge is a small graphical element that represents a piece of information, often
+ * used to highlight the status of an item or to draw attention to a particular
+ * element on a webpage.
  * @author coder
  *
  * Created on: May 12, 2024 at 10:17:47 AM

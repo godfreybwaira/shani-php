@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of ToggleInput
+ * ToggleInput is a user interface element that allows users to switch between
+ * two states, such as on/off or true/false.
  * @author coder
  *
  * Created on: May 13, 2024 at 3:23:35 PM
@@ -23,6 +24,11 @@ namespace gui\v1\components {
             $this->setAttribute('type', 'checkbox')->setAttribute('name', $name);
         }
 
+        /**
+         * Set input type
+         * @param int $toggleType Input type from ToggleInput::TYPE_*
+         * @return self
+         */
         public function setType(int $toggleType): self
         {
             return $this->addProperty(self::NAME . '-type', self::TYPES[$toggleType]);

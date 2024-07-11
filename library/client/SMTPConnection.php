@@ -55,6 +55,10 @@ namespace library\client {
             return false;
         }
 
+        /**
+         * Get SMTP socket
+         * @return type An SMTP resource
+         */
         public function getSocket()
         {
             return $this->socket;
@@ -88,6 +92,13 @@ namespace library\client {
             return $this->sendCommand('AUTH PLAIN ' . base64_encode("\0" . $uname . "\0" . $password), 235);
         }
 
+        /**
+         * Initialize SMTP session
+         * @param string $uname Sender username
+         * @param string|null $password Sender password
+         * @param string|null $token Authorization token
+         * @return bool True on success, false otherwise.
+         */
         public function initialize(string $uname, ?string $password, ?string $token): bool
         {
             if (!$this->sayHello() || $this->secure && !$this->enableTLS()) {
@@ -99,6 +110,11 @@ namespace library\client {
             return false;
         }
 
+        /**
+         * Set e-mail receipient(s)
+         * @param array $receipients Emails of receipient(s)
+         * @return self
+         */
         public function setReceipients(array $receipients): self
         {
             foreach ($receipients as $email) {
@@ -108,6 +124,10 @@ namespace library\client {
             return $this;
         }
 
+        /**
+         * Close SMTP session
+         * @return void
+         */
         public function quit(): void
         {
             $this->sendCommand('.', 250);
@@ -164,11 +184,19 @@ namespace library\client {
             return $this->lastReply;
         }
 
+        /**
+         * Get last error code
+         * @return int|null
+         */
         public function errorCode(): ?int
         {
             return $this->errorCode;
         }
 
+        /**
+         * Get last error message
+         * @return string|null
+         */
         public function errorMessage(): ?string
         {
             return $this->errorMsg;

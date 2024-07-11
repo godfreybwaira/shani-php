@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of Callout
+ * Callout is a design element used to draw attention to or highlight important
+ * information on a webpage. It can be a box, banner, or any visual cue that stands
+ * out from the rest of the content to grab the user's attention.
  * @author coder
  *
  * Created on: May 12, 2024 at 9:45:13 AM

@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of ChoiceInput
+ * ChoiceInput is a form input that enable multiple choice selection on available
+ * choices.
  * @author coder
  *
  * Created on: May 12, 2024 at 11:01:53 PM
@@ -30,22 +31,28 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME);
         }
 
-        public function addItem(mixed $value, ?string $text = null): self
+        /**
+         * Add child(ren)
+         * @param mixed $value Input value
+         * @param string|null $label Input label
+         * @return self
+         */
+        public function addItem(mixed $value, ?string $label = null): self
         {
             $listItem = new Component('li');
             $input = new Component('input');
             $input->setAttribute('type', $this->type)->setAttribute('name', $this->name);
             $id = 'id' . hrtime(true);
             $input->setAttribute('id', $id)->setAttribute('value', $value)->setMargin(null);
-            $label = new Component('label', $text ?? $value);
-            $label->setAttribute('for', $id)->setMargin(null);
-            $listItem->appendChildren($input, $label)->setSpacing(null);
+            $choiceLabel = new Component('label', $label ?? $value);
+            $choiceLabel->setAttribute('for', $id)->setMargin(null);
+            $listItem->appendChildren($input, $choiceLabel)->setSpacing(null);
             return $this->appendChildren($listItem);
         }
 
-        public function setInputGroup(InputGroup $group): self
+        public function setParent(InputGroup $parent): self
         {
-            $this->group = $group;
+            $this->group = $parent;
             return $this;
         }
 

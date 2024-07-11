@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of Tab
+ * Tab is a user interface component that allows users to switch between multiple
+ * documents, views, or data sets within the same context and space on a webpage.
  * @author coder
  *
  * Created on: May 12, 2024 at 12:33:54 PM
@@ -24,6 +25,13 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME);
         }
 
+        /**
+         * Add a link button to a tab
+         * @param Component $link Link button
+         * @param bool $active If set to true, then it's content will be shown by
+         * default.
+         * @return self
+         */
         public function addLink(Component $link, bool $active = false): self
         {
             $list = new Component('li', false);

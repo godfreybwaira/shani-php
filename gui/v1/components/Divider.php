@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Description of Divider
+ * Divider is a visual or functional element used to separate content, categories,
+ * or sections within a webpage.
  * @author coder
  *
  * Created on: May 12, 2024 at 11:42:47 AM

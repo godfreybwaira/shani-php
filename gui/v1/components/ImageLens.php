@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Lens
+ * ImageLens provide a capability for viewing interacting with image like zooming in
  * @author coder
  *
  * Created on: May 12, 2024 at 12:00:03 PM
@@ -11,7 +11,7 @@ namespace gui\v1\components {
 
     use gui\v1\Component;
 
-    final class Lens extends Component
+    final class ImageLens extends Component
     {
 
         private ?string $script;
