@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of ListPane
+ * ListPane  is a component that displays a series of content items in a
+ * structured list format. It's often used to present a collection of related
+ * items, such as links, text, or images, in a clean and organized way.
  * @author coder
  *
  * Created on: May 11, 2024 at 8:05:45 PM
@@ -23,11 +25,21 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME);
         }
 
+        /**
+         * Set list stripes
+         * @param int $stripes Stripe values from ListPane::STRIPES_*
+         * @return self
+         */
         public function setStripes(int $stripes): self
         {
             return $this->addProperty(self::NAME . '-stripes', self::STRIPES[$stripes]);
         }
 
+        /**
+         * Add item(s) to a list item
+         * @param Component $items
+         * @return self
+         */
         public function addItem(Component ...$items): self
         {
             $list = new Component('li', false);

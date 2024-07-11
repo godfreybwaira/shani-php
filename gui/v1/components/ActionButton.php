@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ActionButton
+ * ActionButton class for creating more specific custom button(s)
  * @author coder
  *
  * Created on: May 5, 2024 at 8:18:38 PM
@@ -22,6 +22,11 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME)->setType($buttonType);
         }
 
+        /**
+         * Set button type
+         * @param int $buttonType Type values from ActionButton::TYPE_*
+         * @return self
+         */
         public function setType(int $buttonType): self
         {
             return $this->addProperty(self::NAME . '-type', self::TYPES[$buttonType]);

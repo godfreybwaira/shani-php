@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Button
+ * Button element class
  * @author coder
  *
  * Created on: May 5, 2024 at 8:18:38 PM
@@ -22,14 +22,23 @@ namespace gui\v1\components {
             $this->addProperty(self::NAME)->setColor(parent::COLOR_PRIMARY);
         }
 
+        /**
+         * Set button type
+         * @param int $buttonType Button type from Button::TYPE_*
+         * @return self
+         */
         public function setType(int $buttonType): self
         {
             return $this->addProperty(self::NAME . '-type', self::TYPES[$buttonType]);
         }
 
+        /**
+         * Set a button to behave like block element
+         * @return self
+         */
         public function setBlock(): self
         {
-            $this->addProperty(self::NAME . '-' . 'block');
+            $this->addProperty(self::NAME . '-block');
             return $this;
         }
     }

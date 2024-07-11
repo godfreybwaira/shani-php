@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Description of Carousel
+ * Carousel also known as a slider or slideshow, is a user interface component
+ * that displays a collection of items, such as images or cards, in a rotating
+ * fashion, one at a time. Users can navigate through the items manually or automatically.
  * @author coder
  *
  * Created on: May 12, 2024 at 4:33:17 PM
@@ -29,6 +31,11 @@ namespace gui\v1\components {
             $this->slides->addProperty(self::NAME . '-slides');
         }
 
+        /**
+         * Add a child item to a carousel
+         * @param Component $items Item(s) to add
+         * @return self
+         */
         public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
