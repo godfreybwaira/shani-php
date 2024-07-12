@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SMTPCommands
+ * SMTPConnection class
  * @author coder
  *
  * Created on: Apr 2, 2024 at 12:59:02 PM
@@ -21,6 +21,13 @@ namespace library\client {
         private const FLAGS = STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT;
         private const EOL = "\r\n";
 
+        /**
+         * Creating SMTP connection to remote host
+         * @param string $host Remote host address
+         * @param string|null $security SSL or TLS security
+         * @param int $retries Number of retries before failing
+         * @param int $timeout Timeout before failing
+         */
         public function __construct(string $host, ?string $security, int $retries, int $timeout)
         {
             $count = 0;
@@ -49,7 +56,7 @@ namespace library\client {
         }
 
         /**
-         * Get SMTP socket
+         * Get SMTP socket object
          * @return type An SMTP resource
          */
         public function getSocket()

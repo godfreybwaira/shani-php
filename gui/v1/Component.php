@@ -274,7 +274,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Set component property, removing all existing properties
+         * Set component property, removing all existing ones. A property represent an array of CSS classes
          * @param string $name Property name
          * @param type $value Property value
          * @return self
@@ -287,7 +287,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Set component property
+         * Set component property. A property represent an array of CSS classes
          * @param string $name Property name
          * @param type $value Property value
          * @return self
