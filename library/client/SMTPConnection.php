@@ -14,36 +14,29 @@ namespace library\client {
 
         private $socket;
         private bool $secure;
+        private string $host;
         private ?int $errorCode;
-        private static ?self $conn = null;
         private ?string $lastReply = null, $errorMsg;
 
         private const FLAGS = STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT;
         private const EOL = "\r\n";
 
-        private function __construct(&$socket, bool $secure, ?int $errorCode, ?string $errorMsg)
+        public function __construct(string $host, ?string $security, int $retries, int $timeout)
         {
-            $this->errorCode = $errorCode;
-            $this->errorMsg = $errorMsg;
-            $this->socket = $socket;
-            $this->secure = $secure;
-        }
-
-        public static function connect(string $host, ?string $security, int $retries, int $timeout): self
-        {
-            if (!isset(self::$conn)) {
-                $count = 0;
-                $socket = $errorCode = $errorMsg = null;
-                while ($count < $retries) {
-                    $socket = stream_socket_client($host, $errorCode, $errorMsg, $timeout, self::FLAGS);
-                    if (is_resource($socket)) {
-                        self::$conn = new self($socket, $security !== null, $errorCode, $errorMsg);
-                        break;
-                    }
-                    \library\Concurrency::sleep(++$count);
+            $count = 0;
+            $socket = $errorCode = $errorMsg = null;
+            while ($count < $retries) {
+                $socket = stream_socket_client($host, $errorCode, $errorMsg, $timeout, self::FLAGS);
+                if (is_resource($socket)) {
+                    $this->errorCode = $errorCode;
+                    $this->errorMsg = $errorMsg;
+                    $this->socket = $socket;
+                    $this->host = $host;
+                    $this->secure = $security !== null;
+                    break;
                 }
+                \library\Concurrency::sleep(++$count);
             }
-            return self::$conn;
         }
 
         private function enableTLS(): bool
@@ -66,10 +59,10 @@ namespace library\client {
 
         private function sayHello(): bool
         {
-            if ($this->sendCommand('EHLO 127.0.0.1', 250)) {
+            if ($this->sendCommand('EHLO ' . $this->host, 250)) {
                 return true;
             }
-            return $this->sendCommand('HELO 127.0.0.1', 250);
+            return $this->sendCommand('HELO ' . $this->host, 250);
         }
 
         private function login(string $uname, ?string $password, ?string $token): bool

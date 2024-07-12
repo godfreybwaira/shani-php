@@ -229,7 +229,7 @@ namespace library\client {
         public function send(callable $callback = null): void
         {
             \library\Concurrency::async(function () use (&$callback) {
-                $this->conn = SMTPConnection::connect($this->host, $this->security, $this->retries, $this->timeout);
+                $this->conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
                 $success = $this->conn->initialize($this->from, $this->password, $this->token);
                 if ($success) {
                     $socket = $this->conn->getSocket();
