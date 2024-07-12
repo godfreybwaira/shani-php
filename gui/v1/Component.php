@@ -97,7 +97,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Remove CSS class or list of classes to a component
+         * Remove CSS class or list of classes
          * @param string $value CSS class(es) to remove
          * @return self
          */
@@ -117,7 +117,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Add custom CSS class(es) to a component. Does not replace existing class(es)
+         * Add custom CSS class(es). It does not replace existing class(es)
          * @param string $values CSS class(es) to add
          * @return self
          * @see Component::setClass()
@@ -245,7 +245,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Toggle attribute's CSS class(es)
+         * Toggle CSS class(es)
          * @param string $classes CSS class(es) to toggle
          * @return self
          */
@@ -262,7 +262,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Add custom CSS class(es) to a component, removing all existing class(es)
+         * Add custom CSS class(es), removing all existing class(es)
          * @param string $values CSS class(es) to add
          * @return self
          * @see Component::addClass()
@@ -274,7 +274,8 @@ namespace gui\v1 {
         }
 
         /**
-         * Set component property, removing all existing ones. A property represent an array of CSS classes
+         * Set component property, removing all existing properties. A property
+         * represent an array of CSS classes.
          * @param string $name Property name
          * @param type $value Property value
          * @return self
@@ -300,7 +301,7 @@ namespace gui\v1 {
         }
 
         /**
-         * Remove all CSS styles
+         * Remove all CSS styles and properties
          * @return self
          */
         public function clearStyles(): self
@@ -394,7 +395,7 @@ namespace gui\v1 {
          */
         public function setGap(?int $size, int $direction = null): self
         {
-            return $this->initProp('gap', $size, $direction);
+            return $this->resetProperty('gap', $size, $direction);
         }
 
         /**
@@ -406,7 +407,7 @@ namespace gui\v1 {
          */
         public function setMargin(?int $size, int $direction = null): self
         {
-            return $this->initProp('margin', $size, $direction);
+            return $this->resetProperty('margin', $size, $direction);
         }
 
         /**
@@ -418,7 +419,7 @@ namespace gui\v1 {
          */
         public function setPadding(?int $size, int $direction = null): self
         {
-            return $this->initProp('padding', $size, $direction);
+            return $this->resetProperty('padding', $size, $direction);
         }
 
         /**
@@ -428,7 +429,7 @@ namespace gui\v1 {
          */
         public function setFontSize(?int $size): self
         {
-            return $this->initProp('font', $size);
+            return $this->resetProperty('font', $size);
         }
 
         /**
@@ -457,10 +458,10 @@ namespace gui\v1 {
          */
         public function setShadow(?int $size, int $direction = null): self
         {
-            return $this->initProp('shadow', $size, $direction);
+            return $this->resetProperty('shadow', $size, $direction);
         }
 
-        private function initProp(string $prop, ?int $value, ?int $direction = null): self
+        private function resetProperty(string $prop, ?int $value, ?int $direction = null): self
         {
             if ($value !== null) {
                 $dir = $direction !== null ? '-' . self::DIRECTIONS[$direction] : null;
@@ -477,7 +478,7 @@ namespace gui\v1 {
          */
         public function setCorners(?int $size, int $direction = null): self
         {
-            return $this->initProp('corner', $size, $direction);
+            return $this->resetProperty('corner', $size, $direction);
         }
 
         /**
