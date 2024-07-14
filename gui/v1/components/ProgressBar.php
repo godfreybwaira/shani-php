@@ -16,13 +16,17 @@ namespace gui\v1\components {
     final class ProgressBar extends Component
     {
 
-        private const NAME = 'progress-bar';
+        private const PROGRESS_BAR = 0;
+        private const PROPS = [
+            self::PROGRESS_BAR => ''
+        ];
 
         public function __construct(float $percent)
         {
-            parent::__construct('div');
-            $this->addProperty(self::NAME);
-            $bar = new Component('span', $percent . '%');
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::PROGRESS_BAR);
+            $bar = new Component('span');
+            $bar->setContent($percent . '%');
             $bar->setAttribute('style', 'width:' . $percent . '%');
             $this->appendChildren($bar);
         }

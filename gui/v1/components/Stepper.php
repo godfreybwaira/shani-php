@@ -17,12 +17,17 @@ namespace gui\v1\components {
     final class Stepper extends Component
     {
 
-        private const NAME = 'steps';
+        private const STEPPER = 0, STEPPER_ROUND = 1, STEPPER_COMPLETE = 2;
+        private const PROPS = [
+            self::STEPPER => '',
+            self::STEPPER_ROUND => '',
+            self::STEPPER_COMPLETE => ''
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME)->addProperty(self::NAME, 'round');
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::STEPPER)->addProperty(self::STEPPER_ROUND);
         }
 
         /**
@@ -34,11 +39,11 @@ namespace gui\v1\components {
          */
         public function addItem(Component $item, bool $active, bool $complete = false): self
         {
-            $list = new Component('li', false);
+            $list = new Component('li', self::PROPS);
             if ($complete) {
-                $list->addProperty(self::NAME, 'complete');
+                $list->addProperty(self::STEPPER_COMPLETE);
             } elseif ($active) {
-                $list->addProperty(self::NAME, 'active');
+                $list->setActive($active);
             }
             $list->appendChildren($item);
             return $this->appendChildren($list);

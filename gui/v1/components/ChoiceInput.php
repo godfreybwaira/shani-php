@@ -15,7 +15,10 @@ namespace gui\v1\components {
     final class ChoiceInput extends Component
     {
 
-        private const NAME = 'choice-input';
+        private const CHOICE_INPUT = 0;
+        private const PROPS = [
+            self::CHOICE_INPUT => ''
+        ];
 
         private bool $wrapped = false;
         private ?InputGroup $group = null;
@@ -23,12 +26,12 @@ namespace gui\v1\components {
 
         public function __construct(string $name, bool $multiSelect = false)
         {
-            parent::__construct('ul');
+            parent::__construct('ul', self::PROPS);
             $this->name = $name;
             if ($multiSelect) {
                 $this->type = 'checkbox';
             }
-            $this->addProperty(self::NAME);
+            $this->addProperty(self::CHOICE_INPUT);
         }
 
         /**
@@ -43,10 +46,10 @@ namespace gui\v1\components {
             $input = new Component('input');
             $input->setAttribute('type', $this->type)->setAttribute('name', $this->name);
             $id = 'id' . hrtime(true);
-            $input->setAttribute('id', $id)->setAttribute('value', $value)->setMargin(null);
-            $choiceLabel = new Component('label', $label ?? $value);
-            $choiceLabel->setAttribute('for', $id)->setMargin(null);
-            $listItem->appendChildren($input, $choiceLabel)->setSpacing(null);
+            $input->setAttribute('id', $id)->setAttribute('value', $value);
+            $choiceLabel = new Component('label');
+            $choiceLabel->setContent($label ?? $value)->setAttribute('for', $id);
+            $listItem->appendChildren($input, $choiceLabel);
             return $this->appendChildren($listItem);
         }
 

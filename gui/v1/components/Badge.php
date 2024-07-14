@@ -12,20 +12,24 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
+    use gui\v1\Style;
 
     final class Badge extends Component
     {
 
-        private const NAME = 'badge';
+        private const BADGE = 0;
+        private const PROPS = [
+            self::BADGE => ''
+        ];
 
-        public function __construct(string $text = null)
+        public function __construct(?string $text = null)
         {
-            parent::__construct('span');
-            $this->setContent($text)->addProperty(self::NAME);
-            if (parent::SIZE_DEFAULT === parent::SIZE_SM) {
-                $this->setSpacing(parent::SIZE_SM);
+            parent::__construct('span', self::PROPS);
+            $this->setContent($text)->addProperty(self::BADGE);
+            if (Style::SIZE_DEFAULT === Style::SIZE_SM) {
+                $this->setSpacing(Style::SIZE_SM);
             } else {
-                $this->setSpacing(parent::SIZE_DEFAULT - 1);
+                $this->setSpacing(Style::SIZE_DEFAULT - 1);
             }
         }
     }

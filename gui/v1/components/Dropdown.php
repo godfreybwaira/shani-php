@@ -17,12 +17,15 @@ namespace gui\v1\components {
 
         private ?Component $body, $header;
 
-        private const NAME = 'dropdown';
+        private const DROPDOWN = 0;
+        private const PROPS = [
+            self::DROPDOWN => ''
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME);
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::DROPDOWN);
             $this->header = $this->body = null;
         }
 
@@ -50,8 +53,8 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            $title = new Component('li', false);
-            $body = new Component('li', false);
+            $title = new Component('li');
+            $body = new Component('li');
             $title->appendChildren($this->header);
             $body->appendChildren($this->body);
             $this->appendChildren($title, $body);

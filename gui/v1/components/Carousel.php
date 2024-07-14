@@ -12,11 +12,17 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
+    use gui\v1\Style;
 
     final class Carousel extends Component
     {
 
-        private const NAME = 'carousel';
+        private const CAROUSEL = 0, CAROUSEL_SLIDES = 1, CAROUSEL_NAV = 3;
+        private const PROPS = [
+            self::CAROUSEL => '',
+            self::CAROUSEL_SLIDES => '',
+            self::CAROUSEL_NAV => ''
+        ];
 
         private Component $slides;
         private bool $bottomNav;
@@ -24,11 +30,11 @@ namespace gui\v1\components {
 
         public function __construct(bool $bottomNav = true)
         {
-            parent::__construct('div');
-            $this->addProperty(self::NAME);
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::CAROUSEL);
             $this->bottomNav = $bottomNav;
-            $this->slides = new Component('ul', false);
-            $this->slides->addProperty(self::NAME . '-slides');
+            $this->slides = new Component('ul', self::PROPS);
+            $this->slides->addProperty(self::CAROUSEL_SLIDES);
         }
 
         /**
@@ -40,7 +46,7 @@ namespace gui\v1\components {
         {
             foreach ($items as $item) {
                 $id = 'id' . hrtime(true);
-                $slide = new Component('li', false);
+                $slide = new Component('li', self::PROPS);
                 $slide->appendChildren($item);
                 $slide->setAttribute('id', $id);
                 $this->slides->appendChildren($slide);
@@ -50,18 +56,18 @@ namespace gui\v1\components {
 
         private function makeNavigation(int $count): self
         {
-            $pos = $this->bottomNav ? parent::POS_BC : parent::POS_TC;
-            $nav = new Component('ul', false);
-            $nav->addProperty(self::NAME . '-nav');
+            $pos = $this->bottomNav ? Style::POS_BC : Style::POS_TC;
+            $nav = new Component('ul', self::PROPS);
+            $nav->addProperty(self::CAROUSEL_NAV);
             for ($i = 0; $i < $count; $i++) {
-                $dot = new Component('li', '&nbsp;');
-                $dot->setAttribute('for', $this->slideIds[$i]);
+                $dot = new Component('li');
+                $dot->setAttribute('for', $this->slideIds[$i])->setContent('&nbsp;');
                 $nav->appendChildren($dot);
             }
             $nextBtn = new ActionButton(ActionButton::TYPE_NEXT);
             $prevBtn = new ActionButton(ActionButton::TYPE_PREV);
-            $nextBtn->setPosition(parent::POS_CR)->setParent($this);
-            $prevBtn->setPosition(parent::POS_CL)->setParent($this);
+            $nextBtn->setPosition(Style::POS_CR)->setParent($this);
+            $prevBtn->setPosition(Style::POS_CL)->setParent($this);
             $this->appendChildren($nav->setPosition($pos));
             return $this;
         }

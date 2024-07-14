@@ -20,7 +20,7 @@ namespace library\client {
         private ?string $signatureKey = null, $signatureAlgorithm = null;
         private ?string $signatureHeader = null, $cipherKey = null;
         private ?string $cipherAlgorithm = null, $initVector = null;
-        private static array $specialOptions = [];
+        private array $specialOptions = [];
 
         public function __construct(string $host, int $retries = 3, int $timeout = 20)
         {
@@ -152,15 +152,14 @@ namespace library\client {
             Concurrency::async(function ()use (&$reqMethod, &$endpoint, &$body, &$callback) {
                 $stream = null;
                 $this->finalize($reqMethod, $body);
-                if (!isset(self::$specialOptions[CURLOPT_FILE])) {
+                if (!isset($this->specialOptions[CURLOPT_FILE])) {
                     $stream = fopen('php://temp', 'r+b');
                 } else {
-                    $stream = fopen(self::$specialOptions[CURLOPT_FILE], 'a+b');
-                    self::$specialOptions[CURLOPT_RESUME_FROM] = fstat($stream)['size'];
+                    $stream = fopen($this->specialOptions[CURLOPT_FILE], 'a+b');
+                    $this->specialOptions[CURLOPT_RESUME_FROM] = fstat($stream)['size'];
                 }
                 $this->done($stream, $endpoint, $callback);
                 fclose($stream);
-                self::$specialOptions = [];
             });
             return $this;
         }
@@ -170,8 +169,8 @@ namespace library\client {
             $retry = 0;
             $curl = curl_init($this->host . $endpoint);
             curl_setopt_array($curl, $this->curlOptions);
-            self::$specialOptions[CURLOPT_FILE] = $stream;
-            curl_setopt_array($curl, self::$specialOptions);
+            $this->specialOptions[CURLOPT_FILE] = $stream;
+            curl_setopt_array($curl, $this->specialOptions);
             while (curl_exec($curl) === false && $retry < $this->retries) {
                 Concurrency::sleep(++$retry);
             }
@@ -403,12 +402,12 @@ namespace library\client {
          */
         public function download(string $endpoint, string $destination, callable $callback = null): self
         {
-            self::$specialOptions = [
+            $this->specialOptions = [
                 CURLOPT_FILE => $destination, CURLOPT_HEADER => false
             ];
             if ($callback !== null) {
-                self::$specialOptions[CURLOPT_NOPROGRESS] = true;
-                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $total, $loaded) use (&$callback) {
+                $this->specialOptions[CURLOPT_NOPROGRESS] = true;
+                $this->specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $total, $loaded) use (&$callback) {
                     $callback($total, $loaded);
                 };
             }
@@ -427,13 +426,13 @@ namespace library\client {
         public function upload(string $endpoint, string $source, callable $callback = null): self
         {
             $fp = fopen($source, 'rb');
-            self::$specialOptions = [
+            $this->specialOptions = [
                 CURLOPT_INFILE => $fp, CURLOPT_UPLOAD => true,
                 CURLOPT_INFILESIZE => fstat($fp)['size']
             ];
             if ($callback !== null) {
-                self::$specialOptions[CURLOPT_NOPROGRESS] = true;
-                self::$specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $dt, $dl, $total, $loaded) use (&$callback) {
+                $this->specialOptions[CURLOPT_NOPROGRESS] = true;
+                $this->specialOptions[CURLOPT_PROGRESSFUNCTION] = function (&$fp, $dt, $dl, $total, $loaded) use (&$callback) {
                     $callback($total, $loaded);
                 };
             }

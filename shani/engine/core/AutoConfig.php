@@ -174,7 +174,7 @@ namespace shani\engine\core {
          */
         public function appName(): string
         {
-            return 'Shani Foundation Framework v1.0';
+            return 'Shani Framework v1.0';
         }
 
         /**

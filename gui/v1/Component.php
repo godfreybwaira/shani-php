@@ -14,30 +14,14 @@ namespace gui\v1 {
     {
 
         private string $htmlTag;
-        private array $children, $attributes, $classList, $props;
-        private ?string $content, $gap, $fontSize, $padding, $shadow, $corner;
+        private ?string $content = null;
+        private array $children, $attributes, $classList, $props, $propSource, $externalProps = [];
 
-        private const MAX_COLUMNS = 24;
-        protected const SIZES = ['sm', 'md', 'lg', 'xl', 'full'];
-        protected const COLORS = ['danger', 'success', 'alert', 'info', 'primary', 'secondary', 'transluscent'];
-        protected const POSITIONS = ['tl', 'tc', 'tr', 'cl', 'cc', 'cr', 'bl', 'bc', 'br', 'top', 'left', 'bottom', 'right'];
-        protected const DIRECTIONS = ['x', 'y', 'top', 'bottom'], ALIGNS = [ 'x', 'y'];
-        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
-        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
-        public const COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_TRANSLUSCENT = 6;
-        public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
-        public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
-        public const DIRECTION_X = 0, DIRECTION_Y = 1, DIRECTION_TOP = 2, DIRECTION_BOTTOM = 3;
-        public const SIZE_DEFAULT = self::SIZE_MD, ALIGN_X = 0, ALIGN_Y = 1;
-
-        public function __construct(string $htmlTag, bool $spacing = true)
+        public function __construct(string $htmlTag, ?array $styleSource = null)
         {
             $this->htmlTag = $htmlTag;
+            $this->propSource = $styleSource ?? [];
             $this->children = $this->classList = $this->attributes = $this->props = [];
-            $this->content = $this->gap = $this->fontSize = $this->padding = $this->shadow = $this->corner = null;
-            if ($spacing) {
-                $this->setSpacing(self::SIZE_DEFAULT);
-            }
         }
 
         public function __toString(): string
@@ -58,32 +42,6 @@ namespace gui\v1 {
                 return $texts . $this->stringifyChildren() . '</' . $this->htmlTag . '>';
             }
             return '<' . $this->htmlTag . $css . $this->stringifyAttr() . '/>';
-        }
-
-        public function addColumnSize(int $column, int $size): self
-        {
-            if ($column <= self::MAX_COLUMNS) {
-                return $this->addProperty('width-' . self::SIZES[$size], $column);
-            }
-            throw new \InvalidArgumentException('Maximum column size is ' . self::MAX_COLUMNS);
-        }
-
-        /**
-         * Set height of a component to fit height of a parent component
-         * @return self
-         */
-        public function fillHeight(): self
-        {
-            return $this->addProperty('height', 'fill');
-        }
-
-        /**
-         * Set width of a component to fit width of a parent component
-         * @return self
-         */
-        public function fillWidth(): self
-        {
-            return $this->addProperty('width', 'fill');
         }
 
         /**
@@ -191,8 +149,8 @@ namespace gui\v1 {
         }
 
         /**
-         * Get single component attribute value
-         * @param string $name Attribute name to get
+         * Get single attribute value
+         * @param string $name Attribute name
          * @return type Attribute value
          * @see Component::getAttributes()
          */
@@ -220,15 +178,22 @@ namespace gui\v1 {
             return $result;
         }
 
-        private function stringifyClass(): ?string
+        private function addStyleCollection(array $collection, array $source): self
         {
-            foreach ($this->props as $key => $value) {
+            foreach ($collection as $key => $value) {
                 if ($value !== null) {
-                    $this->addClass(...Theme::styles($key . '-' . $value));
+                    $this->addClass(...$source[$key][$value]);
                 } else {
-                    $this->addClass(...Theme::styles($key));
+                    $this->addClass(...$source[$key]);
                 }
             }
+            return $this;
+        }
+
+        private function stringifyClass(): ?string
+        {
+            $this->addStyleCollection($this->props, $this->propSource);
+            $this->addStyleCollection($this->externalProps, Style::getStyles(array_keys($this->externalProps)));
             if (empty($this->classList)) {
                 return null;
             }
@@ -288,15 +253,26 @@ namespace gui\v1 {
         }
 
         /**
+         * Set source to CSS class collection where properties will get their values from.
+         * @param array $cssCollection CSS class collection
+         * @return self
+         */
+        public function setStyleSource(array $cssCollection): self
+        {
+            $this->propSource = $cssCollection;
+            return $this;
+        }
+
+        /**
          * Set component property. A property represent an array of CSS classes
-         * @param string $name Property name
+         * @param int $id Property id
          * @param type $value Property value
          * @return self
-         * @see Component::setProperty()
+         * @see Component::setProperty(), Component::setStyleSource()
          */
-        public function addProperty(string $name, $value = null): self
+        public function addProperty(int $id, $value = null): self
         {
-            $this->props[$name] = $value;
+            $this->props[$id] = $value;
             return $this;
         }
 
@@ -313,22 +289,22 @@ namespace gui\v1 {
 
         /**
          * Check if a property exists
-         * @param string $name Property name
+         * @param int $id Property id
          * @return bool
          */
-        public function hasProperty(string $name): bool
+        public function hasProperty(int $id): bool
         {
-            return array_key_exists($name, $this->props);
+            return array_key_exists($id, $this->props);
         }
 
         /**
-         * Remove property
-         * @param string $names Property name
+         * Remove a property
+         * @param int $id Property id
          * @return self
          */
-        public function removeProperty(string ...$names): self
+        public function removeProperty(int ...$id): self
         {
-            foreach ($names as $key) {
+            foreach ($id as $key) {
                 if (isset($this->props[$key])) {
                     unset($this->props[$key]);
                 }
@@ -349,87 +325,90 @@ namespace gui\v1 {
 
         /**
          * Set background color (and font color)
-         * @param int|null $color Color values from Component::COLORS
+         * @param int|null $color Color values from Style::COLOR_*
          * @return self
          */
-        protected function setColor(?int $color): self
+        public function setColor(?int $color): self
         {
             if ($color !== null) {
-                return $this->addProperty('color', self::COLORS[$color]);
+                return $this->addExternalProps('colors', $color);
             }
-            return $this->removeProperty('color');
+            return $this->removeExternalProps('colors');
         }
 
         /**
          * Set position
-         * @param int|null $position Position values from Component::POSITIONS
+         * @param int|null $position Position values from Style::POS_*
          * @return self
          */
-        protected function setPosition(?int $position): self
+        public function setPosition(?int $position): self
         {
             if ($position !== null) {
-                return $this->addProperty('pos', self::POSITIONS[$position]);
+                return $this->addExternalProps('positions', $position);
             }
-            return $this->removeProperty('pos');
+            return $this->removeExternalProps('positions');
         }
 
         /**
          * Set alignment of a component horizontally or vertically
-         * @param int|null $align Alignment value from Component::ALIGNS
+         * @param int|null $align Alignment value from Style::ALIGN_*
          * @return self
          */
         public function setAlign(?int $align): self
         {
             if ($align !== null) {
-                return $this->addProperty('align', self::ALIGNS[$align]);
+                return $this->addExternalProps('alignments', $align);
             }
-            return $this->removeProperty('align');
+            return $this->removeExternalProps('alignments');
         }
 
         /**
          * Set gap to a component
-         * @param int|null $size Size values from Component::SIZES
-         * @param int $direction Direction values from Component::DIRECTIONS
+         * @param int|null $size Size values from Style::SIZE_*
+         * @param int $direction Direction values from Style::GAP_*
          * @return self
          * @see Component::setSpacing()
          */
         public function setGap(?int $size, int $direction = null): self
         {
-            return $this->resetProperty('gap', $size, $direction);
+            return $this->resetExternalProps('gap_sizes', 'gaps', $size, $direction);
         }
 
         /**
-         * Set margin to a component
-         * @param int|null $size Size values from Component::SIZES
-         * @param int $direction Direction values from Component::DIRECTIONS
+         * Set margin to
+         * @param int|null $size Size values from Style::SIZE_*
+         * @param int $direction Direction values from Style::GAP_*
          * @return self
          * @see Component::setSpacing()
          */
         public function setMargin(?int $size, int $direction = null): self
         {
-            return $this->resetProperty('margin', $size, $direction);
+            return $this->resetExternalProps('margin_sizes', 'gaps', $size, $direction);
         }
 
         /**
          * Set padding to a component
-         * @param int|null $size Size values from Component::SIZES
-         * @param int $direction Direction values from Component::DIRECTIONS
+         * @param int|null $size Size values from Style::SIZE_*
+         * @param int $direction Direction values from Style::GAP_*
          * @return self
          * @see Component::setSpacing()
          */
         public function setPadding(?int $size, int $direction = null): self
         {
-            return $this->resetProperty('padding', $size, $direction);
+            return $this->resetExternalProps('padding_sizes', 'gaps', $size, $direction);
         }
 
         /**
          * Set font size
-         * @param int|null $size Size values from Component::SIZES
+         * @param int|null $size Size values from Style::SIZE_*
          * @return self
          */
         public function setFontSize(?int $size): self
         {
-            return $this->resetProperty('font', $size);
+            if ($size !== null) {
+                return $this->addExternalProps('font_sizes', $size);
+            }
+            return $this->removeExternalProps('font_sizes');
         }
 
         /**
@@ -438,7 +417,7 @@ namespace gui\v1 {
          */
         public function removeBorders(): self
         {
-            return $this->removeProperty('with-borders');
+            return $this->removeExternalProps('border');
         }
 
         /**
@@ -447,43 +426,71 @@ namespace gui\v1 {
          */
         public function setBorders(): self
         {
-            return $this->addProperty('with-borders');
+            return $this->addExternalProps('border');
+        }
+
+        /**
+         * Whether a component can take parent's full height or not
+         * @param bool $full
+         * @return self
+         */
+        public function fullHeight(bool $full): self
+        {
+            if ($full) {
+                return $this->addExternalProps('full_height');
+            }
+            return $this->removeExternalProps('full_height');
+        }
+
+        /**
+         * Whether a component can take parent's full height or not
+         * @param bool $full
+         * @return self
+         */
+        public function fullWidh(bool $full): self
+        {
+            if ($full) {
+                return $this->addExternalProps('full_width');
+            }
+            return $this->removeExternalProps('full_width');
         }
 
         /**
          * Set box shadow
-         * @param int|null $size Size values from Component::SIZES
-         * @param int $direction Direction values from Component::DIRECTIONS
+         * @param int|null $size Size values from Style::SIZE_*
+         * @param int $direction Direction values from Style::SHADOW_*
          * @return self
          */
         public function setShadow(?int $size, int $direction = null): self
         {
-            return $this->resetProperty('shadow', $size, $direction);
-        }
-
-        private function resetProperty(string $prop, ?int $value, ?int $direction = null): self
-        {
-            if ($value !== null) {
-                $dir = $direction !== null ? '-' . self::DIRECTIONS[$direction] : null;
-                return $this->addProperty($prop, $dir . self::SIZES[$value]);
-            }
-            return $this->removeProperty($prop);
+            return $this->resetExternalProps('shadow_sizes', 'shadow_directions', $size, $direction);
         }
 
         /**
          * Set round corners (border-radius)
-         * @param int|null $size Size values from Component::SIZES
-         * @param int $direction Direction values from Component::DIRECTIONS
+         * @param int|null $size Size values from Style::SIZE_*
+         * @param int $direction Direction values from Style::DIRECTION_*
          * @return self
          */
         public function setCorners(?int $size, int $direction = null): self
         {
-            return $this->resetProperty('corner', $size, $direction);
+            return $this->resetExternalProps('corner_sizes', 'corner_directions', $size, $direction);
+        }
+
+        public function resetExternalProps(int $valueProp, int $dirProp, ?int $value, ?int $direction): self
+        {
+            if ($value !== null) {
+                if ($direction !== null) {
+                    $this->addExternalProps($dirProp, $direction);
+                }
+                return $this->addExternalProps($valueProp, $value);
+            }
+            return $this->removeExternalProps($valueProp);
         }
 
         /**
          * Set margin, padding and gap
-         * @param int|null $size Size values from Component::SIZES
+         * @param int|null $size Size values from Style::SIZE_*
          * @return self
          */
         public function setSpacing(?int $size): self
@@ -580,7 +587,7 @@ namespace gui\v1 {
          */
         public function setParent(Component &$parent): self
         {
-            $parent->addProperty('relative-pos')->appendChildren($this);
+            $parent->addExternalProps('relative_position')->appendChildren($this);
             return $this;
         }
 
@@ -612,6 +619,31 @@ namespace gui\v1 {
                     $this->children[] = $child;
                 }
             }
+            return $this;
+        }
+
+        /**
+         * Set or unset a component active state
+         * @param bool $active Value to set
+         * @return self
+         */
+        public function setActive(bool $active): self
+        {
+            if ($active) {
+                return $this->addExternalProps('active');
+            }
+            return $this->removeExternalProps('active');
+        }
+
+        private function removeExternalProps(int $property): self
+        {
+            unset($this->externalProps[$property]);
+            return $this;
+        }
+
+        private function addExternalProps(string $property, $value = null): self
+        {
+            $this->externalProps[$property] = $value;
             return $this;
         }
     }

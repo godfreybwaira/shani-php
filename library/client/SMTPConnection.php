@@ -19,7 +19,7 @@ namespace library\client {
         private ?string $lastReply = null, $errorMsg;
 
         private const FLAGS = STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT;
-        private const EOL = "\r\n";
+        private const STATUS_CODE_LENGTH = 4, EOL = "\r\n";
 
         /**
          * Creating SMTP connection to remote host
@@ -82,7 +82,7 @@ namespace library\client {
                 return true;
             }
             if ($this->sendCommand('AUTH CRAM-MD5', 334)) {
-                $challenge = base64_decode(substr($this->lastReply, 4));
+                $challenge = base64_decode(substr($this->lastReply, self::STATUS_CODE_LENGTH));
                 $result = $uname . ' ' . hash_hmac('md5', $challenge, $password);
                 return $this->sendCommand(base64_encode($result), 235);
             }
@@ -144,12 +144,13 @@ namespace library\client {
                 if ($line === null) {
                     return false;
                 }
-                $code = (int) substr($line, 0, 3);
+                $len = strlen((string) $expectedCodes);
+                $code = (int) substr($line, 0, $len);
                 if ($code === $expectedCodes) {
                     return true;
                 }
                 $this->errorCode = $code;
-                $this->errorMsg = substr($line, 4);
+                $this->errorMsg = substr($line, $len + 1);
             }
             return true;
         }

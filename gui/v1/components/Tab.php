@@ -17,12 +17,15 @@ namespace gui\v1\components {
 
         private bool $wrapped = false;
 
-        private const NAME = 'tab';
+        private const TAB = 0;
+        private const PROPS = [
+            self::TAB => ''
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME);
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::TAB);
         }
 
         /**
@@ -34,11 +37,8 @@ namespace gui\v1\components {
          */
         public function addLink(Component $link, bool $active = false): self
         {
-            $list = new Component('li', false);
-            if ($active) {
-                $list->addClass('active');
-            }
-            $list->appendChildren($link);
+            $list = new Component('li');
+            $list->setActive($active)->appendChildren($link);
             $this->appendChildren($list);
         }
 
@@ -46,8 +46,8 @@ namespace gui\v1\components {
         {
             if (!$this->wrapped) {
                 $this->wrapped = true;
-                $wrapper = new Component('div', false);
-                $body = new Component('div', false);
+                $wrapper = new Component('div');
+                $body = new Component('div');
                 return $wrapper->appendChildren($this, $body)->build();
             }
             return parent::build();

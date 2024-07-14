@@ -23,6 +23,15 @@ namespace library\schema {
             }
         }
 
+        /**
+         * Get current PDO object
+         * @return \PDO PDO object
+         */
+        public function pdo(): \PDO
+        {
+            return $this->pdo;
+        }
+
         private static function escapeHTML(&$var): void
         {
             if (is_string($var)) {
@@ -102,15 +111,15 @@ namespace library\schema {
                 case 'mssql':
                     return $driver . ':host=' . $host . ':' . $port . ';dbname=' . $database;
                 case 'dblib': //for sqlserver & sybase
-                    return "dblib:host=$host:dbname=" . $database;
+                    return 'dblib:host=' . $host . ':dbname=' . $database;
                 case 'oci': //for oracle
                     return 'oci:dbname=//' . $host . ':' . $port . '/' . $database;
                 case 'sqlite':
-                    return "sqlite:$database";
+                    return 'sqlite:' . $database;
                 case 'sqlsrv'://for sqlserver
-                    return "sqlsrv:Server=$host;Database=" . $database;
+                    return 'sqlsrv:Server=' . $host . ';Database=' . $database;
                 case 'odbc'://for sqlserver
-                    return "odbc:Driver=FreeTDS;Server=$host:$port;Database=" . $database;
+                    return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
             }
             throw new \RuntimeException('Driver "' . $driver . '" not supported');
         }

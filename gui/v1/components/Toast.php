@@ -16,12 +16,15 @@ namespace gui\v1\components {
     final class Toast extends Component
     {
 
-        private const NAME = 'toast';
+        private const TOAST = 0;
+        private const PROPS = [
+            self::TOAST => '',
+        ];
 
         public function __construct()
         {
-            parent::__construct('div');
-            $this->addProperty(self::NAME);
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::TOAST);
         }
     }
 

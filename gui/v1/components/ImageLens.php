@@ -17,12 +17,16 @@ namespace gui\v1\components {
         private ?string $script;
         private bool $wrapped = false;
 
-        private const NAME = 'lens';
+        private const LENS = 0, LENS_WRAPPER = 1;
+        private const PROPS = [
+            self::LENS => '',
+            self::LENS_WRAPPER => '',
+        ];
 
         public function __construct(string $script = null)
         {
-            parent::__construct('div');
-            $this->addProperty(self::NAME);
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::LENS);
             if ($script !== null) {
                 $this->script = '<script defer src="' . $script . '"></script>';
             }
@@ -30,8 +34,8 @@ namespace gui\v1\components {
 
         private static function wrap(self $lens): Component
         {
-            $wrapper = new Component('div', false);
-            $wrapper->setContent($lens->script)->addProperty(self::NAME . '-wrapper');
+            $wrapper = new Component('div', self::PROPS);
+            $wrapper->setContent($lens->script)->addProperty(self::LENS_WRAPPER);
             return $wrapper->appendChildren($lens);
         }
 

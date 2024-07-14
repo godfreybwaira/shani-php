@@ -12,18 +12,24 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
+    use gui\v1\Style;
 
     final class InputGroup extends Component
     {
 
-        private const NAME = 'input-group', TYPES = ['1', '2'];
         public const TYPE_1 = 0, TYPE_2 = 1;
+        private const INPUT_GROUP = 0, INPUT_TYPES = 1, INPUT_MASK = 2;
+        private const PROPS = [
+            self::INPUT_GROUP => '',
+            self::INPUT_MASK => '',
+            self::INPUT_TYPES => [self::TYPE_1 => '', self::TYPE_2 => '']
+        ];
 
-        public function __construct()
+        public function __construct(int $inputType = null)
         {
-            parent::__construct('div');
-            $this->addProperty(self::NAME);
-            $this->setType(self::TYPE_1);
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::INPUT_GROUP);
+            $this->setType($inputType ?? self::TYPE_1);
         }
 
         /**
@@ -33,14 +39,14 @@ namespace gui\v1\components {
          */
         public function setType(int $inputType): self
         {
-            $this->addProperty('input-type', self::TYPES[$inputType]);
+            $this->addProperty(self::INPUT_TYPES, $inputType);
             return $this;
         }
 
         public function setMask(string $text): self
         {
-            $mask = new Component('span', false);
-            $mask->addProperty('input-mask')->setContent($text)->setPadding(parent::SIZE_DEFAULT);
+            $mask = new Component('span', self::PROPS);
+            $mask->addProperty(self::INPUT_MASK)->setContent($text)->setPadding(Style::SIZE_DEFAULT);
             $this->appendChildren($mask);
             return $this;
         }
@@ -55,12 +61,12 @@ namespace gui\v1\components {
         public function setInput(string $name, string $type, ?string $id = null): self
         {
             $tag = ($type === 'select' || $type === 'textarea') ? $type : 'input';
-            $input = new Component($tag, false);
+            $input = new Component($tag);
             if ($tag === 'input') {
                 $input->setAttribute('type', $type);
             }
             $input->setAttribute('name', $name);
-            $input->setAttribute('id', $id ?? $name)->setPadding(parent::SIZE_DEFAULT);
+            $input->setAttribute('id', $id ?? $name)->setPadding(Style::SIZE_DEFAULT);
             $this->appendChildren($input);
             return $this;
         }
@@ -73,11 +79,11 @@ namespace gui\v1\components {
          */
         public function setLabel(string $text, ?string $refId = null): self
         {
-            $label = new Component('label', false);
+            $label = new Component('label');
             if ($refId !== null) {
                 $label->setAttribute('for', $refId);
             }
-            $label->setContent($text)->setPadding(parent::SIZE_DEFAULT);
+            $label->setContent($text)->setPadding(Style::SIZE_DEFAULT);
             $this->appendChildren($label);
             return $this;
         }

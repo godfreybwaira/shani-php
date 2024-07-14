@@ -3,7 +3,7 @@
 /**
  * ListPane  is a component that displays a series of content items in a
  * structured list format. It's often used to present a collection of related
- * items, such as links, text, or images, in a clean and organized way.
+ * items, such as links, text, cards, or images, in a clean and organized way.
  * @author coder
  *
  * Created on: May 11, 2024 at 8:05:45 PM
@@ -16,13 +16,27 @@ namespace gui\v1\components {
     final class ListPane extends Component
     {
 
-        private const NAME = 'list-pane', STRIPES = ['even', 'odd'];
-        public const STRIPES_EVEN = 0, STRIPES_ODD = 1;
+        /**
+         * Even list items have 'dense' background color
+         */
+        public const STRIPE_EVEN = 0;
+
+        /**
+         * Odd list items have 'dense' background color
+         */
+        public const STRIPE_ODD = 1;
+        private const LIST_PANE = 0, STRIPES = 1;
+        private const PROPS = [
+            self::LIST_PANE => '',
+            self::STRIPES => [
+                self::STRIPE_EVEN => '', self::STRIPE_ODD => ''
+            ]
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME);
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::LIST_PANE);
         }
 
         /**
@@ -32,7 +46,7 @@ namespace gui\v1\components {
          */
         public function setStripes(int $stripes): self
         {
-            return $this->addProperty(self::NAME . '-stripes', self::STRIPES[$stripes]);
+            return $this->addProperty(self::STRIPES, $stripes);
         }
 
         /**
@@ -42,7 +56,7 @@ namespace gui\v1\components {
          */
         public function addItem(Component ...$items): self
         {
-            $list = new Component('li', false);
+            $list = new Component('li');
             foreach ($items as $item) {
                 $list->appendChildren($item);
             }

@@ -11,6 +11,7 @@ namespace shani\server\swoole {
 
     use shani\engine\http\Host;
     use shani\engine\http\App;
+    use shani\engine\core\Constants;
     use Swoole\WebSocket\Server as WSocket;
 
     final class HttpServer
@@ -36,8 +37,8 @@ namespace shani\server\swoole {
                 'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
-                'ssl_cert_file' => str_replace('${SSL_DIR}', \shani\ServerConfig::SSL_DIR, $cnf['SSL']['CERT']),
-                'ssl_key_file' => str_replace('${SSL_DIR}', \shani\ServerConfig::SSL_DIR, $cnf['SSL']['KEY'])
+                'ssl_cert_file' => str_replace('${SSL_DIR}', Constants::DIR_SSL, $cnf['SSL']['CERT']),
+                'ssl_key_file' => str_replace('${SSL_DIR}', Constants::DIR_SSL, $cnf['SSL']['KEY'])
             ]);
             $server->addListener($cnf['IP'], $cnf['SERVER_PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
             return $server;
@@ -56,15 +57,25 @@ namespace shani\server\swoole {
             new App(new Request($req, $uri), new Response($res), new Host($uri->hostname()));
         }
 
+        private static function checkFrameworkRequirements()
+        {
+            if (version_compare(Constants::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
+                exit('PHP version ' . Constants::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
+            }
+            foreach (Constants::REQUIRED_EXTENSIONS as $extension) {
+                if (!extension_loaded($extension)) {
+                    exit('Please install PHP ' . $extension . ' extension' . PHP_EOL);
+                }
+            }
+        }
+
         /**
          * Starting the server. When started, server becomes ready to accept requests
          * @return void
          */
         public static function start(): void
         {
-            if (!extension_loaded('swoole')) {
-                exit('Please install PHP swoole extension' . PHP_EOL);
-            }
+            self::checkFrameworkRequirements();
             \library\Utils::errorHandler();
             $cnf = \shani\ServerConfig::server();
             $server = self::configure($cnf);

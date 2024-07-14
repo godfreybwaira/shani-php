@@ -19,6 +19,9 @@ namespace apps\demo\codes\v1\modules\greetings\src\get {
             $this->app = $app;
         }
 
+        /**
+         * Display greetings from Shani.
+         */
         public function world()
         {
             $lang = $this->app->dictionary(['name' => 'user']);

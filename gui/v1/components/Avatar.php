@@ -9,25 +9,40 @@
 
 namespace gui\v1\components {
 
-    final class Avatar extends \gui\v1\Component
+    use gui\v1\Component;
+
+    final class Avatar extends Component
     {
 
-        private const NAME = 'avatar', STATES = ['off', 'on'];
-        public const STATE_ON = 1, STATE_OFF = 0;
-
-        public function __construct(string $content = null)
-        {
-            parent::__construct('div');
-            $this->setContent($content)->addProperty(self::NAME);
-        }
+        private const AVATAR = 0;
 
         /**
-         * Whether avatars to stack on top of each other
-         * @return self
+         * Set avatar state to on
          */
-        public function setStack(): self
+        public const STATE_ON = 0;
+
+        /**
+         * Set avatar state to off
+         */
+        public const STATE_OFF = 1;
+
+        /**
+         * Avatar will stack on top of each other
+         */
+        public const AVATAR_STACK = 3;
+        private const AVATAR_STATES = 4;
+        private const PROPS = [
+            self::AVATAR => '',
+            self::AVATAR_STACK => '',
+            self::AVATAR_STATES => [
+                self::STATE_ON => '', self::STATE_OFF => ''
+            ]
+        ];
+
+        public function __construct(?string $content = null)
         {
-            return $this->addProperty(self::NAME . '-stack');
+            parent::__construct('div', self::PROPS);
+            $this->setContent($content)->addProperty(self::AVATAR);
         }
 
         /**
@@ -37,7 +52,7 @@ namespace gui\v1\components {
          */
         public function setState(int $state): self
         {
-            return $this->addProperty(self::NAME . '-state', self::STATES[$state]);
+            return $this->addProperty(self::AVATAR_STATES, $state);
         }
     }
 

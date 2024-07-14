@@ -16,12 +16,18 @@ namespace gui\v1\components {
     final class Accordion extends Component
     {
 
-        private const NAME = 'accordion';
+        private const ACCORDION = 0, ACCORDION_ITEM = 1, ACCORDION_BODY = 2, ACCORDION_LABEL = 3;
+        private const PROPS = [
+            self::ACCORDION => '',
+            self::ACCORDION_ITEM => '',
+            self::ACCORDION_BODY => '',
+            self::ACCORDION_LABEL => ''
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME);
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::ACCORDION);
         }
 
         /**
@@ -35,18 +41,16 @@ namespace gui\v1\components {
          */
         public function addItem(string $label, Component $body, bool $expanded = false, bool $disabled = false): self
         {
-            $item = new Component('li', false);
-            $node = new Component('a', false);
+            $item = new Component('li', self::PROPS);
+            $node = new Component('a', self::PROPS);
+            $wrapper = new Component('div', self::PROPS);
             $node->setContent($label);
-            $wrapper = new Component('div', false);
-            $item->addProperty(self::NAME . '-item');
-            $wrapper->addProperty(self::NAME . '-body');
-            $node->addProperty(self::NAME . '-label')->setAttribute('href', '#');
+            $item->addProperty(self::ACCORDION_ITEM);
+            $wrapper->addProperty(self::ACCORDION_BODY);
+            $node->addProperty(self::ACCORDION_LABEL)->setAttribute('href', '#');
             $wrapper->appendChildren($body);
             $item->appendChildren($node, $wrapper);
-            if ($expanded) {
-                $item->addClass('expanded');
-            }
+            $item->setActive($expanded);
             if ($disabled) {
                 $item->setAttribute('disabled');
             }

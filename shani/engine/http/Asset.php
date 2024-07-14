@@ -70,7 +70,7 @@ namespace shani\engine\http {
          */
         public function directory(?string $path): string
         {
-            return \shani\engine\core\Path::APPS . $this->app->config()->assetDir() . $path;
+            return \shani\engine\core\Constants::DIR_APPS . $this->app->config()->assetDir() . $path;
         }
     }
 

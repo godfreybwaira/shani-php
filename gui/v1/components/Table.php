@@ -18,19 +18,23 @@ namespace gui\v1\components {
         private bool $wrapped = false;
         private ?Component $header, $body, $footer, $caption = null;
 
-        private const NAME = 'table';
+        private const TABLE = 0, TABLE_WRAPPER = 1;
+        private const PROPS = [
+            self::TABLE => '',
+            self::TABLE_WRAPPER => ''
+        ];
 
         public function __construct(string $caption = null)
         {
-            parent::__construct('table');
+            parent::__construct('table', self::PROPS);
             $this->header = $this->body = $this->footer = null;
-            $this->setCaption($caption)->addProperty(self::NAME);
+            $this->setCaption($caption)->addProperty(self::TABLE);
         }
 
         private static function wrap(Table $table): Component
         {
-            $wrapper = new Component('div', false);
-            $wrapper->addProperty(self::NAME . '-wrapper');
+            $wrapper = new Component('div', self::PROPS);
+            $wrapper->addProperty(self::TABLE_WRAPPER);
             return $wrapper->appendChildren($table);
         }
 
@@ -42,7 +46,7 @@ namespace gui\v1\components {
         public function setCaption(?string $caption): self
         {
             if (!$this->caption && $caption !== null) {
-                $this->caption = new Component('caption', false);
+                $this->caption = new Component('caption');
                 $this->caption->setContent($caption);
             }
             return $this;
@@ -81,9 +85,9 @@ namespace gui\v1\components {
         private function setData(string $tag, ?Component &$wrapper, Component ...$cells): self
         {
             if (!$wrapper) {
-                $wrapper = new Component($tag, false);
+                $wrapper = new Component($tag);
             }
-            $row = new Component('tr', false);
+            $row = new Component('tr');
             $row->appendChildren(...$cells);
             $wrapper->appendChildren($row);
             return $this;

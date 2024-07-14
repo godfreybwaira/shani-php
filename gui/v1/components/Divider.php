@@ -13,12 +13,15 @@ namespace gui\v1\components {
     final class Divider extends \gui\v1\Component
     {
 
-        private const NAME = 'divider';
+        private const DIVIDER = 0;
+        private const PROPS = [
+            self::DIVIDER => ''
+        ];
 
         public function __construct(string $text = null)
         {
-            parent::__construct('div');
-            $this->setContent($text)->addProperty(self::NAME);
+            parent::__construct('div', self::PROPS);
+            $this->setContent($text)->addProperty(self::DIVIDER);
         }
     }
 

@@ -14,12 +14,16 @@ namespace gui\v1\components {
     final class Tree extends Component
     {
 
-        private const NAME = 'tree';
+        private const TREE = 0, TREE_LABEL = 1;
+        private const PROPS = [
+            self::TREE => '',
+            self::TREE_LABEL => ''
+        ];
 
         public function __construct()
         {
-            parent::__construct('ul');
-            $this->addProperty(self::NAME);
+            parent::__construct('ul', self::PROPS);
+            $this->addProperty(self::TREE);
         }
 
         /**
@@ -31,11 +35,9 @@ namespace gui\v1\components {
          */
         public function addItem(Component $item, bool $expanded = false): self
         {
-            $list = new Component('li', false);
-            if ($expanded) {
-                $list->addClass('expanded');
-            }
-            $list->addProperty(self::NAME, 'label')->appendChildren($item);
+            $list = new Component('li', self::PROPS);
+            $list->setActive($expanded);
+            $list->addProperty(self::TREE_LABEL)->appendChildren($item);
             $this->appendChildren($list);
         }
     }

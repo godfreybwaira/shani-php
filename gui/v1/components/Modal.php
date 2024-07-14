@@ -16,8 +16,15 @@ namespace gui\v1\components {
     final class Modal extends Component
     {
 
-        private const NAME = 'modal', TYPES = ['card', 'drawer'];
+        private const MODAL = 0, MODAL_TYPES = 1, MODAL_WRAPPER = 2;
         public const TYPE_DRAWER = 1, TYPE_CARD = 0;
+        private const PROPS = [
+            self::MODAL => '',
+            self::MODAL_TYPES => [
+                self::TYPE_CARD => '', self::TYPE_DRAWER => ''
+            ],
+            self::MODAL_WRAPPER => ''
+        ];
 
         private bool $wrapped = false;
         private ?Component $navbar = null;
@@ -25,11 +32,11 @@ namespace gui\v1\components {
 
         public function __construct()
         {
-            parent::__construct('div', false);
-            $this->addProperty(self::NAME);
+            parent::__construct('div', self::PROPS);
+            $this->addProperty(self::MODAL);
             $this->setType(self::TYPE_CARD);
-            $this->wrapper = new Component('div', false);
-            $this->wrapper->addProperty(self::NAME . '-wrapper');
+            $this->wrapper = new Component('div', self::PROPS);
+            $this->wrapper->addProperty(self::MODAL_WRAPPER);
         }
 
         /**
@@ -39,23 +46,23 @@ namespace gui\v1\components {
          */
         public function setType(int $modalType): self
         {
-            return $this->addProperty(self::NAME . '-type', self::TYPES[$modalType]);
+            return $this->addProperty(self::MODAL_TYPES, $modalType);
         }
 
         /**
-         * Add modal navigation bar
+         * Add modal navigation bar and it's item(s)
          * @param Component $items navigation bar item(s)
          * @return self
          */
-        public function addNavbar(Component ...$items): self
+        public function addNavbarItem(Component ...$items): self
         {
             if ($this->navbar === null) {
-                $this->navbar = new Component('ul', false);
-                $this->navbar->addProperty(self::NAME . '-nav');
+                $this->navbar = new Component('ul', self::PROPS);
+                $this->navbar->addProperty(self::MODAL_NAV);
                 $this->wrapper->appendChildren($this->navbar);
             }
             foreach ($items as $item) {
-                $list = new Component('li', false);
+                $list = new Component('li');
                 $list->appendChildren($item);
             }
             $this->navbar->appendChildren($list);

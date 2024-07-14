@@ -158,7 +158,8 @@ namespace shani\engine\http {
         }
 
         /**
-         * Customize the HTML template to be sent to user.
+         * Get the current HTML template. This function can be used to customize
+         * HTML template before sending to user agent.
          * @return \gui\Template
          */
         public function template(): \gui\Template
@@ -170,8 +171,8 @@ namespace shani\engine\http {
         }
 
         /**
-         * Render HTML document to user agent
-         * @param array|null $data Values to be passed on view component
+         * Render HTML document to user agent. All views have access to application object as $app
+         * @param array|null $data Values to be passed on view file
          * @return void
          */
         public function render(?array $data = null): void
@@ -196,7 +197,8 @@ namespace shani\engine\http {
          * and the dictionary file name must be language code supported by your application.
          * @param array|null $data Data to pass to dictionary file. These data are
          * available on dictionary file via $data variable
-         * @return array Associative array of words/sentences and code representation from dictionary
+         * @return array Associative array where key is the word/sentence unique
+         * code and the value is the actual word/sentence.
          */
         public function dictionary(?array $data = null): array
         {
@@ -215,8 +217,10 @@ namespace shani\engine\http {
         /**
          * Set and/or get current view file from disk to be rendered as HTML to user agent.
          * @param string|null $path Case sensitive Path to view file, if not provided then
-         * the view file will ne the same as current executing function name.
+         * the view file will be the same as current executing function name. All views
+         * have access to application object as $app
          * @return string Path to view file
+         * @see App::render()
          */
         public function view(?string $path = null): string
         {
@@ -230,7 +234,7 @@ namespace shani\engine\http {
          */
         public function module(?string $path = null): string
         {
-            return \shani\engine\core\Path::APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
+            return \shani\engine\core\Constants::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
         }
 
         /**
@@ -250,7 +254,7 @@ namespace shani\engine\http {
         private function getClassPath(): string
         {
             $method = $this->req->method();
-            $class = \shani\engine\core\Path::DIR_APPS . $this->config->root() . $this->config->moduleDir();
+            $class = \shani\engine\core\Constants::DIRNAME_APPS . $this->config->root() . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));

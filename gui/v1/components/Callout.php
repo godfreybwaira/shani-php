@@ -11,16 +11,23 @@
 
 namespace gui\v1\components {
 
-    final class Callout extends \gui\v1\Component
+    use gui\v1\Component;
+    use gui\v1\Style;
+
+    final class Callout extends Component
     {
 
-        private const NAME = 'callout';
+        private const CALLOUT = 0;
+        private const PROPS = [
+            self::CALLOUT => '',
+        ];
 
         public function __construct(int $color, string $text = null)
         {
-            parent::__construct('div');
-            $this->setContent($text)->addProperty(self::NAME);
-            $this->setSpacing(parent::SIZE_DEFAULT)->setColor($color);
+            parent::__construct('div', self::PROPS);
+            $this->setContent($text)->addProperty(self::CALLOUT);
+            $this->setSpacing(Style::SIZE_DEFAULT);
+            $this->setColor($color);
         }
     }
 

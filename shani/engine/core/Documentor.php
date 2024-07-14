@@ -50,7 +50,7 @@ namespace shani\engine\core {
         public static function generate(\shani\engine\http\App &$app): array
         {
             $config = $app->config();
-            $path = \shani\engine\core\Path::APPS . $config->root() . $config->moduleDir();
+            $path = \shani\engine\core\Constants::DIR_APPS . $config->root() . $config->moduleDir();
             $modules = self::folderContent($path, $config->requestMethodsDir());
             $docs = [
                 'name' => $config->appName(),
@@ -68,10 +68,13 @@ namespace shani\engine\core {
                                 continue;
                             }
                             $comments = self::cleanComment($fnobj->getDocComment());
-                            $id = strtolower($method . '/' . $module . '/' . $className . '/' . $name);
+                            $path = $module . '/' . $className . '/' . $name;
+                            $details = $method . ' ' . $module . ' ' . $className . ' (';
+                            $details .= ($name === Constants::HOME_FUNCTION ? 'single/all' : $name) . ')';
                             $docs['modules'][$module][$className][$name][$method] = [
-                                'details' => $comments ?? ucwords(str_replace('/', ' ', $id)),
-                                'id' => \library\Utils::digest($id)
+                                'details' => $comments ?? ucwords(strtolower($details)),
+                                'id' => \library\Utils::digest(strtolower($method . '/' . $path)),
+                                'path' => '/' . str_replace('/', '/{id}/', strtolower($path))
                             ];
                         }
                     }
