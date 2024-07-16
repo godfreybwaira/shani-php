@@ -23,27 +23,27 @@ namespace shani\engine\core {
         public const DIRNAME_APPS = '/apps';
 
         /**
-         * Configuration directory absolute path
+         * Configuration directory path
          */
         public const DIR_CONFIG = SERVER_ROOT . '/config';
 
         /**
-         * SSL files directory
+         * SSL files directory path
          */
         public const DIR_SSL = self::DIR_CONFIG . '/ssl';
 
         /**
-         * Hosts directory absolute path
+         * Hosts directory path
          */
         public const DIR_HOSTS = self::DIR_CONFIG . '/hosts';
 
         /**
-         * GUI directory absolute path
+         * GUI directory path
          */
         public const DIR_GUI = SERVER_ROOT . '/gui';
 
         /**
-         * Application directory absolute path
+         * Application directory path
          */
         public const DIR_APPS = SERVER_ROOT . self::DIRNAME_APPS;
 

@@ -1,4 +1,4 @@
-## Shani SERVER CONFIGURATION.
+## Shani Server Configuration.
 ---
 #The IP address server is running on.
 IP: "0.0.0.0"
@@ -21,4 +21,3 @@ RUNAS_DAEMON: false
 # Display all application errors and server errors.
 # This variable can be overridden by application.
 DISPLAY_ERRORS: false
-ERROR_LOG: "${SERVER_LOGS}/error"
