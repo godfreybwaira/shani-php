@@ -13,6 +13,11 @@ namespace shani\engine\core {
     {
 
         /**
+         * Default buffer size
+         */
+        public const BUFFER_SIZE = 1_048_576;
+
+        /**
          * Default home function if no function name is provided on URL
          */
         public const HOME_FUNCTION = 'index';
