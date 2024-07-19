@@ -25,7 +25,7 @@ namespace gui\v1\components {
         public function __construct(int $color, string $text = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->setContent($text)->addProperty(self::CALLOUT);
+            $this->setContent($text)->addStyle(self::CALLOUT);
             $this->setSpacing(Style::SIZE_DEFAULT);
             $this->setColor($color);
         }

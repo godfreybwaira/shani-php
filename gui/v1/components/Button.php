@@ -33,7 +33,7 @@ namespace gui\v1\components {
         public const BLOCK = 1;
         private const BUTTON_TYPES = 2;
         private const PROPS = [
-            self::BUTTON => '',
+            self::BUTTON => 'button',
             self::BLOCK => '',
             self::BUTTON_TYPES => [self::TYPE_BOLD => '', self::TYPE_OUTLINE => ''],
         ];
@@ -41,7 +41,7 @@ namespace gui\v1\components {
         public function __construct(string $text = null)
         {
             parent::__construct('button', self::PROPS);
-            $this->setContent($text)->addProperty(self::BUTTON);
+            $this->setContent($text)->addStyle(self::BUTTON);
             $this->setType(self::TYPE_BOLD);
             $this->setColor(Style::COLOR_PRIMARY);
         }
@@ -53,7 +53,7 @@ namespace gui\v1\components {
          */
         public function setType(int $buttonType): self
         {
-            return $this->addProperty(self::BUTTON_TYPES, $buttonType);
+            return $this->addStyle(self::BUTTON_TYPES, $buttonType);
         }
     }
 

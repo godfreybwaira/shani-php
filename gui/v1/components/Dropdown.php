@@ -25,7 +25,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul', self::PROPS);
-            $this->addProperty(self::DROPDOWN);
+            $this->addStyle(self::DROPDOWN);
             $this->header = $this->body = null;
         }
 

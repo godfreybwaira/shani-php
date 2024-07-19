@@ -17,11 +17,19 @@ namespace gui\v1\components {
     final class Carousel extends Component
     {
 
-        private const CAROUSEL = 0, CAROUSEL_SLIDES = 1, CAROUSEL_NAV = 3;
+        private const CAROUSEL = 0, CAROUSEL_SLIDES = 1, CAROUSEL_NAV = 2;
+        private const ANIMATION_BEHAVIOR = 3;
         private const PROPS = [
             self::CAROUSEL => '',
             self::CAROUSEL_SLIDES => '',
-            self::CAROUSEL_NAV => ''
+            self::CAROUSEL_NAV => '',
+            self::ANIMATION_BEHAVIOR => [
+                Style::ANINATION_FADE => '',
+                Style::ANINATION_SLIDE_BOTTOM => '',
+                Style::ANINATION_SLIDE_LEFT => '',
+                Style::ANINATION_SLIDE_RIGHT => '',
+                Style::ANINATION_SLIDE_TOP => ''
+            ]
         ];
 
         private Component $slides;
@@ -31,10 +39,10 @@ namespace gui\v1\components {
         public function __construct(bool $bottomNav = true)
         {
             parent::__construct('div', self::PROPS);
-            $this->addProperty(self::CAROUSEL);
+            $this->addStyle(self::CAROUSEL);
             $this->bottomNav = $bottomNav;
             $this->slides = new Component('ul', self::PROPS);
-            $this->slides->addProperty(self::CAROUSEL_SLIDES);
+            $this->slides->addStyle(self::CAROUSEL_SLIDES);
         }
 
         /**
@@ -58,7 +66,7 @@ namespace gui\v1\components {
         {
             $pos = $this->bottomNav ? Style::POS_BC : Style::POS_TC;
             $nav = new Component('ul', self::PROPS);
-            $nav->addProperty(self::CAROUSEL_NAV);
+            $nav->addStyle(self::CAROUSEL_NAV);
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li');
                 $dot->setAttribute('for', $this->slideIds[$i])->setContent('&nbsp;');
@@ -69,6 +77,17 @@ namespace gui\v1\components {
             $nextBtn->setPosition(Style::POS_CR)->setParent($this);
             $prevBtn->setPosition(Style::POS_CL)->setParent($this);
             $this->appendChildren($nav->setPosition($pos));
+            return $this;
+        }
+
+        /**
+         * Set animation behavior
+         * @param int $behavior Animation behavior set using Style::ANIMATION_*
+         * @return self
+         */
+        public function setAnimationBehavior(int $behavior): self
+        {
+            $this->addStyle(self::ANIMATION_BEHAVIOR, $behavior);
             return $this;
         }
 

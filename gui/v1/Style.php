@@ -12,7 +12,9 @@ namespace gui\v1 {
     final class Style
     {
 
-        public const DIRECTION_X = 0, DIRECTION_Y = 1, DIRECTION_TOP = 2, DIRECTION_BOTTOM = 3;
+        public const ANINATION_SLIDE_LEFT = 0, ANINATION_SLIDE_RIGHT = 1;
+        public const ANINATION_SLIDE_TOP = 2, ANINATION_SLIDE_BOTTOM = 3;
+        public const ANINATION_FADE = 4;
         ///////////////////////
         public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
         public const COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_TRANSLUSCENT = 6;
@@ -20,7 +22,9 @@ namespace gui\v1 {
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
         public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
         ///////////////////////
-        public const ALIGN_X = 0, ALIGN_Y = 1, GAP_X = 0, GAP_Y = 1, GAP_XY = 2;
+        public const ALIGN_CENTER = 0, ALIGN_START = 1, ALIGN_END = 2, ALIGN_STRETCH = 3;
+        public const ALIGN_VERTICAL = 4, ALIGN_HORIZONTAL = 5;
+        public const GAP_X = 0, GAP_Y = 1, GAP_XY = 2;
         ///////////////////////
         public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
         public const SIZE_DEFAULT = self::SIZE_MD;
@@ -31,7 +35,7 @@ namespace gui\v1 {
 
         private const PROPS = [
             'colors' => [
-                self::COLOR_DANGER => '', self::COLOR_SUCCESS => '', self::COLOR_ALERT => '',
+                self::COLOR_DANGER => 'crimson', self::COLOR_SUCCESS => '', self::COLOR_ALERT => 'goldenrod',
                 self::COLOR_INFO => '', self::COLOR_PRIMARY => '', self::COLOR_SECONDARY => '',
                 self::COLOR_TRANSLUSCENT => ''
             ],
@@ -43,38 +47,41 @@ namespace gui\v1 {
                 self::POS_TR => ''
             ],
             'alignments' => [
-                self::ALIGN_X => '', self::ALIGN_Y => ''
+                self::ALIGN_CENTER => '', self::ALIGN_END => '',
+                self::ALIGN_START => '', self::ALIGN_STRETCH => ''
             ],
             'gaps' => [
                 self::GAP_X => '', self::GAP_Y => '', self::GAP_XY => ''
             ],
             'gap_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
+                self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
             'margin_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
+                self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
             'padding_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
+                self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
             'font_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
+                self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
             'shadow_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
+                self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
             'corner_sizes' => [
                 self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
                 self::SIZE_SM => '', self::SIZE_XL => ''
             ],
-            'corner_directions' => [
-                self::DIRECTION_BOTTOM => '', self::DIRECTION_TOP => '',
-                self::DIRECTION_X => '', self::DIRECTION_Y => ''
+            'corner_radius' => [
+                self::POS_BL => '', self::POS_BOTTOM => '',
+                self::POS_BR => '', self::POS_LEFT => '',
+                self::POS_RIGHT => '', self::POS_TL => '',
+                self::POS_TOP => '', self::POS_TR => ''
             ],
             'shadow_directions' => [
                 self::SHADOW_BL => '', self::SHADOW_BR => '', self::SHADOW_TL => '',

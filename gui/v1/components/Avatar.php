@@ -42,7 +42,7 @@ namespace gui\v1\components {
         public function __construct(?string $content = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->setContent($content)->addProperty(self::AVATAR);
+            $this->setContent($content)->addStyle(self::AVATAR);
         }
 
         /**
@@ -52,7 +52,7 @@ namespace gui\v1\components {
          */
         public function setState(int $state): self
         {
-            return $this->addProperty(self::AVATAR_STATES, $state);
+            return $this->addStyle(self::AVATAR_STATES, $state);
         }
     }
 

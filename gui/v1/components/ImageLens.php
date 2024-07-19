@@ -26,7 +26,7 @@ namespace gui\v1\components {
         public function __construct(string $script = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->addProperty(self::LENS);
+            $this->addStyle(self::LENS);
             if ($script !== null) {
                 $this->script = '<script defer src="' . $script . '"></script>';
             }
@@ -35,7 +35,7 @@ namespace gui\v1\components {
         private static function wrap(self $lens): Component
         {
             $wrapper = new Component('div', self::PROPS);
-            $wrapper->setContent($lens->script)->addProperty(self::LENS_WRAPPER);
+            $wrapper->setContent($lens->script)->addStyle(self::LENS_WRAPPER);
             return $wrapper->appendChildren($lens);
         }
 

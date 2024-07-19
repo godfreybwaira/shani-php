@@ -28,13 +28,13 @@ namespace gui\v1\components {
         {
             parent::__construct('table', self::PROPS);
             $this->header = $this->body = $this->footer = null;
-            $this->setCaption($caption)->addProperty(self::TABLE);
+            $this->setCaption($caption)->addStyle(self::TABLE);
         }
 
         private static function wrap(Table $table): Component
         {
             $wrapper = new Component('div', self::PROPS);
-            $wrapper->addProperty(self::TABLE_WRAPPER);
+            $wrapper->addStyle(self::TABLE_WRAPPER);
             return $wrapper->appendChildren($table);
         }
 

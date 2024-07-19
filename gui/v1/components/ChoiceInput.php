@@ -31,7 +31,7 @@ namespace gui\v1\components {
             if ($multiSelect) {
                 $this->type = 'checkbox';
             }
-            $this->addProperty(self::CHOICE_INPUT);
+            $this->addStyle(self::CHOICE_INPUT);
         }
 
         /**

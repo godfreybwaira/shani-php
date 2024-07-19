@@ -23,7 +23,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul', self::PROPS);
-            $this->addProperty(self::TREE);
+            $this->addStyle(self::TREE);
         }
 
         /**
@@ -37,7 +37,7 @@ namespace gui\v1\components {
         {
             $list = new Component('li', self::PROPS);
             $list->setActive($expanded);
-            $list->addProperty(self::TREE_LABEL)->appendChildren($item);
+            $list->addStyle(self::TREE_LABEL)->appendChildren($item);
             $this->appendChildren($list);
         }
     }

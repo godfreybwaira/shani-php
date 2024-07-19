@@ -55,7 +55,7 @@ namespace gui\v1\components {
         public function __construct(int $buttonType)
         {
             parent::__construct('button', self::PROPS);
-            $this->addProperty(self::ACTION_BUTTON);
+            $this->addStyle(self::ACTION_BUTTON);
             $this->setType($buttonType);
         }
 
@@ -66,7 +66,7 @@ namespace gui\v1\components {
          */
         public function setType(int $buttonType): self
         {
-            return $this->addProperty(self::BUTTON_TYPES, $buttonType);
+            return $this->addStyle(self::BUTTON_TYPES, $buttonType);
         }
     }
 

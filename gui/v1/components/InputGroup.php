@@ -28,7 +28,7 @@ namespace gui\v1\components {
         public function __construct(int $inputType = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->addProperty(self::INPUT_GROUP);
+            $this->addStyle(self::INPUT_GROUP);
             $this->setType($inputType ?? self::TYPE_1);
         }
 
@@ -39,14 +39,14 @@ namespace gui\v1\components {
          */
         public function setType(int $inputType): self
         {
-            $this->addProperty(self::INPUT_TYPES, $inputType);
+            $this->addStyle(self::INPUT_TYPES, $inputType);
             return $this;
         }
 
         public function setMask(string $text): self
         {
             $mask = new Component('span', self::PROPS);
-            $mask->addProperty(self::INPUT_MASK)->setContent($text)->setPadding(Style::SIZE_DEFAULT);
+            $mask->addStyle(self::INPUT_MASK)->setContent($text)->setPadding(Style::SIZE_DEFAULT);
             $this->appendChildren($mask);
             return $this;
         }

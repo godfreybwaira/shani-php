@@ -24,7 +24,7 @@ namespace gui\v1\components {
         public function __construct(Component $media)
         {
             parent::__construct('div', self::PROPS);
-            $this->addProperty(self::MEDIA);
+            $this->addStyle(self::MEDIA);
             $this->appendChildren($media);
         }
 
@@ -38,7 +38,7 @@ namespace gui\v1\components {
         {
             $wrapper = new Component('div', self::PROPS);
             $wrapper->appendChildren($caption);
-            $wrapper->addProperty(self::MEDIA_CAPTION);
+            $wrapper->addStyle(self::MEDIA_CAPTION);
             $wrapper->setPosition($position ?? Style::POS_BOTTOM);
             $this->appendChildren($wrapper);
             return $this;

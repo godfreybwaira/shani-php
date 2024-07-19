@@ -27,7 +27,7 @@ namespace gui\v1\components {
         public function __construct()
         {
             parent::__construct('ul', self::PROPS);
-            $this->addProperty(self::STEPPER)->addProperty(self::STEPPER_ROUND);
+            $this->addStyle(self::STEPPER)->addStyle(self::STEPPER_ROUND);
         }
 
         /**
@@ -41,7 +41,7 @@ namespace gui\v1\components {
         {
             $list = new Component('li', self::PROPS);
             if ($complete) {
-                $list->addProperty(self::STEPPER_COMPLETE);
+                $list->addStyle(self::STEPPER_COMPLETE);
             } elseif ($active) {
                 $list->setActive($active);
             }

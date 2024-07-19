@@ -26,7 +26,7 @@ namespace gui\v1\components {
         {
             parent::__construct('input', self::PROPS);
             $this->setAttribute('type', 'checkbox');
-            $this->addProperty(self::TOGGLE)->setAttribute('name', $name);
+            $this->addStyle(self::TOGGLE)->setAttribute('name', $name);
         }
 
         /**
@@ -36,7 +36,7 @@ namespace gui\v1\components {
          */
         public function setType(int $toggleType): self
         {
-            return $this->addProperty(self::TOGGLE_TYPES, $toggleType);
+            return $this->addStyle(self::TOGGLE_TYPES, $toggleType);
         }
     }
 

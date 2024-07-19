@@ -25,7 +25,7 @@ namespace gui\v1\components {
         public function __construct(?string $text = null)
         {
             parent::__construct('span', self::PROPS);
-            $this->setContent($text)->addProperty(self::BADGE);
+            $this->setContent($text)->addStyle(self::BADGE);
             if (Style::SIZE_DEFAULT === Style::SIZE_SM) {
                 $this->setSpacing(Style::SIZE_SM);
             } else {

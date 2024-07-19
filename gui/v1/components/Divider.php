@@ -21,7 +21,7 @@ namespace gui\v1\components {
         public function __construct(string $text = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->setContent($text)->addProperty(self::DIVIDER);
+            $this->setContent($text)->addStyle(self::DIVIDER);
         }
     }
 

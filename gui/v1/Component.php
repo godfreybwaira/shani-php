@@ -15,13 +15,14 @@ namespace gui\v1 {
 
         private string $htmlTag;
         private ?string $content = null;
-        private array $children, $attributes, $classList, $props, $propSource, $externalProps = [];
+        private array $children, $attributes, $classList, $inlineStyles = [];
+        private array $inlineSourceCSS, $externalStyles = [];
 
-        public function __construct(string $htmlTag, ?array $styleSource = null)
+        public function __construct(string $htmlTag, array $styleSource = [])
         {
             $this->htmlTag = $htmlTag;
-            $this->propSource = $styleSource ?? [];
-            $this->children = $this->classList = $this->attributes = $this->props = [];
+            $this->inlineSourceCSS = $styleSource;
+            $this->children = $this->classList = $this->attributes = [];
         }
 
         public function __toString(): string
@@ -36,32 +37,37 @@ namespace gui\v1 {
          */
         public function build(): string
         {
-            $css = $this->stringifyClass();
+            $css = $this->serializeStyles();
             if ($this->content !== null || !empty($this->children)) {
-                $texts = '<' . $this->htmlTag . $css . $this->stringifyAttr() . '>' . $this->content;
-                return $texts . $this->stringifyChildren() . '</' . $this->htmlTag . '>';
+                $markup = '<' . $this->htmlTag . $css . $this->serializeAttributes() . '>' . $this->content;
+                return $markup . $this->serializeChildren() . '</' . $this->htmlTag . '>';
             }
-            return '<' . $this->htmlTag . $css . $this->stringifyAttr() . '/>';
+            return '<' . $this->htmlTag . $css . $this->serializeAttributes() . '/>';
         }
 
         /**
          * Check whether a component has a given CSS class.
-         * @param string $value CSS class to check
+         * @param string $css CSS class to check
          * @return bool
          */
-        public function hasClass(string $value): bool
+        public function hasClass(string $css): bool
         {
-            return in_array($value, $this->classList);
+            return array_key_exists($css, $this->classList);
         }
 
         /**
          * Remove CSS class or list of classes
-         * @param string $value CSS class(es) to remove
+         * @param string $classes CSS class(es) to remove separated by space
          * @return self
          */
-        public function removeClass(string ...$value): self
+        public function removeClass(string $classes): self
         {
-            $this->classList = array_diff($this->classList, $value);
+            $values = explode(' ', trim($classes));
+            foreach ($values as $css) {
+                if ($this->hasClass($css)) {
+                    unset($this->classList[$css]);
+                }
+            }
             return $this;
         }
 
@@ -69,25 +75,36 @@ namespace gui\v1 {
          * Get the content of a component as HTML markups or texts
          * @return string|null
          */
-        public function content(): ?string
+        public function getContent(): ?string
         {
             return $this->content;
         }
 
         /**
          * Add custom CSS class(es). It does not replace existing class(es)
-         * @param string $values CSS class(es) to add
+         * @param string $classes CSS class(es) to add separated by space
          * @return self
          * @see Component::setClass()
          */
-        public function addClass(string ...$values): self
+        public function addClass(string $classes): self
         {
-            foreach ($values as $value) {
-                if (!$this->hasClass($value)) {
-                    $this->classList[] = $value;
+            $values = explode(' ', trim($classes));
+            foreach ($values as $val) {
+                $css = trim($val);
+                if ($css !== '') {
+                    $this->classList[$css] = null;
                 }
             }
             return $this;
+        }
+
+        /**
+         * Get all custom CSS classes defined by user
+         * @return string CSS classes separated by space
+         */
+        public function getClass(): string
+        {
+            return implode(' ', array_keys($this->classList));
         }
 
         /**
@@ -169,7 +186,7 @@ namespace gui\v1 {
             return $this->attributes;
         }
 
-        private function stringifyChildren(): ?string
+        private function serializeChildren(): ?string
         {
             $result = null;
             foreach ($this->children as $child) {
@@ -178,29 +195,31 @@ namespace gui\v1 {
             return $result;
         }
 
-        private function addStyleCollection(array $collection, array $source): self
+        private function applyStyles(array &$styles, array &$sourceStyles): self
         {
-            foreach ($collection as $key => $value) {
-                if ($value !== null) {
-                    $this->addClass(...$source[$key][$value]);
-                } else {
-                    $this->addClass(...$source[$key]);
+            foreach ($styles as $key => $value) {
+                if ($value === null) {
+                    $this->addClass($sourceStyles[$key]);
+                    continue;
+                }
+                if (!empty($sourceStyles[$key][$value])) {
+                    $this->addClass($sourceStyles[$key][$value]);
                 }
             }
             return $this;
         }
 
-        private function stringifyClass(): ?string
+        private function serializeStyles(): ?string
         {
-            $this->addStyleCollection($this->props, $this->propSource);
-            $this->addStyleCollection($this->externalProps, Style::getStyles(array_keys($this->externalProps)));
+            $this->applyStyles($this->externalStyles, Style::getStyles(array_keys($this->externalStyles)));
+            $this->applyStyles($this->inlineStyles, $this->inlineSourceCSS);
             if (empty($this->classList)) {
                 return null;
             }
-            return ' class="' . implode(' ', $this->classList) . '"';
+            return ' class="' . trim(implode(' ', array_keys($this->classList))) . '"';
         }
 
-        private function stringifyAttr(): ?string
+        private function serializeAttributes(): ?string
         {
             $result = null;
             foreach ($this->attributes as $name => $value) {
@@ -211,16 +230,17 @@ namespace gui\v1 {
 
         /**
          * Toggle CSS class(es)
-         * @param string $classes CSS class(es) to toggle
+         * @param string $classes CSS class(es) to toggle separated by space
          * @return self
          */
-        public function toggleClass(string ...$classes): self
+        public function toggleClass(string $classes): self
         {
-            foreach ($classes as $css) {
+            $values = explode(' ', trim($classes));
+            foreach ($values as $css) {
                 if ($this->hasClass($css)) {
                     $this->removeClass($css);
                 } else {
-                    $this->classList[] = $css;
+                    $this->addClass($css);
                 }
             }
             return $this;
@@ -228,98 +248,123 @@ namespace gui\v1 {
 
         /**
          * Add custom CSS class(es), removing all existing class(es)
-         * @param string $values CSS class(es) to add
+         * @param string $classes CSS class(es) to add separated by space
          * @return self
          * @see Component::addClass()
          */
-        public function setClass(string ...$values): self
+        public function setClass(string $classes): self
         {
             $this->classList = [];
-            return $this->addClass(...$values);
+            return $this->addClass($classes);
         }
 
         /**
-         * Set component property, removing all existing properties. A property
-         * represent an array of CSS classes.
-         * @param string $name Property name
-         * @param type $value Property value
+         * Add a style to a component style collection
+         * @param int $name Style name
+         * @param type $value Style value
          * @return self
-         * @see Component::addProperty()
+         * @see Component::setStyle()
          */
-        public function setProperty(string $name, $value = null): self
+        protected function addStyle(int $name, $value = null): self
         {
-            $this->props = [];
-            return $this->addProperty($name, $value);
+            $this->inlineStyles[$name] = $value;
+            return $this;
         }
 
-        /**
-         * Set source to CSS class collection where properties will get their values from.
-         * @param array $cssCollection CSS class collection
-         * @return self
-         */
-        public function setStyleSource(array $cssCollection): self
+        private function addExternalStyle(string $name, $value = null): self
         {
-            $this->propSource = $cssCollection;
+            $this->externalStyles[$name] = $value;
             return $this;
         }
 
         /**
-         * Set component property. A property represent an array of CSS classes
-         * @param int $id Property id
-         * @param type $value Property value
+         * Remove all CSS styles. It also remove all classes set by user. The
+         * final result is unstyled component.
          * @return self
-         * @see Component::setProperty(), Component::setStyleSource()
          */
-        public function addProperty(int $id, $value = null): self
+        public function clearAllStyles(): self
         {
-            $this->props[$id] = $value;
+            return $this->clearClass()->clearExternalStyles()->clearDefaultStyles();
+        }
+
+        /**
+         * Remove CSS default styles.
+         * @return self
+         */
+        public function clearDefaultStyles(): self
+        {
+            $this->inlineStyles = [];
             return $this;
         }
 
         /**
-         * Remove all CSS styles and properties
+         * Remove CSS style classes set by user.
          * @return self
          */
-        public function clearStyles(): self
+        public function clearClass(): self
         {
-            $this->props = [];
             $this->classList = [];
             return $this;
         }
 
         /**
-         * Check if a property exists
-         * @param int $id Property id
-         * @return bool
-         */
-        public function hasProperty(int $id): bool
-        {
-            return array_key_exists($id, $this->props);
-        }
-
-        /**
-         * Remove a property
-         * @param int $id Property id
+         * Remove all CSS styles set using Style::*.
          * @return self
          */
-        public function removeProperty(int ...$id): self
+        public function clearExternalStyles(): self
         {
-            foreach ($id as $key) {
-                if (isset($this->props[$key])) {
-                    unset($this->props[$key]);
-                }
-            }
+            $this->externalStyles = [];
             return $this;
         }
 
         /**
-         * Set component content as HTML markups or texts
-         * @param string|null $content HTML markups or text
+         * Remove style from style collection
+         * @param int $name Style name
+         * @return self
+         */
+        protected function removeStyle(int $name): self
+        {
+            unset($this->inlineStyles[$name]);
+            return $this;
+        }
+
+        /**
+         * Create and return a copy of this component.
+         * @return self A new copy of this component with all the features from
+         * original component
+         */
+        public function copy(): self
+        {
+            return clone $this;
+        }
+
+        private function removeExternalStyle(string $name): self
+        {
+            unset($this->externalStyles[$name]);
+            return $this;
+        }
+
+        /**
+         * Set content as HTML markups or texts
+         * @param string|null $content HTML markups or text content
          * @return self
          */
         public function setContent(?string $content): self
         {
             $this->content = $content;
+            return $this;
+        }
+
+        /**
+         * Set content as HTML markups or texts using file content.
+         * @param string|null $filePath Path to a file to get content from
+         * @return self
+         */
+        public function setContentFromFile(string $filePath): self
+        {
+            ob_start();
+            require $filePath;
+            $this->content = ob_get_clean();
             return $this;
         }
 
@@ -330,10 +375,7 @@ namespace gui\v1 {
          */
         public function setColor(?int $color): self
         {
-            if ($color !== null) {
-                return $this->addExternalProps('colors', $color);
-            }
-            return $this->removeExternalProps('colors');
+            return $this->resetExternalStyle('colors', $color);
         }
 
         /**
@@ -343,23 +385,17 @@ namespace gui\v1 {
          */
         public function setPosition(?int $position): self
         {
-            if ($position !== null) {
-                return $this->addExternalProps('positions', $position);
-            }
-            return $this->removeExternalProps('positions');
+            return $this->resetExternalStyle('positions', $position);
         }
 
         /**
          * Set alignment of a component horizontally or vertically
-         * @param int|null $align Alignment value from Style::ALIGN_*
+         * @param int|null $alignment Alignment value from Style::ALIGN_*
          * @return self
          */
-        public function setAlign(?int $align): self
+        public function setAlignment(?int $alignment): self
         {
-            if ($align !== null) {
-                return $this->addExternalProps('alignments', $align);
-            }
-            return $this->removeExternalProps('alignments');
+            return $this->resetExternalStyle('alignments', $alignment);
         }
 
         /**
@@ -371,7 +407,8 @@ namespace gui\v1 {
          */
         public function setGap(?int $size, int $direction = null): self
         {
-            return $this->resetExternalProps('gap_sizes', 'gaps', $size, $direction);
+            $this->resetExternalStyle('gap_sizes', $size);
+            return $this->resetExternalStyle('gaps', $direction);
         }
 
         /**
@@ -383,7 +420,8 @@ namespace gui\v1 {
          */
         public function setMargin(?int $size, int $direction = null): self
         {
-            return $this->resetExternalProps('margin_sizes', 'gaps', $size, $direction);
+            $this->resetExternalStyle('margin_sizes', $size);
+            return $this->resetExternalStyle('gaps', $direction);
         }
 
         /**
@@ -395,7 +433,8 @@ namespace gui\v1 {
          */
         public function setPadding(?int $size, int $direction = null): self
         {
-            return $this->resetExternalProps('padding_sizes', 'gaps', $size, $direction);
+            $this->resetExternalStyle('padding_sizes', $size);
+            return $this->resetExternalStyle('gaps', $direction);
         }
 
         /**
@@ -405,10 +444,7 @@ namespace gui\v1 {
          */
         public function setFontSize(?int $size): self
         {
-            if ($size !== null) {
-                return $this->addExternalProps('font_sizes', $size);
-            }
-            return $this->removeExternalProps('font_sizes');
+            return $this->resetExternalStyle('font_sizes', $size);
         }
 
         /**
@@ -417,7 +453,7 @@ namespace gui\v1 {
          */
         public function removeBorders(): self
         {
-            return $this->removeExternalProps('border');
+            return $this->removeExternalStyle('border');
         }
 
         /**
@@ -426,7 +462,7 @@ namespace gui\v1 {
          */
         public function setBorders(): self
         {
-            return $this->addExternalProps('border');
+            return $this->addExternalStyle('border');
         }
 
         /**
@@ -437,9 +473,9 @@ namespace gui\v1 {
         public function fullHeight(bool $full): self
         {
             if ($full) {
-                return $this->addExternalProps('full_height');
+                return $this->addExternalStyle('full_height');
             }
-            return $this->removeExternalProps('full_height');
+            return $this->removeExternalStyle('full_height');
         }
 
         /**
@@ -450,9 +486,9 @@ namespace gui\v1 {
         public function fullWidh(bool $full): self
         {
             if ($full) {
-                return $this->addExternalProps('full_width');
+                return $this->addExternalStyle('full_width');
             }
-            return $this->removeExternalProps('full_width');
+            return $this->removeExternalStyle('full_width');
         }
 
         /**
@@ -463,29 +499,28 @@ namespace gui\v1 {
          */
         public function setShadow(?int $size, int $direction = null): self
         {
-            return $this->resetExternalProps('shadow_sizes', 'shadow_directions', $size, $direction);
+            $this->resetExternalStyle('shadow_sizes', $size);
+            return $this->resetExternalStyle('shadow_directions', $direction);
         }
 
         /**
          * Set round corners (border-radius)
          * @param int|null $size Size values from Style::SIZE_*
-         * @param int $direction Direction values from Style::DIRECTION_*
+         * @param int $direction Direction values from Style::POS_*
          * @return self
          */
         public function setCorners(?int $size, int $direction = null): self
         {
-            return $this->resetExternalProps('corner_sizes', 'corner_directions', $size, $direction);
+            $this->resetExternalStyle('corner_sizes', $size);
+            return $this->resetExternalStyle('corner_radius', $direction);
         }
 
-        public function resetExternalProps(int $valueProp, int $dirProp, ?int $value, ?int $direction): self
+        private function resetExternalStyle(string $property, ?int $value): self
         {
             if ($value !== null) {
-                if ($direction !== null) {
-                    $this->addExternalProps($dirProp, $direction);
-                }
-                return $this->addExternalProps($valueProp, $value);
+                return $this->addExternalStyle($property, $value);
             }
-            return $this->removeExternalProps($valueProp);
+            return $this->removeExternalStyle($property);
         }
 
         /**
@@ -514,26 +549,38 @@ namespace gui\v1 {
         }
 
         /**
-         * Toggle property
-         * @param string $name Property name
-         * @param type $value Property value
-         * @return self
-         */
-        public function toggleProperty(string $name, $value = null): self
-        {
-            if ($this->hasProperty($name)) {
-                return $this->removeProperty($name);
-            }
-            return $this->addProperty($name, $value);
-        }
-
-        /**
          * Get all children components
          * @return array
          */
         public function getChildren(): array
         {
             return $this->children;
+        }
+
+        /**
+         * Check if a component has one or more children. It does not include
+         * text content or HTML markup
+         * @return bool
+         */
+        public function hasChildren(): bool
+        {
+            return !empty($this->children);
+        }
+
+        public function hasContent(): bool
+        {
+            return !empty($this->children);
+        }
+
+        /**
+         * Remove all child elements of this component.
+         * @return self
+         */
+        public function removeChildren(): self
+        {
+            $this->children = [];
+            return $this;
+            ;
         }
 
         /**
@@ -587,7 +634,7 @@ namespace gui\v1 {
          */
         public function setParent(Component &$parent): self
         {
-            $parent->addExternalProps('relative_position')->appendChildren($this);
+            $parent->addExternalStyle('relative_position')->appendChildren($this);
             return $this;
         }
 
@@ -623,6 +670,44 @@ namespace gui\v1 {
         }
 
         /**
+         * Move all element children of this component to a destination
+         * @param Component $destination Destination component
+         * @return self
+         * @see Component::moveContent();
+         */
+        public function moveChildrenTo(Component &$destination): self
+        {
+            $destination->appendChildren(...$this->getChildren());
+            return $this->removeChildren();
+        }
+
+        /**
+         * Move content of this component to a destination
+         * @param Component $destination Destination component
+         * @return self
+         * @see Component::moveChildren();
+         */
+        public function moveContentTo(Component &$destination): self
+        {
+            $destination->setContent($this->getContent());
+            return $this->setContent(null);
+        }
+
+        /**
+         * Check if style exists in component's style collection
+         * @param int $name Style name
+         * @param type $value Style value
+         * @return bool True on success, false otherwise.
+         */
+        protected function hasStyle(int $name, $value = null): bool
+        {
+            if ($value === null) {
+                return array_key_exists($name, $this->inlineStyles);
+            }
+            return array_key_exists($value, $this->inlineStyles[$name]);
+        }
+
+        /**
          * Set or unset a component active state
          * @param bool $active Value to set
          * @return self
@@ -630,21 +715,9 @@ namespace gui\v1 {
         public function setActive(bool $active): self
         {
             if ($active) {
-                return $this->addExternalProps('active');
+                return $this->addExternalStyle('active');
             }
-            return $this->removeExternalProps('active');
-        }
-
-        private function removeExternalProps(int $property): self
-        {
-            unset($this->externalProps[$property]);
-            return $this;
-        }
-
-        private function addExternalProps(string $property, $value = null): self
-        {
-            $this->externalProps[$property] = $value;
-            return $this;
+            return $this->removeExternalStyle('active');
         }
     }
 

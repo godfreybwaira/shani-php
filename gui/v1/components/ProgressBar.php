@@ -24,7 +24,7 @@ namespace gui\v1\components {
         public function __construct(float $percent)
         {
             parent::__construct('div', self::PROPS);
-            $this->addProperty(self::PROGRESS_BAR);
+            $this->addStyle(self::PROGRESS_BAR);
             $bar = new Component('span');
             $bar->setContent($percent . '%');
             $bar->setAttribute('style', 'width:' . $percent . '%');

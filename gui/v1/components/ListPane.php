@@ -12,6 +12,7 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
+    use gui\v1\Style;
 
     final class ListPane extends Component
     {
@@ -25,18 +26,23 @@ namespace gui\v1\components {
          * Odd list items have 'dense' background color
          */
         public const STRIPE_ODD = 1;
-        private const LIST_PANE = 0, STRIPES = 1;
+        ////////////////////
+        private const LIST_PANE = 0, LIST_STRIPES = 1, LIST_ALIGN = 2;
         private const PROPS = [
             self::LIST_PANE => '',
-            self::STRIPES => [
+            self::LIST_STRIPES => [
                 self::STRIPE_EVEN => '', self::STRIPE_ODD => ''
+            ],
+            self::LIST_ALIGN => [
+                Style::ALIGN_VERTICAL => '', Style::ALIGN_HORIZONTAL => ''
             ]
         ];
 
         public function __construct()
         {
             parent::__construct('ul', self::PROPS);
-            $this->addProperty(self::LIST_PANE);
+            $this->addStyle(self::LIST_PANE);
+            $this->setAlignment(Style::ALIGN_VERTICAL);
         }
 
         /**
@@ -46,7 +52,7 @@ namespace gui\v1\components {
          */
         public function setStripes(int $stripes): self
         {
-            return $this->addProperty(self::STRIPES, $stripes);
+            return $this->addStyle(self::LIST_STRIPES, $stripes);
         }
 
         /**
@@ -56,11 +62,17 @@ namespace gui\v1\components {
          */
         public function addItem(Component ...$items): self
         {
-            $list = new Component('li');
             foreach ($items as $item) {
+                $list = new Component('li');
                 $list->appendChildren($item);
+                $this->appendChildren($list);
             }
-            return $this->appendChildren($list);
+            return $this;
+        }
+
+        public function setAlignment(?int $alignment): self
+        {
+            return $this->addStyle(self::LIST_ALIGN, $alignment ?? Style::ALIGN_VERTICAL);
         }
     }
 
