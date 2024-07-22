@@ -9,7 +9,7 @@
 
 namespace shani\engine\http {
 
-    use shani\engine\core\Constants;
+    use shani\engine\core\Definitions;
 
     final class Request
     {
@@ -335,7 +335,7 @@ namespace shani\engine\http {
             $resource = $params[2] ?? $params[0];
             return [
                 'params' => $params, 'resource' => '/' . $resource,
-                'module' => '/' . $params[0], 'callback' => '/' . ($params[4] ?? Constants::HOME_FUNCTION)
+                'module' => '/' . $params[0], 'callback' => '/' . ($params[4] ?? Definitions::HOME_FUNCTION)
             ];
         }
     }

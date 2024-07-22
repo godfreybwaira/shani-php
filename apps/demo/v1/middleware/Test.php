@@ -7,7 +7,7 @@
  * Created on: Feb 13, 2024 at 11:02:00 AM
  */
 
-namespace apps\demo\codes\v2\middleware {
+namespace apps\demo\v1\middleware {
 
     final class Test
     {

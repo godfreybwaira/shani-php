@@ -112,7 +112,7 @@ namespace gui {
             if ($this->app->request()->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
-                self::load($this->app, \shani\engine\core\Constants::DIR_GUI . '/html/main.php');
+                self::load($this->app, \shani\engine\core\Definitions::DIR_GUI . '/html/main.php');
             }
         }
 
@@ -149,10 +149,10 @@ namespace gui {
             $head = $this->icon;
             $asset = $this->app->asset();
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $asset->url($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $asset->files($url) . '"></script>';
             }
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->url($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->files($url) . '"/>';
             }
             return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
         }

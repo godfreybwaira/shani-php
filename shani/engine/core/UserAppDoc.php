@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Documentor
+ * User application documentation generator
  * @author coder
  *
  * Created on: May 30, 2024 at 4:31:29 PM
@@ -9,7 +9,7 @@
 
 namespace shani\engine\core {
 
-    final class Documentor
+    final class UserAppDoc
     {
 
         private static function folderContent(string $rootPath, string $subDir = null)
@@ -50,7 +50,7 @@ namespace shani\engine\core {
         public static function generate(\shani\engine\http\App &$app): array
         {
             $config = $app->config();
-            $path = \shani\engine\core\Constants::DIR_APPS . $config->root() . $config->moduleDir();
+            $path = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
             $modules = self::folderContent($path, $config->requestMethodsDir());
             $docs = [
                 'name' => $config->appName(),
@@ -70,7 +70,7 @@ namespace shani\engine\core {
                             $comments = self::cleanComment($fnobj->getDocComment());
                             $path = $module . '/' . $className . '/' . $name;
                             $details = $method . ' ' . $module . ' ' . $className . ' (';
-                            $details .= ($name === Constants::HOME_FUNCTION ? 'single/all' : $name) . ')';
+                            $details .= ($name === Definitions::HOME_FUNCTION ? 'single/all' : $name) . ')';
                             $docs['modules'][$module][$className][$name][$method] = [
                                 'details' => $comments ?? ucwords(strtolower($details)),
                                 'id' => \library\Utils::digest(strtolower($method . '/' . $path)),

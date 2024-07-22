@@ -234,7 +234,7 @@ namespace shani\engine\http {
          */
         public function module(?string $path = null): string
         {
-            return \shani\engine\core\Constants::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
+            return \shani\engine\core\Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
         }
 
         /**
@@ -254,7 +254,7 @@ namespace shani\engine\http {
         private function getClassPath(): string
         {
             $method = $this->req->method();
-            $class = \shani\engine\core\Constants::DIRNAME_APPS . $this->config->root() . $this->config->moduleDir();
+            $class = \shani\engine\core\Definitions::DIRNAME_APPS . $this->config->root() . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));
@@ -266,7 +266,7 @@ namespace shani\engine\http {
          */
         public function documentation(): array
         {
-            return \shani\engine\core\Documentor::generate($this);
+            return \shani\engine\core\UserAppDoc::generate($this);
         }
 
         /**

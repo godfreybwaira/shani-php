@@ -10,7 +10,7 @@
 namespace library\client {
 
     use library\Concurrency;
-    use shani\engine\core\Constants;
+    use shani\engine\core\Definitions;
 
     final class HTTP
     {
@@ -31,8 +31,8 @@ namespace library\client {
                 CURLOPT_SSL_VERIFYPEER => true, CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true, CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_HEADER => true, CURLOPT_CONNECTTIMEOUT => $timeout,
-                CURLOPT_UPLOAD_BUFFERSIZE => Constants::BUFFER_SIZE,
-                CURLOPT_BUFFERSIZE => Constants::BUFFER_SIZE
+                CURLOPT_UPLOAD_BUFFERSIZE => Definitions::BUFFER_SIZE,
+                CURLOPT_BUFFERSIZE => Definitions::BUFFER_SIZE
             ];
         }
 

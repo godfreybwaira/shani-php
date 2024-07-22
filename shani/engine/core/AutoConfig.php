@@ -117,8 +117,8 @@ namespace shani\engine\core {
         }
 
         /**
-         * Execute user defined middlewares. This function provide access to user to
-         * register and execute middlewares
+         * Execute user defined middlewares. This function provide access for user
+         * to register and execute middlewares
          */
         public abstract function middleware(\shani\engine\http\Middleware &$mw): void;
 
@@ -174,17 +174,17 @@ namespace shani\engine\core {
          */
         public function appName(): string
         {
-            return 'Shani Framework v1.0';
+            return Framework::NAME . ' v' . Framework::VERSION;
         }
 
         /**
-         * Get or set user defined static contents directory.
-         * @return string Path relative to application root directory
+         * Get user application storage directory.
+         * @return string Path relative to application directory
          */
-        public abstract function assetDir(): ?string;
+        public abstract function storageDir(): string;
 
         /**
-         * Default path to homepage if '/' is provided by during http request
+         * Default path to homepage if '/' is provided by during HTTP request
          */
         public abstract function homepage(): string;
     }

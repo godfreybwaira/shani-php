@@ -9,7 +9,7 @@
 
 namespace library\client {
 
-    use shani\engine\core\Constants;
+    use shani\engine\core\Definitions;
 
     final class Response
     {
@@ -90,7 +90,7 @@ namespace library\client {
             $data = null;
             fseek($stream, $offset);
             while (!feof($stream)) {
-                $data .= fread($stream, Constants::BUFFER_SIZE);
+                $data .= fread($stream, Definitions::BUFFER_SIZE);
             }
             return $data;
         }

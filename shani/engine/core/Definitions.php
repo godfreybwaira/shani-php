@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Constants
+ * Description of Definitions
  * @author coder
  *
  * Created on: Feb 13, 2024 at 12:12:54 PM
@@ -9,7 +9,7 @@
 
 namespace shani\engine\core {
 
-    interface Constants
+    interface Definitions
     {
 
         /**
@@ -46,6 +46,11 @@ namespace shani\engine\core {
          * GUI directory path
          */
         public const DIR_GUI = SERVER_ROOT . '/gui';
+
+        /**
+         * Asset directory path
+         */
+        public const DIR_ASSET = self::DIR_GUI . '/asset';
 
         /**
          * Application directory path

@@ -7,7 +7,7 @@
  * Created on: Feb 18, 2024 at 2:20:26 PM
  */
 
-namespace apps\demo\codes\v1\config {
+namespace apps\demo\v1\config {
 
     use shani\engine\core\AutoConfig;
     use shani\engine\http\Middleware;
@@ -22,12 +22,12 @@ namespace apps\demo\codes\v1\config {
 
         public function root(): ?string
         {
-            return '/demo/codes/v1';
+            return '/demo/v1';
         }
 
         public function middleware(Middleware &$mw): void
         {
-            \apps\demo\codes\v1\middleware\Register::exec($this->app, $mw);
+            \apps\demo\v1\middleware\Register::exec($this->app, $mw);
         }
 
         public function homepage(): string
@@ -50,9 +50,9 @@ namespace apps\demo\codes\v1\config {
             return 'en';
         }
 
-        public function assetDir(): ?string
+        public function storageDir(): string
         {
-            return '/demo/asset';
+            return '/demo/storage';
         }
     }
 

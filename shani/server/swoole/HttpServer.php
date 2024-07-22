@@ -11,7 +11,7 @@ namespace shani\server\swoole {
 
     use shani\engine\http\Host;
     use shani\engine\http\App;
-    use shani\engine\core\Constants;
+    use shani\engine\core\Definitions;
     use Swoole\WebSocket\Server as WSocket;
 
     final class HttpServer
@@ -37,8 +37,8 @@ namespace shani\server\swoole {
                 'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
-                'ssl_cert_file' => str_replace('${SSL_DIR}', Constants::DIR_SSL, $cnf['SSL']['CERT']),
-                'ssl_key_file' => str_replace('${SSL_DIR}', Constants::DIR_SSL, $cnf['SSL']['KEY'])
+                'ssl_cert_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['CERT']),
+                'ssl_key_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['KEY'])
             ]);
             $server->addListener($cnf['IP'], $cnf['SERVER_PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
             return $server;
@@ -59,10 +59,10 @@ namespace shani\server\swoole {
 
         private static function checkFrameworkRequirements()
         {
-            if (version_compare(Constants::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
-                exit('PHP version ' . Constants::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
+            if (version_compare(Definitions::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
+                exit('PHP version ' . Definitions::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
             }
-            foreach (Constants::REQUIRED_EXTENSIONS as $extension) {
+            foreach (Definitions::REQUIRED_EXTENSIONS as $extension) {
                 if (!extension_loaded($extension)) {
                     exit('Please install PHP ' . $extension . ' extension' . PHP_EOL);
                 }

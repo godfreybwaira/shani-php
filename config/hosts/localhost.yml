@@ -4,9 +4,9 @@ DEFAULT_VERSION: "2.0"
 VERSIONS:
   "1.0":
     ENVIRONMENTS:
-      DEV: \apps\demo\codes\v1\config\Settings
+      DEV: \apps\demo\v1\config\Settings
     ACTIVE_ENVIRONMENT: DEV
   "2.0":
     ENVIRONMENTS:
-      DEV: \apps\demo\codes\v2\config\Settings
+      DEV: \apps\demo\v2\config\Settings
     ACTIVE_ENVIRONMENT: DEV

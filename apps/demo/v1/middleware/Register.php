@@ -7,7 +7,7 @@
  * Created on: Feb 12, 2024 at 8:45:37 PM
  */
 
-namespace apps\demo\codes\v1\middleware {
+namespace apps\demo\v1\middleware {
 
     use shani\engine\http\App;
     use shani\engine\http\Middleware;

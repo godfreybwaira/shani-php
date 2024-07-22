@@ -64,8 +64,7 @@ namespace gui\v1\components {
         {
             foreach ($items as $item) {
                 $list = new Component('li');
-                $list->appendChildren($item);
-                $this->appendChildren($list);
+                $this->appendChildren($list->appendChildren($item));
             }
             return $this;
         }

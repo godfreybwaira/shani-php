@@ -46,7 +46,8 @@ namespace gui\v1\components {
         public function setMask(string $text): self
         {
             $mask = new Component('span', self::PROPS);
-            $mask->addStyle(self::INPUT_MASK)->setContent($text)->setPadding(Style::SIZE_DEFAULT);
+            $mask->addStyle(self::INPUT_MASK)->setContent($text);
+            $this->setPadding(Style::SIZE_DEFAULT);
             $this->appendChildren($mask);
             return $this;
         }
@@ -84,8 +85,7 @@ namespace gui\v1\components {
                 $label->setAttribute('for', $refId);
             }
             $label->setContent($text)->setPadding(Style::SIZE_DEFAULT);
-            $this->appendChildren($label);
-            return $this;
+            return $this->appendChildren($label);
         }
     }
 

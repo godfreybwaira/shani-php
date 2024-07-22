@@ -35,7 +35,7 @@ namespace gui\v1\components {
         }
 
         /**
-         * Add child(ren)
+         * Add input component
          * @param mixed $value Input value
          * @param string|null $label Input label
          * @return self

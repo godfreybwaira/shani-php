@@ -9,7 +9,7 @@
 
 namespace library\client {
 
-    use shani\engine\core\Constants;
+    use shani\engine\core\Definitions;
 
     final class SMTP
     {
@@ -290,7 +290,7 @@ namespace library\client {
         {
             stream_filter_append($src, 'convert.base64-encode');
             while (!feof($src)) {
-                fwrite($dst, chunk_split(fread($src, Constants::BUFFER_SIZE)));
+                fwrite($dst, chunk_split(fread($src, Definitions::BUFFER_SIZE)));
             }
         }
     }

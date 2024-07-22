@@ -15,7 +15,8 @@ namespace shani\engine\http {
 
         private App $app;
 
-        private const PREFIX = '/0';
+        private const ASSET_PREFIX = '/0';
+        private const STORAGE_PREFIX = '/1';
 
         public function __construct(App &$app)
         {
@@ -33,19 +34,26 @@ namespace shani\engine\http {
         }
 
         /**
-         * Serve static application content such as css, images and other static files.
+         * Serve static content e.g css, images and other static files.
          * @param App $app Application object
          * @return bool True on success, false otherwise.
          */
         public static function tryServe(App &$app): bool
         {
             $path = $app->request()->uri()->path();
-            if (!self::isStaticPath($path, self::PREFIX)) {
+            $prefix = $rootPath = null;
+            if (self::isStaticPath($path, self::ASSET_PREFIX)) {
+                $prefix = self::ASSET_PREFIX;
+                $rootPath = \shani\engine\core\Definitions::DIR_ASSET;
+            } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
+                $prefix = self::STORAGE_PREFIX;
+                $rootPath = \shani\engine\core\Definitions::DIR_APPS . $app->config()->storageDir();
+            }
+            if ($prefix === null) {
                 return false;
             }
             if ($app->request()->headers('if-none-match') === null) {
-                $filepath = self::sanitizePath(substr($path, strlen(self::PREFIX)));
-                $location = $app->asset()->directory($filepath);
+                $location = $rootPath . self::sanitizePath(substr($path, strlen($prefix)));
                 $app->response()->setStatus(\library\HttpStatus::OK)->setCache()->stream($location);
             } else {
                 $app->response()->setStatus(\library\HttpStatus::NOT_MODIFIED)->send();
@@ -54,23 +62,28 @@ namespace shani\engine\http {
         }
 
         /**
-         * Set and get full qualified URL to current resource
-         * @param string $path Path to current resource
+         * Get a full qualified URL to a static asset resource
+         * @param string $path Path to a static asset resource
          * @return string
          */
-        public function url(string $path): string
+        public function files(string $path): string
         {
-            return $this->app->request()->uri()->host() . self::PREFIX . $path;
+            return $this->createUrl($path, self::ASSET_PREFIX);
         }
 
         /**
-         * Get and/or set absolute path to current resource relative to asset directory.
-         * @param string|null $path Path to current resource.
-         * @return string Absolute path to current resource or a asset directory.
+         * Get a full qualified URL of a file from user application file storage
+         * @param string $path A file path
+         * @return string A file URL accessible from user application file storage
          */
-        public function directory(?string $path): string
+        public function storage(string $path): string
         {
-            return \shani\engine\core\Constants::DIR_APPS . $this->app->config()->assetDir() . $path;
+            return $this->createUrl($path, self::STORAGE_PREFIX);
+        }
+
+        private function createUrl(string $path, string $prefix): string
+        {
+            return $this->app->request()->uri()->host() . $prefix . $path;
         }
     }
 
