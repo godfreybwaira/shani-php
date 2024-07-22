@@ -1,17 +1,13 @@
-# shani-php
-=======
 # Shani Web Application Framework
 
 **Shani** is an open source web framework designed to enable fast application
 development with minimal efforts while performance, security, creativity
 and modern web application development practices coexists.
 
-
 ## Use Cases
 
 Use **Shani** to build cilent-side or server-side application. You can also use
 your favorite front-end framework while **Shani** stands on back-end, or vice versa.
-
 
 ## Main Features
 
@@ -47,12 +43,181 @@ No installation is required.
 
 ## Usage
 
-Run the following command on terminal to start **Shani** web server.
+To start **Shani** application web server, run the following command on terminal:
 
 ```bash
 $ php index.php
 ```
 
+### Project Structure
+Shani Application has the following project structure
+
+```js
+`/root`
+	`apps/` (Contains user applications. Create your applications here)
+	`config/` (Contains important server and hosts configurations)
+		`hosts/` (Contains host configurations files (`hostname.yml`). Register your application here)
+			`localhost.yml` (can be customized)
+		`ssl/` (Contains server ssl certificate files for)
+		`mime.yml`
+		`server.yml` (Server configuration are written here, and can be customized.)
+	`gui/` (Contains support for GUI building)
+		`assets/` (Contains static files e.g: `.css`, `.js`,`fonts` etc shared by all applications)
+		`html/` (Contains `html` templates comes with framework)
+	`library/` (Contains files comes with framework that can be used directly by user application)
+	`shani/` (Contains core framework files)
+	`index.php` (The entry point of a Shani application)
+```
+#### User Application Structure
+
+A typical user application folder structure may appear as the following:
+
+```js
+`apps/`
+	`demo/`
+		`v1/`
+			`modules/` (Can be renamed)
+				`module1_name/` (Can be desired module name)
+					`src/` (Can be renamed)
+						`get/` (This is the request method as directory)
+							`Resource.php` (Can be any resource file)
+					`views/` (can be renamed)
+						`resource/` (All lowercase, must match resource file name)
+					`lang/` (Can be renamed)
+						`resource/` (All lowercase, must match resource file name)
+					`breadcrumb/`(Can be renamed)
+						`resource/` (All lowercase, must match resource file name)
+							`functions/` (can be renamed)
+								`function-name.php` (Must match function name in resource file class)
+							`resource.php` (must match module name)
+						`module1_name.php` (must match module name)
+```
+
+Let's assume we want to create an application called `demo` having version 1.0 (`v1`).
+Our application has one module called `greetings` and one resource file called `Hello.php`. 
+
+Now, look at the following example of a resource file:
+
+```php
+<?php
+
+namespace apps\demo\v1\modules\greetings\src\get {
+
+	use shani\engine\http\App;
+	
+    final class Hello
+    {
+        private App $app;
+        
+        public function __construct(App &$app)
+        {
+            $this->app = $app;
+        }
+        
+        /**
+         * Display greetings from Shani.
+         */
+        public function world()
+        {
+	        //sending output to user agent using default view file (world.php)
+            $this->app->render();
+        }
+    }
+}
+```
+
+Creating view file:
+(`apps/demo/v1/modules/greetings/views/hello/world.php`)
+
+```php
+<h1>Hello From Shani</h1>
+```
+
+Considering our example above, our application folder structure will be like this:
+
+```php
+`apps/`
+	`demo/`
+		`v1/`
+			`modules/`
+				`greetings/`
+					`src/`
+						`get/`
+							`Hello.php`
+					`views/`
+						`hello/`
+							`world.php`
+```
+#### Registering Application
+
+The next step is to register our application so that it can be available on the web. You can do this by going to `/config/hosts/` and create a configuration file called `localhost.yml`. You can choose any name.
+
+**Remember!**
+*Each application MUST have it's own configuration file*
+
+The following is the default application configuration that comes with **Shani**
+
+```yml
+# A user application must have atleast one version.
+VERSIONS:
+  "1.0":
+    # Environment variables are customs, you can create any e.g DEV, TEST, PROD or any
+    # Must extends shani\engine\core\AutoConfig
+    ENVIRONMENTS:
+      DEV: \apps\demo\v1\config\Settings
+      # Active environment can any one of the provided above.
+    ACTIVE_ENVIRONMENT: DEV
+  "2.0":
+    ENVIRONMENTS:
+      DEV: \apps\demo\v2\config\Settings
+    ACTIVE_ENVIRONMENT: DEV
+# This is the default application version
+DEFAULT_VERSION: "1.0"
+```
+
+Let us customize this file to fit our application needs:
+
+```yml
+VERSIONS:
+  "1.0":
+    ENVIRONMENTS:
+      DEV: \apps\demo\v1\config\DevSettings
+      TEST: \apps\demo\v1\config\TestSettings
+      PROD: \apps\demo\v1\config\ProdSettings
+    ACTIVE_ENVIRONMENT: DEV
+DEFAULT_VERSION: "1.0"
+```
+
+The next step is to create these configuration class files. We will create them under `apps/demo/v1/config/`. Some content can be like so:
+
+```php
+<php
+
+namespace apps\demo\v1\config {
+
+    use shani\engine\core\AutoConfig;
+    use shani\engine\http\App;
+    
+    final class DevSettings extends AutoConfig
+    {
+        public function __construct(App &$app)
+        {
+            parent::__construct($app);
+        }
+        //Add all unimplemented methods here
+	}
+}
+```
+
+#### Running Application
+
+Again, let's assume our application is available via `localhost:8008`. The default port for uor web server is `8008` for HTTP and port `44380` for HTTPS. We can use the following URL to call our function `world`.
+
+```bash
+$ curl http://localhost:8008/greetings/0/hello/0/world
+```
+
+Congratulation! You have completed the first step to become a *Shani developer*.
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

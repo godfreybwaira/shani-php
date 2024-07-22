@@ -50,7 +50,7 @@ namespace shani\engine\core {
         /**
          * Asset directory path
          */
-        public const DIR_ASSET = self::DIR_GUI . '/asset';
+        public const DIR_ASSETS = self::DIR_GUI . '/assets';
 
         /**
          * Application directory path

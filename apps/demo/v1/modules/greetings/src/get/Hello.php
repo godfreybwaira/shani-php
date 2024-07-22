@@ -14,7 +14,7 @@ namespace apps\demo\v1\modules\greetings\src\get {
 
         private \shani\engine\http\App $app;
 
-        public function __construct(\shani\engine\http\App $app)
+        public function __construct(\shani\engine\http\App &$app)
         {
             $this->app = $app;
         }
