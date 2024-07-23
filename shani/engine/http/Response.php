@@ -47,7 +47,7 @@ namespace shani\engine\http {
          */
         public function type(): ?string
         {
-            if (!$this->type) {
+            if ($this->type === null) {
                 if (!empty($this->headers['content-type'])) {
                     $this->type = \library\Mime::explode($this->headers['content-type'])[1] ?? null;
                 } else {
@@ -104,6 +104,7 @@ namespace shani\engine\http {
                     case'yml':
                         return $this->sendAsYaml($data);
                     case'html':
+                    case'htm':
                         return $this->sendAsHtml($data);
                     case'raw':
                         return $this->plainText($data, 'application/octet-stream');
@@ -145,7 +146,7 @@ namespace shani\engine\http {
         public function sendAsSse($data, string $event = 'message'): self
         {
             $this->setHeaders('cache-control', 'no-cache');
-            $evt = 'id:idn' . hrtime(true) . PHP_EOL;
+            $evt = 'id:id' . hrtime(true) . PHP_EOL;
             $evt .= 'event:' . $event . PHP_EOL;
             $evt .= 'data:' . (is_array($data) ? serialize($data) : $data);
             $evt .= PHP_EOL . PHP_EOL;

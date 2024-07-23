@@ -18,42 +18,42 @@ namespace gui\v1\components {
         private const BUTTON = 0;
 
         /**
-         * Button type 'bold'
+         * Button style 'bold'
          */
-        public const TYPE_BOLD = 0;
+        public const APPEARANCE_BOLD = 0;
 
         /**
-         * Button type 'outline'
+         * Button style 'outline'
          */
-        public const TYPE_OUTLINE = 1;
+        public const APPEARANCE_OUTLINE = 1;
 
         /**
          * Create 'Block' button
          */
         public const BLOCK = 1;
-        private const BUTTON_TYPES = 2;
+        private const BUTTON_APPEARANCE = 2;
         private const PROPS = [
             self::BUTTON => 'button',
             self::BLOCK => '',
-            self::BUTTON_TYPES => [self::TYPE_BOLD => '', self::TYPE_OUTLINE => ''],
+            self::BUTTON_APPEARANCE => [self::APPEARANCE_BOLD => '', self::APPEARANCE_OUTLINE => ''],
         ];
 
         public function __construct(string $text = null)
         {
             parent::__construct('button', self::PROPS);
             $this->setContent($text)->addStyle(self::BUTTON);
-            $this->setType(self::TYPE_BOLD);
+            $this->setAppearance(self::APPEARANCE_BOLD);
             $this->setColor(Style::COLOR_PRIMARY);
         }
 
         /**
          * Set button type
-         * @param int $buttonType Type values from Button::TYPE_*
+         * @param int $ppearance A value set using Button::APPEARANCE_*
          * @return self
          */
-        public function setType(int $buttonType): self
+        public function setAppearance(int $ppearance): self
         {
-            return $this->addStyle(self::BUTTON_TYPES, $buttonType);
+            return $this->addStyle(self::BUTTON_APPEARANCE, $ppearance);
         }
     }
 

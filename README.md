@@ -52,49 +52,49 @@ $ php index.php
 ### Project Structure
 Shani Application has the following project structure
 
-```js
-`/root`
-	`apps/` (Contains user applications. Create your applications here)
-	`config/` (Contains important server and hosts configurations)
-		`hosts/` (Contains host configurations files (`hostname.yml`). Register your application here)
-			`localhost.yml` (can be customized)
-		`ssl/` (Contains server ssl certificate files for)
-		`mime.yml`
-		`server.yml` (Server configuration are written here, and can be customized.)
-	`gui/` (Contains support for GUI building)
-		`assets/` (Contains static files e.g: `.css`, `.js`,`fonts` etc shared by all applications)
-		`html/` (Contains `html` templates comes with framework)
-	`library/` (Contains files comes with framework that can be used directly by user application)
-	`shani/` (Contains core framework files)
-	`index.php` (The entry point of a Shani application)
+```
+/root
+	apps/ (Contains user applications. Create your applications here)
+	config/ (Contains important server and hosts configurations)
+		hosts/ (Contains host configurations files (hostname.yml). Register your application here)
+			localhost.yml (can be customized)
+		ssl/ (Contains server ssl certificate files for)
+		mime.yml
+		server.yml (Server configuration are written here, and can be customized.)
+	gui/ (Contains support for GUI building)
+		assets/ (Contains static files e.g: .css, .js,fonts etc shared by all applications)
+		html/ (Contains html templates comes with framework)
+	library/ (Contains files comes with framework that can be used directly by user application)
+	shani/ (Contains core framework files)
+	index.php (The entry point of a Shani application)
 ```
 #### User Application Structure
 
 A typical user application folder structure may appear as the following:
 
-```js
-`apps/`
-	`demo/`
-		`v1/`
-			`modules/` (Can be renamed)
-				`module1_name/` (Can be desired module name)
-					`src/` (Can be renamed)
-						`get/` (This is the request method as directory)
-							`Resource.php` (Can be any resource file)
-					`views/` (can be renamed)
-						`resource/` (All lowercase, must match resource file name)
-					`lang/` (Can be renamed)
-						`resource/` (All lowercase, must match resource file name)
-					`breadcrumb/`(Can be renamed)
-						`resource/` (All lowercase, must match resource file name)
-							`functions/` (can be renamed)
-								`function-name.php` (Must match function name in resource file class)
-							`resource.php` (must match module name)
-						`module1_name.php` (must match module name)
+```
+apps/
+	demo/
+		v1/
+			modules/ (Can be renamed)
+				module1_name/ (Can be desired module name)
+					src/ (Can be renamed)
+						get/ (This is the request method as directory)
+							Resource.php (Can be any resource file)
+					views/ (can be renamed)
+						resource/ (All lowercase, must match resource file name)
+					lang/ (Can be renamed)
+						resource/ (All lowercase, must match resource file name)
+					breadcrumb/(Can be renamed)
+						resource/ (All lowercase, must match resource file name)
+							functions/ (can be renamed)
+								function-name.php (Must match function name in resource file class)
+							resource.php (must match module name)
+						module1_name.php (must match module name)
 ```
 
 Let's assume we want to create an application called `demo` having version 1.0 (`v1`).
-Our application has one module called `greetings` and one resource file called `Hello.php`. 
+Our application has one module called `greetings` and one resource file called `Hello.php`.
 
 Now, look at the following example of a resource file:
 
@@ -104,16 +104,16 @@ Now, look at the following example of a resource file:
 namespace apps\demo\v1\modules\greetings\src\get {
 
 	use shani\engine\http\App;
-	
+
     final class Hello
     {
         private App $app;
-        
+
         public function __construct(App &$app)
         {
             $this->app = $app;
         }
-        
+
         /**
          * Display greetings from Shani.
          */
@@ -135,18 +135,18 @@ Creating view file:
 
 Considering our example above, our application folder structure will be like this:
 
-```php
-`apps/`
-	`demo/`
-		`v1/`
-			`modules/`
-				`greetings/`
-					`src/`
-						`get/`
-							`Hello.php`
-					`views/`
-						`hello/`
-							`world.php`
+```
+apps/
+	demo/
+	    v1/
+			modules/
+		        greetings/
+			        src/
+						get/
+							Hello.php
+					views/
+						hello/
+							world.php
 ```
 #### Registering Application
 
@@ -197,7 +197,7 @@ namespace apps\demo\v1\config {
 
     use shani\engine\core\AutoConfig;
     use shani\engine\http\App;
-    
+
     final class DevSettings extends AutoConfig
     {
         public function __construct(App &$app)
@@ -209,7 +209,7 @@ namespace apps\demo\v1\config {
 }
 ```
 
-#### Running Application
+#### Running The Application
 
 Again, let's assume our application is available via `localhost:8008`. The default port for uor web server is `8008` for HTTP and port `44380` for HTTPS. We can use the following URL to call our function `world`.
 

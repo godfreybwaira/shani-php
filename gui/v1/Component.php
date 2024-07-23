@@ -39,8 +39,8 @@ namespace gui\v1 {
         {
             $css = $this->serializeStyles();
             if ($this->content !== null || !empty($this->children)) {
-                $markup = '<' . $this->htmlTag . $css . $this->serializeAttributes() . '>' . $this->content;
-                return $markup . $this->serializeChildren() . '</' . $this->htmlTag . '>';
+                $markup = '<' . $this->htmlTag . $css . $this->serializeAttributes() . '>';
+                return $markup . $this->serializeChildren() . $this->content . '</' . $this->htmlTag . '>';
             }
             return '<' . $this->htmlTag . $css . $this->serializeAttributes() . '/>';
         }

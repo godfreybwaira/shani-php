@@ -319,7 +319,7 @@ namespace shani\engine\http {
                         ->setSecure($this->req->secure());
                 $this->res->setCookie($cookie);
             }
-            return $this->req->uri()->hostname() . $url;
+            return $this->req->uri()->host() . $url;
         }
 
         /**

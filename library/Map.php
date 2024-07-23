@@ -121,7 +121,7 @@ namespace library {
                     $content[$key] = ($val === 'true');
                 } elseif (preg_match('/^\d+$/', $val)) {
                     $content[$key] = (int) $val;
-                } elseif (preg_match('/^\d*\.\d+/$', $val)) {
+                } elseif (preg_match('/^\d*\.\d+$/', $val)) {
                     $content[$key] = (double) $val;
                 } else {
                     $content[$key] = $val;
