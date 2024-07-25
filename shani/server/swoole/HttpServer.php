@@ -31,8 +31,9 @@ namespace shani\server\swoole {
             $server->set([
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
+                'reload_async' => true, 'max_wait_time' => (int) $cnf['MAX_WAIT_TIME'],
                 'open_http2_protocol' => $cnf['ENABLE_HTTP2'], 'backlog' => $cores * 30, // number of connections in queue
-                'max_request' => (int) $cnf['REQ_PER_WORKER'], 'http_compression' => true,
+                'max_request' => (int) $cnf['MAX_WORKER_REQUESTS'], 'http_compression' => true,
                 'max_conn' => (int) $cnf['MAX_CONNECTIONS'], 'task_enable_coroutine' => true,
                 'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],

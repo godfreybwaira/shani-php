@@ -262,7 +262,7 @@ namespace shani\engine\http {
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function read($names = null, bool $selected = true)
+        public function body($names = null, bool $selected = true)
         {
             if (!empty($this->inputs)) {
                 return \library\Map::get($this->inputs, $names, $selected);

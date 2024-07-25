@@ -11,7 +11,10 @@ SCHEDULING_ALGORITHM: "PREEMPTIVE"
 MAX_CONNECTIONS: 1024
 # maximum number of requests a worker process should execute
 # before it is automatically restarted by the server
-REQ_PER_WORKER: 100
+MAX_WORKER_REQUESTS: 1000
+# the server will wait for worker processes to exit gracefully before forcing
+# termination. Value is in seconds
+MAX_WAIT_TIME: 60
 ENABLE_HTTP2: false
 SSL:
   KEY: "${SSL_DIR}/server.key"
