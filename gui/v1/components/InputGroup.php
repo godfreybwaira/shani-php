@@ -25,21 +25,25 @@ namespace gui\v1\components {
             self::INPUT_TYPES => [self::TYPE_1 => '', self::TYPE_2 => '']
         ];
 
-        public function __construct(int $inputType = null)
+        /**
+         * Create input group elements
+         * @param int $groupType Group type value set using InputGroup::TYPE_*
+         */
+        public function __construct(int $groupType = null)
         {
             parent::__construct('div', self::PROPS);
             $this->addStyle(self::INPUT_GROUP);
-            $this->setType($inputType ?? self::TYPE_1);
+            $this->setType($groupType ?? self::TYPE_1);
         }
 
         /**
          * Set input group type
-         * @param int $inputType Values from InputGroup::TYPE_*
+         * @param int $groupType Values from InputGroup::TYPE_*
          * @return self
          */
-        public function setType(int $inputType): self
+        public function setType(int $groupType): self
         {
-            $this->addStyle(self::INPUT_TYPES, $inputType);
+            $this->addStyle(self::INPUT_TYPES, $groupType);
             return $this;
         }
 

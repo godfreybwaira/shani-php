@@ -9,18 +9,18 @@ SERVER_PORTS:
 SCHEDULING_ALGORITHM: "PREEMPTIVE"
 # maximum number of concurrent connections
 MAX_CONNECTIONS: 1024
-# maximum number of requests a worker process should execute
-# before it is automatically restarted by the server
+# maximum number of requests a worker process should execute before it is
+# automatically restarted by the server
 MAX_WORKER_REQUESTS: 1000
-# the server will wait for worker processes to exit gracefully before forcing
-# termination. Value is in seconds
+# Time in seconds that the server will wait for worker processes to exit
+# gracefully before forcing termination.
 MAX_WAIT_TIME: 60
 ENABLE_HTTP2: false
 SSL:
   KEY: "${SSL_DIR}/server.key"
   CERT: "${SSL_DIR}/server.crt"
-# Run server as background process
+# Run the server in background
 RUNAS_DAEMON: false
-# Display all application errors and server errors.
-# This variable can be overridden by application.
+# Display all application errors and server errors. This variable can be
+# overridden by application.
 DISPLAY_ERRORS: false
