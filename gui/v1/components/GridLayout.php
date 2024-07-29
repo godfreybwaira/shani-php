@@ -14,7 +14,7 @@ namespace gui\v1\components {
     final class GridLayout extends Component
     {
 
-        private array $children, $areas, $queries;
+        private array $children, $queries;
         private string $id;
 
         private const GRID = 0;
@@ -29,23 +29,28 @@ namespace gui\v1\components {
         public function __construct(string $id = null)
         {
             parent::__construct('div', self::PROPS);
-            $this->children = $this->areas = $this->queries = [];
-            $this->id = $id ?? 'id' . hrtime(true);
+            $this->children = $this->queries = [];
+            $this->id = $id ?? static::createId();
             $this->setAttribute('id', $this->id);
             $this->addStyle(self::GRID);
         }
 
         /**
          * Set device layout for responsiveness
-         * @param int $device Target device set using TargetDevice::DEVICE_*
-         * @param array $layout Two dimension array [][y] where [y] represents
-         * associative array whose keys is the grid area name and value is the
-         * integer that explain how much columns does a cell should occupies
-         * @return self
+         * @param int $device Target device set using TargetDevice::*
+         * @param array $layout Two dimension array [][y] where [y] is the
+         * associative array whose keys are the grid area names and values are
+         * the integer number of columns does a cell should occupies
+         * @throws \RuntimeException Throws error if number of columns in a row
+         * mismatch the next row
          */
         public function setLayout(int $device, array $layout): self
         {
+            $sum = array_sum($layout[0]);
             foreach ($layout as $row) {
+                if (array_sum($row) !== $sum) {
+                    throw new \RuntimeException('Column count mismatch the previous row');
+                }
                 $area = null;
                 foreach ($row as $name => $span) {
                     $area .= str_repeat(' ' . $name, $span);
@@ -63,18 +68,18 @@ namespace gui\v1\components {
         /**
          * Get a grid cell object
          * @param string $gridName Grid area name
-         * @return Component|null Grid cell object or null if object not found
+         * @return Component Grid cell object
          */
-        public function getCell(string $gridName): ?Component
+        public function getCell(string $gridName): Component
         {
-            return $this->children[$gridName] ?? null;
+            return $this->children[$gridName];
         }
 
         public function build(): string
         {
             if (!empty($this->queries)) {
                 $css = null;
-                $mobile = \gui\v1\TargetDevice::DEVICE_MOBILE;
+                $mobile = \gui\v1\TargetDevice::MOBILE;
                 foreach ($this->queries as $device => $query) {
                     if ($device === $mobile) {
                         $css .= '#' . $this->id . '{grid-template-areas:' . $query . '}';

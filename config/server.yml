@@ -10,7 +10,7 @@ SCHEDULING_ALGORITHM: "PREEMPTIVE"
 # maximum number of concurrent connections
 MAX_CONNECTIONS: 1024
 # maximum number of requests a worker process should execute before it is
-# automatically restarted by the server
+# automatically restarted by the server, set 0 for unlimited.
 MAX_WORKER_REQUESTS: 1000
 # Time in seconds that the server will wait for worker processes to exit
 # gracefully before forcing termination.

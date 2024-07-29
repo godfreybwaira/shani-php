@@ -45,7 +45,7 @@ namespace gui\v1\components {
             $listItem = new Component('li');
             $input = new Component('input');
             $input->setAttribute('type', $this->type)->setAttribute('name', $this->name);
-            $id = 'id' . hrtime(true);
+            $id = static::createId();
             $input->setAttribute('id', $id)->setAttribute('value', $value);
             $choiceLabel = new Component('label');
             $choiceLabel->setContent($label ?? $value)->setAttribute('for', $id);

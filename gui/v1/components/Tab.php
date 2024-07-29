@@ -12,6 +12,7 @@ namespace gui\v1\components {
 
     use gui\v1\Component;
     use gui\v1\Style;
+    use gui\v1\TargetDevice;
 
     final class Tab extends Component
     {
@@ -36,33 +37,28 @@ namespace gui\v1\components {
          */
         public const MENU_POS_RIGHT = 3;
         //////////////////
-        private const TAB = 0, MENU_POS = 1, TAB_MENU = 2, TAB_BODY = 3;
-        private const MENU_ALIGN = 4;
+        private const TAB = 0, TAB_MENU = 1, TAB_BODY = 2;
+        private const MENU_ALIGN = 3;
         private const PROPS = [
-            self::TAB => '',
-            self::TAB_MENU => '',
-            self::TAB_BODY => '',
+            self::TAB => 'grid',
+            self::TAB_MENU => 'red',
+            self::TAB_BODY => 'blue',
             self::MENU_ALIGN => [
                 Style::ALIGN_CENTER => '', Style::ALIGN_END => '',
                 Style::ALIGN_START => '', Style::ALIGN_STRETCH => ''
-            ],
-            self::MENU_POS => [
-                self::MENU_POS_BOTTOM => '', self::MENU_POS_LEFT => '',
-                self::MENU_POS_RIGHT => '', self::MENU_POS_TOP => ''
             ]
         ];
 
         private Component $menu, $body;
-        private int $position;
+        private array $positions = [];
 
         public function __construct()
         {
             parent::__construct('div', self::PROPS);
-            $this->position = self::MENU_POS_TOP;
             $this->menu = new Component('ul', self::PROPS);
             $this->body = new Component('div', self::PROPS);
             $this->setMenuAlignment(Style::ALIGN_CENTER);
-            $this->setMenuPosition($this->position);
+            $this->setMenuPosition(TargetDevice::MOBILE, self::MENU_POS_TOP);
             $this->menu->addStyle(self::TAB_MENU);
             $this->body->addStyle(self::TAB_BODY);
             $this->addStyle(self::TAB);
@@ -84,13 +80,22 @@ namespace gui\v1\components {
 
         /**
          * Position a tab menu according to position specified using Tab::MENU_POS_*
+         * @param int $device Target device set using TargetDevice::*
          * @param int $position Menu position
          * @return self
          */
-        public function setMenuPosition(int $position): self
+        public function setMenuPosition(int $device, int $position): self
         {
-            $this->position = $position;
-            return $this->addStyle(self::MENU_POS, $position);
+            if ($position === self::MENU_POS_TOP) {
+                $this->positions[$device] = ['rows', 'auto 1fr'];
+            } else if ($position === self::MENU_POS_RIGHT) {
+                $this->positions[$device] = ['columns', '1fr auto'];
+            } else if ($position === self::MENU_POS_BOTTOM) {
+                $this->positions[$device] = ['rows', '1fr auto'];
+            } else {
+                $this->positions[$device] = ['columns', 'auto 1fr'];
+            }
+            return $this;
         }
 
         /**
@@ -106,11 +111,21 @@ namespace gui\v1\components {
 
         public function build(): string
         {
-            if ($this->position === self::MENU_POS_TOP || $this->position === self::MENU_POS_LEFT) {
-                $this->appendChildren($this->menu, $this->body);
-            } else {
-                $this->appendChildren($this->body, $this->menu);
+            $css = null;
+            $id = static::createId();
+            $mobile = \gui\v1\TargetDevice::MOBILE;
+            foreach ($this->positions as $device => $query) {
+                if ($device === $mobile) {
+                    $css .= '#' . $id . '{grid-template-' . $query[0] . ':' . $query[1] . '}';
+                } else {
+                    $css .= '@media(min-width:' . $device . 'rem){';
+                    $css .= '#' . $id . '{grid-template-' . $query[0] . ':' . $query[1] . '}}';
+                }
             }
+            $style = new Component('style');
+            $style->setAttribute('type', 'text/css')->setContent($css);
+            $this->appendChildren($this->menu, $this->body, $style)->setAttribute('id', $id);
+
             return parent::build();
         }
     }

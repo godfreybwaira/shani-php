@@ -53,7 +53,7 @@ namespace gui\v1\components {
         public function addItem(Component ...$items): self
         {
             foreach ($items as $item) {
-                $id = 'id' . hrtime(true);
+                $id = static::createId();
                 $slide = new Component('li', self::PROPS);
                 $slide->appendChildren($item);
                 $slide->setAttribute('id', $id);

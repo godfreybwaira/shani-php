@@ -47,7 +47,7 @@ namespace gui\v1\components {
         }
 
         /**
-         * Set button type
+         * Set a button appearance
          * @param int $ppearance A value set using Button::APPEARANCE_*
          * @return self
          */

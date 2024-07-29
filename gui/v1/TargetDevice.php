@@ -16,27 +16,27 @@ namespace gui\v1 {
         /**
          * Min-width: 0
          */
-        public const DEVICE_MOBILE = 0;
+        public const MOBILE = 0;
 
         /**
          * Min-width: 36rem or 576px
          */
-        public const DEVICE_TABLET = 36;
+        public const TABLET = 36;
 
         /**
          * Min-width: 48rem or 768px
          */
-        public const DEVICE_LAPTOP = 48;
+        public const LAPTOP = 48;
 
         /**
          * Min-width: 62rem or 992px
          */
-        public const DEVICE_DESKTOP = 62;
+        public const DESKTOP = 62;
 
         /**
          * Min-width: 75rem or 1200px
          */
-        public const DEVICE_TV = 75;
+        public const TV = 75;
     }
 
 }

@@ -45,6 +45,10 @@ namespace gui\v1\components {
             ]
         ];
 
+        /**
+         * Create accordion component
+         * @param int $openBehavior Open behavior set using Accordion::OPEN_BEHAVIOR_*
+         */
         public function __construct(int $openBehavior = null)
         {
             parent::__construct('ul', self::PROPS);

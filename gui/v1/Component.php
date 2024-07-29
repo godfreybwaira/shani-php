@@ -719,6 +719,15 @@ namespace gui\v1 {
             }
             return $this->removeExternalStyle('active');
         }
+
+        /**
+         * Create unique ID
+         * @return string
+         */
+        public static function createId(): string
+        {
+            return 'id' . substr(hrtime(true), 8);
+        }
     }
 
 }
