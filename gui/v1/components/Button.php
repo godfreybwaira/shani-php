@@ -28,7 +28,7 @@ namespace gui\v1\components {
         public const APPEARANCE_OUTLINE = 1;
 
         /**
-         * Create 'Block' button
+         * Create a 'Block' button
          */
         public const BLOCK = 1;
         private const BUTTON_APPEARANCE = 2;
