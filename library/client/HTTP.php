@@ -135,7 +135,7 @@ namespace library\client {
         {
             try {
                 return hash_hmac($this->signatureAlgorithm, $data, $this->signatureKey);
-            } catch (\Exception $e) {
+            } catch (\ErrorException $e) {
                 throw new \RuntimeException('Missing signature key.');
             }
         }
@@ -150,7 +150,7 @@ namespace library\client {
         {
             try {
                 return openssl_encrypt($data, $this->cipherAlgorithm, $this->cipherKey, 0, $this->initVector);
-            } catch (\Exception $e) {
+            } catch (\ErrorException $e) {
                 throw new \RuntimeException('Missing encryption key.');
             }
         }
@@ -165,7 +165,7 @@ namespace library\client {
         {
             try {
                 return openssl_decrypt($data, $this->cipherAlgorithm, $this->cipherKey, 0, $this->initVector);
-            } catch (\Exception $e) {
+            } catch (\ErrorException $e) {
                 throw new \RuntimeException('Missing decryption key.');
             }
         }
@@ -528,7 +528,7 @@ namespace library\client {
         private static function merge(string $endpoint, $body): string
         {
             if ($body !== null && !is_callable($body)) {
-                $connector = strpos($endpoint, '?') !== false ? '&' : '?';
+                $connector = str_contains($endpoint, '?') ? '&' : '?';
                 $endpoint .= $connector . (is_array($body) ? http_build_query($body) : $body);
             }
             return $endpoint;

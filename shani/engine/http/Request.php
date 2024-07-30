@@ -131,7 +131,7 @@ namespace shani\engine\http {
                 $this->accepted = \library\Mime::parse($this->headers('accept'));
             }
             if ($this->accepted !== null) {
-                if (strpos($type, '/') !== false) {
+                if (str_contains($type, '/')) {
                     return in_array($type, $this->accepted);
                 }
                 foreach ($this->accepted as $mime) {
@@ -222,22 +222,22 @@ namespace shani\engine\http {
 
         /**
          * Get request parameters sent via HTTP request endpoint
-         * @param type $index Index of request parameter
+         * @param int|array $index Index of request parameter
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function params($index = null, bool $selected = true)
+        public function params(int|array $index = null, bool $selected = true)
         {
             return \library\Map::get($this->url['params'], $index, $selected);
         }
 
         /**
          * Get HTTP queries
-         * @param type $names query string name, can be array or string
+         * @param string|array $names query string name
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function query($names = null, bool $selected = true)
+        public function query(string|array $names = null, bool $selected = true)
         {
             if (empty($this->queryValues)) {
                 $this->queryValues = \library\Map::normalize($this->req->get());
@@ -247,22 +247,22 @@ namespace shani\engine\http {
 
         /**
          * Get HTTP cookie value(s)
-         * @param type $names named key, can be string or array
+         * @param string|array $names named key
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function cookies($names = null, bool $selected = true)
+        public function cookies(string|array $names = null, bool $selected = true)
         {
             return \library\Map::get($this->req->cookies(), $names, $selected);
         }
 
         /**
          * Get HTTP request values obtained via HTTP request body.
-         * @param type $names named key, can be string or array
+         * @param string|array $names named key
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function body($names = null, bool $selected = true)
+        public function body(string|array $names = null, bool $selected = true)
         {
             if (!empty($this->inputs)) {
                 return \library\Map::get($this->inputs, $names, $selected);
@@ -272,11 +272,11 @@ namespace shani\engine\http {
 
         /**
          * Get HTTP request headers
-         * @param type $names header name, can be string or array
+         * @param string|array $names header name
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function headers($names = null, bool $selected = true)
+        public function headers(string|array $names = null, bool $selected = true)
         {
             return \library\Map::get($this->req->headers(), $names, $selected);
         }

@@ -18,7 +18,7 @@ namespace library\schema {
             try {
                 $connectionString = self::getConnectionString($driver, $database, $host, $port);
                 $this->pdo = new \PDO($connectionString, $username, $password);
-            } catch (\Exception $ex) {
+            } catch (\ErrorException $ex) {
                 echo 'Database connection failed! ' . $ex->getMessage();
             }
         }
@@ -49,7 +49,7 @@ namespace library\schema {
                 $result = $this->pdo->prepare($query);
                 $result->execute($data);
                 return $result;
-            } catch (\Exception $ex) {
+            } catch (\ErrorException $ex) {
                 throw $ex;
             }
         }

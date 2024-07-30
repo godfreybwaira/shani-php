@@ -62,13 +62,12 @@ namespace gui {
 
         /**
          * Set link to external script file for HTML document relative to asset directory.
-         * @param type $srcs Path to Javascript file(s) relative to asset directory.
-         * Can be a string or an array
+         * @param string|array $srcs Path to Javascript file(s) relative to asset directory.
          * @param array $attributes Script attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function scripts($srcs, array $attributes = []): self
+        public function scripts(string|array $srcs, array $attributes = []): self
         {
             self::createHeader($this->scripts, $srcs, $attributes);
             return $this;
@@ -76,13 +75,12 @@ namespace gui {
 
         /**
          * Set link to external CSS file for HTML document relative to asset directory.
-         * @param type $hrefs Path to CSS file(s) relative to asset directory.
-         * Can be a string or an array
+         * @param string|array $hrefs Path to CSS file(s) relative to asset directory.
          * @param array $attributes Style attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function styles($hrefs, array $attributes = []): self
+        public function styles(string|array $hrefs, array $attributes = []): self
         {
             self::createHeader($this->styles, $hrefs, $attributes);
             return $this;

@@ -12,7 +12,7 @@ namespace shani\engine\http {
     final class Host
     {
 
-        private array $host;
+        private ?array $host;
 
         public function __construct(string $name)
         {
@@ -27,6 +27,9 @@ namespace shani\engine\http {
          */
         public function getEnvironment(?string $version = null): ?string
         {
+            if (empty($this->host)) {
+                return null;
+            }
             if ($version === null) {
                 $env = $this->host['VERSIONS'][$this->host['DEFAULT_VERSION']];
                 return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];

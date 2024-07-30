@@ -46,7 +46,7 @@ namespace library\client {
                 $raw = fread($this->stream, $this->headerSize - 1);
                 $lines = explode("\r\n", trim($raw));
                 foreach ($lines as $line) {
-                    if (strpos($line, ':') === false) {
+                    if (!str_contains($line, ':')) {
                         continue;
                     }
                     list($key, $value) = explode(': ', $line, 2);

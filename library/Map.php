@@ -150,12 +150,12 @@ namespace library {
         /**
          * Get a value from array
          * @param array|null $row single-dimensional array of items to get values from
-         * @param type $keys A key or array of keys to be used as filter
+         * @param string|array|null $keys A key or array of keys to be used as filter
          * @param bool $selected If true will mean getting only returning arrays
          * with selected keys, otherwise will return arrays NOT from selected keys.
          * @return type A value(s) that was found in array
          */
-        public static function get(?array $row, $keys = null, bool $selected = true)
+        public static function get(?array $row, string|array|null $keys = null, bool $selected = true)
         {
             if ($keys === null || $row === null) {
                 return $selected ? $row : [];
@@ -181,12 +181,12 @@ namespace library {
          * Add source array and destination array based on keys provided and selection criteria
          * @param array $source A source array
          * @param array $destination Destination array
-         * @param type $keys Destination array keys to add to a new array
+         * @param string|array|null $keys Destination array keys to add to a new array
          * @param bool $selected If set to true, only selected keys will be added,
          * the rest will be ignored and vice versa.
          * @return array new array
          */
-        public static function add(array $source, array $destination, $keys = null, bool $selected = true): array
+        public static function add(array $source, array $destination, string|array|null $keys = null, bool $selected = true): array
         {
             return array_merge($destination, self::get($source, is_array($keys) ? $keys : [$keys], $selected));
         }
@@ -207,10 +207,10 @@ namespace library {
         /**
          * Check if array has all the keys provided
          * @param array $data Array to check for keys
-         * @param type $keys Keys to check in array
+         * @param string|array $keys Keys to check in array
          * @return bool True on success, false otherwise
          */
-        public static function hasKeys(array $data, $keys): bool
+        public static function hasKeys(array $data, string|array $keys): bool
         {
             if (is_array($keys)) {
                 foreach ($keys as $k) {

@@ -25,7 +25,7 @@ namespace shani\engine\http {
 
         private static function isStaticPath(string $str, string $phrase): bool
         {
-            return strpos($str, $phrase . '/') === 0;
+            return str_starts_with($str, $phrase . '/');
         }
 
         public static function sanitizePath(string $path): string

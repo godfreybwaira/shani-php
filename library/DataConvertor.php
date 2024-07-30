@@ -111,18 +111,13 @@ namespace library {
          */
         public static function convertFrom(?string $data, string $type): ?array
         {
-            switch ($type) {
-                case'json':
-                    return json_decode($data, true);
-                case'xml':
-                    return self::xml2array($data);
-                case'csv':
-                    return str_getcsv($data);
-                case'yaml':
-                case'yml':
-                    return self::yaml2array($data);
-            }
-            return null;
+            return match ($type) {
+                'json' => json_decode($data, true),
+                'xml' => self::xml2array($data),
+                'csv' => str_getcsv($data),
+                'yaml', 'yml' => self::yaml2array($data),
+                default => null
+            };
         }
 
         /**
@@ -134,18 +129,13 @@ namespace library {
          */
         public static function convertTo(array $data, string $type): string
         {
-            switch ($type) {
-                case'json':
-                    return json_encode($data);
-                case'xml':
-                    return self::array2xml($data);
-                case'csv':
-                    return self::array2csv($data);
-                case'yaml':
-                case'yml':
-                    return yaml_emit($data);
-            }
-            return serialize($data);
+            return match ($type) {
+                'json' => json_encode($data),
+                'xml' => self::array2xml($data),
+                'csv' => self::array2csv($data),
+                'yaml', 'yml' => yaml_emit($data),
+                default => serialize($data)
+            };
         }
 
         private static function toyaml(array $obj, int $indent = 0): string

@@ -173,7 +173,7 @@ namespace library\validation {
             // Make sure it has a valid prefix
             $validPrefix = false;
             foreach ($info['prefixes'] as $prefix) {
-                if (strpos($ccNumber, (string) $prefix) === 0) {
+                if (str_starts_with($ccNumber, (string) $prefix)) {
                     $validPrefix = true;
                     break;
                 }
@@ -212,7 +212,7 @@ namespace library\validation {
                     continue;
                 }
                 foreach ($card['prefixes'] as $prefix) {
-                    if (strpos($ccNumber, (string) $prefix) === 0) {
+                    if (str_starts_with($ccNumber, (string) $prefix)) {
                         $possibles[$card['name']] = $key;
                     }
                 }

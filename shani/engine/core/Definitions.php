@@ -60,7 +60,7 @@ namespace shani\engine\core {
         /**
          * Minimum PHP version supported by Shani framework
          */
-        public const MIN_PHP_VERSION = '7.4';
+        public const MIN_PHP_VERSION = '8.0';
 
         /**
          * Mandatory extensions required by Shani framework

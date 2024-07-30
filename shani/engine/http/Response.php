@@ -30,7 +30,9 @@ namespace shani\engine\http {
             $this->res = $res;
             $this->headers = [
                 'x-frame-options' => 'sameorigin',
-                'x-content-type-options' => 'nosniff'
+                'x-content-type-options' => 'nosniff',
+                'referrer-policy' => 'same-origin', //or strict-origin-when-cross-origin
+                'access-control-allow-origin' => '*'
             ];
         }
 
@@ -256,13 +258,13 @@ namespace shani\engine\http {
 
         /**
          * Set HTTP response headers
-         * @param type $headers header to send, if it is string then value must be
+         * @param string|array $headers header to send, if it is string then value must be
          * provided, else it must be an array of key-value pair where key is the
          * header name and value is header value.
-         * @param type $val
+         * @param string|null $val header value
          * @return self
          */
-        public function setHeaders($headers, $val = null): self
+        public function setHeaders(string|array $headers, ?string $val = null): self
         {
             if (is_array($headers)) {
                 foreach ($headers as $key => $value) {
@@ -276,18 +278,18 @@ namespace shani\engine\http {
 
         /**
          * Get HTTP response headers
-         * @param type $names header name, can be string or array
+         * @param string|array $names header name
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return type
          */
-        public function headers($names = null, bool $selected = true)
+        public function headers(string|array $names = null, bool $selected = true)
         {
             return \library\Map::get($this->headers, $names, $selected);
         }
 
         /**
          * Get HTTP cookie object(s)
-         * @param type $name named key
+         * @param string $name named key
          * @param bool $selected If set to true, only the selected values will be returned.
          * @return \library\HttpCookie|null
          */

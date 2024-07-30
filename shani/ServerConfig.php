@@ -20,14 +20,17 @@ namespace shani {
             return $mime[$extension] ?? null;
         }
 
-        public static function host(string $name): array
+        public static function host(string $name): ?array
         {
-            try {
+            if (is_file(Definitions::DIR_HOSTS . '/' . $name . '.yml')) {
                 return yaml_parse_file(Definitions::DIR_HOSTS . '/' . $name . '.yml');
-            } catch (\RuntimeException $exc) {
-                echo 'Host "' . $name . '" not found.';
-                return [];
             }
+            if (is_file(Definitions::DIR_HOSTS . '/' . $name . '.alias')) {
+                $host = file_get_contents(Definitions::DIR_HOSTS . '/' . $name . '.alias');
+                return static::host(trim($host));
+            }
+            echo 'Host "' . $name . '" not found.' . PHP_EOL;
+            return null;
         }
 
         public static function server(): array

@@ -35,13 +35,13 @@ namespace shani\engine\http {
         /**
          * Add items to session storage
          * @param array $items Items to add to session storage
-         * @param type $keys If provided, only items with specified keys will be considered.
-         * This variable can  be string or array
+         * @param string|array|null $keys If provided, only items with specified
+         * keys will be considered
          * @param bool $selected If true, the function will add only the selected
          * items matches with $keys, and vice versa
          * @return self
          */
-        public function add(array $items, $keys = null, bool $selected = true): self
+        public function add(array $items, string|array|null $keys = null, bool $selected = true): self
         {
             $this->data[$this->name] = Map::add($items, $this->data[$this->name], $keys, $selected);
             return $this;
@@ -50,13 +50,12 @@ namespace shani\engine\http {
         /**
          * Clears the array then add new items
          * @param array $items Items to add to session storage
-         * @param type $keys If provided, only items with specified keys will be considered.
-         * This variable can  be string or array
+         * @param string|array $keys If provided, only items with specified keys will be considered
          * @param bool $selected If true, the function will add only the selected
          * items matches with $keys, and vice versa
          * @return self
          */
-        public function put(array $items, $keys = null, bool $selected = true): self
+        public function put(array $items, string|array $keys = null, bool $selected = true): self
         {
             $this->data[$this->name] = Map::add($items, $keys, $selected);
             return $this;

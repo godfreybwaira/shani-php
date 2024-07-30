@@ -184,12 +184,11 @@ namespace library\client {
         /**
          * Set e-mail message headers. This headers must follow the HTTP header
          * standards
-         * @param type $headers Header(s) to send, can be a string or array. If
-         * is a string then $val must be set.
-         * @param type $val Header value if $headres is string.
+         * @param string|array $headers Header(s) to send. If is a string then $val must be set.
+         * @param string|null $val Header value if $headres is string.
          * @return self
          */
-        public function setHeaders($headers, $val = null): self
+        public function setHeaders(string|array $headers, ?string $val = null): self
         {
             if (is_array($headers)) {
                 foreach ($headers as $key => $value) {

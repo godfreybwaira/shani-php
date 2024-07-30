@@ -79,7 +79,7 @@ namespace library {
                     try {
                         Concurrency::sleep($seconds);
                         $this->execTask($counter)->handleRepetition($counter);
-                    } catch (Exception $exc) {
+                    } catch (\ErrorException $exc) {
                         $this->exception = $exc;
                         $this->listener->trigger('error');
                     }
