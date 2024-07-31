@@ -46,6 +46,7 @@ namespace gui\v1\components {
          */
         public function setLayout(int $device, array $layout): self
         {
+            $query = null;
             $sum = array_sum($layout[0]);
             foreach ($layout as $row) {
                 if (array_sum($row) !== $sum) {
@@ -60,8 +61,9 @@ namespace gui\v1\components {
                         $this->children[$name] = $child;
                     }
                 }
-                $this->queries[$device] .= '"' . ltrim($area) . '"';
+                $query .= '"' . ltrim($area) . '"';
             }
+            $this->queries[$device] = $query;
             return $this;
         }
 

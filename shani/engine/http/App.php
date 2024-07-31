@@ -10,14 +10,13 @@
 
 namespace shani\engine\http {
 
-    use library\HttpStatus;
     use gui\Template;
+    use library\HttpStatus;
     use shani\engine\core\AutoConfig;
 
     final class App
     {
 
-        private Host $host;
         private Asset $asset;
         private Request $req;
         private Response $res;
@@ -26,22 +25,43 @@ namespace shani\engine\http {
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
 
-        public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res, Host $host)
+        public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res)
         {
             $this->lang = null;
-            $this->host = $host;
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
-            $cnf = $host->getEnvironment($this->req->version());
-            if ($cnf !== null) {
+            try {
+                $cnf = $this->getHostEnvironment();
                 $this->config = new $cnf($this);
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
                 }
-            } else {
-                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send('Unsupported application version');
+            } catch (\ErrorException $ex) {
+                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send($ex->getMessage());
             }
+        }
+
+        /**
+         * Get current running application environment. These values are provided
+         * by the host configuration file.
+         * @return string
+         * @throws \ErrorException If hostname or bad application version
+         */
+        private function getHostEnvironment(): string
+        {
+            $hostname = $this->req->uri()->hostname();
+            $host = \shani\ServerConfig::host($hostname);
+            $version = $this->req->version();
+            if ($version === null) {
+                $env = $host['VERSIONS'][$host['DEFAULT_VERSION']];
+                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
+            }
+            if (!empty($host['VERSIONS'][$version])) {
+                $env = $host['VERSIONS'][$version];
+                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
+            }
+            throw new \ErrorException('Unsupported application version "' . $version . '"');
         }
 
         private function catchErrors(): void
@@ -109,11 +129,6 @@ namespace shani\engine\http {
         public function response(): Response
         {
             return $this->res;
-        }
-
-        public function host(): Host
-        {
-            return $this->host;
         }
 
         public function csrfToken(): Session
@@ -272,8 +287,6 @@ namespace shani\engine\http {
         /**
          * Dynamically route a user request to mapped resource. The routing mechanism
          * always depends on HTTP method and application endpoint provided by the user.
-         * If the destination resource is not found the HTTP status 404 or 405 will
-         * be raised.
          * @return void
          */
         public function route(): void
@@ -283,11 +296,11 @@ namespace shani\engine\http {
                 $className = str_replace('/', '\\', $classPath);
                 $obj = new $className($this);
                 $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
-                if (is_callable([$obj, $cb])) {
+                try {
                     $obj->$cb();
-                } else {
-                    $this->res->setStatus(HttpStatus::NOT_FOUND);
-                    $this->config->handleHttpErrors();
+                } catch (\Exception $ex) {
+                    $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                    $this->config->handleHttpErrors($ex->getMessage());
                 }
             } else {
                 $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);

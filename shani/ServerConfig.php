@@ -20,17 +20,18 @@ namespace shani {
             return $mime[$extension] ?? null;
         }
 
-        public static function host(string $name): ?array
+        public static function host(string $name): array
         {
-            if (is_file(Definitions::DIR_HOSTS . '/' . $name . '.yml')) {
-                return yaml_parse_file(Definitions::DIR_HOSTS . '/' . $name . '.yml');
+            $yaml = Definitions::DIR_HOSTS . '/' . $name . '.yml';
+            if (is_file($yaml)) {
+                return yaml_parse_file($yaml);
             }
-            if (is_file(Definitions::DIR_HOSTS . '/' . $name . '.alias')) {
-                $host = file_get_contents(Definitions::DIR_HOSTS . '/' . $name . '.alias');
+            $alias = Definitions::DIR_HOSTS . '/' . $name . '.alias';
+            if (is_file($alias)) {
+                $host = file_get_contents($alias);
                 return static::host(trim($host));
             }
-            echo 'Host "' . $name . '" not found.' . PHP_EOL;
-            return null;
+            throw new \ErrorException('Host "' . $name . '" not found');
         }
 
         public static function server(): array

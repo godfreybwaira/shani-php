@@ -195,7 +195,7 @@ namespace gui\v1 {
             return $result;
         }
 
-        private function applyStyles(array &$styles, array &$sourceStyles): self
+        private function applyStyles(array &$styles, array $sourceStyles): self
         {
             foreach ($styles as $key => $value) {
                 if ($value === null) {

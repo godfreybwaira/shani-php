@@ -9,7 +9,6 @@
 
 namespace shani\server\swoole {
 
-    use shani\engine\http\Host;
     use shani\engine\http\App;
     use shani\engine\core\Definitions;
     use Swoole\WebSocket\Server as WSocket;
@@ -55,7 +54,7 @@ namespace shani\server\swoole {
         private static function handleHTTP(string $scheme, \Swoole\Http\Request &$req, \Swoole\Http\Response &$res)
         {
             $uri = self::makeURI($scheme, $req->header['host'], $req->server);
-            new App(new Request($req, $uri), new Response($res), new Host($uri->hostname()));
+            new App(new Request($req, $uri), new Response($res));
         }
 
         private static function checkFrameworkRequirements()

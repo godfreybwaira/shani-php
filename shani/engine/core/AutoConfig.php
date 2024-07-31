@@ -98,13 +98,19 @@ namespace shani\engine\core {
 
         /**
          * Handle all HTTP errors that may occur during program execution.
+         * @param string|null $errorMessage HTTP error message
          */
-        public abstract function handleHttpErrors(): void;
+        public abstract function handleHttpErrors(?string $errorMessage = null): void;
 
         /**
          * Handle all application errors
+         * @param \Throwable $t
+         * @return void
          */
-        public abstract function handleApplicationErrors(\Throwable $t): void;
+        public function handleApplicationErrors(\Throwable $t): void
+        {
+            print_r($t);
+        }
 
         /**
          * Set all application supported languages where key being language code
