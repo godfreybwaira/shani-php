@@ -205,6 +205,29 @@ namespace apps\demo\v1\config {
 }
 ```
 
+#### 1.0.2.1 Aliases
+
+Let us assume our application is available through `http://localhost:8008`, we also want our application  to be available via `http://127.0.0.1:8008`, and `http://example.local`, or more...
+
+There comes the concept of aliases, it is when the application is available via more than one host name. Just like we created `localhost.yml` file, we're going to create `127.0.0.1.alias` file and `example.local.alias` file.
+
+***Remember***
+_The file `localhost.yml` must be available before creating `.alias` file, otherwise your server will crush_
+
+`127.0.0.1.alias` file contents
+
+```alias
+localhost
+```
+
+
+`example.local.alias` file contents
+
+```alias
+localhost
+```
+
+As we have seen, all `.alias` files must contains a host name they point to. This is how you create alias(es) in **Shani** application.
 #### 1.0.3 Running The Application
 
 Again, let's assume our application is available via `localhost:8008`. The default port for our web server is `8008` for HTTP and port `44380` for HTTPS. We can use the following URL to call our function `world`.
