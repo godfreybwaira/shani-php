@@ -49,6 +49,11 @@ namespace apps\demo\v1\config {
         {
             return '/demo/storage';
         }
+
+        public function requestMethods(): array
+        {
+            return ['get', 'post', 'head'];
+        }
     }
 
 }

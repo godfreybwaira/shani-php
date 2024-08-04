@@ -75,7 +75,7 @@ namespace shani\engine\core {
          */
         public function requestMethodsDir(): string
         {
-            return '/src';
+            return '/web';
         }
 
         /**
@@ -193,6 +193,11 @@ namespace shani\engine\core {
          * Default path to homepage if '/' is provided by during HTTP request
          */
         public abstract function homepage(): string;
+
+        /**
+         * Returns an array of HTTP request methods supported by the application (in lower case)
+         */
+        public abstract function requestMethods(): array;
     }
 
 }

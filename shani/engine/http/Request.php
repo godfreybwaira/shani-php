@@ -157,9 +157,9 @@ namespace shani\engine\http {
         }
 
         /**
-         * Check if HTTP request is requested via asynchronous mode. This value can
-         * be set by HTTP x-request-mode request header. It is useful for example
-         * if the request is made via AJAX or any other same technologies
+         * Check if HTTP request is requested via asynchronous mode using x-request-mode
+         * request header value set to 'async'. For example if the request is made
+         * via AJAX or any other same technologies
          * @return bool True if the request is asynchronous, false otherwise
          */
         public function isAsync(): bool
@@ -290,11 +290,20 @@ namespace shani\engine\http {
             return $this->req->method();
         }
 
+        /**
+         * Get the original unchanged request URI object
+         * @return \library\URI Request URI object
+         * @see self::path()
+         */
         public function uri(): \library\URI
         {
             return $this->req->uri();
         }
 
+        /**
+         * Check if the request is from local machine
+         * @return bool True on success, false otherwise
+         */
         public function localhost(): bool
         {
             return $this->req->ip() === '127.0.0.1';
@@ -309,22 +318,32 @@ namespace shani\engine\http {
             return $this->req->uri()->scheme() === 'https';
         }
 
-        public function path(string $name = null): ?string
+        /**
+         * Get the current refined URL path referring to current path to class function
+         * @param string|\Stringable $url
+         * @return string|null
+         */
+        public function path(string|\Stringable $url = null): ?string
         {
-            $parts = $name === null ? $this->url : self::explodePath($name);
+            $parts = $url === null ? $this->url : self::explodePath($url);
             if (!empty($parts)) {
                 return $this->req->method() . $parts['module'] . $parts['resource'] . $parts['callback'];
             }
             return null;
         }
 
-        public function forward(string $path): self
+        /**
+         * Change the current request URL to a new value
+         * @param string|Stringable $newUrl New URL or URI object
+         * @return self
+         */
+        public function rewriteUrl(string|\Stringable $newUrl): self
         {
-            $this->url = self::explodePath($path);
+            $this->url = self::explodePath($newUrl);
             return $this;
         }
 
-        private static function explodePath(string $path): array
+        private static function explodePath(string|\Stringable $path): array
         {
             $idx = strpos($path, '?');
             if ($idx !== false) {

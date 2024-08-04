@@ -16,11 +16,11 @@ namespace shani\engine\http {
 
         private Request $req;
         private int $statusCode;
-        private ?string $type = null;
+        private ?string $datatype = null;
         private array $headers, $cookies;
         private \shani\contracts\Response $res;
 
-        private const CHUNK_SIZE = 1048576; //1MB
+        private const CHUNK_SIZE = 1_048_576; //1MB
 
         public function __construct(Request &$req, \shani\contracts\Response &$res)
         {
@@ -44,26 +44,26 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get HTTP response type
-         * @return string|null HTTP response type
+         * Get HTTP response data type
+         * @return string|null HTTP response data type
          */
         public function type(): ?string
         {
-            if ($this->type === null) {
+            if ($this->datatype === null) {
                 if (!empty($this->headers['content-type'])) {
-                    $this->type = \library\Mime::explode($this->headers['content-type'])[1] ?? null;
+                    $this->datatype = \library\Mime::explode($this->headers['content-type'])[1] ?? null;
                 } else {
                     $path = $this->req->uri()->path();
                     $parts = explode('.', $path);
                     $size = count($parts);
                     if ($size > 1) {
-                        $this->type = strtolower($parts[$size - 1]);
+                        $this->datatype = strtolower($parts[$size - 1]);
                     } else {
-                        $this->type = \library\Mime::explode($this->req->headers('accept'))[1] ?? null;
+                        $this->datatype = \library\Mime::explode($this->req->headers('accept'))[1] ?? null;
                     }
                 }
             }
-            return $this->type;
+            return $this->datatype;
         }
 
         /**
@@ -407,10 +407,10 @@ namespace shani\engine\http {
         /**
          * Stream  a file as HTTP response
          * @param string $filepath Path to a file to stream
-         * @param int $chunkSize Number of bytes to stream every turn
+         * @param int|null $chunkSize Number of bytes to stream every turn, default is 1MB
          * @return self
          */
-        public function stream(string $filepath, int $chunkSize = self::CHUNK_SIZE): self
+        public function stream(string $filepath, ?int $chunkSize = null): self
         {
             if (!is_readable($filepath)) {
                 return $this->setStatus(HttpStatus::NOT_FOUND)->send();
@@ -418,7 +418,7 @@ namespace shani\engine\http {
             $file = stat($filepath);
             $range = $this->req->headers('range') ?? '=0-';
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-            $end = min($start + $chunkSize, $file['size'] - 1);
+            $end = min($start + ($chunkSize ?? self::CHUNK_SIZE), $file['size'] - 1);
             return $this->setHeaders([
                         'content-range' => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
                         'accept-ranges' => 'bytes'

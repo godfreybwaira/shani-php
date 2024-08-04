@@ -65,7 +65,7 @@ namespace shani\engine\core {
         /**
          * Mandatory extensions required by Shani framework
          */
-        public const REQUIRED_EXTENSIONS = ['swoole', 'yaml'];
+        public const REQUIRED_EXTENSIONS = ['swoole', 'yaml', 'mbstring'];
     }
 
 }

@@ -12,14 +12,14 @@ namespace shani\engine\core {
     final class UserAppDoc
     {
 
-        private static function folderContent(string $rootPath, string $subDir = null)
+        private static function folderContent(string $modulesRootPath, string $methodsDir = null)
         {
             $folders = [];
-            $contents = array_diff(scandir($rootPath), ['.', '..']);
-            foreach ($contents as $content) {
-                $path = $rootPath . '/' . $content . $subDir;
+            $modules = array_diff(scandir($modulesRootPath), ['.', '..']);
+            foreach ($modules as $module) {
+                $path = $modulesRootPath . '/' . $module . $methodsDir;
                 if (is_dir($path)) {
-                    $folders[$content] = self::folderContent($path);
+                    $folders[$module] = self::folderContent($path);
                 } else {
                     $str = substr($path, 0, strpos($path, '.'));
                     $folders[] = str_replace('/', '\\', substr($str, strlen(SERVER_ROOT)));
@@ -50,14 +50,18 @@ namespace shani\engine\core {
         public static function generate(\shani\engine\http\App &$app): array
         {
             $config = $app->config();
-            $path = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
-            $modules = self::folderContent($path, $config->requestMethodsDir());
+            $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
+            $modules = self::folderContent($modulesPath, $config->requestMethodsDir());
+            $allMethods = $config->requestMethods();
             $docs = [
                 'name' => $config->appName(),
                 'version' => $app->request()->version()
             ];
             foreach ($modules as $module => $reqMethods) {
                 foreach ($reqMethods as $method => $classes) {
+                    if (!in_array($method, $allMethods)) {
+                        continue;
+                    }
                     foreach ($classes as $class) {
                         $rf = new \ReflectionClass($class);
                         $functions = $rf->getMethods(\ReflectionMethod::IS_PUBLIC);

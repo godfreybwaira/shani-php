@@ -57,7 +57,7 @@ namespace library\middlewares {
             $module = $app->request()->module();
             if ($loggedIn) {
                 if (in_array($module, $guestModules)) {
-                    $app->request()->forward($app->config()->homepage());
+                    $app->request()->rewriteUrl($app->config()->homepage());
                 }
                 return;
             }

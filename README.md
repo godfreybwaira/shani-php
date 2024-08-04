@@ -98,19 +98,19 @@ Now, look at the following example of a resource file:
 ```php
 <?php
 
-namespace apps\demo\v1\modules\greetings\src\get {
+namespace apps\demo\v1\modules\greetings\web\get {
 
 	use shani\engine\http\App;
-	
+
     final class Hello
     {
         private App $app;
-        
+
         public function __construct(App &$app)
         {
             $this->app = $app;
         }
-        
+
         /**
          * Display greetings from Shani.
          */
@@ -193,7 +193,7 @@ namespace apps\demo\v1\config {
 
     use shani\engine\core\AutoConfig;
     use shani\engine\http\App;
-    
+
     final class DevSettings extends AutoConfig
     {
         public function __construct(App &$app)
@@ -235,7 +235,7 @@ Breaking down the pattern above, we can see that
 http://localhost:8008/products/201/sales/10/details
 ```
 
-**Shani** application uses kebab to camel case conversion to convert URL into valid names. 
+**Shani** application uses kebab to camel case conversion to convert URL into valid names.
 
 1. `module-name` in URL represents a `module-name` directory in project structure.
 2. `resource-name` in URL represents a `ResourceName` class in `module-name` directory, and `resource-name` directory in a view directory

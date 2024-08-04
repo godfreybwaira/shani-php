@@ -259,16 +259,15 @@ namespace shani\engine\http {
         private function start(): void
         {
             $path = $this->req->uri()->location();
-            $this->req->forward($path === '/' ? $this->config->homepage() : $path);
+            $this->req->rewriteUrl($path === '/' ? $this->config->homepage() : $path);
             Session::start($this);
             $middleware = new Middleware($this);
             $this->config->middleware($middleware);
             $middleware->run();
         }
 
-        private function getClassPath(): string
+        private function getClassPath(string $method): string
         {
-            $method = $this->req->method();
             $class = \shani\engine\core\Definitions::DIRNAME_APPS . $this->config->root() . $this->config->moduleDir();
             $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
             $class .= ($method !== 'head' ? $method : 'get');
@@ -291,20 +290,25 @@ namespace shani\engine\http {
          */
         public function route(): void
         {
-            $classPath = $this->getClassPath();
-            if (is_file(SERVER_ROOT . $classPath . '.php')) {
-                $className = str_replace('/', '\\', $classPath);
-                $obj = new $className($this);
-                $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
+            $method = $this->req->method();
+            if (!in_array($method, $this->config->requestMethods())) {
+                $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
+                $this->config->handleHttpErrors();
+                return;
+            }
+            $classPath = $this->getClassPath($method);
+            if (!is_file(SERVER_ROOT . $classPath . '.php')) {
+                $this->res->setStatus(HttpStatus::NOT_FOUND);
+                $this->config->handleHttpErrors();
+            } else {
                 try {
-                    $obj->$cb();
+                    $className = str_replace('/', '\\', $classPath);
+                    $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
+                    (new $className($this))->$cb();
                 } catch (\Exception $ex) {
                     $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                     $this->config->handleHttpErrors($ex->getMessage());
                 }
-            } else {
-                $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-                $this->config->handleHttpErrors();
             }
         }
 
