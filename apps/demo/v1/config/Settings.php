@@ -45,7 +45,7 @@ namespace apps\demo\v1\config {
             return 'en';
         }
 
-        public function storageDir(): string
+        public function webroot(): string
         {
             return '/demo/storage';
         }

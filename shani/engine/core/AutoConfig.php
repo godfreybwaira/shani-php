@@ -184,10 +184,10 @@ namespace shani\engine\core {
         }
 
         /**
-         * Get user application storage directory.
+         * Returns application web root directory where all application specific static files are stored.
          * @return string Path relative to application directory
          */
-        public abstract function storageDir(): string;
+        public abstract function webroot(): string;
 
         /**
          * Default path to homepage if '/' is provided by during HTTP request

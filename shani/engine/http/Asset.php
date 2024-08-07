@@ -47,7 +47,7 @@ namespace shani\engine\http {
                 $rootPath = \shani\engine\core\Definitions::DIR_ASSETS;
             } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
                 $prefix = self::STORAGE_PREFIX;
-                $rootPath = \shani\engine\core\Definitions::DIR_APPS . $app->config()->storageDir();
+                $rootPath = \shani\engine\core\Definitions::DIR_APPS . $app->config()->webroot();
             }
             if ($prefix === null) {
                 return false;
