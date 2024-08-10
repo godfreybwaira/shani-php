@@ -10,6 +10,7 @@
 namespace shani\engine\http {
 
     use library\HttpStatus;
+    use shani\contracts\ServerResponse;
 
     final class Response
     {
@@ -18,11 +19,11 @@ namespace shani\engine\http {
         private int $statusCode;
         private ?string $datatype = null;
         private array $headers, $cookies;
-        private \shani\contracts\Response $res;
+        private ServerResponse $res;
 
         private const CHUNK_SIZE = 1_048_576; //1MB
 
-        public function __construct(Request &$req, \shani\contracts\Response &$res)
+        public function __construct(Request &$req, ServerResponse &$res)
         {
             $this->statusCode = HttpStatus::OK;
             $this->cookies = [];

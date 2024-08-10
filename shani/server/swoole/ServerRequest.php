@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Request
+ * Description of ServerRequest
  * @author coder
  *
  * Created on: Mar 25, 2024 at 12:36:29 PM
@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Request implements \shani\contracts\Request
+    final class ServerRequest implements \shani\contracts\ServerRequest
     {
 
         private \library\URI $uri;

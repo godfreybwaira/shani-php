@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Response
+ * Description of ServerResponse
  * @author coder
  *
  * Created on: Mar 25, 2024 at 1:26:42 PM
@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Response implements \shani\contracts\Response
+    final class ServerResponse implements \shani\contracts\ServerResponse
     {
 
         private \Swoole\Http\Response $res;

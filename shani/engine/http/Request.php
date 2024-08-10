@@ -9,17 +9,18 @@
 
 namespace shani\engine\http {
 
+    use shani\contracts\ServerRequest;
     use shani\engine\core\Definitions;
 
     final class Request
     {
 
         private ?string $type = null;
-        private \shani\contracts\Request $req;
+        private ServerRequest $req;
         private ?array $url, $inputs, $queryValues = null;
         private ?string $platform = null, $version = null, $accepted = null;
 
-        public function __construct(\shani\contracts\Request &$req)
+        public function __construct(ServerRequest &$req)
         {
             $this->url = self::explodePath($req->uri()->path());
             $files = $req->files();

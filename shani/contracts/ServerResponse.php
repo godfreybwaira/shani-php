@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Response
+ * Description of ServerResponse
  * @author coder
  *
  * Created on: Mar 25, 2024 at 1:31:32 PM
@@ -9,7 +9,7 @@
 
 namespace shani\contracts {
 
-    interface Response
+    interface ServerResponse
     {
 
         public function ended(): bool;

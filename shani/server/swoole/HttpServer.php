@@ -54,7 +54,7 @@ namespace shani\server\swoole {
         private static function handleHTTP(string $scheme, \Swoole\Http\Request &$req, \Swoole\Http\Response &$res)
         {
             $uri = self::makeURI($scheme, $req->header['host'], $req->server);
-            new App(new Request($req, $uri), new Response($res));
+            new App(new ServerRequest($req, $uri), new ServerResponse($res));
         }
 
         private static function checkFrameworkRequirements()
@@ -87,15 +87,14 @@ namespace shani\server\swoole {
                 $scheme = $cnf['SERVER_PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
                 self::handleHTTP($scheme, $req, $res);
             });
-            $requests = [];
-            $server->on('open', function (WSocket $server, \Swoole\Http\Request $req)use (&$requests) {
-//                $requests[$req->fd] = $req;
+            $server->on('open', function (WSocket $server, \Swoole\Http\Request $req) {
+
             });
-            $server->on('message', function (WSocket $server, \Swoole\WebSocket\Frame $frame)use (&$requests) {
-//                print_r($requests[$frame->fd]);
+            $server->on('message', function (WSocket $server, \Swoole\WebSocket\Frame $frame) {
+
             });
-            $server->on('close', function (WSocket $server, int $fd)use (&$requests) {
-//                unset($requests[$fd]);
+            $server->on('close', function (WSocket $server, int $fd) {
+
             });
             $server->on('task', fn() => null);
             $server->start();

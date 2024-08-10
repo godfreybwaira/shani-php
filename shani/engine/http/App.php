@@ -25,7 +25,7 @@ namespace shani\engine\http {
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
 
-        public function __construct(\shani\contracts\Request $req, \shani\contracts\Response $res)
+        public function __construct(\shani\contracts\ServerRequest $req, \shani\contracts\ServerResponse $res)
         {
             $this->lang = null;
             $this->req = new Request($req);

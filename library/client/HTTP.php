@@ -271,14 +271,10 @@ namespace library\client {
         /**
          * Set HTTP cookies
          * @param \library\HttpCookie $cookie Cookie object to send
-         * @param string $cookieFile If given, the request cookies will be loaded from file
          * @return self
          */
-        public function cookies(\library\HttpCookie $cookie, string $cookieFile = null): self
+        public function cookies(\library\HttpCookie $cookie): self
         {
-            if ($cookieFile !== null) {
-                $this->setOptions([CURLOPT_COOKIEFILE => $cookieFile]);
-            }
             $this->cookies[$cookie->name()] = $cookie;
             $this->setOptions([CURLOPT_COOKIE => $cookie]);
             return $this;
