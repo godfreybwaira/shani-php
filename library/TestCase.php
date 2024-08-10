@@ -51,7 +51,7 @@ namespace library {
                     $halfLen = ceil(($this->length - strlen($this->description)) / 2);
                     $space = str_repeat(' ', $halfLen);
                     $str = '+' . str_repeat('-', $this->length) . '+' . PHP_EOL;
-                    echo $str . '|' . $space . strtoupper($this->description) . $space . '|' . PHP_EOL . $str;
+                    echo $str . '|' . $space . mb_strtoupper($this->description) . $space . '|' . PHP_EOL . $str;
                 }
                 echo $this->lines . PHP_EOL;
                 $diff = $this->total - $this->pass;

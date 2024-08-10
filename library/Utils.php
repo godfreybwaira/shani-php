@@ -32,7 +32,7 @@ namespace library {
                 if ($dot > 0) {
                     $str = substr($str, 0, $dot);
                 }
-//                $str = preg_replace_callback('/(?<=-)[a-z]/', fn($ch) => strtoupper($ch[0]), $str);
+//                $str = preg_replace_callback('/(?<=-)[a-z]/', fn($ch) => mb_strtoupper($ch[0]), $str);
                 $str = lcfirst(ucwords($str, $separator));
                 return str_replace($separator, '', $str);
             }

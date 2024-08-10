@@ -49,7 +49,7 @@ namespace library {
             $results = [];
             foreach ($rows as $row) {
                 if (self::found($row, $row[$key])) {
-                    $results[strtoupper($row[$key])][] = $row;
+                    $results[strtolower($row[$key])][] = $row;
                 }
             }
             return $results;
