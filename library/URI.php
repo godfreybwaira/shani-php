@@ -22,10 +22,10 @@ namespace library {
             if (!is_array($this->parts)) {
                 throw new \InvalidArgumentException('Invalid URI detected.');
             }
-            $this->path = '/' . trim($this->parts['path'], '/');
+            $this->path = '/' . trim(str_replace([chr(0), '/..', '/.'], '', $this->parts['path']), '/');
         }
 
-        private static function value($value, $default = null)
+        private static function valueOf($value, $default = null)
         {
             return !empty($value) ? $value : $default;
         }
@@ -47,22 +47,22 @@ namespace library {
 
         public function authority(): string
         {
-            $info = self::value($this->userInfo());
-            $port = self::value($this->parts['port']);
+            $info = self::valueOf($this->userInfo());
+            $port = self::valueOf($this->parts['port']);
             return ($info ? $info . '@' : null ) . $this->hostname() . ($port ? ':' . $port : null);
         }
 
         /**
-         * Get URL fragment
-         * @return string|null URL fragment
+         * Get URI fragment
+         * @return string|null URI fragment
          */
         public function fragment(): ?string
         {
-            return self::value($this->parts['fragment']);
+            return self::valueOf($this->parts['fragment']);
         }
 
         /**
-         * Get hostname from URL
+         * Get hostname from URI
          * @return string Hostname
          */
         public function hostname(): string
@@ -83,16 +83,14 @@ namespace library {
         public function host(): string
         {
             $scheme = $this->scheme();
-            $port = self::value($this->parts['port']);
-            if ($scheme !== null) {
-                return $scheme . '://' . $this->parts['host'] . ($port ? ':' . $port : null);
-            }
-            return $this->hostname() . ($port ? ':' . $port : null);
+            $port = self::valueOf($this->parts['port']);
+            $host = $this->parts['host'] . ($port ? ':' . $port : null);
+            return $scheme !== null ? $scheme . '://' . $host : $host;
         }
 
         /**
-         * Get the URL path.
-         * @return string URL path
+         * Get the sanitized URI path.
+         * @return string URI path
          */
         public function path(): string
         {
@@ -100,13 +98,21 @@ namespace library {
         }
 
         /**
-         * Get the URL path joined with query string.
-         * @return string URL path joined with query string.
+         * Get the URI path joined with query string.
+         * @return string URI path joined with query string.
          */
-        public function location(): string
+        public function pathInfo(): string
         {
+            $path = $this->path;
             $query = $this->query();
-            return $this->path . ($query ? '?' . $query : null);
+            $fragment = $this->fragment();
+            if ($query !== null) {
+                $path .= '?' . $query;
+            }
+            if ($fragment !== null) {
+                $path .= '#' . $fragment;
+            }
+            return $path;
         }
 
         public function port(): ?int
@@ -115,7 +121,7 @@ namespace library {
         }
 
         /**
-         * Get query string part of a URL
+         * Get query string part of a URI
          * @return string|null Query string
          */
         public function query(): ?string
@@ -125,13 +131,13 @@ namespace library {
 
         public function scheme(): ?string
         {
-            return self::value($this->parts['scheme']);
+            return self::valueOf($this->parts['scheme']);
         }
 
         public function userInfo(): ?string
         {
             $pass = !empty($this->parts['pass']) ? ':' . $this->parts['pass'] : null;
-            return self::value($this->parts['user'] . $pass);
+            return self::valueOf($this->parts['user'] . $pass);
         }
 
         public function withFragment(string $fragment): self
@@ -176,6 +182,16 @@ namespace library {
         public function withUserInfo(string $user, ?string $password = null): self
         {
             return $this->copy('user', $user)->copy('pass', $password);
+        }
+
+        /**
+         * Check if request URI was made through secure connection
+         * @param type $scheme URI scheme
+         * @return bool True on success, false otherwise
+         */
+        public function secure($scheme = 'https'): bool
+        {
+            return $this->scheme() === $scheme;
         }
     }
 

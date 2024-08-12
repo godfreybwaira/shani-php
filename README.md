@@ -1,4 +1,4 @@
-# Shani Web Application Framework
+	# Shani Web Application Framework
 
 **Shani** is an open source web framework designed to enable fast application
 development with minimal efforts while performance, security, creativity
@@ -158,17 +158,22 @@ The following is the default application configuration that comes with **Shani**
 VERSIONS:
   "1.0":
     # Environment variables are customs, you can create any e.g DEV, TEST, PROD or any
-    # Must extends shani\engine\core\AutoConfig
+    # Must extends shani\advisors\Configuration
     ENVIRONMENTS:
       DEV: \apps\demo\v1\config\Settings
       # Active environment can any one of the provided above.
     ACTIVE_ENVIRONMENT: DEV
+    DEFAULT_LANGUAGE: sw
+    # Whether an application is running or not
+    RUNNING: true
   "2.0":
     ENVIRONMENTS:
       DEV: \apps\demo\v2\config\Settings
     ACTIVE_ENVIRONMENT: DEV
-# This is the default application version
-DEFAULT_VERSION: "1.0"
+    DEFAULT_LANGUAGE: sw
+    RUNNING: true
+# The default application version
+DEFAULT_VERSION: "2.0"
 ```
 
 Let us customize this file to fit our application needs:
@@ -181,6 +186,8 @@ VERSIONS:
       TEST: \apps\demo\v1\config\TestSettings
       PROD: \apps\demo\v1\config\ProdSettings
     ACTIVE_ENVIRONMENT: DEV
+    DEFAULT_LANGUAGE: sw
+    RUNNING: true
 DEFAULT_VERSION: "1.0"
 ```
 
@@ -191,14 +198,14 @@ The next step is to create these configuration class files. We will create them 
 
 namespace apps\demo\v1\config {
 
-    use shani\engine\core\AutoConfig;
+    use shani\advisors\Configuration;
     use shani\engine\http\App;
 
-    final class DevSettings extends AutoConfig
+    final class DevSettings extends Configuration
     {
-        public function __construct(App &$app)
+        public function __construct(App &$app, array &$configurations)
         {
-            parent::__construct($app);
+            parent::__construct($app, $configurations);
         }
         //Add all unimplemented methods here
 	}

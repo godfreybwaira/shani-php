@@ -12,7 +12,7 @@ namespace shani\engine\http {
 
     use gui\Template;
     use library\HttpStatus;
-    use shani\engine\core\AutoConfig;
+    use shani\advisors\Configuration;
 
     final class App
     {
@@ -21,7 +21,7 @@ namespace shani\engine\http {
         private Request $req;
         private Response $res;
         private ?string $lang;
-        private AutoConfig $config;
+        private Configuration $config;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
 
@@ -31,8 +31,9 @@ namespace shani\engine\http {
             $this->req = new Request($req);
             $this->res = new Response($this->req, $res);
             try {
-                $cnf = $this->getHostEnvironment();
-                $this->config = new $cnf($this);
+                $cnf = $this->getHostConfiguration();
+                $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
+                $this->config = new $env($this, $cnf);
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
@@ -43,25 +44,22 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get current running application environment. These values are provided
-         * by the host configuration file.
-         * @return string
-         * @throws \ErrorException If hostname or bad application version
+         * Get configuration from host application configuration file.
+         * @return array Application configuration
+         * @throws \ErrorException If bad application version
          */
-        private function getHostEnvironment(): string
+        private function getHostConfiguration(): array
         {
             $hostname = $this->req->uri()->hostname();
             $host = \shani\ServerConfig::host($hostname);
-            $version = $this->req->version();
-            if ($version === null) {
-                $env = $host['VERSIONS'][$host['DEFAULT_VERSION']];
-                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
+            $requestVersion = $this->req->version();
+            if ($requestVersion === null) {
+                return $host['VERSIONS'][$host['DEFAULT_VERSION']];
             }
-            if (!empty($host['VERSIONS'][$version])) {
-                $env = $host['VERSIONS'][$version];
-                return $env['ENVIRONMENTS'][$env['ACTIVE_ENVIRONMENT']];
+            if (!empty($host['VERSIONS'][$requestVersion])) {
+                return $host['VERSIONS'][$requestVersion];
             }
-            throw new \ErrorException('Unsupported application version "' . $version . '"');
+            throw new \ErrorException('Unsupported application version "' . $requestVersion . '"');
         }
 
         private function catchErrors(): void
@@ -106,9 +104,9 @@ namespace shani\engine\http {
 
         /**
          * Get current loaded application configurations.
-         * @return AutoConfig Current application loaded configurations
+         * @return Configuration Current application loaded configurations
          */
-        public function config(): AutoConfig
+        public function config(): Configuration
         {
             return $this->config;
         }
@@ -258,19 +256,20 @@ namespace shani\engine\http {
          */
         private function start(): void
         {
-            $path = $this->req->uri()->location();
-            $this->req->rewriteUrl($path === '/' ? $this->config->homepage() : $path);
+            if ($this->req->uri()->path() === '/') {
+                $this->req->rewriteUrl($this->config->homepage());
+            }
             Session::start($this);
             $middleware = new Middleware($this);
-            $this->config->middleware($middleware);
-            $middleware->run();
+            $securityAdvisor = $this->config->middleware($middleware);
+            $middleware->run($securityAdvisor);
         }
 
         private function getClassPath(string $method): string
         {
-            $class = \shani\engine\core\Definitions::DIRNAME_APPS . $this->config->root() . $this->config->moduleDir();
-            $class .= $this->req->module() . $this->config->requestMethodsDir() . '/';
-            $class .= ($method !== 'head' ? $method : 'get');
+            $class = \shani\engine\core\Definitions::DIRNAME_APPS . $this->config->root();
+            $class .= $this->config->moduleDir() . $this->req->module();
+            $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));
         }
 
@@ -323,9 +322,9 @@ namespace shani\engine\http {
         {
             $protection = $this->config->csrf();
             $url = $path ?? $this->req->uri()->path();
-            if ($protection !== AutoConfig::CSRF_OFF) {
+            if ($protection !== Configuration::CSRF_OFF) {
                 $token = base64_encode(random_bytes(6));
-                if ($protection === AutoConfig::CSRF_STRICT) {
+                if ($protection === Configuration::CSRF_STRICT) {
                     $this->csrfToken()->add([\library\Utils::digest($url) => $token]);
                 } else {
                     $this->csrfToken()->add([$token => \library\Utils::digest($url)]);
@@ -333,7 +332,7 @@ namespace shani\engine\http {
                 $cookie = (new \library\HttpCookie())->setName('csrf_token')
                         ->setSameSite(\library\HttpCookie::SAME_SITE_STRICT)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
-                        ->setSecure($this->req->secure());
+                        ->setSecure($this->req->uri()->secure());
                 $this->res->setCookie($cookie);
             }
             return $this->req->uri()->host() . $url;

@@ -12,13 +12,24 @@ namespace apps\demo\v1\middleware {
     use shani\engine\http\App;
     use shani\engine\http\Middleware;
 
-    final class Register
+    final class Register extends \shani\advisors\SecurityMiddleware
     {
 
-        public static function exec(App &$app, Middleware &$mw)
+        public function __construct(App &$app, Middleware &$mw)
         {
+            parent::__construct($app);
             $mw->on('before', fn() => Test::m1($app));
             $mw->on('before', fn() => Test::m2($app));
+        }
+
+        public function checkAuthentication(): bool
+        {
+            return parent::authenticated(false);
+        }
+
+        public function checkAuthorization(): bool
+        {
+            return parent::authorized('');
         }
     }
 

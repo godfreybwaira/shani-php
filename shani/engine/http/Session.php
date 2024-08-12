@@ -157,7 +157,7 @@ namespace shani\engine\http {
         private static function prepareCookie(App &$app, string $value): void
         {
             $cookie = (new \library\HttpCookie())->setValue($value)
-                    ->setSecure($app->request()->secure())->setHttpOnly(true)
+                    ->setSecure($app->request()->uri()->secure())->setHttpOnly(true)
                     ->setDomain($app->request()->uri()->hostname())
                     ->setMaxAge($app->config()->cookieMaxAge())
                     ->setName($app->config()->sessionName());

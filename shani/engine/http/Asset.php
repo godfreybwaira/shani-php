@@ -28,11 +28,6 @@ namespace shani\engine\http {
             return str_starts_with($str, $phrase . '/');
         }
 
-        public static function sanitizePath(string $path): string
-        {
-            return str_replace([chr(0), '..', '//'], '', $path);
-        }
-
         /**
          * Serve static content e.g css, images and other static files.
          * @param App $app Application object
@@ -53,7 +48,7 @@ namespace shani\engine\http {
                 return false;
             }
             if ($app->request()->headers('if-none-match') === null) {
-                $location = $rootPath . self::sanitizePath(substr($path, strlen($prefix)));
+                $location = $rootPath . substr($path, strlen($prefix));
                 $app->response()->setStatus(\library\HttpStatus::OK)->setCache()->stream($location);
             } else {
                 $app->response()->setStatus(\library\HttpStatus::NOT_MODIFIED)->send();

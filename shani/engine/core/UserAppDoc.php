@@ -51,7 +51,7 @@ namespace shani\engine\core {
         {
             $config = $app->config();
             $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
-            $modules = self::folderContent($modulesPath, $config->requestMethodsDir());
+            $modules = self::folderContent($modulesPath, $config->controllers());
             $allMethods = $config->requestMethods();
             $docs = [
                 'name' => $config->appName(),

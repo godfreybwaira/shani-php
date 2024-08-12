@@ -10,6 +10,7 @@
 namespace shani\engine\http {
 
     use library\Event;
+    use shani\advisors\SecurityMiddleware;
 
     final class Middleware
     {
@@ -19,15 +20,15 @@ namespace shani\engine\http {
         public function __construct(App &$app)
         {
             $this->listener = new Event(['before', 'after']);
-            $this->listener->done(function (string $event) use (&$app) {
-                if ($event !== 'before') {
-                    return;
-                }
-                if ($app->response()->statusCode() < 300) {
-                    return $app->route();
-                }
-                $app->config()->handleHttpErrors();
-            });
+            $this->listener->done(fn() => self::returnResponse($app));
+        }
+
+        private static function returnResponse(App &$app)
+        {
+            if ($app->response()->statusCode() < 300) {
+                return $app->route();
+            }
+            $app->config()->handleHttpErrors();
         }
 
         /**
@@ -50,11 +51,15 @@ namespace shani\engine\http {
         /**
          * This method start execution of all registered middlewares according
          * to their orders.
+         * @param SecurityMiddleware|null $middleware Security advisor middleware object
          * @return self
          */
-        public function run(): self
+        public function run(?SecurityMiddleware $middleware): self
         {
-            $this->listener->trigger('before')->trigger('after');
+            if ($middleware === null || ($middleware->checkAuthentication() && $middleware->checkAuthorization() && $middleware->blockCSRF())) {
+                $this->listener->trigger('before');
+            }
+            $this->listener->trigger('after');
             return $this;
         }
     }

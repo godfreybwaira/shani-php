@@ -8,9 +8,12 @@
  * Created on: Feb 18, 2024 at 2:05:46 PM
  */
 
-namespace shani\engine\core {
+namespace shani\advisors {
 
-    abstract class AutoConfig
+    use shani\engine\http\App;
+    use shani\engine\http\Middleware;
+
+    abstract class Configuration
     {
 
         /**
@@ -31,16 +34,19 @@ namespace shani\engine\core {
          */
         public const CSRF_FLEXIBLE = 2;
 
-        protected \shani\engine\http\App $app;
+        protected App $app;
+        private array $config;
 
-        protected function __construct(\shani\engine\http\App &$app)
+        protected function __construct(App &$app, array &$configurations)
         {
             $this->app = $app;
+            $this->config = $configurations;
         }
 
         /**
-         * Get the application root directory with trailing /
-         * @return string Application root directory relative to Apps directory
+         * Get the application root directory with a leading /. If set to null
+         * then the application root directory will be the /apps directory
+         * @return string|null Application root directory relative to Apps directory
          */
         public function root(): ?string
         {
@@ -66,14 +72,14 @@ namespace shani\engine\core {
         }
 
         /**
-         * Set directory inside application module where module controllers with
-         * be resides.
+         * Get the directory inside application module where module controllers
+         * resides.
          * <p>It is in this directory you will create GET, POST, PUT, DELETE
          * or any other custom http method directories, These directories must be
          * in lowercase.</p>
          * @return string Path relative to current module directory
          */
-        public function requestMethodsDir(): string
+        public function controllers(): string
         {
             return '/web';
         }
@@ -93,7 +99,36 @@ namespace shani\engine\core {
          */
         public function defaultLanguage(): string
         {
-            return 'sw';
+            return $this->config['DEFAULT_LANGUAGE'];
+        }
+
+        /**
+         * Check whether application is in running state or not. A programmer should
+         * implements the logic on application running state, otherwise this configuration
+         * has no effect.
+         * @return string Application language
+         */
+        public final function running(): bool
+        {
+            return $this->config['RUNNING'];
+        }
+
+        /**
+         * Get application environments
+         * @return array application environments
+         */
+        public final function environments(): array
+        {
+            return array_keys($this->config['ENVIRONMENTS']);
+        }
+
+        /**
+         * Get current active application environment
+         * @return string application environment
+         */
+        public final function activeEnvironment(): string
+        {
+            return $this->config['ACTIVE_ENVIRONMENT'];
         }
 
         /**
@@ -125,8 +160,11 @@ namespace shani\engine\core {
         /**
          * Execute user defined middlewares. This function provide access for user
          * to register and execute middlewares
+         * @param Middleware $mw Middleware object
+         * @return SecurityMiddleware|null If null then the Security advisor will
+         * be disabled (not recommended)
          */
-        public abstract function middleware(\shani\engine\http\Middleware &$mw): void;
+        public abstract function middleware(Middleware &$mw): ?SecurityMiddleware;
 
         /**
          * Get or set application modules directory

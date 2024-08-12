@@ -9,25 +9,21 @@
 
 namespace apps\demo\v1\config {
 
-    use shani\engine\core\AutoConfig;
+    use shani\advisors\Configuration;
+    use shani\engine\http\App;
     use shani\engine\http\Middleware;
 
-    final class Settings extends AutoConfig
+    final class Settings extends Configuration
     {
 
-        public function __construct(\shani\engine\http\App &$app)
+        public function __construct(App &$app, array &$configurations)
         {
-            parent::__construct($app);
+            parent::__construct($app, $configurations);
         }
 
         public function root(): ?string
         {
             return '/demo/v1';
-        }
-
-        public function middleware(Middleware &$mw): void
-        {
-            \apps\demo\v1\middleware\Register::exec($this->app, $mw);
         }
 
         public function homepage(): string
@@ -40,11 +36,6 @@ namespace apps\demo\v1\config {
             $this->app->response()->send();
         }
 
-        public function defaultLanguage(): string
-        {
-            return 'en';
-        }
-
         public function webroot(): string
         {
             return '/demo/storage';
@@ -53,6 +44,11 @@ namespace apps\demo\v1\config {
         public function requestMethods(): array
         {
             return ['get', 'post', 'head'];
+        }
+
+        public function middleware(Middleware &$mw): ?\shani\advisors\SecurityMiddleware
+        {
+            return new \apps\demo\v1\middleware\Register($this->app, $mw);
         }
     }
 

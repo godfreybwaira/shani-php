@@ -311,26 +311,12 @@ namespace shani\engine\http {
         }
 
         /**
-         * Check if HTTP request was made via secure connection
-         * @return bool True on success, false otherwise
+         * Get the current request target referring to current path to a class function
+         * @return string
          */
-        public function secure(): bool
+        public function target(): string
         {
-            return $this->req->uri()->scheme() === 'https';
-        }
-
-        /**
-         * Get the current refined URL path referring to current path to class function
-         * @param string|\Stringable $url
-         * @return string|null
-         */
-        public function path(string|\Stringable $url = null): ?string
-        {
-            $parts = $url === null ? $this->url : self::explodePath($url);
-            if (!empty($parts)) {
-                return $this->req->method() . $parts['module'] . $parts['resource'] . $parts['callback'];
-            }
-            return null;
+            return $this->req->method() . $this->url['module'] . $this->url['resource'] . $this->url['callback'];
         }
 
         /**
