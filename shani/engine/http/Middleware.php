@@ -17,9 +17,11 @@ namespace shani\engine\http {
     {
 
         private Event $listener;
+        private App $app;
 
         public function __construct(App &$app)
         {
+            $this->app = $app;
             $this->listener = new Event(['before']);
             $this->listener->done(fn() => self::returnResponse($app));
         }
@@ -58,8 +60,12 @@ namespace shani\engine\http {
         public function runWith(?SecurityMiddleware $mw): self
         {
             if ($mw === null || ($mw->checkAuthentication() && $mw->checkAuthorization() && $mw->blockCSRF())) {
-                $this->listener->trigger('before');
+                if ($this->listener->listening('before')) {
+                    $this->listener->trigger('before');
+                    return $this;
+                }
             }
+            self::returnResponse($this->app);
             return $this;
         }
     }

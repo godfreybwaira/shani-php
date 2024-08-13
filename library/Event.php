@@ -128,8 +128,6 @@ namespace library {
             } elseif ($cb !== null) {
                 $this->off($event);
                 Concurrency::async(fn() => self::finish($event, $this->onDone, $cb(...$params)));
-            } else {
-                Concurrency::async(fn() => self::finish($event, $this->onDone, null));
             }
             return $this;
         }
