@@ -99,14 +99,16 @@ namespace shani\engine\http {
 
         /**
          * Move a file from temporary directory to destination directory
+         * @param string|null $location A location to save a file, relative to web
+         * root directory. If set, then it must have a leading slash
          * @param string $newName A new file name without extension
          * @return string File path to a new location
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
          */
-        public function save(string $newName = null): string
+        public function save(string $location = null, string $newName = null): string
         {
 
-            $directory = self::createDirectory($this->file['type']);
+            $directory = self::createDirectory($location . '/' . $this->file['type']);
             $filepath = $directory . '/' . ($newName ?? 'file' . hrtime(true));
             $filepath .= self::getExtension($this->file['name']);
             $file = fopen($filepath, 'a+b');
@@ -132,7 +134,7 @@ namespace shani\engine\http {
 
         private static function createDirectory(string $destination): string
         {
-            $directory = self::$storage . '/' . $destination;
+            $directory = self::$storage . $destination;
             $created = mkdir($directory, self::FILE_MODE, true) || is_dir($directory);
             if (!$created) {
                 throw new \ErrorException('Failed to create directory ' . $directory);
