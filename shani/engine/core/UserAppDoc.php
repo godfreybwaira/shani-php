@@ -9,6 +9,8 @@
 
 namespace shani\engine\core {
 
+    use shani\engine\http\App;
+
     final class UserAppDoc
     {
 
@@ -44,13 +46,13 @@ namespace shani\engine\core {
 
         /**
          * Generate current user application documentation
-         * @param \shani\engine\http\App $app Application object
+         * @param App $app Application object
          * @return array User application documentation
          */
-        public static function generate(\shani\engine\http\App &$app): array
+        public static function generate(App &$app): array
         {
             $config = $app->config();
-            $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
+            $modulesPath = Definitions::DIR_APPS . $config->root() . $config->moduleDir();
             $modules = self::folderContent($modulesPath, $config->controllers());
             $allMethods = $config->requestMethods();
             $docs = [
@@ -74,10 +76,10 @@ namespace shani\engine\core {
                             $comments = self::cleanComment($fnobj->getDocComment());
                             $path = $module . '/' . $className . '/' . $name;
                             $details = $method . ' ' . $module . ' ' . $className . ' (';
-                            $details .= ($name === Definitions::HOME_FUNCTION ? 'single/all' : $name) . ')';
+                            $details .= ($name === Definitions::HOME_FUNCTION ? 'one/all' : $name) . ')';
                             $docs['modules'][$module][$className][$name][$method] = [
                                 'details' => $comments ?? ucwords(strtolower($details)),
-                                'id' => \library\Utils::digest(strtolower($method . '/' . $path)),
+                                'id' => App::digest(strtolower($method . '/' . $path)),
                                 'path' => '/' . str_replace('/', '/{id}/', strtolower($path))
                             ];
                         }

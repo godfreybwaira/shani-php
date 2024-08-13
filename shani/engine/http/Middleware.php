@@ -1,7 +1,8 @@
 <?php
 
 /**
- * Middleware registration point
+ * Middleware registration point. When a middleware check fails, it must set
+ * HTTP status code above 299 for it to raise an error.
  * @author coder
  *
  * Created on: Feb 13, 2024 at 8:55:03 AM
@@ -19,7 +20,7 @@ namespace shani\engine\http {
 
         public function __construct(App &$app)
         {
-            $this->listener = new Event(['before', 'after']);
+            $this->listener = new Event(['before']);
             $this->listener->done(fn() => self::returnResponse($app));
         }
 
@@ -51,15 +52,14 @@ namespace shani\engine\http {
         /**
          * This method start execution of all registered middlewares according
          * to their orders.
-         * @param SecurityMiddleware|null $middleware Security advisor middleware object
+         * @param SecurityMiddleware|null $mw Security advisor middleware object
          * @return self
          */
-        public function run(?SecurityMiddleware $middleware): self
+        public function runWith(?SecurityMiddleware $mw): self
         {
-            if ($middleware === null || ($middleware->checkAuthentication() && $middleware->checkAuthorization() && $middleware->blockCSRF())) {
+            if ($mw === null || ($mw->checkAuthentication() && $mw->checkAuthorization() && $mw->blockCSRF())) {
                 $this->listener->trigger('before');
             }
-            $this->listener->trigger('after');
             return $this;
         }
     }

@@ -13,11 +13,6 @@ namespace library {
     final class Utils
     {
 
-        public static function digest(string $str, string $algorithm = 'crc32b'): string
-        {
-            return hash($algorithm, $str);
-        }
-
         public static function errorHandler()
         {
             set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {

@@ -36,7 +36,7 @@ namespace shani\advisors {
             }
             $accepted = false;
             $token = $this->app->request()->cookies('csrf_token');
-            $hashedUrl = \library\Utils::digest($this->app->request()->uri()->path());
+            $hashedUrl = App::digest($this->app->request()->uri()->path());
             if ($csrf === \shani\advisors\Configuration::CSRF_STRICT) {
                 $accepted = $this->app->csrfToken()->get($hashedUrl) === $token;
             } else {
@@ -77,13 +77,13 @@ namespace shani\advisors {
         /**
          * Check if current application user has permissions enough to access
          * the current resource. If not then HTTP code 401 will be raised
-         * @param string $permissions List of application to search from, separated by
-         * comma or any special character
+         * @param string $permissions List of application to search from, separated
+         * by comma or any special character.
          * @return bool True if user is authorized, false otherwise
          */
         protected function authorized(string $permissions): bool
         {
-            $code = \library\Utils::digest($this->app->request()->target());
+            $code = App::digest($this->app->request()->target());
             if (preg_match('\b' . $code . '\b', $permissions) !== 1) {
                 $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
                 return false;

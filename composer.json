@@ -5,7 +5,7 @@
     "license": "GPL-3.0-only",
     "description": "an open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "swoole": ">=5.1"
     },
     "authors": [

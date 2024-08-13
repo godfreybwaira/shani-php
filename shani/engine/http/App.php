@@ -262,7 +262,7 @@ namespace shani\engine\http {
             Session::start($this);
             $middleware = new Middleware($this);
             $securityAdvisor = $this->config->middleware($middleware);
-            $middleware->run($securityAdvisor);
+            $middleware->runWith($securityAdvisor);
         }
 
         private function getClassPath(string $method): string
@@ -311,6 +311,11 @@ namespace shani\engine\http {
             }
         }
 
+        public static function digest(string $str, string $algorithm = 'crc32b'): string
+        {
+            return hash($algorithm, $str);
+        }
+
         /**
          * Set and/or get URL safe from CSRF attack. if CSRF is enabled, then the
          * application will be protected against CSRF attack and the URL will be
@@ -325,9 +330,9 @@ namespace shani\engine\http {
             if ($protection !== Configuration::CSRF_OFF) {
                 $token = base64_encode(random_bytes(6));
                 if ($protection === Configuration::CSRF_STRICT) {
-                    $this->csrfToken()->add([\library\Utils::digest($url) => $token]);
+                    $this->csrfToken()->add([self::digest($url) => $token]);
                 } else {
-                    $this->csrfToken()->add([$token => \library\Utils::digest($url)]);
+                    $this->csrfToken()->add([$token => self::digest($url)]);
                 }
                 $cookie = (new \library\HttpCookie())->setName('csrf_token')
                         ->setSameSite(\library\HttpCookie::SAME_SITE_STRICT)
