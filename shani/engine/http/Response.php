@@ -21,8 +21,6 @@ namespace shani\engine\http {
         private array $headers, $cookies;
         private ServerResponse $res;
 
-        private const CHUNK_SIZE = 1_048_576; //1MB
-
         public function __construct(Request &$req, ServerResponse &$res)
         {
             $this->statusCode = HttpStatus::OK;
@@ -362,7 +360,7 @@ namespace shani\engine\http {
             if ($size <= $start || ($end !== null && $start >= $end)) {
                 return $this->setStatus(HttpStatus::BAD_REQUEST)->send();
             }
-            $chunk = min($size, self::CHUNK_SIZE);
+            $chunk = min($size, \shani\engine\core\Definitions::BUFFER_SIZE);
             $len = $size - $start;
             if ($end > 0) {
                 $len = $chunk = $end - $start + 1;
@@ -419,7 +417,7 @@ namespace shani\engine\http {
             $file = stat($filepath);
             $range = $this->req->headers('range') ?? '=0-';
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-            $end = min($start + ($chunkSize ?? self::CHUNK_SIZE), $file['size'] - 1);
+            $end = min($start + ($chunkSize ?? \shani\engine\core\Definitions::BUFFER_SIZE), $file['size'] - 1);
             return $this->setHeaders([
                         'content-range' => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
                         'accept-ranges' => 'bytes'

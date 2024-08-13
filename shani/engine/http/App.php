@@ -34,6 +34,7 @@ namespace shani\engine\http {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
+                UploadedFile::setDefaultStorage($this->config->webroot());
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
