@@ -18,7 +18,7 @@ namespace shani\engine\http {
         private \SplFileObject $stream;
         public static $storage;
 
-        public const FILE_MODE = 0750;
+        private const PREFIXES = ['y', 'e', 's', 'u'];
 
         public function __construct(array &$file)
         {
@@ -64,7 +64,7 @@ namespace shani\engine\http {
          */
         public function getError(): ?array
         {
-            if ($this->file['error'] === 0) {
+            if ($this->file['error'] === UPLOAD_ERR_OK) {
                 return null;
             }
             $msg = match ($this->file['error']) {
@@ -109,8 +109,8 @@ namespace shani\engine\http {
         {
 
             $directory = self::createDirectory($location . '/' . $this->file['type']);
-            $filepath = $directory . '/' . ($newName ?? 'file' . hrtime(true));
-            $filepath .= self::getExtension($this->file['name']);
+            $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
+            $filepath .= hrtime(true) . self::getExtension($this->file['name']);
             $file = fopen($filepath, 'a+b');
             $size = fstat($file)['size'];
             if ($size < $this->file['size']) {
@@ -135,7 +135,7 @@ namespace shani\engine\http {
         private static function createDirectory(string $destination): string
         {
             $directory = self::$storage . $destination;
-            $created = mkdir($directory, self::FILE_MODE, true) || is_dir($directory);
+            $created = is_dir($directory) || mkdir($directory, Disk::FILE_MODE, true);
             if (!$created) {
                 throw new \ErrorException('Failed to create directory ' . $directory);
             }
@@ -144,7 +144,7 @@ namespace shani\engine\http {
 
         public static function setDefaultStorage(string $path): void
         {
-            self::$storage = Definitions::DIR_APPS . $path;
+            self::$storage = $path;
         }
     }
 
