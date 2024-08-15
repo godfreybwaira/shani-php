@@ -64,12 +64,12 @@ namespace shani\engine\http {
                 $mw->blockClickjacking();
                 $mw->resourceAccessPolicy();
             }
-            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
-                if ($this->listener->listening('before')) {
-                    $this->listener->trigger('before');
-                    return;
-                }
-            }
+//            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
+//                if ($this->listener->listening('before')) {
+//                    $this->listener->trigger('before');
+//                    return;
+//                }
+//            }
             self::returnResponse($this->app);
         }
     }

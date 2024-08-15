@@ -97,9 +97,16 @@ namespace shani\advisors {
         public function resourceAccessPolicy(): void
         {
             $cnf = $this->app->config();
+            $policy = $cnf->resourceAccessPolicy();
+            if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
+                return;
+            }
             $this->app->response()->setHeaders([
-                'cross-origin-resource-policy' => self::ACCESS_POLICIES[$cnf->resourceAccessPolicy()],
-                'access-control-allow-origin' => $cnf->resourceAccessWhitelist()
+                'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
+                'access-control-allow-origin' => $cnf->resourceAccessWhitelist(),
+                'access-control-allow-methods' => implode(', ', $cnf->requestMethods()),
+                'access-control-allow-headers' => '*',
+                'access-control-max-age' => 86400
             ]);
         }
 
@@ -111,7 +118,7 @@ namespace shani\advisors {
         public function blockClickjacking(): void
         {
             $this->app->response()->setHeaders([
-                'x-frame-options' => 'sameorigin',
+                'x-frame-options' => 'SAMEORIGIN',
                 'content-security-policy' => "frame-ancestors 'self'"
             ]);
         }

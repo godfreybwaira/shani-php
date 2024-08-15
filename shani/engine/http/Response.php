@@ -408,7 +408,7 @@ namespace shani\engine\http {
          */
         public function stream(string $filepath, ?int $chunkSize = null): self
         {
-            if (!is_readable($filepath)) {
+            if (!is_file($filepath)) {
                 return $this->setStatus(HttpStatus::NOT_FOUND)->send();
             }
             $file = stat($filepath);

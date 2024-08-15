@@ -50,17 +50,23 @@ namespace shani\advisors {
         public const ACCESS_POLICY_ANY_DOMAIN = 2;
 
         /**
-         * Never send the Referrer header
+         *  Do not use resource access policy (Not recommended)
+         */
+        public const ACCESS_POLICY_DISABLE = 3;
+
+        /**
+         * Never send the Referrer header (Protect user's privacy)
          */
         public const BROWSING_PRIVACY_STRICT = 0;
 
         /**
-         * Send the Referrer header, but only on requests from this domain.
+         * Send the Referrer header (See what user is browsing but only on this domain)
          */
         public const BROWSING_PRIVACY_THIS_DOMAIN = 1;
 
         /**
-         * Send the Referrer header to all origins, but only include the URL without the path
+         * Send the Referrer header (See what user is browsing on all domains
+         * but do not show the actual content they browse)
          */
         public const BROWSING_PRIVACY_PARTIALLY = 2;
 
@@ -254,7 +260,7 @@ namespace shani\advisors {
          */
         public function appName(): string
         {
-            return Framework::NAME . ' v' . Framework::VERSION;
+            return \shani\engine\core\Framework::NAME . ' v' . \shani\engine\core\Framework::VERSION;
         }
 
         /**

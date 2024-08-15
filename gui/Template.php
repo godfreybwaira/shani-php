@@ -144,7 +144,7 @@ namespace gui {
          */
         public function head(): string
         {
-            $head = $this->icon;
+            $head = $this->icon . $this->details;
             $asset = $this->app->asset();
             foreach ($this->scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $asset->urlTo($url) . '"></script>';
