@@ -57,16 +57,20 @@ namespace shani\engine\http {
          * @param SecurityMiddleware|null $mw Security advisor middleware object
          * @return self
          */
-        public function runWith(?SecurityMiddleware $mw): self
+        public function runWith(?SecurityMiddleware $mw): void
         {
-            if ($mw === null || ($mw->checkAuthentication() && $mw->checkAuthorization() && $mw->blockCSRF())) {
+            if ($mw !== null) {
+                $mw->browsingPrivacy();
+                $mw->blockClickjacking();
+                $mw->resourceAccessPolicy();
+            }
+            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
                 if ($this->listener->listening('before')) {
                     $this->listener->trigger('before');
-                    return $this;
+                    return;
                 }
             }
             self::returnResponse($this->app);
-            return $this;
         }
     }
 

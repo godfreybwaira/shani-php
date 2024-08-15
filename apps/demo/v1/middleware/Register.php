@@ -21,16 +21,6 @@ namespace apps\demo\v1\middleware {
             $mw->on('before', fn() => Test::m1($app));
             $mw->on('before', fn() => Test::m2($app));
         }
-
-        public function checkAuthentication(): bool
-        {
-            return parent::authenticated(false);
-        }
-
-        public function checkAuthorization(): bool
-        {
-            return parent::authorized('');
-        }
     }
 
 }

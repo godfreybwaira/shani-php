@@ -34,6 +34,42 @@ namespace shani\advisors {
          */
         public const CSRF_FLEXIBLE = 2;
 
+        /**
+         *  allows resource access on this application from this domain only
+         */
+        public const ACCESS_POLICY_THIS_DOMAIN = 0;
+
+        /**
+         *  allows resource access on this application from this domain and it's subdomain
+         */
+        public const ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN = 1;
+
+        /**
+         *  allows resource access on this application from any domain (origin)
+         */
+        public const ACCESS_POLICY_ANY_DOMAIN = 2;
+
+        /**
+         * Never send the Referrer header
+         */
+        public const BROWSING_PRIVACY_STRICT = 0;
+
+        /**
+         * Send the Referrer header, but only on requests from this domain.
+         */
+        public const BROWSING_PRIVACY_THIS_DOMAIN = 1;
+
+        /**
+         * Send the Referrer header to all origins, but only include the URL without the path
+         */
+        public const BROWSING_PRIVACY_PARTIALLY = 2;
+
+        /**
+         * Send the full Referrer header on same-origin requests and only the
+         * URL without the path on cross-origin requests
+         */
+        public const BROWSING_PRIVACY_NONE = 3;
+
         protected App $app;
         private array $config;
 
@@ -236,6 +272,61 @@ namespace shani\advisors {
          * Returns an array of HTTP request methods supported by the application (in lower case)
          */
         public abstract function requestMethods(): array;
+
+        /**
+         * Get a list of authenticated user's permissions separated by comma.
+         * @return string|null List of user permissions or null if no permission is granted
+         */
+        public abstract function userPermissions(): ?string;
+
+        /**
+         * Get a list of modules accessible by all users (guests & authenticated)
+         * @return array List of public modules
+         */
+        public function publicModules(): array
+        {
+            return [];
+        }
+
+        /**
+         * Get a list of modules accessible by guest users only
+         * @return array List of guest modules
+         */
+        public function guestModules(): array
+        {
+            return [];
+        }
+
+        /**
+         * Returns a list of domains (FQDN), ip address or subdomains that a web browser
+         * will allow to access resources on this application. The list items are
+         * separated by comma
+         * @return string
+         */
+        public function resourceAccessWhitelist(): string
+        {
+            return '*';
+        }
+
+        /**
+         * Tells a web browser how to decide which domain can access resources
+         * on this application.
+         * @return int
+         * @see SecurityMiddleware::resourceAccessPolicy()
+         */
+        public function resourceAccessPolicy(): int
+        {
+            return self::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN;
+        }
+
+        /**
+         * @return int
+         * @see SecurityMiddleware::browsingPrivacy()
+         */
+        public function browsingPrivacy(): int
+        {
+            return self::BROWSING_PRIVACY_THIS_DOMAIN;
+        }
     }
 
 }

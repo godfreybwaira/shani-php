@@ -28,10 +28,7 @@ namespace shani\engine\http {
             $this->req = $req;
             $this->res = $res;
             $this->headers = [
-                'x-frame-options' => 'sameorigin',
-                'x-content-type-options' => 'nosniff',
-                'referrer-policy' => 'same-origin', //or strict-origin-when-cross-origin
-                'access-control-allow-origin' => '*'
+                'x-content-type-options' => 'nosniff'
             ];
         }
 
