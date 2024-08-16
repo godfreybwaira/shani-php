@@ -15,18 +15,18 @@ namespace shani\engine\http {
     final class Response
     {
 
-        private Request $req;
+        private App $app;
         private int $statusCode;
         private ?string $datatype = null;
         private array $headers, $cookies;
         private ServerResponse $res;
 
-        public function __construct(Request &$req, ServerResponse &$res)
+        public function __construct(App &$app, ServerResponse &$res)
         {
             $this->statusCode = HttpStatus::OK;
             $this->cookies = [];
-            $this->req = $req;
             $this->res = $res;
+            $this->app = $app;
             $this->headers = [
                 'x-content-type-options' => 'nosniff'
             ];
@@ -34,8 +34,31 @@ namespace shani\engine\http {
 
         private function write(?string $content = null): self
         {
-            $this->sendHeaders(['content-length' => $content !== null ? mb_strlen($content) : 0]);
-            $this->res->write($this->req->method() !== 'head' ? $content : null);
+            $length = $content !== null ? mb_strlen($content) : 0;
+            $encoding = $this->app->request()->headers('accept-encoding');
+            $ratio = $this->app->config()->compressionLevel();
+            if ($encoding === null || $ratio === 0 || $length < $this->app->config()->compressionMinSize()) {
+                return $this->finish($content);
+            }
+            if (str_contains($encoding, 'gzip')) {
+                $content = gzencode($content, $ratio);
+                $this->sendHeaders(['content-encoding' => 'gzip']);
+            } elseif (str_contains($encoding, 'deflate')) {
+                $content = gzdeflate($content, $ratio);
+                $this->sendHeaders(['content-encoding' => 'deflate']);
+            }
+            return $this->finish($content);
+        }
+
+        private function finish(?string $content = null): self
+        {
+            if ($content === null) {
+                $this->sendHeaders(['content-length' => 0]);
+                $this->res->write(null);
+            } else {
+                $this->sendHeaders(['content-length' => mb_strlen($content)]);
+                $this->res->write($this->app->request()->method() !== 'head' ? $content : null);
+            }
             return $this;
         }
 
@@ -49,13 +72,13 @@ namespace shani\engine\http {
                 if (!empty($this->headers['content-type'])) {
                     $this->datatype = \library\Mime::explode($this->headers['content-type'])[1] ?? null;
                 } else {
-                    $path = $this->req->uri()->path();
+                    $path = $this->app->request()->uri()->path();
                     $parts = explode('.', $path);
                     $size = count($parts);
                     if ($size > 1) {
                         $this->datatype = strtolower($parts[$size - 1]);
                     } else {
-                        $this->datatype = \library\Mime::explode($this->req->headers('accept'))[1] ?? null;
+                        $this->datatype = \library\Mime::explode($this->app->request()->headers('accept'))[1] ?? null;
                     }
                 }
             }
@@ -74,11 +97,11 @@ namespace shani\engine\http {
          */
         public function sendFilter(array $data, ?array $availableColumns = null, ?array $filters = null): self
         {
-            $values = \library\Map::filter($data, $filters ?? $this->req->query());
+            $values = \library\Map::filter($data, $filters ?? $this->app->request()->query());
             if (empty($availableColumns)) {
                 return $this->send($values);
             }
-            $userColumns = $this->req->columns($availableColumns);
+            $userColumns = $this->app->request()->columns($availableColumns);
             return $this->send(\library\Map::getAll($values, $userColumns));
         }
 
@@ -111,7 +134,7 @@ namespace shani\engine\http {
                         return $this->sendAsSse($data);
                     case'js':
                     case'jsonp':
-                        return $this->sendAsJsonp($data, $this->req->query('callback') ?? 'callback');
+                        return $this->sendAsJsonp($data, $this->app->request()->query('callback') ?? 'callback');
                 }
             }
             return $this->plainText($data, 'text/plain; charset=utf-8');
@@ -314,7 +337,7 @@ namespace shani\engine\http {
          */
         public function redirectBack(int $code = HttpStatus::FOUND): bool
         {
-            $url = $this->req->headers('referer');
+            $url = $this->app->request()->headers('referer');
             if ($url !== null) {
                 $this->res->redirect($url, $code);
                 return true;
@@ -358,16 +381,16 @@ namespace shani\engine\http {
                 return $this->setStatus(HttpStatus::BAD_REQUEST)->send();
             }
             $chunk = min($size, \shani\engine\core\Definitions::BUFFER_SIZE);
-            $len = $size - $start;
+            $length = $size - $start;
             if ($end > 0) {
-                $len = $chunk = $end - $start + 1;
+                $length = $chunk = $end - $start + 1;
             }
             $this->sendHeaders([
-                'content-length' => $len,
+                'content-length' => $length,
                 'content-type' => \library\Mime::fromFilename($path)
             ]);
 
-            if ($this->req->method() !== 'head') {
+            if ($this->app->request()->method() !== 'head') {
                 $this->res->sendFile($path, $start, $chunk);
             } else {
                 $this->res->write();
@@ -412,7 +435,7 @@ namespace shani\engine\http {
                 return $this->setStatus(HttpStatus::NOT_FOUND)->send();
             }
             $file = stat($filepath);
-            $range = $this->req->headers('range') ?? '=0-';
+            $range = $this->app->request()->headers('range') ?? '=0-';
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
             $end = min($start + ($chunkSize ?? \shani\engine\core\Definitions::BUFFER_SIZE), $file['size'] - 1);
             return $this->setHeaders([

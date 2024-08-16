@@ -153,7 +153,7 @@ namespace shani\advisors {
             if (empty($headers['access-control-request-method'])) {
                 return;
             }
-            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([,
+            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
                 'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
                 'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
                 'access-control-allow-origin' => $this->app->config()->resourceAccessWhitelist(),

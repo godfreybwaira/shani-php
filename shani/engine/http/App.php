@@ -30,7 +30,7 @@ namespace shani\engine\http {
         {
             $this->lang = null;
             $this->req = new Request($req);
-            $this->res = new Response($this->req, $res);
+            $this->res = new Response($this, $res);
             try {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];

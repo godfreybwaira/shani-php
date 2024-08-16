@@ -333,6 +333,26 @@ namespace shani\advisors {
         {
             return self::BROWSING_PRIVACY_THIS_DOMAIN;
         }
+
+        /**
+         * Set level for compression algorithm from 0 to 9 where 0 = disable,
+         * 4-6 = ideal ratio, 9 = Maximum compression but slow. The default ratio is 5
+         * @return int
+         */
+        public function compressionLevel(): int
+        {
+            return 5;
+        }
+
+        /**
+         * Set data compression minimum size (in bytes) during transmission.
+         * The default size is 1KB
+         * @return int Minimum number of bytes to compress
+         */
+        public function compressionMinSize(): int
+        {
+            return 1024; //1KB
+        }
     }
 
 }
