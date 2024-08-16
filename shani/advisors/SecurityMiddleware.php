@@ -104,9 +104,7 @@ namespace shani\advisors {
             $this->app->response()->setHeaders([
                 'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
                 'access-control-allow-origin' => $cnf->resourceAccessWhitelist(),
-                'access-control-allow-methods' => implode(', ', $cnf->requestMethods()),
-                'access-control-allow-headers' => '*',
-                'access-control-max-age' => 86400
+                'access-control-allow-methods' => implode(',', $cnf->requestMethods())
             ]);
         }
 
@@ -133,6 +131,33 @@ namespace shani\advisors {
         {
             $this->app->response()->setHeaders([
                 'referrer-policy' => self::REFERRER_PRIVACIES[$this->app->config()->browsingPrivacy()]
+            ]);
+        }
+
+        /**
+         * A request sent by the browser before sending the actual request to verify
+         * whether a server can process the coming request.
+         * @param int $cacheTime Tells the browser to cache the preflight response
+         * @return void
+         */
+        public function preflightRequest(int $cacheTime = 86400): void
+        {
+            $req = $this->app->request();
+            if ($req->method() !== 'options') {
+                return;
+            }
+            $headers = $req->headers([
+                'access-control-request-method',
+                'access-control-request-headers'
+            ]);
+            if (empty($headers['access-control-request-method'])) {
+                return;
+            }
+            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([,
+                'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
+                'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
+                'access-control-allow-origin' => $this->app->config()->resourceAccessWhitelist(),
+                'access-control-max-age' => $cacheTime
             ]);
         }
     }

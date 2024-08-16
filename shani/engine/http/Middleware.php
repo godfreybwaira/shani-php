@@ -63,6 +63,7 @@ namespace shani\engine\http {
                 $mw->browsingPrivacy();
                 $mw->blockClickjacking();
                 $mw->resourceAccessPolicy();
+                $mw->preflightRequest();
             }
 //            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
 //                if ($this->listener->listening('before')) {
