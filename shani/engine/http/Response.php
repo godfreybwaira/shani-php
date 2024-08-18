@@ -20,6 +20,7 @@ namespace shani\engine\http {
         private ?string $datatype = null;
         private array $headers, $cookies;
         private ServerResponse $res;
+        private bool $buffer = false;
 
         public function __construct(App &$app, ServerResponse &$res)
         {
@@ -27,39 +28,53 @@ namespace shani\engine\http {
             $this->cookies = [];
             $this->res = $res;
             $this->app = $app;
-            $this->headers = [
-                'x-content-type-options' => 'nosniff'
-            ];
+            $this->headers = ['x-content-type-options' => 'nosniff'];
+        }
+
+        /**
+         * Set output buffer on so that output can be sent in chunks without closing connection.
+         * @param bool $use Buffer value. If true, then the buffer will be on,
+         * If false, then connection will be closed and no output can be sent.
+         * @return self
+         */
+        public function useBuffer(bool $use = true): self
+        {
+            $this->buffer = $use;
+            if (!$use) {
+                $this->res->close();
+            }
+            return $this;
         }
 
         private function write(?string $content = null): self
         {
-            $length = $content !== null ? mb_strlen($content) : 0;
+            if ($content === null || $content === '') {
+                return $this->setHeaders('content-length', 0)->close();
+            }
             $encoding = $this->app->request()->headers('accept-encoding');
             $ratio = $this->app->config()->compressionLevel();
-            if ($encoding === null || $ratio === 0 || $length < $this->app->config()->compressionMinSize()) {
+            $minSize = $this->app->config()->compressionMinSize();
+            if ($encoding === null || $ratio === 0 || mb_strlen($content) < $minSize) {
                 return $this->finish($content);
-            }
-            if (str_contains($encoding, 'gzip')) {
-                $content = gzencode($content, $ratio);
-                $this->sendHeaders(['content-encoding' => 'gzip']);
+            } elseif (str_contains($encoding, 'gzip')) {
+                return $this->setHeaders('content-encoding', 'gzip')->finish(gzencode($content, $ratio));
             } elseif (str_contains($encoding, 'deflate')) {
-                $content = gzdeflate($content, $ratio);
-                $this->sendHeaders(['content-encoding' => 'deflate']);
+                return $this->setHeaders('content-encoding', 'deflate')->finish(gzdeflate($content, $ratio));
             }
             return $this->finish($content);
         }
 
-        private function finish(?string $content = null): self
+        private function finish(string $content): self
         {
-            if ($content === null) {
-                $this->sendHeaders(['content-length' => 0]);
-                $this->res->write(null);
-            } else {
-                $this->sendHeaders(['content-length' => mb_strlen($content)]);
-                $this->res->write($this->app->request()->method() !== 'head' ? $content : null);
+            if ($this->app->request()->method() !== 'head') {
+                if (!$this->buffer) {
+                    return $this->setHeaders('content-length', mb_strlen($content))->close($content);
+                }
+                $this->sendHeaders()->res->write($content);
+                return $this;
             }
-            return $this;
+            $this->setStatus(HttpStatus::NO_CONTENT);
+            return $this->setHeaders('content-length', mb_strlen($content))->close();
         }
 
         /**
@@ -91,8 +106,7 @@ namespace shani\engine\http {
          * @param array|null $availableColumns Allowed columns to be send to user response.
          * Use this parameter to filter out columns you don't want to send to user.
          * @param array|null $filters User filters supplied via HTTP query string.
-         * The values of query string must match data columns and values MUST be
-         * present.
+         * The values of query string must match data columns and values MUST be present
          * @return self
          */
         public function sendFilter(array $data, ?array $availableColumns = null, ?array $filters = null): self
@@ -106,9 +120,11 @@ namespace shani\engine\http {
         }
 
         /**
-         * Send HTTP response body
+         * Send HTTP response body, leaving connection open. Ideal when wanting
+         * to send data in chunks. Remember to close the connection when done.
          * @param type $data Data to send as response body.
          * @return self
+         * @see self::close()
          */
         public function send($data = null): self
         {
@@ -187,7 +203,7 @@ namespace shani\engine\http {
         /**
          * Send HTTP response body as JSON with padding
          * @param type $data Data to send
-         * @param string $callback Javascript callback function
+         * @param string $callback JavaScript callback function
          * @return self
          */
         public function sendAsJsonp($data, string $callback): self
@@ -260,18 +276,16 @@ namespace shani\engine\http {
          * @param array|null $headers Headers to send
          * @return self
          */
-        public function sendHeaders(?array $headers = null): self
+        private function sendHeaders(?array $headers = null): self
         {
-            if (!$this->res->ended()) {
-                if ($headers !== null) {
-                    $this->setHeaders($headers);
-                }
-                if (count($this->cookies) > 0) {
-                    $this->setHeaders('set-cookie', implode(',', $this->cookies));
-                }
-                $this->setHeaders('server', \shani\engine\core\Framework::NAME);
-                $this->res->sendHeaders($this->headers);
+            if ($headers !== null) {
+                $this->setHeaders($headers);
             }
+            if (count($this->cookies) > 0) {
+                $this->setHeaders('set-cookie', implode(',', $this->cookies));
+            }
+            $this->setHeaders('server', \shani\engine\core\Framework::NAME);
+            $this->res->sendHeaders($this->headers);
             return $this;
         }
 
@@ -330,8 +344,8 @@ namespace shani\engine\http {
         }
 
         /**
-         * Send HTTP response redirect to a given HTTP referer, if no referer given
-         * false is returned
+         * Send HTTP response redirect using a given HTTP referrer, if no referrer given
+         * false is returned and redirection fails
          * @param int $code HTTP status code, default is 302
          * @return bool
          */
@@ -368,7 +382,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Stream a file
+         * Stream a file to a client
          * @param string $path Path to a file to stream
          * @param int $start Start bytes to stream
          * @param int $end End bytes to stream
@@ -378,22 +392,23 @@ namespace shani\engine\http {
         {
             $size = filesize($path);
             if ($size <= $start || ($end !== null && $start >= $end)) {
-                return $this->setStatus(HttpStatus::BAD_REQUEST)->send();
+                return $this->setStatus(HttpStatus::BAD_REQUEST)->close();
             }
             $chunk = min($size, \shani\engine\core\Definitions::BUFFER_SIZE);
             $length = $size - $start;
             if ($end > 0) {
                 $length = $chunk = $end - $start + 1;
             }
-            $this->sendHeaders([
-                'content-length' => $length,
-                'content-type' => \library\Mime::fromFilename($path)
-            ]);
-
             if ($this->app->request()->method() !== 'head') {
-                $this->res->sendFile($path, $start, $chunk);
+                $this->sendHeaders([
+                    'content-length' => $length,
+                    'content-type' => \library\Mime::fromFilename($path)
+                ])->res->sendFile($path, $start, $chunk);
             } else {
-                $this->res->write();
+                $this->setHeaders([
+                    'content-length' => $length,
+                    'content-type' => \library\Mime::fromFilename($path)
+                ])->setStatus(HttpStatus::NO_CONTENT)->close();
             }
             return $this;
         }
@@ -432,16 +447,17 @@ namespace shani\engine\http {
         public function stream(string $filepath, ?int $chunkSize = null): self
         {
             if (!is_file($filepath)) {
-                return $this->setStatus(HttpStatus::NOT_FOUND)->send();
+                return $this->setStatus(HttpStatus::NOT_FOUND)->close();
             }
             $file = stat($filepath);
             $range = $this->app->request()->headers('range') ?? '=0-';
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
             $end = min($start + ($chunkSize ?? \shani\engine\core\Definitions::BUFFER_SIZE), $file['size'] - 1);
-            return $this->setHeaders([
-                        'content-range' => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
-                        'accept-ranges' => 'bytes'
-                    ])->setStatus(HttpStatus::PARTIAL_CONTENT)->doStream($filepath, $start, $end);
+            $this->setHeaders([
+                'content-range' => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
+                'accept-ranges' => 'bytes'
+            ])->setStatus(HttpStatus::PARTIAL_CONTENT);
+            return $this->doStream($filepath, $start, $end);
         }
 
         /**
@@ -474,6 +490,17 @@ namespace shani\engine\http {
                 }
             }
             return $this->setHeaders('cache-control', implode(',', $directives));
+        }
+
+        /**
+         * Send output and close connection
+         * @param string|null $content Output to send
+         * @return self
+         */
+        private function close(?string $content = null): self
+        {
+            $this->sendHeaders()->res->close($content);
+            return $this;
         }
     }
 

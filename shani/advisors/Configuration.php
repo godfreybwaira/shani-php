@@ -305,11 +305,10 @@ namespace shani\advisors {
 
         /**
          * Returns a list of domains (FQDN), ip address or subdomains that a web browser
-         * will allow to access resources on this application. The list items are
-         * separated by comma
+         * will allow to access resources on this application. The list is separated by comma
          * @return string
          */
-        public function resourceAccessWhitelist(): string
+        public function whitelistedDomains(): string
         {
             return '*';
         }
@@ -352,6 +351,16 @@ namespace shani\advisors {
         public function compressionMinSize(): int
         {
             return 1024; //1KB
+        }
+
+        /**
+         * Enable/disable preflight request sent by the browser
+         * @return bool
+         * @see SecurityMiddleware::preflightRequest()
+         */
+        public function preflightRequest(): bool
+        {
+            return true;
         }
     }
 

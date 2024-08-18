@@ -137,17 +137,6 @@ namespace shani\engine\http {
         }
 
         /**
-         * Clears all user data. This application does not terminate the application,
-         * instead it terminate current online user.
-         * @return void
-         */
-        public function close(): void
-        {
-            Session::stop();
-            $this->res->redirect('/');
-        }
-
-        /**
          * Create and return cart for storing session values
          * @param string $name Cart name
          * @return Session
@@ -198,7 +187,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Render HTML document to user agent. All views have access to application object as $app
+         * Render HTML document to user agent and close the HTTP connection.
          * @param array|null $data Values to be passed on view file
          * @return void
          */
@@ -209,12 +198,12 @@ namespace shani\engine\http {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsHtml(ob_get_clean());
-            } else if ($type === 'event-stream') {
+            } else if ($type !== 'event-stream') {
+                $this->res->send($data);
+            } else {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsSse(ob_get_clean());
-            } else {
-                $this->res->send($data);
             }
         }
 

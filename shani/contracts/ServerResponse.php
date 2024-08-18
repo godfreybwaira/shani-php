@@ -12,9 +12,9 @@ namespace shani\contracts {
     interface ServerResponse
     {
 
-        public function ended(): bool;
-
         public function write(?string $content = null): self;
+
+        public function close(?string $content = null): self;
 
         public function sendHeaders(array $values): self;
 

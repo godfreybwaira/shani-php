@@ -103,7 +103,7 @@ namespace shani\advisors {
             }
             $this->app->response()->setHeaders([
                 'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
-                'access-control-allow-origin' => $cnf->resourceAccessWhitelist(),
+                'access-control-allow-origin' => $cnf->whitelistedDomains(),
                 'access-control-allow-methods' => implode(',', $cnf->requestMethods())
             ]);
         }
@@ -139,11 +139,12 @@ namespace shani\advisors {
          * whether a server can process the coming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
          * @return void
+         * @see Configuration::preflightRequest()
          */
         public function preflightRequest(int $cacheTime = 86400): void
         {
             $req = $this->app->request();
-            if ($req->method() !== 'options') {
+            if (!$this->app->config()->preflightRequest() || $req->method() !== 'options') {
                 return;
             }
             $headers = $req->headers([
@@ -156,7 +157,7 @@ namespace shani\advisors {
             $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
                 'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
                 'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
-                'access-control-allow-origin' => $this->app->config()->resourceAccessWhitelist(),
+                'access-control-allow-origin' => $this->app->config()->whitelistedDomains(),
                 'access-control-max-age' => $cacheTime
             ]);
         }

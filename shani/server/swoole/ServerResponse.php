@@ -19,20 +19,23 @@ namespace shani\server\swoole {
             $this->res = $res;
         }
 
-        public function ended(): bool
-        {
-            return !$this->res->isWritable();
-        }
-
         public function sendHeaders(array $values): self
         {
-            foreach ($values as $key => $value) {
-                $this->res->header($key, $value);
+            if ($this->res->isWritable()) {
+                foreach ($values as $key => $value) {
+                    $this->res->header($key, $value);
+                }
             }
             return $this;
         }
 
         public function write(?string $content = null): self
+        {
+            $this->res->write($content);
+            return $this;
+        }
+
+        public function close(?string $content = null): self
         {
             $this->res->end($content);
             return $this;
