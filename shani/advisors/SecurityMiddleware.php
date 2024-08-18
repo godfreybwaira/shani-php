@@ -17,6 +17,18 @@ namespace shani\advisors {
 
         protected App $app;
 
+        private const ACCESS_POLICIES = [
+            Configuration::ACCESS_POLICY_ANY_DOMAIN => 'cross-origin',
+            Configuration::ACCESS_POLICY_THIS_DOMAIN => 'same-origin',
+            Configuration::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN => 'same-site'
+        ];
+        private const REFERRER_PRIVACIES = [
+            Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
+            Configuration::BROWSING_PRIVACY_THIS_DOMAIN => 'same-origin',
+            Configuration::BROWSING_PRIVACY_PARTIALLY => 'strict-origin',
+            Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
+        ];
+
         protected function __construct(App &$app)
         {
             $this->app = $app;
@@ -49,59 +61,106 @@ namespace shani\advisors {
         }
 
         /**
-         * Check if current application user is authenticated to access the requested
-         * resource. If not, then 403 HTTP error will be raised.
-         * @param bool $loggedIn Value to check if user has logged in successfully.
-         * @param array $guestModules All modules that can be accessed by guest user
-         * must be provided here
-         * @param array $publicModules All modules that are accessed by both guest and
-         * and authenticated user must be mentioned here.
-         * @return bool True if user is authenticated, false otherwise
+         * Check if current application user is authorized to access the requested
+         * resource. If not, then 401 HTTP error will be raised.
+         * @return bool True on success, false otherwise
          */
-        protected function authenticated(bool $loggedIn, array $guestModules = [], array $publicModules = []): bool
+        public function authorized(): bool
         {
+            $cnf = $this->app->config();
+            $permissions = $cnf->userPermissions();
             $module = $this->app->request()->module();
-            if ($loggedIn) {
-                if (in_array($module, $guestModules)) {
-                    $this->app->request()->rewriteUrl($this->app->config()->homepage());
+            if ($permissions !== null) {
+                if (in_array($module, $cnf->guestModules())) {
+                    $this->app->request()->rewriteUrl($cnf->homepage());
+                    return true;
                 }
+                if (in_array($module, $cnf->publicModules())) {
+                    return true;
+                }
+                $code = App::digest($this->app->request()->target());
+                if (preg_match('\b' . $code . '\b', $permissions) === 1) {
+                    return true;
+                }
+            } else if (in_array($module, $cnf->guestModules()) || in_array($module, $cnf->publicModules())) {
                 return true;
             }
-            if (in_array($module, $guestModules) || in_array($module, $publicModules)) {
-                return true;
-            }
-            $this->app->response()->setStatus(HttpStatus::FORBIDDEN);
+            $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
             return false;
         }
 
         /**
-         * Check if current application user has permissions enough to access
-         * the current resource. If not then HTTP code 401 will be raised
-         * @param string $permissions List of application to search from, separated
-         * by comma or any special character.
-         * @return bool True if user is authorized, false otherwise
+         * Tells a web browser whether to allow other sites to access your resources
+         * @return void
+         * @see Configuration::resourceAccessPolicy()
          */
-        protected function authorized(string $permissions): bool
+        public function resourceAccessPolicy(): void
         {
-            $code = App::digest($this->app->request()->target());
-            if (preg_match('\b' . $code . '\b', $permissions) !== 1) {
-                $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
-                return false;
+            $cnf = $this->app->config();
+            $policy = $cnf->resourceAccessPolicy();
+            if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
+                return;
             }
-            return true;
+            $this->app->response()->setHeaders([
+                'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
+                'access-control-allow-origin' => $cnf->whitelistedDomains(),
+                'access-control-allow-methods' => implode(',', $cnf->requestMethods())
+            ]);
         }
 
         /**
-         * Implement your own logic or call parent::authorized()
-         * @see parent::authorized()
+         * Tells a web browser to disable other sites from embedding your website
+         * to theirs, e.g via iframe tag
+         * @return void
          */
-        public abstract function checkAuthorization(): bool;
+        public function blockClickjacking(): void
+        {
+            $this->app->response()->setHeaders([
+                'x-frame-options' => 'SAMEORIGIN',
+                'content-security-policy' => "frame-ancestors 'self'"
+            ]);
+        }
 
         /**
-         * Implement your own logic or call parent::authenticated()
-         * @see parent::authenticated()
+         * Tells a web browser how send HTTP referrer header. This is important
+         * for keeping user browsing privacy
+         * @return void
+         * @see Configuration::browsingPrivacy()
          */
-        public abstract function checkAuthentication(): bool;
+        public function browsingPrivacy(): void
+        {
+            $this->app->response()->setHeaders([
+                'referrer-policy' => self::REFERRER_PRIVACIES[$this->app->config()->browsingPrivacy()]
+            ]);
+        }
+
+        /**
+         * A request sent by the browser before sending the actual request to verify
+         * whether a server can process the coming request.
+         * @param int $cacheTime Tells the browser to cache the preflight response
+         * @return void
+         * @see Configuration::preflightRequest()
+         */
+        public function preflightRequest(int $cacheTime = 86400): void
+        {
+            $req = $this->app->request();
+            if (!$this->app->config()->preflightRequest() || $req->method() !== 'options') {
+                return;
+            }
+            $headers = $req->headers([
+                'access-control-request-method',
+                'access-control-request-headers'
+            ]);
+            if (empty($headers['access-control-request-method'])) {
+                return;
+            }
+            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
+                'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
+                'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
+                'access-control-allow-origin' => $this->app->config()->whitelistedDomains(),
+                'access-control-max-age' => $cacheTime
+            ]);
+        }
     }
 
 }

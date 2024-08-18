@@ -9,6 +9,7 @@
 
 namespace shani\engine\http {
 
+    use library\HttpStatus;
 
     final class Asset
     {
@@ -16,7 +17,7 @@ namespace shani\engine\http {
         private App $app;
 
         private const ASSET_PREFIX = '/0';
-        private const STORAGE_PREFIX = '/1';
+        public const DISK_PREFIX = '/1';
 
         public function __construct(App &$app)
         {
@@ -39,19 +40,19 @@ namespace shani\engine\http {
             $prefix = $rootPath = null;
             if (self::isStaticPath($path, self::ASSET_PREFIX)) {
                 $prefix = self::ASSET_PREFIX;
-                $rootPath = \shani\engine\core\Definitions::DIR_ASSETS;
-            } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
-                $prefix = self::STORAGE_PREFIX;
-                $rootPath = \shani\engine\core\Definitions::DIR_APPS . $app->config()->webroot();
+                $rootPath = $app->asset()->pathTo();
+            } elseif (self::isStaticPath($path, self::DISK_PREFIX)) {
+                $prefix = self::DISK_PREFIX;
+                $rootPath = $app->disk()->path();
             }
             if ($prefix === null) {
                 return false;
             }
             if ($app->request()->headers('if-none-match') === null) {
                 $location = $rootPath . substr($path, strlen($prefix));
-                $app->response()->setStatus(\library\HttpStatus::OK)->setCache()->stream($location);
+                $app->response()->setStatus(HttpStatus::OK)->setCache()->stream($location);
             } else {
-                $app->response()->setStatus(\library\HttpStatus::NOT_MODIFIED)->send();
+                $app->response()->setStatus(HttpStatus::NOT_MODIFIED)->send();
             }
             return true;
         }
@@ -61,24 +62,19 @@ namespace shani\engine\http {
          * @param string $path Path to a static asset resource
          * @return string
          */
-        public function files(string $path): string
+        public function urlTo(string $path): string
         {
-            return $this->createUrl($path, self::ASSET_PREFIX);
+            return $this->app->request()->uri()->host() . self::ASSET_PREFIX . $path;
         }
 
         /**
-         * Get a full qualified URL of a file from user application file storage
-         * @param string $path A file path
-         * @return string A file URL accessible from user application file storage
+         * Get a file absolute path from public (shared) asset directory
+         * @param string $path A file path relative to asset directory
+         * @return string
          */
-        public function storage(string $path): string
+        public function pathTo(string $path = null): string
         {
-            return $this->createUrl($path, self::STORAGE_PREFIX);
-        }
-
-        private function createUrl(string $path, string $prefix): string
-        {
-            return $this->app->request()->uri()->host() . $prefix . $path;
+            return \shani\engine\core\Definitions::DIR_ASSETS . $path;
         }
     }
 

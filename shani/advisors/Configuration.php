@@ -34,6 +34,48 @@ namespace shani\advisors {
          */
         public const CSRF_FLEXIBLE = 2;
 
+        /**
+         *  allows resource access on this application from this domain only
+         */
+        public const ACCESS_POLICY_THIS_DOMAIN = 0;
+
+        /**
+         *  allows resource access on this application from this domain and it's subdomain
+         */
+        public const ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN = 1;
+
+        /**
+         *  allows resource access on this application from any domain (origin)
+         */
+        public const ACCESS_POLICY_ANY_DOMAIN = 2;
+
+        /**
+         *  Do not use resource access policy (Not recommended)
+         */
+        public const ACCESS_POLICY_DISABLE = 3;
+
+        /**
+         * Never send the Referrer header (Protect user's privacy)
+         */
+        public const BROWSING_PRIVACY_STRICT = 0;
+
+        /**
+         * Send the Referrer header (See what user is browsing but only on this domain)
+         */
+        public const BROWSING_PRIVACY_THIS_DOMAIN = 1;
+
+        /**
+         * Send the Referrer header (See what user is browsing on all domains
+         * but do not show the actual content they browse)
+         */
+        public const BROWSING_PRIVACY_PARTIALLY = 2;
+
+        /**
+         * Send the full Referrer header on same-origin requests and only the
+         * URL without the path on cross-origin requests
+         */
+        public const BROWSING_PRIVACY_NONE = 3;
+
         protected App $app;
         private array $config;
 
@@ -218,7 +260,7 @@ namespace shani\advisors {
          */
         public function appName(): string
         {
-            return Framework::NAME . ' v' . Framework::VERSION;
+            return \shani\engine\core\Framework::NAME . ' v' . \shani\engine\core\Framework::VERSION;
         }
 
         /**
@@ -236,6 +278,90 @@ namespace shani\advisors {
          * Returns an array of HTTP request methods supported by the application (in lower case)
          */
         public abstract function requestMethods(): array;
+
+        /**
+         * Get a list of authenticated user's permissions separated by comma.
+         * @return string|null List of user permissions or null if no permission is granted
+         */
+        public abstract function userPermissions(): ?string;
+
+        /**
+         * Get a list of modules accessible by all users (guests & authenticated)
+         * @return array List of public modules
+         */
+        public function publicModules(): array
+        {
+            return [];
+        }
+
+        /**
+         * Get a list of modules accessible by guest users only
+         * @return array List of guest modules
+         */
+        public function guestModules(): array
+        {
+            return [];
+        }
+
+        /**
+         * Returns a list of domains (FQDN), ip address or subdomains that a web browser
+         * will allow to access resources on this application. The list is separated by comma
+         * @return string
+         */
+        public function whitelistedDomains(): string
+        {
+            return '*';
+        }
+
+        /**
+         * Tells a web browser how to decide which domain can access resources
+         * on this application.
+         * @return int
+         * @see SecurityMiddleware::resourceAccessPolicy()
+         */
+        public function resourceAccessPolicy(): int
+        {
+            return self::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN;
+        }
+
+        /**
+         * @return int
+         * @see SecurityMiddleware::browsingPrivacy()
+         */
+        public function browsingPrivacy(): int
+        {
+            return self::BROWSING_PRIVACY_THIS_DOMAIN;
+        }
+
+        /**
+         * Set level for compression algorithm from 0 to 9 where 0 = disable,
+         * 4-6 = ideal ratio, 9 = Maximum compression but slow. The default ratio is 5
+         * @return int
+         */
+        public function compressionLevel(): int
+        {
+            return 5;
+        }
+
+        /**
+         * Set data compression minimum size (in bytes) during transmission.
+         * The default size is 1KB
+         * @return int Minimum number of bytes to compress
+         */
+        public function compressionMinSize(): int
+        {
+            return 1024; //1KB
+        }
+
+        /**
+         * Enable/disable preflight request sent by the browser
+         * @return bool
+         * @see SecurityMiddleware::preflightRequest()
+         */
+        public function preflightRequest(): bool
+        {
+            return true;
+        }
     }
 
 }

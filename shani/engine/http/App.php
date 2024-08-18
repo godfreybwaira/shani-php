@@ -17,6 +17,7 @@ namespace shani\engine\http {
     final class App
     {
 
+        private Disk $disk;
         private Asset $asset;
         private Request $req;
         private Response $res;
@@ -29,11 +30,12 @@ namespace shani\engine\http {
         {
             $this->lang = null;
             $this->req = new Request($req);
-            $this->res = new Response($this->req, $res);
+            $this->res = new Response($this, $res);
             try {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
+                UploadedFile::setDefaultStorage($this->disk()->pathTo());
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
@@ -135,17 +137,6 @@ namespace shani\engine\http {
         }
 
         /**
-         * Clears all user data. This application does not terminate the application,
-         * instead it terminate current online user.
-         * @return void
-         */
-        public function close(): void
-        {
-            Session::stop();
-            $this->res->redirect('/');
-        }
-
-        /**
          * Create and return cart for storing session values
          * @param string $name Cart name
          * @return Session
@@ -159,7 +150,19 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get static assets from application static asset directory
+         * Get Disk object representing application web root directory
+         * @return Disk
+         */
+        public function disk(): Disk
+        {
+            if (!isset($this->disk)) {
+                $this->disk = new Disk($this);
+            }
+            return $this->disk;
+        }
+
+        /**
+         * Get static assets object representing application static asset directory
          * @return Asset
          */
         public function asset(): Asset
@@ -184,7 +187,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Render HTML document to user agent. All views have access to application object as $app
+         * Render HTML document to user agent and close the HTTP connection.
          * @param array|null $data Values to be passed on view file
          * @return void
          */
@@ -195,12 +198,12 @@ namespace shani\engine\http {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsHtml(ob_get_clean());
-            } else if ($type === 'event-stream') {
+            } else if ($type !== 'event-stream') {
+                $this->res->send($data);
+            } else {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsSse(ob_get_clean());
-            } else {
-                $this->res->send($data);
             }
         }
 

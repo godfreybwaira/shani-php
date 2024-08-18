@@ -15,26 +15,39 @@ namespace shani\engine\http {
     final class Request
     {
 
-        private ?string $type = null;
         private ServerRequest $req;
-        private ?array $url, $inputs, $queryValues = null;
+        private ?string $type = null;
+        private ?array $url, $inputs, $queryValues = null, $files = null;
         private ?string $platform = null, $version = null, $accepted = null;
 
         public function __construct(ServerRequest &$req)
         {
-            $this->url = self::explodePath($req->uri()->path());
-            $files = $req->files();
-            $post = $req->post();
             $this->req = $req;
-            if (empty($post)) {
+            $this->url = self::explodePath($req->uri()->path());
+            $this->inputs = \library\Map::normalize($req->post());
+            if (empty($this->inputs)) {
                 $this->inputs = $this->parseRawData();
-                if ($files !== null) {
-                    $this->inputs = !empty($this->inputs) ? array_merge($this->inputs, $files) : $files;
-                }
-            } else {
-                $post = \library\Map::normalize($post);
-                $this->inputs = !empty($files) ? array_merge($post, $files) : $post;
             }
+        }
+
+        /**
+         * Get uploaded file by name and optional file index
+         * @param string $name Name value as given in upload form
+         * @param int $index File index in array, default is zero
+         * @return UploadedFile|null Return uploaded file object if file is valid
+         * and exists, false otherwise.
+         */
+        public function file(string $name, int $index = 0): ?UploadedFile
+        {
+            if (!empty($this->files[$name][$index])) {
+                return $this->files[$name][$index];
+            }
+            $files = $this->req->files();
+            if (!empty($files[$name][$index])) {
+                $this->files[$name][$index] = new UploadedFile($files[$name][$index]);
+                return $this->files[$name][$index];
+            }
+            return null;
         }
 
         private function parseRawData(): ?array

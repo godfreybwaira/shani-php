@@ -50,6 +50,11 @@ namespace apps\demo\v1\config {
         {
             return new \apps\demo\v1\middleware\Register($this->app, $mw);
         }
+
+        public function userPermissions(): ?string
+        {
+            return null;
+        }
     }
 
 }

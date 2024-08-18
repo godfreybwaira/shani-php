@@ -144,13 +144,13 @@ namespace gui {
          */
         public function head(): string
         {
-            $head = $this->icon;
+            $head = $this->icon . $this->details;
             $asset = $this->app->asset();
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $asset->files($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $asset->urlTo($url) . '"></script>';
             }
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->files($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->urlTo($url) . '"/>';
             }
             return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
         }
