@@ -99,16 +99,15 @@ namespace shani\engine\http {
 
         /**
          * Move a file from temporary directory to destination directory
-         * @param string|null $location A location to save a file, relative to web
-         * root directory. If set, then it must have a leading slash
+         * @param Storage $storage A storage object
          * @param string $newName A new file name without extension
          * @return string File path to a new location
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
          */
-        public function save(string $location = null, string $newName = null): string
+        public function save(Storage $storage, string $newName = null): string
         {
-
-            $directory = self::createDirectory($location . '/' . $this->file['type']);
+            $destination = $storage->pathTo();
+            $directory = self::createDirectory($destination . '/' . $this->file['type']);
             $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
             $filepath .= hrtime(true) . self::getExtension($this->file['name']);
             $file = fopen($filepath, 'a+b');
@@ -123,7 +122,7 @@ namespace shani\engine\http {
                 unlink($this->file['tmp_name']);
             }
             fclose($file);
-            return substr($filepath, strlen(self::$storage));
+            return substr($filepath, strlen($destination));
         }
 
         private static function getExtension(string $file): ?string
@@ -134,17 +133,11 @@ namespace shani\engine\http {
 
         private static function createDirectory(string $destination): string
         {
-            $directory = self::$storage . $destination;
-            $created = is_dir($directory) || mkdir($directory, Storage::FILE_MODE, true);
+            $created = is_dir($destination) || mkdir($destination, Storage::FILE_MODE, true);
             if (!$created) {
-                throw new \ErrorException('Failed to create directory ' . $directory);
+                throw new \ErrorException('Failed to create directory ' . $destination);
             }
-            return $directory;
-        }
-
-        public static function setDefaultStorage(string $path): void
-        {
-            self::$storage = $path;
+            return $destination;
         }
     }
 

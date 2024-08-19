@@ -35,7 +35,6 @@ namespace shani\engine\http {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
-                UploadedFile::setDefaultStorage($this->storage()->pathTo());
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
@@ -178,12 +177,12 @@ namespace shani\engine\http {
         /**
          * Get the current HTML template. This function can be used to customize
          * HTML template before sending to user agent.
-         * @return \gui\Template
+         * @return Template
          */
-        public function template(): \gui\Template
+        public function template(): Template
         {
             if (!isset($this->template)) {
-                $this->template = new \gui\Template($this);
+                $this->template = new Template($this);
             }
             return $this->template;
         }

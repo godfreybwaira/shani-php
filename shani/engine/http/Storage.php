@@ -19,6 +19,11 @@ namespace shani\engine\http {
 
         public const FILE_MODE = 0750;
 
+        /**
+         * Create a storage area for files and directories
+         * @param App $app
+         * @param string|null $rootPath Path inside web root directory
+         */
         public function __construct(App &$app, ?string $rootPath = null)
         {
             $this->app = $app;

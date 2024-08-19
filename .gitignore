@@ -6,3 +6,7 @@ js/
 v2/
 .obsidian/
 RequestInterface.php
+*.png
+*.jpg
+*.jpeg
+*.pdf
