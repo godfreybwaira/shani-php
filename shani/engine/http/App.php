@@ -151,12 +151,14 @@ namespace shani\engine\http {
 
         /**
          * Get Storage object representing application web root directory
+         * @param string $destination Storage destination inside web storage directory.
+         * If provided, it must have a leading /
          * @return Storage
          */
-        public function storage(): Storage
+        public function storage(string $destination = null): Storage
         {
             if (!isset($this->storage)) {
-                $this->storage = new Storage($this);
+                $this->storage = new Storage($this, $destination);
             }
             return $this->storage;
         }

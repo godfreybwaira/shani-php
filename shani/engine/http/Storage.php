@@ -19,10 +19,10 @@ namespace shani\engine\http {
 
         public const FILE_MODE = 0750;
 
-        public function __construct(App &$app)
+        public function __construct(App &$app, ?string $rootPath = null)
         {
             $this->app = $app;
-            $this->root = Definitions::DIR_APPS . $app->config()->webroot();
+            $this->root = Definitions::DIR_APPS . $app->config()->webroot() . $rootPath;
         }
 
         /**
