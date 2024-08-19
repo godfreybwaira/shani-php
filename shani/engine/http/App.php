@@ -17,11 +17,11 @@ namespace shani\engine\http {
     final class App
     {
 
-        private Disk $disk;
         private Asset $asset;
         private Request $req;
         private Response $res;
         private ?string $lang;
+        private Storage $storage;
         private Configuration $config;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
@@ -35,7 +35,7 @@ namespace shani\engine\http {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
-                UploadedFile::setDefaultStorage($this->disk()->pathTo());
+                UploadedFile::setDefaultStorage($this->storage()->pathTo());
                 if (!Asset::tryServe($this)) {
                     $this->catchErrors();
                     $this->start();
@@ -150,15 +150,15 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get Disk object representing application web root directory
-         * @return Disk
+         * Get Storage object representing application web root directory
+         * @return Storage
          */
-        public function disk(): Disk
+        public function storage(): Storage
         {
-            if (!isset($this->disk)) {
-                $this->disk = new Disk($this);
+            if (!isset($this->storage)) {
+                $this->storage = new Storage($this);
             }
-            return $this->disk;
+            return $this->storage;
         }
 
         /**
@@ -231,7 +231,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Set and/or get current view file from disk to be rendered as HTML to user agent.
+         * Set and/or get current view file to be rendered as HTML to client.
          * @param string|null $path Case sensitive Path to view file, if not provided then
          * the view file will be the same as current executing function name. All views
          * have access to application object as $app

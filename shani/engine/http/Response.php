@@ -24,11 +24,11 @@ namespace shani\engine\http {
 
         public function __construct(App &$app, ServerResponse &$res)
         {
+            $this->headers = ['x-content-type-options' => 'nosniff'];
             $this->statusCode = HttpStatus::OK;
             $this->cookies = [];
             $this->res = $res;
             $this->app = $app;
-            $this->headers = ['x-content-type-options' => 'nosniff'];
         }
 
         /**
@@ -153,7 +153,7 @@ namespace shani\engine\http {
                         return $this->sendAsJsonp($data, $this->app->request()->query('callback') ?? 'callback');
                 }
             }
-            return $this->plainText($data, 'text/plain; charset=utf-8');
+            return $this->plainText($data, 'text/plain');
         }
 
         private function plainText($data, string $type): self
@@ -172,7 +172,7 @@ namespace shani\engine\http {
          */
         public function sendAsHtml($data): self
         {
-            return $this->plainText($data, 'text/html; charset=utf-8');
+            return $this->plainText($data, 'text/html');
         }
 
         /**
@@ -197,7 +197,7 @@ namespace shani\engine\http {
          */
         public function sendAsJson($data): self
         {
-            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json; charset=utf-8');
+            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json');
         }
 
         /**
@@ -208,7 +208,7 @@ namespace shani\engine\http {
          */
         public function sendAsJsonp($data, string $callback): self
         {
-            $this->setHeaders('content-type', 'application/javascript; charset=utf-8');
+            $this->setHeaders('content-type', 'application/javascript');
             $type = gettype($data);
             if ($type === 'array') {
                 return $this->write($callback . '(' . json_encode($data) . ');');
@@ -235,7 +235,7 @@ namespace shani\engine\http {
          */
         public function sendAsXml($data): self
         {
-            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml; charset=utf-8');
+            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml');
         }
 
         /**
@@ -246,7 +246,7 @@ namespace shani\engine\http {
          */
         public function sendAsCsv($data, string $separator = ','): self
         {
-            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv; charset=utf-8');
+            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv');
         }
 
         /**
@@ -257,7 +257,7 @@ namespace shani\engine\http {
         public function sendAsYaml($data): self
         {
 //            return $this->plainText(\library\DataConvertor::array2yaml($data), 'text/yaml');
-            return $this->plainText(yaml_emit($data), 'text/yaml; charset=utf-8');
+            return $this->plainText(yaml_emit($data), 'text/yaml');
         }
 
         /**
@@ -424,17 +424,19 @@ namespace shani\engine\http {
             return $this;
         }
 
-        public function setLink($links, $name = null): self
+        /**
+         * The Link header is used to provide relationships between the current
+         * document and other resources.
+         * @param array $links Associative array where key is the link name and value is the actual link
+         * @return self
+         */
+        public function setLink(array $links): self
         {
-            if (is_array($links)) {
-                $lnk = [];
-                foreach ($links as $key => $value) {
-                    $lnk[] = '<' . $value . '>; rel="' . $key . '"';
-                }
-                $this->setHeaders('link', implode(',', $lnk));
-            } else {
-                $this->setHeaders('link', '<' . $name . '>; rel="' . $links . '"');
+            $lnk = null;
+            foreach ($links as $name => $link) {
+                $lnk .= ',<' . $link . '>; rel="' . $name . '"';
             }
+            $this->setHeaders('link', substr($lnk, 1));
             return $this;
         }
 
@@ -456,8 +458,8 @@ namespace shani\engine\http {
             $this->setHeaders([
                 'content-range' => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
                 'accept-ranges' => 'bytes'
-            ])->setStatus(HttpStatus::PARTIAL_CONTENT);
-            return $this->doStream($filepath, $start, $end);
+            ]);
+            return $this->setStatus(HttpStatus::PARTIAL_CONTENT)->doStream($filepath, $start, $end);
         }
 
         /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Disk
+ * Description of Storage
  * @author coder
  *
  * Created on: Aug 14, 2024 at 12:48:49 PM
@@ -11,7 +11,7 @@ namespace shani\engine\http {
 
     use shani\engine\core\Definitions;
 
-    final class Disk
+    final class Storage
     {
 
         private App $app;
@@ -77,9 +77,9 @@ namespace shani\engine\http {
         }
 
         /**
-         * Move a file from where it is to a destination directory within a web disk
+         * Move a file from where it is to a destination directory within a web storage
          * @param string $srcFile Path to a source file to move
-         * @param string $destinationFolder Destination directory relative to web disk directory
+         * @param string $destinationFolder Destination directory relative to web storage directory
          * @return string|null Path to a new file location, or null if it fails.
          */
         public function moveTo(string $srcFile, string $destinationFolder): ?string
@@ -88,9 +88,9 @@ namespace shani\engine\http {
         }
 
         /**
-         * Copy a file from where it is to a destination directory within a web disk
+         * Copy a file from where it is to a destination directory within a web storage
          * @param string $srcFile Path to a source file to copy
-         * @param string $destinationFolder Destination directory relative to web disk directory
+         * @param string $destinationFolder Destination directory relative to web storage directory
          * @return string|null Path to a new file location, or null if it fails.
          */
         public function copyTo(string $srcFile, string $destinationFolder): ?string
@@ -115,13 +115,13 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get a full qualified URL to a web root directory (web disk)
+         * Get a full qualified URL to a web root directory (web storage)
          * @param string $path Path to a file in a web root directory
-         * @return string URL referring to a file from disk
+         * @return string URL referring to a file from storage
          */
         public function urlTo(string $path): string
         {
-            return $this->app->request()->uri()->host() . Asset::DISK_PREFIX . $path;
+            return $this->app->request()->uri()->host() . Asset::STORAGE_PREFIX . $path;
         }
 
         /**

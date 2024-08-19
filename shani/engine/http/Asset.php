@@ -17,7 +17,7 @@ namespace shani\engine\http {
         private App $app;
 
         private const ASSET_PREFIX = '/0';
-        public const DISK_PREFIX = '/1';
+        public const STORAGE_PREFIX = '/1';
 
         public function __construct(App &$app)
         {
@@ -41,9 +41,9 @@ namespace shani\engine\http {
             if (self::isStaticPath($path, self::ASSET_PREFIX)) {
                 $prefix = self::ASSET_PREFIX;
                 $rootPath = $app->asset()->pathTo();
-            } elseif (self::isStaticPath($path, self::DISK_PREFIX)) {
-                $prefix = self::DISK_PREFIX;
-                $rootPath = $app->disk()->path();
+            } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
+                $prefix = self::STORAGE_PREFIX;
+                $rootPath = $app->storage()->path();
             }
             if ($prefix === null) {
                 return false;

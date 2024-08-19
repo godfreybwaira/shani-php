@@ -116,11 +116,11 @@ namespace gui {
 
         /**
          * Get immutable data that will be available to all views.
-         * @return array|null Data read
+         * @param type $key Key
          */
-        public function data(): ?array
+        public function data($key = null)
         {
-            return $this->data;
+            return $key === null ? $this->data : $this->data[$key] ?? null;
         }
 
         /**

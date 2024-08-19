@@ -135,7 +135,7 @@ namespace shani\engine\http {
         private static function createDirectory(string $destination): string
         {
             $directory = self::$storage . $destination;
-            $created = is_dir($directory) || mkdir($directory, Disk::FILE_MODE, true);
+            $created = is_dir($directory) || mkdir($directory, Storage::FILE_MODE, true);
             if (!$created) {
                 throw new \ErrorException('Failed to create directory ' . $directory);
             }
