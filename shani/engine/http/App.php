@@ -153,7 +153,7 @@ namespace shani\engine\http {
          * Get Storage object representing application web root directory
          * @return Storage
          */
-        public function storage(string $name = null): Storage
+        public function storage(): Storage
         {
             if (!isset($this->storage)) {
                 $this->storage = new Storage($this);
