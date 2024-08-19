@@ -45,7 +45,7 @@ namespace shani\advisors {
         public const ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN = 1;
 
         /**
-         *  allows resource access on this application from any domain (origin)
+         *  allows resource access on this application from any domain (Not recommended)
          */
         public const ACCESS_POLICY_ANY_DOMAIN = 2;
 
@@ -335,7 +335,7 @@ namespace shani\advisors {
 
         /**
          * Set level for compression algorithm from 0 to 9 where 0 = disable,
-         * 4-6 = ideal ratio, 9 = Maximum compression but slow. The default ratio is 5
+         * 4-6 = ideal level, 9 = Maximum compression but slow. The default ratio is 5
          * @return int
          */
         public function compressionLevel(): int

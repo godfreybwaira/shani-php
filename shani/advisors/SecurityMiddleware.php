@@ -117,7 +117,7 @@ namespace shani\advisors {
         {
             $this->app->response()->setHeaders([
                 'x-frame-options' => 'SAMEORIGIN',
-                'content-security-policy' => "frame-ancestors 'self'"
+//                'content-security-policy' => "frame-ancestors 'self'"
             ]);
         }
 
@@ -130,6 +130,7 @@ namespace shani\advisors {
         public function browsingPrivacy(): void
         {
             $this->app->response()->setHeaders([
+                //meta
                 'referrer-policy' => self::REFERRER_PRIVACIES[$this->app->config()->browsingPrivacy()]
             ]);
         }

@@ -15,13 +15,13 @@ namespace gui {
     {
 
         private App $app;
-        private ?string $title, $details, $icon;
-        private ?array $scripts, $styles, $data, $attributes;
+        private ?string $title, $icon;
+        private ?array $scripts, $styles, $data, $attributes, $details = [];
 
         public function __construct(App &$app)
         {
             $this->scripts = $this->styles = $this->data = $this->attributes = [];
-            $this->title = $this->details = $this->icon = null;
+            $this->title = $this->icon = null;
             $this->app = $app;
         }
 
@@ -44,7 +44,18 @@ namespace gui {
          */
         public function description(string $content): self
         {
-            $this->details = '<meta name="description" content="' . $content . '"/>';
+            return $this->meta('description', $content);
+        }
+
+        /**
+         * Create an HTML meta tag
+         * @param string $name meta name
+         * @param string $value meta value
+         * @return self
+         */
+        public function meta(string $name, string $value): self
+        {
+            $this->details[$name] = $value;
             return $this;
         }
 
@@ -144,8 +155,11 @@ namespace gui {
          */
         public function head(): string
         {
-            $head = $this->icon . $this->details;
+            $head = $this->icon;
             $asset = $this->app->asset();
+            foreach ($this->details as $name => $value) {
+                $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
+            }
             foreach ($this->scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $asset->urlTo($url) . '"></script>';
             }

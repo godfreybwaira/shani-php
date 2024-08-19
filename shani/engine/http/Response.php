@@ -36,6 +36,7 @@ namespace shani\engine\http {
          * @param bool $use Buffer value. If true, then the buffer will be on,
          * If false, then connection will be closed and no output can be sent.
          * @return self
+         * @see self::send()
          */
         public function useBuffer(bool $use = true): self
         {
@@ -124,7 +125,7 @@ namespace shani\engine\http {
          * to send data in chunks. Remember to close the connection when done.
          * @param type $data Data to send as response body.
          * @return self
-         * @see self::close()
+         * @see self::close(), self::useBuffer()
          */
         public function send($data = null): self
         {
