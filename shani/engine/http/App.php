@@ -153,11 +153,14 @@ namespace shani\engine\http {
          * @param string $destination Storage destination inside web storage directory.
          * If provided, it must have a leading /
          * @return Storage
+         * @throws \ErrorException Throws error if object has already created using destination path
          */
         public function storage(string $destination = null): Storage
         {
             if (!isset($this->storage)) {
                 $this->storage = new Storage($this, $destination);
+            } elseif ($destination !== null) {
+                throw new \ErrorException('Storage object using destination path already created.');
             }
             return $this->storage;
         }

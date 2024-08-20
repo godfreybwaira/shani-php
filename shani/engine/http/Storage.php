@@ -56,7 +56,7 @@ namespace shani\engine\http {
 
         private function getPath(?string $path): ?string
         {
-            if (is_file($path)) {
+            if ($path === null || is_file($path)) {
                 return $path;
             }
             $filepath = $this->pathTo($path);
@@ -68,11 +68,11 @@ namespace shani\engine\http {
 
         /**
          * Create and return a file info object
-         * @param string|null $path a file path
+         * @param string $path a file path
          * @return \SplFileInfo
          * @throws \ErrorException
          */
-        public function getInfo(?string $path): \SplFileInfo
+        public function getInfo(string $path): \SplFileInfo
         {
             $filepath = $this->pathTo($path);
             if (is_file($filepath)) {
