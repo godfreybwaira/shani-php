@@ -72,11 +72,11 @@ namespace shani\engine\http {
         }
 
         /**
-         * Check if session object has an item or items
+         * Check if session object has an item(s)
          * @param string|array $keys
          * @return bool Returns true on success, false otherwise
          */
-        public function has($keys): bool
+        public function has(string|array $keys): bool
         {
             return Map::has($this->data[$this->name], $keys);
         }

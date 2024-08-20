@@ -29,35 +29,32 @@ namespace shani\advisors {
             Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
         ];
 
+        private Configuration $cnf;
+
         protected function __construct(App &$app)
         {
             $this->app = $app;
+            $this->cnf = $app->config();
         }
 
         /**
-         * Block incoming CSRF attacks. All attacks coming via http GET request will
+         * Block incoming CSRF attacks. All attacks coming via HTTP GET request will
          * be discarded. User must make sure not submitting sensitive information
          * via GET request
          * @return bool True if check passes, false otherwise
          */
         public function blockCSRF(): bool
         {
-            $csrf = $this->app->config()->csrf();
-            if ($this->app->request()->method() === 'get' || $csrf === \shani\advisors\Configuration::CSRF_OFF) {
+            $method = $this->app->request()->method();
+            if (!$this->cnf->csrfProtectionEnabled() || !in_array($method, $this->cnf->csrfProtectedMethods())) {
                 return true;
             }
-            $accepted = false;
-            $token = $this->app->request()->cookies('csrf_token');
-            $hashedUrl = App::digest($this->app->request()->uri()->path());
-            if ($csrf === \shani\advisors\Configuration::CSRF_STRICT) {
-                $accepted = $this->app->csrfToken()->get($hashedUrl) === $token;
-            } else {
-                $accepted = $this->app->csrfToken()->get($token) === $hashedUrl;
-            }
-            if (!$accepted) {
+            $token = $this->app->request()->cookies($this->cnf->csrfTokenName());
+            if ($token === null || !$this->app->csrfToken()->has($token)) {
                 $this->app->response()->setStatus(HttpStatus::NOT_ACCEPTABLE);
+                return false;
             }
-            return $accepted;
+            return true;
         }
 
         /**
@@ -67,22 +64,21 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $cnf = $this->app->config();
-            $permissions = $cnf->userPermissions();
+            $permissions = $this->cnf->userPermissions();
             $module = $this->app->request()->module();
             if ($permissions !== null) {
-                if (in_array($module, $cnf->guestModules())) {
-                    $this->app->request()->rewriteUrl($cnf->homepage());
+                if (in_array($module, $this->cnf->guestModules())) {
+                    $this->app->request()->rewriteUrl($this->cnf->homepage());
                     return true;
                 }
-                if (in_array($module, $cnf->publicModules())) {
+                if (in_array($module, $this->cnf->publicModules())) {
                     return true;
                 }
                 $code = App::digest($this->app->request()->target());
                 if (preg_match('\b' . $code . '\b', $permissions) === 1) {
                     return true;
                 }
-            } else if (in_array($module, $cnf->guestModules()) || in_array($module, $cnf->publicModules())) {
+            } else if (in_array($module, $this->cnf->guestModules()) || in_array($module, $this->cnf->publicModules())) {
                 return true;
             }
             $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
@@ -96,15 +92,14 @@ namespace shani\advisors {
          */
         public function resourceAccessPolicy(): void
         {
-            $cnf = $this->app->config();
-            $policy = $cnf->resourceAccessPolicy();
+            $policy = $this->cnf->resourceAccessPolicy();
             if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
                 return;
             }
             $this->app->response()->setHeaders([
                 'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
-                'access-control-allow-origin' => $cnf->whitelistedDomains(),
-                'access-control-allow-methods' => implode(',', $cnf->requestMethods())
+                'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
+                'access-control-allow-methods' => implode(',', $this->cnf->requestMethods())
             ]);
         }
 
@@ -131,7 +126,7 @@ namespace shani\advisors {
         {
             $this->app->response()->setHeaders([
                 //meta
-                'referrer-policy' => self::REFERRER_PRIVACIES[$this->app->config()->browsingPrivacy()]
+                'referrer-policy' => self::REFERRER_PRIVACIES[$this->cnf->browsingPrivacy()]
             ]);
         }
 
@@ -145,7 +140,7 @@ namespace shani\advisors {
         public function preflightRequest(int $cacheTime = 86400): void
         {
             $req = $this->app->request();
-            if (!$this->app->config()->preflightRequest() || $req->method() !== 'options') {
+            if (!$this->cnf->preflightRequest() || $req->method() !== 'options') {
                 return;
             }
             $headers = $req->headers([
@@ -156,9 +151,9 @@ namespace shani\advisors {
                 return;
             }
             $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
-                'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
+                'access-control-allow-methods' => implode(',', $this->cnf->requestMethods()),
                 'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
-                'access-control-allow-origin' => $this->app->config()->whitelistedDomains(),
+                'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
                 'access-control-max-age' => $cacheTime
             ]);
         }

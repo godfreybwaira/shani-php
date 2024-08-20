@@ -65,12 +65,12 @@ namespace shani\engine\http {
                 $mw->resourceAccessPolicy();
                 $mw->preflightRequest();
             }
-//            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
-//                if ($this->listener->listening('before')) {
-//                    $this->listener->trigger('before');
-//                    return;
-//                }
-//            }
+            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
+                if ($this->listener->listening('before')) {
+                    $this->listener->trigger('before');
+                    return;
+                }
+            }
             self::returnResponse($this->app);
         }
     }

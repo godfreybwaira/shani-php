@@ -332,17 +332,12 @@ namespace shani\engine\http {
          */
         public function csrf(?string $path = null): string
         {
-            $protection = $this->config->csrf();
             $url = $path ?? $this->req->uri()->path();
-            if ($protection !== Configuration::CSRF_OFF) {
+            if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
-                if ($protection === Configuration::CSRF_STRICT) {
-                    $this->csrfToken()->add([self::digest($url) => $token]);
-                } else {
-                    $this->csrfToken()->add([$token => self::digest($url)]);
-                }
-                $cookie = (new \library\HttpCookie())->setName('csrf_token')
-                        ->setSameSite(\library\HttpCookie::SAME_SITE_STRICT)
+                $this->csrfToken()->add([$token => null]);
+                $cookie = (new \library\HttpCookie())->setName($this->config->csrfTokenName())
+                        ->setSameSite(\library\HttpCookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
                         ->setSecure($this->req->uri()->secure());
                 $this->res->setCookie($cookie);

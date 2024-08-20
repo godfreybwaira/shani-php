@@ -136,11 +136,11 @@ namespace library {
         }
 
         /**
-         *
-         * @param \library\http\DateTimeInterface|string|int $maxAge
+         * Set Cookie maximum age
+         * @param \DateTimeInterface|string|int $maxAge
          * @return self
          */
-        public function setMaxAge($maxAge): self
+        public function setMaxAge(\DateTimeInterface|string|int $maxAge): self
         {
             $age = $maxAge;
             if ($maxAge instanceof DateTimeInterface) {
@@ -154,7 +154,6 @@ namespace library {
 
         /**
          * Gets the domain of the cookie.
-         *
          * @return string|null
          */
         public function domain(): ?string
@@ -163,8 +162,7 @@ namespace library {
         }
 
         /**
-         * Returns an instance with the specified set of domains.
-         *
+         * Set Cookie domain
          * @param string|null $domain
          * @return static
          */
@@ -176,7 +174,6 @@ namespace library {
 
         /**
          * Gets the path of the cookie.
-         *
          * @return string
          */
         public function path(): ?string
@@ -185,9 +182,8 @@ namespace library {
         }
 
         /**
-         * Returns an instance with the specified set of paths.
-         *
-         * @param string|null $path
+         * Set cookie path
+         * @param string $path
          * @return static
          */
         public function setPath(string $path): self
@@ -240,7 +236,6 @@ namespace library {
         /**
          * Returns an instance with the specified enable or
          * disable cookie transmission over the HTTP protocol only.
-         *
          * @param bool $httpOnly
          * @return static
          */

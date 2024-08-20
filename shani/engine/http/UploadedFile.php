@@ -109,7 +109,7 @@ namespace shani\engine\http {
             $destination = $storage->pathTo();
             $directory = self::createDirectory($destination . '/' . $this->file['type']);
             $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
-            $filepath .= hrtime(true) . self::getExtension($this->file['name']);
+            $filepath .= hrtime()[1] . self::getExtension($this->file['name']);
             $file = fopen($filepath, 'a+b');
             $size = fstat($file)['size'];
             if ($size < $this->file['size']) {
@@ -133,11 +133,10 @@ namespace shani\engine\http {
 
         private static function createDirectory(string $destination): string
         {
-            $created = is_dir($destination) || mkdir($destination, Storage::FILE_MODE, true);
-            if (!$created) {
-                throw new \ErrorException('Failed to create directory ' . $destination);
+            if (is_dir($destination) || mkdir($destination, Storage::FILE_MODE, true)) {
+                return $destination;
             }
-            return $destination;
+            throw new \ErrorException('Failed to create directory ' . $destination);
         }
     }
 

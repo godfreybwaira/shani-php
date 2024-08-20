@@ -17,24 +17,6 @@ namespace shani\advisors {
     {
 
         /**
-         * Turn OFF CSRF signature verification.
-         */
-        public const CSRF_OFF = 0;
-
-        /**
-         * Same CSRF signature is used on same form just once. Once the signature
-         * is verified the form becomes invalid on next use. This is the default
-         * CSRF protection mechanism.
-         */
-        public const CSRF_STRICT = 1;
-
-        /**
-         * Different CSRF signature is used for the same form, each form submit
-         * comes with it's own CSRF signature.
-         */
-        public const CSRF_FLEXIBLE = 2;
-
-        /**
          *  allows resource access on this application from this domain only
          */
         public const ACCESS_POLICY_THIS_DOMAIN = 0;
@@ -117,7 +99,7 @@ namespace shani\advisors {
          * Get the directory inside application module where module controllers
          * resides.
          * <p>It is in this directory you will create GET, POST, PUT, DELETE
-         * or any other custom http method directories, These directories must be
+         * or any other custom HTTP method directories, These directories must be
          * in lowercase.</p>
          * @return string Path relative to current module directory
          */
@@ -127,12 +109,21 @@ namespace shani\advisors {
         }
 
         /**
-         * Get or set user defined CSRF protection mechanism.
-         * @return int CSRF protection mechanism.
+         * Enable/disable CSRF protection mechanism.
+         * @return bool True to enable, to disable otherwise.
          */
-        public function csrf(): int
+        public function csrfProtectionEnabled(): bool
         {
-            return self::CSRF_STRICT;
+            return true;
+        }
+
+        /**
+         * Get/set request methods that will be protected from CSRF attacks
+         * @return array Methods (in lower cases) to protect.
+         */
+        public function csrfProtectedMethods(): array
+        {
+            return ['post', 'put', 'patch', 'delete'];
         }
 
         /**
@@ -361,6 +352,15 @@ namespace shani\advisors {
         public function preflightRequest(): bool
         {
             return true;
+        }
+
+        /**
+         * Get name of the CSRF token used in CSRF protection.
+         * @return string
+         */
+        public function csrfTokenName(): string
+        {
+            return 'csrf_token';
         }
     }
 

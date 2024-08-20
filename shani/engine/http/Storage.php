@@ -54,6 +54,15 @@ namespace shani\engine\http {
             return unlink($filepath);
         }
 
+        private function getHash(?string $path, string $algorithm = 'sha256'): ?string
+        {
+            $filepath = $this->pathTo($path);
+            if ($path === null || !is_file($filepath)) {
+                return $path;
+            }
+            return hash_file($algorithm, $filepath);
+        }
+
         private function getPath(?string $path): ?string
         {
             if ($path === null || is_file($path)) {

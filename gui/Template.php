@@ -16,7 +16,8 @@ namespace gui {
 
         private App $app;
         private ?string $title, $icon;
-        private ?array $scripts, $styles, $data, $attributes, $details = [];
+        private array $details = [];
+        private ?array $scripts, $styles, $data, $attributes;
 
         public function __construct(App &$app)
         {
@@ -157,14 +158,14 @@ namespace gui {
         {
             $head = $this->icon;
             $asset = $this->app->asset();
-            foreach ($this->details as $name => $value) {
-                $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
+            foreach ($this->styles as $url => $attr) {
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->urlTo($url) . '"/>';
             }
             foreach ($this->scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $asset->urlTo($url) . '"></script>';
             }
-            foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->urlTo($url) . '"/>';
+            foreach ($this->details as $name => $value) {
+                $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
             }
             return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
         }
