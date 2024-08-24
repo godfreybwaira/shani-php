@@ -184,8 +184,8 @@ namespace shani\engine\http {
         /**
          * Get HTTP preferred request context (platform) set by user agent. This
          * value is set via HTTP accept-version header and the accepted values are
-         * 'web' and 'api' only. User can also set preferred application version
-         * after request context, separated by semicolon
+         * 'web' and 'api'. User can also set application version after request context,
+         * separated by semicolon. If none given, the 'web' context is assumed.
          * @example accept-version=web;1.0
          * @return string|null
          */

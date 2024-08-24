@@ -74,13 +74,13 @@ namespace shani\engine\http {
 
         /**
          * Execute a callback function only when a application is in a given context
-         * execution environment. Currently, 'web' and 'api' context are supported
-         * by the framework, but application can define and handle different application
-         * context. Client application can supply this context via accept-version header.
-         * If none given, the 'web' context is assumed.
+         * execution environment. Currently, 'web' and 'api' context are supported by
+         * the framework. Developer is encouraged to use 'web' for web application and 'api'
+         * for API application, but can define and handle different application context
+         * depending on type of application and the need. Client application can supply
+         * this context via accept-version header.
          * @param string $context Application execution context.
-         * @param callable $cb A callback to execute that accept application object
-         * as argument.
+         * @param callable $cb A callback to execute that accept application object as argument.
          * @return self
          */
         public function on(string $context, callable $cb): self
