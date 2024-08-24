@@ -66,38 +66,26 @@ namespace shani\engine\http {
         private function catchErrors(): void
         {
             set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
-                $this->config->handleApplicationErrors(new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline));
+                $this->config->applicationErrorHandler(new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline));
                 return true;
             });
-            set_exception_handler(fn(\Throwable $e) => $this->config->handleApplicationErrors($e));
+            set_exception_handler(fn(\Throwable $e) => $this->config->applicationErrorHandler($e));
         }
 
         /**
-         * Execute a callback function only when a application is in web context.
-         * This occurs when user, via accept-version header selects 'web' as the
-         * default application context
+         * Execute a callback function only when a application is in a given context
+         * execution environment. Currently, 'web' and 'api' context are supported
+         * by the framework, but application can define and handle different application
+         * context. Client application can supply this context via accept-version header.
+         * If none given, the 'web' context is assumed.
+         * @param string $context Application execution context.
          * @param callable $cb A callback to execute that accept application object
          * as argument.
          * @return self
          */
-        public function web(callable $cb): self
+        public function on(string $context, callable $cb): self
         {
-            if ($this->req->platform() === 'web') {
-                $cb($this);
-            }
-            return $this;
-        }
-
-        /**
-         * Execute a callback function only when a application is in api context.
-         * This occurs when user, via accept-version header selects 'api' as the
-         * default application context
-         * @param callable $cb A callback to execute that accept application object
-         * as argument.
-         */
-        public function api(callable $cb): self
-        {
-            if ($this->req->platform() === 'api') {
+            if ($this->req->platform() === $context) {
                 $cb($this);
             }
             return $this;
@@ -299,13 +287,13 @@ namespace shani\engine\http {
             $method = $this->req->method();
             if (!in_array($method, $this->config->requestMethods())) {
                 $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-                $this->config->handleHttpErrors();
+                $this->config->httpErrorHandler();
                 return;
             }
             $classPath = $this->getClassPath($method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 $this->res->setStatus(HttpStatus::NOT_FOUND);
-                $this->config->handleHttpErrors();
+                $this->config->httpErrorHandler();
             } else {
                 try {
                     $className = str_replace('/', '\\', $classPath);
@@ -313,7 +301,7 @@ namespace shani\engine\http {
                     (new $className($this))->$cb();
                 } catch (\Exception $ex) {
                     $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-                    $this->config->handleHttpErrors($ex->getMessage());
+                    $this->config->httpErrorHandler($ex->getMessage());
                 }
             }
         }

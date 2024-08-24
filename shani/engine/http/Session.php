@@ -19,10 +19,10 @@ namespace shani\engine\http {
         public function __construct(App &$app, string $name)
         {
             $this->name = $name;
-            $app->web(function () use (&$name) {
+            $app->on('web', function () use (&$name) {
                 $this->data[$name] = $_SESSION[$name] ?? [];
                 unset($_SESSION[$name]);
-            })->api(function () use (&$name) {
+            })->on('api', function () use (&$name) {
                 $this->data[$name] = [];
             });
         }
@@ -142,7 +142,7 @@ namespace shani\engine\http {
 
         public static function start(App &$app): void
         {
-            $app->web(function (App &$app) {
+            $app->on('web', function (App &$app) {
                 $sessId = $app->request()->cookies($app->config()->sessionName()) ?? session_create_id();
                 $storageFile = session_save_path() . '/sess_' . $sessId;
                 if (!is_file($storageFile)) {

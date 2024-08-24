@@ -168,14 +168,14 @@ namespace shani\advisors {
          * Handle all HTTP errors that may occur during program execution.
          * @param string|null $errorMessage HTTP error message
          */
-        public abstract function handleHttpErrors(?string $errorMessage = null): void;
+        public abstract function httpErrorHandler(?string $errorMessage = null): void;
 
         /**
          * Handle all application errors
          * @param \Throwable $t
          * @return void
          */
-        public function handleApplicationErrors(\Throwable $t): void
+        public function applicationErrorHandler(\Throwable $t): void
         {
             print_r($t);
         }

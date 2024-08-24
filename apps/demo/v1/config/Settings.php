@@ -31,7 +31,7 @@ namespace apps\demo\v1\config {
             return '/greetings/0/hello/1/world';
         }
 
-        public function handleHttpErrors(?string $errorMessage = null): void
+        public function httpErrorHandler(?string $errorMessage = null): void
         {
             $this->app->response()->send();
         }
