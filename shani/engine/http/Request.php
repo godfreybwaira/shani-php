@@ -297,7 +297,7 @@ namespace shani\engine\http {
 
         /**
          * Get HTTP request method
-         * @return string HTTP request method
+         * @return string HTTP request method (in lowercase)
          */
         public function method(): string
         {
@@ -325,6 +325,7 @@ namespace shani\engine\http {
 
         /**
          * Get the current request target referring to current path to a class function
+         * (i.e method/module/resource/callback)
          * @return string
          */
         public function target(): string
