@@ -114,35 +114,36 @@ namespace shani\advisors {
         /**
          * Tells a web browser to disable other sites from embedding your website
          * to theirs, e.g via iframe tag
-         * @return void
+         * @return self
          */
-        public function blockClickjacking(): void
+        public function blockClickjacking(): self
         {
             $this->app->response()->setHeaders([
                 'x-frame-options' => 'SAMEORIGIN',
 //                'content-security-policy' => "frame-ancestors 'self'"
             ]);
+            return $this;
         }
 
         /**
          * A request sent by the browser before sending the actual request to verify
          * whether a server can process the coming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
-         * @return void
+         * @return self
          * @see Configuration::preflightRequest()
          */
-        public function preflightRequest(int $cacheTime = 86400): void
+        public function preflightRequest(int $cacheTime = 86400): self
         {
             $req = $this->app->request();
             if (!$this->cnf->preflightRequest() || $req->method() !== 'options') {
-                return;
+                return $this;
             }
             $headers = $req->headers([
                 'access-control-request-method',
                 'access-control-request-headers'
             ]);
             if (empty($headers['access-control-request-method'])) {
-                return;
+                return $this;
             }
             $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
                 'access-control-allow-methods' => implode(',', $this->cnf->requestMethods()),
@@ -150,6 +151,7 @@ namespace shani\advisors {
                 'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
                 'access-control-max-age' => $cacheTime
             ]);
+            return $this;
         }
 
         /**

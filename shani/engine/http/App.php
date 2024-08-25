@@ -289,15 +289,15 @@ namespace shani\engine\http {
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 $this->res->setStatus(HttpStatus::NOT_FOUND);
                 $this->config->httpErrorHandler();
-            } else {
-                try {
-                    $className = str_replace('/', '\\', $classPath);
-                    $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
-                    (new $className($this))->$cb();
-                } catch (\Exception $ex) {
-                    $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-                    $this->config->httpErrorHandler($ex->getMessage());
-                }
+                return;
+            }
+            try {
+                $className = str_replace('/', '\\', $classPath);
+                $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
+                (new $className($this))->$cb();
+            } catch (\Exception $ex) {
+                $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                $this->config->httpErrorHandler($ex->getMessage());
             }
         }
 
