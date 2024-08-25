@@ -47,7 +47,7 @@ namespace shani\advisors {
         public const BROWSING_PRIVACY_THIS_DOMAIN = 1;
 
         /**
-         * Send the Referrer header (See what user is browsing on all domains
+         * Send the Referrer header (i.e see what user is browsing on all domains
          * but do not show the actual content they browse)
          */
         public const BROWSING_PRIVACY_PARTIALLY = 2;
@@ -194,10 +194,9 @@ namespace shani\advisors {
          * Execute user defined middlewares. This function provide access for user
          * to register and execute middlewares
          * @param Middleware $mw Middleware object
-         * @return SecurityMiddleware|null If null then the Security advisor will
-         * be disabled (not recommended)
+         * @return SecurityMiddleware
          */
-        public abstract function middleware(Middleware &$mw): ?SecurityMiddleware;
+        public abstract function middleware(Middleware &$mw): SecurityMiddleware;
 
         /**
          * Get or set application modules directory
@@ -267,6 +266,7 @@ namespace shani\advisors {
 
         /**
          * Returns an array of HTTP request methods supported by the application (in lower case)
+         * @see SecurityMiddleware::passedRequestMethodCheck()
          */
         public abstract function requestMethods(): array;
 
@@ -316,8 +316,9 @@ namespace shani\advisors {
         }
 
         /**
+         * Tells a web browser how send HTTP referrer header. This is important
+         * for managing user browsing privacy
          * @return int
-         * @see SecurityMiddleware::browsingPrivacy()
          */
         public function browsingPrivacy(): int
         {
@@ -361,6 +362,16 @@ namespace shani\advisors {
         public function csrfTokenName(): string
         {
             return 'csrf_token';
+        }
+
+        /**
+         * Enable/disable security checks (disabling is not recommended in production environment)
+         * @return bool
+         * @see SecurityMiddleware::disabled()
+         */
+        public function disableSecurityAdvisor(): bool
+        {
+            return false;
         }
     }
 

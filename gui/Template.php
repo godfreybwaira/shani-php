@@ -10,6 +10,7 @@
 namespace gui {
 
     use shani\engine\http\App;
+    use shani\advisors\Configuration;
 
     final class Template
     {
@@ -19,8 +20,16 @@ namespace gui {
         private array $details = [];
         private ?array $scripts, $styles, $data, $attributes;
 
+        private const REFERRER_PRIVACIES = [
+            Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
+            Configuration::BROWSING_PRIVACY_THIS_DOMAIN => 'same-origin',
+            Configuration::BROWSING_PRIVACY_PARTIALLY => 'strict-origin',
+            Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
+        ];
+
         public function __construct(App &$app)
         {
+            $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config()->browsingPrivacy()]);
             $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;

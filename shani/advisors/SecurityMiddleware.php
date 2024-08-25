@@ -22,12 +22,6 @@ namespace shani\advisors {
             Configuration::ACCESS_POLICY_THIS_DOMAIN => 'same-origin',
             Configuration::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN => 'same-site'
         ];
-        private const REFERRER_PRIVACIES = [
-            Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
-            Configuration::BROWSING_PRIVACY_THIS_DOMAIN => 'same-origin',
-            Configuration::BROWSING_PRIVACY_PARTIALLY => 'strict-origin',
-            Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
-        ];
 
         private Configuration $cnf;
 
@@ -38,12 +32,26 @@ namespace shani\advisors {
         }
 
         /**
+         * Check whether the client request method is allowed by the application.
+         * @return bool
+         * @see Configuration::requestMethods()
+         */
+        public function passedRequestMethodCheck(): bool
+        {
+            if (in_array($this->app->request()->method(), $this->cnf->requestMethods())) {
+                return true;
+            }
+            $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
+            return false;
+        }
+
+        /**
          * Block incoming CSRF attacks. All attacks coming via HTTP GET request will
          * be discarded. User must make sure not submitting sensitive information
          * via GET request
          * @return bool True if check passes, false otherwise
          */
-        public function blockCSRF(): bool
+        public function passedCsrfTest(): bool
         {
             $method = $this->app->request()->method();
             if (!$this->cnf->csrfProtectionEnabled() || !in_array($method, $this->cnf->csrfProtectedMethods())) {
@@ -117,20 +125,6 @@ namespace shani\advisors {
         }
 
         /**
-         * Tells a web browser how send HTTP referrer header. This is important
-         * for keeping user browsing privacy
-         * @return void
-         * @see Configuration::browsingPrivacy()
-         */
-        public function browsingPrivacy(): void
-        {
-            $this->app->response()->setHeaders([
-                //meta
-                'referrer-policy' => self::REFERRER_PRIVACIES[$this->cnf->browsingPrivacy()]
-            ]);
-        }
-
-        /**
          * A request sent by the browser before sending the actual request to verify
          * whether a server can process the coming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
@@ -156,6 +150,16 @@ namespace shani\advisors {
                 'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
                 'access-control-max-age' => $cacheTime
             ]);
+        }
+
+        /**
+         * Checks whether security checks is disabled.
+         * @return bool
+         * @see Configuration::disableSecurityAdvisor()
+         */
+        public function disabled(): bool
+        {
+            return $this->cnf->disableSecurityAdvisor();
         }
     }
 

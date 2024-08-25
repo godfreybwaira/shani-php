@@ -46,7 +46,7 @@ namespace apps\demo\v1\config {
             return ['get', 'post', 'head'];
         }
 
-        public function middleware(Middleware &$mw): ?\shani\advisors\SecurityMiddleware
+        public function middleware(Middleware &$mw): \shani\advisors\SecurityMiddleware
         {
             return new \apps\demo\v1\middleware\Register($this->app, $mw);
         }

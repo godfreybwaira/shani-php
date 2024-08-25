@@ -285,11 +285,6 @@ namespace shani\engine\http {
         public function route(): void
         {
             $method = $this->req->method();
-            if (!in_array($method, $this->config->requestMethods())) {
-                $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-                $this->config->httpErrorHandler();
-                return;
-            }
             $classPath = $this->getClassPath($method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 $this->res->setStatus(HttpStatus::NOT_FOUND);

@@ -54,18 +54,22 @@ namespace shani\engine\http {
         /**
          * This method start execution of all registered middlewares according
          * to their orders.
-         * @param SecurityMiddleware|null $mw Security advisor middleware object
+         * @param SecurityMiddleware $mw Security advisor middleware object
          * @return self
          */
-        public function runWith(?SecurityMiddleware $mw): void
+        public function runWith(SecurityMiddleware $mw): void
         {
-            if ($mw !== null) {
-                $mw->browsingPrivacy();
+            if ($mw->disabled()) {
+                self::returnResponse($this->app);
+                return;
+            }
+            $this->app->on('web', function () use (&$mw) {
                 $mw->blockClickjacking();
                 $mw->resourceAccessPolicy();
                 $mw->preflightRequest();
-            }
-            if ($mw === null || ($mw->authorized() && $mw->blockCSRF())) {
+                $mw->passedCsrfTest();
+            });
+            if ($mw->authorized() && $mw->passedRequestMethodCheck()) {
                 if ($this->listener->listening('before')) {
                     $this->listener->trigger('before');
                     return;
