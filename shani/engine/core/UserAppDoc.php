@@ -69,15 +69,15 @@ namespace shani\engine\core {
                         $functions = $rf->getMethods(\ReflectionMethod::IS_PUBLIC);
                         $className = $rf->getShortName();
                         foreach ($functions as $fnobj) {
-                            $name = $fnobj->getName();
-                            if (substr($name, 0, 2) === '__') {
+                            $fnName = $fnobj->getName();
+                            if (substr($fnName, 0, 2) === '__') {
                                 continue;
                             }
                             $comments = self::cleanComment($fnobj->getDocComment());
-                            $path = $module . '/' . $className . '/' . $name;
+                            $path = $module . '/' . $className . '/' . $fnName;
                             $details = $method . ' ' . $module . ' ' . $className . ' (';
-                            $details .= ($name === Definitions::HOME_FUNCTION ? 'one/all' : $name) . ')';
-                            $docs['modules'][$module][$className][$name][$method] = [
+                            $details .= ($fnName === Definitions::HOME_FUNCTION ? 'one/all' : $fnName) . ')';
+                            $docs['modules'][$module][$className][$fnName][$method] = [
                                 'details' => $comments ?? ucwords(strtolower($details)),
                                 'id' => App::digest(strtolower($method . '/' . $path)),
                                 'path' => '/' . str_replace('/', '/{id}/', strtolower($path))

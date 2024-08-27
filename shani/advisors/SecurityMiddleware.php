@@ -73,17 +73,17 @@ namespace shani\advisors {
         public function authorized(): bool
         {
             $permissions = $this->cnf->userPermissions();
-            $module = $this->app->request()->module();
+            $request = $this->app->request();
+            $module = $request->module();
             if ($permissions !== null) {
                 if (in_array($module, $this->cnf->guestModules())) {
-                    $this->app->request()->rewriteUrl($this->cnf->homepage());
+                    $request->rewriteUrl($this->cnf->homepage());
                     return true;
                 }
                 if (in_array($module, $this->cnf->publicModules())) {
                     return true;
                 }
-                $code = App::digest($this->app->request()->target());
-                if (preg_match('\b' . $code . '\b', $permissions) === 1) {
+                if ($this->app->hasAuthority($request->target())) {
                     return true;
                 }
             } else if (in_array($module, $this->cnf->guestModules()) || in_array($module, $this->cnf->publicModules())) {

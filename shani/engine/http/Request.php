@@ -327,6 +327,7 @@ namespace shani\engine\http {
          * Get the current request target referring to current path to a class function
          * (i.e method/module/resource/callback)
          * @return string
+         * @see App::hasAuthority()
          */
         public function target(): string
         {

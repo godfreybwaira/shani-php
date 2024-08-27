@@ -278,6 +278,21 @@ namespace shani\engine\http {
         }
 
         /**
+         * Check whether a user has enough privileges to access a target resource
+         * @param string $target Target path
+         * @return bool True a user has enough privileges, false otherwise.
+         * @see Request::target()
+         */
+        public function hasAuthority(string $target): bool
+        {
+            if ($this->config->disableSecurityAdvisor()) {
+                return true;
+            }
+            $code = self::digest($target);
+            return (preg_match('\b' . $code . '\b', $this->config->userPermissions()) === 1);
+        }
+
+        /**
          * Dynamically route a user request to mapped resource. The routing mechanism
          * always depends on HTTP method and application endpoint provided by the user.
          * @return void
@@ -310,12 +325,12 @@ namespace shani\engine\http {
          * Set and/or get URL safe from CSRF attack. if CSRF is enabled, then the
          * application will be protected against CSRF attack and the URL will be
          * returned, otherwise the URL will be returned but CSRF will be turned off.
-         * @param string|null $path
+         * @param string|null $urlPath
          * @return string URL safe from CSRF attack
          */
-        public function csrf(?string $path = null): string
+        public function csrf(?string $urlPath = null): string
         {
-            $url = $path ?? $this->req->uri()->path();
+            $url = $urlPath ?? $this->req->uri()->path();
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add([$token => null]);

@@ -273,6 +273,7 @@ namespace shani\advisors {
         /**
          * Get a list of authenticated user's permissions separated by comma.
          * @return string|null List of user permissions or null if no permission is granted
+         * @see App::hasAuthority()
          */
         public abstract function userPermissions(): ?string;
 
