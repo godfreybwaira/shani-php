@@ -279,17 +279,16 @@ namespace shani\engine\http {
 
         /**
          * Check whether a user has enough privileges to access a target resource
-         * @param string $target Target path
+         * @param string $targetId Target id, see self::documentation()
          * @return bool True a user has enough privileges, false otherwise.
-         * @see Request::target()
+         * @see self::documentation()
          */
-        public function hasAuthority(string $target): bool
+        public function hasAuthority(string $targetId): bool
         {
             if ($this->config->disableSecurityAdvisor()) {
                 return true;
             }
-            $code = self::digest($target);
-            return (preg_match('\b' . $code . '\b', $this->config->userPermissions()) === 1);
+            return (preg_match('\b' . $targetId . '\b', $this->config->userPermissions()) === 1);
         }
 
         /**

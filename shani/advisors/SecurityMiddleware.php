@@ -72,10 +72,9 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $permissions = $this->cnf->userPermissions();
             $request = $this->app->request();
             $module = $request->module();
-            if ($permissions !== null) {
+            if ($this->cnf->userPermissions() !== null) {
                 if (in_array($module, $this->cnf->guestModules())) {
                     $request->rewriteUrl($this->cnf->homepage());
                     return true;
@@ -83,7 +82,8 @@ namespace shani\advisors {
                 if (in_array($module, $this->cnf->publicModules())) {
                     return true;
                 }
-                if ($this->app->hasAuthority($request->target())) {
+                $targetId = App::digest($request->target());
+                if ($this->app->hasAuthority($targetId)) {
                     return true;
                 }
             } else if (in_array($module, $this->cnf->guestModules()) || in_array($module, $this->cnf->publicModules())) {
