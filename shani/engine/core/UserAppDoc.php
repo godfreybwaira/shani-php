@@ -74,13 +74,15 @@ namespace shani\engine\core {
                                 continue;
                             }
                             $comments = self::cleanComment($fnobj->getDocComment());
+                            $path = $module . '/' . $className . '/' . $fnName;
                             $details = $method . ' ' . $module . ' ' . $className . ' (';
                             $details .= ($fnName === Definitions::HOME_FUNCTION ? 'one/all' : $fnName) . ')';
-                            $target = strtolower($method . '/' . $module . '/' . $className . '/' . $fnName);
+                            $target = strtolower($method . '/' . $path);
                             $docs['modules'][$module][$className][$fnName][$method] = [
                                 'details' => $comments ?? ucwords(strtolower($details)),
 //                                'target' => $target,
-                                'targetId' => App::digest($target)
+                                'targetId' => App::digest($target),
+                                'path' => '/' . str_replace('/', '/{id}/', strtolower($path))
                             ];
                         }
                     }

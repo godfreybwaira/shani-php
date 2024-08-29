@@ -315,9 +315,9 @@ namespace shani\engine\http {
             }
         }
 
-        public static function digest(string $str, string $algorithm = 'crc32b'): string
+        public static function digest(string $str, string $algorithm = 'sha1', int $length = 7): string
         {
-            return hash($algorithm, $str);
+            return substr(hash($algorithm, $str), 0, $length);
         }
 
         /**
