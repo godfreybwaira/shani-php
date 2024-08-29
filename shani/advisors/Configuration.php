@@ -383,6 +383,15 @@ namespace shani\advisors {
         {
             return false;
         }
+
+        /**
+         * Check whether the current user is authenticated and has at least one permission.
+         * @return bool
+         */
+        public final function authenticated(): bool
+        {
+            return $this->userPermissions() !== null;
+        }
     }
 
 }

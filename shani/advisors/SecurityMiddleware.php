@@ -74,7 +74,7 @@ namespace shani\advisors {
         {
             $request = $this->app->request();
             $module = $request->module();
-            if ($this->cnf->userPermissions() !== null) {
+            if ($this->cnf->authenticated()) {
                 if (in_array($module, $this->cnf->guestModules())) {
                     $request->rewriteUrl($this->cnf->homepage());
                     return true;

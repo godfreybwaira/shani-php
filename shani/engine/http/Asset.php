@@ -46,7 +46,7 @@ namespace shani\engine\http {
                 $prefix = self::STORAGE_PREFIX;
                 $rootPath = $app->storage()->pathTo();
             } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
-                if ($app->config()->userPermissions() === null) {
+                if (!$app->config()->authenticated()) {
                     $app->response()->setStatus(HttpStatus::UNAUTHORIZED)->send();
                     return true;
                 }
