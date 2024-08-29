@@ -16,8 +16,9 @@ namespace shani\engine\http {
 
         private App $app;
 
-        private const ASSET_PREFIX = '/0';
-        public const STORAGE_PREFIX = '/1';
+        private const ASSET_PREFIX = '/-1';
+        public const STORAGE_PREFIX = '/-2';
+        public const PRIVATE_PREFIX = '/-3';
 
         public function __construct(App &$app)
         {
@@ -30,7 +31,7 @@ namespace shani\engine\http {
         }
 
         /**
-         * Serve static content e.g css, images and other static files.
+         * Serve static content e.g CSS, images and other static files.
          * @param App $app Application object
          * @return bool True on success, false otherwise.
          */
@@ -43,7 +44,14 @@ namespace shani\engine\http {
                 $rootPath = $app->asset()->pathTo();
             } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
                 $prefix = self::STORAGE_PREFIX;
-                $rootPath = $app->storage()->path();
+                $rootPath = $app->storage()->pathTo();
+            } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
+                if ($app->config()->userPermissions() === null) {
+                    $app->response()->setStatus(HttpStatus::UNAUTHORIZED)->send();
+                    return true;
+                }
+                $prefix = self::PRIVATE_PREFIX;
+                $rootPath = $app->storage()->pathTo($app->config()->protectedStorage());
             }
             if ($prefix === null) {
                 return false;

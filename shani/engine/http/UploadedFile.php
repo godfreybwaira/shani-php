@@ -15,8 +15,9 @@ namespace shani\engine\http {
     {
 
         private array $file;
-        private \SplFileObject $stream;
         public static $storage;
+        private \SplFileObject $stream;
+        private ?string $destination = null;
 
         private const PREFIXES = ['y', 'e', 's', 'u'];
 
@@ -98,15 +99,29 @@ namespace shani\engine\http {
         }
 
         /**
+         * Set a destination storage directory. If is null or not provided, then
+         * the web root directory will be the last destination.
+         * @param string $path Storage destination inside web storage directory.
+         * It must have a leading / if provided.
+         * @return self
+         */
+        public function setDestination(string $path): self
+        {
+            $this->destination = $path;
+            return $this;
+        }
+
+        /**
          * Move a file from temporary directory to destination directory
-         * @param Storage $storage A storage object
+         * @param App $app Application object
+         * @param bool $protected If set to true, then the file will be uploaded to a protected storage
          * @param string $newName A new file name without extension
          * @return string File path to a new location
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
          */
-        public function save(Storage $storage, string $newName = null): string
+        public function save(App $app, bool $protected = true, string $newName = null): string
         {
-            $destination = $storage->pathTo();
+            $destination = $app->storage()->pathTo($protected ? $app->config()->protectedStorage() : null) . $this->destination;
             $directory = self::createDirectory($destination . '/' . $this->file['type']);
             $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
             $filepath .= hrtime()[1] . self::getExtension($this->file['name']);

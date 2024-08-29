@@ -22,12 +22,11 @@ namespace shani\engine\http {
         /**
          * Create a storage area for files and directories
          * @param App $app
-         * @param string|null $rootPath Path inside web root directory
          */
-        public function __construct(App &$app, ?string $rootPath = null)
+        public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->root = Definitions::DIR_APPS . $app->config()->webroot() . $rootPath;
+            $this->root = Definitions::DIR_APPS . $app->config()->webroot();
         }
 
         /**
@@ -131,11 +130,16 @@ namespace shani\engine\http {
         /**
          * Get a full qualified URL to a web root directory (web storage)
          * @param string $path Path to a file in a web root directory
+         * @param bool $protected If set to true, then the file will be loaded from a protected storage
          * @return string URL referring to a file from storage
          */
-        public function urlTo(string $path): string
+        public function urlTo(string $path, bool $protected = true): string
         {
-            return $this->app->request()->uri()->host() . Asset::STORAGE_PREFIX . $path;
+            if ($protected) {
+                $url = $this->app->request()->uri()->host() . self::PRIVATE_PREFIX;
+                return $url . substr($path, strlen($this->app->config()->protectedStorage()));
+            }
+            return $this->app->request()->uri()->host() . self::STORAGE_PREFIX . $path;
         }
 
         /**

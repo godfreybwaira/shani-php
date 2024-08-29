@@ -260,6 +260,15 @@ namespace shani\advisors {
         public abstract function webroot(): string;
 
         /**
+         * All files that have to be accessed by an authenticated users are kept here.
+         * @return string|null A path relative to a web root directory
+         */
+        public function protectedStorage(): ?string
+        {
+            return '/protected';
+        }
+
+        /**
          * Default path to homepage if '/' is provided by during HTTP request
          */
         public abstract function homepage(): string;
