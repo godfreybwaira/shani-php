@@ -136,8 +136,9 @@ namespace shani\engine\http {
         public function urlTo(string $path, bool $protected = true): string
         {
             if ($protected) {
+                $storage = $this->app->config()->protectedStorage();
                 $url = $this->app->request()->uri()->host() . self::PRIVATE_PREFIX;
-                return $url . substr($path, strlen($this->app->config()->protectedStorage()));
+                return $url . (empty($storage) ? $path : substr($path, strlen($storage)));
             }
             return $this->app->request()->uri()->host() . self::STORAGE_PREFIX . $path;
         }

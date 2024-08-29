@@ -114,14 +114,15 @@ namespace shani\engine\http {
         /**
          * Move a file from temporary directory to destination directory
          * @param App $app Application object
-         * @param bool $protected If set to true, then the file will be uploaded to a protected storage
+         * @param bool $protectedFile If set to true, then the file will be uploaded to a protected storage
          * @param string $newName A new file name without extension
          * @return string File path to a new location
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
+         * @see \shani\advisors\Configuration::protectedStorage()
          */
-        public function save(App $app, bool $protected = true, string $newName = null): string
+        public function save(App $app, bool $protectedFile = true, string $newName = null): string
         {
-            $destination = $app->storage()->pathTo($protected ? $app->config()->protectedStorage() : null) . $this->destination;
+            $destination = $app->storage()->pathTo($protectedFile ? $app->config()->protectedStorage() : null) . $this->destination;
             $directory = self::createDirectory($destination . '/' . $this->file['type']);
             $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
             $filepath .= hrtime()[1] . self::getExtension($this->file['name']);
