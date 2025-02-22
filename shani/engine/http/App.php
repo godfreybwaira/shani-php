@@ -269,7 +269,7 @@ namespace shani\engine\http {
          */
         public function documentation(): array
         {
-            return \shani\engine\core\UserAppDoc::generate($this);
+            return (new \shani\engine\documentation\Generator($this))->generate();
         }
 
         /**

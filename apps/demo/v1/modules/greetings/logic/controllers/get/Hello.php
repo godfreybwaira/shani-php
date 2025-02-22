@@ -28,16 +28,15 @@ namespace apps\demo\v1\modules\greetings\logic\controllers\get {
          */
         public function world()
         {
-            //using dictionary
-            $lang = $this->app->dictionary(['name' => 'user']);
             //using global style
             $this->app->template()->styles('/css/styles.css');
-            //passing data to this view (greetings/views/hello/world.php)
+            //passing data to current view (greetings/presentation/views/hello/world.php)
             $student = new Student('Godfrey', 'Bwaira', 20);
             $student->addSubject(new Subject('English', 'A', 89))
                     ->addSubject(new Subject('Kiswahili', 'B', 79))
                     ->addSubject(new Subject('Maths', 'C', 70.6));
-            $this->app->render($student->dto());
+//            $this->app->render($student->dto());
+            $this->app->render($this->app->documentation());
         }
     }
 

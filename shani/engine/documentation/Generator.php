@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * User application documentation generator
+ * @author coder
+ *
+ * Created on: May 30, 2024 at 4:31:29 PM
+ */
+
+namespace shani\engine\documentation {
+
+    use shani\engine\documentation\dto\ControllerDto;
+    use shani\engine\documentation\dto\ModuleDto;
+    use shani\engine\documentation\dto\RequestMethodDto;
+    use shani\engine\documentation\dto\UserAppDto;
+    use shani\engine\http\App;
+
+    final class Generator
+    {
+
+        private UserAppDto $userApp;
+        private array $allowedMethods, $modules;
+
+        public function __construct(App &$app)
+        {
+            $config = $app->config();
+            $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
+            $moduleColletion = self::scanModules($modulesPath, $config->controllers());
+            $this->allowedMethods = $config->requestMethods();
+            $this->userApp = new UserAppDto($config->appName(), $app->request()->version());
+            foreach ($moduleColletion as $moduleName => $reqMethods) {
+                $module = new ModuleDto($moduleName);
+                foreach ($reqMethods as $name => $methodList) {
+                    $method = new RequestMethodDto($name);
+                    self::scanControllers($module, $method, $methodList);
+                }
+                $this->userApp->addModule($module);
+            }
+        }
+
+        private static function scanControllers(ModuleDto &$module, RequestMethodDto &$method, array &$reqMethods): void
+        {
+            foreach ($reqMethods as $path) {
+                $controller = new ControllerDto(basename($path, '.php'));
+                $controller->addRequestMethod($method);
+                $module->addController($controller);
+                self::scanFunctions($module->getName(), $method, $path);
+            }
+        }
+
+        private static function scanModules(string $modulesRootPath, string $methodsDir = null): array
+        {
+            $folders = [];
+            $modules = array_diff(scandir($modulesRootPath), ['.', '..']);
+            foreach ($modules as $module) {
+                $path = $modulesRootPath . '/' . $module . $methodsDir;
+                if (is_dir($path)) {
+                    $folders[$module] = self::scanModules($path);
+                } else {
+                    $folders[] = substr($path, strlen(SERVER_ROOT));
+                }
+            }
+            return $folders;
+        }
+
+        private static function cleanComment($str): ?string
+        {
+            if ($str !== false) {
+                $comments = explode(PHP_EOL, $str);
+                $size = count($comments) - 1;
+                $result = ltrim($comments[1], " *\t\v\x00");
+                for ($i = 2; $i < $size; $i++) {
+                    $result .= PHP_EOL . ltrim($comments[$i], " *\t\v\x00");
+                }
+                return $result;
+            }
+            return null;
+        }
+
+        /**
+         * Generate current user application documentation
+         * @return array User application documentation
+         */
+        public function generate(): array
+        {
+            return $this->userApp->dto();
+        }
+
+        public static function scanFunctions(string $moduleName, RequestMethodDto &$method, string $classPath): void
+        {
+
+            $cleanPath = str_replace('/', '\\', substr($classPath, 0, strpos($classPath, '.')));
+            $class = new \ReflectionClass($cleanPath);
+            $functions = $class->getMethods(\ReflectionMethod::IS_PUBLIC);
+            $className = $class->getShortName();
+            $methodName = $method->getName();
+            foreach ($functions as $fnobj) {
+                $fnName = $fnobj->getName();
+                if (substr($fnName, 0, 2) === '__') {
+                    continue;
+                }
+                $path = $moduleName . '/' . $className . '/' . $fnName;
+                $target = strtolower($methodName . '/' . $path);
+                $endpoint = '/' . str_replace('/', '/{id}/', strtolower($path));
+                $comments = self::cleanComment($fnobj->getDocComment());
+                $details = $methodName . ' ' . $moduleName . ' ' . $className . ' (' . $comments . ')';
+                $method->addFunction(new dto\FunctionDto($fnName, $target, $endpoint, $details));
+            }
+        }
+    }
+
+}
