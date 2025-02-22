@@ -14,8 +14,8 @@ namespace shani\engine\http {
     final class Storage
     {
 
-        private App $app;
-        private string $root;
+        private readonly App $app;
+        private readonly string $root;
 
         public const FILE_MODE = 0750;
 

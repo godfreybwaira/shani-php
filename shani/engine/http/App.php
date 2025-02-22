@@ -18,11 +18,11 @@ namespace shani\engine\http {
     {
 
         private Asset $asset;
-        private Request $req;
-        private Response $res;
         private ?string $lang;
         private Storage $storage;
-        private Configuration $config;
+        private readonly Request $req;
+        private readonly Response $res;
+        private readonly Configuration $config;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
 
@@ -40,7 +40,7 @@ namespace shani\engine\http {
                     $this->start();
                 }
             } catch (\ErrorException $ex) {
-                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send($ex->getMessage());
+                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send(['message' => $ex->getMessage()]);
             }
         }
 
@@ -175,22 +175,22 @@ namespace shani\engine\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param array|null $data Values to be passed on view file
+         * @param array|null $data Data object to be passed to a view file
          * @return void
          */
         public function render(?array $data = null): void
         {
             $type = $this->res->type();
-            if ($type === null || $type === 'html') {
+            if ($type === 'html' || $type === 'htm') {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsHtml(ob_get_clean());
-            } else if ($type !== 'event-stream') {
-                $this->res->send($data);
-            } else {
+            } else if ($type === 'event-stream') {
                 ob_start();
                 $this->template()->render($data);
                 $this->res->sendAsSse(ob_get_clean());
+            } else {
+                $this->res->send($data, $type);
             }
         }
 

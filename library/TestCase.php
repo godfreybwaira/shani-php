@@ -12,254 +12,243 @@ namespace library {
     final class TestCase
     {
 
-        private $value = null;
-        private int $pass = 0, $total = 0, $length;
-        private ?string $description, $lines = null;
-        private $before = null, $after = null;
-        private array $results = [];
+        private array $cases;
+        private $testedValue = null;
+        private ?string $description;
+        private int $totalPasses = 0, $totalCases = 0;
 
         public const TYPE_INT = 'integer', TYPE_BOOL = 'boolean', TYPE_DOUBLE = 'double';
         public const TYPE_STRING = 'string', TYPE_ARRAY = 'array', TYPE_OBJECT = 'object';
         public const TYPE_NULL = 'NULL', TYPE_RESOURCE_CLOSED = 'resource (closed)';
         public const TYPE_RESOURCE = 'resource', TYPE_UNKNOWN = 'unknown type';
-        private const COLOR_BLACK = 0, COLOR_GREEN = 2, COLOR_RED = 1, COLOR_CYAN = 6;
-        private const COLOR_BROWN = 3, COLOR_BLUE = 4, COLOR_PURPLE = 5, COLOR_GREY = 7;
 
-        public function __construct(string $description = null)
+        public function __construct(?string $description = null)
         {
-            $this->length = strlen($description ?? '');
             $this->description = $description;
-        }
-
-        public function __destruct()
-        {
-            $this->printResults();
+            $this->cases = [];
         }
 
         public function done(): array
         {
-            $this->results['all'] = $this->total;
-            $this->results['passed'] = $this->pass;
-            $this->results['failed'] = $this->total - $this->pass;
-            return $this->results;
-        }
-
-        private function printResults(): void
-        {
-            if ($this->total > 0) {
-                if ($this->description !== null) {
-                    $halfLen = ceil(($this->length - strlen($this->description)) / 2);
-                    $space = str_repeat(' ', $halfLen);
-                    $str = '+' . str_repeat('-', $this->length) . '+' . PHP_EOL;
-                    echo $str . '|' . $space . mb_strtoupper($this->description) . $space . '|' . PHP_EOL . $str;
-                }
-                echo $this->lines . PHP_EOL;
-                $diff = $this->total - $this->pass;
-                $title = 'Total Tests: ' . $this->total . ' (100%)';
-                echo 'Results:' . PHP_EOL . $title . PHP_EOL;
-                echo 'Test Passed: ' . $this->pass . ' (' . round($this->pass * 100 / $this->total, 2) . '%)' . PHP_EOL;
-                echo 'Test Failed: ' . $diff . ' (' . round($diff * 100 / $this->total, 2) . '%)' . PHP_EOL;
-            }
+            return [
+                'test' => [
+                    'description' => $this->description, 'date' => date(DATE_RFC2822),
+                    'cases' => $this->totalCases, 'passes' => $this->totalPasses,
+                    'fails' => ($this->totalCases - $this->totalPasses)
+                ],
+                'cases' => $this->cases
+            ];
         }
 
         /**
          * Create and start a unit test.
-         * @param mixed $value A target value to test
+         * @param mixed $expectedValue A target value to test
          * @return self
          */
-        public function testIf(mixed $value): self
+        public function testIf(mixed $expectedValue): self
         {
-            $this->value = $value;
+            $this->testedValue = $expectedValue;
             return $this;
         }
 
-        private static function toReadable($value)
+        private static function toReadable($expectedValue)
         {
-            if (is_bool($value)) {
-                return $value ? 'true' : 'false';
+            if (is_bool($expectedValue)) {
+                return $expectedValue ? 'true' : 'false';
             }
-            if ($value === null) {
+            if ($expectedValue === null) {
                 return 'NULL';
             }
-            if (is_array($value)) {
-                return json_encode($value);
+            if (is_array($expectedValue)) {
+                return json_encode($expectedValue);
             }
-            return $value;
-        }
-
-        private static function setup(?callable $callback): void
-        {
-            if ($callback !== null) {
-                $callback();
-            }
-        }
-
-        public function afterEachTest(callable $callback): self
-        {
-            $this->after = $callback;
-        }
-
-        public function beforeEachTest(callable $callback): self
-        {
-            $this->before = $callback;
+            return $expectedValue;
         }
 
         public function matchesWith(string $pattern, string $details = null): self
         {
-            return $this->compare($pattern, preg_match($pattern, $this->value) === 1, $details);
+            $details ??= 'Test if "' . $this->testedValue . '" matches with a pattern ' . $pattern;
+            $pass = preg_match($pattern, $this->testedValue) === 1;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
         public function notMatchesWith(string $pattern, string $details = null): self
         {
-            return $this->compare($pattern, preg_match($pattern, $this->value) === 0, $details);
+            $details ??= 'Test if "' . $this->testedValue . '" not matches with a pattern ' . $pattern;
+            $pass = preg_match($pattern, $this->testedValue) === 0;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function contains(string $needle, string $details = null): self
+        public function containsWord(string $word, string $details = null): self
         {
-            return $this->compare($needle, preg_match('/\b' . $this->value . '\b/', $needle) === 1, $details);
+            $details ??= 'Test if "' . $this->testedValue . '" contains a word "' . $word . '"';
+            $pass = preg_match('/\b' . preg_quote($word, '/') . '\b/i', $this->testedValue) === 1;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function notContains(string $needle, string $details = null): self
+        public function notContainsWord(string $word, string $details = null): self
         {
-            return $this->compare($needle, preg_match('/\b' . $this->value . '\b/', $needle) !== 1, $details);
+            $details ??= 'Test if "' . $this->testedValue . '" not contains a word "' . $word . '"';
+            $pass = preg_match('/\b' . preg_quote($word, '/') . '\b/i', $this->testedValue) !== 1;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
         public function isNotType(string $type, string $details = null): self
         {
-            return $this->compare($type, gettype($this->value) !== $type, $details);
+            $details ??= 'Test if ' . self::toReadable($this->testedValue) . ' is not of type ' . $type;
+            $actualType = gettype($this->testedValue);
+            return $this->getResult($actualType !== $type, $details, $type, $actualType);
         }
 
         public function isType(string $type, string $details = null): self
         {
-            return $this->compare($type, gettype($this->value) === $type, $details);
+            $details ??= 'Test if ' . self::toReadable($this->testedValue) . ' is of type ' . $type;
+            $actualType = gettype($this->testedValue);
+            return $this->getResult($actualType === $type, $details, $type, $actualType);
         }
 
-        public function hasValues(array $values, string $details = null): self
+        public function hasValues(string|array $expectedValues, string $details = null): self
         {
-            return $this->compare($values, \library\Map::hasValues($this->value, $values), $details);
+            $details ??= 'Test if a given array contains all value(s): ' . self::toReadable($expectedValues);
+            $pass = \library\Map::hasValues($this->testedValue, $expectedValues);
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function hasKeys($keys, string $details = null): self
+        public function hasKeys(string|array $keys, string $details = null): self
         {
-            return $this->compare($keys, \library\Map::hasKeys($this->value, $keys), $details);
+            $details ??= 'Test if a given array contains all key(s): ' . self::toReadable($keys);
+            $pass = \library\Map::hasKeys($this->testedValue, $keys);
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function missingKeys($keys, string $details = null): self
+        public function missingKeys(string|array $keys, string $details = null): self
         {
-            return $this->compare($keys, !\library\Map::hasKeys($this->value, $keys), $details);
+            $details ??= 'Test if a given array missing any of the key(s): ' . self::toReadable($keys);
+            $pass = !\library\Map::hasKeys($this->testedValue, $keys);
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function missingValues($values, string $details = null): self
+        public function missingValues(string|array $expectedValues, string $details = null): self
         {
-            return $this->compare($values, !\library\Map::hasValues($this->value, $values), $details);
+            $details ??= 'Test if a given array missing any of the value(s): ' . self::toReadable($expectedValues);
+            $pass = !\library\Map::hasValues($this->testedValue, $expectedValues);
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function isGreaterThan($value, string $details = null): self
+        /**
+         * Test if a given tested value satisfies a given equation solved by a callback
+         * @param callable $callback A callback that accepts a tested value as argument
+         * and returns true if test passes, false otherwise.
+         * @param string $details Test description
+         * @return self
+         */
+        public function satisfies(callable $callback, string $details): self
         {
-            return $this->compare($value, $this->value > $value, $details);
+            $pass = $callback($this->testedValue);
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        public function isLessThan($value, string $details = null): self
+        public function isGreaterThan(float $expectedValue, string $details = null): self
         {
-            return $this->compare($value, $this->value < $value, $details);
+            $details ??= 'Test if ' . $this->testedValue . ' is greater than ' . $expectedValue;
+            return $this->getResult($this->testedValue > $expectedValue, $details, $expectedValue, $this->testedValue);
+        }
+
+        public function isLessThan(float $expectedValue, string $details = null): self
+        {
+            $details ??= 'Test if ' . $this->testedValue . ' is less than ' . $expectedValue;
+            return $this->getResult($this->testedValue < $expectedValue, $details, $expectedValue, $this->testedValue);
         }
 
         public function isEmpty(string $details = null): self
         {
-            return $this->compare('(empty)', $this->value === '' || $this->value === null, $details);
+            $details ??= 'Test if "' . $this->testedValue . '" is NULL or empty string';
+            return $this->getResult($this->testedValue === '' || $this->testedValue === null, $details, $this->testedValue, $this->testedValue);
         }
 
         public function isNotEmpty(string $details = null): self
         {
-            return $this->compare('(not empty)', $this->value == 0 || !empty($this->value), $details);
+            $details ??= 'Test if "' . $this->testedValue . '" is not NULL or empty string';
+            return $this->getResult($this->testedValue !== '' || $this->testedValue !== null, $details, $this->testedValue, $this->testedValue);
         }
 
         public function isFalsy(string $details = null): self
         {
-            return $this->compare('(falsy)', empty($this->value), $details);
+            $details ??= 'Test if "' . $this->testedValue . '" is NULL, zero, false, or empty string';
+            return $this->getResult(empty($this->testedValue), $details, false, $this->testedValue);
         }
 
         public function isTruthy(string $details = null): self
         {
-            return $this->compare('(truthy)', !empty($this->value), $details);
+            $details ??= 'Test if "' . $this->testedValue . '"  is not NULL, zero, false, or empty string';
+            return $this->getResult(!empty($this->testedValue), $details, true, $this->testedValue);
         }
 
-        public function is($value, string $details = null): self
+        public function is($expectedValue, string $details = null): self
         {
-            return $this->compare($value, $this->value == $value, $details);
+            $details ??= 'Test if ' . $this->testedValue . ' equals ' . self::toReadable($expectedValue);
+            return $this->getResult($this->testedValue == $expectedValue, $details, $expectedValue, $this->testedValue);
         }
 
-        public function isExact($value, string $details = null): self
+        public function isExact($expectedValue, string $details = null): self
         {
-            return $this->compare($value, $this->value === $value, $details);
+            $details = 'Test if ' . $this->testedValue . ' is exact ' . self::toReadable($expectedValue);
+            return $this->getResult($this->testedValue === $expectedValue, $details, $expectedValue, $this->testedValue);
         }
 
-        public function isNotExact($value, string $details = null): self
+        public function isNotExact($expectedValue, string $details = null): self
         {
-            return $this->compare($value, $this->value !== $value, $details);
+            $details ??= 'Test if ' . $this->testedValue . ' is not exact ' . self::toReadable($expectedValue);
+            return $this->getResult($this->testedValue !== $expectedValue, $details, $expectedValue, $this->testedValue);
         }
 
-        public function isNot($value, string $details = null): self
+        public function isNot($expectedValue, string $details = null): self
         {
-            return $this->compare($value, $this->value != $value, $details);
+            $details ??= 'Test if ' . $this->testedValue . ' is not equals ' . self::toReadable($expectedValue);
+            return $this->getResult($this->testedValue != $expectedValue, $details, $expectedValue, $this->testedValue);
         }
 
         public function isJson(string $details = null): self
         {
-            return $this->compare($this->value, is_array(json_decode($this->value, true)), $details);
+            $details ??= 'Test if given value is can be a valid JSON';
+            $pass = is_array(json_decode($this->testedValue, true));
+            return $this->getResult($pass, $details, true, $pass);
         }
 
         public function isXml(string $details = null): self
         {
-            return $this->compare($this->value, simplexml_load_string($this->value) !== false, $details);
+            $details ??= 'Test if given value is can be a valid XML';
+            $pass = simplexml_load_string($this->testedValue) !== false;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
         public function isYaml(string $details = null): self
         {
-            return $this->compare($this->value, yaml_parse($this->value) !== false, $details);
+            $details ??= 'Test if given value is can be a valid YAML';
+            $pass = yaml_parse($this->testedValue) !== false;
+            return $this->getResult($pass, $details, true, $pass);
         }
 
         public function isCsv(string $details = null): self
         {
-            return $this->compare($this->value, is_array(str_getcsv($this->value)), $details);
+            $details ??= 'Test if given string is can be a valid CSV';
+            $pass = is_array(str_getcsv($this->testedValue));
+            return $this->getResult($pass, $details, true, $pass);
         }
 
-        private function compare($expected, bool $pass, string $details = null): self
+        private function getResult(bool $pass, string $details, $expectedValue, $foundValue): self
         {
-            self::setup($this->before);
-            $this->total++;
+            $this->totalCases++;
             if ($pass) {
-                $this->pass++;
-                $str = $this->total . '.Pass ';
-                $len = strlen($str);
-                $this->lines .= $str;
-            } else {
-                $str = $this->total . '.Fail ';
-                $len = strlen($str);
-                $this->lines .= self::setColor($str, self::COLOR_BLACK, self::COLOR_RED);
+                $this->totalPasses++;
             }
-            $details .= ' Expected: ' . self::toReadable($expected);
-            $details .= ', Found: ' . self::toReadable($this->value);
-            $count = strlen($details) + $len;
-            if ($this->length < $count) {
-                $this->length = $count;
-            }
-            if (!$pass) {
-                $details = self::setColor($details, self::COLOR_RED);
-            }
-            $this->lines .= $details . PHP_EOL;
-            self::setup($this->after);
+            $this->cases[] = [
+                'description' => $details,
+                'expected' => $expectedValue,
+                'found' => $foundValue,
+                'result' => $pass ? 'PASS' : 'FAIL'
+            ];
             return $this;
-        }
-
-        private static function setColor(?string $text, int $fontColor, ?int $bgColor = null, int $bold = 0): ?string
-        {
-            if ($text === null) {
-                return null;
-            }
-            $font = 30 + $fontColor;
-            $bg = $bgColor !== null ? ';' . (40 + $bgColor) . 'm' : 'm';
-            return "\033[$bold;$font{$bg}$text\033[0m";
         }
     }
 

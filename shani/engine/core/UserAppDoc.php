@@ -23,8 +23,8 @@ namespace shani\engine\core {
                 if (is_dir($path)) {
                     $folders[$module] = self::folderContent($path);
                 } else {
-                    $str = substr($path, 0, strpos($path, '.'));
-                    $folders[] = str_replace('/', '\\', substr($str, strlen(SERVER_ROOT)));
+                    $class = substr($path, 0, strpos($path, '.'));
+                    $folders[] = str_replace('/', '\\', substr($class, strlen(SERVER_ROOT)));
                 }
             }
             return $folders;
@@ -54,41 +54,36 @@ namespace shani\engine\core {
             $config = $app->config();
             $modulesPath = Definitions::DIR_APPS . $config->root() . $config->moduleDir();
             $modules = self::folderContent($modulesPath, $config->controllers());
-            $allMethods = $config->requestMethods();
+            $allowedMethods = $config->requestMethods();
             $docs = [
                 'name' => $config->appName(),
                 'version' => $app->request()->version()
             ];
             foreach ($modules as $module => $reqMethods) {
-                foreach ($reqMethods as $method => $classes) {
-                    if (!in_array($method, $allMethods)) {
-                        continue;
-                    }
-                    foreach ($classes as $class) {
-                        $rf = new \ReflectionClass($class);
-                        $functions = $rf->getMethods(\ReflectionMethod::IS_PUBLIC);
-                        $className = $rf->getShortName();
-                        foreach ($functions as $fnobj) {
-                            $fnName = $fnobj->getName();
-                            if (substr($fnName, 0, 2) === '__') {
-                                continue;
-                            }
-                            $comments = self::cleanComment($fnobj->getDocComment());
-                            $path = $module . '/' . $className . '/' . $fnName;
-                            $details = $method . ' ' . $module . ' ' . $className . ' (';
-                            $details .= ($fnName === Definitions::HOME_FUNCTION ? 'one/all' : $fnName) . ')';
-                            $target = strtolower($method . '/' . $path);
-                            $docs['modules'][$module][$className][$fnName][$method] = [
-                                'details' => $comments ?? ucwords(strtolower($details)),
-//                                'target' => $target,
-                                'targetId' => App::digest($target),
-                                'path' => '/' . str_replace('/', '/{id}/', strtolower($path))
-                            ];
-                        }
-                    }
-                }
+                $docs['modules'][] = self::getModules($module, $reqMethods, $allowedMethods);
             }
             return $docs;
+        }
+
+        private static function getModules(string $moduleName, array &$reqMethods, array &$allowedMethods): array
+        {
+            $modules = null;
+            foreach ($reqMethods as $method => $classes) {
+                if (!in_array($method, $allowedMethods)) {
+                    continue;
+                }
+                $modules[$moduleName][] = self::getClasses($method, $classes);
+            }
+            return $modules;
+        }
+
+        private static function getClasses(string $method, array &$classes)
+        {
+            $classList = null;
+            foreach ($classes as $key => $class) {
+                $classList[$class][] = $key;
+            }
+            return $classList;
         }
     }
 

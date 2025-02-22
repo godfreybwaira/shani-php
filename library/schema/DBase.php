@@ -13,7 +13,7 @@ namespace library\schema {
 
         private \PDO $pdo;
 
-        public function __construct(string $driver, string $database, string $host, ?int $port = null, ?string $username = null, ?string $password = null)
+        public function __construct(string $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
             try {
                 $connectionString = self::getConnectionString($driver, $database, $host, $port);
@@ -102,7 +102,7 @@ namespace library\schema {
             return \library\DataConvertor::array2table($rows, $headers);
         }
 
-        private static function getConnectionString(string $driver, string $database, string $host, ?int $port): string
+        private static function getConnectionString(string $driver, string $database, ?string $host, ?int $port): string
         {
             switch ($driver) {
                 case 'mysql':

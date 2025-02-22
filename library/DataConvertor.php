@@ -67,16 +67,6 @@ namespace library {
         }
 
         /**
-         * Convert array to YAML data format
-         * @param array|null $data Data to convert
-         * @return string|null converted data as YAML
-         */
-        public static function array2yaml(?array $data): ?string
-        {
-            return $data !== null ? '---' . PHP_EOL . self::toyaml($data) . '...' : $data;
-        }
-
-        /**
          * Convert XML data to array
          * @param string|null $data XML data to convert
          * @return array|null A result from conversion
@@ -136,24 +126,6 @@ namespace library {
                 'yaml', 'yml' => yaml_emit($data),
                 default => serialize($data)
             };
-        }
-
-        private static function toyaml(array $obj, int $indent = 0): string
-        {
-            $yaml = '';
-            foreach ($obj as $key => $value) {
-                $yaml .= str_repeat('  ', $indent) . $key . ': ';
-                if (is_array($value)) {
-                    $yaml .= PHP_EOL . self::toyaml($value, $indent + 1);
-                } else if (is_bool($value)) {
-                    $yaml .= ($value ? 'true' : 'false') . PHP_EOL;
-                } else if (is_numeric($value)) {
-                    $yaml .= $value . PHP_EOL;
-                } else {
-                    $yaml .= '"' . str_replace(self::SEARCH_STR, self::REPLACE_STR, $value) . '"' . PHP_EOL;
-                }
-            }
-            return $yaml;
         }
 
         private static function tocsv(array $obj, string $separator): ?string

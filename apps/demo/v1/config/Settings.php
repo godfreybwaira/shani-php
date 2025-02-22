@@ -33,7 +33,7 @@ namespace apps\demo\v1\config {
 
         public function httpErrorHandler(?string $errorMessage = null): void
         {
-            $this->app->response()->send();
+            $this->app->response()->send(['message' => $errorMessage ?? 'No message available']);
         }
 
         public function webroot(): string
@@ -54,6 +54,26 @@ namespace apps\demo\v1\config {
         public function userPermissions(): ?string
         {
             return null;
+        }
+
+        public function breadcrumbDir(): string
+        {
+            return '/presentation/breadcrumb';
+        }
+
+        public function breadcrumbMethodsDir(): string
+        {
+            return '/function';
+        }
+
+        public function languageDir(): string
+        {
+            return '/presentation/lang';
+        }
+
+        public function viewDir(): string
+        {
+            return '/presentation/views';
         }
     }
 

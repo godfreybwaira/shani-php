@@ -9,15 +9,15 @@
 
 namespace gui {
 
-    use shani\engine\http\App;
     use shani\advisors\Configuration;
+    use shani\engine\http\App;
 
     final class Template
     {
 
-        private App $app;
-        private ?string $title, $icon;
+        private readonly App $app;
         private array $details = [];
+        private ?string $title, $icon;
         private ?array $scripts, $styles, $data, $attributes;
 
         private const REFERRER_PRIVACIES = [
@@ -122,12 +122,12 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param array|null $data Values to be passed on view component
+         * @param array|null $data Data object to be passed to a view component.
          * @return void
          */
-        public function render(?array $data): void
+        public function render(?array $data = null): void
         {
-            $this->data = $data;
+            $this->data = $data ?? [];
             if ($this->app->request()->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
@@ -137,9 +137,9 @@ namespace gui {
 
         /**
          * Get immutable data that will be available to all views.
-         * @param type $key Key
+         * @param string $key Key
          */
-        public function data($key = null)
+        public function data(string $key = null)
         {
             return $key === null ? $this->data : $this->data[$key] ?? null;
         }

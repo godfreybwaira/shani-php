@@ -82,17 +82,15 @@ namespace library {
         /**
          * Filter array and return the filtered array
          * @param array $rows Array to filter from
-         * @param array $filters Array of keys and values to be used on filtering.
+         * @param array $filters Array of keys to be used on filtering.
+         * @param bool $selected Whether to retain only selected items
          * @return array filtered array
          */
-        public static function filter(array $rows, array $filters = null): array
+        public static function filter(array $rows, array $filters, bool $selected = true): array
         {
-            if (empty($filters)) {
-                return $rows;
-            }
             $data = [];
-            self::find($rows, function ($row) use (&$filters, &$data) {
-                if (self::hasValues($row, $filters)) {
+            self::find($rows, function ($row) use (&$filters, &$data, &$selected) {
+                if (self::hasValues($row, $filters) === $selected) {
                     $data[] = $row;
                 }
             });
@@ -240,7 +238,7 @@ namespace library {
         }
 
         /**
-         * Reduce an array to a scalar value, example when wanting to find sum or
+         * Reduce an array to a scalar value, for example when wanting to find sum or
          * average of array
          * @param array $rows A multidimensional array to reduce
          * @param callable $cb a callback that accepts two arguments, a single array

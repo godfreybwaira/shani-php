@@ -15,9 +15,8 @@ namespace shani\engine\http {
     final class Response
     {
 
-        private App $app;
+        private readonly App $app;
         private int $statusCode;
-        private ?string $datatype = null;
         private array $headers, $cookies;
         private ServerResponse $res;
         private bool $buffer = false;
@@ -47,7 +46,7 @@ namespace shani\engine\http {
             return $this;
         }
 
-        private function write(?string $content = null): self
+        private function write(?string $content): self
         {
             if ($content === null || $content === '') {
                 return $this->setHeaders('content-length', 0)->close();
@@ -84,180 +83,135 @@ namespace shani\engine\http {
          */
         public function type(): ?string
         {
-            if ($this->datatype === null) {
-                if (!empty($this->headers['content-type'])) {
-                    $this->datatype = \library\Mime::explode($this->headers['content-type'])[1] ?? null;
-                } else {
-                    $path = $this->app->request()->uri()->path();
-                    $parts = explode('.', $path);
-                    $size = count($parts);
-                    if ($size > 1) {
-                        $this->datatype = strtolower($parts[$size - 1]);
-                    } else {
-                        $this->datatype = \library\Mime::explode($this->app->request()->headers('accept'))[1] ?? null;
-                    }
-                }
+            if (!empty($this->headers['content-type'])) {
+                return \library\Mime::explode($this->headers['content-type'])[1] ?? null;
             }
-            return $this->datatype;
-        }
-
-        /**
-         * Filter HTTP response body before sending using user preferences
-         * @param array $data Data to filter
-         * @param array|null $availableColumns Allowed columns to be send to user response.
-         * Use this parameter to filter out columns you don't want to send to user.
-         * @param array|null $filters User filters supplied via HTTP query string.
-         * The values of query string must match data columns and values MUST be present
-         * @return self
-         */
-        public function sendFilter(array $data, ?array $availableColumns = null, ?array $filters = null): self
-        {
-            $values = \library\Map::filter($data, $filters ?? $this->app->request()->query());
-            if (empty($availableColumns)) {
-                return $this->send($values);
+            $parts = explode('.', $this->app->request()->uri()->path());
+            $size = count($parts);
+            if ($size > 1) {
+                return strtolower($parts[$size - 1]);
             }
-            $userColumns = $this->app->request()->columns($availableColumns);
-            return $this->send(\library\Map::getAll($values, $userColumns));
+            return \library\Mime::explode($this->app->request()->headers('accept'))[1] ?? null;
         }
 
         /**
          * Send HTTP response body, leaving connection open. Ideal when wanting
          * to send data in chunks. Remember to close the connection when done.
-         * @param type $data Data to send as response body.
+         * @param array|null $data Data object to send
+         * @param string|null $type Type to send
          * @return self
          * @see self::close(), self::useBuffer()
          */
-        public function send($data = null): self
+        public function send(?array $data, ?string $type = null): self
         {
-            $type = $this->type();
-            if ($type !== null) {
-                switch ($type) {
-                    case'json':
-                        return $this->sendAsJson($data);
-                    case'xml':
-                        return $this->sendAsXml($data);
-                    case'csv':
-                        return $this->sendAsCsv($data);
-                    case'yaml':
-                    case'yml':
-                        return $this->sendAsYaml($data);
-                    case'html':
-                    case'htm':
-                        return $this->sendAsHtml($data);
-                    case'raw':
-                        return $this->plainText($data, 'application/octet-stream');
-                    case'sse':
-                    case'event-stream':
-                        return $this->sendAsSse($data);
-                    case'js':
-                    case'jsonp':
-                        return $this->sendAsJsonp($data, $this->app->request()->query('callback') ?? 'callback');
-                }
+            $datatype = $type ?? $this->type();
+            switch ($datatype) {
+                case'json':
+                    return $this->sendAsJson($data);
+                case'xml':
+                    return $this->sendAsXml($data);
+                case'csv':
+                    return $this->sendAsCsv($data);
+                case'yaml':
+                case'yml':
+                    return $this->sendAsYaml($data);
+                case'sse':
+                case'event-stream':
+                    return $this->sendAsSse(json_encode($data));
+                case'js':
+                case'jsonp':
+                    return $this->sendAsJsonp($data, $this->app->request()->query('callback') ?? 'callback');
+                default :
+                    return $this->plainText(serialize($data), 'application/octet-stream');
             }
-            return $this->plainText($data, 'text/plain');
         }
 
-        private function plainText($data, string $type): self
+        private function plainText(?string $data, string $type): self
         {
             $this->setHeaders('content-type', $type);
-            if (is_array($data)) {
-                return $this->write(serialize($data));
-            }
             return $this->write($data);
         }
 
         /**
          * Send HTTP response body as HTML
-         * @param type $data Data to send
+         * @param string $htmlString HTML string to send
          * @return self
          */
-        public function sendAsHtml($data): self
+        public function sendAsHtml(string $htmlString): self
         {
-            return $this->plainText($data, 'text/html');
+            return $this->plainText($htmlString, 'text/html');
         }
 
         /**
          * Send HTTP response body as Server sent event
-         * @param type $data Data to send
+         * @param string $data Data to send
          * @return self
          */
-        public function sendAsSse($data, string $event = 'message'): self
+        public function sendAsSse(string $data, string $event = 'message'): self
         {
             $this->setHeaders('cache-control', 'no-cache');
             $evt = 'id:id' . hrtime(true) . PHP_EOL;
             $evt .= 'event:' . $event . PHP_EOL;
-            $evt .= 'data:' . (is_array($data) ? serialize($data) : $data);
-            $evt .= PHP_EOL . PHP_EOL;
+            $evt .= 'data:' . $data . PHP_EOL;
+            $evt .= PHP_EOL;
             return $this->plainText($evt, 'text/event-stream', null);
         }
 
         /**
          * Send HTTP response body as JSON
-         * @param type $data Data to send
+         * @param array|null $data Data object to send
          * @return self
          */
-        public function sendAsJson($data): self
+        public function sendAsJson(?array $data): self
         {
-            return $this->plainText($data !== null ? json_encode($data) : null, 'application/json');
+            return $this->plainText(json_encode($data), 'application/json');
         }
 
         /**
          * Send HTTP response body as JSON with padding
-         * @param type $data Data to send
+         * @param array|null $data Data object to send
          * @param string $callback JavaScript callback function
          * @return self
          */
-        public function sendAsJsonp($data, string $callback): self
+        public function sendAsJsonp(?array $data, string $callback): self
         {
             $this->setHeaders('content-type', 'application/javascript');
-            $type = gettype($data);
-            if ($type === 'array') {
-                return $this->write($callback . '(' . json_encode($data) . ');');
-            }
-            if ($type === 'string') {
-                return $this->write($callback . '("' . $data . '");');
-            }
-            if ($type === 'boolean') {
-                return $this->write($callback . '(' . ($data ? 'true' : 'false') . ');');
-            }
-            if ($type === 'NULL') {
+            if ($data === null) {
                 return $this->write($callback . '(null);');
             }
-            if ($type === 'double' || $type === 'integer') {
-                return $this->write($callback . '(' . $data . ');');
-            }
-            return $this->write($callback . '();');
+            return $this->write($callback . '(' . json_encode($data) . ');');
         }
 
         /**
          * Send HTTP response body as XML
-         * @param type $data Data to send
+         * @param array|null $data Data object to send
          * @return self
          */
-        public function sendAsXml($data): self
+        public function sendAsXml(?array $data): self
         {
-            return $this->plainText(\library\DataConvertor::array2xml($data), 'application/xml');
+            $xml = \library\DataConvertor::array2xml($data);
+            return $this->plainText($xml, 'application/xml');
         }
 
         /**
          * Send HTTP response body as CSV
-         * @param type $data Data to send
+         * @param array|null $data Data object to send
          * @param string $separator data separator
          * @return self
          */
-        public function sendAsCsv($data, string $separator = ','): self
+        public function sendAsCsv(?array $data, string $separator = ','): self
         {
-            return $this->plainText(\library\DataConvertor::array2csv($data, $separator), 'text/csv');
+            $csv = \library\DataConvertor::array2csv($data, $separator);
+            return $this->plainText($csv, 'text/csv');
         }
 
         /**
          * Send HTTP response body as YAML
-         * @param type $data Data to send
+         * @param array|null $data Data object to send
          * @return self
          */
-        public function sendAsYaml($data): self
+        public function sendAsYaml(?array $data): self
         {
-//            return $this->plainText(\library\DataConvertor::array2yaml($data), 'text/yaml');
             return $this->plainText(yaml_emit($data), 'text/yaml');
         }
 

@@ -17,7 +17,7 @@ namespace shani\engine\http {
     {
 
         private Event $listener;
-        private App $app;
+        private readonly App $app;
 
         public function __construct(App &$app)
         {

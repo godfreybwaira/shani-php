@@ -105,7 +105,7 @@ namespace shani\advisors {
          */
         public function controllers(): string
         {
-            return '/web';
+            return '/logic/controllers';
         }
 
         /**
@@ -208,41 +208,29 @@ namespace shani\advisors {
         }
 
         /**
-         * Get or set user defined breadcrumb directory.
+         * Get a user defined breadcrumb directory.
          * @return string Path relative to current module directory
          */
-        public function breadcrumbDir(): string
-        {
-            return '/breadcrumb';
-        }
+        public abstract function breadcrumbDir(): string;
 
         /**
          * Get or set user defined breadcrumb methods directory.
          * @return string Path relative to current breadcrumb directory
          */
-        public function breadcrumbMethodsDir(): string
-        {
-            return '/functions';
-        }
+        public abstract function breadcrumbMethodsDir(): string;
 
         /**
          * Get or set user defined view directory.
          * @return string Path relative to current module directory
          */
-        public function viewDir(): string
-        {
-            return '/views';
-        }
+        public abstract function viewDir(): string;
 
         /**
          * Get or set user defined language directory. This will be folder on every
          * module where the language files will reside.
          * @return string Path relative to current module directory
          */
-        public function languageDir(): string
-        {
-            return '/lang';
-        }
+        public abstract function languageDir(): string;
 
         /**
          * Set and get user application name
@@ -381,7 +369,7 @@ namespace shani\advisors {
          */
         public function disableSecurityAdvisor(): bool
         {
-            return false;
+            return true;
         }
 
         /**

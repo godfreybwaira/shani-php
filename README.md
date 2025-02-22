@@ -69,26 +69,32 @@ Shani Application has the following project structure
 
 #### 1.0.1 User Application Structure
 
-A typical user application folder structure may appear as the following:
+All folders below can be renamed. A typical user application folder structure may appear as the following:
 
 	apps/
 		demo/
 			v1/
-				modules/ (Can be renamed)
-					module1_name/ (Can be desired module name)
-						src/ (Can be renamed)
-							get/ (This is the request method as directory)
-								Resource.php (Can be any resource file)
-						views/ (can be renamed)
-							resource/ (All lowercase, must match resource file name)
-						lang/ (Can be renamed)
-							resource/ (All lowercase, must match resource file name)
-						breadcrumb/(Can be renamed)
-							resource/ (All lowercase, must match resource file name)
-								functions/ (can be renamed)
-									function-name.php (Must match function name in resource file class)
-								resource.php (must match module name)
-							module1_name.php (must match module name)
+				modules/
+					module1_name/ (Can be any desired module name)
+						data (Data layer)
+							dto (Data transfer object)
+							models (Application models)
+						logic (Business logic layer)
+							services
+							controllers/
+								get/ (This is the request method as directory)
+									Resource.php (Can be any resource file)
+						presentation (Presentation layer)
+							views/
+								resource/ (All lowercase, must match resource file name)
+							lang/
+								resource/ (All lowercase, must match resource file name)
+							breadcrumb/
+								resource/ (All lowercase, must match resource file name)
+									functions/
+										function-name.php (Must match function name in resource file class)
+									resource.php (must match module name)
+								module1_name.php (must match module name)
 
 Let's assume we want to create an application called `demo` having version 1.0 (`v1`).
 Our application has one module called `greetings` and one resource file called `Hello.php`.
@@ -98,13 +104,13 @@ Now, look at the following example of a resource file:
 ```php
 <?php
 
-namespace apps\demo\v1\modules\greetings\web\get {
+namespace apps\demo\v1\modules\greetings\logic\controllers\get {
 
 	use shani\engine\http\App;
 
     final class Hello
     {
-        private App $app;
+        private readonly App $app;
 
         public function __construct(App &$app)
         {
@@ -117,14 +123,14 @@ namespace apps\demo\v1\modules\greetings\web\get {
         public function world()
         {
 	        //sending output to user agent using default view file (world.php)
-            $this->app->render();
+            $this->app->render(null);
         }
     }
 }
 ```
 
-Creating view file:
-(`apps/demo/v1/modules/greetings/views/hello/world.php`)
+Creating a view file:
+(`apps/demo/v1/modules/greetings/presentation/views/hello/world.php`)
 
 ```php
 <h1>Hello From Shani</h1>
@@ -137,12 +143,17 @@ Considering our example above, our application folder structure will be like thi
             v1/
                 modules/
                     greetings/
-                        src/
-                            get/
-                                Hello.php
-                        views/
-                            hello/
-                                world.php
+		                data
+			                dto
+			                models
+	                    logic/
+	                        controllers/
+	                            get/
+	                                Hello.php
+						presentation
+	                        views/
+	                            hello/
+	                                world.php
 
 #### 1.0.2 Registering Application
 
@@ -164,7 +175,7 @@ VERSIONS:
       # Active environment can any one of the provided above.
     ACTIVE_ENVIRONMENT: DEV
     DEFAULT_LANGUAGE: sw
-    # Whether an application is running or not
+    # Whether an application is able to run or not
     RUNNING: true
   "2.0":
     ENVIRONMENTS:

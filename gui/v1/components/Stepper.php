@@ -18,6 +18,16 @@ namespace gui\v1\components {
     {
 
         private const STEPPER = 0, STEPPER_ROUND = 1, STEPPER_COMPLETE = 2;
+
+        /**
+         * Represent an active step
+         */
+        public const STATUS_ACTIVE = 0;
+
+        /**
+         * Representing a complete step
+         */
+        public const STATUS_COMPLETE = 1;
         private const PROPS = [
             self::STEPPER => '',
             self::STEPPER_ROUND => '',
@@ -33,17 +43,16 @@ namespace gui\v1\components {
         /**
          * Add child(ren)
          * @param Component $item
-         * @param bool $active If sets to true, the current item becomes the active step
-         * @param bool $complete Whether the step is completed or not
+         * @param int $status Stepper status set using Stepper::STATUS_*
          * @return self
          */
-        public function addItem(Component $item, bool $active, bool $complete = false): self
+        public function addItem(Component $item, int $status): self
         {
             $list = new Component('li', self::PROPS);
-            if ($complete) {
+            if ($status == self::STATUS_COMPLETE) {
                 $list->addStyle(self::STEPPER_COMPLETE);
-            } elseif ($active) {
-                $list->setActive($active);
+            } else if ($status === self::STATUS_ACTIVE) {
+                $list->setActive(true);
             }
             $list->appendChildren($item);
             return $this->appendChildren($list);

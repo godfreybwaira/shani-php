@@ -14,7 +14,7 @@ namespace shani\engine\http {
     final class Asset
     {
 
-        private App $app;
+        private readonly App $app;
 
         private const ASSET_PREFIX = '/-1';
         public const STORAGE_PREFIX = '/-2';
@@ -47,7 +47,7 @@ namespace shani\engine\http {
                 $rootPath = $app->storage()->pathTo();
             } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
                 if (!$app->config()->authenticated()) {
-                    $app->response()->setStatus(HttpStatus::UNAUTHORIZED)->send();
+                    $app->response()->setStatus(HttpStatus::UNAUTHORIZED)->send(null);
                     return true;
                 }
                 $prefix = self::PRIVATE_PREFIX;
@@ -60,7 +60,7 @@ namespace shani\engine\http {
                 $location = $rootPath . substr($path, strlen($prefix));
                 $app->response()->setStatus(HttpStatus::OK)->setCache()->stream($location);
             } else {
-                $app->response()->setStatus(HttpStatus::NOT_MODIFIED)->send();
+                $app->response()->setStatus(HttpStatus::NOT_MODIFIED)->send(null);
             }
             return true;
         }
