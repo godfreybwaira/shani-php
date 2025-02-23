@@ -13,20 +13,11 @@ namespace shani\engine\documentation\dto {
     {
 
         private readonly string $name;
-        private array $methods;
-        private static array $list = [];
+        private array $methods = [];
 
         public function __construct(string $name)
         {
             $this->name = $name;
-            if (!self::exists($name)) {
-                self::$list[] = $name;
-            }
-        }
-
-        public static function exists(string $name): bool
-        {
-            return in_array($name, self::$list);
         }
 
         public function addRequestMethod(RequestMethodDto $method): self

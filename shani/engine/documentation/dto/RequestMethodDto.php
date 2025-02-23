@@ -13,7 +13,7 @@ namespace shani\engine\documentation\dto {
     {
 
         private string $name;
-        private array $functions;
+        private array $functions = [];
 
         public function __construct(string $name)
         {

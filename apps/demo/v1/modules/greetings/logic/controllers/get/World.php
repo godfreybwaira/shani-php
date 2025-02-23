@@ -24,7 +24,7 @@ namespace apps\demo\v1\modules\greetings\logic\controllers\get {
         /**
          * Display greetings from Shani.
          */
-        public function hello()
+        public function helloWorld()
         {
 
         }

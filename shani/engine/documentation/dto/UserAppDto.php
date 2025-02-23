@@ -13,7 +13,7 @@ namespace shani\engine\documentation\dto {
     {
 
         private string $appName, $version;
-        private array $modules;
+        private array $modules = [];
 
         public function __construct(string $appName, string $version)
         {

@@ -18,15 +18,13 @@ namespace shani\engine\documentation {
     final class Generator
     {
 
-        private UserAppDto $userApp;
-        private array $allowedMethods, $modules;
+        private readonly UserAppDto $userApp;
 
         public function __construct(App &$app)
         {
             $config = $app->config();
             $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
             $moduleColletion = self::scanModules($modulesPath, $config->controllers());
-            $this->allowedMethods = $config->requestMethods();
             $this->userApp = new UserAppDto($config->appName(), $app->request()->version());
             foreach ($moduleColletion as $moduleName => $reqMethods) {
                 $module = new ModuleDto($moduleName);
@@ -42,9 +40,9 @@ namespace shani\engine\documentation {
         {
             foreach ($reqMethods as $path) {
                 $controller = new ControllerDto(basename($path, '.php'));
+                self::scanFunctions($module->getName(), $method, $path);
                 $controller->addRequestMethod($method);
                 $module->addController($controller);
-                self::scanFunctions($module->getName(), $method, $path);
             }
         }
 
