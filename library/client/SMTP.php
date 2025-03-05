@@ -176,7 +176,7 @@ namespace library\client {
          */
         public function attachment(string $path, string $filename = null, string $mime = null): self
         {
-            $mime ??= \library\Mime::fromFilename($path) ?? 'application/octet-stream';
+            $mime ??= \library\MediaType::fromFilename($path) ?? 'application/octet-stream';
             $this->files[md5_file($path)] = ['path' => $path, 'mime' => $mime, 'name' => $filename];
             return $this;
         }

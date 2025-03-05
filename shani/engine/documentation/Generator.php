@@ -93,7 +93,7 @@ namespace shani\engine\documentation {
             $className = $class->getShortName();
             $methodName = $method->getName();
             foreach ($functions as $fnobj) {
-                $fnName = $fnobj->getName();
+                $fnName = $fnobj->name();
                 if (substr($fnName, 0, 2) === '__') {
                     continue;
                 }

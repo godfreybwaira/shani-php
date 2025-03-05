@@ -10,6 +10,8 @@
 
 namespace shani\advisors {
 
+    use library\decode\DataCompressionLevel;
+    use shani\engine\core\Framework;
     use shani\engine\http\App;
     use shani\engine\http\Middleware;
 
@@ -238,7 +240,7 @@ namespace shani\advisors {
          */
         public function appName(): string
         {
-            return \shani\engine\core\Framework::NAME . ' v' . \shani\engine\core\Framework::VERSION;
+            return Framework::NAME . ' v' . Framework::VERSION;
         }
 
         /**
@@ -324,13 +326,12 @@ namespace shani\advisors {
         }
 
         /**
-         * Set level for compression algorithm from 0 to 9 where 0 = disable,
-         * 4-6 = ideal level, 9 = Maximum compression but slow. The default ratio is 5
-         * @return int
+         * Set level for compression algorithm. Default level is DataCompressionLevel::BEST
+         * @return DataCompressionLevel
          */
-        public function compressionLevel(): int
+        public function compressionLevel(): DataCompressionLevel
         {
-            return 5;
+            return DataCompressionLevel::BEST;
         }
 
         /**

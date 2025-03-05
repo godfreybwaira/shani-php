@@ -14,6 +14,12 @@ namespace library {
 
         private const SEARCH_STR = ['\\', "\"", "\n", "\r", "\t"];
         private const REPLACE_STR = ['\\\\', '\\"', "\\n", "\\r", "\\t"];
+        public const TYPE_JSON = 'json';
+        public const TYPE_XML = 'xml';
+        public const TYPE_YAML = 'yaml';
+        public const TYPE_YML = 'yml';
+        public const TYPE_CSV = 'csv';
+        public const TYPE_url_encode = 'x-www-form-urlencoded';
 
         /**
          * Convert normal array to table like array. A table like array has two values
@@ -95,37 +101,45 @@ namespace library {
         /**
          * Convert string data to array.
          * @param string|null $data Data to convert
-         * @param string $type target data type. Can be any of the following:
-         * json, xml, csv or yaml.
+         * @param string $type target data type of DataConvertor::TYPE_*.
          * @return array|null A result from conversion
          */
         public static function convertFrom(?string $data, string $type): ?array
         {
-            return match ($type) {
-                'json' => json_decode($data, true),
-                'xml' => self::xml2array($data),
-                'csv' => str_getcsv($data),
-                'yaml', 'yml' => self::yaml2array($data),
+            $convertedData = match ($type) {
+                self::TYPE_JSON => json_decode($data, true),
+                self::TYPE_XML => self::xml2array($data),
+                self::TYPE_CSV => str_getcsv($data),
+                self::TYPE_URL_ENCODE => self::toUrlEncode($data),
+                self::TYPE_YAML, self::TYPE_YML => self::yaml2array($data),
                 default => null
             };
+            return \library\Map::normalize($convertedData);
         }
 
         /**
          * Convert array data to string data.
          * @param array $data Data to convert
-         * @param string $type target data type. Can be any of the following:
-         * json, xml, csv or yaml.
+         * @param string $type target data type of DataConvertor::TYPE_*.
          * @return string A result from conversion
          */
         public static function convertTo(array $data, string $type): string
         {
             return match ($type) {
-                'json' => json_encode($data),
-                'xml' => self::array2xml($data),
-                'csv' => self::array2csv($data),
-                'yaml', 'yml' => yaml_emit($data),
+                self::TYPE_JSON => json_encode($data),
+                self::TYPE_XML => self::array2xml($data),
+                self::TYPE_CSV => self::array2csv($data),
+                self::TYPE_URL_ENCODE => self::toUrlEncode($data),
+                self::TYPE_YAML, self::TYPE_YML => yaml_emit($data),
                 default => serialize($data)
             };
+        }
+
+        private static function toUrlEncode(string $data): ?string
+        {
+            $rawData = null;
+            parse_str($data, $rawData);
+            return $rawData;
         }
 
         private static function tocsv(array $obj, string $separator): ?string

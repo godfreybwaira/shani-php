@@ -9,7 +9,9 @@
 
 namespace library {
 
-    final class HttpCookie
+    use shani\contracts\HttpCookie;
+
+    final class Cookie implements HttpCookie
     {
 
         public const SAME_SITE_NONE = 'None';
@@ -23,7 +25,7 @@ namespace library {
             if ($rawCookie !== null) {
                 $attributes = preg_split('/\s*;\s*/', $rawCookie, -1, PREG_SPLIT_NO_EMPTY);
                 if (!$attributes) {
-                    throw new \InvalidArgumentException('Could not parse raw cookie ' . $rawCookie);
+                    throw new \InvalidArgumentException('Could not parse raw cookie: ' . $rawCookie);
                 }
                 $this->parse($attributes);
             }
@@ -37,34 +39,26 @@ namespace library {
                 'value' => isset($nameValue[1]) ? urldecode($nameValue[1]) : null
             ];
             while ($attr = array_shift($attributes)) {
-                $attr = explode('=', $attr, 2);
-                $name = strtolower($attr[0]);
-                $value = $attr[1] ?? null;
-                if (in_array($name, ['expires', 'domain', 'path', 'samesite'], true)) {
-                    $this->cookie[$name] = $value;
-                } else if (in_array($name, ['secure', 'httponly'], true)) {
+                $pair = explode('=', $attr, 2);
+                $name = strtolower($pair[0]);
+                $value = $pair[1] ?? null;
+                if (in_array($name, ['secure', 'httponly'], true)) {
                     $this->cookie[$name] = true;
                 } else if ($name === 'max-age') {
                     $this->cookie['max-age'] = (int) $value;
+                } else {
+                    $this->cookie[$name] = $value;
                 }
             }
         }
 
-        /**
-         * Gets the name of the cookie.
-         *
-         * @return string
-         */
+        #[\Override]
         public function name(): string
         {
             return $this->cookie['name'];
         }
 
-        /**
-         * Gets the value of the cookie.
-         *
-         * @return string
-         */
+        #[\Override]
         public function value(): string
         {
             return $this->cookie['value'];
@@ -85,9 +79,9 @@ namespace library {
         /**
          * Gets the max-age attribute.
          *
-         * @return int
+         * @return \DateTime
          */
-        public function maxAge(): int
+        public function maxAge(): \DateTime
         {
             return $this->cookie['max-age'];
         }
@@ -95,9 +89,9 @@ namespace library {
         /**
          * Gets the time the cookie expires.
          *
-         * @return string|null
+         * @return \DateTime|null
          */
-        public function expires(): ?string
+        public function expires(): ?\DateTime
         {
             return $this->cookie['expires'] ?? null;
         }
@@ -110,45 +104,29 @@ namespace library {
         public function isExpired(): bool
         {
             if (!empty($this->cookie['expires'])) {
-                return time() - (new \DateTime($this->cookie['expires']))->getTimestamp() <= 0;
+                return time() - $this->cookie['expires']->getTimestamp() <= 0;
             }
             return true;
         }
 
         /**
          * Returns an instance with the specified expires.
-         *
-         * The `$expire` value can be an `DateTimeInterface` instance,
-         * a string representation of a date, or a integer Unix timestamp.
-         *
          * @return static
          */
-        public function setExpires($expires): self
+        public function setExpires(\DateTime $expires): self
         {
-            $date = $expires;
-            if ($expires instanceof DateTimeInterface) {
-                $date = $expires->getTimestamp();
-            } else if (is_string($expires)) {
-                $date = (new \DateTime($expires))->getTimestamp();
-            }
-            $this->cookie['expires'] = date(DATE_COOKIE, $date);
+            $this->cookie['expires'] = $expires;
             return $this;
         }
 
         /**
          * Set Cookie maximum age
-         * @param \DateTimeInterface|string|int $maxAge
+         * @param \DateTime $maxAge
          * @return self
          */
-        public function setMaxAge(\DateTimeInterface|string|int $maxAge): self
+        public function setMaxAge(\DateTime $maxAge): self
         {
-            $age = $maxAge;
-            if ($maxAge instanceof DateTimeInterface) {
-                $age = $maxAge->getTimestamp() - time();
-            } else if (is_string($maxAge)) {
-                $age = (new \DateTime($maxAge))->getTimestamp() - time();
-            }
-            $this->cookie['max-age'] = $age;
+            $this->cookie['max-age'] = $maxAge;
             return $this;
         }
 
@@ -276,10 +254,10 @@ namespace library {
         {
             $cookie = $this->cookie['name'] . '=' . $this->cookie['value'];
             if (!empty($this->cookie['expires'])) {
-                $cookie .= '; Expires=' . $this->cookie['expires'];
+                $cookie .= '; Expires=' . date(DATE_COOKIE, $this->cookie['expires']->getTimestamp());
             }
             if (array_key_exists('max-age', $this->cookie)) {
-                $cookie .= '; Max-Age=' . $this->cookie['max-age'];
+                $cookie .= '; Max-Age=' . $this->cookie['max-age']->getTimestamp() - time();
             }
             if (!empty($this->cookie['path'])) {
                 $cookie .= '; Path=' . $this->cookie['path'];

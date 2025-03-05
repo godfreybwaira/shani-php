@@ -17,7 +17,7 @@ namespace shani\engine\http {
 
         private ServerRequest $req;
         private ?string $type = null;
-        private ?array $url, $inputs, $queryValues = null, $files = null;
+        private ?array $url, $inputs, $queryValues = null;
         private ?string $platform = null, $version = null, $accepted = null;
 
         public function __construct(ServerRequest &$req)
@@ -39,15 +39,8 @@ namespace shani\engine\http {
          */
         public function file(string $name, int $index = 0): ?UploadedFile
         {
-            if (!empty($this->files[$name][$index])) {
-                return $this->files[$name][$index];
-            }
             $files = $this->req->files();
-            if (!empty($files[$name][$index])) {
-                $this->files[$name][$index] = new UploadedFile($files[$name][$index]);
-                return $this->files[$name][$index];
-            }
-            return null;
+            return $files[$name][$index] ?? null;
         }
 
         private function parseRawData(): ?array
@@ -118,7 +111,7 @@ namespace shani\engine\http {
         public function accept(string $type): bool
         {
             if ($this->accepted === null) {
-                $this->accepted = \library\Mime::parse($this->headers('accept'));
+                $this->accepted = \library\MediaType::parse($this->headers('accept'));
             }
             if ($this->accepted !== null) {
                 if (str_contains($type, '/')) {
@@ -141,7 +134,7 @@ namespace shani\engine\http {
         public function type(): ?string
         {
             if (!$this->type) {
-                $this->type = \library\Mime::explode($this->headers('content-type'))[1] ?? null;
+                $this->type = \library\MediaType::explode($this->headers('content-type'))[1] ?? null;
             }
             return $this->type;
         }

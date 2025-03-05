@@ -14,17 +14,18 @@ namespace library\client {
     final class Response
     {
 
-        private \CurlHandle $curl;
-        private array $headers = [];
-        private int $code, $headerSize, $bodySize;
-        private ?string $body = null, $raw = null;
         private $stream;
+        private array $headers = [];
+        private readonly \CurlHandle $curl;
+        private int $headerSize, $bodySize;
+        private ?string $body = null, $raw = null;
+        private readonly \library\HttpStatus $status;
 
         public function __construct(\CurlHandle &$curl, &$stream)
         {
             $this->headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
             $this->bodySize = curl_getinfo($curl, CURLINFO_SIZE_DOWNLOAD);
-            $this->code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $this->status = \library\HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
             $this->stream = $stream;
             $this->curl = $curl;
         }
@@ -63,7 +64,7 @@ namespace library\client {
 
         public function asArray(): ?array
         {
-            $type = \library\Mime::explode($this->headers('content-type'));
+            $type = \library\MediaType::explode($this->headers('content-type'));
             if (!empty($type[1])) {
                 return \library\DataConvertor::convertFrom($this->body(), $type[1]);
             }
@@ -100,9 +101,9 @@ namespace library\client {
             return $this->stream;
         }
 
-        public function statusCode(): int
+        public function status(): \library\HttpStatus
         {
-            return $this->code;
+            return $this->status;
         }
     }
 

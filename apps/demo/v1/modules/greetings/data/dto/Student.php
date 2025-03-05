@@ -9,7 +9,7 @@
 
 namespace apps\demo\v1\modules\greetings\data\dto {
 
-    final class Student
+    final class Student implements \shani\contracts\ResponseDto
     {
 
         private string $firstName, $lastName;
@@ -25,11 +25,12 @@ namespace apps\demo\v1\modules\greetings\data\dto {
 
         public function addSubject(Subject $subject): self
         {
-            $this->subjects[] = $subject->dto();
+            $this->subjects[] = $subject->asMap();
             return $this;
         }
 
-        public function dto(): array
+        #[\Override]
+        public function asMap(): array
         {
             return [
                 'firstName' => $this->firstName,

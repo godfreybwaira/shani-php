@@ -10,40 +10,24 @@
 namespace shani\engine\http {
 
     use library\HttpStatus;
-    use shani\contracts\ServerResponse;
+    use shani\contracts\ResponseDto;
+    use shani\contracts\ResponseWriter;
 
     final class Response
     {
 
         private readonly App $app;
-        private int $statusCode;
+        private HttpStatus $httpStatus;
         private array $headers, $cookies;
-        private ServerResponse $res;
-        private bool $buffer = false;
+        private ResponseWriter $res;
 
-        public function __construct(App &$app, ServerResponse &$res)
+        public function __construct(App &$app, ResponseWriter &$res)
         {
             $this->headers = ['x-content-type-options' => 'nosniff'];
-            $this->statusCode = HttpStatus::OK;
+            $this->httpStatus = HttpStatus::OK;
             $this->cookies = [];
             $this->res = $res;
             $this->app = $app;
-        }
-
-        /**
-         * Set output buffer on so that output can be sent in chunks without closing connection.
-         * @param bool $use Buffer value. If true, then the buffer will be on,
-         * If false, then connection will be closed and no output can be sent.
-         * @return self
-         * @see self::send()
-         */
-        public function useBuffer(bool $use = true): self
-        {
-            $this->buffer = $use;
-            if (!$use) {
-                $this->res->close();
-            }
-            return $this;
         }
 
         private function write(?string $content): self
@@ -64,155 +48,122 @@ namespace shani\engine\http {
             return $this->finish($content);
         }
 
-        private function finish(string $content): self
-        {
-            if ($this->app->request()->method() !== 'head') {
-                if (!$this->buffer) {
-                    return $this->setHeaders('content-length', mb_strlen($content))->close($content);
-                }
-                $this->sendHeaders()->res->write($content);
-                return $this;
-            }
-            $this->setStatus(HttpStatus::NO_CONTENT);
-            return $this->setHeaders('content-length', mb_strlen($content))->close();
-        }
-
-        /**
-         * Get HTTP response data type
-         * @return string|null HTTP response data type
-         */
-        public function type(): ?string
-        {
-            if (!empty($this->headers['content-type'])) {
-                return \library\Mime::explode($this->headers['content-type'])[1] ?? null;
-            }
-            $parts = explode('.', $this->app->request()->uri()->path());
-            $size = count($parts);
-            if ($size > 1) {
-                return strtolower($parts[$size - 1]);
-            }
-            return \library\Mime::explode($this->app->request()->headers('accept'))[1] ?? null;
-        }
-
         /**
          * Send HTTP response body, leaving connection open. Ideal when wanting
          * to send data in chunks. Remember to close the connection when done.
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @param string|null $type Type to send
          * @return self
          * @see self::close(), self::useBuffer()
          */
-        public function send(?array $data, ?string $type = null): self
+        public function send(ResponseDto $dto, ?string $type = null): self
         {
             $datatype = $type ?? $this->type();
             switch ($datatype) {
                 case'json':
-                    return $this->sendAsJson($data);
+                    return $this->sendAsJson($dto);
                 case'xml':
-                    return $this->sendAsXml($data);
+                    return $this->sendAsXml($dto);
                 case'csv':
-                    return $this->sendAsCsv($data);
+                    return $this->sendAsCsv($dto);
                 case'yaml':
                 case'yml':
-                    return $this->sendAsYaml($data);
+                    return $this->sendAsYaml($dto);
                 case'sse':
                 case'event-stream':
-                    return $this->sendAsSse(json_encode($data));
+                    return $this->sendAsSse(json_encode($dto->asMap()));
                 case'js':
                 case'jsonp':
-                    return $this->sendAsJsonp($data, $this->app->request()->query('callback') ?? 'callback');
+                    return $this->sendAsJsonp($dto, $this->app->request()->query('callback') ?? 'callback');
                 default :
-                    return $this->plainText(serialize($data), 'application/octet-stream');
+                    return $this->plainText(serialize($dto->asMap()), \library\MediaType::BIN);
             }
         }
 
-        private function plainText(?string $data, string $type): self
+        private function plainText(?string $content, string $type): self
         {
             $this->setHeaders('content-type', $type);
-            return $this->write($data);
+            return $this->write($content);
         }
 
         /**
          * Send HTTP response body as HTML
-         * @param string $htmlString HTML string to send
+         * @param string $html HTML string to send
          * @return self
          */
-        public function sendAsHtml(string $htmlString): self
+        public function sendAsHtml(string $html): self
         {
-            return $this->plainText($htmlString, 'text/html');
+            return $this->plainText($html, \library\MediaType::TEXT_HTML);
         }
 
         /**
          * Send HTTP response body as Server sent event
-         * @param string $data Data to send
+         * @param string $content Data to send
          * @return self
          */
-        public function sendAsSse(string $data, string $event = 'message'): self
+        public function sendAsSse(string $content, string $event = 'message'): self
         {
             $this->setHeaders('cache-control', 'no-cache');
             $evt = 'id:id' . hrtime(true) . PHP_EOL;
             $evt .= 'event:' . $event . PHP_EOL;
-            $evt .= 'data:' . $data . PHP_EOL;
+            $evt .= 'data:' . $content . PHP_EOL;
             $evt .= PHP_EOL;
             return $this->plainText($evt, 'text/event-stream', null);
         }
 
         /**
          * Send HTTP response body as JSON
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @return self
          */
-        public function sendAsJson(?array $data): self
+        public function sendAsJson(ResponseDto $dto): self
         {
-            return $this->plainText(json_encode($data), 'application/json');
+            return $this->plainText(json_encode($dto->asMap()), \library\MediaType::JSON);
         }
 
         /**
          * Send HTTP response body as JSON with padding
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @param string $callback JavaScript callback function
          * @return self
          */
-        public function sendAsJsonp(?array $data, string $callback): self
+        public function sendAsJsonp(ResponseDto $dto, string $callback): self
         {
-            $this->setHeaders('content-type', 'application/javascript');
-            if ($data === null) {
-                return $this->write($callback . '(null);');
-            }
-            return $this->write($callback . '(' . json_encode($data) . ');');
+            $this->setHeaders('content-type', \library\MediaType::JS);
+            return $this->write($callback . '(' . json_encode($dto->asMap()) . ');');
         }
 
         /**
          * Send HTTP response body as XML
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @return self
          */
-        public function sendAsXml(?array $data): self
+        public function sendAsXml(ResponseDto $dto): self
         {
-            $xml = \library\DataConvertor::array2xml($data);
-            return $this->plainText($xml, 'application/xml');
+            $xml = \library\DataConvertor::array2xml($dto->asMap());
+            return $this->plainText($xml, \library\MediaType::XML);
         }
 
         /**
          * Send HTTP response body as CSV
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @param string $separator data separator
          * @return self
          */
-        public function sendAsCsv(?array $data, string $separator = ','): self
+        public function sendAsCsv(ResponseDto $dto, string $separator = ','): self
         {
-            $csv = \library\DataConvertor::array2csv($data, $separator);
-            return $this->plainText($csv, 'text/csv');
+            $csv = \library\DataConvertor::array2csv($dto->asMap(), $separator);
+            return $this->plainText($csv, \library\MediaType::TEXT_CSV);
         }
 
         /**
          * Send HTTP response body as YAML
-         * @param array|null $data Data object to send
+         * @param ResponseDto $dto Data object to send
          * @return self
          */
-        public function sendAsYaml(?array $data): self
+        public function sendAsYaml(ResponseDto $dto): self
         {
-            return $this->plainText(yaml_emit($data), 'text/yaml');
+            return $this->plainText(yaml_emit($dto->asMap()), \library\MediaType::TEXT_YAML);
         }
 
         /**
@@ -279,9 +230,9 @@ namespace shani\engine\http {
          * Get HTTP cookie object(s)
          * @param string $name named key
          * @param bool $selected If set to true, only the selected values will be returned.
-         * @return \library\HttpCookie|null
+         * @return \library\Cookie|null
          */
-        public function cookie(string $name): ?\library\HttpCookie
+        public function cookie(string $name): ?\library\Cookie
         {
             return $this->cookies[$name] ?? null;
         }
@@ -289,26 +240,26 @@ namespace shani\engine\http {
         /**
          * Send HTTP response redirect
          * @param string $url new destination
-         * @param int $code HTTP status code, default is 302
+         * @param HttpStatus $status HTTP status code, default is 302
          * @return self
          */
-        public function redirect(string $url, int $code = HttpStatus::FOUND): self
+        public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
         {
-            $this->res->redirect($url, $code);
+            $this->res->redirect($url, $status->value);
             return $this;
         }
 
         /**
          * Send HTTP response redirect using a given HTTP referrer, if no referrer given
          * false is returned and redirection fails
-         * @param int $code HTTP status code, default is 302
+         * @param HttpStatus $status HTTP status code, default is 302
          * @return bool
          */
-        public function redirectBack(int $code = HttpStatus::FOUND): bool
+        public function redirectBack(HttpStatus $status = HttpStatus::FOUND): bool
         {
             $url = $this->app->request()->headers('referer');
             if ($url !== null) {
-                $this->res->redirect($url, $code);
+                $this->res->redirect($url, $status->value);
                 return true;
             }
             return false;
@@ -316,24 +267,25 @@ namespace shani\engine\http {
 
         /**
          * Set HTTP response status code
-         * @param int $code HTTP status code
-         * @param string $message HTTP status message
+         * @param HttpStatus $status HTTP status
+         * @param string $message HTTP status message, if not provided then default
+         * HTTP message will be used.
          * @return self
          */
-        public function setStatus(int $code, string $message = ''): self
+        public function setStatus(HttpStatus $status, string $message = null): self
         {
-            $this->statusCode = $code;
-            $this->res->setStatus($code, $message);
+            $this->httpStatus = $status;
+            $this->res->setStatus($status->value, $message ?? $status->getMessage());
             return $this;
         }
 
         /**
-         * Get HTTP response status code
-         * @return int Status code
+         * Get HTTP response status
+         * @return HttpStatus Status code
          */
-        public function statusCode(): int
+        public function status(): HttpStatus
         {
-            return $this->statusCode;
+            return $this->httpStatus;
         }
 
         /**
@@ -357,12 +309,12 @@ namespace shani\engine\http {
             if ($this->app->request()->method() !== 'head') {
                 $this->sendHeaders([
                     'content-length' => $length,
-                    'content-type' => \library\Mime::fromFilename($path)
+                    'content-type' => \library\MediaType::fromFilename($path)
                 ])->res->sendFile($path, $start, $chunk);
             } else {
                 $this->setHeaders([
                     'content-length' => $length,
-                    'content-type' => \library\Mime::fromFilename($path)
+                    'content-type' => \library\MediaType::fromFilename($path)
                 ])->setStatus(HttpStatus::NO_CONTENT)->close();
             }
             return $this;
@@ -370,10 +322,10 @@ namespace shani\engine\http {
 
         /**
          * Set HTTP response cookie
-         * @param \library\HttpCookie $cookie
+         * @param \library\Cookie $cookie
          * @return self
          */
-        public function setCookie(\library\HttpCookie $cookie): self
+        public function setCookie(\library\Cookie $cookie): self
         {
             $this->cookies[$cookie->name()] = $cookie;
             return $this;
@@ -447,17 +399,6 @@ namespace shani\engine\http {
                 }
             }
             return $this->setHeaders('cache-control', implode(',', $directives));
-        }
-
-        /**
-         * Send output and close connection
-         * @param string|null $content Output to send
-         * @return self
-         */
-        private function close(?string $content = null): self
-        {
-            $this->sendHeaders()->res->close($content);
-            return $this;
         }
     }
 

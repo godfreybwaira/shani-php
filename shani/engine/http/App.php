@@ -11,36 +11,70 @@
 namespace shani\engine\http {
 
     use gui\Template;
+    use library\Cookie;
+    use library\HttpHeader;
     use library\HttpStatus;
+    use library\Utils;
     use shani\advisors\Configuration;
+    use shani\contracts\ResponseDto;
+    use shani\contracts\ResponseWriter;
+    use shani\engine\core\Definitions;
+    use shani\engine\documentation\Generator;
+    use shani\engine\http\bado\RequestEntity;
+    use shani\engine\http\bado\ResponseEntity;
+    use shani\ServerConfig;
 
     final class App
     {
 
         private Asset $asset;
-        private ?string $lang;
         private Storage $storage;
-        private readonly Request $req;
-        private readonly Response $res;
+        private ?string $lang = null;
+        private readonly RequestEntity $req;
+        private readonly ResponseEntity $res;
         private readonly Configuration $config;
+        private readonly ResponseWriter $writer;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
 
-        public function __construct(\shani\contracts\ServerRequest $req, \shani\contracts\ServerResponse $res)
+        public function __construct(RequestEntity &$req, ResponseEntity &$res, ResponseWriter $writer)
         {
-            $this->lang = null;
-            $this->req = new Request($req);
-            $this->res = new Response($this, $res);
+            $this->req = $req;
+            $this->res = $res;
+            $this->writer = $writer;
             try {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
-                if (!Asset::tryServe($this)) {
+                $this->res->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
+                if (!Asset::tryServe($this, $req, $res)) {
                     $this->catchErrors();
                     $this->start();
                 }
             } catch (\ErrorException $ex) {
-                $this->response()->setStatus(HttpStatus::BAD_REQUEST)->send(['message' => $ex->getMessage()]);
+                $this->res->setStatus(HttpStatus::BAD_REQUEST)
+                        ->setBody(new HttpResponseDto(HttpStatus::BAD_REQUEST, $ex->getMessage()));
+                $this->send($this->res);
+            }
+        }
+
+        /**
+         * Send content to a client application
+         * @param ResponseEntity $res
+         * @param bool $useBuffer Set output buffer on so that output can be sent
+         * in chunks without closing connection. If false, then connection will
+         * be closed and no output can be sent.
+         * @return void
+         */
+        public function send(ResponseEntity &$res, bool $useBuffer = false): void
+        {
+            if ($this->req->method() === 'head') {
+                $res->setStatus(HttpStatus::NO_CONTENT);
+                $this->writer->send($res, true);
+            } else if ($useBuffer) {
+                $this->writer->send($res);
+            } else {
+                $this->writer->close($res);
             }
         }
 
@@ -52,7 +86,7 @@ namespace shani\engine\http {
         private function getHostConfiguration(): array
         {
             $hostname = $this->req->uri()->hostname();
-            $host = \shani\ServerConfig::host($hostname);
+            $host = ServerConfig::host($hostname);
             $requestVersion = $this->req->version();
             if ($requestVersion === null) {
                 return $host['VERSIONS'][$host['DEFAULT_VERSION']];
@@ -102,18 +136,18 @@ namespace shani\engine\http {
 
         /**
          * Get HTTP request object
-         * @return Request Request object
+         * @return RequestEntity Request object
          */
-        public function request(): Request
+        public function request(): RequestEntity
         {
             return $this->req;
         }
 
         /**
          * Get HTTP response object
-         * @return Response Response object
+         * @return ResponseEntity Response object
          */
-        public function response(): Response
+        public function response(): ResponseEntity
         {
             return $this->res;
         }
@@ -175,22 +209,23 @@ namespace shani\engine\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param array|null $data Data object to be passed to a view file
+         * @param ResponseDto $dto Data object to be passed to a view file
          * @return void
          */
-        public function render(?array $data = null): void
+        public function render(ResponseDto $dto = null): void
         {
+            $customDto = $dto ?? new HttpResponseDto($this->response()->status());
             $type = $this->res->type();
             if ($type === 'html' || $type === 'htm') {
                 ob_start();
-                $this->template()->render($data);
-                $this->res->sendAsHtml(ob_get_clean());
+                $this->template()->render($customDto);
+                $this->sendAsHtml(ob_get_clean());
             } else if ($type === 'event-stream') {
                 ob_start();
-                $this->template()->render($data);
-                $this->res->sendAsSse(ob_get_clean());
+                $this->template()->render($customDto);
+                $this->sendAsSse(ob_get_clean());
             } else {
-                $this->res->send($data, $type);
+                $this->send($customDto, $type);
             }
         }
 
@@ -237,7 +272,7 @@ namespace shani\engine\http {
          */
         public function module(?string $path = null): string
         {
-            return \shani\engine\core\Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
+            return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
         }
 
         /**
@@ -257,7 +292,7 @@ namespace shani\engine\http {
 
         private function getClassPath(string $method): string
         {
-            $class = \shani\engine\core\Definitions::DIRNAME_APPS . $this->config->root();
+            $class = Definitions::DIRNAME_APPS . $this->config->root();
             $class .= $this->config->moduleDir() . $this->req->module();
             $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));
@@ -269,7 +304,7 @@ namespace shani\engine\http {
          */
         public function documentation(): array
         {
-            return (new \shani\engine\documentation\Generator($this))->generate();
+            return (new Generator($this))->generate();
         }
 
         /**
@@ -302,8 +337,8 @@ namespace shani\engine\http {
             }
             try {
                 $className = str_replace('/', '\\', $classPath);
-                $cb = \library\Utils::kebab2camelCase(substr($this->req->callback(), 1));
-                (new $className($this))->$cb();
+                $cb = Utils::kebab2camelCase(substr($this->req->callback(), 1));
+                (new $className($this))->$cb($this->req, $this->res);
             } catch (\Exception $ex) {
                 $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                 $this->config->httpErrorHandler($ex->getMessage());
@@ -328,8 +363,8 @@ namespace shani\engine\http {
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add([$token => null]);
-                $cookie = (new \library\HttpCookie())->setName($this->config->csrfTokenName())
-                        ->setSameSite(\library\HttpCookie::SAME_SITE_LAX)
+                $cookie = (new Cookie())->setName($this->config->csrfTokenName())
+                        ->setSameSite(Cookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
                         ->setSecure($this->req->uri()->secure());
                 $this->res->setCookie($cookie);

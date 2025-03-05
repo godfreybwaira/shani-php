@@ -9,9 +9,10 @@
 
 namespace apps\demo\v1\config {
 
-    use shani\advisors\Configuration;
     use shani\engine\http\App;
     use shani\engine\http\Middleware;
+    use shani\advisors\Configuration;
+    use shani\engine\http\HttpResponseDto;
 
     final class Settings extends Configuration
     {
@@ -33,7 +34,8 @@ namespace apps\demo\v1\config {
 
         public function httpErrorHandler(?string $errorMessage = null): void
         {
-            $this->app->response()->send(['message' => $errorMessage ?? 'No message available']);
+            $this->app->response()
+                    ->send(new HttpResponseDto($this->app->response()->status(), $errorMessage));
         }
 
         public function webroot(): string

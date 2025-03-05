@@ -9,8 +9,24 @@
 
 namespace shani\server\swoole {
 
-    use shani\engine\http\App;
+    use library\Concurrency;
+    use library\DataConvertor;
+    use library\Event;
+    use library\HttpHeader;
+    use library\HttpStatus;
+    use library\Map;
+    use library\MediaType;
+    use library\RequestEntityBuilder;
+    use library\URI;
+    use library\Utils;
     use shani\engine\core\Definitions;
+    use shani\engine\http\App;
+    use shani\engine\http\bado\ResponseEntity;
+    use shani\engine\http\UploadedFile;
+    use shani\ServerConfig;
+    use Swoole\Http\Request;
+    use Swoole\Http\Response;
+    use Swoole\WebSocket\Frame;
     use Swoole\WebSocket\Server as WSocket;
 
     final class HttpServer
@@ -22,9 +38,9 @@ namespace shani\server\swoole {
         private static function configure(array $cnf): WSocket
         {
             ini_set('display_errors', $cnf['DISPLAY_ERRORS']);
-            new \library\Concurrency(new Concurrency());
-            \library\Event::setHandler(new Event());
-            \library\Mime::setHandler(new Cache(1500, 100));
+            new Concurrency(new Concurrency());
+            Event::setHandler(new Event());
+            MediaType::setHandler(new Cache(1500, 100));
             $server = new WSocket($cnf['IP'], $cnf['SERVER_PORTS']['HTTP']);
             $cores = swoole_cpu_num();
             $server->set([
@@ -44,17 +60,53 @@ namespace shani\server\swoole {
             return $server;
         }
 
-        private static function makeURI(string $scheme, string $host, array &$server): \library\URI
+        private static function makeURI(string $scheme, string $host, array &$server): URI
         {
             $query = !empty($server['query_string']) ? '?' . $server['query_string'] : null;
             $path = $scheme . '://' . $host . $server['path_info'] . $query;
-            return new \library\URI($path);
+            return new URI($path);
         }
 
-        private static function handleHTTP(string $scheme, \Swoole\Http\Request &$req, \Swoole\Http\Response &$res)
+        private static function handleHTTP(string $scheme, Request &$req, Response &$res)
         {
             $uri = self::makeURI($scheme, $req->header['host'], $req->server);
-            new App(new ServerRequest($req, $uri), new ServerResponse($res));
+            $type = MediaType::explode(strtolower($req->header['content-type']))[1];
+            $request = (new RequestEntityBuilder())
+                    ->protocol($req->server['server_protocol'])
+                    ->method($req->server['request_method'])
+                    ->headers(new HttpHeader($req->header))
+                    ->time($req->server['request_time'])
+                    ->files(self::getFiles($req->files))
+                    ->body(self::getBody($req, $type))
+                    ->ip($req->server['remote_addr'])
+                    ->cookies($req->cookie)
+                    ->type($type)
+                    ->uri($uri)
+                    ->build();
+            $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
+            new App($request, $response, new SwooleResponseWriter($res));
+        }
+
+        private static function getBody(Request &$req, string $type): ?array
+        {
+            $inputs = Map::normalize($req->post());
+            if (!empty($inputs)) {
+                return $inputs;
+            }
+            return DataConvertor::convertFrom($req->rawcontent(), $type);
+        }
+
+        private static function getFiles(array $files): array
+        {
+            $uploaded = [];
+            foreach ($files as $name => $file) {
+                $uploaded[$name] = new UploadedFile(
+                        path: $file['tmp_name'], type: $file['type'],
+                        size: $file['size'], name: $file['name'],
+                        error: $file['error']
+                );
+            }
+            return $uploaded;
         }
 
         private static function checkFrameworkRequirements()
@@ -76,21 +128,21 @@ namespace shani\server\swoole {
         public static function start(): void
         {
             self::checkFrameworkRequirements();
-            \library\Utils::errorHandler();
-            $cnf = \shani\ServerConfig::server();
+            Utils::errorHandler();
+            $cnf = ServerConfig::server();
             $server = self::configure($cnf);
             $server->on('start', function () use (&$cnf) {
                 echo 'http://' . $cnf['IP'] . ':' . $cnf['SERVER_PORTS']['HTTP'] . PHP_EOL;
                 echo 'https://' . $cnf['IP'] . ':' . $cnf['SERVER_PORTS']['HTTPS'] . PHP_EOL;
             });
-            $server->on('request', function (\Swoole\Http\Request $req, \Swoole\Http\Response $res) use (&$cnf) {
+            $server->on('request', function (Request $req, Response $res) use (&$cnf) {
                 $scheme = $cnf['SERVER_PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
                 self::handleHTTP($scheme, $req, $res);
             });
-            $server->on('open', function (WSocket $server, \Swoole\Http\Request $req) {
+            $server->on('open', function (WSocket $server, Request $req) {
 
             });
-            $server->on('message', function (WSocket $server, \Swoole\WebSocket\Frame $frame) {
+            $server->on('message', function (WSocket $server, Frame $frame) {
 
             });
             $server->on('close', function (WSocket $server, int $fd) {

@@ -22,6 +22,7 @@ namespace library\client {
         private ?string $signatureHeader = null, $cipherKey = null;
         private ?string $cipherAlgorithm = null, $initVector = null;
         private array $specialOptions = [];
+        private $body = null;
 
         public function __construct(string $host, int $retries = 3, int $timeout = 20)
         {
@@ -46,6 +47,17 @@ namespace library\client {
             foreach ($headers as $key => $value) {
                 $this->headers[strtolower(trim($key))] = $value;
             }
+            return $this;
+        }
+
+        /**
+         * Set body to send
+         * @param type $body
+         * @return self
+         */
+        public function setBody($body): self
+        {
+            $this->body = $body;
             return $this;
         }
 
@@ -196,18 +208,17 @@ namespace library\client {
         }
 
         /**
-         * Send HTTP request using any request method
-         * @param string|null $reqMethod Request method e.g: GET, PUT, POST etc
+         * Send HTTP request using provided request method
+         * @param string $method Request method e.g: GET, PUT, POST etc
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function send(?string $reqMethod, string $endpoint, $body = null, callable $callback = null): self
+        public function send(string $method, string $endpoint, callable $callback = null): self
         {
-            Concurrency::async(function ()use (&$reqMethod, &$endpoint, &$body, &$callback) {
+            Concurrency::async(function ()use (&$method, &$endpoint, &$callback) {
                 $stream = null;
-                $this->finalize($reqMethod, $body);
+                $this->finalize($method);
                 if (!isset($this->specialOptions[CURLOPT_FILE])) {
                     $stream = fopen('php://temp', 'r+b');
                 } else {
@@ -236,10 +247,11 @@ namespace library\client {
             curl_close($curl);
         }
 
-        private function finalize(?string $method, &$body): void
+        private function finalize(string $method): void
         {
+            $body = $this->body;
             if (!empty($this->files)) {
-                $body = !empty($body) ? array_merge($body, $this->files) : $this->files;
+                $body = !empty($this->body) ? array_merge($this->body, $this->files) : $this->files;
             }
             if (!empty($body)) {
                 if ($this->signatureKey !== null) {
@@ -253,16 +265,13 @@ namespace library\client {
                     $this->setOptions([CURLOPT_POSTFIELDS => $this->convertBody($body)]);
                 }
             }
-            if ($method !== null) {
-                $this->setOptions([CURLOPT_CUSTOMREQUEST => $method]);
-            }
-            $this->setHeaders();
+            $this->setOptions([CURLOPT_CUSTOMREQUEST => $method])->setHeaders();
         }
 
         private function convertBody(&$body)
         {
             if (!empty($this->headers['content-type']) && is_array($body)) {
-                $type = \library\Mime::explode($this->headers['content-type'])[1];
+                $type = \library\MediaType::explode($this->headers['content-type'])[1];
                 return \library\DataConvertor::convertTo($body, $type);
             }
             return $body;
@@ -270,10 +279,10 @@ namespace library\client {
 
         /**
          * Set HTTP cookies
-         * @param \library\HttpCookie $cookie Cookie object to send
+         * @param \library\Cookie $cookie Cookie object to send
          * @return self
          */
-        public function cookies(\library\HttpCookie $cookie): self
+        public function cookies(\library\Cookie $cookie): self
         {
             $this->cookies[$cookie->name()] = $cookie;
             $this->setOptions([CURLOPT_COOKIE => $cookie]);
@@ -300,7 +309,7 @@ namespace library\client {
         public function attachments(array $filenames): self
         {
             foreach ($filenames as $name => $path) {
-                $this->files[$name] = curl_file_create($path, \library\Mime::fromFilename($path), basename($path));
+                $this->files[$name] = curl_file_create($path, \library\MediaType::fromFilename($path), basename($path));
             }
             return $this;
         }
@@ -404,25 +413,23 @@ namespace library\client {
         /**
          * Send HTTP GET request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function get(string $endpoint, $body = null, callable $callback = null): self
+        public function get(string $endpoint, callable $callback = null): self
         {
-            return $this->send('GET', self::merge($endpoint, $body), null, $callback);
+            return $this->send('GET', self::merge($endpoint, $this->body), $callback);
         }
 
         /**
          * Send HTTP POST request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function post(string $endpoint, $body = null, callable $callback = null): self
+        public function post(string $endpoint, callable $callback = null): self
         {
-            return $this->send('POST', $endpoint, $body, $callback);
+            return $this->send('POST', $endpoint, $callback);
         }
 
         /**
@@ -432,45 +439,42 @@ namespace library\client {
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function put(string $endpoint, $body = null, callable $callback = null): self
+        public function put(string $endpoint, callable $callback = null): self
         {
-            return $this->send('PUT', $endpoint, $body, $callback);
+            return $this->send('PUT', $endpoint, $callback);
         }
 
         /**
          * Send HTTP PATCH request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function patch(string $endpoint, $body = null, callable $callback = null): self
+        public function patch(string $endpoint, callable $callback = null): self
         {
-            return $this->send('PATCH', $endpoint, $body, $callback);
+            return $this->send('PATCH', $endpoint, $callback);
         }
 
         /**
          * Send HTTP DELETE request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function delete(string $endpoint, $body = null, callable $callback = null): self
+        public function delete(string $endpoint, callable $callback = null): self
         {
-            return $this->send('DELETE', $endpoint, $body, $callback);
+            return $this->send('DELETE', $endpoint, $callback);
         }
 
         /**
          * Send HTTP HEAD request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
          * @param callable $callback A callback that must accept Response object
          * @return self
          */
-        public function head(string $endpoint, $body = null, callable $callback = null): self
+        public function head(string $endpoint, callable $callback = null): self
         {
-            return $this->send('HEAD', $endpoint, $body, $callback);
+            return $this->send('HEAD', $endpoint, $callback);
         }
 
         /**

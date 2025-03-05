@@ -9,8 +9,9 @@
 
 namespace gui {
 
-    use shani\advisors\Configuration;
     use shani\engine\http\App;
+    use shani\contracts\ResponseDto;
+    use shani\advisors\Configuration;
 
     final class Template
     {
@@ -122,12 +123,12 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param array|null $data Data object to be passed to a view component.
+         * @param ResponseDto $dto Data object to be passed to a view component.
          * @return void
          */
-        public function render(?array $data = null): void
+        public function render(ResponseDto $dto): void
         {
-            $this->data = $data ?? [];
+            $this->data = $dto->asMap() ?? [];
             if ($this->app->request()->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {

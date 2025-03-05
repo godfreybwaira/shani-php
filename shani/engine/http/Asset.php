@@ -9,7 +9,12 @@
 
 namespace shani\engine\http {
 
+    use library\HttpHeader;
     use library\HttpStatus;
+    use shani\engine\core\Definitions;
+    use shani\engine\http\bado\HttpCache;
+    use shani\engine\http\bado\RequestEntity;
+    use shani\engine\http\bado\ResponseEntity;
 
     final class Asset
     {
@@ -33,21 +38,24 @@ namespace shani\engine\http {
         /**
          * Serve static content e.g CSS, images and other static files.
          * @param App $app Application object
+         * @param RequestEntity $req RequestEntity object
+         * @param ResponseEntity $res ResponseEntity object
          * @return bool True on success, false otherwise.
          */
-        public static function tryServe(App &$app): bool
+        public static function tryServe(App &$app, RequestEntity &$req, ResponseEntity &$res): bool
         {
             $path = $app->request()->uri()->path();
             $prefix = $rootPath = null;
             if (self::isStaticPath($path, self::ASSET_PREFIX)) {
                 $prefix = self::ASSET_PREFIX;
-                $rootPath = $app->asset()->pathTo();
+                $rootPath = self::pathTo();
             } elseif (self::isStaticPath($path, self::STORAGE_PREFIX)) {
                 $prefix = self::STORAGE_PREFIX;
                 $rootPath = $app->storage()->pathTo();
             } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
                 if (!$app->config()->authenticated()) {
-                    $app->response()->setStatus(HttpStatus::UNAUTHORIZED)->send(null);
+                    $res->setStatus(HttpStatus::UNAUTHORIZED);
+                    $app->send($res);
                     return true;
                 }
                 $prefix = self::PRIVATE_PREFIX;
@@ -56,11 +64,14 @@ namespace shani\engine\http {
             if ($prefix === null) {
                 return false;
             }
-            if ($app->request()->headers('if-none-match') === null) {
-                $location = $rootPath . substr($path, strlen($prefix));
-                $app->response()->setStatus(HttpStatus::OK)->setCache()->stream($location);
+            if (!$req->header()->has(HttpHeader::IF_NONE_MATCH)) {
+                $filepath = $rootPath . substr($path, strlen($prefix));
+                $res->setStatus(HttpStatus::OK);
+                $res->header()->setCache(new HttpCache());
+                $app->stream($res, $$filepath);
             } else {
-                $app->response()->setStatus(HttpStatus::NOT_MODIFIED)->send(null);
+                $res->setStatus(HttpStatus::NOT_MODIFIED);
+                $app->send($res);
             }
             return true;
         }
@@ -80,9 +91,9 @@ namespace shani\engine\http {
          * @param string $path A file path relative to asset directory
          * @return string
          */
-        public function pathTo(string $path = null): string
+        public static function pathTo(string $path = null): string
         {
-            return \shani\engine\core\Definitions::DIR_ASSETS . $path;
+            return Definitions::DIR_ASSETS . $path;
         }
     }
 

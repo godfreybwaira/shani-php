@@ -11,16 +11,17 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
+    use library\MediaType;
 
     final class Form extends Component
     {
 
         private ?Component $fieldset = null;
 
-        public const ENCTYPE_JSON = 'application/json';
-        public const ENCTYPE_YAML = 'text/yaml';
-        public const ENCTYPE_CSV = 'text/csv';
-        public const ENCTYPE_XML = 'application/xml';
+        public const ENCTYPE_JSON = MediaType::JSON;
+        public const ENCTYPE_YAML = MediaType::TEXT_YAML;
+        public const ENCTYPE_CSV = MediaType::TEXT_CSV;
+        public const ENCTYPE_XML = MediaType::XML;
         public const ENCTYPE_MULTIPART = 'multipart/form-data';
         public const ENCTYPE_ENCODED = 'application/x-www-form-urlencoded';
         public const ENCTYPE_DEFAULT = self::ENCTYPE_MULTIPART;

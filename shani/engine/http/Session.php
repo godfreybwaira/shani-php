@@ -257,7 +257,7 @@ namespace shani\engine\http {
 //                    session_regenerate_id();
 //                }
                 $sessName = $app->config()->sessionName();
-                $cookie = (new \library\HttpCookie())->setName($sessName)
+                $cookie = (new \library\Cookie())->setName($sessName)
                         ->setValue($app->request()->cookies($sessName) ?? session_create_id())
                         ->setSecure($app->request()->uri()->secure())->setHttpOnly(true)
                         ->setDomain($app->request()->uri()->hostname())

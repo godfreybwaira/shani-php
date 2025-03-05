@@ -9,7 +9,7 @@
 
 namespace apps\demo\v1\modules\greetings\data\dto {
 
-    final class Subject
+    final class Subject implements \shani\contracts\ResponseDto
     {
 
         private string $name, $grade;
@@ -22,7 +22,8 @@ namespace apps\demo\v1\modules\greetings\data\dto {
             $this->marks = $marks;
         }
 
-        public function dto(): array
+        #[\Override]
+        public function asMap(): array
         {
             return [
                 'name' => $this->name,
