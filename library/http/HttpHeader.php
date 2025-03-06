@@ -1,9 +1,8 @@
 <?php
 
-namespace library {
+namespace library\http {
 
-    use shani\contracts\HttpCookie;
-    use shani\engine\http\bado\HttpCache;
+    use library\Map;
 
     final class HttpHeader
     {
@@ -14,6 +13,7 @@ namespace library {
         public const ACCEPT_LANGUAGE = 'Accept-Language';
         public const ACCEPT_PATCH = 'Accept-Patch';
         public const ACCEPT_RANGES = 'Accept-Ranges';
+        public const ACCEPT_VERSION = 'Accept-Version';
         public const ACCESS_CONTROL_ALLOW_CREDENTIALS = 'Access-Control-Allow-Credentials';
         public const ACCESS_CONTROL_ALLOW_HEADERS = 'Access-Control-Allow-Headers';
         public const ACCESS_CONTROL_ALLOW_METHODS = 'Access-Control-Allow-Methods';
@@ -34,7 +34,9 @@ namespace library {
         public const CONTENT_LOCATION = 'Content-Location';
         public const CONTENT_RANGE = 'Content-Range';
         public const CONTENT_TYPE = 'Content-Type';
+        public const CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
         public const COOKIE = 'Cookie';
+        public const CROSS_ORIGIN_RESOURCE_POLICY = 'Cross-Origin-Resource-Policy';
         public const DATE = 'Date';
         public const ETAG = 'ETag';
         public const EXPECT = 'Expect';
@@ -69,6 +71,8 @@ namespace library {
         public const VIA = 'Via';
         public const WARNING = 'Warning';
         public const WWW_AUTHENTICATE = 'WWW-Authenticate';
+        public const X_FRAME_OPTIONS = 'X-Frame-Options';
+        public const X_CONTENT_TYPE_OPTIONS = 'X-Content-Type-Options';
 
         private array $headers = [];
 
@@ -78,37 +82,8 @@ namespace library {
                 return;
             }
             foreach ($headers as $key => $value) {
-                $this->headers[ucwords($key, '-')] = $value;
+                $this->headers[self::createName($key)] = $value;
             }
-        }
-
-        public function setCache(HttpCache $cache): self
-        {
-            $this->headers[self::CACHE_CONTROL] = (string) $cache;
-            $etag = $cache->etag();
-            if ($etag !== null) {
-                $this->headers[self::ETAG] = $etag;
-            }
-            return $this;
-        }
-
-        public function clearCache(): self
-        {
-            unset($this->headers[self::ETAG]);
-            unset($this->headers[self::CACHE_CONTROL]);
-            return $this;
-        }
-
-        public function clearCookies(): self
-        {
-            unset($this->headers[self::SET_COOKIE]);
-            return $this;
-        }
-
-        public function setCookie(HttpCookie $cookie): self
-        {
-            $this->headers[self::SET_COOKIE][$cookie->name()] = $cookie;
-            return $this;
         }
 
         /**
@@ -181,13 +156,28 @@ namespace library {
         /**
          * Set the given, single header value under the given name.
          * @param string $headerName the header name
-         * @param string $headerValue the header value
+         * @param array|Stringable|null $headerValue the header value
          * @see setIfAbsent(string, string)
          */
-        public function set(string $headerName, ?string $headerValue): self
+        public function set(string $headerName, array|\Stringable|null $headerValue): self
         {
-            $this->headers[$headerName] = $headerValue;
+            if ($headerValue === null) {
+                return $this;
+            }
+            $name = self::createName($headerName);
+            if (is_string($headerValue)) {
+                $this->headers[$name] = $headerValue;
+            } else {
+                foreach ($headerValue as $key => $value) {
+                    $this->headers[$name][$key] = $value;
+                }
+            }
             return $this;
+        }
+
+        public static function createName($headerName): string
+        {
+            return ucwords(strtolower($headerName), '-');
         }
 
         public function count(): int
@@ -220,9 +210,9 @@ namespace library {
             return array_key_exists($headerName, $this->headers);
         }
 
-        public function getAll(): array
+        public function getAll(array $names = null): array
         {
-            return $this->headers;
+            return Map::get($this->headers, $names);
         }
 
         public function get(string $headerName): ?string

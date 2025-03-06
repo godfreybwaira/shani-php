@@ -106,7 +106,7 @@ namespace library {
          */
         public static function normalize(?array $values): ?array
         {
-            if ($values === null) {
+            if (empty($values)) {
                 return $values;
             }
             $content = [];
@@ -155,7 +155,7 @@ namespace library {
          */
         public static function get(?array $row, string|array|null $keys = null, bool $selected = true)
         {
-            if ($keys === null || $row === null) {
+            if ($keys === null || empty($row)) {
                 return $selected ? $row : [];
             }
             if (is_array($keys)) {

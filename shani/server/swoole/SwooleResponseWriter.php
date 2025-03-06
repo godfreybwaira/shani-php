@@ -9,9 +9,8 @@
 
 namespace shani\server\swoole {
 
-    use library\HttpStatus;
+    use library\http\HttpStatus;
     use shani\contracts\ResponseWriter;
-    use shani\engine\http\bado\ResponseEntity;
     use Swoole\Http\Response as SwooleResponse;
 
     final class SwooleResponseWriter implements ResponseWriter

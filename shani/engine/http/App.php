@@ -12,17 +12,20 @@ namespace shani\engine\http {
 
     use gui\Template;
     use library\Cookie;
-    use library\HttpHeader;
-    use library\HttpStatus;
+    use library\DataConvertor;
+    use library\http\HttpHeader;
+    use library\http\HttpStatus;
+    use library\http\RequestEntity;
     use library\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseDto;
     use shani\contracts\ResponseWriter;
     use shani\engine\core\Definitions;
     use shani\engine\documentation\Generator;
-    use shani\engine\http\bado\RequestEntity;
-    use shani\engine\http\bado\ResponseEntity;
+    use library\http\ResponseEntity;
     use shani\ServerConfig;
+    use shani\engine\core\Framework;
+    use library\MediaType;
 
     final class App
     {
@@ -36,46 +39,128 @@ namespace shani\engine\http {
         private readonly ResponseWriter $writer;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
+        private ?string $platform = null, $version = null;
 
-        public function __construct(RequestEntity &$req, ResponseEntity &$res, ResponseWriter $writer)
+        public function __construct(ResponseEntity &$res, ResponseWriter $writer)
         {
-            $this->req = $req;
             $this->res = $res;
             $this->writer = $writer;
+            $this->req = $res->request();
+            $this->res->header()
+                    ->set(HttpHeader::X_CONTENT_TYPE_OPTIONS, 'nosniff')
+                    ->set(HttpHeader::SERVER, Framework::NAME);
             try {
                 $cnf = $this->getHostConfiguration();
                 $env = $cnf['ENVIRONMENTS'][$cnf['ACTIVE_ENVIRONMENT']];
                 $this->config = new $env($this, $cnf);
                 $this->res->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-                if (!Asset::tryServe($this, $req, $res)) {
-                    $this->catchErrors();
+                if (!Asset::tryServe($this)) {
+                    $this->registerErrorHandler();
                     $this->start();
                 }
             } catch (\ErrorException $ex) {
-                $this->res->setStatus(HttpStatus::BAD_REQUEST)
-                        ->setBody(new HttpResponseDto(HttpStatus::BAD_REQUEST, $ex->getMessage()));
-                $this->send($this->res);
+                $this->res->setStatus(HttpStatus::BAD_REQUEST)->setBody($ex->getMessage());
+                $this->send();
             }
         }
 
         /**
          * Send content to a client application
-         * @param ResponseEntity $res
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function send(ResponseEntity &$res, bool $useBuffer = false): void
+        public function send(bool $useBuffer = false): void
         {
-            if ($this->req->method() === 'head') {
-                $res->setStatus(HttpStatus::NO_CONTENT);
-                $this->writer->send($res, true);
+            if ($this->res->request()->method === 'head') {
+                $this->res->setStatus(HttpStatus::NO_CONTENT);
+                $this->writer->send($this->res, true);
             } else if ($useBuffer) {
-                $this->writer->send($res);
+                $this->writer->send($this->res);
             } else {
-                $this->writer->close($res);
+                $this->writer->close($this->res);
             }
+        }
+
+        /**
+         * Stream  a file as HTTP response
+         * @param string $filepath Path to a file to stream
+         * @param int|null $chunkSize Number of bytes to stream every turn, default is 1MB
+         * @return self
+         */
+        public function stream(string $filepath, ?int $chunkSize = null): self
+        {
+            if (!is_file($filepath)) {
+                $this->res->setStatus(HttpStatus::NOT_FOUND);
+                $this->writer->close($this->res);
+                return $this;
+            }
+            $file = stat($filepath);
+            $range = $this->req->header()->get(HttpHeader::RANGE) ?? '=0-';
+            $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
+            $end = min($start + ($chunkSize ?? Definitions::BUFFER_SIZE), $file['size'] - 1);
+            $this->res->setStatus(HttpStatus::PARTIAL_CONTENT)->header()
+                    ->set(HttpHeader::CONTENT_RANGE, 'bytes ' . $start . '-' . $end . '/' . $file['size'])
+                    ->set(HttpHeader::ACCEPT_RANGES, 'bytes');
+            return $this->doStream($filepath, $start, $end);
+        }
+
+        /**
+         * Send HTTP response redirect using a given HTTP referrer, if no referrer given
+         * false is returned and redirection fails
+         * @param HttpStatus $status HTTP status code, default is 302
+         * @return bool
+         */
+        public function redirectBack(HttpStatus $status = HttpStatus::FOUND): bool
+        {
+            $url = $this->req->header()->get(HttpHeader::REFERER);
+            if ($url !== null) {
+                $this->writer->redirect($url, $status);
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Send HTTP response redirect
+         * @param string $url new destination
+         * @param HttpStatus $status HTTP status code, default is 302
+         * @return self
+         */
+        public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
+        {
+            $this->writer->redirect($url, $status);
+            return $this;
+        }
+
+        /**
+         * Stream a file to a client
+         * @param string $path Path to a file to stream
+         * @param int $start Start bytes to stream
+         * @param int $end End bytes to stream
+         * @return self
+         */
+        private function doStream(string $path, int $start = 0, int $end = null): self
+        {
+            $size = filesize($path);
+            if ($size <= $start || ($end !== null && $start >= $end)) {
+                $this->res->setStatus(HttpStatus::BAD_REQUEST);
+                $this->writer->close($this->res);
+                return $this;
+            }
+            $chunk = min($size, Definitions::BUFFER_SIZE);
+            $length = $end <= 0 ? $size - $start : $chunk = $end - $start + 1;
+            $this->res->header()
+                    ->set(HttpHeader::CONTENT_LENGTH, $length)
+                    ->set(HttpHeader::CONTENT_TYPE, MediaType::fromFilename($path));
+            if ($this->app->request()->method !== 'head') {
+                $this->writer->sendFile($this->res, $path, $start, $chunk);
+            } else {
+                $this->res->setStatus(HttpStatus::NO_CONTENT);
+                $this->writer->close($this->res);
+            }
+            return $this;
         }
 
         /**
@@ -97,7 +182,7 @@ namespace shani\engine\http {
             throw new \ErrorException('Unsupported application version "' . $requestVersion . '"');
         }
 
-        private function catchErrors(): void
+        private function registerErrorHandler(): void
         {
             set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
                 $this->config->applicationErrorHandler(new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline));
@@ -119,10 +204,45 @@ namespace shani\engine\http {
          */
         public function on(string $context, callable $cb): self
         {
-            if ($this->req->platform() === $context) {
+            if ($this->platform() === $context) {
                 $cb($this);
             }
             return $this;
+        }
+
+        /**
+         * Get HTTP preferred request context (platform) set by user agent. This
+         * value is set via HTTP accept-version header and the accepted values are
+         * 'web' and 'api'. User can also set application version after request context,
+         * separated by semicolon. If none given, the 'web' context is assumed.
+         * @example accept-version=web;1.0
+         * @return string|null
+         */
+        public function platform(): ?string
+        {
+            if ($this->platform === null) {
+                $str = $this->req->header()->get(HttpHeader::ACCEPT_VERSION);
+                if ($str === null) {
+                    $this->platform = 'web';
+                } else {
+                    $list = explode(';', strtolower($str));
+                    $this->version = !empty($list[1]) ? trim($list[1]) : null;
+                    $this->platform = $list[0];
+                }
+            }
+            return $this->platform;
+        }
+
+        /**
+         * Get application version requested via HTTP.
+         * @return string|null
+         */
+        public function version(): ?string
+        {
+            if ($this->version === null) {
+                $this->platform();
+            }
+            return $this->version;
         }
 
         /**
@@ -210,44 +330,86 @@ namespace shani\engine\http {
         /**
          * Render HTML document to user agent and close the HTTP connection.
          * @param ResponseDto $dto Data object to be passed to a view file
+         * @param bool $useBuffer Set output buffer on so that output can be sent
+         * in chunks without closing connection. If false, then connection will
+         * be closed and no output can be sent.
          * @return void
          */
-        public function render(ResponseDto $dto = null): void
+        public function render(ResponseDto $dto = null, bool $useBuffer = false): void
         {
-            $customDto = $dto ?? new HttpResponseDto($this->response()->status());
             $type = $this->res->type();
-            if ($type === 'html' || $type === 'htm') {
+            if ($type === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->template()->render($customDto);
-                $this->sendAsHtml(ob_get_clean());
-            } else if ($type === 'event-stream') {
+                $this->template()->render($dto);
+                $this->sendHtml(ob_get_clean(), $type);
+            } else if ($type === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->template()->render($customDto);
-                $this->sendAsSse(ob_get_clean());
-            } else {
-                $this->send($customDto, $type);
+                $this->template()->render($dto);
+                $this->sendSse(ob_get_clean(), $type);
+            } else if ($type === DataConvertor::TYPE_JS) {
+                $this->sendJsonp($dto, $type);
+            } else if ($dto !== null) {
+                $this->res->setBody(DataConvertor::convertTo($dto->asMap(), $type), $type);
             }
+            $this->send($useBuffer);
+        }
+
+        private function sendHtml(string $content, string $type): void
+        {
+            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
+            $this->res->setBody($content, $type);
+        }
+
+        private function sendJsonp(ResponseDto $dto, string $type): void
+        {
+            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
+            $callback = $this->req->query('callback') ?? 'callback';
+            $data = $callback . '(' . json_encode($dto->asMap()) . ');';
+            $this->res->setBody($data, $type);
+        }
+
+        private function sendSse(string $content, string $type): void
+        {
+            $this->res->header()->setIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache');
+            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
+            $this->res->setBody(DataConvertor::toEventStream($content), $type);
+        }
+
+        /**
+         * Get use request language codes. These values will be used for application
+         * language selection if the values are supported.
+         * @return array users accepted languages
+         */
+        public function languages(): array
+        {
+            $accept = $this->req->header()->get(HttpHeader::ACCEPT_LANGUAGE);
+            if ($accept !== null) {
+                $langs = explode(',', $accept);
+                return array_map(fn($val) => strtolower(trim(explode(';', $val)[0])), $langs);
+            }
+            return [];
         }
 
         /**
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param array|null $data Data to pass to dictionary file. These data are
+         * @param ResponseDto $dto Data to pass to dictionary file. These data are
          * available on dictionary file via $data variable
          * @return array Associative array where key is the word/sentence unique
          * code and the value is the actual word/sentence.
          */
-        public function dictionary(?array $data = null): array
+        public function dictionary(ResponseDto $dto = null): array
         {
             if ($this->dict === null) {
-                $file = $this->module($this->config->languageDir() . $this->req->resource() . $this->req->callback() . '/' . $this->language() . '.php');
-                $this->dict = self::getFile($file, $data);
+                $route = $this->req->route();
+                $file = $this->module($this->config->languageDir() . $route->resource . $route->callback . '/' . $this->language() . '.php');
+                $this->dict = self::getFile($file, $dto?->asMap());
             }
             return $this->dict;
         }
 
-        private static function getFile(string $loadedFile, ?array &$data): array
+        private static function getFile(string $loadedFile, ?array $data): array
         {
             return require $loadedFile;
         }
@@ -262,7 +424,7 @@ namespace shani\engine\http {
          */
         public function view(?string $path = null): string
         {
-            return $this->module($this->config->viewDir() . $this->req->resource() . ($path ?? $this->req->callback()) . '.php');
+            return $this->module($this->config->viewDir() . $this->req->route()->resource . ($path ?? $this->req->route()->callback) . '.php');
         }
 
         /**
@@ -272,7 +434,18 @@ namespace shani\engine\http {
          */
         public function module(?string $path = null): string
         {
-            return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->module() . $path;
+            return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->req->route()->module . $path;
+        }
+
+        /**
+         * Get the current request target referring to current path to a class function
+         * (i.e method/module/resource/callback)
+         * @return string
+         * @see App::hasAuthority()
+         */
+        public function target(): string
+        {
+            return $this->req->method . $this->route->module . $this->route->resource . $this->route->callback;
         }
 
         /**
@@ -282,7 +455,7 @@ namespace shani\engine\http {
         private function start(): void
         {
             if ($this->req->uri()->path() === '/') {
-                $this->req->rewriteUrl($this->config->homepage());
+                $this->req->setRoute(new RequestRoute($this->config->homepage()));
             }
             Session::start($this);
             $middleware = new Middleware($this);
@@ -293,9 +466,9 @@ namespace shani\engine\http {
         private function getClassPath(string $method): string
         {
             $class = Definitions::DIRNAME_APPS . $this->config->root();
-            $class .= $this->config->moduleDir() . $this->req->module();
+            $class .= $this->config->moduleDir() . $this->req->route()->module;
             $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
-            return $class . '/' . str_replace('-', '', ucwords(substr($this->req->resource(), 1), '-'));
+            return $class . '/' . str_replace('-', '', ucwords(substr($this->req->route()->resource, 1), '-'));
         }
 
         /**
@@ -326,10 +499,9 @@ namespace shani\engine\http {
          * always depends on HTTP method and application endpoint provided by the user.
          * @return void
          */
-        public function route(): void
+        public function processRequest(): void
         {
-            $method = $this->req->method();
-            $classPath = $this->getClassPath($method);
+            $classPath = $this->getClassPath($this->req->method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 $this->res->setStatus(HttpStatus::NOT_FOUND);
                 $this->config->httpErrorHandler();
@@ -337,8 +509,8 @@ namespace shani\engine\http {
             }
             try {
                 $className = str_replace('/', '\\', $classPath);
-                $cb = Utils::kebab2camelCase(substr($this->req->callback(), 1));
-                (new $className($this))->$cb($this->req, $this->res);
+                $cb = Utils::kebab2camelCase(substr($this->req->route()->callback, 1));
+                (new $className($this))->$cb();
             } catch (\Exception $ex) {
                 $this->res->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                 $this->config->httpErrorHandler($ex->getMessage());
@@ -380,7 +552,7 @@ namespace shani\engine\http {
         public function language(): string
         {
             if (!$this->lang) {
-                $reqLangs = $this->req->languages();
+                $reqLangs = $this->languages();
                 $appLangs = $this->config->languages();
                 foreach ($reqLangs as $lang) {
                     if (!empty($appLangs[$lang])) {

@@ -7,27 +7,19 @@
  * Created on: Feb 28, 2025 at 11:54:08 PM
  */
 
-namespace shani\engine\http\bado {
+namespace library\http {
 
-    use library\HttpHeader;
     use shani\contracts\HttpCookie;
 
     abstract class HttpEntity
     {
 
         protected readonly HttpHeader $headers;
-        protected ?string $body;
         private array $cookies = [];
 
-        protected function __construct(HttpHeader $headers, ?string $body)
+        protected function __construct(HttpHeader $headers)
         {
             $this->headers = $headers;
-            $this->body = $body;
-        }
-
-        public function size(): int
-        {
-            return $this->bodySize() + $this->headers->size();
         }
 
         public function withHeaders(HttpHeader $headers): self
@@ -44,21 +36,19 @@ namespace shani\engine\http\bado {
             return $copy;
         }
 
-        public function body(): ?string
-        {
-            return $this->body;
-        }
-
-        public function bodySize(): int
-        {
-            return $this->body === null ? 0 : mb_strlen($this->body);
-        }
-
+        /**
+         * Get HTTP header object
+         * @return HttpHeader
+         */
         public function header(): HttpHeader
         {
             return $this->headers;
         }
 
+        /**
+         * Get available HTTP cookie(s)
+         * @return array HTTP Cookie(s)
+         */
         public function cookies(): array
         {
             return $this->cookies;

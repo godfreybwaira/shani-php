@@ -10,7 +10,7 @@
 
 namespace shani\advisors {
 
-    use library\decode\DataCompressionLevel;
+    use library\DataCompressionLevel;
     use shani\engine\core\Framework;
     use shani\engine\http\App;
     use shani\engine\http\Middleware;
@@ -60,10 +60,10 @@ namespace shani\advisors {
          */
         public const BROWSING_PRIVACY_NONE = 3;
 
-        protected App $app;
-        private array $config;
+        protected readonly App $app;
+        protected readonly array $config;
 
-        protected function __construct(App &$app, array &$configurations)
+        public function __construct(App &$app, array &$configurations)
         {
             $this->app = $app;
             $this->config = $configurations;
@@ -165,6 +165,13 @@ namespace shani\advisors {
         {
             return $this->config['ACTIVE_ENVIRONMENT'];
         }
+
+        /**
+         * Check if HTTP request is requested via asynchronous mode for example
+         * whether the request is made via AJAX or any other similar technology.
+         * @return bool True if the request is asynchronous, false otherwise
+         */
+        public abstract function isAsync(): bool;
 
         /**
          * Handle all HTTP errors that may occur during program execution.

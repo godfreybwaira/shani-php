@@ -186,11 +186,11 @@ namespace gui {
          */
         public function breadcrumb(): string
         {
-            $rs = $this->app->request()->resource();
-            $bc = $this->app->module() . $this->app->config()->breadcrumbDir();
-            $str = self::loadFile($bc . $this->app->request()->module());
-            $str .= self::loadFile($bc . $rs . $rs);
-            $str .= self::loadFile($bc . $rs . $this->app->config()->breadcrumbMethodsDir() . $this->app->request()->callback());
+            $route = $this->app->request()->route();
+            $bc = $route->module . $this->app->config()->breadcrumbDir();
+            $str = self::loadFile($bc . $route->module);
+            $str .= self::loadFile($bc . $route->resource . $route->resource);
+            $str .= self::loadFile($bc . $route->resource . $this->app->config()->breadcrumbMethodsDir() . $route->callback);
             return $str;
         }
 

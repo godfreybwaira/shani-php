@@ -9,12 +9,10 @@
 
 namespace shani\engine\http {
 
-    use library\HttpHeader;
-    use library\HttpStatus;
+    use library\http\HttpHeader;
+    use library\http\HttpStatus;
     use shani\engine\core\Definitions;
-    use shani\engine\http\bado\HttpCache;
-    use shani\engine\http\bado\RequestEntity;
-    use shani\engine\http\bado\ResponseEntity;
+    use shani\engine\http\HttpCache;
 
     final class Asset
     {
@@ -38,11 +36,9 @@ namespace shani\engine\http {
         /**
          * Serve static content e.g CSS, images and other static files.
          * @param App $app Application object
-         * @param RequestEntity $req RequestEntity object
-         * @param ResponseEntity $res ResponseEntity object
          * @return bool True on success, false otherwise.
          */
-        public static function tryServe(App &$app, RequestEntity &$req, ResponseEntity &$res): bool
+        public static function tryServe(App &$app): bool
         {
             $path = $app->request()->uri()->path();
             $prefix = $rootPath = null;
@@ -54,8 +50,8 @@ namespace shani\engine\http {
                 $rootPath = $app->storage()->pathTo();
             } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
                 if (!$app->config()->authenticated()) {
-                    $res->setStatus(HttpStatus::UNAUTHORIZED);
-                    $app->send($res);
+                    $app->response()->setStatus(HttpStatus::UNAUTHORIZED);
+                    $app->send();
                     return true;
                 }
                 $prefix = self::PRIVATE_PREFIX;
@@ -64,14 +60,13 @@ namespace shani\engine\http {
             if ($prefix === null) {
                 return false;
             }
-            if (!$req->header()->has(HttpHeader::IF_NONE_MATCH)) {
+            if (!$app->request()->header()->has(HttpHeader::IF_NONE_MATCH)) {
                 $filepath = $rootPath . substr($path, strlen($prefix));
-                $res->setStatus(HttpStatus::OK);
-                $res->header()->setCache(new HttpCache());
-                $app->stream($res, $$filepath);
+                $app->response()->setStatus(HttpStatus::OK)->setCache(new HttpCache());
+                $app->stream($filepath);
             } else {
-                $res->setStatus(HttpStatus::NOT_MODIFIED);
-                $app->send($res);
+                $app->response()->setStatus(HttpStatus::NOT_MODIFIED);
+                $app->send();
             }
             return true;
         }

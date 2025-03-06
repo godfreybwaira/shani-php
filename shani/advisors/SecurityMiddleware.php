@@ -9,8 +9,10 @@
 
 namespace shani\advisors {
 
+    use library\http\HttpHeader;
+    use library\http\HttpStatus;
     use shani\engine\http\App;
-    use library\HttpStatus;
+    use shani\engine\http\bado\RequestRoute;
 
     abstract class SecurityMiddleware
     {
@@ -38,7 +40,7 @@ namespace shani\advisors {
          */
         public function passedRequestMethodCheck(): bool
         {
-            if (in_array($this->app->request()->method(), $this->cnf->requestMethods())) {
+            if (in_array($this->app->request()->method, $this->cnf->requestMethods())) {
                 return true;
             }
             $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
@@ -53,7 +55,7 @@ namespace shani\advisors {
          */
         public function passedCsrfTest(): bool
         {
-            $method = $this->app->request()->method();
+            $method = $this->app->request()->method;
             if (!$this->cnf->csrfProtectionEnabled() || !in_array($method, $this->cnf->csrfProtectedMethods())) {
                 return true;
             }
@@ -72,17 +74,16 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $request = $this->app->request();
-            $module = $request->module();
+            $module = $this->app->request()->route()->module;
             if ($this->cnf->authenticated()) {
                 if (in_array($module, $this->cnf->guestModules())) {
-                    $request->rewriteUrl($this->cnf->homepage());
+                    $this->app->request()->setRoute(new RequestRoute($this->cnf->homepage()));
                     return true;
                 }
                 if (in_array($module, $this->cnf->publicModules())) {
                     return true;
                 }
-                $targetId = App::digest($request->target());
+                $targetId = App::digest($this->app->target());
                 if ($this->app->hasAuthority($targetId)) {
                     return true;
                 }
@@ -104,11 +105,10 @@ namespace shani\advisors {
             if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
                 return;
             }
-            $this->app->response()->setHeaders([
-                'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
-                'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
-                'access-control-allow-methods' => implode(',', $this->cnf->requestMethods())
-            ]);
+            $this->app->response()->header()
+                    ->set(HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY, self::ACCESS_POLICIES[$policy])
+                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $this->cnf->whitelistedDomains())
+                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $this->cnf->requestMethods());
         }
 
         /**
@@ -118,10 +118,8 @@ namespace shani\advisors {
          */
         public function blockClickjacking(): self
         {
-            $this->app->response()->setHeaders([
-                'x-frame-options' => 'SAMEORIGIN',
-//                'content-security-policy' => "frame-ancestors 'self'"
-            ]);
+            $this->app->response()->header()->set(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
+//            $this->app->response()->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
             return $this;
         }
 
@@ -135,22 +133,21 @@ namespace shani\advisors {
         public function preflightRequest(int $cacheTime = 86400): self
         {
             $req = $this->app->request();
-            if (!$this->cnf->preflightRequest() || $req->method() !== 'options') {
+            if (!$this->cnf->preflightRequest() || $req->method !== 'options') {
                 return $this;
             }
-            $headers = $req->headers([
-                'access-control-request-method',
-                'access-control-request-headers'
+            $headers = $req->header()->getAll([
+                HttpHeader::ACCESS_CONTROL_REQUEST_METHOD,
+                HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS
             ]);
-            if (empty($headers['access-control-request-method'])) {
+            if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
                 return $this;
             }
-            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
-                'access-control-allow-methods' => implode(',', $this->cnf->requestMethods()),
-                'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
-                'access-control-allow-origin' => $this->cnf->whitelistedDomains(),
-                'access-control-max-age' => $cacheTime
-            ]);
+            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->header()
+                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, implode(',', $this->cnf->requestMethods()))
+                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS, $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*')
+                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $this->cnf->whitelistedDomains())
+                    ->set(HttpHeader::ACCESS_CONTROL_MAX_AGE, $cacheTime);
             return $this;
         }
 

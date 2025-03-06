@@ -25,7 +25,7 @@ namespace shani\engine\documentation {
             $config = $app->config();
             $modulesPath = \shani\engine\core\Definitions::DIR_APPS . $config->root() . $config->moduleDir();
             $moduleColletion = self::scanModules($modulesPath, $config->controllers());
-            $this->userApp = new UserAppDto($config->appName(), $app->request()->version());
+            $this->userApp = new UserAppDto($config->appName(), $app->version());
             foreach ($moduleColletion as $moduleName => $reqMethods) {
                 $module = new ModuleDto($moduleName);
                 foreach ($reqMethods as $name => $methodList) {

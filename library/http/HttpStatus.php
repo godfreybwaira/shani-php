@@ -5,7 +5,7 @@
  * @author coder
  */
 
-namespace library {
+namespace library\http {
 
     enum HttpStatus: int
     {

@@ -9,10 +9,11 @@
 
 namespace apps\demo\v1\config {
 
+    use apps\demo\v1\middleware\Register;
+    use shani\advisors\Configuration;
+    use shani\advisors\SecurityMiddleware;
     use shani\engine\http\App;
     use shani\engine\http\Middleware;
-    use shani\advisors\Configuration;
-    use shani\engine\http\HttpResponseDto;
 
     final class Settings extends Configuration
     {
@@ -34,8 +35,8 @@ namespace apps\demo\v1\config {
 
         public function httpErrorHandler(?string $errorMessage = null): void
         {
-            $this->app->response()
-                    ->send(new HttpResponseDto($this->app->response()->status(), $errorMessage));
+            $this->app->response()->setBody($errorMessage ?? 'No details provided');
+            $this->app->send();
         }
 
         public function webroot(): string
@@ -48,9 +49,9 @@ namespace apps\demo\v1\config {
             return ['get', 'post', 'head'];
         }
 
-        public function middleware(Middleware &$mw): \shani\advisors\SecurityMiddleware
+        public function middleware(Middleware &$mw): SecurityMiddleware
         {
-            return new \apps\demo\v1\middleware\Register($this->app, $mw);
+            return new Register($this->app, $mw);
         }
 
         public function userPermissions(): ?string
@@ -76,6 +77,11 @@ namespace apps\demo\v1\config {
         public function viewDir(): string
         {
             return '/presentation/views';
+        }
+
+        public function isAsync(): bool
+        {
+            return $this->app->request()->header()->get('X-Request-Mode') === 'async';
         }
     }
 

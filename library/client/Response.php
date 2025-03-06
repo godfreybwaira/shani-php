@@ -19,13 +19,13 @@ namespace library\client {
         private readonly \CurlHandle $curl;
         private int $headerSize, $bodySize;
         private ?string $body = null, $raw = null;
-        private readonly \library\HttpStatus $status;
+        private readonly \library\http\HttpStatus $status;
 
         public function __construct(\CurlHandle &$curl, &$stream)
         {
             $this->headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
             $this->bodySize = curl_getinfo($curl, CURLINFO_SIZE_DOWNLOAD);
-            $this->status = \library\HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
+            $this->status = \library\http\HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
             $this->stream = $stream;
             $this->curl = $curl;
         }
@@ -101,7 +101,7 @@ namespace library\client {
             return $this->stream;
         }
 
-        public function status(): \library\HttpStatus
+        public function status(): \library\http\HttpStatus
         {
             return $this->status;
         }

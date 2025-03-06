@@ -7,7 +7,7 @@
  * Created on: Mar 2, 2025 at 6:05:25 PM
  */
 
-namespace shani\engine\http\bado {
+namespace library\http {
 
     final class HttpCache
     {

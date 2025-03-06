@@ -12,8 +12,9 @@ namespace shani\server\swoole {
     use library\Concurrency;
     use library\DataConvertor;
     use library\Event;
-    use library\HttpHeader;
-    use library\HttpStatus;
+    use library\http\HttpHeader;
+    use library\http\HttpStatus;
+    use library\http\ResponseEntity;
     use library\Map;
     use library\MediaType;
     use library\RequestEntityBuilder;
@@ -21,7 +22,6 @@ namespace shani\server\swoole {
     use library\Utils;
     use shani\engine\core\Definitions;
     use shani\engine\http\App;
-    use shani\engine\http\bado\ResponseEntity;
     use shani\engine\http\UploadedFile;
     use shani\ServerConfig;
     use Swoole\Http\Request;
@@ -75,16 +75,17 @@ namespace shani\server\swoole {
                     ->protocol($req->server['server_protocol'])
                     ->method($req->server['request_method'])
                     ->headers(new HttpHeader($req->header))
+                    ->cookies(Map::normalize($req->cookie))
                     ->time($req->server['request_time'])
                     ->files(self::getFiles($req->files))
+                    ->query(Map::normalize($req->get()))
                     ->body(self::getBody($req, $type))
                     ->ip($req->server['remote_addr'])
-                    ->cookies($req->cookie)
                     ->type($type)
                     ->uri($uri)
                     ->build();
             $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
-            new App($request, $response, new SwooleResponseWriter($res));
+            new App($response, new SwooleResponseWriter($res));
         }
 
         private static function getBody(Request &$req, string $type): ?array

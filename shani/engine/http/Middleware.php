@@ -29,7 +29,7 @@ namespace shani\engine\http {
         private static function returnResponse(App &$app)
         {
             if ($app->response()->status()->value < 300) {
-                return $app->route();
+                return $app->processRequest();
             }
             $app->config()->httpErrorHandler();
         }

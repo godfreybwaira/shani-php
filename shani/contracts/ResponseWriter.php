@@ -9,8 +9,8 @@
 
 namespace shani\contracts {
 
-    use library\HttpStatus;
-    use shani\engine\http\bado\ResponseEntity;
+    use library\http\HttpStatus;
+    use library\http\ResponseEntity;
 
     interface ResponseWriter
     {

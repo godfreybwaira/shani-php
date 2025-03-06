@@ -15,11 +15,14 @@ namespace library {
         private const SEARCH_STR = ['\\', "\"", "\n", "\r", "\t"];
         private const REPLACE_STR = ['\\\\', '\\"', "\\n", "\\r", "\\t"];
         public const TYPE_JSON = 'json';
+        public const TYPE_JS = 'js';
         public const TYPE_XML = 'xml';
         public const TYPE_YAML = 'yaml';
+        public const TYPE_HTML = 'html';
         public const TYPE_YML = 'yml';
         public const TYPE_CSV = 'csv';
-        public const TYPE_url_encode = 'x-www-form-urlencoded';
+        public const TYPE_SSE = 'event-stream';
+        public const TYPE_URL_ENCODE = 'x-www-form-urlencoded';
 
         /**
          * Convert normal array to table like array. A table like array has two values
@@ -115,6 +118,22 @@ namespace library {
                 default => null
             };
             return \library\Map::normalize($convertedData);
+        }
+
+        /**
+         * Convert a given data string to a compatible server sent event (SSE)
+         * @param string $content Data to convert
+         * @param int $retry Number of milliseconds a client should retry if the
+         * server is temporarily offline
+         * @return self
+         */
+        public static function toEventStream(string $content, int $retry = 2000, string $event = 'message'): self
+        {
+            $evt = 'id:id' . hrtime(true) . PHP_EOL;
+            $evt .= 'retry:' . $retry . PHP_EOL;
+            $evt .= 'event:' . $event . PHP_EOL;
+            $evt .= 'data:' . $content . PHP_EOL;
+            return $evt . PHP_EOL;
         }
 
         /**

@@ -9,7 +9,8 @@
 
 namespace library {
 
-    use shani\engine\http\bado\RequestEntity;
+    use library\http\HttpHeader;
+    use library\http\RequestEntity;
 
     final class RequestEntityBuilder
     {
@@ -17,12 +18,22 @@ namespace library {
         private int $time = 0;
         private ?URI $uri = null;
         private ?HttpHeader $headers = null;
-        private array $cookies = [], $files = [];
-        private ?string $body, $method = null, $protocol = null;
+        private ?string $method = null, $protocol = null;
+        private array $cookies = [], $files = [], $queries = [], $body = [];
 
-        public function body(?string $body): self
+        public function body(?array $body): self
         {
-            $this->body = $body;
+            if (!empty($body)) {
+                $this->body = $body;
+            }
+            return $this;
+        }
+
+        public function query(?array $values): self
+        {
+            if (!empty($values)) {
+                $this->queries = $values;
+            }
             return $this;
         }
 
@@ -89,7 +100,7 @@ namespace library {
             return new RequestEntity(
                     uri: $this->uri, headers: $this->headers, body: $this->body,
                     cookies: $this->cookies, files: $this->files, type: $this->type,
-                    ip: $this->ip, time: $this->time
+                    ip: $this->ip, time: $this->time, queries: $this->queries
             );
         }
     }

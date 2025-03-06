@@ -7,7 +7,7 @@
  * Created on: Mar 5, 2025 at 10:48:56 AM
  */
 
-namespace library\decode {
+namespace library {
 
     enum DataCompressionLevel: int
     {
