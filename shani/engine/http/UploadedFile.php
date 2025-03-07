@@ -19,7 +19,7 @@ namespace shani\engine\http {
 
         public readonly string $name, $path, $type;
         public readonly \SplFileObject $stream;
-        public readonly ?array $error;
+        public readonly ?string $error;
         public readonly int $size;
 
         public function __construct(string $path, string $type, ?int $size = null, ?string $name = null, ?int $error = null)
@@ -40,14 +40,14 @@ namespace shani\engine\http {
         /**
          * Get file error (if any) as occurred during upload
          * @param int|null $error File error
-         * @return array|null Array of error code as key and error message or null if no error
+         * @return string|null Array of error code as key and error message or null if no error
          */
-        private static function getFileErrors(?int $error): ?array
+        private static function getFileErrors(?int $error): ?string
         {
             if ($error === null) {
                 return null;
             }
-            $msg = match ($error) {
+            return match ($error) {
                 UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE => 'File is too large.',
                 UPLOAD_ERR_PARTIAL => 'File was only partially uploaded.',
                 UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
@@ -57,7 +57,6 @@ namespace shani\engine\http {
                 UPLOAD_ERR_OK => null,
                 default => 'Unknown error.',
             };
-            return [$error => $msg];
         }
 
         /**

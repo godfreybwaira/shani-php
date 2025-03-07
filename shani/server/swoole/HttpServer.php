@@ -104,13 +104,18 @@ namespace shani\server\swoole {
         private static function getFiles(?array $files): array
         {
             $uploaded = [];
-            if (!empty($files)) {
-                foreach ($files as $name => $file) {
+            if (empty($files)) {
+                return $uploaded;
+            }
+            foreach ($files as $name => $file) {
+                if (!empty($file['tmp_name'])) {
                     $uploaded[$name] = new UploadedFile(
                             path: $file['tmp_name'], type: $file['type'],
                             size: $file['size'], name: $file['name'],
                             error: $file['error']
                     );
+                } else {
+                    $uploaded[$name] = self::getFiles($file);
                 }
             }
             return $uploaded;
