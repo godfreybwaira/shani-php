@@ -137,10 +137,10 @@ namespace shani\engine\http {
         {
             if ($protected) {
                 $storage = $this->app->config()->protectedStorage();
-                $url = $this->app->request()->uri()->host() . self::PRIVATE_PREFIX;
+                $url = $this->app->request()->uri->host() . self::PRIVATE_PREFIX;
                 return $url . (empty($storage) ? $path : substr($path, strlen($storage)));
             }
-            return $this->app->request()->uri()->host() . self::STORAGE_PREFIX . $path;
+            return $this->app->request()->uri->host() . self::STORAGE_PREFIX . $path;
         }
 
         /**

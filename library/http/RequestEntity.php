@@ -18,41 +18,43 @@ namespace library\http {
     final class RequestEntity extends HttpEntity
     {
 
-        private readonly URI $uri;
+        /**
+         * Original unchanged request URI object
+         * @var URI
+         */
+        public readonly URI $uri;
 
         /**
          * User request time
          * @var int
          */
         public readonly int $time;
-        private array $acceptedType = [], $queries;
-        public readonly string $type, $method;
+        public readonly string $method;
 
         /**
          * User IP address
          * @var string
          */
         public readonly string $ip;
-        private readonly array $files, $cookies;
-        private readonly array $body;
+        public readonly array $files;
         private RequestRoute $route;
+        private readonly array $cookies, $body, $queries, $acceptedType;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
-                string $type, string $method, string $ip, int $time, array $queries
+                string $method, string $ip, int $time, array $queries, string $protocol
         )
         {
-            parent::__construct($headers);
-            $this->setRoute(new RequestRoute($uri->path()));
+            parent::__construct($headers, $protocol);
             $this->cookies = $cookies;
             $this->queries = $queries;
             $this->method = $method;
             $this->files = $files;
             $this->body = $body;
-            $this->type = $type;
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
+            $this->setRoute($uri->path());
         }
 
         /**
@@ -64,51 +66,15 @@ namespace library\http {
             return $this->ip === '127.0.0.1';
         }
 
-        public function setRoute(RequestRoute $route): self
+        public function setRoute(string $path): self
         {
-            $this->route = $route;
+            $this->route = new RequestRoute($this->method, $path);
             return $this;
         }
 
         public function route(): RequestRoute
         {
             return $this->route;
-        }
-
-        #[\Override]
-        public function httpVersion(): string
-        {
-
-        }
-
-        #[\Override]
-        public function mediaType(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocol(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocolLine(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocolVersion(): float
-        {
-
-        }
-
-        #[\Override]
-        public function type(): string
-        {
-            return $this->type;
         }
 
         /**
@@ -135,16 +101,6 @@ namespace library\http {
             return false;
         }
 
-        /**
-         * Get the original unchanged request URI object
-         * @return URI Request URI object
-         * @see self::path()
-         */
-        public function uri(): URI
-        {
-            return $this->uri;
-        }
-
         public function withUri(URI $uri): self
         {
             $copy = clone $this;
@@ -162,17 +118,6 @@ namespace library\http {
         public function file(string $name, int $index = 0): ?UploadedFile
         {
             return $this->files[$name][$index] ?? null;
-        }
-
-        /**
-         * Get HTTP cookie value(s)
-         * @param string|array $names named key
-         * @param bool $selected If set to true, only the selected values will be returned.
-         * @return type
-         */
-        public function cookie(string|array $names = null, bool $selected = true)
-        {
-            return Map::get($this->cookies, $names, $selected);
         }
 
         /**

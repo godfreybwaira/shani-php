@@ -15,11 +15,16 @@ namespace library {
     final class RequestEntityBuilder
     {
 
-        private int $time = 0;
-        private ?URI $uri = null;
-        private ?HttpHeader $headers = null;
-        private ?string $method = null, $protocol = null;
+        private int $time;
+        private ?URI $uri;
+        private ?HttpHeader $headers;
+        private ?string $method, $ip, $protocol;
         private array $cookies = [], $files = [], $queries = [], $body = [];
+
+        public function __construct()
+        {
+
+        }
 
         public function body(?array $body): self
         {
@@ -77,12 +82,6 @@ namespace library {
             return $this;
         }
 
-        public function type(string $type): self
-        {
-            $this->type = $type;
-            return $this;
-        }
-
         public function ip(string $ip): self
         {
             $this->ip = $ip;
@@ -99,8 +98,9 @@ namespace library {
         {
             return new RequestEntity(
                     uri: $this->uri, headers: $this->headers, body: $this->body,
-                    cookies: $this->cookies, files: $this->files, type: $this->type,
-                    ip: $this->ip, time: $this->time, queries: $this->queries
+                    cookies: $this->cookies, files: $this->files, ip: $this->ip,
+                    time: $this->time, queries: $this->queries, method: $this->method,
+                    protocol: $this->protocol
             );
         }
     }

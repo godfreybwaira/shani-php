@@ -126,10 +126,10 @@ namespace gui {
          * @param ResponseDto $dto Data object to be passed to a view component.
          * @return void
          */
-        public function render(ResponseDto $dto): void
+        public function render(?ResponseDto $dto): void
         {
-            $this->data = $dto->asMap() ?? [];
-            if ($this->app->request()->isAsync()) {
+            $this->data = $dto?->asMap() ?? [];
+            if ($this->app->config()->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
                 self::load($this->app, \shani\engine\core\Definitions::DIR_GUI . '/html/main.php');

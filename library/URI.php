@@ -49,7 +49,7 @@ namespace library {
         {
             $info = self::valueOf($this->userInfo());
             $port = self::valueOf($this->parts['port']);
-            return ($info ? $info . '@' : null ) . $this->hostname() . ($port ? ':' . $port : null);
+            return ($info ? $info . '@' : null) . $this->hostname() . ($port ? ':' . $port : null);
         }
 
         /**
@@ -80,6 +80,10 @@ namespace library {
             return substr($this->parts['host'], strrpos($this->parts['host'], '.') + 1);
         }
 
+        /**
+         * Get full host name including scheme, hostname and port (i.e scheme://host:00)
+         * @return string
+         */
         public function host(): string
         {
             $scheme = $this->scheme();

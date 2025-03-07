@@ -39,7 +39,7 @@ namespace shani\engine\http {
         private readonly ResponseWriter $writer;
         private ?Template $template = null;
         private ?array $appCart = null, $dict = null;
-        private ?string $platform = null, $version = null;
+        private ?string $platform = null, $requestVersion = null;
 
         public function __construct(ResponseEntity &$res, ResponseWriter $writer)
         {
@@ -73,7 +73,7 @@ namespace shani\engine\http {
          */
         public function send(bool $useBuffer = false): void
         {
-            if ($this->res->request()->method === 'head') {
+            if ($this->req->method === 'head') {
                 $this->res->setStatus(HttpStatus::NO_CONTENT);
                 $this->writer->send($this->res, true);
             } else if ($useBuffer) {
@@ -100,9 +100,11 @@ namespace shani\engine\http {
             $range = $this->req->header()->get(HttpHeader::RANGE) ?? '=0-';
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
             $end = min($start + ($chunkSize ?? Definitions::BUFFER_SIZE), $file['size'] - 1);
-            $this->res->setStatus(HttpStatus::PARTIAL_CONTENT)->header()
-                    ->set(HttpHeader::CONTENT_RANGE, 'bytes ' . $start . '-' . $end . '/' . $file['size'])
-                    ->set(HttpHeader::ACCEPT_RANGES, 'bytes');
+            $this->res->setStatus(HttpStatus::PARTIAL_CONTENT)
+                    ->header()->setAll([
+                HttpHeader::CONTENT_RANGE => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
+                HttpHeader::ACCEPT_RANGES => 'bytes'
+            ]);
             return $this->doStream($filepath, $start, $end);
         }
 
@@ -151,10 +153,11 @@ namespace shani\engine\http {
             }
             $chunk = min($size, Definitions::BUFFER_SIZE);
             $length = $end <= 0 ? $size - $start : $chunk = $end - $start + 1;
-            $this->res->header()
-                    ->set(HttpHeader::CONTENT_LENGTH, $length)
-                    ->set(HttpHeader::CONTENT_TYPE, MediaType::fromFilename($path));
-            if ($this->app->request()->method !== 'head') {
+            $this->res->header()->setAll([
+                HttpHeader::CONTENT_LENGTH => $length,
+                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
+            ]);
+            if ($this->req->method !== 'head') {
                 $this->writer->sendFile($this->res, $path, $start, $chunk);
             } else {
                 $this->res->setStatus(HttpStatus::NO_CONTENT);
@@ -170,16 +173,16 @@ namespace shani\engine\http {
          */
         private function getHostConfiguration(): array
         {
-            $hostname = $this->req->uri()->hostname();
+            $hostname = $this->req->uri->hostname();
             $host = ServerConfig::host($hostname);
-            $requestVersion = $this->req->version();
-            if ($requestVersion === null) {
+            $version = $this->version();
+            if ($version === null) {
                 return $host['VERSIONS'][$host['DEFAULT_VERSION']];
             }
-            if (!empty($host['VERSIONS'][$requestVersion])) {
-                return $host['VERSIONS'][$requestVersion];
+            if (!empty($host['VERSIONS'][$version])) {
+                return $host['VERSIONS'][$version];
             }
-            throw new \ErrorException('Unsupported application version "' . $requestVersion . '"');
+            throw new \ErrorException('Unsupported application version "' . $version . '"');
         }
 
         private function registerErrorHandler(): void
@@ -226,7 +229,7 @@ namespace shani\engine\http {
                     $this->platform = 'web';
                 } else {
                     $list = explode(';', strtolower($str));
-                    $this->version = !empty($list[1]) ? trim($list[1]) : null;
+                    $this->requestVersion = !empty($list[1]) ? trim($list[1]) : null;
                     $this->platform = $list[0];
                 }
             }
@@ -239,10 +242,10 @@ namespace shani\engine\http {
          */
         public function version(): ?string
         {
-            if ($this->version === null) {
+            if ($this->requestVersion === null) {
                 $this->platform();
             }
-            return $this->version;
+            return $this->requestVersion;
         }
 
         /**
@@ -356,23 +359,23 @@ namespace shani\engine\http {
 
         private function sendHtml(string $content, string $type): void
         {
-            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
-            $this->res->setBody($content, $type);
+            $this->res->setBody($content, $type)->header()
+                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
         }
 
         private function sendJsonp(ResponseDto $dto, string $type): void
         {
-            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
             $callback = $this->req->query('callback') ?? 'callback';
             $data = $callback . '(' . json_encode($dto->asMap()) . ');';
-            $this->res->setBody($data, $type);
+            $this->res->setBody($data, $type)->header()
+                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
         }
 
         private function sendSse(string $content, string $type): void
         {
-            $this->res->header()->setIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache');
-            $this->res->header()->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
-            $this->res->setBody(DataConvertor::toEventStream($content), $type);
+            $this->res->setBody(DataConvertor::toEventStream($content), $type)
+                    ->header()->setIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
+                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
         }
 
         /**
@@ -438,24 +441,13 @@ namespace shani\engine\http {
         }
 
         /**
-         * Get the current request target referring to current path to a class function
-         * (i.e method/module/resource/callback)
-         * @return string
-         * @see App::hasAuthority()
-         */
-        public function target(): string
-        {
-            return $this->req->method . $this->route->module . $this->route->resource . $this->route->callback;
-        }
-
-        /**
          * Start executing user application
          * @return void
          */
         private function start(): void
         {
-            if ($this->req->uri()->path() === '/') {
-                $this->req->setRoute(new RequestRoute($this->config->homepage()));
+            if ($this->req->uri->path() === '/') {
+                $this->req->setRoute($this->config->homepage());
             }
             Session::start($this);
             $middleware = new Middleware($this);
@@ -531,17 +523,17 @@ namespace shani\engine\http {
          */
         public function csrf(?string $urlPath = null): string
         {
-            $url = $urlPath ?? $this->req->uri()->path();
+            $url = $urlPath ?? $this->req->uri->path();
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add([$token => null]);
                 $cookie = (new Cookie())->setName($this->config->csrfTokenName())
                         ->setSameSite(Cookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
-                        ->setSecure($this->req->uri()->secure());
+                        ->setSecure($this->req->uri->secure());
                 $this->res->setCookie($cookie);
             }
-            return $this->req->uri()->host() . $url;
+            return $this->req->uri->host() . $url;
         }
 
         /**

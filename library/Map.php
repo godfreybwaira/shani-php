@@ -155,7 +155,7 @@ namespace library {
          */
         public static function get(?array $row, string|array|null $keys = null, bool $selected = true)
         {
-            if ($keys === null || empty($row)) {
+            if ($keys === null || $row === null) {
                 return $selected ? $row : [];
             }
             if (is_array($keys)) {

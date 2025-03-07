@@ -9,17 +9,30 @@
 
 namespace library\http {
 
+    use library\Map;
     use shani\contracts\HttpCookie;
 
     abstract class HttpEntity
     {
 
+        private readonly string $protocol;
         protected readonly HttpHeader $headers;
         private array $cookies = [];
 
-        protected function __construct(HttpHeader $headers)
+        protected function __construct(HttpHeader $headers, string $protocol)
         {
             $this->headers = $headers;
+            $this->protocol = $protocol;
+        }
+
+        public function protocol(): string
+        {
+            return $this->protocol;
+        }
+
+        public function protocolVersion(): float
+        {
+            return (float) explode('/', $this->protocol)[1];
         }
 
         public function withHeaders(HttpHeader $headers): self
@@ -46,29 +59,15 @@ namespace library\http {
         }
 
         /**
-         * Get available HTTP cookie(s)
-         * @return array HTTP Cookie(s)
+         * Get HTTP cookie value(s)
+         * @param string|array $names named key
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
          */
-        public function cookies(): array
+        public function cookies(string|array $names = null, bool $selected = true)
         {
-            return $this->cookies;
+            return Map::get($this->cookies, $names, $selected);
         }
-
-        public abstract function protocolVersion(): float;
-
-        public abstract function protocolLine(): string;
-
-        public abstract function httpVersion(): string;
-
-        public abstract function mediaType(): string;
-
-        public abstract function protocol(): string;
-
-        /**
-         * Get HTTP response data type
-         * @return string HTTP response data type
-         */
-        public abstract function type(): string;
     }
 
 }

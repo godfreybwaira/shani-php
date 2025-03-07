@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Cache implements \shani\contracts\Cacheable
+    final class SwooleCache implements \shani\contracts\Cacheable
     {
 
         private \Swoole\Table $table;

@@ -35,7 +35,7 @@ namespace apps\demo\v1\modules\greetings\logic\controllers\get {
             $student->addSubject(new Subject('English', 'A', 89))
                     ->addSubject(new Subject('Kiswahili', 'B', 79))
                     ->addSubject(new Subject('Maths', 'C', 70.6));
-            $this->app->render();
+            $this->app->render($student);
 //            $this->app->render($this->app->documentation());
         }
     }

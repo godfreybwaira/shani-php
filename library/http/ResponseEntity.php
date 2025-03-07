@@ -25,43 +25,12 @@ namespace library\http {
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
         {
-            parent::__construct($headers);
+            parent::__construct($headers, $request->protocol());
             $this->status = $status;
             $this->request = $request;
             $this->compression = DataCompressionLevel::DISABLE;
         }
 
-        #[\Override]
-        public function httpVersion(): string
-        {
-
-        }
-
-        #[\Override]
-        public function mediaType(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocol(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocolLine(): string
-        {
-
-        }
-
-        #[\Override]
-        public function protocolVersion(): float
-        {
-
-        }
-
-        #[\Override]
         public function type(): string
         {
             if ($this->type !== null) {
@@ -71,7 +40,7 @@ namespace library\http {
             if (!empty($contentType)) {
                 $this->type = MediaType::explode($contentType)[1];
             } else {
-                $parts = explode('.', $this->request->uri()->path());
+                $parts = explode('.', $this->request->uri->path());
                 $size = count($parts);
                 if ($size > 1) {
                     $this->type = strtolower($parts[$size - 1]);
@@ -130,6 +99,7 @@ namespace library\http {
         private function compress(string &$content): self
         {
             if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
+                $this->body = $content;
                 $this->headers->set(HttpHeader::CONTENT_LENGTH, $this->bodySize());
                 return $this;
             }

@@ -15,10 +15,10 @@ namespace shani\engine\core {
         /**
          * Default buffer size
          */
-        public const BUFFER_SIZE = 1_048_576;
+        public const BUFFER_SIZE = 1_048_576; //1MB
 
         /**
-         * Default home function if no function name is provided on URL
+         * Default home function if no function name is provided on the URL
          */
         public const HOME_FUNCTION = 'index';
 
@@ -60,7 +60,7 @@ namespace shani\engine\core {
         /**
          * Minimum PHP version supported by Shani framework
          */
-        public const MIN_PHP_VERSION = '8.0';
+        public const MIN_PHP_VERSION = '8.1';
 
         /**
          * Mandatory extensions required by Shani framework

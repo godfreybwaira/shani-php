@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Event
+ * Description of SwooleEvent
  * @author coder
  *
  * Created on: Mar 5, 2024 at 10:22:08 AM
@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    class Event implements \shani\contracts\Event
+    class SwooleEvent implements \shani\contracts\Event
     {
 
         public function dispatch(array $callbacks, callable $finish, ...$params): self

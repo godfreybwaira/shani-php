@@ -34,17 +34,26 @@ namespace shani\engine\http {
          */
         public readonly string $callback;
 
-        public function __construct(string $path)
+        /**
+         * The current request target referring to a path to a class function
+         * (i.e method/module/resource/callback)
+         * @var string
+         */
+        public readonly string $target;
+
+        public function __construct(string $method, string $path)
         {
-            $idx = strpos($path, '?');
+            $cleanPath = strtolower(trim($path, '/'));
+            $idx = strpos($cleanPath, '?');
             if ($idx !== false) {
-                $path = substr($path, 0, $idx);
+                $cleanPath = substr($cleanPath, 0, $idx);
             }
-            $url = explode('.', strtolower(trim($path, '/')));
+            $url = explode('.', $cleanPath);
             $this->params = explode('/', $url[0]);
-            $this->resource = '/' . $this->params[2] ?? $this->params[0];
+            $this->resource = '/' . ($this->params[2] ?? $this->params[0]);
             $this->module = '/' . $this->params[0];
             $this->callback = '/' . ($this->params[4] ?? Definitions::HOME_FUNCTION);
+            $this->target = $method . $this->module . $this->resource . $this->callback;
         }
     }
 

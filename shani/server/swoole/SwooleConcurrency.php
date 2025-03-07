@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Concurrency
+ * Description of SwooleConcurrency
  * @author coder
  *
  * Created on: Apr 5, 2024 at 11:37:53 PM
@@ -9,7 +9,7 @@
 
 namespace shani\server\swoole {
 
-    final class Concurrency implements \shani\contracts\Concurrency
+    final class SwooleConcurrency implements \shani\contracts\Concurrency
     {
 
         public function async(callable $callback): void

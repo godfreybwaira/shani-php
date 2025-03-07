@@ -12,7 +12,6 @@ namespace shani\advisors {
     use library\http\HttpHeader;
     use library\http\HttpStatus;
     use shani\engine\http\App;
-    use shani\engine\http\bado\RequestRoute;
 
     abstract class SecurityMiddleware
     {
@@ -74,20 +73,19 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $module = $this->app->request()->route()->module;
+            $route = $this->app->request()->route();
             if ($this->cnf->authenticated()) {
-                if (in_array($module, $this->cnf->guestModules())) {
-                    $this->app->request()->setRoute(new RequestRoute($this->cnf->homepage()));
+                if (in_array($route->module, $this->cnf->guestModules())) {
+                    $this->app->request()->setRoute($this->cnf->homepage());
                     return true;
                 }
-                if (in_array($module, $this->cnf->publicModules())) {
+                if (in_array($route->module, $this->cnf->publicModules())) {
                     return true;
                 }
-                $targetId = App::digest($this->app->target());
-                if ($this->app->hasAuthority($targetId)) {
+                if ($this->app->hasAuthority(App::digest($route->target))) {
                     return true;
                 }
-            } else if (in_array($module, $this->cnf->guestModules()) || in_array($module, $this->cnf->publicModules())) {
+            } else if (in_array($route->module, $this->cnf->guestModules()) || in_array($route->module, $this->cnf->publicModules())) {
                 return true;
             }
             $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
@@ -105,10 +103,11 @@ namespace shani\advisors {
             if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
                 return;
             }
-            $this->app->response()->header()
-                    ->set(HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY, self::ACCESS_POLICIES[$policy])
-                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $this->cnf->whitelistedDomains())
-                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $this->cnf->requestMethods());
+            $this->app->response()->header()->setAll([
+                HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => self::ACCESS_POLICIES[$policy],
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->cnf->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->cnf->requestMethods()
+            ]);
         }
 
         /**
@@ -143,11 +142,12 @@ namespace shani\advisors {
             if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
                 return $this;
             }
-            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->header()
-                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, implode(',', $this->cnf->requestMethods()))
-                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS, $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*')
-                    ->set(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $this->cnf->whitelistedDomains())
-                    ->set(HttpHeader::ACCESS_CONTROL_MAX_AGE, $cacheTime);
+            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => implode(',', $this->cnf->requestMethods()),
+                HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->cnf->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
+            ]);
             return $this;
         }
 

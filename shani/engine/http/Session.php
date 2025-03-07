@@ -8,6 +8,7 @@
 
 namespace shani\engine\http {
 
+    use library\Cookie;
     use library\Map;
     use library\schema\DBase;
 
@@ -257,11 +258,11 @@ namespace shani\engine\http {
 //                    session_regenerate_id();
 //                }
                 $sessName = $app->config()->sessionName();
-                $cookie = (new \library\Cookie())->setName($sessName)
+                $cookie = (new Cookie())->setName($sessName)
                         ->setValue($app->request()->cookies($sessName) ?? session_create_id())
-                        ->setSecure($app->request()->uri()->secure())->setHttpOnly(true)
-                        ->setDomain($app->request()->uri()->hostname())
-                        ->setMaxAge($app->config()->cookieMaxAge());
+                        ->setSecure($app->request()->uri->secure())->setHttpOnly(true)
+                        ->setDomain($app->request()->uri->hostname())
+                        ->setMaxAge(new \DateTime($app->config()->cookieMaxAge()));
                 $app->response()->setCookie($cookie);
             });
         }

@@ -71,6 +71,7 @@ namespace library\http {
         public const VIA = 'Via';
         public const WARNING = 'Warning';
         public const WWW_AUTHENTICATE = 'WWW-Authenticate';
+        //Custom but important headers
         public const X_FRAME_OPTIONS = 'X-Frame-Options';
         public const X_CONTENT_TYPE_OPTIONS = 'X-Content-Type-Options';
 
@@ -78,11 +79,8 @@ namespace library\http {
 
         public function __construct(?array $headers = null)
         {
-            if (empty($headers)) {
-                return;
-            }
-            foreach ($headers as $key => $value) {
-                $this->headers[self::createName($key)] = $value;
+            if (!empty($headers)) {
+                $this->setAll($headers);
             }
         }
 
@@ -141,14 +139,14 @@ namespace library\http {
         /**
          * Set the given, single header value under the given name only if it does not exists.
          * @param string $headerName the header name
-         * @param string $headerValue the header value
+         * @param array|string|null $headerValue the header value
          * @see set(string, string)
          * @return self
          */
-        public function setIfAbsent(string $headerName, string $headerValue): self
+        public function setIfAbsent(string $headerName, array|string|null $headerValue): self
         {
             if (!array_key_exists($headerName, $this->headers)) {
-                $this->headers[$headerName] = $headerValue;
+                $this->set($headerName, $headerValue);
             }
             return $this;
         }
@@ -156,10 +154,10 @@ namespace library\http {
         /**
          * Set the given, single header value under the given name.
          * @param string $headerName the header name
-         * @param array|Stringable|null $headerValue the header value
+         * @param array|string|null $headerValue the header value
          * @see setIfAbsent(string, string)
          */
-        public function set(string $headerName, array|\Stringable|null $headerValue): self
+        public function set(string $headerName, array|string|null $headerValue): self
         {
             if ($headerValue === null) {
                 return $this;
@@ -171,6 +169,14 @@ namespace library\http {
                 foreach ($headerValue as $key => $value) {
                     $this->headers[$name][$key] = $value;
                 }
+            }
+            return $this;
+        }
+
+        public function setAll(array $headers): self
+        {
+            foreach ($headers as $name => $value) {
+                $this->set($name, $value);
             }
             return $this;
         }
@@ -195,7 +201,7 @@ namespace library\http {
             $headerString = '';
             foreach ($this->headers as $key => $value) {
                 $val = is_array($value) ? implode(',', $value) : $value;
-                $headerString .= PHP_EOL . $key = ': ' . $val;
+                $headerString .= "\r\n" . $key = ': ' . $val;
             }
             return ltrim($headerString);
         }
@@ -210,9 +216,16 @@ namespace library\http {
             return array_key_exists($headerName, $this->headers);
         }
 
-        public function getAll(array $names = null): array
+        public function getAll(array $headerNames = null): array
         {
-            return Map::get($this->headers, $names);
+            if (empty($headerNames)) {
+                return $this->headers;
+            }
+            $names = [];
+            foreach ($headerNames as $name) {
+                $names[$name] = $this->get($name);
+            }
+            return $names;
         }
 
         public function get(string $headerName): ?string
@@ -223,6 +236,14 @@ namespace library\http {
         public function remove(string $headerName): self
         {
             unset($this->headers[$headerName]);
+            return $this;
+        }
+
+        public function removeAll(array $headerName): self
+        {
+            foreach ($headerName as $name) {
+                $this->remove($name);
+            }
             return $this;
         }
 

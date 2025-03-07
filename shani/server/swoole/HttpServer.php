@@ -38,9 +38,10 @@ namespace shani\server\swoole {
         private static function configure(array $cnf): WSocket
         {
             ini_set('display_errors', $cnf['DISPLAY_ERRORS']);
-            new Concurrency(new Concurrency());
-            Event::setHandler(new Event());
-            MediaType::setHandler(new Cache(1500, 100));
+            new Concurrency(new SwooleConcurrency());
+
+            Event::setHandler(new SwooleEvent());
+            MediaType::setHandler(new SwooleCache(1500, 100));
             $server = new WSocket($cnf['IP'], $cnf['SERVER_PORTS']['HTTP']);
             $cores = swoole_cpu_num();
             $server->set([
@@ -70,7 +71,6 @@ namespace shani\server\swoole {
         private static function handleHTTP(string $scheme, Request &$req, Response &$res)
         {
             $uri = self::makeURI($scheme, $req->header['host'], $req->server);
-            $type = MediaType::explode(strtolower($req->header['content-type']))[1];
             $request = (new RequestEntityBuilder())
                     ->protocol($req->server['server_protocol'])
                     ->method($req->server['request_method'])
@@ -78,34 +78,40 @@ namespace shani\server\swoole {
                     ->cookies(Map::normalize($req->cookie))
                     ->time($req->server['request_time'])
                     ->files(self::getFiles($req->files))
-                    ->query(Map::normalize($req->get()))
-                    ->body(self::getBody($req, $type))
+                    ->query(Map::normalize($req->get))
                     ->ip($req->server['remote_addr'])
-                    ->type($type)
+                    ->body(self::getBody($req))
                     ->uri($uri)
                     ->build();
             $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
             new App($response, new SwooleResponseWriter($res));
         }
 
-        private static function getBody(Request &$req, string $type): ?array
+        private static function getBody(Request &$req): ?array
         {
-            $inputs = Map::normalize($req->post());
+            $inputs = Map::normalize($req->post);
             if (!empty($inputs)) {
                 return $inputs;
             }
+            $contentType = $req->header['content-type'] ?? null;
+            if (empty($contentType)) {
+                return null;
+            }
+            $type = MediaType::explode(strtolower($contentType))[1];
             return DataConvertor::convertFrom($req->rawcontent(), $type);
         }
 
-        private static function getFiles(array $files): array
+        private static function getFiles(?array $files): array
         {
             $uploaded = [];
-            foreach ($files as $name => $file) {
-                $uploaded[$name] = new UploadedFile(
-                        path: $file['tmp_name'], type: $file['type'],
-                        size: $file['size'], name: $file['name'],
-                        error: $file['error']
-                );
+            if (!empty($files)) {
+                foreach ($files as $name => $file) {
+                    $uploaded[$name] = new UploadedFile(
+                            path: $file['tmp_name'], type: $file['type'],
+                            size: $file['size'], name: $file['name'],
+                            error: $file['error']
+                    );
+                }
             }
             return $uploaded;
         }
