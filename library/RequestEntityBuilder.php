@@ -79,6 +79,7 @@ namespace library {
             if (!empty($files)) {
                 $this->files = $files;
             }
+            print_r($files);
             return $this;
         }
 

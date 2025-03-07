@@ -17,19 +17,18 @@ namespace shani\engine\http {
 
         private const PREFIXES = ['y', 'e', 's', 'u'];
 
-        public readonly string $name, $path, $type;
+        public readonly string $name, $type;
         public readonly \SplFileObject $stream;
         public readonly ?string $error;
         public readonly int $size;
 
         public function __construct(string $path, string $type, ?int $size = null, ?string $name = null, ?int $error = null)
         {
-            $this->path = $path;
             $this->type = $type;
             $this->name = $name ?? basename($path);
             $this->size = $size ?? stat($path)['size'];
             $this->error = self::getFileErrors($error);
-            $this->stream = new \SplFileObject($this->path, 'rb');
+            $this->stream = new \SplFileObject($path, 'rb');
         }
 
         public function __destruct()
@@ -82,7 +81,7 @@ namespace shani\engine\http {
                 while ($this->stream->valid()) {
                     fwrite($file, $this->stream->fread($chunk));
                 }
-                unlink($this->path);
+                unlink($this->stream->getPathname());
             }
             fclose($file);
             return substr($filepath, strlen($savePath));

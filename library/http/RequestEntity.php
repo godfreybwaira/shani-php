@@ -115,8 +115,11 @@ namespace library\http {
          * @return UploadedFile|null Return uploaded file object if file is valid
          * and exists, false otherwise.
          */
-        public function file(string $name, int $index = 0): ?UploadedFile
+        public function file(string $name, int $index = null): ?UploadedFile
         {
+            if ($index === null) {
+                return $this->files[$name] ?? null;
+            }
             return $this->files[$name][$index] ?? null;
         }
 
@@ -142,10 +145,10 @@ namespace library\http {
             return Map::get($this->route->params, $index, $selected);
         }
 
-        public function withFile(UploadedFile $file): self
+        public function withFile(string $name, UploadedFile $file): self
         {
             $copy = clone $this;
-            $copy->files[$file->name][] = $file;
+            $copy->files[$name] = $file;
             return $copy;
         }
 
