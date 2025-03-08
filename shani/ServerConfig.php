@@ -9,7 +9,8 @@
 
 namespace shani {
 
-    use shani\engine\core\Definitions;
+    use shani\core\Definitions;
+    use shani\core\VirtualHost;
 
     final class ServerConfig
     {
@@ -20,11 +21,11 @@ namespace shani {
             return $mime[$extension] ?? null;
         }
 
-        public static function host(string $name): array
+        public static function host(string $name): VirtualHost
         {
             $yaml = Definitions::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                return yaml_parse_file($yaml);
+                return new VirtualHost(yaml_parse_file($yaml));
             }
             $alias = Definitions::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {

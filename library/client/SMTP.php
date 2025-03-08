@@ -9,7 +9,7 @@
 
 namespace library\client {
 
-    use shani\engine\core\Definitions;
+    use shani\core\Definitions;
 
     final class SMTP
     {

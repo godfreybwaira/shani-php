@@ -12,8 +12,8 @@ namespace library\http {
     use library\Map;
     use library\URI;
     use library\MediaType;
-    use shani\engine\http\RequestRoute;
-    use shani\engine\http\UploadedFile;
+    use shani\http\RequestRoute;
+    use shani\http\UploadedFile;
 
     final class RequestEntity extends HttpEntity
     {

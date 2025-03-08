@@ -61,32 +61,39 @@ namespace library\http {
         case BANDWIDTH_LIMIT_EXCEEDED = 509;
         case NOT_EXTENDED = 510;
 
-        public function getMessage():string{
+        public function getMessage(): string
+        {
             $name = strtolower(str_replace('_', ' ', $this->name));
-            return ucwords($name);
+            return ucfirst($name);
         }
 
-        public function is1xx():bool{
+        public function is1xx(): bool
+        {
             return $this->value >= 100 && $this->value < 200;
         }
 
-        public function is2xx():bool{
+        public function is2xx(): bool
+        {
             return $this->value >= 200 && $this->value < 300;
         }
 
-        public function is3xx():bool{
+        public function is3xx(): bool
+        {
             return $this->value >= 300 && $this->value < 400;
         }
 
-        public function is4xx():bool{
+        public function is4xx(): bool
+        {
             return $this->value >= 400 && $this->value < 500;
         }
 
-        public function is5xx():bool{
+        public function is5xx(): bool
+        {
             return $this->value >= 500 && $this->value < 600;
         }
 
-        public function isError():bool{
+        public function isError(): bool
+        {
             return $this->is4xx() || $this->is5xx();
         }
     }

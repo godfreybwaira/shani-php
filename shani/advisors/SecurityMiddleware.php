@@ -11,7 +11,7 @@ namespace shani\advisors {
 
     use library\http\HttpHeader;
     use library\http\HttpStatus;
-    use shani\engine\http\App;
+    use shani\http\App;
 
     abstract class SecurityMiddleware
     {
@@ -24,12 +24,9 @@ namespace shani\advisors {
             Configuration::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN => 'same-site'
         ];
 
-        private Configuration $cnf;
-
         protected function __construct(App &$app)
         {
             $this->app = $app;
-            $this->cnf = $app->config();
         }
 
         /**
@@ -39,7 +36,7 @@ namespace shani\advisors {
          */
         public function passedRequestMethodCheck(): bool
         {
-            if (in_array($this->app->request()->method, $this->cnf->requestMethods())) {
+            if (in_array($this->app->request->method, $this->app->config->requestMethods())) {
                 return true;
             }
             $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
@@ -54,13 +51,13 @@ namespace shani\advisors {
          */
         public function passedCsrfTest(): bool
         {
-            $method = $this->app->request()->method;
-            if (!$this->cnf->csrfProtectionEnabled() || !in_array($method, $this->cnf->csrfProtectedMethods())) {
+            $method = $this->app->request->method;
+            if (!$this->app->config->csrfProtectionEnabled() || !in_array($method, $this->app->config->csrfProtectedMethods())) {
                 return true;
             }
-            $token = $this->app->request()->cookies($this->cnf->csrfTokenName());
+            $token = $this->app->request->cookies($this->app->config->csrfTokenName());
             if ($token === null || !$this->app->csrfToken()->has($token)) {
-                $this->app->response()->setStatus(HttpStatus::NOT_ACCEPTABLE);
+                $this->app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
                 return false;
             }
             return true;
@@ -73,22 +70,22 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $route = $this->app->request()->route();
-            if ($this->cnf->authenticated()) {
-                if (in_array($route->module, $this->cnf->guestModules())) {
-                    $this->app->request()->setRoute($this->cnf->homepage());
+            $route = $this->app->request->route();
+            if ($this->app->config->authenticated()) {
+                if (in_array($route->module, $this->app->config->guestModules())) {
+                    $this->app->request->setRoute($this->app->config->homepage());
                     return true;
                 }
-                if (in_array($route->module, $this->cnf->publicModules())) {
+                if (in_array($route->module, $this->app->config->publicModules())) {
                     return true;
                 }
                 if ($this->app->hasAuthority(App::digest($route->target))) {
                     return true;
                 }
-            } else if (in_array($route->module, $this->cnf->guestModules()) || in_array($route->module, $this->cnf->publicModules())) {
+            } else if (in_array($route->module, $this->app->config->guestModules()) || in_array($route->module, $this->app->config->publicModules())) {
                 return true;
             }
-            $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
+            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
             return false;
         }
 
@@ -99,14 +96,14 @@ namespace shani\advisors {
          */
         public function resourceAccessPolicy(): void
         {
-            $policy = $this->cnf->resourceAccessPolicy();
+            $policy = $this->app->config->resourceAccessPolicy();
             if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
                 return;
             }
-            $this->app->response()->header()->setAll([
+            $this->app->response->header()->setAll([
                 HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => self::ACCESS_POLICIES[$policy],
-                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->cnf->whitelistedDomains(),
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->cnf->requestMethods()
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods()
             ]);
         }
 
@@ -117,8 +114,8 @@ namespace shani\advisors {
          */
         public function blockClickjacking(): self
         {
-            $this->app->response()->header()->set(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
-//            $this->app->response()->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
+            $this->app->response->header()->set(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
+//            $this->app->response->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
             return $this;
         }
 
@@ -131,21 +128,20 @@ namespace shani\advisors {
          */
         public function preflightRequest(int $cacheTime = 86400): self
         {
-            $req = $this->app->request();
-            if (!$this->cnf->preflightRequest() || $req->method !== 'options') {
+            if (!$this->app->config->preflightRequest() || $this->app->request->method !== 'options') {
                 return $this;
             }
-            $headers = $req->header()->getAll([
+            $headers = $this->app->request->header()->getAll([
                 HttpHeader::ACCESS_CONTROL_REQUEST_METHOD,
                 HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS
             ]);
             if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
                 return $this;
             }
-            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => implode(',', $this->cnf->requestMethods()),
+            $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => implode(',', $this->app->config->requestMethods()),
                 HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
-                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->cnf->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                 HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
             ]);
             return $this;
@@ -158,7 +154,7 @@ namespace shani\advisors {
          */
         public function disabled(): bool
         {
-            return $this->cnf->disableSecurityAdvisor();
+            return $this->app->config->disableSecurityAdvisor();
         }
     }
 

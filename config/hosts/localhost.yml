@@ -1,20 +1,9 @@
-# A user application must have atleast one version.
-VERSIONS:
-  "1.0":
-    # Environment variables are customs, you can create any e.g DEV, TEST, PROD or any
-    # Must extends shani\advisors\Configuration
-    ENVIRONMENTS:
-      DEV: \apps\demo\v1\config\Settings
-      # Active environment can any one of the provided above.
-    ACTIVE_ENVIRONMENT: DEV
-    DEFAULT_LANGUAGE: sw
-    # Whether an application is able to run or not
-    RUNNING: true
-  "2.0":
-    ENVIRONMENTS:
-      DEV: \apps\demo\v2\config\Settings
-    ACTIVE_ENVIRONMENT: DEV
-    DEFAULT_LANGUAGE: sw
-    RUNNING: true
-# The default application version
-DEFAULT_VERSION: "2.0"
+# Environment variables are customs. Create enviroment variables and give them
+# names of your choice, e.g DEV, TEST, PROD
+ENVIRONMENTS:
+  # Must extends shani\advisors\Configuration
+  DEV: \apps\demo\config\Settings
+  # Active environment can be any one of the provided above.
+ACTIVE_ENVIRONMENT: DEV
+# Whether an application is able to run or not
+RUNNING: true

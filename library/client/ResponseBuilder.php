@@ -13,7 +13,7 @@ namespace library\client {
     use library\http\HttpStatus;
     use library\http\RequestEntity;
     use library\http\ResponseEntity;
-    use shani\engine\core\Definitions;
+    use shani\core\Definitions;
 
     final class ResponseBuilder
     {

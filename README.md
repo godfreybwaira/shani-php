@@ -73,40 +73,39 @@ All folders below can be renamed. A typical user application folder structure ma
 
 	apps/
 		demo/
-			v1/
-				modules/
-					module1_name/ (Can be any desired module name)
-						data (Data layer)
-							dto (Data transfer object)
-							models (Application models)
-						logic (Business logic layer)
-							services
-							controllers/
-								get/ (This is the request method as directory)
-									Resource.php (Can be any resource file)
-						presentation (Presentation layer)
-							views/
-								resource/ (All lowercase, must match resource file name)
-							lang/
-								resource/ (All lowercase, must match resource file name)
-							breadcrumb/
-								resource/ (All lowercase, must match resource file name)
-									functions/
-										function-name.php (Must match function name in resource file class)
-									resource.php (must match module name)
-								module1_name.php (must match module name)
+            modules/
+                module1_name/ (Can be any desired module name)
+                    data (Data layer)
+                        dto (Data transfer object)
+                        models (Application models)
+                    logic (Business logic layer)
+                        services
+                        controllers/
+                            get/ (This is the request method as directory)
+                                Resource.php (Can be any resource file)
+                    presentation (Presentation layer)
+                        views/
+                            resource/ (All lowercase, must match resource file name)
+                        lang/
+                            resource/ (All lowercase, must match resource file name)
+                        breadcrumb/
+                            resource/ (All lowercase, must match resource file name)
+                                functions/
+                                    function-name.php (Must match function name in resource file class)
+                                resource.php (must match module name)
+                            module1_name.php (must match module name)
 
-Let's assume we want to create an application called `demo` having version 1.0 (`v1`).
-Our application has one module called `greetings` and one resource file called `Hello.php`.
+Let's assume we want to create an application called `demo`, our application has
+one module called `greetings` and one resource file called `Hello.php`.
 
 Now, look at the following example of a resource file:
 
 ```php
 <?php
 
-namespace apps\demo\v1\modules\greetings\logic\controllers\get {
+namespace apps\demo\modules\greetings\logic\controllers\get {
 
-	use shani\engine\http\App;
+	use shani\http\App;
 
     final class Hello
     {
@@ -130,7 +129,7 @@ namespace apps\demo\v1\modules\greetings\logic\controllers\get {
 ```
 
 Creating a view file:
-(`apps/demo/v1/modules/greetings/presentation/views/hello/world.php`)
+(`apps/demo/modules/greetings/presentation/views/hello/world.php`)
 
 ```php
 <h1>Hello From Shani</h1>
@@ -140,20 +139,19 @@ Considering our example above, our application folder structure will be like thi
 
     apps/
         demo/
-            v1/
-                modules/
-                    greetings/
-		                data
-			                dto
-			                models
-	                    logic/
-	                        controllers/
-	                            get/
-	                                Hello.php
-						presentation
-	                        views/
-	                            hello/
-	                                world.php
+            modules/
+                greetings/
+                    data
+                        dto
+                        models
+                    logic/
+                        controllers/
+                            get/
+                                Hello.php
+                    presentation
+                        views/
+                            hello/
+                                world.php
 
 #### 1.0.2 Registering Application
 
@@ -165,52 +163,37 @@ The next step is to register our application so that it can be available on the 
 The following is the default application configuration that comes with **Shani**
 
 ```yml
-# A user application must have atleast one version.
-VERSIONS:
-  "1.0":
-    # Environment variables are customs, you can create any e.g DEV, TEST, PROD or any
-    # Must extends shani\advisors\Configuration
-    ENVIRONMENTS:
-      DEV: \apps\demo\v1\config\Settings
-      # Active environment can any one of the provided above.
-    ACTIVE_ENVIRONMENT: DEV
-    DEFAULT_LANGUAGE: sw
-    # Whether an application is able to run or not
-    RUNNING: true
-  "2.0":
-    ENVIRONMENTS:
-      DEV: \apps\demo\v2\config\Settings
-    ACTIVE_ENVIRONMENT: DEV
-    DEFAULT_LANGUAGE: sw
-    RUNNING: true
-# The default application version
-DEFAULT_VERSION: "2.0"
+# Environment variables are customs. Create enviroment variables and give them
+# names of your choice, e.g DEV, TEST, PROD
+ENVIRONMENTS:
+  # Must extends shani\advisors\Configuration
+  DEV: \apps\demo\config\Settings
+  # Active environment can be any one of the provided above.
+ACTIVE_ENVIRONMENT: DEV
+# Whether an application is able to run or not
+RUNNING: true
 ```
 
 Let us customize this file to fit our application needs:
 
 ```yml
-VERSIONS:
-  "1.0":
-    ENVIRONMENTS:
-      DEV: \apps\demo\v1\config\DevSettings
-      TEST: \apps\demo\v1\config\TestSettings
-      PROD: \apps\demo\v1\config\ProdSettings
-    ACTIVE_ENVIRONMENT: DEV
-    DEFAULT_LANGUAGE: sw
-    RUNNING: true
-DEFAULT_VERSION: "1.0"
+ENVIRONMENTS:
+  DEV: \apps\demo\config\DevSettings
+  TEST: \apps\demo\config\TestSettings
+  PROD: \apps\demo\config\ProdSettings
+ACTIVE_ENVIRONMENT: DEV
+RUNNING: true
 ```
 
-The next step is to create these configuration class files. We will create them under `apps/demo/v1/config/`. Some content can be like so:
+The next step is to create these configuration class files. We will create them under `apps/demo/config/`. Some content can be like so:
 
 ```php
 <php
 
-namespace apps\demo\v1\config {
+namespace apps\demo\config {
 
     use shani\advisors\Configuration;
-    use shani\engine\http\App;
+    use shani\http\App;
 
     final class DevSettings extends Configuration
     {

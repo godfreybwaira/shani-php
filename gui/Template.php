@@ -9,9 +9,9 @@
 
 namespace gui {
 
-    use shani\engine\http\App;
-    use shani\contracts\DataDto;
     use shani\advisors\Configuration;
+    use shani\core\Definitions;
+    use shani\http\App;
 
     final class Template
     {
@@ -30,7 +30,7 @@ namespace gui {
 
         public function __construct(App &$app)
         {
-            $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config()->browsingPrivacy()]);
+            $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config->browsingPrivacy()]);
             $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;
@@ -123,16 +123,16 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param DataDto $dto Data object to be passed to a view component.
+         * @param array $data Data object to be passed to a view component.
          * @return void
          */
-        public function render(?DataDto $dto): void
+        public function render(?array $data): void
         {
-            $this->data = $dto?->asMap() ?? [];
-            if ($this->app->config()->isAsync()) {
+            $this->data = $data ?? [];
+            if ($this->app->config->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
-                self::load($this->app, \shani\engine\core\Definitions::DIR_GUI . '/html/main.php');
+                self::load($this->app, Definitions::DIR_GUI . '/html/main.php');
             }
         }
 
@@ -177,7 +177,7 @@ namespace gui {
             foreach ($this->details as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
             }
-            return $head . '<title>' . ($this->title ?? $this->app->config()->appName()) . '</title>';
+            return $head . '<title>' . ($this->title ?? $this->app->config->appName()) . '</title>';
         }
 
         /**
@@ -186,11 +186,11 @@ namespace gui {
          */
         public function breadcrumb(): string
         {
-            $route = $this->app->request()->route();
-            $bc = $route->module . $this->app->config()->breadcrumbDir();
+            $route = $this->app->request->route();
+            $bc = $route->module . $this->app->config->breadcrumbDir();
             $str = self::loadFile($bc . $route->module);
             $str .= self::loadFile($bc . $route->resource . $route->resource);
-            $str .= self::loadFile($bc . $route->resource . $this->app->config()->breadcrumbMethodsDir() . $route->callback);
+            $str .= self::loadFile($bc . $route->resource . $this->app->config->breadcrumbMethodsDir() . $route->callback);
             return $str;
         }
 

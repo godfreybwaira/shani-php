@@ -12,7 +12,7 @@ namespace library\client {
     use library\Concurrency;
     use library\DataConvertor;
     use library\http\RequestEntity;
-    use shani\engine\core\Definitions;
+    use shani\core\Definitions;
 
     final class HTTP
     {

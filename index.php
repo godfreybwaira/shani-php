@@ -9,4 +9,4 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'library');
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
-shani\server\swoole\HttpServer::start();
+shani\servers\swoole\HttpServer::start();

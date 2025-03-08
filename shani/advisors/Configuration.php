@@ -11,9 +11,9 @@
 namespace shani\advisors {
 
     use library\DataCompressionLevel;
-    use shani\engine\core\Framework;
-    use shani\engine\http\App;
-    use shani\engine\http\Middleware;
+    use shani\core\Framework;
+    use shani\http\App;
+    use shani\http\Middleware;
 
     abstract class Configuration
     {
@@ -61,12 +61,10 @@ namespace shani\advisors {
         public const BROWSING_PRIVACY_NONE = 3;
 
         protected readonly App $app;
-        protected readonly array $config;
 
-        public function __construct(App &$app, array &$configurations)
+        public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->config = $configurations;
         }
 
         /**
@@ -92,7 +90,7 @@ namespace shani\advisors {
          * Get or set cookie max age before expiration.
          * @return string A date/time string. Valid formats are explained in Date and Time Formats.
          */
-        public function cookieMaxAge()
+        public function cookieMaxAge(): string
         {
             return '2 hours';
         }
@@ -134,36 +132,7 @@ namespace shani\advisors {
          */
         public function defaultLanguage(): string
         {
-            return $this->config['DEFAULT_LANGUAGE'];
-        }
-
-        /**
-         * Check whether application is in running state or not. A programmer should
-         * implements the logic on application running state, otherwise this configuration
-         * has no effect.
-         * @return string Application language
-         */
-        public final function running(): bool
-        {
-            return $this->config['RUNNING'];
-        }
-
-        /**
-         * Get application environments
-         * @return array application environments
-         */
-        public final function environments(): array
-        {
-            return array_keys($this->config['ENVIRONMENTS']);
-        }
-
-        /**
-         * Get current active application environment
-         * @return string application environment
-         */
-        public final function activeEnvironment(): string
-        {
-            return $this->config['ACTIVE_ENVIRONMENT'];
+            return 'sw';
         }
 
         /**
@@ -174,19 +143,14 @@ namespace shani\advisors {
         public abstract function isAsync(): bool;
 
         /**
-         * Handle all HTTP errors that may occur during program execution.
-         * @param string|null $errorMessage HTTP error message
-         */
-        public abstract function httpErrorHandler(?string $errorMessage = null): void;
-
-        /**
          * Handle all application errors
          * @param \Throwable $t
          * @return void
          */
-        public function applicationErrorHandler(\Throwable $t): void
+        public function errorHandler(\Throwable $t = null): void
         {
-            print_r($t);
+            $this->app->response->setBody($this->app->response->statusMessage() ?? 'No details provided');
+            $this->app->send();
         }
 
         /**
@@ -242,7 +206,7 @@ namespace shani\advisors {
         public abstract function languageDir(): string;
 
         /**
-         * Set and get user application name
+         * Get user application name
          * @return string Application name
          */
         public function appName(): string
@@ -254,7 +218,7 @@ namespace shani\advisors {
          * Returns application web root directory where all application specific static files are stored.
          * @return string Path relative to application directory
          */
-        public abstract function webroot(): string;
+        public abstract function staticAssetStorage(): string;
 
         /**
          * All files that have to be accessed by an authenticated users are kept here.

@@ -17,11 +17,15 @@ namespace library\http {
     final class ResponseEntity extends HttpEntity
     {
 
-        private HttpStatus $status;
-        private readonly RequestEntity $request;
+        /**
+         * HTTP request associated with this response
+         * @var RequestEntity
+         */
+        public readonly RequestEntity $request;
         private DataCompressionLevel $compression;
         private int $compressionMinSize = 1024; //1KB
         private ?string $statusMessage = null, $type = null, $body = null;
+        private HttpStatus $status;
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
         {
@@ -67,15 +71,6 @@ namespace library\http {
         public function size(): int
         {
             return $this->bodySize() + $this->headers->size();
-        }
-
-        /**
-         * Get HTTP request associated with this response
-         * @return RequestEntity
-         */
-        public function request(): RequestEntity
-        {
-            return $this->request;
         }
 
         /**
