@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ResponseDto
+ * DataDto
  * @author coder
  *
  * Created on: Feb 25, 2025 at 7:44:35 PM
@@ -9,7 +9,7 @@
 
 namespace shani\contracts {
 
-    interface ResponseDto
+    interface DataDto
     {
 
         /**

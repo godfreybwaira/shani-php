@@ -18,13 +18,15 @@ namespace shani\engine\http {
         private const PREFIXES = ['y', 'e', 's', 'u'];
 
         public readonly string $name, $type;
-        public readonly \SplFileObject $stream;
+        public \SplFileObject $stream;
         public readonly ?string $error;
         public readonly int $size;
+        private ?string $savedPath;
 
         public function __construct(string $path, string $type, ?int $size = null, ?string $name = null, ?int $error = null)
         {
             $this->type = $type;
+            $this->savedPath = null;
             $this->name = $name ?? basename($path);
             $this->size = $size ?? stat($path)['size'];
             $this->error = self::getFileErrors($error);
@@ -34,6 +36,15 @@ namespace shani\engine\http {
         public function __destruct()
         {
             unset($this->stream);
+        }
+
+        /**
+         * Get path to a saved file relative to a storage directory
+         * @return string|null Path to a saved file, null if the file is not yet saved.
+         */
+        public function savedPath(): ?string
+        {
+            return $this->savedPath;
         }
 
         /**
@@ -62,11 +73,11 @@ namespace shani\engine\http {
          * Move a file from temporary directory to destination directory
          * @param string $destination File storage destination
          * @param string $newName A new file name without extension
-         * @return string File path to a new location
+         * @return self
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
          * @see Configuration::protectedStorage()
          */
-        public function save(App &$app, string $destination = null, string $newName = null): string
+        public function save(App &$app, string $destination = null, string $newName = null): self
         {
             $savePath = $app->storage()->pathTo($destination);
             $directory = self::createDirectory($savePath . '/' . $this->type);
@@ -77,14 +88,15 @@ namespace shani\engine\http {
             if ($size < $this->size) {
                 fseek($file, $size);
                 $this->stream->seek($size);
-                $chunk = min($size, Definitions::BUFFER_SIZE);
+                $chunk = $size > 0 && $size <= Definitions::BUFFER_SIZE ? $size : Definitions::BUFFER_SIZE;
                 while ($this->stream->valid()) {
                     fwrite($file, $this->stream->fread($chunk));
                 }
                 unlink($this->stream->getPathname());
             }
             fclose($file);
-            return substr($filepath, strlen($savePath));
+            $this->savedPath = substr($filepath, strlen($savePath));
+            return $this;
         }
 
         private static function getExtension(string $file): ?string

@@ -10,7 +10,7 @@
 namespace gui {
 
     use shani\engine\http\App;
-    use shani\contracts\ResponseDto;
+    use shani\contracts\DataDto;
     use shani\advisors\Configuration;
 
     final class Template
@@ -123,10 +123,10 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param ResponseDto $dto Data object to be passed to a view component.
+         * @param DataDto $dto Data object to be passed to a view component.
          * @return void
          */
-        public function render(?ResponseDto $dto): void
+        public function render(?DataDto $dto): void
         {
             $this->data = $dto?->asMap() ?? [];
             if ($this->app->config()->isAsync()) {

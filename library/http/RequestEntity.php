@@ -38,7 +38,8 @@ namespace library\http {
         public readonly string $ip;
         public readonly array $files;
         private RequestRoute $route;
-        private readonly array $cookies, $body, $queries, $acceptedType;
+        private array $acceptedType;
+        private readonly array $cookies, $body, $queries;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
@@ -46,6 +47,7 @@ namespace library\http {
         )
         {
             parent::__construct($headers, $protocol);
+            $this->acceptedType = [];
             $this->cookies = $cookies;
             $this->queries = $queries;
             $this->method = $method;

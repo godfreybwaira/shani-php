@@ -9,7 +9,7 @@
 
 namespace apps\demo\v1\modules\greetings\data\dto {
 
-    final class Subject implements \shani\contracts\ResponseDto
+    final class Subject implements \shani\contracts\DataDto
     {
 
         private string $name, $grade;

@@ -18,7 +18,7 @@ namespace shani\engine\http {
     use library\http\RequestEntity;
     use library\Utils;
     use shani\advisors\Configuration;
-    use shani\contracts\ResponseDto;
+    use shani\contracts\DataDto;
     use shani\contracts\ResponseWriter;
     use shani\engine\core\Definitions;
     use shani\engine\documentation\Generator;
@@ -332,13 +332,13 @@ namespace shani\engine\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param ResponseDto $dto Data object to be passed to a view file
+         * @param DataDto $dto Data object to be passed to a view file
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(ResponseDto $dto = null, bool $useBuffer = false): void
+        public function render(DataDto $dto = null, bool $useBuffer = false): void
         {
             $type = $this->res->type();
             if ($type === DataConvertor::TYPE_HTML) {
@@ -363,7 +363,7 @@ namespace shani\engine\http {
                     ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
         }
 
-        private function sendJsonp(ResponseDto $dto, string $type): void
+        private function sendJsonp(DataDto $dto, string $type): void
         {
             $callback = $this->req->query('callback') ?? 'callback';
             $data = $callback . '(' . json_encode($dto->asMap()) . ');';
@@ -397,12 +397,12 @@ namespace shani\engine\http {
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param ResponseDto $dto Data to pass to dictionary file. These data are
+         * @param DataDto $dto Data to pass to dictionary file. These data are
          * available on dictionary file via $data variable
          * @return array Associative array where key is the word/sentence unique
          * code and the value is the actual word/sentence.
          */
-        public function dictionary(ResponseDto $dto = null): array
+        public function dictionary(DataDto $dto = null): array
         {
             if ($this->dict === null) {
                 $route = $this->req->route();

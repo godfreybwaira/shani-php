@@ -218,7 +218,7 @@ namespace library\client {
         {
             $files = [];
             foreach ($this->request->files as $name => $file) {
-                $files[$name] = curl_file_create($file->path, $file->type, $file->name);
+                $files[$name] = curl_file_create($file->stream->getPathname(), $file->type, $file->name);
             }
             $body = $this->request->body();
             if (!empty($files)) {
