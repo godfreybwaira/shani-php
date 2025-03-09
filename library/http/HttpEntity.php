@@ -15,7 +15,7 @@ namespace library\http {
     abstract class HttpEntity
     {
 
-        private readonly string $protocol;
+        public readonly string $protocol;
         protected readonly HttpHeader $headers;
         private array $cookies = [];
 
@@ -23,11 +23,6 @@ namespace library\http {
         {
             $this->headers = $headers;
             $this->protocol = $protocol;
-        }
-
-        public function protocol(): string
-        {
-            return $this->protocol;
         }
 
         public function protocolVersion(): float

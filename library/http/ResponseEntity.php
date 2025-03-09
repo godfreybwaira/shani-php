@@ -29,7 +29,7 @@ namespace library\http {
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
         {
-            parent::__construct($headers, $request->protocol());
+            parent::__construct($headers, $request->protocol);
             $this->status = $status;
             $this->request = $request;
             $this->compression = DataCompressionLevel::DISABLE;
