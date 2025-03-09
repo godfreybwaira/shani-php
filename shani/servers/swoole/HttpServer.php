@@ -42,7 +42,7 @@ namespace shani\servers\swoole {
 
             Event::setHandler(new SwooleEvent());
             MediaType::setHandler(new SwooleCache(1500, 100));
-            $server = new WSocket($cnf['IP'], $cnf['SERVER_PORTS']['HTTP']);
+            $server = new WSocket($cnf['IP'], $cnf['PORTS']['HTTP']);
             $cores = swoole_cpu_num();
             $server->set([
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
@@ -57,7 +57,7 @@ namespace shani\servers\swoole {
                 'ssl_cert_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['CERT']),
                 'ssl_key_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['KEY'])
             ]);
-            $server->addListener($cnf['IP'], $cnf['SERVER_PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
+            $server->addListener($cnf['IP'], $cnf['PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
             return $server;
         }
 
@@ -144,11 +144,11 @@ namespace shani\servers\swoole {
             $cnf = ServerConfig::server();
             $server = self::configure($cnf);
             $server->on('start', function () use (&$cnf) {
-                echo 'http://' . $cnf['IP'] . ':' . $cnf['SERVER_PORTS']['HTTP'] . PHP_EOL;
-                echo 'https://' . $cnf['IP'] . ':' . $cnf['SERVER_PORTS']['HTTPS'] . PHP_EOL;
+                echo 'http://' . $cnf['IP'] . ':' . $cnf['PORTS']['HTTP'] . PHP_EOL;
+                echo 'https://' . $cnf['IP'] . ':' . $cnf['PORTS']['HTTPS'] . PHP_EOL;
             });
             $server->on('request', function (Request $req, Response $res) use (&$cnf) {
-                $scheme = $cnf['SERVER_PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
+                $scheme = $cnf['PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
                 self::handleHTTP($scheme, $req, $res);
             });
             $server->on('open', function (WSocket $server, Request $req) {

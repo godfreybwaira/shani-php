@@ -2,7 +2,7 @@
 ---
 #The IP address server is running on.
 IP: "0.0.0.0"
-SERVER_PORTS:
+PORTS:
   HTTP: 8008
   HTTPS: 44380
 # SCHEDULING_ALGORITHM: "PREEMPTIVE, ROUND_ROBIN, FIXED"
