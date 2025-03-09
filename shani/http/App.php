@@ -94,7 +94,7 @@ namespace shani\http {
          * Send content to a client application
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
-         * be closed and no output can be sent.
+         * be closed and no output will be sent afterward.
          * @return void
          */
         public function send(bool $useBuffer = false): void
@@ -409,7 +409,7 @@ namespace shani\http {
         private function start(): void
         {
             if ($this->request->uri->path() === '/') {
-                $this->request->setRoute($this->config->homepage());
+                $this->request->changeRoute($this->config->homepage());
             }
             Session::start($this);
             $middleware = new Middleware($this);
@@ -436,16 +436,16 @@ namespace shani\http {
 
         /**
          * Check whether a user has enough privileges to access a target resource
-         * @param string $targetId Target id, see self::documentation()
+         * @param string $target Route target, see self::documentation()
          * @return bool True a user has enough privileges, false otherwise.
          * @see self::documentation()
          */
-        public function hasAuthority(string $targetId): bool
+        public function accessGranted(string $target): bool
         {
-            if ($this->config->disableSecurityAdvisor()) {
+            if ($this->config->authorizationDisabled()) {
                 return true;
             }
-            return (preg_match('\b' . $targetId . '\b', $this->config->userPermissions()) === 1);
+            return (preg_match('\b' . self::digest($target) . '\b', $this->config->userPermissions()) === 1);
         }
 
         /**

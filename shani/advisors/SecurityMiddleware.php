@@ -71,18 +71,15 @@ namespace shani\advisors {
         public function authorized(): bool
         {
             $route = $this->app->request->route();
-            if ($this->app->config->authenticated()) {
-                if (in_array($route->module, $this->app->config->guestModules())) {
-                    $this->app->request->setRoute($this->app->config->homepage());
+            if ($this->app->config->authenticated) {
+                if ($this->app->config->guestModule($route->module)) {
+                    $this->app->request->changeRoute($this->app->config->homepage());
                     return true;
                 }
-                if (in_array($route->module, $this->app->config->publicModules())) {
+                if ($this->app->config->publicModule($route->module) || $this->app->accessGranted($route->target)) {
                     return true;
                 }
-                if ($this->app->hasAuthority(App::digest($route->target))) {
-                    return true;
-                }
-            } else if (in_array($route->module, $this->app->config->guestModules()) || in_array($route->module, $this->app->config->publicModules())) {
+            } else if ($this->app->config->guestModule($route->module) || $this->app->config->publicModule($route->module)) {
                 return true;
             }
             $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
@@ -145,16 +142,6 @@ namespace shani\advisors {
                 HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
             ]);
             return $this;
-        }
-
-        /**
-         * Checks whether security checks is disabled.
-         * @return bool
-         * @see Configuration::disableSecurityAdvisor()
-         */
-        public function disabled(): bool
-        {
-            return $this->app->config->disableSecurityAdvisor();
         }
     }
 

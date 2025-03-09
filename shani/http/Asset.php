@@ -49,7 +49,7 @@ namespace shani\http {
                 $prefix = self::STORAGE_PREFIX;
                 $rootPath = $app->storage()->pathTo();
             } elseif (self::isStaticPath($path, self::PRIVATE_PREFIX)) {
-                if (!$app->config->authenticated()) {
+                if (!$app->config->authenticated) {
                     $app->response->setStatus(HttpStatus::UNAUTHORIZED);
                     $app->send();
                     return true;

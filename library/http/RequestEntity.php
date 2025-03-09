@@ -56,7 +56,7 @@ namespace library\http {
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
-            $this->setRoute($uri->path());
+            $this->changeRoute($uri->path());
         }
 
         /**
@@ -68,7 +68,7 @@ namespace library\http {
             return $this->ip === '127.0.0.1';
         }
 
-        public function setRoute(string $path): self
+        public function changeRoute(string $path): self
         {
             $this->route = new RequestRoute($this->method, $path);
             return $this;

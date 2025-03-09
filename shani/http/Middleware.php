@@ -57,9 +57,9 @@ namespace shani\http {
          * @param SecurityMiddleware $advisor Security advisor middleware object
          * @return self
          */
-        public function runWith(SecurityMiddleware $advisor): void
+        public function runWith(SecurityMiddleware &$advisor): void
         {
-            if ($advisor->disabled()) {
+            if ($this->app->config->authorizationDisabled()) {
                 self::returnResponse($this->app);
                 return;
             }

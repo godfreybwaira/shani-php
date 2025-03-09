@@ -60,11 +60,17 @@ namespace shani\advisors {
          */
         public const BROWSING_PRIVACY_NONE = 3;
 
+        /**
+         * Whether the current user is authenticated and has at least one permission
+         * @var bool
+         */
+        public readonly bool $authenticated;
         protected readonly App $app;
 
         public function __construct(App &$app)
         {
             $this->app = $app;
+            $this->authenticated = $this->userPermissions() !== null;
         }
 
         /**
@@ -149,7 +155,6 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t = null): void
         {
-            $this->app->response->setBody($this->app->response->statusMessage() ?? 'No details provided');
             $this->app->send();
         }
 
@@ -248,21 +253,23 @@ namespace shani\advisors {
         public abstract function userPermissions(): ?string;
 
         /**
-         * Get a list of modules accessible by all users (guests & authenticated)
-         * @return array List of public modules
+         * Check whether a given module is available among modules granted access to a public
+         * @param string $module Module name
+         * @return bool True on success, false otherwise.
          */
-        public function publicModules(): array
+        public function publicModule(string $module): bool
         {
-            return [];
+            return false;
         }
 
         /**
-         * Get a list of modules accessible by guest users only
-         * @return array List of guest modules
+         * Check whether a given module is available among modules granted access to a guest user
+         * @param string $module Module name
+         * @return bool True on success, false otherwise.
          */
-        public function guestModules(): array
+        public function guestModule(string $module): bool
         {
-            return [];
+            return false;
         }
 
         /**
@@ -335,22 +342,13 @@ namespace shani\advisors {
         }
 
         /**
-         * Enable/disable security checks (disabling is not recommended in production environment)
+         * Enable/disable user authorization on restricted resources.
+         * (disabling is not recommended in production environment)
          * @return bool
-         * @see SecurityMiddleware::disabled()
          */
-        public function disableSecurityAdvisor(): bool
+        public function authorizationDisabled(): bool
         {
             return true;
-        }
-
-        /**
-         * Check whether the current user is authenticated and has at least one permission.
-         * @return bool
-         */
-        public final function authenticated(): bool
-        {
-            return $this->userPermissions() !== null;
         }
     }
 
