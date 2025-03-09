@@ -75,11 +75,7 @@ namespace shani\http {
             try {
                 $this->vhost = ServerConfig::host($this->request->uri->hostname());
                 $this->config = new $this->vhost->config($this);
-                $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-                $this->registerErrorHandler();
-                if (!Asset::tryServe($this)) {
-                    $this->start();
-                }
+                $this->runApp();
             } catch (\ErrorException $ex) {
                 $this->response->setStatus(HttpStatus::BAD_REQUEST);
                 if (isset($this->config)) {
@@ -88,6 +84,20 @@ namespace shani\http {
                     $this->send();
                 }
             }
+        }
+
+        private function runApp()
+        {
+            $this->registerErrorHandler();
+            if ($this->vhost->running) {
+                $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
+                if (!Asset::tryServe($this)) {
+                    $this->start();
+                }
+                return;
+            }
+            $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
+            $this->config->errorHandler();
         }
 
         /**

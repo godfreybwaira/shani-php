@@ -25,9 +25,8 @@ namespace shani\core {
         public readonly string $activeEnv;
 
         /**
-         * Check whether application is in running state or not. A programmer should
-         * implements the logic on application running state, otherwise this configuration
-         * has no effect.
+         * Check whether application is in running state or not, if not then
+         * HttpStatus::SERVICE_UNAVAILABLE is set
          * @var bool
          */
         public readonly bool $running;
