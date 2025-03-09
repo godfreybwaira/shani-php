@@ -19,7 +19,7 @@ namespace library\http {
 
         public function __construct(bool $reuse = false)
         {
-            $this->maxAge = new \DateTime('6m');
+            $this->maxAge = new \DateTime('6 month');
             $this->setReuse($reuse);
             $this->stale = null;
             $this->etag = null;
