@@ -80,20 +80,20 @@ namespace gui\v1\components {
 
         /**
          * Position a tab menu according to position specified using Tab::MENU_POS_*
-         * @param int $device Target device set using TargetDevice::*
+         * @param TargetDevice $device Target device
          * @param int $position Menu position
          * @return self
          */
-        public function setMenuPosition(int $device, int $position): self
+        public function setMenuPosition(TargetDevice $device, int $position): self
         {
             if ($position === self::MENU_POS_TOP) {
-                $this->positions[$device] = ['rows', 'auto 1fr'];
+                $this->positions[$device->value] = ['rows', 'auto 1fr'];
             } else if ($position === self::MENU_POS_RIGHT) {
-                $this->positions[$device] = ['columns', '1fr auto'];
+                $this->positions[$device->value] = ['columns', '1fr auto'];
             } else if ($position === self::MENU_POS_BOTTOM) {
-                $this->positions[$device] = ['rows', '1fr auto'];
+                $this->positions[$device->value] = ['rows', '1fr auto'];
             } else {
-                $this->positions[$device] = ['columns', 'auto 1fr'];
+                $this->positions[$device->value] = ['columns', 'auto 1fr'];
             }
             return $this;
         }
@@ -113,7 +113,7 @@ namespace gui\v1\components {
         {
             $css = null;
             $id = static::createId();
-            $mobile = \gui\v1\TargetDevice::MOBILE;
+            $mobile = \gui\v1\TargetDevice::MOBILE->value;
             foreach ($this->positions as $device => $query) {
                 if ($device === $mobile) {
                     $css .= '#' . $id . '{grid-template-' . $query[0] . ':' . $query[1] . '}';

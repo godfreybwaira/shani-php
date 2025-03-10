@@ -2,7 +2,6 @@
 
 namespace library\http {
 
-    use library\Map;
 
     final class HttpHeader
     {
@@ -82,16 +81,6 @@ namespace library\http {
             if (!empty($headers)) {
                 $this->setAll($headers);
             }
-        }
-
-        /**
-         * Get the list of header values for the given header name, if any.
-         * @param string $headerName the header name
-         * @return string the list of header values, or an empty list
-         */
-        public function getOrEmpty(string $headerName): string
-        {
-            return $this->headers[$headerName] ?? '';
         }
 
         /**

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Template
+ * Description of UI
  * @author coder
  *
  * Created on: Feb 19, 2024 at 1:07:12 PM
@@ -13,7 +13,7 @@ namespace gui {
     use shani\core\Definitions;
     use shani\http\App;
 
-    final class Template
+    final class UI
     {
 
         private readonly App $app;

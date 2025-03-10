@@ -10,7 +10,7 @@
 
 namespace shani\http {
 
-    use gui\Template;
+    use gui\UI;
     use library\Cookie;
     use library\DataConvertor;
     use library\http\HttpHeader;
@@ -35,7 +35,7 @@ namespace shani\http {
         private Storage $storage;
         private ?string $lang = null;
         private readonly ResponseWriter $writer;
-        private ?Template $template = null;
+        private ?UI $ui = null;
         private ?array $appCart = null, $dict = null;
         private ?string $platform = null;
 
@@ -299,16 +299,15 @@ namespace shani\http {
         }
 
         /**
-         * Get the current HTML template. This function can be used to customize
-         * HTML template before sending to user agent.
-         * @return Template
+         * Manage Graphical User interface with this function
+         * @return UI
          */
-        public function template(): Template
+        public function ui(): UI
         {
-            if (!isset($this->template)) {
-                $this->template = new Template($this);
+            if (!isset($this->ui)) {
+                $this->ui = new UI($this);
             }
-            return $this->template;
+            return $this->ui;
         }
 
         /**
@@ -325,11 +324,11 @@ namespace shani\http {
             $type = $this->response->type();
             if ($type === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->template()->render($customDto->asMap());
+                $this->ui()->render($customDto->asMap());
                 $this->sendHtml(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->template()->render($customDto->asMap());
+                $this->ui()->render($customDto->asMap());
                 $this->sendSse(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($customDto->asMap(), $type);

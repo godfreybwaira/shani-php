@@ -81,7 +81,7 @@ namespace gui\v1\components {
         {
             if (!empty($this->queries)) {
                 $css = null;
-                $mobile = \gui\v1\TargetDevice::MOBILE;
+                $mobile = \gui\v1\TargetDevice::MOBILE->value;
                 foreach ($this->queries as $device => $query) {
                     if ($device === $mobile) {
                         $css .= '#' . $this->id . '{grid-template-areas:' . $query . '}';
