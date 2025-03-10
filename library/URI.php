@@ -147,7 +147,7 @@ namespace library {
             return $this->copy('path', $path);
         }
 
-        public function withPort(?int $port): self
+        public function withPort(int $port): self
         {
             return $this->copy('port', $port);
         }
