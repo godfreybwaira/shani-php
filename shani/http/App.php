@@ -379,8 +379,7 @@ namespace shani\http {
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param DataDto $dto Data to pass to dictionary file. These data are
-         * available on dictionary file via $data variable
+         * @param DataDto $dto Data to pass to dictionary file.
          * @return array Associative array where key is the word/sentence unique
          * code and the value is the actual word/sentence.
          */
@@ -389,12 +388,12 @@ namespace shani\http {
             if ($this->dict === null) {
                 $route = $this->request->route();
                 $file = $this->module($this->config->languageDir() . $route->resource . $route->callback . '/' . $this->language() . '.php');
-                $this->dict = self::getFile($file, $dto?->asMap());
+                $this->dict = self::getFile($file, $dto);
             }
             return $this->dict;
         }
 
-        private static function getFile(string $loadedFile, ?array $data): array
+        private static function getFile(string $loadedFile, DataDto $dto = null): array
         {
             return require $loadedFile;
         }
@@ -422,7 +421,7 @@ namespace shani\http {
             return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
         }
 
-        private function getClassPath(string $method): string
+        private function classPath(string $method): string
         {
             $class = Definitions::DIRNAME_APPS . $this->config->root();
             $class .= $this->config->moduleDir() . $this->request->route()->module;
@@ -460,7 +459,7 @@ namespace shani\http {
          */
         public function processRequest(): void
         {
-            $classPath = $this->getClassPath($this->request->method);
+            $classPath = $this->classPath($this->request->method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
                 $this->config->errorHandler();

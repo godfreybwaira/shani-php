@@ -36,6 +36,12 @@ namespace library\http {
          * @var string
          */
         public readonly string $ip;
+
+        /**
+         * Check whether the request comes from local machine
+         * @var string
+         */
+        public readonly string $localhost;
         public readonly array $files;
         private RequestRoute $route;
         private array $acceptedType;
@@ -47,6 +53,7 @@ namespace library\http {
         )
         {
             parent::__construct($headers, $protocol);
+            $this->localhost = $ip === '127.0.0.1';
             $this->acceptedType = [];
             $this->cookies = $cookies;
             $this->queries = $queries;
@@ -57,15 +64,6 @@ namespace library\http {
             $this->uri = $uri;
             $this->ip = $ip;
             $this->changeRoute($uri->path);
-        }
-
-        /**
-         * Check if the request is from local machine
-         * @return bool True on success, false otherwise
-         */
-        public function localhost(): bool
-        {
-            return $this->ip === '127.0.0.1';
         }
 
         public function changeRoute(string $path): self

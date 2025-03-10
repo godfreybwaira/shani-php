@@ -23,10 +23,6 @@ namespace library {
         public static function kebab2camelCase(string $str, string $separator = '-'): string
         {
             if (str_contains($str, $separator)) {
-                $dot = strpos($str, '.');
-                if ($dot > 0) {
-                    $str = substr($str, 0, $dot);
-                }
 //                $str = preg_replace_callback('/(?<=-)[a-z]/', fn($ch) => mb_strtoupper($ch[0]), $str);
                 $str = lcfirst(ucwords($str, $separator));
                 return str_replace($separator, '', $str);
