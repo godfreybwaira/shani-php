@@ -24,7 +24,7 @@ namespace library\http {
         public readonly RequestEntity $request;
         private DataCompressionLevel $compression;
         private int $compressionMinSize = 1024; //1KB
-        private ?string $statusMessage = null, $type = null, $body = null;
+        private ?string $statusMessage = null, $body = null;
         private HttpStatus $status;
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
@@ -37,22 +37,16 @@ namespace library\http {
 
         public function type(): string
         {
-            if ($this->type !== null) {
-                return $this->type;
-            }
             $contentType = $this->headers->get(HttpHeader::CONTENT_TYPE);
             if (!empty($contentType)) {
-                $this->type = MediaType::explode($contentType)[1];
-            } else {
-                $parts = explode('.', $this->request->uri->path());
-                $size = count($parts);
-                if ($size > 1) {
-                    $this->type = strtolower($parts[$size - 1]);
-                } else {
-                    $this->type = MediaType::explode($this->request->header()->get(HttpHeader::ACCEPT))[1] ?? '';
-                }
+                return MediaType::explode($contentType)[1];
             }
-            return $this->type;
+            $parts = explode('.', $this->request->uri->path());
+            $size = count($parts);
+            if ($size > 1) {
+                return strtolower($parts[$size - 1]);
+            }
+            return MediaType::explode($this->request->header()->get(HttpHeader::ACCEPT))[1] ?? '';
         }
 
         /**
