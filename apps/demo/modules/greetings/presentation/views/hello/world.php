@@ -1,6 +1,6 @@
 <?php $app->ui()->import($app->view('/shani')); ?>
 
-<?php $data = $app->ui()->data(); ?>
+<?php $data = $app->ui()->dto()->asMap(); ?>
 <h2>Student details</h2>
 <ul>
     <?php foreach ($data as $key => $value): ?>

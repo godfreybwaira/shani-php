@@ -10,6 +10,7 @@
 namespace gui {
 
     use shani\advisors\Configuration;
+    use shani\contracts\DataDto;
     use shani\core\Definitions;
     use shani\http\App;
 
@@ -19,7 +20,8 @@ namespace gui {
         private readonly App $app;
         private array $details = [];
         private ?string $title, $icon;
-        private ?array $scripts, $styles, $data, $attributes;
+        private ?array $scripts, $styles, $attributes;
+        private ?DataDto $dto = null;
 
         private const REFERRER_PRIVACIES = [
             Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
@@ -31,7 +33,7 @@ namespace gui {
         public function __construct(App &$app)
         {
             $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config->browsingPrivacy()]);
-            $this->scripts = $this->styles = $this->data = $this->attributes = [];
+            $this->scripts = $this->styles = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;
         }
@@ -71,7 +73,7 @@ namespace gui {
         }
 
         /**
-         * Set title to HTML document. If not set, thn the default title will be
+         * Set title to HTML document. If not set, then the default title will be
          * application name, or empty string.
          * @param string $name HTML title
          * @return self
@@ -84,51 +86,46 @@ namespace gui {
 
         /**
          * Set link to external script file for HTML document relative to asset directory.
-         * @param string|array $srcs Path to Javascript file(s) relative to asset directory.
+         * @param string $src Path to Javascript file(s) relative to asset directory.
          * @param array $attributes Script attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function scripts(string|array $srcs, array $attributes = []): self
+        public function scripts(string $src, array $attributes = []): self
         {
-            self::createHeader($this->scripts, $srcs, $attributes);
+            self::createHeader($this->scripts, $src, $attributes);
             return $this;
         }
 
         /**
          * Set link to external CSS file for HTML document relative to asset directory.
-         * @param string|array $hrefs Path to CSS file(s) relative to asset directory.
+         * @param string $href Path to CSS file relative to asset directory.
          * @param array $attributes Style attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function styles(string|array $hrefs, array $attributes = []): self
+        public function styles(string $href, array $attributes = []): self
         {
-            self::createHeader($this->styles, $hrefs, $attributes);
+            self::createHeader($this->styles, $href, $attributes);
             return $this;
         }
 
-        private static function createHeader(array &$head, $urls, array &$attributes): void
+        private static function createHeader(array &$head, string $url, array &$attributes): void
         {
-            if (!is_array($urls)) {
-                $urls = [$urls];
-            }
-            foreach ($urls as $url) {
-                $head[$url] = null;
-                foreach ($attributes as $key => $val) {
-                    $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
-                }
+            $head[$url] = null;
+            foreach ($attributes as $key => $val) {
+                $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
             }
         }
 
         /**
          * Render HTML document to user agent
-         * @param array $data Data object to be passed to a view component.
+         * @param DataDto $dto Data object to be passed to a view component.
          * @return void
          */
-        public function render(?array $data): void
+        public function render(?DataDto $dto): void
         {
-            $this->data = $data ?? [];
+            $this->dto = $dto;
             if ($this->app->config->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
@@ -136,13 +133,9 @@ namespace gui {
             }
         }
 
-        /**
-         * Get immutable data that will be available to all views.
-         * @param string $key Key
-         */
-        public function data(string $key = null)
+        public function dto(): ?DataDto
         {
-            return $key === null ? $this->data : $this->data[$key] ?? null;
+            return $this->dto;
         }
 
         /**

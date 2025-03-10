@@ -62,6 +62,7 @@ namespace library {
             $this->port = $this->parts['port'] ?? null;
             $this->fragment = $this->parts['fragment'] ?? null;
             $this->query = $this->parts['query'] ?? null;
+            $this->scheme = $this->parts['scheme'] ?? null;
         }
 
         private static function valueOf($value, $default = null)
