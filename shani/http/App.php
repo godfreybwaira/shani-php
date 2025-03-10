@@ -86,18 +86,28 @@ namespace shani\http {
             }
         }
 
-        private function runApp()
+        /**
+         * Start executing user application
+         * @return void
+         */
+        private function runApp(): void
         {
             $this->registerErrorHandler();
-            if ($this->vhost->running) {
-                $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-                if (!Asset::tryServe($this)) {
-                    $this->start();
-                }
+            $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
+            if (!$this->vhost->running) {
+                $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
+                $this->config->errorHandler();
                 return;
             }
-            $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-            $this->config->errorHandler();
+            if (!Asset::tryServe($this)) {
+                if ($this->request->uri->path === '/') {
+                    $this->request->changeRoute($this->config->homepage());
+                }
+                Session::start($this);
+                $middleware = new Middleware($this);
+                $securityAdvisor = $this->config->middleware($middleware);
+                $middleware->runWith($securityAdvisor);
+            }
         }
 
         /**
@@ -410,21 +420,6 @@ namespace shani\http {
         public function module(?string $path = null): string
         {
             return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
-        }
-
-        /**
-         * Start executing user application
-         * @return void
-         */
-        private function start(): void
-        {
-            if ($this->request->uri->path === '/') {
-                $this->request->changeRoute($this->config->homepage());
-            }
-            Session::start($this);
-            $middleware = new Middleware($this);
-            $securityAdvisor = $this->config->middleware($middleware);
-            $middleware->runWith($securityAdvisor);
         }
 
         private function getClassPath(string $method): string
