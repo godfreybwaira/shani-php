@@ -40,7 +40,7 @@ namespace shani\http {
          */
         public static function tryServe(App &$app): bool
         {
-            $path = $app->request->uri->path();
+            $path = $app->request->uri->path;
             $prefix = $rootPath = null;
             if (self::isStaticPath($path, self::ASSET_PREFIX)) {
                 $prefix = self::ASSET_PREFIX;

@@ -41,7 +41,7 @@ namespace library\http {
             if (!empty($contentType)) {
                 return MediaType::explode($contentType)[1];
             }
-            $parts = explode('.', $this->request->uri->path());
+            $parts = explode('.', $this->request->uri->path);
             $size = count($parts);
             if ($size > 1) {
                 return strtolower($parts[$size - 1]);

@@ -418,7 +418,7 @@ namespace shani\http {
          */
         private function start(): void
         {
-            if ($this->request->uri->path() === '/') {
+            if ($this->request->uri->path === '/') {
                 $this->request->changeRoute($this->config->homepage());
             }
             Session::start($this);
@@ -495,7 +495,7 @@ namespace shani\http {
          */
         public function csrf(?string $urlPath = null): string
         {
-            $url = $urlPath ?? $this->request->uri->path();
+            $url = $urlPath ?? $this->request->uri->path;
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add([$token => null]);

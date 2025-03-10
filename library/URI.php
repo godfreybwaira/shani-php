@@ -12,7 +12,12 @@ namespace library {
     final class URI
     {
 
-        private string $uri, $path;
+        /**
+         * The sanitized URI path
+         * @var string
+         */
+        public readonly string $path;
+        private string $uri;
         private array $parts;
 
         public function __construct(string $uri)
@@ -90,15 +95,6 @@ namespace library {
             $port = self::valueOf($this->parts['port']);
             $host = $this->parts['host'] . ($port ? ':' . $port : null);
             return $scheme !== null ? $scheme . '://' . $host : $host;
-        }
-
-        /**
-         * Get the sanitized URI path.
-         * @return string URI path
-         */
-        public function path(): string
-        {
-            return $this->path;
         }
 
         /**

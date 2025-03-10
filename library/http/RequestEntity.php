@@ -56,7 +56,7 @@ namespace library\http {
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
-            $this->changeRoute($uri->path());
+            $this->changeRoute($uri->path);
         }
 
         /**
