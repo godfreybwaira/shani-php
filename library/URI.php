@@ -17,7 +17,37 @@ namespace library {
          * @var string
          */
         public readonly string $path;
-        private string $uri;
+
+        /**
+         * host name from URI
+         * @var string
+         */
+        public readonly string $hostname;
+
+        /**
+         * Host port
+         * @var string
+         */
+        public readonly string $port;
+
+        /**
+         * URI fragment
+         * @var string
+         */
+        public readonly ?string $fragment;
+
+        /**
+         * URI query string
+         * @var string
+         */
+        public readonly ?string $query;
+
+        /**
+         * URI scheme
+         * @var string|null
+         */
+        public readonly ?string $scheme;
+        private readonly string $uri;
         private array $parts;
 
         public function __construct(string $uri)
@@ -28,6 +58,10 @@ namespace library {
                 throw new \InvalidArgumentException('Invalid URI detected.');
             }
             $this->path = '/' . trim(str_replace([chr(0), '/..', '/.'], '', $this->parts['path']), '/');
+            $this->hostname = $this->parts['host'];
+            $this->port = $this->parts['port'] ?? null;
+            $this->fragment = $this->parts['fragment'] ?? null;
+            $this->query = $this->parts['query'] ?? null;
         }
 
         private static function valueOf($value, $default = null)
@@ -53,36 +87,17 @@ namespace library {
         public function authority(): string
         {
             $info = self::valueOf($this->userInfo());
-            $port = self::valueOf($this->parts['port']);
-            return ($info ? $info . '@' : null) . $this->hostname() . ($port ? ':' . $port : null);
-        }
-
-        /**
-         * Get URI fragment
-         * @return string|null URI fragment
-         */
-        public function fragment(): ?string
-        {
-            return self::valueOf($this->parts['fragment']);
-        }
-
-        /**
-         * Get hostname from URI
-         * @return string Hostname
-         */
-        public function hostname(): string
-        {
-            return $this->parts['host'];
+            return ($info ? $info . '@' : null) . $this->hostname . ($this->port ? ':' . $this->port : null);
         }
 
         public function subdomain(): string
         {
-            return substr($this->parts['host'], 0, strpos($this->parts['host'], '.'));
+            return substr($this->hostname, 0, strpos($this->hostname, '.'));
         }
 
         public function tld(): string
         {
-            return substr($this->parts['host'], strrpos($this->parts['host'], '.') + 1);
+            return substr($this->hostname, strrpos($this->hostname, '.') + 1);
         }
 
         /**
@@ -91,10 +106,8 @@ namespace library {
          */
         public function host(): string
         {
-            $scheme = $this->scheme();
-            $port = self::valueOf($this->parts['port']);
-            $host = $this->parts['host'] . ($port ? ':' . $port : null);
-            return $scheme !== null ? $scheme . '://' . $host : $host;
+            $host = $this->hostname . ($this->port ? ':' . $this->port : null);
+            return $this->scheme !== null ? $this->scheme . '://' . $host : $host;
         }
 
         /**
@@ -104,34 +117,13 @@ namespace library {
         public function pathInfo(): string
         {
             $path = $this->path;
-            $query = $this->query();
-            $fragment = $this->fragment();
-            if ($query !== null) {
-                $path .= '?' . $query;
+            if ($this->query !== null) {
+                $path .= '?' . $this->query;
             }
-            if ($fragment !== null) {
-                $path .= '#' . $fragment;
+            if ($this->fragment !== null) {
+                $path .= '#' . $this->fragment;
             }
             return $path;
-        }
-
-        public function port(): ?int
-        {
-            return $this->parts['port'];
-        }
-
-        /**
-         * Get query string part of a URI
-         * @return string|null Query string
-         */
-        public function query(): ?string
-        {
-            return $this->parts['query'] ?? null;
-        }
-
-        public function scheme(): ?string
-        {
-            return self::valueOf($this->parts['scheme']);
         }
 
         public function userInfo(): ?string
@@ -191,7 +183,7 @@ namespace library {
          */
         public function secure($scheme = 'https'): bool
         {
-            return $this->scheme() === $scheme;
+            return $this->scheme === $scheme;
         }
     }
 

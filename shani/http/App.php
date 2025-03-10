@@ -73,7 +73,7 @@ namespace shani\http {
                 HttpHeader::SERVER => Framework::NAME
             ]);
             try {
-                $this->vhost = ServerConfig::host($this->request->uri->hostname());
+                $this->vhost = ServerConfig::host($this->request->uri->hostname);
                 $this->config = new $this->vhost->config($this);
                 $this->runApp();
             } catch (\ErrorException $ex) {
