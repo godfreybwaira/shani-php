@@ -10,7 +10,6 @@
 namespace gui {
 
     use shani\advisors\Configuration;
-    use shani\contracts\DataDto;
     use shani\core\Definitions;
     use shani\http\App;
 
@@ -20,8 +19,7 @@ namespace gui {
         private readonly App $app;
         private array $details = [];
         private ?string $title, $icon;
-        private ?array $scripts, $styles, $attributes;
-        private ?DataDto $dto = null;
+        private ?array $scripts, $styles, $data, $attributes;
 
         private const REFERRER_PRIVACIES = [
             Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
@@ -33,7 +31,7 @@ namespace gui {
         public function __construct(App &$app)
         {
             $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config->browsingPrivacy()]);
-            $this->scripts = $this->styles = $this->attributes = [];
+            $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;
         }
@@ -120,12 +118,12 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param DataDto $dto Data object to be passed to a view component.
+         * @param array $data Data object to be passed to a view component.
          * @return void
          */
-        public function render(?DataDto $dto): void
+        public function render(?array $data): void
         {
-            $this->dto = $dto;
+            $this->data = $data ?? [];
             if ($this->app->config->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
@@ -133,9 +131,13 @@ namespace gui {
             }
         }
 
-        public function dto(): ?DataDto
+        /**
+         * Get immutable data that will be available to all views.
+         * @param string $key Key
+         */
+        public function data(string $key = null)
         {
-            return $this->dto;
+            return $key === null ? $this->data : $this->data[$key] ?? null;
         }
 
         /**

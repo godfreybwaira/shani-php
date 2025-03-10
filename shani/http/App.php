@@ -324,11 +324,11 @@ namespace shani\http {
             $type = $this->response->type();
             if ($type === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($customDto);
+                $this->ui()->render($customDto->asMap());
                 $this->sendHtml(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($customDto);
+                $this->ui()->render($customDto->asMap());
                 $this->sendSse(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($customDto->asMap(), $type);
