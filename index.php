@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+use shani\servers\swoole\HttpServer;
+
 /**
  * Server root directory
  */
@@ -9,4 +12,4 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'library');
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
-shani\servers\swoole\HttpServer::start();
+HttpServer::start();
