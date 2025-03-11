@@ -252,13 +252,11 @@ namespace library\http {
             return array_values($this->headers);
         }
 
-        public function entrySet(): array
+        public function entrySet(): \Generator
         {
-            $entries = [];
             foreach ($this->headers as $key => $value) {
-                $entries[] = [$key => $value];
+                yield [$key => $value];
             }
-            return $entries;
         }
     }
 
