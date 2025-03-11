@@ -192,11 +192,15 @@ namespace gui {
         /**
          * Import a template file. The template imported also has access to $app object
          * @param string $template Path to template file
+         * @param bool $allow If true then import will be done, false otherwise.
          * @return void
          */
-        public function import(string $template): void
+        public function import(string $template, bool $allow = true): self
         {
-            self::load($this->app, $template);
+            if ($allow) {
+                self::load($this->app, $template);
+            }
+            return $this;
         }
 
         private static function load(App &$app, string $loadedFile): void
