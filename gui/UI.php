@@ -39,12 +39,12 @@ namespace gui {
         /**
          * Set HTML document icon (favicon)
          * @param string $path Path to icon file
-         * @param string $mime MIME type of a file
+         * @param string $mediaType media type of a file
          * @return self
          */
-        public function icon(string $path, string $mime): self
+        public function icon(string $path, string $mediaType): self
         {
-            $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mime . '"/>';
+            $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mediaType . '"/>';
             return $this;
         }
 

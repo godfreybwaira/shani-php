@@ -111,9 +111,10 @@ namespace library {
 
         /**
          * Returns an instance with the specified expires.
+         * @param \DateTimeInterface $expires Time to expire
          * @return static
          */
-        public function setExpires(\DateTime $expires): self
+        public function setExpires(\DateTimeInterface $expires): self
         {
             $this->cookie['expires'] = $expires;
             return $this;
@@ -121,10 +122,10 @@ namespace library {
 
         /**
          * Set Cookie maximum age
-         * @param \DateTime $maxAge
+         * @param \DateTimeInterface $maxAge
          * @return self
          */
-        public function setMaxAge(\DateTime $maxAge): self
+        public function setMaxAge(\DateTimeInterface $maxAge): self
         {
             $this->cookie['max-age'] = $maxAge;
             return $this;

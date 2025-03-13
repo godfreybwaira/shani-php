@@ -262,7 +262,7 @@ namespace shani\http {
                         ->setValue($app->request->cookies($sessName) ?? session_create_id())
                         ->setSecure($app->request->uri->secure())->setHttpOnly(true)
                         ->setDomain($app->request->uri->hostname)
-                        ->setMaxAge(new \DateTime($app->config->cookieMaxAge()));
+                        ->setMaxAge($app->config->cookieMaxAge());
                 $app->response->setCookie($cookie);
             });
         }

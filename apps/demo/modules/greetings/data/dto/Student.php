@@ -9,7 +9,7 @@
 
 namespace apps\demo\modules\greetings\data\dto {
 
-    final class Student implements \shani\contracts\DataDto
+    final class Student implements \JsonSerializable
     {
 
         private string $firstName, $lastName;
@@ -25,12 +25,12 @@ namespace apps\demo\modules\greetings\data\dto {
 
         public function addSubject(Subject $subject): self
         {
-            $this->subjects[] = $subject->asMap();
+            $this->subjects[] = $subject->jsonSerialize();
             return $this;
         }
 
         #[\Override]
-        public function asMap(): array
+        public function jsonSerialize(): array
         {
             return [
                 'firstName' => $this->firstName,

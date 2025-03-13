@@ -13,16 +13,10 @@ namespace library {
     final class Task
     {
 
-        private Event $listener;
         private \Exception $exception;
+        private readonly Event $listener;
         private bool $paused = false, $cancelled = false;
         private int $frequency = 1, $steps = 1, $repeat = 0;
-
-        public const TIME_SECOND = 1;
-        public const TIME_MINUTE = self::TIME_SECOND * 60;
-        public const TIME_HOUR = self::TIME_MINUTE * 60;
-        public const TIME_DAY = self::TIME_HOUR * 24;
-        public const TIME_WEEK = self::TIME_DAY * 7;
 
         /**
          * Supported task events
@@ -36,10 +30,10 @@ namespace library {
 
         /**
          * Set start time on when to execute a task
-         * @param \DateTimeImmutable $duration Duration from now
+         * @param \DateTimeInterface $duration Duration from now
          * @return self
          */
-        public function startAt(\DateTimeImmutable $duration): self
+        public function startAt(\DateTimeInterface $duration): self
         {
             return $this->startAfter($duration->getTimestamp() - time());
         }

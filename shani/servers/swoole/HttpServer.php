@@ -75,12 +75,12 @@ namespace shani\servers\swoole {
                     ->protocol($req->server['server_protocol'])
                     ->method($req->server['request_method'])
                     ->headers(new HttpHeader($req->header))
-                    ->cookies(Map::normalize($req->cookie))
                     ->time($req->server['request_time'])
                     ->files(self::getFiles($req->files))
-                    ->query(Map::normalize($req->get))
                     ->ip($req->server['remote_addr'])
                     ->body(self::getBody($req))
+                    ->cookies($req->cookie)
+                    ->query($req->get)
                     ->uri($uri)
                     ->build();
             $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
@@ -89,13 +89,9 @@ namespace shani\servers\swoole {
 
         private static function getBody(Request &$req): ?array
         {
-            $inputs = Map::normalize($req->post);
-            if (!empty($inputs)) {
-                return $inputs;
-            }
             $contentType = $req->header['content-type'] ?? null;
-            if (empty($contentType)) {
-                return null;
+            if (!empty($req->post) || empty($contentType)) {
+                return $req->post;
             }
             $type = MediaType::explode(strtolower($contentType))[1];
             return DataConvertor::convertFrom($req->rawcontent(), $type);

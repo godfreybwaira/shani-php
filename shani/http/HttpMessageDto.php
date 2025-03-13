@@ -10,9 +10,8 @@
 namespace shani\http {
 
     use library\http\HttpStatus;
-    use shani\contracts\DataDto;
 
-    final class HttpMessageDto implements DataDto
+    final class HttpMessageDto implements \JsonSerializable
     {
 
         private readonly HttpStatus $status;
@@ -25,7 +24,7 @@ namespace shani\http {
         }
 
         #[\Override]
-        public function asMap(): array
+        public function jsonSerialize(): array
         {
             return[
                 'code' => $this->status->value,

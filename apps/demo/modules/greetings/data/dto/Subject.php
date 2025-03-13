@@ -9,7 +9,7 @@
 
 namespace apps\demo\modules\greetings\data\dto {
 
-    final class Subject implements \shani\contracts\DataDto
+    final class Subject implements \JsonSerializable
     {
 
         private string $name, $grade;
@@ -23,7 +23,7 @@ namespace apps\demo\modules\greetings\data\dto {
         }
 
         #[\Override]
-        public function asMap(): array
+        public function jsonSerialize(): array
         {
             return [
                 'name' => $this->name,

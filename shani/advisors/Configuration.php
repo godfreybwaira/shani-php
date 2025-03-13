@@ -11,6 +11,7 @@
 namespace shani\advisors {
 
     use library\DataCompressionLevel;
+    use library\Duration;
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
@@ -65,12 +66,14 @@ namespace shani\advisors {
          * @var bool
          */
         public readonly bool $authenticated;
+        public readonly ?string $permissionList;
         protected readonly App $app;
 
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->authenticated = $this->userPermissions() !== null;
+            $this->permissionList = $this->userPermissions();
+            $this->authenticated = $this->permissionList !== null;
         }
 
         /**
@@ -94,11 +97,11 @@ namespace shani\advisors {
 
         /**
          * Get or set cookie max age before expiration.
-         * @return string A date/time string. Valid formats are explained in Date and Time Formats.
+         * @return \DateTimeInterface A date/time object.
          */
-        public function cookieMaxAge(): string
+        public function cookieMaxAge(): \DateTimeInterface
         {
-            return '2 hours';
+            return Duration::of(2, Duration::HOURS);
         }
 
         /**
@@ -125,11 +128,11 @@ namespace shani\advisors {
 
         /**
          * Get/set request methods that will be protected from CSRF attacks
-         * @return array Methods (in lower cases) to protect.
+         * @return bool True if request Methods (in lower cases) to protect.
          */
-        public function csrfProtectedMethods(): array
+        public function csrfProtected(): bool
         {
-            return ['post', 'put', 'patch', 'delete'];
+            return str_contains('post,put,patch,delete', $this->app->request->method);
         }
 
         /**
@@ -159,11 +162,11 @@ namespace shani\advisors {
         }
 
         /**
-         * Set all application supported languages where key being language code
-         * and value being language name.
+         * Get all application supported languages where a key is a language code
+         * and a value is a language name.
          * @return array Associative array of supported languages.
          */
-        public function languages(): array
+        public function supportedLanguages(): array
         {
             return ['sw' => 'Kiswahili', 'en' => 'English'];
         }

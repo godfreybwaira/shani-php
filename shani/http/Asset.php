@@ -19,9 +19,9 @@ namespace shani\http {
 
         private readonly App $app;
 
-        private const ASSET_PREFIX = '/-1';
-        public const STORAGE_PREFIX = '/-2';
-        public const PRIVATE_PREFIX = '/-3';
+        private const ASSET_PREFIX = '/0';
+        public const STORAGE_PREFIX = '/1';
+        public const PRIVATE_PREFIX = '/2';
 
         public function __construct(App &$app)
         {
@@ -40,7 +40,7 @@ namespace shani\http {
          */
         public static function tryServe(App &$app): bool
         {
-            $path = $app->request->uri->path;
+            echo $path = $app->request->uri->path;
             $prefix = $rootPath = null;
             if (self::isStaticPath($path, self::ASSET_PREFIX)) {
                 $prefix = self::ASSET_PREFIX;

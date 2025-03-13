@@ -51,8 +51,7 @@ namespace shani\advisors {
          */
         public function passedCsrfTest(): bool
         {
-            $method = $this->app->request->method;
-            if (!$this->app->config->csrfProtectionEnabled() || !in_array($method, $this->app->config->csrfProtectedMethods())) {
+            if (!$this->app->config->csrfProtectionEnabled() || !$this->app->config->csrfProtected()) {
                 return true;
             }
             $token = $this->app->request->cookies($this->app->config->csrfTokenName());

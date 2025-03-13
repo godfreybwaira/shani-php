@@ -13,7 +13,7 @@ namespace gui\v1 {
     class Component
     {
 
-        private string $htmlTag;
+        private readonly string $htmlTag;
         private ?string $content = null;
         private array $children, $attributes, $classList, $inlineStyles = [];
         private array $inlineSourceCSS, $externalStyles = [];

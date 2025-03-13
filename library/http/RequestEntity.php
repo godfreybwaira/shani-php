@@ -10,8 +10,8 @@
 namespace library\http {
 
     use library\Map;
-    use library\URI;
     use library\MediaType;
+    use library\URI;
     use shani\http\RequestRoute;
     use shani\http\UploadedFile;
 
@@ -29,6 +29,11 @@ namespace library\http {
          * @var int
          */
         public readonly int $time;
+
+        /**
+         * Request method
+         * @var string
+         */
         public readonly string $method;
 
         /**
@@ -44,8 +49,8 @@ namespace library\http {
         public readonly string $localhost;
         public readonly array $files;
         private RequestRoute $route;
-        private array $acceptedType;
-        private readonly array $cookies, $body, $queries;
+        private ?array $acceptedType = null;
+        public readonly array $cookies, $body, $queries;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
@@ -54,16 +59,15 @@ namespace library\http {
         {
             parent::__construct($headers, $protocol);
             $this->localhost = $ip === '127.0.0.1';
-            $this->acceptedType = [];
+            $this->method = $method;
+            $this->changeRoute($uri->path);
             $this->cookies = $cookies;
             $this->queries = $queries;
-            $this->method = $method;
             $this->files = $files;
             $this->body = $body;
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
-            $this->changeRoute($uri->path);
         }
 
         public function changeRoute(string $path): self
@@ -78,11 +82,26 @@ namespace library\http {
         }
 
         /**
+         * Get user request language codes. These values will be used for selection
+         * of application language if they are supported.
+         * @return array users accepted languages
+         */
+        public function languages(): array
+        {
+            $acceptedLanguages = $this->headers->get(HttpHeader::ACCEPT_LANGUAGE);
+            if ($acceptedLanguages !== null) {
+                $langs = explode(',', $acceptedLanguages);
+                return array_map(fn($val) => strtolower(trim(explode(';', $val)[0])), $langs);
+            }
+            return [];
+        }
+
+        /**
          * Check if HTTP user agent accept the given content type.
          * @param string $type MIME type or last part of MIME before /
          * @return bool True on success, false otherwise.
          */
-        public function accept(string $type): bool
+        public function accepted(string $type): bool
         {
             if (empty($this->acceptedType)) {
                 $this->acceptedType = MediaType::parse($this->headers->get(HttpHeader::ACCEPT));
@@ -125,24 +144,22 @@ namespace library\http {
 
         /**
          * Get HTTP request values obtained via HTTP request body.
-         * @param string|array $names named key
-         * @param bool $selected If set to true, only the selected values will be returned.
-         * @return type
+         * @param string $name named key
+         * @return string|null
          */
-        public function body(string|array $names = null, bool $selected = true)
+        public function body(string $name): ?string
         {
-            return Map::get($this->body, $names, $selected);
+            return $this->body[$name] ?? null;
         }
 
         /**
          * Get request parameters sent via HTTP request endpoint
-         * @param int|array $index Index of request parameter
-         * @param bool $selected If set to true, only the selected values will be returned.
-         * @return type
+         * @param int $index Index of a request parameter
+         * @return string|null
          */
-        public function params(int|array $index = null, bool $selected = true)
+        public function params(int $index): ?string
         {
-            return Map::get($this->route->params, $index, $selected);
+            return $this->route->params[$index] ?? null;
         }
 
         public function withFile(string $name, UploadedFile $file): self
@@ -154,13 +171,12 @@ namespace library\http {
 
         /**
          * Get HTTP queries
-         * @param string|array $names query string name
-         * @param bool $selected If set to true, only the selected values will be returned.
-         * @return type
+         * @param string $name query string name
+         * @return string|null
          */
-        public function query(string|array $names = null, bool $selected = true)
+        public function query(string $name): ?string
         {
-            return Map::get($this->queries, $names, $selected);
+            return $this->queries[$name] ?? null;
         }
     }
 

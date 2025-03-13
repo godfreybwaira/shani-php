@@ -26,9 +26,9 @@ namespace apps\demo\modules\greetings\logic\controllers\post {
          */
         public function world()
         {
-            $file = $this->app->request->file('picha', 1);
+            $file = $this->app->request->file('picha');
             $file->save($this->app);
-            print_r($file);
+            print_r($this->app->asset()->urlTo($file->saveLocation()));
             $this->app->render();
         }
     }

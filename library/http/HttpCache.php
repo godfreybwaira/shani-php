@@ -9,17 +9,19 @@
 
 namespace library\http {
 
+    use library\Duration;
+
     final class HttpCache
     {
 
         private bool $reuse, $versioned, $accessible, $revalidate, $unique;
-        private \DateTime $maxAge;
-        private ?\DateTime $stale;
+        private \DateTimeInterface $maxAge;
+        private ?\DateTimeInterface $stale;
         private ?string $etag;
 
         public function __construct(bool $reuse = false)
         {
-            $this->maxAge = new \DateTime('6 month');
+            $this->maxAge = Duration::of(6, Duration::MONTHS);
             $this->setReuse($reuse);
             $this->stale = null;
             $this->etag = null;
@@ -40,7 +42,7 @@ namespace library\http {
             return $this->etag;
         }
 
-        public function setMaxAge(\DateTime $age): self
+        public function setMaxAge(\DateTimeInterface $age): self
         {
             $this->maxAge = $age;
             return $this;
@@ -76,7 +78,7 @@ namespace library\http {
             return $this;
         }
 
-        public function setStale(\DateTime $stale): self
+        public function setStale(\DateTimeInterface $stale): self
         {
             $this->stale = $stale;
             return $this;

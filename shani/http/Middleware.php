@@ -16,8 +16,8 @@ namespace shani\http {
     final class Middleware
     {
 
-        private Event $listener;
         private readonly App $app;
+        private readonly Event $listener;
 
         public function __construct(App &$app)
         {

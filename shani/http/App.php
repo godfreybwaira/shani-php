@@ -18,7 +18,6 @@ namespace shani\http {
     use library\http\RequestEntity;
     use library\Utils;
     use shani\advisors\Configuration;
-    use shani\contracts\DataDto;
     use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
     use shani\documentation\Generator;
@@ -96,8 +95,6 @@ namespace shani\http {
             $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
             if (!$this->vhost->running) {
                 $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-                $this->config->errorHandler();
-                return;
             }
             if (!Asset::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
@@ -132,10 +129,10 @@ namespace shani\http {
         /**
          * Stream  a file as HTTP response
          * @param string $filepath Path to a file to stream
-         * @param int|null $chunkSize Number of bytes to stream every turn, default is 1MB
+         * @param int $chunkSize Number of bytes to stream every turn, default is 1MB
          * @return self
          */
-        public function stream(string $filepath, ?int $chunkSize = null): self
+        public function stream(string $filepath, int $chunkSize = null): self
         {
             if (!is_file($filepath)) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
@@ -312,28 +309,28 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param DataDto $dto Data object to be passed to a view file
+         * @param \JsonSerializable $dto Data object to be passed to a view file
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(DataDto $dto = null, bool $useBuffer = false): void
+        public function render(\JsonSerializable $dto = null, bool $useBuffer = false): void
         {
-            $customDto = $dto ?? new HttpMesageDto($this->response->status());
+            $customDto = $dto ?? new HttpMessageDto($this->response->status());
             $type = $this->response->type();
             if ($type === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($customDto->asMap());
+                $this->ui()->render($customDto->jsonSerialize());
                 $this->sendHtml(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($customDto->asMap());
+                $this->ui()->render($customDto->jsonSerialize());
                 $this->sendSse(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($customDto->asMap(), $type);
+                $this->sendJsonp($customDto->jsonSerialize(), $type);
             } else {
-                $this->response->setBody(DataConvertor::convertTo($customDto->asMap(), $type), $type);
+                $this->response->setBody(DataConvertor::convertTo($customDto->jsonSerialize(), $type), $type);
             }
             $this->send($useBuffer);
         }
@@ -360,29 +357,14 @@ namespace shani\http {
         }
 
         /**
-         * Get use request language codes. These values will be used for application
-         * language selection if the values are supported.
-         * @return array users accepted languages
-         */
-        public function languages(): array
-        {
-            $accept = $this->request->header()->get(HttpHeader::ACCEPT_LANGUAGE);
-            if ($accept !== null) {
-                $langs = explode(',', $accept);
-                return array_map(fn($val) => strtolower(trim(explode(';', $val)[0])), $langs);
-            }
-            return [];
-        }
-
-        /**
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param DataDto $dto Data to pass to dictionary file.
+         * @param \JsonSerializable $dto Data to pass to dictionary file.
          * @return array Associative array where key is the word/sentence unique
          * code and the value is the actual word/sentence.
          */
-        public function dictionary(DataDto $dto = null): array
+        public function dictionary(\JsonSerializable $dto = null): array
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
@@ -392,7 +374,7 @@ namespace shani\http {
             return $this->dict;
         }
 
-        private static function getFile(string $loadedFile, DataDto $dto = null): array
+        private static function getFile(string $loadedFile, \JsonSerializable $dto = null): array
         {
             return require $loadedFile;
         }
@@ -448,7 +430,10 @@ namespace shani\http {
             if ($this->config->authorizationDisabled()) {
                 return true;
             }
-            return (preg_match('\b' . self::digest($target) . '\b', $this->config->userPermissions()) === 1);
+            if (empty($this->config->permissionList)) {
+                return false;
+            }
+            return (preg_match('\b' . self::digest($target) . '\b', $this->config->permissionList) === 1);
         }
 
         /**
@@ -509,10 +494,10 @@ namespace shani\http {
         public function language(): string
         {
             if (!$this->lang) {
-                $reqLangs = $this->languages();
-                $appLangs = $this->config->languages();
+                $reqLangs = $this->request->languages();
+                $supportedLangs = $this->config->supportedLanguages();
                 foreach ($reqLangs as $lang) {
-                    if (!empty($appLangs[$lang])) {
+                    if (!empty($supportedLangs[$lang])) {
                         $this->lang = $lang;
                         return $lang;
                     }
