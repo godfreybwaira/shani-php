@@ -144,6 +144,7 @@ namespace shani\http {
             $end = min($start + ($chunkSize ?? Definitions::BUFFER_SIZE), $file['size'] - 1);
             $this->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->setAll([
                 HttpHeader::CONTENT_RANGE => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
+                HttpHeader::LAST_MODIFIED => gmdate(DATE_RFC7231, $file['mtime']),
                 HttpHeader::ACCEPT_RANGES => 'bytes'
             ]);
             return $this->doStream($filepath, $start, $end);

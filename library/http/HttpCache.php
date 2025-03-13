@@ -54,7 +54,7 @@ namespace library\http {
             return $this;
         }
 
-        public function setEtag(bool $etag): self
+        public function setEtag(string $etag): self
         {
             $this->etag = $etag;
             return $this;
@@ -90,9 +90,7 @@ namespace library\http {
             if ($this->reuse) {
                 $directives[] = $this->accessible ? 'no-cache' : 'no-store';
             } else {
-                if ($this->unique) {
-                    $directives[] = 'private';
-                }
+                $directives[] = $this->unique ? 'private' : 'public';
                 $directives[] = 'max-age=' . $this->maxAge->getTimestamp();
                 if ($this->versioned) {
                     $directives[] = 'immutable';
@@ -101,7 +99,7 @@ namespace library\http {
                     $directives[] = 'stale-while-revalidate=' . $age->getTimestamp();
                 }
             }
-            return implode(',', $directives);
+            return implode(', ', $directives);
         }
     }
 

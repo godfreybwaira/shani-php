@@ -148,8 +148,11 @@ namespace library\http {
          */
         public function setCache(HttpCache $cache): self
         {
-            $this->headers->set(HttpHeader::ETAG, $cache->etag())
-                    ->set(HttpHeader::CACHE_CONTROL, $cache);
+            $etag = $cache->etag();
+            if (!empty($etag)) {
+                $this->headers->set(HttpHeader::ETAG, $etag);
+            }
+            $this->headers->set(HttpHeader::CACHE_CONTROL, $cache);
             return $this;
         }
 

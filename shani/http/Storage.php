@@ -48,12 +48,14 @@ namespace shani\http {
 
         private static function sendFile(App &$app, string $rootPath, string $prefix): bool
         {
-            if ($app->request->header()->has(HttpHeader::IF_NONE_MATCH)) {
+            $etag = md5($app->request->uri->path);
+            if ($app->request->header()->get(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
                 $app->send();
             } else {
                 $file = $rootPath . substr($app->request->uri->path, strlen($prefix));
-                $app->response->setStatus(HttpStatus::OK)->setCache(new HttpCache());
+                $cache = (new HttpCache())->setEtag($etag);
+                $app->response->setStatus(HttpStatus::OK)->setCache($cache);
                 $app->stream($file);
             }
             return true;
