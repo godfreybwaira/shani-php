@@ -223,19 +223,11 @@ namespace shani\advisors {
         }
 
         /**
-         * Returns application web root directory where all application specific static files are stored.
+         * Returns application storage directory relative to apps directory,
+         * where all application specific static files are stored.
          * @return string Path relative to application directory
          */
-        public abstract function staticAssetStorage(): string;
-
-        /**
-         * All files that have to be accessed by an authenticated users are kept here.
-         * @return string|null A path relative to a web root directory
-         */
-        public function protectedStorage(): ?string
-        {
-            return '/protected';
-        }
+        public abstract function appStorage(): string;
 
         /**
          * Default path to homepage if '/' is provided by during HTTP request

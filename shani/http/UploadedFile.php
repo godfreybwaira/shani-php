@@ -71,20 +71,19 @@ namespace shani\http {
 
         /**
          * Move a file from temporary directory to destination directory
-         * @param string $destination File storage destination
-         * @param string $newName A new file name without extension
+         * @param App $app Application object
+         * @param string $destination File storage destination, must begins with /
          * @return self
          * @throws \ErrorException Throw error if fails to create destination directory or not exists
-         * @see Configuration::protectedStorage()
          */
-        public function save(App &$app, string $destination = null, string $newName = null): self
+        public function save(App &$app, string $destination = null): self
         {
             if ($this->saveLocation !== null) {
                 return $this;
             }
             $savePath = $app->storage()->pathTo($destination);
             $directory = self::createDirectory($savePath . '/' . $this->type);
-            $filepath = $directory . '/' . ($newName ?? self::PREFIXES[rand(0, count(self::PREFIXES) - 1)]);
+            $filepath = $directory . '/' . self::PREFIXES[rand(0, count(self::PREFIXES) - 1)];
             $filepath .= hrtime()[1] . self::getExtension($this->name);
             $file = fopen($filepath, 'a+b');
             $size = fstat($file)['size'];

@@ -162,12 +162,12 @@ namespace gui {
         public function head(): string
         {
             $head = $this->icon;
-            $asset = $this->app->asset();
+            $asset = $this->app->storage();
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->urlTo($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->assetUrl($url) . '"/>';
             }
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $asset->urlTo($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $asset->assetUrl($url) . '"></script>';
             }
             foreach ($this->details as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';

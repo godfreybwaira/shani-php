@@ -30,7 +30,6 @@ namespace shani\http {
     final class App
     {
 
-        private Asset $asset;
         private Storage $storage;
         private ?string $lang = null;
         private readonly ResponseWriter $writer;
@@ -96,7 +95,7 @@ namespace shani\http {
             if (!$this->vhost->running) {
                 $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
             }
-            if (!Asset::tryServe($this)) {
+            if (!Storage::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
                     $this->request->changeRoute($this->config->homepage());
                 }
@@ -272,8 +271,8 @@ namespace shani\http {
         }
 
         /**
-         * Get Storage object representing application web root directory
-         * @return Storage A storage object
+         * Get storage object representing application storage directory
+         * @return Storage
          */
         public function storage(): Storage
         {
@@ -281,18 +280,6 @@ namespace shani\http {
                 $this->storage = new Storage($this);
             }
             return $this->storage;
-        }
-
-        /**
-         * Get static assets object representing application static asset directory
-         * @return Asset
-         */
-        public function asset(): Asset
-        {
-            if (!isset($this->asset)) {
-                $this->asset = new Asset($this);
-            }
-            return $this->asset;
         }
 
         /**

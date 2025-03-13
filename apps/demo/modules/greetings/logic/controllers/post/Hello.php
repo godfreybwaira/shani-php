@@ -28,7 +28,7 @@ namespace apps\demo\modules\greetings\logic\controllers\post {
         {
             $file = $this->app->request->file('picha');
             $file->save($this->app);
-            print_r($this->app->asset()->urlTo($file->saveLocation()));
+            print_r($this->app->storage()->assetUrl($file->saveLocation()));
             $this->app->render();
         }
     }

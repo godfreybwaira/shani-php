@@ -1,81 +1,130 @@
 <?php
 
 /**
- * Description of Storage
+ * Description of Asset
  * @author coder
  *
- * Created on: Aug 14, 2024 at 12:48:49 PM
+ * Created on: Feb 11, 2024 at 6:50:02 PM
  */
 
 namespace shani\http {
 
+    use library\http\HttpCache;
+    use library\http\HttpHeader;
+    use library\http\HttpStatus;
     use shani\core\Definitions;
 
     final class Storage
     {
 
         private readonly App $app;
-        private readonly string $root;
+        private readonly string $host, $storage;
 
+        private const ASSET_PREFIX = '/0';
+        private const STORAGE_PREFIX = '/1';
         public const FILE_MODE = 0750;
 
-        /**
-         * Create a storage area for files and directories
-         * @param App $app
-         */
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->root = Definitions::DIR_APPS . $app->config->staticAssetStorage();
+            $this->host = $app->request->uri->host();
+            $this->storage = Definitions::DIR_APPS . $app->config->appStorage();
         }
 
         /**
-         * Get a file from application web storage directory
-         * @param string|null $path A file path relative to web root directory
+         * Serve static content e.g CSS, images and other static files.
+         * @param App $app Application object
+         * @return bool True on success, false otherwise.
+         */
+        public static function tryServe(App &$app): bool
+        {
+            $prefix = substr($app->request->uri->path, 0, strpos($app->request->uri->path, '/', 1));
+            return match ($prefix) {
+                self::ASSET_PREFIX => self::sendFile($app, Definitions::DIR_ASSETS, $prefix),
+                self::STORAGE_PREFIX => self::sendFile($app, $app->storage()->pathTo(), $prefix),
+                default => false
+            };
+        }
+
+        private static function sendFile(App &$app, string $rootPath, string $prefix): bool
+        {
+            if ($app->request->header()->has(HttpHeader::IF_NONE_MATCH)) {
+                $app->response->setStatus(HttpStatus::NOT_MODIFIED);
+                $app->send();
+            } else {
+                $file = $rootPath . substr($app->request->uri->path, strlen($prefix));
+                $app->response->setStatus(HttpStatus::OK)->setCache(new HttpCache());
+                $app->stream($file);
+            }
+            return true;
+        }
+
+        /**
+         * Get absolute path of a file from static asset directory
+         * @param string $path A file path
          * @return string
          */
+        public static function assetPath(string $path): string
+        {
+            return Definitions::DIR_ASSETS . $path;
+        }
+
+        /**
+         * Get URL to a static asset resource
+         * @param string $path Path to a file relative to static asset directory
+         * @return string
+         */
+        public function assetUrl(string $path): string
+        {
+            return $this->host . self::ASSET_PREFIX . $path;
+        }
+
+        /**
+         * Get file URL
+         * @param string $path Path to a file relative to a web root directory
+         * @return string URL referring to a file from storage
+         */
+        public function url(string $path): string
+        {
+            return $this->host . self::STORAGE_PREFIX . $path;
+        }
+
         public function pathTo(?string $path = null): string
         {
-            return $this->root . $path;
+            return $this->storage . $path;
         }
 
         /**
          * Delete a file
-         * @param string|null $path file to delete
+         * @param string $path file to delete
          * @return bool True on success, false otherwise
          */
-        public function delete(?string $path): bool
+        public function delete(string $path): bool
         {
-            $filepath = $this->pathTo($path);
-            if (!is_file($filepath)) {
-                return false;
-            }
-            return unlink($filepath);
-        }
-
-        private function getHash(?string $path, string $algorithm = 'sha256'): ?string
-        {
-            $filepath = $this->pathTo($path);
-            if ($path === null || !is_file($filepath)) {
-                return $path;
-            }
-            return hash_file($algorithm, $filepath);
-        }
-
-        private function getPath(?string $path): ?string
-        {
-            if ($path === null || is_file($path)) {
-                return $path;
-            }
             $filepath = $this->pathTo($path);
             if (is_file($filepath)) {
-                return $filepath;
+                return unlink($filepath);
+            }
+            return false;
+        }
+
+        /**
+         * Get hash of a file
+         * @param string $path Path to a file
+         * @param string $algorithm Hashing algorithms
+         * @return string|null Returns hash of a file, or null if file does not exists.
+         */
+        private function getHash(string $path, string $algorithm = 'sha256'): ?string
+        {
+            $filepath = $this->pathTo($path);
+            if (is_file($filepath)) {
+                return hash_file($algorithm, $filepath);
             }
             return null;
         }
 
         /**
-         * Create and return a file info object
+         * Get information about the file
          * @param string $path a file path
          * @return \SplFileInfo
          * @throws \ErrorException
@@ -113,8 +162,8 @@ namespace shani\http {
 
         private function transferFile(string $src, string $dst, callable $cb): ?string
         {
-            $filepath = $this->getPath($src);
-            if ($filepath === null) {
+            $filepath = $this->pathTo($src);
+            if (!is_file($filepath)) {
                 return null;
             }
             $filename = '/' . basename($filepath);
@@ -128,41 +177,25 @@ namespace shani\http {
         }
 
         /**
-         * Get a full qualified URL to a web root directory (web storage)
-         * @param string $path Path to a file in a web root directory
-         * @param bool $protected If set to true, then the file will be loaded from a protected storage
-         * @return string URL referring to a file from storage
-         */
-        public function urlTo(string $path, bool $protected = true): string
-        {
-            if ($protected) {
-                $storage = $this->app->config->protectedStorage();
-                $url = $this->app->request->uri->host() . self::PRIVATE_PREFIX;
-                return $url . (empty($storage) ? $path : substr($path, strlen($storage)));
-            }
-            return $this->app->request->uri->host() . self::STORAGE_PREFIX . $path;
-        }
-
-        /**
          * Zip and compress a file
-         * @param string|array $sourcePath A file to compress
+         * @param string|array $path A file(s) to add to zip archieve
          * @return string|null Path to a zipped file
          */
-        public function zip(string|array $sourcePath): ?string
+        public function zip(string|array $path): ?string
         {
             $zip = new \ZipArchive();
             $archive = stream_get_meta_data(tmpfile())['uri'];
             $zip->open($archive, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-            if (is_array($sourcePath)) {
-                foreach ($sourcePath as $path) {
-                    $filepath = $this->getPath($path);
-                    if ($filepath !== null) {
+            if (is_array($path)) {
+                foreach ($path as $file) {
+                    $filepath = $this->pathTo($file);
+                    if (is_file($filepath)) {
                         $zip->addFile($filepath, basename($filepath));
                     }
                 }
             } else {
-                $filepath = $this->getPath($sourcePath);
-                if ($filepath !== null) {
+                $filepath = $this->pathTo($path);
+                if (is_file($filepath)) {
                     $zip->addFile($filepath, basename($filepath));
                 }
             }

@@ -33,7 +33,7 @@ namespace apps\demo\config {
             return '/greetings/0/hello/1/world';
         }
 
-        public function staticAssetStorage(): string
+        public function appStorage(): string
         {
             return '/demo/storage';
         }
