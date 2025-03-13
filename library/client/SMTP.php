@@ -31,7 +31,7 @@ namespace library\client {
             $this->retries = $retries;
             $this->timeout = $timeout;
             $this->headers = [
-                'MIME-Version' => '1.0', 'Date' => date('r'),
+                'MIME-Version' => '1.0', 'Date' => gmdate('r'),
                 'Message-ID' => '<' . $this->boundary . '>'
             ];
         }

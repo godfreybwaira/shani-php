@@ -255,7 +255,7 @@ namespace library {
         {
             $cookie = $this->cookie['name'] . '=' . $this->cookie['value'];
             if (!empty($this->cookie['expires'])) {
-                $cookie .= '; Expires=' . date(DATE_COOKIE, $this->cookie['expires']->getTimestamp());
+                $cookie .= '; Expires=' . gmdate(DATE_COOKIE, $this->cookie['expires']->getTimestamp());
             }
             if (array_key_exists('max-age', $this->cookie)) {
                 $cookie .= '; Max-Age=' . $this->cookie['max-age']->getTimestamp() - time();

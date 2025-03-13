@@ -32,7 +32,7 @@ namespace library {
         {
             return [
                 'test' => [
-                    'description' => $this->description, 'date' => date(DATE_RFC2822),
+                    'description' => $this->description, 'date' => gmdate(DATE_RFC2822),
                     'cases' => $this->totalCases, 'passes' => $this->totalPasses,
                     'fails' => ($this->totalCases - $this->totalPasses)
                 ],
