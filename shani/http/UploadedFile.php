@@ -18,7 +18,7 @@ namespace shani\http {
         private const PREFIXES = ['y', 'e', 's', 'u'];
 
         public readonly string $name, $type;
-        public \SplFileObject $stream;
+        public readonly \SplFileObject $stream;
         public readonly ?string $error;
         public readonly int $size;
         private ?string $saveLocation;
@@ -31,11 +31,6 @@ namespace shani\http {
             $this->size = $size ?? stat($path)['size'];
             $this->error = self::getFileErrors($error);
             $this->stream = new \SplFileObject($path, 'rb');
-        }
-
-        public function __destruct()
-        {
-            unset($this->stream);
         }
 
         /**

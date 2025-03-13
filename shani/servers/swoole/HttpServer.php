@@ -15,7 +15,6 @@ namespace shani\servers\swoole {
     use library\http\HttpHeader;
     use library\http\HttpStatus;
     use library\http\ResponseEntity;
-    use library\Map;
     use library\MediaType;
     use library\RequestEntityBuilder;
     use library\URI;
@@ -33,7 +32,7 @@ namespace shani\servers\swoole {
     {
 
         private const SOCKET_TCP = 1, SSL = 512;
-        private const SCHEDULING = ['ROUND_ROBIN' => 1, 'PREEMPTIVE' => 3, 'FIXED' => 2];
+        private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private static function configure(array $cnf): WSocket
         {
