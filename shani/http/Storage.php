@@ -18,7 +18,8 @@ namespace shani\http {
     {
 
         private readonly App $app;
-        private readonly string $host, $storage;
+        private readonly string $host;
+        public readonly string $path;
 
         private const ASSET_PREFIX = '/0';
         private const STORAGE_PREFIX = '/1';
@@ -28,7 +29,7 @@ namespace shani\http {
         {
             $this->app = $app;
             $this->host = $app->request->uri->host();
-            $this->storage = Definitions::DIR_APPS . $app->config->appStorage();
+            $this->path = $app->config->appStorage();
         }
 
         /**
@@ -93,7 +94,7 @@ namespace shani\http {
 
         public function pathTo(?string $path = null): string
         {
-            return $this->storage . $path;
+            return $this->path . $path;
         }
 
         /**
@@ -180,7 +181,7 @@ namespace shani\http {
 
         /**
          * Zip and compress a file
-         * @param string|array $path A file(s) to add to zip archieve
+         * @param string|array $path A file(s) to add to zip archive
          * @return string|null Path to a zipped file
          */
         public function zip(string|array $path): ?string

@@ -223,9 +223,10 @@ namespace shani\advisors {
         }
 
         /**
-         * Returns application storage directory relative to apps directory,
-         * where all application specific static files are stored.
-         * @return string Path relative to application directory
+         * Returns application storage directory where all application specific
+         * static files are stored. The path must be accessible and writable by
+         * the web server
+         * @return string Absolute path
          */
         public abstract function appStorage(): string;
 

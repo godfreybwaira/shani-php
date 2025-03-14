@@ -131,7 +131,7 @@ namespace shani\http {
          * @param int $chunkSize Number of bytes to stream every turn, default is 1MB
          * @return self
          */
-        public function stream(string $filepath, int $chunkSize = null): self
+        public function stream(string $filepath, int $chunkSize = Definitions::BUFFER_SIZE): self
         {
             if (!is_file($filepath)) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
@@ -140,14 +140,47 @@ namespace shani\http {
             }
             $file = stat($filepath);
             $range = $this->request->header()->get(HttpHeader::RANGE) ?? '=0-';
+            if ($range === '=0-' && $file['size'] <= $chunkSize) {
+                $this->response->setStatus(HttpStatus::OK);
+                return $this->doStream($filepath, $file['size'], 0, $file['size'] - 1);
+            }
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-            $end = min($start + ($chunkSize ?? Definitions::BUFFER_SIZE), $file['size'] - 1);
+            $end = min($start + $chunkSize, $file['size']) - 1;
             $this->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->setAll([
-                HttpHeader::CONTENT_RANGE => 'bytes ' . $start . '-' . $end . '/' . $file['size'],
-                HttpHeader::LAST_MODIFIED => gmdate(DATE_RFC7231, $file['mtime']),
+                HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
                 HttpHeader::ACCEPT_RANGES => 'bytes'
             ]);
-            return $this->doStream($filepath, $start, $end);
+            $this->response->header()->set(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
+            return $this->doStream($filepath, $file['size'], $start, $end);
+        }
+
+        /**
+         * Stream a file to a client
+         * @param string $path Path to a file to stream
+         * @param int $filesize Actual file size
+         * @param int $start Start bytes to stream
+         * @param int $end End bytes to stream
+         * @return self
+         */
+        private function doStream(string $path, int $filesize, int $start, int $end): self
+        {
+            if ($filesize > $end && $start < $end && $start >= 0) {
+                $length = $end - $start + 1;
+                $this->response->header()->setAll([
+                    HttpHeader::CONTENT_LENGTH => $length,
+                    HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
+                ]);
+                if ($this->request->method === 'head') {
+                    $this->response->setStatus(HttpStatus::NO_CONTENT);
+                    $this->writer->close($this->response);
+                } else {
+                    $this->writer->sendFile($this->response, $path, $start, $length);
+                }
+            } else {
+                $this->response->setStatus(HttpStatus::BAD_REQUEST);
+                $this->writer->close($this->response);
+            }
+            return $this;
         }
 
         /**
@@ -175,36 +208,6 @@ namespace shani\http {
         public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
         {
             $this->writer->redirect($url, $status);
-            return $this;
-        }
-
-        /**
-         * Stream a file to a client
-         * @param string $path Path to a file to stream
-         * @param int $start Start bytes to stream
-         * @param int $end End bytes to stream
-         * @return self
-         */
-        private function doStream(string $path, int $start = 0, int $end = null): self
-        {
-            $size = filesize($path);
-            if ($size <= $start || ($end !== null && $start >= $end)) {
-                $this->response->setStatus(HttpStatus::BAD_REQUEST);
-                $this->writer->close($this->response);
-                return $this;
-            }
-            $chunk = min($size, Definitions::BUFFER_SIZE);
-            $length = $end <= 0 ? $size - $start : $chunk = $end - $start + 1;
-            $this->response->header()->setAll([
-                HttpHeader::CONTENT_LENGTH => $length,
-                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
-            ]);
-            if ($this->request->method !== 'head') {
-                $this->writer->sendFile($this->response, $path, $start, $chunk);
-            } else {
-                $this->response->setStatus(HttpStatus::NO_CONTENT);
-                $this->writer->close($this->response);
-            }
             return $this;
         }
 

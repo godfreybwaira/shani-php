@@ -12,6 +12,7 @@ namespace apps\demo\config {
     use apps\demo\middleware\Register;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
+    use shani\core\Definitions;
     use shani\http\App;
     use shani\http\Middleware;
 
@@ -35,7 +36,7 @@ namespace apps\demo\config {
 
         public function appStorage(): string
         {
-            return '/demo/storage';
+            return Definitions::DIR_APPS . '/demo/storage';
         }
 
         public function requestMethods(): array
