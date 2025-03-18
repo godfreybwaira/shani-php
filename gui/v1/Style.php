@@ -98,7 +98,7 @@ namespace gui\v1 {
 
         public static function getStyles(array $keys): array
         {
-            return \library\Map::get(self::PROPS, $keys);
+            return \lib\Map::get(self::PROPS, $keys);
         }
     }
 

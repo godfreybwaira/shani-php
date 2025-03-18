@@ -10,8 +10,8 @@
 
 namespace shani\advisors {
 
-    use library\DataCompressionLevel;
-    use library\Duration;
+    use lib\DataCompressionLevel;
+    use lib\Duration;
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;

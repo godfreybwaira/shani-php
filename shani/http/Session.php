@@ -8,9 +8,9 @@
 
 namespace shani\http {
 
-    use library\Cookie;
-    use library\Map;
-    use library\schema\DBase;
+    use lib\Cookie;
+    use lib\Map;
+    use lib\schema\DBase;
 
     final class Session
     {

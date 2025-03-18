@@ -25,7 +25,7 @@ namespace shani\servers\swoole {
         public function add(string $id, array $items, $keys = null, bool $selected = true): self
         {
             $data = $this->table->get($id, 'data');
-            $values = \library\Map::get($items, $keys, $selected);
+            $values = \lib\Map::get($items, $keys, $selected);
             if (!empty($data)) {
                 $data = unserialize($data);
                 $values = array_merge(is_array($data) ? $data : [$data], is_array($values) ? $values : [$values]);
@@ -41,7 +41,7 @@ namespace shani\servers\swoole {
             }
             $data = $this->table->get($id, 'data');
             if (!empty($data)) {
-                return \library\Map::hasKeys(unserialize($data), $keys);
+                return \lib\Map::hasKeys(unserialize($data), $keys);
             }
             return false;
         }
@@ -51,14 +51,14 @@ namespace shani\servers\swoole {
             $data = $this->table->get($id, 'data');
             if (!empty($data)) {
                 $data = unserialize($data);
-                return is_array($data) ? \library\Map::get($data, $keys, $selected) : $data;
+                return is_array($data) ? \lib\Map::get($data, $keys, $selected) : $data;
             }
             return null;
         }
 
         public function replace(string $id, $items, $keys = null, bool $selected = true): self
         {
-            $data = is_array($items) ? \library\Map::get($items, $keys, $selected) : $items;
+            $data = is_array($items) ? \lib\Map::get($items, $keys, $selected) : $items;
             $this->table->set($id, ['data' => serialize($data), 'ttl' => time()]);
             return $this;
         }
@@ -79,7 +79,7 @@ namespace shani\servers\swoole {
         {
             $data = $this->table->get($id, 'data');
             if (!empty($data)) {
-                $data = \library\Map::get(unserialize($data), $keys, !$selected);
+                $data = \lib\Map::get(unserialize($data), $keys, !$selected);
                 return $this->replace($id, $data);
             }
             return $this;

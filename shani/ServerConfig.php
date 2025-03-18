@@ -15,6 +15,30 @@ namespace shani {
     final class ServerConfig
     {
 
+        public readonly string $ip;
+        public readonly string $schedulingAlgorithm;
+        public readonly int $portHttp, $portHttps;
+        public readonly string $sslKey, $sslCert, $timezone;
+        public readonly bool $http2Enabled, $isDaemon, $showErrors;
+        public readonly int $maxConnections, $maxWorkerRequests, $maxWaitTime;
+
+        private function __construct(array $conf)
+        {
+            $this->ip = $conf['IP'];
+            $this->portHttp = $conf['PORTS']['HTTP'];
+            $this->portHttps = $conf['PORTS']['HTTPS'];
+            $this->schedulingAlgorithm = $conf['SCHEDULING_ALGORITHM'];
+            $this->http2Enabled = $conf['ENABLE_HTTP2'];
+            $this->maxWorkerRequests = $conf['MAX_WORKER_REQUESTS'];
+            $this->maxWaitTime = $conf['MAX_WAIT_TIME'];
+            $this->maxConnections = $conf['MAX_CONNECTIONS'];
+            $this->isDaemon = $conf['RUNAS_DAEMON'];
+            $this->showErrors = $conf['DISPLAY_ERRORS'];
+            $this->timezone = $conf['TIME_ZONE'];
+            $this->sslCert = Definitions::DIR_SSL . $conf['SSL']['CERT'];
+            $this->sslKey = Definitions::DIR_SSL . $conf['SSL']['KEY'];
+        }
+
         public static function mime(string $extension): ?string
         {
             $mime = yaml_parse_file(Definitions::DIR_CONFIG . '/mime.yml');
@@ -35,9 +59,9 @@ namespace shani {
             throw new \ErrorException('Host "' . $name . '" not found');
         }
 
-        public static function server(): array
+        public static function getConfig(): self
         {
-            return yaml_parse_file(Definitions::DIR_CONFIG . '/server.yml');
+            return new self(yaml_parse_file(Definitions::DIR_CONFIG . '/server.yml'));
         }
     }
 

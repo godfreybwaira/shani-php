@@ -9,9 +9,9 @@
 
 namespace shani\http {
 
-    use library\http\HttpCache;
-    use library\http\HttpHeader;
-    use library\http\HttpStatus;
+    use lib\http\HttpCache;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
     use shani\core\Definitions;
 
     final class Storage

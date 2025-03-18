@@ -9,8 +9,8 @@
 
 namespace shani\contracts {
 
-    use library\http\HttpStatus;
-    use library\http\ResponseEntity;
+    use lib\http\HttpStatus;
+    use lib\http\ResponseEntity;
 
     interface ResponseWriter
     {

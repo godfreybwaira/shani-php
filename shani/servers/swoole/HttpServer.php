@@ -9,16 +9,16 @@
 
 namespace shani\servers\swoole {
 
-    use library\Concurrency;
-    use library\DataConvertor;
-    use library\Event;
-    use library\http\HttpHeader;
-    use library\http\HttpStatus;
-    use library\http\ResponseEntity;
-    use library\MediaType;
-    use library\RequestEntityBuilder;
-    use library\URI;
-    use library\Utils;
+    use lib\Concurrency;
+    use lib\DataConvertor;
+    use lib\Event;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
+    use lib\http\ResponseEntity;
+    use lib\MediaType;
+    use lib\RequestEntityBuilder;
+    use lib\URI;
+    use lib\Utils;
     use shani\core\Definitions;
     use shani\http\App;
     use shani\http\UploadedFile;
@@ -34,29 +34,29 @@ namespace shani\servers\swoole {
         private const SOCKET_TCP = 1, SSL = 512;
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
-        private static function configure(array $cnf): WSocket
+        private static function configure(ServerConfig $cnf): WSocket
         {
-            ini_set('display_errors', $cnf['DISPLAY_ERRORS']);
+            ini_set('display_errors', $cnf->showErrors);
+            date_default_timezone_set($cnf->timezone);
             new Concurrency(new SwooleConcurrency());
 
             Event::setHandler(new SwooleEvent());
             MediaType::setHandler(new SwooleCache(1500, 100));
-            $server = new WSocket($cnf['IP'], $cnf['PORTS']['HTTP']);
+            $server = new WSocket($cnf->ip, $cnf->portHttp);
             $cores = swoole_cpu_num();
             $server->set([
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
-                'reload_async' => true, 'max_wait_time' => (int) $cnf['MAX_WAIT_TIME'],
-                'open_http2_protocol' => $cnf['ENABLE_HTTP2'], 'backlog' => $cores * 30, // number of connections in queue
-                'max_request' => (int) $cnf['MAX_WORKER_REQUESTS'], 'http_compression' => true,
-                'max_conn' => (int) $cnf['MAX_CONNECTIONS'], 'task_enable_coroutine' => true,
-                'http_compression_level' => 3, 'daemonize' => $cnf['RUNAS_DAEMON'],
-                'dispatch_mode' => self::SCHEDULING[$cnf['SCHEDULING_ALGORITHM']],
+                'reload_async' => true, 'max_wait_time' => $cnf->maxWaitTime,
+                'open_http2_protocol' => $cnf->http2Enabled, 'backlog' => $cores * 30, // number of connections in queue
+                'max_request' => $cnf->maxWorkerRequests, 'http_compression' => true,
+                'max_conn' => $cnf->maxConnections, 'task_enable_coroutine' => true,
+                'http_compression_level' => 3, 'daemonize' => $cnf->isDaemon,
+                'dispatch_mode' => self::SCHEDULING[$cnf->schedulingAlgorithm],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
-                'ssl_cert_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['CERT']),
-                'ssl_key_file' => str_replace('${SSL_DIR}', Definitions::DIR_SSL, $cnf['SSL']['KEY'])
+                'ssl_cert_file' => $cnf->sslCert, 'ssl_key_file' => $cnf->sslKey
             ]);
-            $server->addListener($cnf['IP'], $cnf['PORTS']['HTTPS'], self::SOCKET_TCP | self::SSL);
+            $server->addListener($cnf->ip, $cnf->portHttps, self::SOCKET_TCP | self::SSL);
             return $server;
         }
 
@@ -136,14 +136,13 @@ namespace shani\servers\swoole {
         {
             self::checkFrameworkRequirements();
             Utils::errorHandler();
-            $cnf = ServerConfig::server();
+            $cnf = ServerConfig::getConfig();
             $server = self::configure($cnf);
-            $server->on('start', function () use (&$cnf) {
-                echo 'http://' . $cnf['IP'] . ':' . $cnf['PORTS']['HTTP'] . PHP_EOL;
-                echo 'https://' . $cnf['IP'] . ':' . $cnf['PORTS']['HTTPS'] . PHP_EOL;
+            $server->on('start', function () {
+                echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
             });
             $server->on('request', function (Request $req, Response $res) use (&$cnf) {
-                $scheme = $cnf['PORTS']['HTTP'] === $req->server['server_port'] ? 'http' : 'https';
+                $scheme = $cnf->portHttp === $req->server['server_port'] ? 'http' : 'https';
                 self::handleHTTP($scheme, $req, $res);
             });
             $server->on('open', function (WSocket $server, Request $req) {

@@ -11,20 +11,20 @@
 namespace shani\http {
 
     use gui\UI;
-    use library\Cookie;
-    use library\DataConvertor;
-    use library\http\HttpHeader;
-    use library\http\HttpStatus;
-    use library\http\RequestEntity;
-    use library\Utils;
+    use lib\Cookie;
+    use lib\DataConvertor;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
+    use lib\http\RequestEntity;
+    use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
     use shani\documentation\Generator;
-    use library\http\ResponseEntity;
+    use lib\http\ResponseEntity;
     use shani\ServerConfig;
     use shani\core\Framework;
-    use library\MediaType;
+    use lib\MediaType;
     use shani\core\VirtualHost;
 
     final class App

@@ -11,7 +11,7 @@
 namespace gui\v1\components {
 
     use gui\v1\Component;
-    use library\MediaType;
+    use lib\MediaType;
 
     final class Form extends Component
     {

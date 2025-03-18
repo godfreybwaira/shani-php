@@ -9,8 +9,8 @@
 
 namespace shani\advisors {
 
-    use library\http\HttpHeader;
-    use library\http\HttpStatus;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
     use shani\http\App;
 
     abstract class SecurityMiddleware

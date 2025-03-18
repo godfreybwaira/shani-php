@@ -9,8 +9,8 @@
 
 namespace shani\servers\swoole {
 
-    use library\http\HttpStatus;
-    use library\http\ResponseEntity;
+    use lib\http\HttpStatus;
+    use lib\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
     use Swoole\Http\Response as SwooleResponse;
 

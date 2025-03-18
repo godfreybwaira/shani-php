@@ -10,7 +10,7 @@
 
 namespace shani\http {
 
-    use library\Event;
+    use lib\Event;
     use shani\advisors\SecurityMiddleware;
 
     final class Middleware

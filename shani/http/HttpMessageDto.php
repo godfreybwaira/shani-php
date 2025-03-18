@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use library\http\HttpStatus;
+    use lib\http\HttpStatus;
 
     final class HttpMessageDto implements \JsonSerializable
     {
