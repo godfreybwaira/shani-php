@@ -66,16 +66,17 @@ namespace shani\http {
             $this->response = $res;
             $this->writer = $writer;
             $this->request = $res->request;
-            $this->response->header()->setAll([
-                HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
-                HttpHeader::SERVER => Framework::NAME
-            ]);
             try {
+                $this->response->header()->setAll([
+                    HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
+                    HttpHeader::SERVER => Framework::NAME
+                ]);
                 $this->vhost = ServerConfig::host($this->request->uri->hostname);
-                $this->config = new $this->vhost->config($this);
+                $this->config = new $this->vhost->configFile($this);
+                set_exception_handler(fn(\Throwable $e) => $this->config->errorHandler($e));
                 $this->runApp();
             } catch (\ErrorException $ex) {
-                $this->response->setStatus(HttpStatus::BAD_REQUEST);
+                $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                 if (isset($this->config)) {
                     $this->config->errorHandler($ex);
                 } else {
@@ -90,14 +91,13 @@ namespace shani\http {
          */
         private function runApp(): void
         {
-            $this->registerErrorHandler();
             $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-            if (!$this->vhost->running) {
+            if (!$this->vhost->running && !$this->config->appNotRunningHandled()) {
                 $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-            }
-            if (!Storage::tryServe($this)) {
+                $this->send();
+            } else if (!Storage::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
-                    $this->request->changeRoute($this->config->homepage());
+                    $this->request->changeRoute($this->config->home());
                 }
                 Session::start($this);
                 $middleware = new Middleware($this);
@@ -209,15 +209,6 @@ namespace shani\http {
         {
             $this->writer->redirect($url, $status);
             return $this;
-        }
-
-        private function registerErrorHandler(): void
-        {
-            set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
-                $this->config->errorHandler(new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline));
-                return true;
-            });
-            set_exception_handler(fn(\Throwable $e) => $this->config->errorHandler($e));
         }
 
         /**
@@ -440,14 +431,9 @@ namespace shani\http {
                 $this->config->errorHandler();
                 return;
             }
-            try {
-                $className = str_replace('/', '\\', $classPath);
-                $cb = Utils::kebab2camelCase(substr($this->request->route()->callback, 1));
-                (new $className($this))->$cb();
-            } catch (\Exception $ex) {
-                $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-                $this->config->errorHandler($ex);
-            }
+            $className = str_replace('/', '\\', $classPath);
+            $cb = Utils::kebab2camelCase(substr($this->request->route()->callback, 1));
+            (new $className($this))->$cb();
         }
 
         public static function digest(string $str, string $algorithm = 'sha1', int $length = 7): string

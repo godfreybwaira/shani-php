@@ -9,10 +9,10 @@
 
 namespace lib {
 
-    final class MediaType implements \shani\contracts\Handler
-    {
+    use shani\ServerConfig;
 
-        private static \shani\contracts\Cacheable $mime;
+    final class MediaType
+    {
 
         public const ONE_KM = 'application/vnd.1000minds.decision-model+xml';
         public const TEXT_3DML = 'text/vnd.in3d.3dml';
@@ -1250,22 +1250,8 @@ namespace lib {
          */
         public static function fromFilename(string $filename): ?string
         {
-            return self::fromExtension(pathinfo($filename, PATHINFO_EXTENSION));
-        }
-
-        /**
-         * Maps a file extensions to a mime type.
-         *
-         */
-        public static function fromExtension(string $extension): ?string
-        {
-            $ext = strtolower($extension);
-            $type = self::$mime->get($ext);
-            if (!$type) {
-                $type = \shani\ServerConfig::mime($ext);
-                self::$mime->replace($ext, $type);
-            }
-            return $type;
+            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            return !empty($ext) ? ServerConfig::mime(strtolower($ext)) : null;
         }
 
         /**
@@ -1294,11 +1280,6 @@ namespace lib {
             }
             $mime = self::parse($mimeStr)[0];
             return explode('/', $mime);
-        }
-
-        public static function setHandler($handler): void
-        {
-            static::$mime = $handler;
         }
     }
 

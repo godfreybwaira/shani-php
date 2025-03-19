@@ -47,19 +47,17 @@ namespace shani\advisors {
          * Block incoming CSRF attacks. All attacks coming via HTTP GET request will
          * be discarded. User must make sure not submitting sensitive information
          * via GET request
-         * @return bool True if check passes, false otherwise
+         * @return self
          */
-        public function passedCsrfTest(): bool
+        public function csrfTest(): self
         {
-            if (!$this->app->config->csrfProtectionEnabled() || !$this->app->config->csrfProtected()) {
-                return true;
+            if ($this->app->config->csrfProtectionEnabled() && $this->app->config->csrfProtected()) {
+                $token = $this->app->request->cookies($this->app->config->csrfTokenName());
+                if ($token === null || !$this->app->csrfToken()->has($token)) {
+                    $this->app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
+                }
             }
-            $token = $this->app->request->cookies($this->app->config->csrfTokenName());
-            if ($token === null || !$this->app->csrfToken()->has($token)) {
-                $this->app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
-                return false;
-            }
-            return true;
+            return $this;
         }
 
         /**
@@ -72,7 +70,7 @@ namespace shani\advisors {
             $route = $this->app->request->route();
             if ($this->app->config->authenticated) {
                 if ($this->app->config->guestModule($route->module)) {
-                    $this->app->request->changeRoute($this->app->config->homepage());
+                    $this->app->request->changeRoute($this->app->config->home());
                     return true;
                 }
                 if ($this->app->config->publicModule($route->module) || $this->app->accessGranted($route->target)) {
@@ -135,7 +133,7 @@ namespace shani\advisors {
                 return $this;
             }
             $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => implode(',', $this->app->config->requestMethods()),
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods(),
                 HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
                 HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                 HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime

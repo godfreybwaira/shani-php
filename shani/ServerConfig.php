@@ -21,6 +21,7 @@ namespace shani {
         public readonly string $sslKey, $sslCert, $timezone;
         public readonly bool $http2Enabled, $isDaemon, $showErrors;
         public readonly int $maxConnections, $maxWorkerRequests, $maxWaitTime;
+        private static array $mime = [], $hosts = [];
 
         private function __construct(array $conf)
         {
@@ -41,15 +42,28 @@ namespace shani {
 
         public static function mime(string $extension): ?string
         {
-            $mime = yaml_parse_file(Definitions::DIR_CONFIG . '/mime.yml');
-            return $mime[$extension] ?? null;
+            if (!isset(self::$mime[$extension])) {
+                $mime = yaml_parse_file(Definitions::DIR_CONFIG . '/mime.yml')[$extension] ?? null;
+                if ($mime === null) {
+                    return null;
+                }
+                self::$mime[$extension] = $mime;
+            }
+            return self::$mime[$extension];
         }
 
         public static function host(string $name): VirtualHost
         {
+            if (!empty(self::$hosts[$name])) {
+                return self::$hosts[$name];
+            }
             $yaml = Definitions::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                return new VirtualHost(yaml_parse_file($yaml));
+                $config = new VirtualHost(yaml_parse_file($yaml));
+                if ($config->cache) {
+                    self::$hosts[$name] = $config;
+                }
+                return $config;
             }
             $alias = Definitions::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {

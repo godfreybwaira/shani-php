@@ -30,14 +30,26 @@ namespace shani\core {
          * @var bool
          */
         public readonly bool $running;
-        public readonly string $config;
+
+        /**
+         * Active configuration file from active environment
+         * @var string
+         */
+        public readonly string $configFile;
+
+        /**
+         * Whether to cache the current configuration or not
+         * @var string
+         */
+        public readonly string $cache;
 
         public function __construct(array $config)
         {
             $this->env = $config['ENVIRONMENTS'];
             $this->activeEnv = $config['ACTIVE_ENVIRONMENT'];
-            $this->config = $this->env[$this->activeEnv];
+            $this->configFile = $this->env[$this->activeEnv];
             $this->running = $config['RUNNING'];
+            $this->cache = $config['CACHE'];
         }
     }
 

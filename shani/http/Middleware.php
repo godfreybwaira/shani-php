@@ -65,7 +65,7 @@ namespace shani\http {
             }
             $this->app->on('web', function () use (&$advisor) {
                 $advisor->blockClickjacking()->resourceAccessPolicy();
-                $advisor->preflightRequest()->passedCsrfTest();
+                $advisor->preflightRequest()->csrfTest();
             });
             if ($advisor->authorized() && $advisor->passedRequestMethodCheck()) {
                 if ($this->listener->listening('before')) {

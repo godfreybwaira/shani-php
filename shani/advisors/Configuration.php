@@ -162,6 +162,16 @@ namespace shani\advisors {
         }
 
         /**
+         * When app running state is false and your application will handle the
+         * situation then return true, otherwise return false
+         * @return bool
+         */
+        public function appNotRunningHandled(): bool
+        {
+            return false;
+        }
+
+        /**
          * Get all application supported languages where a key is a language code
          * and a value is a language name.
          * @return array Associative array of supported languages.
@@ -233,7 +243,7 @@ namespace shani\advisors {
         /**
          * Default path to homepage if '/' is provided by during HTTP request
          */
-        public abstract function homepage(): string;
+        public abstract function home(): string;
 
         /**
          * Returns an array of HTTP request methods supported by the application (in lower case)

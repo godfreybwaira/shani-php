@@ -29,7 +29,7 @@ namespace apps\demo\config {
             return '/demo';
         }
 
-        public function homepage(): string
+        public function home(): string
         {
             return '/greetings/0/hello/1/world';
         }

@@ -41,7 +41,6 @@ namespace shani\servers\swoole {
             new Concurrency(new SwooleConcurrency());
 
             Event::setHandler(new SwooleEvent());
-            MediaType::setHandler(new SwooleCache(1500, 100));
             $server = new WSocket($cnf->ip, $cnf->portHttp);
             $cores = swoole_cpu_num();
             $server->set([
