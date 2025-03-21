@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Description of DBase
+ * Description of Database
  *
  * @author coder
  */
 
-namespace lib\schema {
+namespace shani\persistence {
 
-    final class DBase
+    final class Database
     {
 
-        private \PDO $pdo;
+        public readonly \PDO $pdo;
 
         public function __construct(string $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
@@ -21,15 +21,6 @@ namespace lib\schema {
             } catch (\PDOException $ex) {
                 throw new \ErrorException('Connection to a database failed.');
             }
-        }
-
-        /**
-         * Get current PDO object
-         * @return \PDO PDO object
-         */
-        public function pdo(): \PDO
-        {
-            return $this->pdo;
         }
 
         private static function escapeHTML(&$var): void
@@ -43,26 +34,27 @@ namespace lib\schema {
             }
         }
 
-        private function processQuery(string &$query, ?\JsonSerializable $obj): \PDOStatement
+        private function processQuery(string &$query, ?array $data): \PDOStatement
         {
             try {
                 $result = $this->pdo->prepare($query);
-                $result->execute($obj->jsonSerialize());
+                $result->execute($data);
                 return $result;
-            } catch (\ErrorException $ex) {
+            } catch (\PDOException $ex) {
                 throw $ex;
+//                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
             }
         }
 
         /**
          * Execute SQL query and return number of rows affected
          * @param string $query A query to run
-         * @param \JsonSerializable|null $obj
+         * @param array|null $data
          * @return int Number of rows affected
          */
-        public function runQuery(string $query, ?\JsonSerializable $obj = null): int
+        public function runQuery(string $query, ?array $data = null): int
         {
-            $result = $this->processQuery($query, $obj);
+            $result = $this->processQuery($query, $data);
             $result->closeCursor();
             return $result->rowCount();
         }
@@ -70,15 +62,15 @@ namespace lib\schema {
         /**
          * Execute SQL query and all rows (if available) found
          * @param string $query A query to execute
-         * @param \JsonSerializable|null $obj
+         * @param array|null $data
          * @param bool $escapeHtml Whether to escape HTML special characters on SQL
          * output or not
          * @return array Rows returned as the result of SQL query.
-         * @see DBase::getResultAsTable()
+         * @see Database::getResultAsTable()
          */
-        public function getResult(string $query, ?\JsonSerializable $obj = null, bool $escapeHtml = true): array
+        public function getResult(string $query, ?array $data = null, bool $escapeHtml = true): array
         {
-            $result = $this->processQuery($query, $obj);
+            $result = $this->processQuery($query, $data);
             $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
             $result->closeCursor();
             if (!empty($rows) && $escapeHtml) {
@@ -94,7 +86,7 @@ namespace lib\schema {
          * @param bool $escapeHtml Whether to escape HTML special characters on SQL
          * output or not
          * @return array Rows returned as the result of SQL query.
-         * @see DBase::getResult()
+         * @see Database::getResult()
          */
         public function getResultAsTable(string $query, array $headers, ?array $data = null, bool $escapeHtml = true): array
         {

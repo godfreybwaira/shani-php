@@ -37,7 +37,9 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 //                    ->addSubject(new Subject('Maths', 'C', 70.6));
 //            $this->app->render($student);
 //            $this->app->render($this->app->documentation());
-            $this->app->stream('/home/coder/Videos/oceans.mp4');
+//            $this->app->stream('/home/coder/Videos/oceans.mp4');
+            $this->app->session()->cart('my')->getAll();
+            $this->app->send();
         }
     }
 

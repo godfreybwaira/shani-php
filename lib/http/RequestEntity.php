@@ -9,7 +9,6 @@
 
 namespace lib\http {
 
-    use lib\Map;
     use lib\MediaType;
     use lib\URI;
     use shani\http\RequestRoute;

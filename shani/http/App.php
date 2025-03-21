@@ -26,15 +26,18 @@ namespace shani\http {
     use shani\core\Framework;
     use lib\MediaType;
     use shani\core\VirtualHost;
+    use shani\persistence\Session;
+    use shani\persistence\SessionCart;
 
     final class App
     {
 
         private Storage $storage;
+        private Session $session;
         private ?string $lang = null;
         private readonly ResponseWriter $writer;
         private ?UI $ui = null;
-        private ?array $appCart = null, $dict = null;
+        private ?array $dict = null;
         private ?string $platform = null;
 
         /**
@@ -99,7 +102,6 @@ namespace shani\http {
                 if ($this->request->uri->path === '/') {
                     $this->request->changeRoute($this->config->home());
                 }
-                Session::start($this);
                 $middleware = new Middleware($this);
                 $securityAdvisor = $this->config->middleware($middleware);
                 $middleware->runWith($securityAdvisor);
@@ -247,22 +249,20 @@ namespace shani\http {
             return $this->platform;
         }
 
-        public function csrfToken(): Session
+        public function csrfToken(): SessionCart
         {
-            return $this->cart('_gGOd2y$oNO6W');
+            return $this->session()->cart('_gGOd2y$oNO6W');
         }
 
         /**
-         * Create and return cart for storing session values
-         * @param string $name Cart name
+         * Create and return session object. If session is not started, it will be started,
+         * otherwise it will be resumed.
          * @return Session
          */
-        public function cart(string $name): Session
+        public function session(): Session
         {
-            if (empty($this->appCart[$name])) {
-                $this->appCart[$name] = new Session($this, $name);
-            }
-            return $this->appCart[$name];
+            $this->session ??= new Session($this);
+            return $this->session;
         }
 
         /**
@@ -271,9 +271,7 @@ namespace shani\http {
          */
         public function storage(): Storage
         {
-            if (!isset($this->storage)) {
-                $this->storage = new Storage($this);
-            }
+            $this->storage ??= new Storage($this);
             return $this->storage;
         }
 
@@ -283,9 +281,7 @@ namespace shani\http {
          */
         public function ui(): UI
         {
-            if (!isset($this->ui)) {
-                $this->ui = new UI($this);
-            }
+            $this->ui ??= new UI($this);
             return $this->ui;
         }
 

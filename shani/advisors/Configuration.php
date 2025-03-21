@@ -95,6 +95,11 @@ namespace shani\advisors {
             return 'sessionId';
         }
 
+        public function sessionSavePath(): string
+        {
+            return $this->appStorage() . '/.session';
+        }
+
         /**
          * Get or set cookie max age before expiration.
          * @return \DateTimeInterface A date/time object.
