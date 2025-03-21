@@ -31,9 +31,9 @@ namespace shani\persistence {
             return $this->storage->cart($name);
         }
 
-        public function stop(): void
+        public function stop(): bool
         {
-            $this->storage->clear();
+            return $this->storage->clear();
         }
     }
 
