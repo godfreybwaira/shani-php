@@ -126,7 +126,7 @@ namespace shani\advisors {
          * Enable/disable CSRF protection mechanism.
          * @return bool True to enable, to disable otherwise.
          */
-        public function csrfProtectionEnabled(): bool
+        public function enableCsrfProtection(): bool
         {
             return true;
         }
@@ -163,6 +163,7 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t = null): void
         {
+            echo $t?->getMessage();
             $this->app->send();
         }
 
@@ -201,6 +202,15 @@ namespace shani\advisors {
         public function moduleDir(): string
         {
             return '/modules';
+        }
+
+        /**
+         * Whether to validate user session or not.
+         * @return bool
+         */
+        public function validateSession(): bool
+        {
+            return true;
         }
 
         /**
@@ -338,7 +348,7 @@ namespace shani\advisors {
          * @return bool
          * @see SecurityMiddleware::preflightRequest()
          */
-        public function preflightRequest(): bool
+        public function preflightRequestEnabled(): bool
         {
             return true;
         }
@@ -357,9 +367,9 @@ namespace shani\advisors {
          * (disabling is not recommended in production environment)
          * @return bool
          */
-        public function authorizationDisabled(): bool
+        public function authorizationEnabled(): bool
         {
-            return true;
+            return false;
         }
     }
 

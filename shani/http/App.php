@@ -26,14 +26,14 @@ namespace shani\http {
     use shani\core\Framework;
     use lib\MediaType;
     use shani\core\VirtualHost;
-    use shani\persistence\Session;
+    use shani\persistence\SessionManager;
     use shani\persistence\SessionCart;
 
     final class App
     {
 
         private Storage $storage;
-        private Session $session;
+        private SessionManager $session;
         private ?string $lang = null;
         private readonly ResponseWriter $writer;
         private ?UI $ui = null;
@@ -195,7 +195,7 @@ namespace shani\http {
         {
             $url = $this->request->header()->get(HttpHeader::REFERER);
             if ($url !== null) {
-                $this->writer->redirect($url, $status);
+                $this->redirect($url, $status);
                 return true;
             }
             return false;
@@ -209,7 +209,7 @@ namespace shani\http {
          */
         public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
         {
-            $this->writer->redirect($url, $status);
+            $this->response->setStatus($status)->header()->set(HttpHeader::LOCATION, $url);
             return $this;
         }
 
@@ -257,11 +257,11 @@ namespace shani\http {
         /**
          * Create and return session object. If session is not started, it will be started,
          * otherwise it will be resumed.
-         * @return Session
+         * @return SessionManager
          */
-        public function session(): Session
+        public function session(): SessionManager
         {
-            $this->session ??= new Session($this);
+            $this->session ??= new SessionManager($this);
             return $this->session;
         }
 
@@ -405,7 +405,7 @@ namespace shani\http {
          */
         public function accessGranted(string $target): bool
         {
-            if ($this->config->authorizationDisabled()) {
+            if ($this->config->authorizationEnabled()) {
                 return true;
             }
             if (empty($this->config->permissionList)) {
@@ -447,9 +447,9 @@ namespace shani\http {
         public function csrf(?string $urlPath = null): string
         {
             $url = $urlPath ?? $this->request->uri->path;
-            if ($this->config->csrfProtectionEnabled()) {
+            if ($this->config->enableCsrfProtection()) {
                 $token = base64_encode(random_bytes(6));
-                $this->csrfToken()->add([$token => null]);
+                $this->csrfToken()->add($token, null);
                 $cookie = (new Cookie())->setName($this->config->csrfTokenName())
                         ->setSameSite(Cookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)

@@ -59,10 +59,7 @@ namespace shani\http {
          */
         public function runWith(SecurityMiddleware &$advisor): void
         {
-            if ($this->app->config->authorizationDisabled()) {
-                self::returnResponse($this->app);
-                return;
-            }
+            $advisor->validateSession();
             $this->app->on('web', function () use (&$advisor) {
                 $advisor->blockClickjacking()->resourceAccessPolicy();
                 $advisor->preflightRequest()->csrfTest();

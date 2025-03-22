@@ -55,12 +55,6 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function redirect(string $url, HttpStatus &$status): self
-        {
-            $this->res->redirect($url, $status->value);
-            return $this;
-        }
-
         public function sendFile(ResponseEntity &$res, string $absoluteFilepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res);

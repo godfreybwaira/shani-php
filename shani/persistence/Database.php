@@ -19,7 +19,7 @@ namespace shani\persistence {
                 $connectionString = self::getConnectionString($driver, $database, $host, $port);
                 $this->pdo = new \PDO($connectionString, $username, $password);
             } catch (\PDOException $ex) {
-                throw new \ErrorException('Connection to a database failed.');
+                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
             }
         }
 
@@ -41,8 +41,7 @@ namespace shani\persistence {
                 $result->execute($data);
                 return $result;
             } catch (\PDOException $ex) {
-                throw $ex;
-//                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
+                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
             }
         }
 
@@ -113,7 +112,7 @@ namespace shani\persistence {
                 case 'odbc'://for sqlserver
                     return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
             }
-            throw new \RuntimeException('Driver "' . $driver . '" not supported');
+            throw new \ErrorException('Driver "' . $driver . '" not supported');
         }
     }
 

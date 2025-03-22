@@ -19,8 +19,6 @@ namespace shani\contracts {
 
         public function close(ResponseEntity &$res, bool $sendOnlyHeaders = false): self;
 
-        public function redirect(string $url, HttpStatus &$status): self;
-
         public function sendFile(ResponseEntity &$res, string $absoluteFilepath, int $startByte, int $chunkSize): self;
     }
 

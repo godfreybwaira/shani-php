@@ -101,7 +101,7 @@ namespace lib {
          *
          * @return bool
          */
-        public function isExpired(): bool
+        public function expired(): bool
         {
             if (!empty($this->cookie['expires'])) {
                 return time() - $this->cookie['expires']->getTimestamp() <= 0;

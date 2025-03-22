@@ -51,7 +51,7 @@ namespace shani\advisors {
          */
         public function csrfTest(): self
         {
-            if ($this->app->config->csrfProtectionEnabled() && $this->app->config->csrfProtected()) {
+            if ($this->app->config->enableCsrfProtection() && $this->app->config->csrfProtected()) {
                 $token = $this->app->request->cookies($this->app->config->csrfTokenName());
                 if ($token === null || !$this->app->csrfToken()->has($token)) {
                     $this->app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
@@ -67,6 +67,9 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
+            if (!$this->app->config->authorizationEnabled()) {
+                return false;
+            }
             $route = $this->app->request->route();
             if ($this->app->config->authenticated) {
                 if ($this->app->config->guestModule($route->module)) {
@@ -114,6 +117,19 @@ namespace shani\advisors {
         }
 
         /**
+         * Check user session validity. If session expired, user is redirected back to /
+         * @return self
+         * @see Configuration::validateSession()
+         */
+        public function validateSession(): self
+        {
+            if ($this->app->config->validateSession() && $this->app->session()->expired()) {
+                $this->app->redirect('/');
+            }
+            return $this;
+        }
+
+        /**
          * A request sent by the browser before sending the actual request to verify
          * whether a server can process the coming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
@@ -122,7 +138,7 @@ namespace shani\advisors {
          */
         public function preflightRequest(int $cacheTime = 86400): self
         {
-            if (!$this->app->config->preflightRequest() || $this->app->request->method !== 'options') {
+            if (!$this->app->config->preflightRequestEnabled() || $this->app->request->method !== 'options') {
                 return $this;
             }
             $headers = $this->app->request->header()->getAll([

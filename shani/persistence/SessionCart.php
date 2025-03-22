@@ -20,12 +20,12 @@ namespace shani\persistence {
         {
             $this->db = $db;
             $this->id = $cart[self::TABLE_ID];
-            $this->ownerId = $cart[SessionStorage::TABLE_ID];
+            $this->ownerId = $cart[Session::TABLE_ID];
         }
 
         public function destroy(): bool
         {
-            $query = 'DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . SessionStorage::TABLE_ID;
+            $query = 'DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . Session::TABLE_ID;
             $query .= ' = :sessId AND ' . self::TABLE_ID . ' = :id LIMIT 1';
             $result = $this->db->runQuery($query, ['sessId' => $this->ownerId, 'id' => $this->id]);
             return $result > 0;
@@ -35,27 +35,24 @@ namespace shani\persistence {
         {
             $query = 'SELECT COUNT(*) AS total FROM ' . self::TABLE_NAME . ' A INNER JOIN ';
             $query .= self::DATA_TABLE . ' B USING(' . self::TABLE_ID . ')WHERE A.' . self::TABLE_ID;
-            $query .= ' = :id AND ' . SessionStorage::TABLE_ID . ' = :sessId';
+            $query .= ' = :id AND ' . Session::TABLE_ID . ' = :sessId';
             $result = $this->db->getResult($query, ['sessId' => $this->ownerId, 'id' => $this->id]);
             return $result[0]['total'] ?? 0;
         }
 
         public function clear(): self
         {
-            $query = 'DELETE FROM B USING ' . self::TABLE_NAME . ' A, ' . self::DATA_TABLE;
-            $query .= ' B WHERE A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME;
-            $query .= ' = :sessId AND A.' . self::TABLE_ID . ' = B.' . self::TABLE_ID;
+            $query = 'DELETE FROM ' . self::TABLE_NAME . ' WHERE ' . self::TABLE_ID;
+            $query .= ' = :id AND ' . Session::TABLE_ID . ' = :sessId';
             $this->db->runQuery($query, ['sessId' => $this->ownerId, 'id' => $this->id]);
             return $this;
         }
 
         public function delete(string $key): self
         {
-            $query = 'DELETE FROM B USING ' . self::TABLE_NAME . ' A, ' . self::DATA_TABLE;
-            $query .= ' B WHERE A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME;
-            $query .= ' = :sessId AND A.' . self::TABLE_ID . ' = B.' . self::TABLE_ID;
-            $query .= ' AND dataKey = :name';
-            $this->db->runQuery($query, ['sessId' => $this->ownerId, 'id' => $this->id, 'name' => $key]);
+            $query = 'DELETE FROM ' . self::DATA_TABLE . ' WHERE ' . self::TABLE_ID;
+            $query .= ' = :id AND dataKey = :name';
+            $this->db->runQuery($query, ['id' => $this->id, 'name' => $key]);
             return $this;
         }
 
@@ -63,7 +60,7 @@ namespace shani\persistence {
         {
             $query = 'SELECT COUNT(*) AS total FROM ' . self::TABLE_NAME . ' A INNER JOIN ';
             $query .= self::DATA_TABLE . ' B USING(' . self::TABLE_ID . ') WHERE ';
-            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME;
+            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . Session::TABLE_ID;
             $query .= ' = :sessId AND dataKey = :name';
             $results = $this->db->getResult($query, ['sessId' => $this->ownerId, 'id' => $this->id, 'name' => $key]);
             return !empty($results[0]['total']);
@@ -79,8 +76,8 @@ namespace shani\persistence {
             }
             $query = 'SELECT COUNT(*) AS total FROM ' . self::TABLE_NAME . ' A INNER JOIN ';
             $query .= self::DATA_TABLE . ' B USING(' . self::TABLE_ID . ') WHERE ';
-            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME . ' = :sessId';
-            $query .= ' AND dataKey IN(:' . substr(1, $keylist) . ')';
+            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . Session::TABLE_ID . ' = :sessId';
+            $query .= ' AND dataKey IN(' . substr($keylist, 1) . ')';
             $results = $this->db->getResult($query, ['sessId' => $this->ownerId, 'id' => $this->id, ...$data]);
             return !empty($results[0]['total']) && $results[0]['total'] === count($keys);
         }
@@ -89,7 +86,7 @@ namespace shani\persistence {
         {
             $query = 'SELECT B.dataValue FROM ' . self::TABLE_NAME . ' A INNER JOIN ';
             $query .= self::DATA_TABLE . ' B USING(' . self::TABLE_ID . ') WHERE ';
-            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME;
+            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . Session::TABLE_ID;
             $query .= ' = :sessId AND dataKey = :name';
             $results = $this->db->getResult($query, ['sessId' => $this->ownerId, 'id' => $this->id, 'name' => $key]);
             return $results[0]['dataValue'] ?? null;
@@ -99,7 +96,7 @@ namespace shani\persistence {
         {
             $query = 'SELECT B.dataKey, B.dataValue FROM ' . self::TABLE_NAME . ' A INNER JOIN ';
             $query .= self::DATA_TABLE . ' B USING(' . self::TABLE_ID . ') WHERE ';
-            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME . ' = :sessId';
+            $query .= 'A.' . self::TABLE_ID . ' = :id AND ' . Session::TABLE_ID . ' = :sessId';
             $params = ['sessId' => $this->ownerId, 'id' => $this->id];
             if (!empty($keys)) {
                 $data = [];
@@ -108,7 +105,7 @@ namespace shani\persistence {
                     $data[$value] = $value;
                     $keylist .= ',:' . $value;
                 }
-                $query .= ' AND dataKey IN(:' . substr(1, $keylist) . ')';
+                $query .= ' AND dataKey IN(' . substr($keylist, 1) . ')';
                 $params = array_merge($params, $data);
             }
             $results = $this->db->getResult($query, $params);
@@ -127,19 +124,17 @@ namespace shani\persistence {
                 $data[$value] = $value;
                 $keylist .= ',:' . $value;
             }
-            $query = 'DELETE FROM B USING ' . self::TABLE_NAME . ' A, ' . self::DATA_TABLE;
-            $query .= ' B WHERE A.' . self::TABLE_ID . ' = :id AND ' . SessionStorage::TABLE_NAME;
-            $query .= ' = :sessId AND A.' . self::TABLE_ID . ' = B.' . self::TABLE_ID;
-            $query .= ' AND dataKey IN(:' . substr(1, $keylist) . ')';
-            $this->db->runQuery($query, ['sessId' => $this->ownerId, 'id' => $this->id, ... $data]);
+            $query = 'DELETE FROM ' . self::DATA_TABLE . ' WHERE ' . self::TABLE_ID;
+            $query .= ' = :id AND dataKey IN(' . substr($keylist, 1) . ')';
+            $this->db->runQuery($query, ['id' => $this->id, ... $data]);
             return $this;
         }
 
         public function add(string $key, mixed $value): self
         {
             $query = 'INSERT INTO ' . self::DATA_TABLE . '(' . self::TABLE_ID . ',dataKey,';
-            $query .= ',dataValue)VALUES(:id,:name,:value) ON CONFLICT(' . self::TABLE_ID;
-            $query .= ',dataKey) DO UPDATE SET dataValue = EXCLUDED.dataValue';
+            $query .= 'dataValue)VALUES(:id,:name,:value)ON CONFLICT(' . self::TABLE_ID;
+            $query .= ',dataKey)DO UPDATE SET dataValue = EXCLUDED.dataValue';
             $this->db->runQuery($query, ['id' => $this->id, 'name' => $key, 'value' => $value]);
             return $this;
         }
@@ -155,8 +150,8 @@ namespace shani\persistence {
             }
 
             $query = 'INSERT INTO ' . self::DATA_TABLE . '(' . self::TABLE_ID . ',dataKey,';
-            $query .= ',dataValue)VALUES' . substr(1, $keylist) . ' ON CONFLICT(' . self::TABLE_ID;
-            $query .= ',dataKey) DO UPDATE SET dataValue = EXCLUDED.dataValue';
+            $query .= 'dataValue)VALUES' . substr($keylist, 1) . 'ON CONFLICT(' . self::TABLE_ID;
+            $query .= ',dataKey)DO UPDATE SET dataValue = EXCLUDED.dataValue';
             $this->db->runQuery($query, ['id' => $this->id, ...$data]);
             return $this;
         }

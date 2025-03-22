@@ -38,7 +38,24 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 //            $this->app->render($student);
 //            $this->app->render($this->app->documentation());
 //            $this->app->stream('/home/coder/Videos/oceans.mp4');
-            $this->app->session()->stop();
+            $session = $this->app->session();
+            $cart = $session->cart('abc');
+            $cart->add('name', 'godfrey')
+                    ->addAll([
+                        ['name' => 'godfrey'],
+                        ['age' => 22],
+                        ['dob' => date(DATE_ATOM)],
+                    ])->delete('name')
+                    ->deleteAll(['name', 'age']);
+            $cart->count();
+            $cart->get('age');
+            $cart->getAll(['name', 'dob']);
+            $cart->has('name');
+            $cart->hasAll(['name', 'age']);
+            $cart->clear();
+            $cart->destroy();
+            $session->expired();
+            $session->stop();
             $this->app->send();
         }
     }
