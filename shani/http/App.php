@@ -287,28 +287,28 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable $dto Data object to be passed to a view file
+         * @param array $data Data object to be passed to a view file
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable $dto = null, bool $useBuffer = false): void
+        public function render(array $data = null, bool $useBuffer = false): void
         {
-            $customDto = $dto ?? new HttpMessageDto($this->response->status());
+            $customData = $data ?? (new HttpMessageDto($this->response->status()))->jsonSerialize();
             $type = $this->response->type();
             if ($type === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($customDto->jsonSerialize());
+                $this->ui()->render($customData);
                 $this->sendHtml(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($customDto->jsonSerialize());
+                $this->ui()->render($customData);
                 $this->sendSse(ob_get_clean(), $type);
             } else if ($type === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($customDto->jsonSerialize(), $type);
+                $this->sendJsonp($customData, $type);
             } else {
-                $this->response->setBody(DataConvertor::convertTo($customDto->jsonSerialize(), $type), $type);
+                $this->response->setBody(DataConvertor::convertTo($customData, $type), $type);
             }
             $this->send($useBuffer);
         }

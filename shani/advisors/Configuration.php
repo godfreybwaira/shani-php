@@ -97,7 +97,8 @@ namespace shani\advisors {
 
         public function sessionSavePath(): string
         {
-            return $this->appStorage() . '/.session';
+//            return $this->appStorage() . '/session.db';
+            return '/home/coder/Documents/session.db';
         }
 
         /**

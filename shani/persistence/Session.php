@@ -32,21 +32,33 @@ namespace shani\persistence {
         {
             $sessName = $app->config->sessionName();
             $this->sessionId = $app->request->cookies($sessName);
-            if ($this->sessionId !== null && $app->config->isAsync()) {
-                return;
-            }
-            $newId = sha1(random_bytes(random_int(20, 70)));
-            if ($this->sessionId !== null) {
-                $this->update($newId);
-            } else {
-                $this->create($newId);
-            }
+            $this->create($this->sessionId);
             $cookie = (new Cookie())->setHttpOnly(true)->setName($sessName)
-                    ->setValue($newId)->setSecure($app->request->uri->secure())
+                    ->setValue($this->sessionId)->setSecure($app->request->uri->secure())
                     ->setDomain($app->request->uri->hostname)
                     ->setMaxAge($app->config->cookieMaxAge());
             $app->response->setCookie($cookie);
         }
+
+//        public function start(App &$app): void
+//        {
+//            $sessName = $app->config->sessionName();
+//            $this->sessionId = $app->request->cookies($sessName);
+//            if (!empty($this->sessionId) && $app->config->isAsync()) {
+//                return;
+//            }
+//            $newId = sha1(random_bytes(random_int(20, 70)));
+//            if (!empty($this->sessionId)) {
+//                $this->update($newId);
+//            } else {
+//                $this->create($newId);
+//            }
+//            $cookie = (new Cookie())->setHttpOnly(true)->setName($sessName)
+//                    ->setValue($newId)->setSecure($app->request->uri->secure())
+//                    ->setDomain($app->request->uri->hostname)
+//                    ->setMaxAge($app->config->cookieMaxAge());
+//            $app->response->setCookie($cookie);
+//        }
 
         private function createTables(): void
         {
@@ -65,8 +77,8 @@ namespace shani\persistence {
 
             $query = 'CREATE TABLE IF NOT EXISTS ' . SessionCart::DATA_TABLE . '(';
             $query .= SessionCart::TABLE_ID . ' INTEGER NOT NULL,dataKey TEXT NOT NULL,';
-            $query .= 'dataValue TEXT NOT NULL,FOREIGN KEY(' . SessionCart::TABLE_ID;
-            $query .= ') REFERENCES ' . SessionCart::TABLE_NAME . '(' . SessionCart::TABLE_ID;
+            $query .= 'dataValue TEXT,FOREIGN KEY(' . SessionCart::TABLE_ID . ') REFERENCES ';
+            $query .= SessionCart::TABLE_NAME . '(' . SessionCart::TABLE_ID;
             $query .= ')ON DELETE CASCADE ON UPDATE CASCADE,UNIQUE(';
             $query .= SessionCart::TABLE_ID . ',dataKey))';
             $this->db->runQuery($query);
@@ -78,6 +90,7 @@ namespace shani\persistence {
             $this->sessionId = $sessionId;
             $query = 'INSERT INTO ' . self::TABLE_NAME . '(' . self::TABLE_ID;
             $query .= ',createdAt,lastActive)VALUES(:id,:createdAt,:lastActive)';
+            $query .= 'ON CONFLICT(' . self::TABLE_ID . ')DO NOTHING';
             $result = $this->db->runQuery($query, ['id' => $sessionId, 'createdAt' => $now, 'lastActive' => $now]);
             return $result > 0;
         }

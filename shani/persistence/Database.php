@@ -41,6 +41,7 @@ namespace shani\persistence {
                 $result->execute($data);
                 return $result;
             } catch (\PDOException $ex) {
+                echo $query;
                 throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
             }
         }

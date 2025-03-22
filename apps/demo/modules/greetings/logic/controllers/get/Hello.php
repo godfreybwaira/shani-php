@@ -45,17 +45,9 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
                         ['name' => 'godfrey'],
                         ['age' => 22],
                         ['dob' => date(DATE_ATOM)],
-                    ])->delete('name')
-                    ->deleteAll(['name', 'age']);
-            $cart->count();
-            $cart->get('age');
-            $cart->getAll(['name', 'dob']);
-            $cart->has('name');
-            $cart->hasAll(['name', 'age']);
-            $cart->clear();
-            $cart->destroy();
-            $session->expired();
-            $session->stop();
+//                        ['sessId' => $this->app->request->cookies($this->app->config->sessionName())]
+            ]);
+            $this->app->render($cart->getAll());
             $this->app->send();
         }
     }

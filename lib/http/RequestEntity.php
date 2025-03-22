@@ -9,8 +9,10 @@
 
 namespace lib\http {
 
+    use lib\Map;
     use lib\MediaType;
     use lib\URI;
+    use shani\contracts\HttpCookie;
     use shani\http\RequestRoute;
     use shani\http\UploadedFile;
 
@@ -49,7 +51,7 @@ namespace lib\http {
         public readonly array $files;
         private RequestRoute $route;
         private ?array $acceptedType = null;
-        public readonly array $cookies, $body, $queries;
+        private readonly array $cookies, $body, $queries;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
@@ -176,6 +178,24 @@ namespace lib\http {
         public function query(string $name): ?string
         {
             return $this->queries[$name] ?? null;
+        }
+
+        /**
+         * Get HTTP cookie value(s)
+         * @param string|array $names named key
+         * @param bool $selected If set to true, only the selected values will be returned.
+         * @return type
+         */
+        public function cookies(string|array $names = null, bool $selected = true)
+        {
+            return Map::get($this->cookies, $names, $selected);
+        }
+
+        public function withCookies(HttpCookie $cookie): self
+        {
+            $copy = clone $this;
+            $copy->cookies[$cookie->name()] = $cookie;
+            return $copy;
         }
     }
 
