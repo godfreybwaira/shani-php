@@ -39,15 +39,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 //            $this->app->render($this->app->documentation());
 //            $this->app->stream('/home/coder/Videos/oceans.mp4');
             $session = $this->app->session();
-            $cart = $session->cart('abc');
-            $cart->add('name', 'godfrey')
-                    ->addAll([
-                        ['name' => 'godfrey'],
-                        ['age' => 22],
-                        ['dob' => date(DATE_ATOM)],
-//                        ['sessId' => $this->app->request->cookies($this->app->config->sessionName())]
-            ]);
-            $this->app->render($cart->getAll());
+            $this->app->response->setBody($session, 'json');
             $this->app->send();
         }
     }

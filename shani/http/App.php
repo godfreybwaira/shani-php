@@ -26,8 +26,8 @@ namespace shani\http {
     use shani\core\Framework;
     use lib\MediaType;
     use shani\core\VirtualHost;
-    use shani\persistence\SessionManager;
-    use shani\persistence\SessionCart;
+    use shani\persistence\session\SessionManager;
+    use shani\persistence\session\Cart;
 
     final class App
     {
@@ -249,9 +249,9 @@ namespace shani\http {
             return $this->platform;
         }
 
-        public function csrfToken(): SessionCart
+        public function csrfToken(): Cart
         {
-            return $this->session()->cart('_gGOd2y$oNO6W');
+            return $this->session()->cart('_gGOd2y$oN');
         }
 
         /**

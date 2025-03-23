@@ -97,8 +97,7 @@ namespace shani\advisors {
 
         public function sessionSavePath(): string
         {
-//            return $this->appStorage() . '/session.db';
-            return '/home/coder/Documents/session.db';
+            return $this->appStorage();
         }
 
         /**
@@ -164,7 +163,11 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t = null): void
         {
-            echo $t?->getMessage();
+            if ($t !== null) {
+                echo 'Message: ' . $t->getMessage() . PHP_EOL;
+                echo 'File: ' . $t->getFile() . PHP_EOL;
+                echo 'Line: ' . $t->getLine() . PHP_EOL;
+            }
             $this->app->send();
         }
 
