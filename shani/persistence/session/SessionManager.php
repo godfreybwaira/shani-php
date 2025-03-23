@@ -45,7 +45,7 @@ namespace shani\persistence\session {
                 return $path . '/' . $oldId;
             }
             $newId = sha1(random_bytes(random_int(20, 70)));
-            if ($oldId != null && is_file($path . '/' . $oldId)) {
+            if (is_file($path . '/' . $oldId)) {
                 rename($path . '/' . $oldId, $path . '/' . $newId);
             }
             $cookie = (new Cookie())->setHttpOnly(true)->setName($name)
@@ -73,6 +73,9 @@ namespace shani\persistence\session {
          */
         public function stop(): void
         {
+            if (is_file($this->filepath)) {
+                unlink($this->filepath);
+            }
             $this->storage->clear();
         }
 
