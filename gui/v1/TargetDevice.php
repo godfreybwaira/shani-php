@@ -10,33 +10,33 @@
 
 namespace gui\v1 {
 
-    interface TargetDevice
+    enum TargetDevice: int
     {
 
         /**
          * Min-width: 0
          */
-        public const MOBILE = 0;
+        case MOBILE = 0;
 
         /**
          * Min-width: 36rem or 576px
          */
-        public const TABLET = 36;
+        case TABLET = 36;
 
         /**
          * Min-width: 48rem or 768px
          */
-        public const LAPTOP = 48;
+        case LAPTOP = 48;
 
         /**
          * Min-width: 62rem or 992px
          */
-        public const DESKTOP = 62;
+        case DESKTOP = 62;
 
         /**
          * Min-width: 75rem or 1200px
          */
-        public const TV = 75;
+        case TV = 75;
     }
 
 }

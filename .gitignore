@@ -4,5 +4,9 @@ light/
 css/
 js/
 v2/
+storage/
 .obsidian/
-RequestInterface.php
+*.png
+*.jpg
+*.jpeg
+*.pdf

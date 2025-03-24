@@ -9,8 +9,9 @@
 
 namespace shani\advisors {
 
-    use shani\engine\http\App;
-    use library\HttpStatus;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
+    use shani\http\App;
 
     abstract class SecurityMiddleware
     {
@@ -22,12 +23,6 @@ namespace shani\advisors {
             Configuration::ACCESS_POLICY_THIS_DOMAIN => 'same-origin',
             Configuration::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN => 'same-site'
         ];
-        private const REFERRER_PRIVACIES = [
-            Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
-            Configuration::BROWSING_PRIVACY_THIS_DOMAIN => 'same-origin',
-            Configuration::BROWSING_PRIVACY_PARTIALLY => 'strict-origin',
-            Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
-        ];
 
         protected function __construct(App &$app)
         {
@@ -35,29 +30,33 @@ namespace shani\advisors {
         }
 
         /**
-         * Block incoming CSRF attacks. All attacks coming via http GET request will
-         * be discarded. User must make sure not submitting sensitive information
-         * via GET request
-         * @return bool True if check passes, false otherwise
+         * Check whether the client request method is allowed by the application.
+         * @return bool
+         * @see Configuration::requestMethods()
          */
-        public function blockCSRF(): bool
+        public function passedRequestMethodCheck(): bool
         {
-            $csrf = $this->app->config()->csrf();
-            if ($this->app->request()->method() === 'get' || $csrf === \shani\advisors\Configuration::CSRF_OFF) {
+            if (in_array($this->app->request->method, $this->app->config->requestMethods())) {
                 return true;
             }
-            $accepted = false;
-            $token = $this->app->request()->cookies('csrf_token');
-            $hashedUrl = App::digest($this->app->request()->uri()->path());
-            if ($csrf === \shani\advisors\Configuration::CSRF_STRICT) {
-                $accepted = $this->app->csrfToken()->get($hashedUrl) === $token;
-            } else {
-                $accepted = $this->app->csrfToken()->get($token) === $hashedUrl;
+            throw HttpStatus::methodNotAllowed($this->app);
+        }
+
+        /**
+         * Block incoming CSRF attacks. All attacks coming via HTTP GET request will
+         * be discarded. User must make sure not submitting sensitive information
+         * via GET request
+         * @return self
+         */
+        public function csrfTest(): self
+        {
+            if ($this->app->config->csrfProtectionEnabled() && $this->app->config->csrfProtected()) {
+                $token = $this->app->request->cookies($this->app->config->csrfTokenName());
+                if ($token === null || !$this->app->csrfToken()->has($token)) {
+                    throw HttpStatus::notAcceptable($this->app);
+                }
             }
-            if (!$accepted) {
-                $this->app->response()->setStatus(HttpStatus::NOT_ACCEPTABLE);
-            }
-            return $accepted;
+            return $this;
         }
 
         /**
@@ -67,26 +66,22 @@ namespace shani\advisors {
          */
         public function authorized(): bool
         {
-            $cnf = $this->app->config();
-            $permissions = $cnf->userPermissions();
-            $module = $this->app->request()->module();
-            if ($permissions !== null) {
-                if (in_array($module, $cnf->guestModules())) {
-                    $this->app->request()->rewriteUrl($cnf->homepage());
+            if (!$this->app->config->authorizationEnabled()) {
+                return false;
+            }
+            $route = $this->app->request->route();
+            if ($this->app->config->authenticated) {
+                if ($this->app->config->guestModule($route->module)) {
+                    $this->app->request->changeRoute($this->app->config->home());
                     return true;
                 }
-                if (in_array($module, $cnf->publicModules())) {
+                if ($this->app->config->publicModule($route->module) || $this->app->accessGranted($route->target)) {
                     return true;
                 }
-                $code = App::digest($this->app->request()->target());
-                if (preg_match('\b' . $code . '\b', $permissions) === 1) {
-                    return true;
-                }
-            } else if (in_array($module, $cnf->guestModules()) || in_array($module, $cnf->publicModules())) {
+            } else if ($this->app->config->guestModule($route->module) || $this->app->config->publicModule($route->module)) {
                 return true;
             }
-            $this->app->response()->setStatus(HttpStatus::UNAUTHORIZED);
-            return false;
+            throw HttpStatus::notAuthorized($this->app);
         }
 
         /**
@@ -96,70 +91,67 @@ namespace shani\advisors {
          */
         public function resourceAccessPolicy(): void
         {
-            $cnf = $this->app->config();
-            $policy = $cnf->resourceAccessPolicy();
+            $policy = $this->app->config->resourceAccessPolicy();
             if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
                 return;
             }
-            $this->app->response()->setHeaders([
-                'cross-origin-resource-policy' => self::ACCESS_POLICIES[$policy],
-                'access-control-allow-origin' => $cnf->whitelistedDomains(),
-                'access-control-allow-methods' => implode(',', $cnf->requestMethods())
+            $this->app->response->header()->setAll([
+                HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => self::ACCESS_POLICIES[$policy],
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods()
             ]);
         }
 
         /**
          * Tells a web browser to disable other sites from embedding your website
          * to theirs, e.g via iframe tag
-         * @return void
+         * @return self
          */
-        public function blockClickjacking(): void
+        public function blockClickjacking(): self
         {
-            $this->app->response()->setHeaders([
-                'x-frame-options' => 'SAMEORIGIN',
-                'content-security-policy' => "frame-ancestors 'self'"
-            ]);
+            $this->app->response->header()->set(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
+//            $this->app->response->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
+            return $this;
         }
 
         /**
-         * Tells a web browser how send HTTP referrer header. This is important
-         * for keeping user browsing privacy
-         * @return void
-         * @see Configuration::browsingPrivacy()
+         * Check user session validity. If session expired, user is redirected back to /
+         * @return self
          */
-        public function browsingPrivacy(): void
+        public function validateSession(): self
         {
-            $this->app->response()->setHeaders([
-                'referrer-policy' => self::REFERRER_PRIVACIES[$this->app->config()->browsingPrivacy()]
-            ]);
+            if ($this->app->config->sessionEnabled() && $this->app->session()->expired()) {
+                throw HttpStatus::sessionExpired($this->app);
+            }
+            return $this;
         }
 
         /**
          * A request sent by the browser before sending the actual request to verify
          * whether a server can process the coming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
-         * @return void
+         * @return self
          * @see Configuration::preflightRequest()
          */
-        public function preflightRequest(int $cacheTime = 86400): void
+        public function preflightRequest(int $cacheTime = 86400): self
         {
-            $req = $this->app->request();
-            if (!$this->app->config()->preflightRequest() || $req->method() !== 'options') {
-                return;
+            if (!$this->app->config->preflightRequestEnabled() || $this->app->request->method !== 'options') {
+                return $this;
             }
-            $headers = $req->headers([
-                'access-control-request-method',
-                'access-control-request-headers'
+            $headers = $this->app->request->header()->getAll([
+                HttpHeader::ACCESS_CONTROL_REQUEST_METHOD,
+                HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS
             ]);
-            if (empty($headers['access-control-request-method'])) {
-                return;
+            if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
+                return $this;
             }
-            $this->app->response()->setStatus(HttpStatus::NO_CONTENT)->setHeaders([
-                'access-control-allow-methods' => implode(',', $this->app->config()->requestMethods()),
-                'access-control-allow-headers' => $headers['access-control-request-headers'] ?? '*',
-                'access-control-allow-origin' => $this->app->config()->whitelistedDomains(),
-                'access-control-max-age' => $cacheTime
+            $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods(),
+                HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
+                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
+                HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
             ]);
+            return $this;
         }
     }
 
