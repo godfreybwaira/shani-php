@@ -14,6 +14,10 @@ namespace shani\persistence\session {
     final class SessionManager
     {
 
+        /**
+         * Session storage object
+         * @var Session
+         */
         public readonly Session $storage;
         private readonly App $app;
         private readonly string $filepath;

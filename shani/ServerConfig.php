@@ -70,7 +70,7 @@ namespace shani {
                 $host = file_get_contents($alias);
                 return static::host(trim($host));
             }
-            throw new \ErrorException('Host "' . $name . '" not found');
+            throw new \Exception('Host "' . $name . '" not found');
         }
 
         public static function getConfig(): self

@@ -161,13 +161,11 @@ namespace shani\advisors {
          * @param \Throwable $t
          * @return void
          */
-        public function errorHandler(\Throwable $t = null): void
+        public function errorHandler(\Throwable $t): void
         {
-            if ($t !== null) {
-                echo 'Message: ' . $t->getMessage() . PHP_EOL;
-                echo 'File: ' . $t->getFile() . PHP_EOL;
-                echo 'Line: ' . $t->getLine() . PHP_EOL;
-            }
+            echo 'Message: ' . $t->getMessage() . PHP_EOL;
+            echo 'File: ' . $t->getFile() . PHP_EOL;
+            echo 'Line: ' . $t->getLine() . PHP_EOL;
             $this->app->send();
         }
 

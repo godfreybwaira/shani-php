@@ -39,8 +39,7 @@ namespace shani\advisors {
             if (in_array($this->app->request->method, $this->app->config->requestMethods())) {
                 return true;
             }
-            $this->res->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-            return false;
+            throw HttpStatus::methodNotAllowed($this->app);
         }
 
         /**
@@ -54,7 +53,7 @@ namespace shani\advisors {
             if ($this->app->config->enableCsrfProtection() && $this->app->config->csrfProtected()) {
                 $token = $this->app->request->cookies($this->app->config->csrfTokenName());
                 if ($token === null || !$this->app->csrfToken()->has($token)) {
-                    $this->app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
+                    throw HttpStatus::notAcceptable($this->app);
                 }
             }
             return $this;
@@ -82,8 +81,7 @@ namespace shani\advisors {
             } else if ($this->app->config->guestModule($route->module) || $this->app->config->publicModule($route->module)) {
                 return true;
             }
-            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
-            return false;
+            throw HttpStatus::notAuthorized($this->app);
         }
 
         /**
@@ -124,7 +122,7 @@ namespace shani\advisors {
         public function validateSession(): self
         {
             if ($this->app->config->validateSession() && $this->app->session()->expired()) {
-                $this->app->redirect('/');
+                throw HttpStatus::sessionExpired($this->app);
             }
             return $this;
         }

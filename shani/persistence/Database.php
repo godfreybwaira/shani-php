@@ -15,12 +15,8 @@ namespace shani\persistence {
 
         public function __construct(string $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
-            try {
-                $connectionString = self::getConnectionString($driver, $database, $host, $port);
-                $this->pdo = new \PDO($connectionString, $username, $password);
-            } catch (\PDOException $ex) {
-                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
-            }
+            $connectionString = self::getConnectionString($driver, $database, $host, $port);
+            $this->pdo = new \PDO($connectionString, $username, $password);
         }
 
         private static function escapeHTML(&$var): void
@@ -36,14 +32,9 @@ namespace shani\persistence {
 
         private function processQuery(string &$query, ?array $data): \PDOStatement
         {
-            try {
-                $result = $this->pdo->prepare($query);
-                $result->execute($data);
-                return $result;
-            } catch (\PDOException $ex) {
-                echo $query;
-                throw new \ErrorException($ex->getMessage(), (int) $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
-            }
+            $result = $this->pdo->prepare($query);
+            $result->execute($data);
+            return $result;
         }
 
         /**
@@ -113,7 +104,7 @@ namespace shani\persistence {
                 case 'odbc'://for sqlserver
                     return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
             }
-            throw new \ErrorException('Driver "' . $driver . '" not supported');
+            throw new \Exception('Driver "' . $driver . '" not supported');
         }
     }
 

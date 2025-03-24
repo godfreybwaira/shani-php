@@ -69,23 +69,19 @@ namespace shani\http {
             $this->response = $res;
             $this->writer = $writer;
             $this->request = $res->request;
+            $this->response->header()->setAll([
+                HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
+                HttpHeader::SERVER => Framework::NAME
+            ]);
             try {
-                $this->response->header()->setAll([
-                    HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
-                    HttpHeader::SERVER => Framework::NAME
-                ]);
                 $this->vhost = ServerConfig::host($this->request->uri->hostname);
                 $this->config = new $this->vhost->configFile($this);
-                set_exception_handler(fn(\Throwable $e) => $this->config->errorHandler($e));
-                $this->runApp();
-            } catch (\ErrorException $ex) {
-                $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-                if (isset($this->config)) {
-                    $this->config->errorHandler($ex);
-                } else {
-                    $this->send();
-                }
+            } catch (\Throwable $ex) {
+                $this->response->setBody($ex->getMessage())->setStatus(HttpStatus::BAD_REQUEST);
+                return $this->send();
             }
+            set_exception_handler(fn(\Throwable $e) => $this->config->errorHandler($e));
+            $this->runApp();
         }
 
         /**
@@ -96,9 +92,9 @@ namespace shani\http {
         {
             $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
             if (!$this->vhost->running && !$this->config->appNotRunningHandled()) {
-                $this->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-                $this->send();
-            } else if (!Storage::tryServe($this)) {
+                throw HttpStatus::offline($this);
+            }
+            if (!Storage::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
                     $this->request->changeRoute($this->config->home());
                 }
@@ -136,9 +132,7 @@ namespace shani\http {
         public function stream(string $filepath, int $chunkSize = Definitions::BUFFER_SIZE): self
         {
             if (!is_file($filepath)) {
-                $this->response->setStatus(HttpStatus::NOT_FOUND);
-                $this->writer->close($this->response);
-                return $this;
+                throw HttpStatus::notFound($this);
             }
             $file = stat($filepath);
             $range = $this->request->header()->get(HttpHeader::RANGE) ?? '=0-';
@@ -179,8 +173,7 @@ namespace shani\http {
                     $this->writer->sendFile($this->response, $path, $start, $length);
                 }
             } else {
-                $this->response->setStatus(HttpStatus::BAD_REQUEST);
-                $this->writer->close($this->response);
+                throw HttpStatus::badRequest($this);
             }
             return $this;
         }
@@ -423,9 +416,7 @@ namespace shani\http {
         {
             $classPath = $this->classPath($this->request->method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
-                $this->response->setStatus(HttpStatus::NOT_FOUND);
-                $this->config->errorHandler();
-                return;
+                throw HttpStatus::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);
             $cb = Utils::kebab2camelCase(substr($this->request->route()->callback, 1));

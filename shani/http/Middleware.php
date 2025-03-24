@@ -23,15 +23,7 @@ namespace shani\http {
         {
             $this->app = $app;
             $this->listener = new Event(['before']);
-            $this->listener->done(fn() => self::returnResponse($app));
-        }
-
-        private static function returnResponse(App &$app)
-        {
-            if ($app->response->status()->value < 300) {
-                return $app->processRequest();
-            }
-            $app->config->errorHandler();
+            $this->listener->done(fn() => $app->processRequest());
         }
 
         /**
@@ -70,7 +62,7 @@ namespace shani\http {
                     return;
                 }
             }
-            self::returnResponse($this->app);
+            $this->app->processRequest();
         }
     }
 

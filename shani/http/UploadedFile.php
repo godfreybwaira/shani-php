@@ -9,7 +9,6 @@
 
 namespace shani\http {
 
-    use shani\advisors\Configuration;
     use shani\core\Definitions;
 
     final class UploadedFile
@@ -106,7 +105,7 @@ namespace shani\http {
             if (is_dir($destination) || mkdir($destination, Storage::FILE_MODE, true)) {
                 return $destination;
             }
-            throw new \ErrorException('Failed to create directory ' . $destination);
+            throw new \Exception('Failed to create directory ' . $destination);
         }
     }
 

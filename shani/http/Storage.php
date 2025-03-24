@@ -130,7 +130,7 @@ namespace shani\http {
          * Get information about the file
          * @param string $path a file path
          * @return \SplFileInfo
-         * @throws \ErrorException
+         * @throws \Exception
          */
         public function getInfo(string $path): \SplFileInfo
         {
@@ -138,7 +138,7 @@ namespace shani\http {
             if (is_file($filepath)) {
                 return new \SplFileInfo($filepath);
             }
-            throw new \ErrorException('File not exists');
+            throw HttpStatus::badRequest($this->app);
         }
 
         /**
