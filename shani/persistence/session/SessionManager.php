@@ -28,7 +28,7 @@ namespace shani\persistence\session {
             $this->app = $app;
             $this->age = $app->config->cookieMaxAge();
             $this->filepath = $this->createSavePath();
-            if (is_file($this->filepath)) {
+            if ($this->filepath !== null && is_file($this->filepath)) {
                 $content = file_get_contents($this->filepath);
                 $this->storage = Session::fromJson($content);
             } else {
@@ -37,13 +37,24 @@ namespace shani\persistence\session {
             }
         }
 
-        public function save()
+        /**
+         * Persist session data. You do not have to call this function as it is
+         * called automatically when response is sent to client.
+         * @return self
+         */
+        public function save(): self
         {
-            file_put_contents($this->filepath, $this->storage);
+            if ($this->filepath !== null) {
+                file_put_contents($this->filepath, $this->storage);
+            }
+            return $this;
         }
 
-        private function createSavePath(): string
+        private function createSavePath(): ?string
         {
+            if (!$this->app->config->sessionEnabled()) {
+                return null;
+            }
             $path = $this->app->config->sessionSavePath();
             $name = $this->app->config->sessionName();
             $oldId = $this->app->request->cookies($name);
@@ -65,7 +76,7 @@ namespace shani\persistence\session {
          */
         public function stop(): void
         {
-            if (is_file($this->filepath)) {
+            if ($this->filepath !== null && is_file($this->filepath)) {
                 unlink($this->filepath);
             }
             $this->storage->clear();

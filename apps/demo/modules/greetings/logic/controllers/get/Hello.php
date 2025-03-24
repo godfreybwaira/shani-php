@@ -41,7 +41,6 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
             $session = $this->app->session();
             $cart = $session->storage->cart('student');
             $cart->add('subjects', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $session->save();
             $this->app->response->setBody($session->storage, 'json');
             $this->app->send();
         }

@@ -438,7 +438,7 @@ namespace shani\http {
         public function csrf(?string $urlPath = null): string
         {
             $url = $urlPath ?? $this->request->uri->path;
-            if ($this->config->enableCsrfProtection()) {
+            if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add($token, null);
                 $cookie = (new Cookie())->setName($this->config->csrfTokenName())

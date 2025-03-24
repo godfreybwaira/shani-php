@@ -50,7 +50,7 @@ namespace shani\advisors {
          */
         public function csrfTest(): self
         {
-            if ($this->app->config->enableCsrfProtection() && $this->app->config->csrfProtected()) {
+            if ($this->app->config->csrfProtectionEnabled() && $this->app->config->csrfProtected()) {
                 $token = $this->app->request->cookies($this->app->config->csrfTokenName());
                 if ($token === null || !$this->app->csrfToken()->has($token)) {
                     throw HttpStatus::notAcceptable($this->app);
@@ -117,11 +117,10 @@ namespace shani\advisors {
         /**
          * Check user session validity. If session expired, user is redirected back to /
          * @return self
-         * @see Configuration::validateSession()
          */
         public function validateSession(): self
         {
-            if ($this->app->config->validateSession() && $this->app->session()->expired()) {
+            if ($this->app->config->sessionEnabled() && $this->app->session()->expired()) {
                 throw HttpStatus::sessionExpired($this->app);
             }
             return $this;

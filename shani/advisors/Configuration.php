@@ -95,9 +95,25 @@ namespace shani\advisors {
             return 'sessionId';
         }
 
+        /**
+         * The directory where session data will be saved. This directory must be
+         * writable and exists
+         * @return string
+         */
         public function sessionSavePath(): string
         {
             return $this->appStorage();
+        }
+
+        /**
+         * Whether session engine is enabled or not. If true then session data
+         * will be persisted on session storage, otherwise session object will
+         * behave just like normal object ait it's data will not be persisted.
+         * @return bool
+         */
+        public function sessionEnabled(): bool
+        {
+            return $this->app->platform() === 'web';
         }
 
         /**
@@ -126,7 +142,7 @@ namespace shani\advisors {
          * Enable/disable CSRF protection mechanism.
          * @return bool True to enable, to disable otherwise.
          */
-        public function enableCsrfProtection(): bool
+        public function csrfProtectionEnabled(): bool
         {
             return true;
         }
@@ -204,15 +220,6 @@ namespace shani\advisors {
         public function moduleDir(): string
         {
             return '/modules';
-        }
-
-        /**
-         * Whether to validate user session or not.
-         * @return bool
-         */
-        public function validateSession(): bool
-        {
-            return true;
         }
 
         /**

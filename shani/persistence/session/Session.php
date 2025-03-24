@@ -23,37 +23,47 @@ namespace shani\persistence\session {
             $this->lastActive = $lastActive;
         }
 
+        /**
+         * Add item to a session object
+         * @param Cart $cart
+         * @return self
+         */
         private function add(Cart $cart): self
         {
             $this->carts[$cart->name] = $cart;
             return $this;
         }
 
-        public function delete(string $cartName): self
+        /**
+         * Delete carts mentioned
+         * @param array $cartName List of carts to delete
+         * @return self
+         */
+        public function delete(string ...$cartName): self
         {
-            unset($this->carts[$cartName]);
+            foreach ($cartName as $name) {
+                unset($this->carts[$name]);
+            }
             return $this;
         }
 
+        /**
+         * Get the last access time on a session object
+         * @return int
+         */
         public function getLastActive(): int
         {
             return $this->lastActive;
         }
 
-        public function clear(): self
+        /**
+         * Check if all carts mentioned exist in the current session object
+         * @param string $cartName List of cart names
+         * @return bool Returns true if all carts exists, false otherwise.
+         */
+        public function has(string ...$cartName): bool
         {
-            $this->carts = [];
-            return $this;
-        }
-
-        public function has(string $cartName): bool
-        {
-            return array_key_exists($cartName, $this->carts);
-        }
-
-        public function hasAll(array $cartNames): bool
-        {
-            foreach ($cartNames as $name) {
+            foreach ($cartName as $name) {
                 if (!array_key_exists($name, $this->carts)) {
                     return false;
                 }
@@ -61,17 +71,32 @@ namespace shani\persistence\session {
             return true;
         }
 
+        /**
+         * Update the last active session time to a current time. This function
+         * is called every time <code>cart</code> function is called.
+         * @return self
+         */
         public function touch(): self
         {
             $this->lastActive = time();
             return $this;
         }
 
+        /**
+         * Returns total number of carts available
+         * @return int
+         */
         public function count(): int
         {
             return count($this->carts);
         }
 
+        /**
+         * Session cart is used for storing and retrieving session data.
+         * @param string $name Cart name, if cart does not exists, it is created
+         * otherwise the available cart object is returned.
+         * @return Cart
+         */
         public function cart(string $name): Cart
         {
             $this->touch();
@@ -94,6 +119,11 @@ namespace shani\persistence\session {
             ];
         }
 
+        /**
+         * Create session cart from JSON data
+         * @param string $json
+         * @return self
+         */
         public static function fromJson(string $json): self
         {
             $data = json_decode($json, true);
