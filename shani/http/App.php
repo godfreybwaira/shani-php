@@ -251,7 +251,7 @@ namespace shani\http {
 
         public function csrfToken(): Cart
         {
-            return $this->session()->cart('_gGOd2y$oN');
+            return $this->session()->storage->cart('_gGOd2y$oN');
         }
 
         /**

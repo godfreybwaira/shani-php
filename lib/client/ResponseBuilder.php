@@ -54,6 +54,10 @@ namespace lib\client {
             }
             $status = HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
             $headers = self::collectHeaders($stream, $headerSize);
+            $cookie = $headers->get(HttpHeader::SET_COOKIE);
+            if (!empty($cookie)) {
+                $request->header()->set(HttpHeader::COOKIE, substr($cookie, 0, strpos($cookie, ';')));
+            }
             $response = new ResponseEntity($request, $status, $headers);
             return $response->setBody(self::getContent($stream, $headerSize));
         }

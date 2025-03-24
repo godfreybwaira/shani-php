@@ -76,7 +76,8 @@ namespace apps\demo\config {
 
         public function isAsync(): bool
         {
-            return $this->app->request->header()->get('X-Request-Mode') === 'async';
+            return true;
+//            return $this->app->request->header()->get('X-Request-Mode') === 'async';
         }
     }
 

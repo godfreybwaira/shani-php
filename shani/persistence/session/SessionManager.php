@@ -14,14 +14,16 @@ namespace shani\persistence\session {
     final class SessionManager
     {
 
+        public readonly Session $storage;
         private readonly App $app;
         private readonly string $filepath;
-        private readonly Session $storage;
+        private readonly \DateTimeInterface $age;
 
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->filepath = $this->start();
+            $this->age = $app->config->cookieMaxAge();
+            $this->filepath = $this->createSavePath();
             if (is_file($this->filepath)) {
                 $content = file_get_contents($this->filepath);
                 $this->storage = Session::fromJson($content);
@@ -36,35 +38,21 @@ namespace shani\persistence\session {
             file_put_contents($this->filepath, $this->storage);
         }
 
-        private function start(): string
+        private function createSavePath(): string
         {
             $path = $this->app->config->sessionSavePath();
             $name = $this->app->config->sessionName();
             $oldId = $this->app->request->cookies($name);
             if ($oldId !== null && $this->app->config->isAsync()) {
+                $this->sendCookie($name, $oldId);
                 return $path . '/' . $oldId;
             }
             $newId = sha1(random_bytes(random_int(20, 70)));
             if (is_file($path . '/' . $oldId)) {
                 rename($path . '/' . $oldId, $path . '/' . $newId);
             }
-            $cookie = (new Cookie())->setHttpOnly(true)->setName($name)
-                    ->setValue($newId)->setSecure($this->app->request->uri->secure())
-                    ->setDomain($this->app->request->uri->hostname)
-                    ->setMaxAge($this->app->config->cookieMaxAge());
-            $this->app->response->setCookie($cookie);
+            $this->sendCookie($name, $newId);
             return $path . '/' . $newId;
-        }
-
-        public function cart(string $name): Cart
-        {
-            return $this->storage->cart($name);
-        }
-
-        #[\Override]
-        public function __toString()
-        {
-            return $this->storage;
         }
 
         /**
@@ -86,8 +74,17 @@ namespace shani\persistence\session {
         public function expired(): bool
         {
             $lastActive = $this->storage->getLastActive();
-            $age = $this->app->config->cookieMaxAge()->getTimestamp();
-            return time() - $lastActive > $age;
+            return time() - $lastActive > $this->age->getTimestamp();
+        }
+
+        private function sendCookie(string $name, string $sessId): void
+        {
+            $cookie = (new Cookie())->setHttpOnly(true)
+                    ->setName($name)->setValue($sessId)
+                    ->setSecure($this->app->request->uri->secure())
+                    ->setDomain($this->app->request->uri->hostname)
+                    ->setMaxAge($this->age);
+            $this->app->response->setCookie($cookie);
         }
     }
 

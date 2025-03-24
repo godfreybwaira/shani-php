@@ -13,9 +13,9 @@ namespace shani\persistence\session {
     final class Session implements \JsonSerializable
     {
 
-        public readonly int $createdAt;
         private int $lastActive;
         private array $carts = [];
+        private readonly int $createdAt;
 
         public function __construct(int $createdAt, int $lastActive)
         {
@@ -97,7 +97,7 @@ namespace shani\persistence\session {
         public static function fromJson(string $json): self
         {
             $data = json_decode($json, true);
-            $session = new Session($data['createdAt'], $data['lastActive']);
+            $session = new self($data['createdAt'], $data['lastActive']);
             foreach ($data['carts'] as $name => $values) {
                 $cart = new Cart($name);
                 foreach ($values as $key => $value) {
