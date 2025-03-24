@@ -46,6 +46,7 @@ namespace shani\persistence\session {
         {
             if ($this->filepath !== null) {
                 file_put_contents($this->filepath, $this->storage);
+                chmod($this->filepath, 0600);
             }
             return $this;
         }

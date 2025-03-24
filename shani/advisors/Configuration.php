@@ -102,7 +102,7 @@ namespace shani\advisors {
          */
         public function sessionSavePath(): string
         {
-            return $this->appStorage();
+            return sys_get_temp_dir();
         }
 
         /**
