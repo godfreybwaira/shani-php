@@ -72,6 +72,16 @@ namespace shani\persistence\session {
         }
 
         /**
+         * Remove all carts in a session object
+         * @return self
+         */
+        public function clear(): self
+        {
+            $this->carts = [];
+            return $this;
+        }
+
+        /**
          * Update the last active session time to a current time. This function
          * is called every time <code>cart</code> function is called.
          * @return self
