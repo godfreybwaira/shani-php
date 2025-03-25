@@ -11,18 +11,13 @@ namespace shani\advisors {
 
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
+    use shani\advisors\web\AccessPolicy;
     use shani\http\App;
 
     abstract class SecurityMiddleware
     {
 
-        protected App $app;
-
-        private const ACCESS_POLICIES = [
-            Configuration::ACCESS_POLICY_ANY_DOMAIN => 'cross-origin',
-            Configuration::ACCESS_POLICY_THIS_DOMAIN => 'same-origin',
-            Configuration::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN => 'same-site'
-        ];
+        protected readonly App $app;
 
         protected function __construct(App &$app)
         {
@@ -92,11 +87,11 @@ namespace shani\advisors {
         public function resourceAccessPolicy(): void
         {
             $policy = $this->app->config->resourceAccessPolicy();
-            if ($policy === Configuration::ACCESS_POLICY_DISABLE) {
+            if ($policy === AccessPolicy::DISABLED) {
                 return;
             }
             $this->app->response->header()->setAll([
-                HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => self::ACCESS_POLICIES[$policy],
+                HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                 HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                 HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods()
             ]);

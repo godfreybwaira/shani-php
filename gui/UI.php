@@ -9,7 +9,6 @@
 
 namespace gui {
 
-    use shani\advisors\Configuration;
     use shani\core\Definitions;
     use shani\http\App;
 
@@ -21,16 +20,9 @@ namespace gui {
         private ?string $title, $icon;
         private ?array $scripts, $styles, $data, $attributes;
 
-        private const REFERRER_PRIVACIES = [
-            Configuration::BROWSING_PRIVACY_STRICT => 'no-referrer',
-            Configuration::BROWSING_PRIVACY_THIS_DOMAIN => 'same-origin',
-            Configuration::BROWSING_PRIVACY_PARTIALLY => 'strict-origin',
-            Configuration::BROWSING_PRIVACY_NONE => 'strict-origin-when-cross-origin'
-        ];
-
         public function __construct(App &$app)
         {
-            $this->meta('referrer-policy', self::REFERRER_PRIVACIES[$app->config->browsingPrivacy()]);
+            $this->meta('referrer-policy', $app->config->browsingPrivacy()->value);
             $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;
