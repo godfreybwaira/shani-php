@@ -11,12 +11,12 @@
 namespace shani\http {
 
     use gui\UI;
-    use lib\Cookie;
+    use lib\Utils;
+    use lib\http\HttpCookie;
     use lib\DataConvertor;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
-    use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
@@ -441,8 +441,8 @@ namespace shani\http {
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add($token, null);
-                $cookie = (new Cookie())->setName($this->config->csrfTokenName())
-                        ->setSameSite(Cookie::SAME_SITE_LAX)
+                $cookie = (new HttpCookie())->setName($this->config->csrfTokenName())
+                        ->setSameSite(HttpCookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
                         ->setSecure($this->request->uri->secure());
                 $this->response->setCookie($cookie);

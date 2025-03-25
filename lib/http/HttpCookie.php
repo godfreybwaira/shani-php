@@ -7,11 +7,10 @@
  * Created on: Mar 27, 2024 at 1:44:06 PM
  */
 
-namespace lib {
+namespace lib\http {
 
-    use shani\contracts\HttpCookie;
 
-    final class Cookie implements HttpCookie
+    final class HttpCookie
     {
 
         public const SAME_SITE_NONE = 'None';

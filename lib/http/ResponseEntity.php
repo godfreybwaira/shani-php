@@ -9,10 +9,9 @@
 
 namespace lib\http {
 
-    use lib\DataConvertor;
     use lib\DataCompressionLevel;
+    use lib\DataConvertor;
     use lib\MediaType;
-    use shani\contracts\HttpCookie;
 
     final class ResponseEntity extends HttpEntity
     {
