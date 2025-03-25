@@ -46,14 +46,30 @@ namespace shani\persistence\session {
         }
 
         /**
-         * Delete an item/list of items from a cart
-         * @param string $keys Items to delete
+         * Delete an item from a cart
+         * @param string $key Item to delete
          * @return self
          */
-        public function delete(string ...$keys): self
+        public function delete(string $key): self
         {
-            foreach ($keys as $key) {
-                unset($this->data[$key]);
+            unset($this->data[$key]);
+            return $this;
+        }
+
+        /**
+         * Delete all items which satisfies the condition provided by the callback
+         * function.
+         * @param callable $callback A callback function that receive an item name as
+         * first parameter and an item value as second parameter. This function
+         * must return a boolean value.
+         * @return array A list if items
+         */
+        public function deleteAll(callable $callback): self
+        {
+            foreach ($this->data as $key => $value) {
+                if ($callback($key, $value)) {
+                    unset($this->data[$key]);
+                }
             }
             return $this;
         }
@@ -69,13 +85,13 @@ namespace shani\persistence\session {
         }
 
         /**
-         * Check if a cart has given item(s)
-         * @param string $keys Items to check
+         * Check if a cart has given item
+         * @param string $key Items to check
          * @return bool
          */
-        public function has(string ...$keys): bool
+        public function has(string ...$key): bool
         {
-            foreach ($keys as $key) {
+            foreach ($key as $key) {
                 if (!array_key_exists($key, $this->data)) {
                     return false;
                 }
@@ -115,35 +131,18 @@ namespace shani\persistence\session {
         }
 
         /**
-         * Get list of items from a cart
-         * @param array|null $keys A list of items to get
-         * @return array A List of items
-         */
-        public function getAll(?array $keys = null): array
-        {
-            if (empty($keys)) {
-                return $this->data;
-            }
-            $rows = [];
-            foreach ($keys as $key) {
-                $rows[$key] = $this->data[$key] ?? null;
-            }
-            return $rows;
-        }
-
-        /**
-         * Apply a callback for each cart item and return true if the condition
-         * on an item is satisfied.
-         * @param callable $cb A callback function that receive an item name as
+         * Get all items which satisfies the condition provided by the callback
+         * function.
+         * @param callable $callback A callback function that receive an item name as
          * first parameter and an item value as second parameter. This function
          * must return a boolean value.
          * @return array A list if items
          */
-        public function where(callable $cb): array
+        public function where(callable $callback): array
         {
             $rows = [];
             foreach ($this->data as $key => $value) {
-                if ($cb($key, $value)) {
+                if ($callback($key, $value)) {
                     $rows[$key] = $value;
                 }
             }

@@ -93,6 +93,4 @@ namespace gui\v1 {
         }
     }
 
-    $button = new Widget();
-    $button->parent()->children(0)->remove();
 }
