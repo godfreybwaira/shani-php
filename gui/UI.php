@@ -65,12 +65,12 @@ namespace gui {
         /**
          * Set title to HTML document. If not set, then the default title will be
          * application name, or empty string.
-         * @param string $name HTML title
+         * @param string $content HTML title
          * @return self
          */
-        public function title(string $name): self
+        public function title(string $content): self
         {
-            $this->title = $name;
+            $this->title = $content;
             return $this;
         }
 
@@ -81,7 +81,7 @@ namespace gui {
          * attributes naming standard
          * @return self
          */
-        public function scripts(string $src, array $attributes = []): self
+        public function script(string $src, array $attributes = []): self
         {
             self::createHeader($this->scripts, $src, $attributes);
             return $this;
@@ -94,7 +94,7 @@ namespace gui {
          * attributes naming standard
          * @return self
          */
-        public function styles(string $href, array $attributes = []): self
+        public function style(string $href, array $attributes = []): self
         {
             self::createHeader($this->styles, $href, $attributes);
             return $this;
@@ -134,16 +134,16 @@ namespace gui {
 
         /**
          * Set or get mutable data. Use this function to pass data from one view to another
-         * @param string $name Attribute name
+         * @param string $key Attribute name
          * @param type $value Attribute value
          * @return type On get, returns attribute/data specified by $name
          */
-        public function attrib(string $name, $value = null)
+        public function attrib(string $key, $value = null)
         {
             if ($value === null) {
-                return $this->attributes[$name];
+                return $this->attributes[$key] ?? null;
             }
-            $this->attributes[$name] = $value;
+            $this->attributes[$key] = $value;
         }
 
         /**
