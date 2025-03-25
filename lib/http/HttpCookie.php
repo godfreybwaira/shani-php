@@ -250,6 +250,7 @@ namespace lib\http {
          *
          * @return string
          */
+        #[\Override]
         public function __toString(): string
         {
             $cookie = $this->cookie['name'] . '=' . $this->cookie['value'];

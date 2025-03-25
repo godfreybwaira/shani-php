@@ -7,7 +7,7 @@
  * Created on: May 12, 2024 at 12:00:03 PM
  */
 
-namespace gui\v1\components {
+namespace gui\v1\widgets {
 
     use gui\v1\Component;
 

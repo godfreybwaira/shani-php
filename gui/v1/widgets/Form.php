@@ -8,7 +8,7 @@
  * Created on: Jul 19, 2024 at 7:02:10 PM
  */
 
-namespace gui\v1\components {
+namespace gui\v1\widgets {
 
     use gui\v1\Component;
     use lib\MediaType;

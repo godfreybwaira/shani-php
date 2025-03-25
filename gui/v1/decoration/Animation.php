@@ -9,7 +9,7 @@
 
 namespace gui\v1\decoration {
 
-    enum Animation: int
+    enum Animation: string
     {
 
         case SLIDE_LEFT = 0;

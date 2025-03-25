@@ -9,50 +9,31 @@
  * Created on: May 13, 2024 at 11:47:22 PM
  */
 
-namespace gui\v1\components {
+namespace gui\v1\widgets {
 
     use gui\v1\Component;
+    use gui\v1\decoration\OpenBehavior;
 
     final class Accordion extends Component
     {
 
-        /**
-         * Open the current element and close all other. This is the default behavior
-         */
-        public const OPEN_BEHAVIOR_CLOSE_OTHER = 0;
-
-        /**
-         * Open the current element without considering the state of other element.
-         */
-        public const OPEN_BEHAVIOR_OPEN_ALL = 1;
-
-        /**
-         * This will disable the opening behavior. All elements are open by default.
-         */
-        public const OPEN_BEHAVIOR_NONE = 2;
         ///////////////////
         private const ACCORDION = 0, ACCORDION_ITEM = 1, ACCORDION_BODY = 2, ACCORDION_LABEL = 3;
-        private const OPEN_BEHAVIOR = 4;
         private const PROPS = [
             self::ACCORDION => '',
             self::ACCORDION_ITEM => '',
             self::ACCORDION_BODY => '',
-            self::ACCORDION_LABEL => '',
-            self::OPEN_BEHAVIOR => [
-                self::OPEN_BEHAVIOR_CLOSE_OTHER => '',
-                self::OPEN_BEHAVIOR_OPEN_ALL => '',
-                self::OPEN_BEHAVIOR_NONE => ''
-            ]
+            self::ACCORDION_LABEL => ''
         ];
 
         /**
          * Create accordion component
-         * @param int $openBehavior Open behavior set using Accordion::OPEN_BEHAVIOR_*
+         * @param OpenBehavior $behavior Open behavior
          */
-        public function __construct(int $openBehavior = null)
+        public function __construct(OpenBehavior $behavior = OpenBehavior::CLOSE_OTHER)
         {
             parent::__construct('ul', self::PROPS);
-            $this->setOpenBehavior($openBehavior ?? self::OPEN_BEHAVIOR_CLOSE_OTHER);
+            $this->setOpenBehavior($behavior);
             $this->addStyle(self::ACCORDION);
         }
 
@@ -85,12 +66,12 @@ namespace gui\v1\components {
 
         /**
          * Set open behavior for this component
-         * @param int $openBehavior Open behavior set using Accordion::OPEN_BEHAVIOR_*
+         * @param OpenBehavior $behavior Open behavior
          * @return self
          */
-        public function setOpenBehavior(int $openBehavior): self
+        public function setOpenBehavior(OpenBehavior $behavior): self
         {
-            return $this->addStyle(self::OPEN_BEHAVIOR, $openBehavior);
+            return $this->addStyle(self::OPEN_BEHAVIOR, $behavior);
         }
     }
 

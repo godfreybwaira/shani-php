@@ -9,7 +9,7 @@
 
 namespace gui\v1\decoration {
 
-    enum Color: int
+    enum Color: string
     {
 
         case DANGER = 0;

@@ -10,7 +10,7 @@
 namespace shani\persistence\session {
 
 
-    final class Session implements \JsonSerializable
+    final class Session implements \JsonSerializable, \Stringable
     {
 
         private int $lastActive;

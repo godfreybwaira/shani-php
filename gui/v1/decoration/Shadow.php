@@ -9,7 +9,7 @@
 
 namespace gui\v1\decoration {
 
-    enum Shadow: int
+    enum Shadow: string
     {
 
         case XY = 0;

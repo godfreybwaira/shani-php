@@ -9,7 +9,7 @@
 
 namespace gui\v1\decoration {
 
-    enum Size: int
+    enum Size: string
     {
 
         case SIZE_SM = 0;

@@ -8,7 +8,7 @@
 
 namespace shani\persistence\session {
 
-    final class Cart implements \JsonSerializable
+    final class Cart implements \JsonSerializable, \Stringable
     {
 
         public readonly string $name;

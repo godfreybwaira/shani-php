@@ -3,7 +3,7 @@
 namespace lib\http {
 
 
-    final class HttpHeader
+    final class HttpHeader implements \Stringable
     {
 
         public const ACCEPT = 'Accept';
@@ -185,6 +185,7 @@ namespace lib\http {
             return mb_strlen($this);
         }
 
+        #[\Override]
         public function __toString(): string
         {
             $headerString = '';
