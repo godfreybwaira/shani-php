@@ -170,7 +170,7 @@ namespace shani\http {
                     $this->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->response);
                 } else {
-                    $this->writer->sendFile($this->response, $path, $start, $length);
+                    $this->writer->stream($this->response, $path, $start, $length);
                 }
             } else {
                 throw HttpStatus::badRequest($this);
