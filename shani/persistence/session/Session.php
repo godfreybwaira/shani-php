@@ -35,16 +35,51 @@ namespace shani\persistence\session {
         }
 
         /**
-         * Delete carts mentioned
-         * @param array $cartName List of carts to delete
+         * Delete a cart
+         * @param string $cartName A cart to delete
          * @return self
          */
-        public function delete(string ...$cartName): self
+        public function delete(string $cartName): self
         {
-            foreach ($cartName as $name) {
-                unset($this->carts[$name]);
+            unset($this->carts[$cartName]);
+            return $this;
+        }
+
+        /**
+         * Delete all items which satisfies the condition provided by the callback
+         * function.
+         * @param callable $callback A callback function that receive an item name as
+         * first parameter and an item value as second parameter. This function
+         * must return a boolean value.
+         * @return self
+         */
+        public function deleteAll(callable $callback): array
+        {
+            foreach ($this->carts as $name => $value) {
+                if ($callback($name, $value)) {
+                    unset($this->carts[$name]);
+                }
             }
             return $this;
+        }
+
+        /**
+         * Get all items which satisfies the condition provided by the callback
+         * function.
+         * @param callable $callback A callback function that receive an item name as
+         * first parameter and an item value as second parameter. This function
+         * must return a boolean value.
+         * @return array A list if items
+         */
+        public function where(callable $callback): array
+        {
+            $rows = [];
+            foreach ($this->carts as $name => $value) {
+                if ($callback($name, $value)) {
+                    $rows[$name] = $value;
+                }
+            }
+            return $rows;
         }
 
         /**

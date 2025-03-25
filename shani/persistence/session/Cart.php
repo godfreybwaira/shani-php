@@ -62,7 +62,7 @@ namespace shani\persistence\session {
          * @param callable $callback A callback function that receive an item name as
          * first parameter and an item value as second parameter. This function
          * must return a boolean value.
-         * @return array A list if items
+         * @return array self
          */
         public function deleteAll(callable $callback): self
         {
