@@ -113,13 +113,13 @@ namespace lib\http {
          */
         public function clearContentHeaders(): self
         {
-            parent::delete(HttpHeader::CONTENT_DISPOSITION);
-            parent::delete(HttpHeader::CONTENT_ENCODING);
-            parent::delete(HttpHeader::CONTENT_LANGUAGE);
-            parent::delete(HttpHeader::CONTENT_LENGTH);
-            parent::delete(HttpHeader::CONTENT_LOCATION);
-            parent::delete(HttpHeader::CONTENT_RANGE);
-            return parent::delete(HttpHeader::CONTENT_TYPE);
+            parent::delete(self::CONTENT_DISPOSITION);
+            parent::delete(self::CONTENT_ENCODING);
+            parent::delete(self::CONTENT_LANGUAGE);
+            parent::delete(self::CONTENT_LENGTH);
+            parent::delete(self::CONTENT_LOCATION);
+            parent::delete(self::CONTENT_RANGE);
+            return parent::delete(self::CONTENT_TYPE);
         }
 
         /**
@@ -135,6 +135,34 @@ namespace lib\http {
                 $this->add($headerName, $headerValue);
             }
             return $this;
+        }
+
+        /**
+         * Delete all HTTP cookie headers
+         * @return self
+         */
+        public function clearCookies(): self
+        {
+            return $this->delete(self::SET_COOKIE);
+        }
+
+        /**
+         * Set HTTP cookie header
+         * @param HttpCookie $cookie Cookie object
+         * @return self
+         */
+        public function setCookie(HttpCookie $cookie): self
+        {
+            return $this->add(self::SET_COOKIE, [$cookie->name() => $cookie]);
+        }
+
+        /**
+         * Get HTTP cookie header object(s) as array
+         * @return array
+         */
+        public function getCookies(): array
+        {
+            return $this->get(self::SET_COOKIE);
         }
 
         /**

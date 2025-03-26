@@ -53,18 +53,19 @@ namespace lib\http {
         public readonly ReadableMap $cookie, $body, $query;
 
         public function __construct(
-                URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
-                string $method, string $ip, int $time, array $queries, string $protocol
+                URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
+                array $files, string $method, string $ip, int $time, ReadableMap $queries,
+                string $protocol
         )
         {
             parent::__construct($headers, $protocol);
             $this->localhost = $ip === '127.0.0.1';
             $this->method = $method;
             $this->changeRoute($uri->path);
-            $this->cookie = new ReadableMap($cookies);
-            $this->query = new ReadableMap($queries);
-            $this->body = new ReadableMap($body);
+            $this->cookie = $cookies;
+            $this->query = $queries;
             $this->files = $files;
+            $this->body = $body;
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;

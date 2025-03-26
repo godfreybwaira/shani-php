@@ -445,7 +445,7 @@ namespace shani\http {
                         ->setSameSite(HttpCookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
                         ->setSecure($this->request->uri->secure());
-                $this->response->setCookie($cookie);
+                $this->response->header()->setCookie($cookie);
             }
             return $this->request->uri->host() . $url;
         }

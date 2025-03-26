@@ -17,19 +17,22 @@ namespace lib {
 
         private int $time;
         private ?URI $uri;
+        private array $files = [];
         private ?HttpHeader $headers;
         private ?string $method, $ip, $protocol;
-        private array $cookies = [], $files = [], $queries = [], $body = [];
+        private ReadableMap $cookies, $queries, $body;
 
         public function __construct()
         {
-
+            $this->body = new ReadableMap();
+            $this->queries = new ReadableMap();
+            $this->cookies = new ReadableMap();
         }
 
         public function body(?array $body): self
         {
             if (!empty($body)) {
-                $this->body = $body;
+                $this->body = new ReadableMap($body);
             }
             return $this;
         }
@@ -37,7 +40,7 @@ namespace lib {
         public function query(?array $values): self
         {
             if (!empty($values)) {
-                $this->queries = $values;
+                $this->queries = new ReadableMap($values);
             }
             return $this;
         }
@@ -69,7 +72,7 @@ namespace lib {
         public function cookies(?array $cookies): self
         {
             if (!empty($cookies)) {
-                $this->cookies = $cookies;
+                $this->cookies = new ReadableMap($cookies);
             }
             return $this;
         }

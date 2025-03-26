@@ -14,7 +14,7 @@ namespace lib {
 
         protected array $data;
 
-        public function __construct(array $data)
+        public function __construct(array $data = [])
         {
             $this->data = $data;
         }

@@ -166,18 +166,6 @@ namespace lib\http {
             return $this;
         }
 
-        public function clearCookies(): self
-        {
-            $this->headers->delete(HttpHeader::SET_COOKIE);
-            return $this;
-        }
-
-        public function setCookie(HttpCookie $cookie): self
-        {
-            $this->headers->add(HttpHeader::SET_COOKIE, [$cookie->name() => $cookie]);
-            return $this;
-        }
-
         /**
          * The Link header is used to provide relationships between the current
          * document and other resources.

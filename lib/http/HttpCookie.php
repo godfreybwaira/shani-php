@@ -10,7 +10,7 @@
 namespace lib\http {
 
 
-    final class HttpCookie
+    final class HttpCookie implements \Stringable
     {
 
         public const SAME_SITE_NONE = 'None';
@@ -101,7 +101,7 @@ namespace lib\http {
         public function expired(): bool
         {
             if (!empty($this->cookie['expires'])) {
-                return time() - $this->cookie['expires']->getTimestamp() <= 0;
+                return time() - $this->cookie['expires']->getTimestamp() >= 0;
             }
             return true;
         }

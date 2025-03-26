@@ -100,7 +100,7 @@ namespace shani\persistence\session {
                     ->setSecure($this->app->request->uri->secure())
                     ->setDomain($this->app->request->uri->hostname)
                     ->setMaxAge($this->age);
-            $this->app->response->setCookie($cookie);
+            $this->app->response->header()->setCookie($cookie);
         }
     }
 
