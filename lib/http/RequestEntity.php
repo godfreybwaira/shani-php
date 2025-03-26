@@ -11,9 +11,9 @@ namespace lib\http {
 
     use lib\URI;
     use lib\MediaType;
-    use lib\IterableData;
     use shani\http\RequestRoute;
     use shani\http\UploadedFile;
+    use lib\ReadableMap;
 
     final class RequestEntity extends HttpEntity
     {
@@ -50,7 +50,7 @@ namespace lib\http {
         public readonly array $files;
         private RequestRoute $route;
         private ?array $acceptedType = null;
-        public readonly IterableData $cookie, $body, $query;
+        public readonly ReadableMap $cookie, $body, $query;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
@@ -61,9 +61,9 @@ namespace lib\http {
             $this->localhost = $ip === '127.0.0.1';
             $this->method = $method;
             $this->changeRoute($uri->path);
-            $this->cookie = new IterableData($cookies);
-            $this->query = new IterableData($queries);
-            $this->body = new IterableData($body);
+            $this->cookie = new ReadableMap($cookies);
+            $this->query = new ReadableMap($queries);
+            $this->body = new ReadableMap($body);
             $this->files = $files;
             $this->time = $time;
             $this->uri = $uri;

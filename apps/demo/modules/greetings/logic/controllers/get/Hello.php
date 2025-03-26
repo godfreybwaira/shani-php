@@ -44,7 +44,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
             $cart->add('tacher', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
             $cart->add('janitor', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
             $cart->add('user', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $data = $cart->getAll(['subjects', 'user'], true);
+            $data = $cart->getAll(['subjects', 'user'], false);
             $this->app->response->setBody(json_encode($data), 'json');
             $this->app->send();
         }
