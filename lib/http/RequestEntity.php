@@ -12,7 +12,6 @@ namespace lib\http {
     use lib\Map;
     use lib\MediaType;
     use lib\URI;
-    use shani\contracts\HttpCookie;
     use shani\http\RequestRoute;
     use shani\http\UploadedFile;
 

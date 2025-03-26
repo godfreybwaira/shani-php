@@ -11,12 +11,12 @@
 namespace shani\http {
 
     use gui\UI;
-    use lib\Cookie;
+    use lib\Utils;
+    use lib\http\HttpCookie;
     use lib\DataConvertor;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
-    use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
@@ -69,7 +69,7 @@ namespace shani\http {
             $this->response = $res;
             $this->writer = $writer;
             $this->request = $res->request;
-            $this->response->header()->setAll([
+            $this->response->header()->addAll([
                 HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
                 HttpHeader::SERVER => Framework::NAME
             ]);
@@ -142,11 +142,11 @@ namespace shani\http {
             }
             $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
             $end = min($start + $chunkSize, $file['size']) - 1;
-            $this->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->setAll([
+            $this->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->addAll([
                 HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
                 HttpHeader::ACCEPT_RANGES => 'bytes'
             ]);
-            $this->response->header()->set(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
+            $this->response->header()->add(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             return $this->doStream($filepath, $file['size'], $start, $end);
         }
 
@@ -162,7 +162,7 @@ namespace shani\http {
         {
             if ($filesize > $end && $start < $end && $start >= 0) {
                 $length = $end - $start + 1;
-                $this->response->header()->setAll([
+                $this->response->header()->addAll([
                     HttpHeader::CONTENT_LENGTH => $length,
                     HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
                 ]);
@@ -170,7 +170,7 @@ namespace shani\http {
                     $this->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->response);
                 } else {
-                    $this->writer->sendFile($this->response, $path, $start, $length);
+                    $this->writer->stream($this->response, $path, $start, $length);
                 }
             } else {
                 throw HttpStatus::badRequest($this);
@@ -202,7 +202,7 @@ namespace shani\http {
          */
         public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
         {
-            $this->response->setStatus($status)->header()->set(HttpHeader::LOCATION, $url);
+            $this->response->setStatus($status)->header()->add(HttpHeader::LOCATION, $url);
             return $this;
         }
 
@@ -309,7 +309,7 @@ namespace shani\http {
         private function sendHtml(string $content, string $type): void
         {
             $this->response->setBody($content, $type)->header()
-                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
+                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
         }
 
         private function sendJsonp(?array $content, string $type): void
@@ -317,14 +317,14 @@ namespace shani\http {
             $callback = $this->request->query('callback') ?? 'callback';
             $data = $callback . '(' . json_encode($content) . ');';
             $this->response->setBody($data, $type)->header()
-                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
+                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
         }
 
         private function sendSse(string $content, string $type): void
         {
             $this->response->setBody(DataConvertor::toEventStream($content), $type)
-                    ->header()->setIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
-                    ->setIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
+                    ->header()->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
+                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
         }
 
         /**
@@ -441,8 +441,8 @@ namespace shani\http {
             if ($this->config->csrfProtectionEnabled()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->add($token, null);
-                $cookie = (new Cookie())->setName($this->config->csrfTokenName())
-                        ->setSameSite(Cookie::SAME_SITE_LAX)
+                $cookie = (new HttpCookie())->setName($this->config->csrfTokenName())
+                        ->setSameSite(HttpCookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
                         ->setSecure($this->request->uri->secure());
                 $this->response->setCookie($cookie);

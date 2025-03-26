@@ -9,15 +9,14 @@
 
 namespace gui\v1 {
 
+    use gui\v1\decoration\Shadow;
+    use lib\Map;
+    use UI\Size;
+
     final class Style
     {
 
-        public const ANINATION_SLIDE_LEFT = 0, ANINATION_SLIDE_RIGHT = 1;
-        public const ANINATION_SLIDE_TOP = 2, ANINATION_SLIDE_BOTTOM = 3;
-        public const ANINATION_FADE = 4;
         ///////////////////////
-        public const COLOR_DANGER = 0, COLOR_SUCCESS = 1, COLOR_ALERT = 2, COLOR_INFO = 3;
-        public const COLOR_PRIMARY = 4, COLOR_SECONDARY = 5, COLOR_TRANSLUSCENT = 6;
         ///////////////////////
         public const POS_TL = 0, POS_TC = 1, POS_TR = 2, POS_CL = 3, POS_CC = 4, POS_CR = 5, POS_BL = 6;
         public const POS_BC = 7, POS_BR = 8, POS_TOP = 9, POS_LEFT = 10, POS_BOTTOM = 11, POS_RIGHT = 12;
@@ -26,11 +25,9 @@ namespace gui\v1 {
         public const ALIGN_VERTICAL = 4, ALIGN_HORIZONTAL = 5;
         public const GAP_X = 0, GAP_Y = 1, GAP_XY = 2;
         ///////////////////////
-        public const SIZE_SM = 0, SIZE_MD = 1, SIZE_LG = 2, SIZE_XL = 3, SIZE_FULL = 4;
-        public const SIZE_DEFAULT = self::SIZE_MD;
         ///////////////////////
         public const SHADOW_XY = 0, SHADOW_TR = 1, SHADOW_TL = 2, SHADOW_BL = 3, SHADOW_BR = 4;
-        public const SHADOW_DEFAULT = self::SHADOW_BR;
+        public const SHADOW_DEFAULT = Shadow::BR;
         ///////////////////////
 
         private const PROPS = [
@@ -54,28 +51,28 @@ namespace gui\v1 {
                 self::GAP_X => '', self::GAP_Y => '', self::GAP_XY => ''
             ],
             'gap_sizes' => [
-                self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'margin_sizes' => [
-                self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'padding_sizes' => [
-                self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'font_sizes' => [
-                self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'shadow_sizes' => [
-                self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'corner_sizes' => [
-                self::SIZE_FULL => '', self::SIZE_LG => '', self::SIZE_MD => '',
-                self::SIZE_SM => '', self::SIZE_XL => ''
+                Size::FULL => '', Size::LG => '', Size::MD => '',
+                Size::SM => '', Size::XL => ''
             ],
             'corner_radius' => [
                 self::POS_BL => '', self::POS_BOTTOM => '',
@@ -84,8 +81,8 @@ namespace gui\v1 {
                 self::POS_TOP => '', self::POS_TR => ''
             ],
             'shadow_directions' => [
-                self::SHADOW_BL => '', self::SHADOW_BR => '', self::SHADOW_TL => '',
-                self::SHADOW_TR => '', self::SHADOW_XY => ''
+                Shadow::BOTTOM_LEFT => '', Shadow::BOTTOM_RIGHT => '', Shadow::TOP_LEFT => '',
+                Shadow::TOP_RIGHT => '', Shadow::XY => ''
             ],
             'border' => '', 'active' => '', 'relative_position' => '',
             'full_width' => '', 'full_height' => ''
@@ -98,7 +95,7 @@ namespace gui\v1 {
 
         public static function getStyles(array $keys): array
         {
-            return \lib\Map::get(self::PROPS, $keys);
+            return Map::get(self::PROPS, $keys);
         }
     }
 

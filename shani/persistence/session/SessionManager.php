@@ -8,8 +8,8 @@
 
 namespace shani\persistence\session {
 
-    use lib\Cookie;
     use shani\http\App;
+    use lib\http\HttpCookie;
 
     final class SessionManager
     {
@@ -95,7 +95,7 @@ namespace shani\persistence\session {
 
         private function sendCookie(string $name, string $sessId): void
         {
-            $cookie = (new Cookie())->setHttpOnly(true)
+            $cookie = (new HttpCookie())->setHttpOnly(true)
                     ->setName($name)->setValue($sessId)
                     ->setSecure($this->app->request->uri->secure())
                     ->setDomain($this->app->request->uri->hostname)

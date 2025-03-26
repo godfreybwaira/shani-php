@@ -10,7 +10,7 @@
 
 namespace gui\v1 {
 
-    class Component
+    class Component implements \Stringable
     {
 
         private readonly string $htmlTag;
@@ -25,6 +25,7 @@ namespace gui\v1 {
             $this->children = $this->classList = $this->attributes = [];
         }
 
+        #[\Override]
         public function __toString(): string
         {
             return $this->build();
@@ -261,13 +262,13 @@ namespace gui\v1 {
         /**
          * Add a style to a component style collection
          * @param int $name Style name
-         * @param type $value Style value
+         * @param \BackedEnum $value Style value
          * @return self
          * @see Component::setStyle()
          */
-        protected function addStyle(int $name, $value = null): self
+        protected function addStyle(int $name, \BackedEnum $value = null): self
         {
-            $this->inlineStyles[$name] = $value;
+            $this->inlineStyles[$name] = $value?->value;
             return $this;
         }
 
@@ -580,7 +581,6 @@ namespace gui\v1 {
         {
             $this->children = [];
             return $this;
-            ;
         }
 
         /**

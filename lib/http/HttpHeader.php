@@ -2,8 +2,9 @@
 
 namespace lib\http {
 
+    use lib\IterableData;
 
-    final class HttpHeader
+    final class HttpHeader extends IterableData
     {
 
         public const ACCEPT = 'Accept';
@@ -74,12 +75,11 @@ namespace lib\http {
         public const X_FRAME_OPTIONS = 'X-Frame-Options';
         public const X_CONTENT_TYPE_OPTIONS = 'X-Content-Type-Options';
 
-        private array $headers = [];
-
         public function __construct(?array $headers = null)
         {
+            parent::__construct([]);
             if (!empty($headers)) {
-                $this->setAll($headers);
+                $this->addAll($headers);
             }
         }
 
@@ -92,8 +92,7 @@ namespace lib\http {
          */
         public function setBasicAuth(string $username, string $password): self
         {
-            $this->headers[self::AUTHORIZATION] = 'Basic ' . base64_encode($username . ':' . $password);
-            return $this;
+            return parent::add(self::AUTHORIZATION, 'Basic ' . base64_encode($username . ':' . $password));
         }
 
         /**
@@ -103,8 +102,7 @@ namespace lib\http {
          */
         public function setBearerAuth(string $token): self
         {
-            $this->headers[self::AUTHORIZATION] = 'Bearer ' . $token;
-            return $this;
+            return parent::add(self::AUTHORIZATION, 'Bearer ' . $token);
         }
 
         /**
@@ -115,57 +113,52 @@ namespace lib\http {
          */
         public function clearContentHeaders(): self
         {
-            unset($this->headers[HttpHeader::CONTENT_DISPOSITION]);
-            unset($this->headers[HttpHeader::CONTENT_ENCODING]);
-            unset($this->headers[HttpHeader::CONTENT_LANGUAGE]);
-            unset($this->headers[HttpHeader::CONTENT_LENGTH]);
-            unset($this->headers[HttpHeader::CONTENT_LOCATION]);
-            unset($this->headers[HttpHeader::CONTENT_RANGE]);
-            unset($this->headers[HttpHeader::CONTENT_TYPE]);
-            return $this;
+            parent::delete(HttpHeader::CONTENT_DISPOSITION);
+            parent::delete(HttpHeader::CONTENT_ENCODING);
+            parent::delete(HttpHeader::CONTENT_LANGUAGE);
+            parent::delete(HttpHeader::CONTENT_LENGTH);
+            parent::delete(HttpHeader::CONTENT_LOCATION);
+            parent::delete(HttpHeader::CONTENT_RANGE);
+            return parent::delete(HttpHeader::CONTENT_TYPE);
         }
 
         /**
          * Set the given, single header value under the given name only if it does not exists.
-         * @param string $headerName the header name
-         * @param array|string|null $headerValue the header value
+         * @param string|int $headerName the header name
+         * @param mixed $headerValue the header value
          * @see set(string, string)
          * @return self
          */
-        public function setIfAbsent(string $headerName, array|string|null $headerValue): self
+        public function addIfAbsent(string|int $headerName, mixed $headerValue): self
         {
-            if (!array_key_exists($headerName, $this->headers)) {
-                $this->set($headerName, $headerValue);
+            if (!array_key_exists($headerName, $this->data)) {
+                $this->add($headerName, $headerValue);
             }
             return $this;
         }
 
         /**
          * Set the given, single header value under the given name.
-         * @param string $headerName the header name
-         * @param array|string|null $headerValue the header value
+         * @param string|int $headerName the header name
+         * @param mixed $headerValue the header value
          * @see setIfAbsent(string, string)
          */
-        public function set(string $headerName, array|string|null $headerValue): self
+        public function add(string|int $headerName, mixed $headerValue): self
         {
-            if ($headerValue === null) {
-                return $this;
-            }
             $name = self::createName($headerName);
-            if (is_string($headerValue)) {
-                $this->headers[$name] = $headerValue;
-            } else {
-                foreach ($headerValue as $key => $value) {
-                    $this->headers[$name][$key] = $value;
-                }
+            if (!is_array($headerValue)) {
+                return parent::add($name, $headerValue);
+            }
+            foreach ($headerValue as $key => $value) {
+                $this->data[$name][$key] = $value;
             }
             return $this;
         }
 
-        public function setAll(array $headers): self
+        public function addAll(array $headers): self
         {
             foreach ($headers as $name => $value) {
-                $this->set($name, $value);
+                $this->add($name, $value);
             }
             return $this;
         }
@@ -175,88 +168,20 @@ namespace lib\http {
             return ucwords(strtolower($headerName), '-');
         }
 
-        public function count(): int
-        {
-            return count($this->headers);
-        }
-
         public function size(): int
         {
             return mb_strlen($this);
         }
 
+        #[\Override]
         public function __toString(): string
         {
             $headerString = '';
-            foreach ($this->headers as $key => $value) {
+            foreach ($this->data as $key => $value) {
                 $val = is_array($value) ? implode(',', $value) : $value;
                 $headerString .= "\r\n" . $key = ': ' . $val;
             }
             return ltrim($headerString);
-        }
-
-        public function isEmpty(): bool
-        {
-            return $this->count() === 0;
-        }
-
-        public function has(string $headerName): bool
-        {
-            return array_key_exists($headerName, $this->headers);
-        }
-
-        public function getAll(array $headerNames = null): array
-        {
-            if (empty($headerNames)) {
-                return $this->headers;
-            }
-            $names = [];
-            foreach ($headerNames as $name) {
-                $names[$name] = $this->get($name);
-            }
-            return $names;
-        }
-
-        public function get(string $headerName): ?string
-        {
-            return $this->headers[$headerName] ?? null;
-        }
-
-        public function remove(string $headerName): self
-        {
-            unset($this->headers[$headerName]);
-            return $this;
-        }
-
-        public function removeAll(array $headerName): self
-        {
-            foreach ($headerName as $name) {
-                $this->remove($name);
-            }
-            return $this;
-        }
-
-        public function clear(): self
-        {
-            unset($this->headers);
-            return $this;
-        }
-
-        public function keySet(): array
-        {
-            return array_keys($this->headers);
-        }
-
-        public function values(): array
-        {
-            return array_values($this->headers);
-        }
-
-        public function entrySet(): \Generator
-        {
-            foreach ($this->headers as $key => $value) {
-                yield [$key => $value];
-            }
         }
     }
 

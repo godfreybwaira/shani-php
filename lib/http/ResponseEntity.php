@@ -9,10 +9,9 @@
 
 namespace lib\http {
 
-    use lib\DataConvertor;
     use lib\DataCompressionLevel;
+    use lib\DataConvertor;
     use lib\MediaType;
-    use shani\contracts\HttpCookie;
 
     final class ResponseEntity extends HttpEntity
     {
@@ -89,23 +88,23 @@ namespace lib\http {
         {
             if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
                 $this->body = $content;
-                $this->headers->set(HttpHeader::CONTENT_LENGTH, $this->bodySize());
+                $this->headers->add(HttpHeader::CONTENT_LENGTH, $this->bodySize());
                 return $this;
             }
             $encoding = $this->request->header()->get(HttpHeader::ACCEPT_ENCODING);
             if (str_contains($encoding, 'gzip')) {
-                $this->headers->set(HttpHeader::CONTENT_ENCODING, 'gzip');
+                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'gzip');
                 $this->body = gzencode($content, $this->compression->value);
             } elseif (str_contains($encoding, 'deflate')) {
-                $this->headers->set(HttpHeader::CONTENT_ENCODING, 'deflate');
+                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'deflate');
                 $this->body = gzdeflate($content, $this->compression->value);
             } elseif (str_contains($encoding, 'compress')) {
-                $this->headers->set(HttpHeader::CONTENT_ENCODING, 'compress');
+                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'compress');
                 $this->body = gzcompress($content, $this->compression->value);
             } else {
                 $this->body = $content;
             }
-            $this->headers->set(HttpHeader::CONTENT_LENGTH, $this->bodySize());
+            $this->headers->add(HttpHeader::CONTENT_LENGTH, $this->bodySize());
             return $this;
         }
 
@@ -120,8 +119,8 @@ namespace lib\http {
 
         public function setBody(string $content, ?string $type = null): self
         {
-            if (!$this->headers->has(HttpHeader::CONTENT_TYPE)) {
-                $this->headers->set(HttpHeader::CONTENT_TYPE, match ($type ?? $this->type()) {
+            if (!$this->headers->exists(HttpHeader::CONTENT_TYPE)) {
+                $this->headers->add(HttpHeader::CONTENT_TYPE, match ($type ?? $this->type()) {
                     DataConvertor::TYPE_JSON => MediaType::JSON,
                     DataConvertor::TYPE_XML => MediaType::XML,
                     DataConvertor::TYPE_CSV => MediaType::TEXT_CSV,
@@ -150,9 +149,9 @@ namespace lib\http {
         {
             $etag = $cache->etag();
             if (!empty($etag)) {
-                $this->headers->set(HttpHeader::ETAG, $etag);
+                $this->headers->add(HttpHeader::ETAG, $etag);
             }
-            $this->headers->set(HttpHeader::CACHE_CONTROL, $cache);
+            $this->headers->add(HttpHeader::CACHE_CONTROL, $cache);
             return $this;
         }
 
@@ -162,20 +161,20 @@ namespace lib\http {
          */
         public function clearCache(): self
         {
-            $this->headers->remove(HttpHeader::ETAG)
-                    ->remove(HttpHeader::CACHE_CONTROL);
+            $this->headers->delete(HttpHeader::ETAG)
+                    ->delete(HttpHeader::CACHE_CONTROL);
             return $this;
         }
 
         public function clearCookies(): self
         {
-            $this->headers->remove(HttpHeader::SET_COOKIE);
+            $this->headers->delete(HttpHeader::SET_COOKIE);
             return $this;
         }
 
         public function setCookie(HttpCookie $cookie): self
         {
-            $this->headers->set(HttpHeader::SET_COOKIE, [$cookie->name() => $cookie]);
+            $this->headers->add(HttpHeader::SET_COOKIE, [$cookie->name() => $cookie]);
             return $this;
         }
 
@@ -191,7 +190,7 @@ namespace lib\http {
             foreach ($links as $name => $link) {
                 $lnk .= ',<' . $link . '>; rel="' . $name . '"';
             }
-            $this->headers->set(HttpHeader::LINK, substr($lnk, 1));
+            $this->headers->add(HttpHeader::LINK, substr($lnk, 1));
             return $this;
         }
 
@@ -203,7 +202,7 @@ namespace lib\http {
         public function saveAs(string $filename = null): self
         {
             $name = $filename ? '; filename="' . $filename . '"' : '';
-            $this->headers->set(HttpHeader::CONTENT_DISPOSITION, 'attachment' . $name);
+            $this->headers->add(HttpHeader::CONTENT_DISPOSITION, 'attachment' . $name);
             return $this;
         }
 

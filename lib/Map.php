@@ -257,8 +257,8 @@ namespace lib {
 
         /**
          * Perform a callback on each single dimension array. This function may
-         * change the original array, depending on wht callback does to array
-         * @param array $rows A multidimensional array to apply cakkback
+         * change the original array, depending on what callback does to array
+         * @param array $rows A multidimensional array to apply callback
          * @param callable $cb A callback function
          * @return array New array
          */

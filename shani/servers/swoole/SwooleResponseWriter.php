@@ -9,7 +9,6 @@
 
 namespace shani\servers\swoole {
 
-    use lib\http\HttpStatus;
     use lib\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
     use Swoole\Http\Response as SwooleResponse;
@@ -55,10 +54,10 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function sendFile(ResponseEntity &$res, string $absoluteFilepath, int $startByte, int $chunkSize): self
+        public function stream(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res);
-            $this->res->sendfile($absoluteFilepath, $startByte, $chunkSize);
+            $this->res->sendfile($filepath, $startByte, $chunkSize);
             return $this;
         }
     }

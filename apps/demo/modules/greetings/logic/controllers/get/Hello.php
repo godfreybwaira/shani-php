@@ -29,7 +29,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
         public function world()
         {
             //using global style
-            $this->app->ui()->styles('/css/styles.css');
+            $this->app->ui()->style('/css/styles.css');
             //passing data to current view (greetings/presentation/views/hello/world.php)
             $student = new Student('Godfrey', 'Bwaira', 20);
             $student->addSubject(new Subject('English', 'A', 89))

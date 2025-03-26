@@ -11,7 +11,7 @@ namespace lib\http {
 
     use lib\Duration;
 
-    final class HttpCache
+    final class HttpCache implements \Stringable
     {
 
         private bool $reuse, $versioned, $accessible, $revalidate, $unique;
@@ -84,6 +84,7 @@ namespace lib\http {
             return $this;
         }
 
+        #[\Override]
         public function __toString(): string
         {
             $directives = [];

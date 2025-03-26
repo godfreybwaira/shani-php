@@ -12,54 +12,14 @@ namespace shani\advisors {
 
     use lib\DataCompressionLevel;
     use lib\Duration;
+    use shani\advisors\web\AccessPolicy;
+    use shani\advisors\web\BrowsingPrivacy;
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
 
     abstract class Configuration
     {
-
-        /**
-         *  allows resource access on this application from this domain only
-         */
-        public const ACCESS_POLICY_THIS_DOMAIN = 0;
-
-        /**
-         *  allows resource access on this application from this domain and it's subdomain
-         */
-        public const ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN = 1;
-
-        /**
-         *  allows resource access on this application from any domain (Not recommended)
-         */
-        public const ACCESS_POLICY_ANY_DOMAIN = 2;
-
-        /**
-         *  Do not use resource access policy (Not recommended)
-         */
-        public const ACCESS_POLICY_DISABLE = 3;
-
-        /**
-         * Never send the Referrer header (Protect user's privacy)
-         */
-        public const BROWSING_PRIVACY_STRICT = 0;
-
-        /**
-         * Send the Referrer header (See what user is browsing but only on this domain)
-         */
-        public const BROWSING_PRIVACY_THIS_DOMAIN = 1;
-
-        /**
-         * Send the Referrer header (i.e see what user is browsing on all domains
-         * but do not show the actual content they browse)
-         */
-        public const BROWSING_PRIVACY_PARTIALLY = 2;
-
-        /**
-         * Send the full Referrer header on same-origin requests and only the
-         * URL without the path on cross-origin requests
-         */
-        public const BROWSING_PRIVACY_NONE = 3;
 
         /**
          * Whether the current user is authenticated and has at least one permission
@@ -315,22 +275,22 @@ namespace shani\advisors {
         /**
          * Tells a web browser how to decide which domain can access resources
          * on this application.
-         * @return int
+         * @return AccessPolicy
          * @see SecurityMiddleware::resourceAccessPolicy()
          */
-        public function resourceAccessPolicy(): int
+        public function resourceAccessPolicy(): AccessPolicy
         {
-            return self::ACCESS_POLICY_THIS_DOMAIN_AND_SUBDOMAIN;
+            return AccessPolicy::THIS_DOMAIN_AND_SUBDOMAIN;
         }
 
         /**
          * Tells a web browser how send HTTP referrer header. This is important
          * for managing user browsing privacy
-         * @return int
+         * @return BrowsingPrivacy
          */
-        public function browsingPrivacy(): int
+        public function browsingPrivacy(): BrowsingPrivacy
         {
-            return self::BROWSING_PRIVACY_THIS_DOMAIN;
+            return BrowsingPrivacy::THIS_DOMAIN;
         }
 
         /**

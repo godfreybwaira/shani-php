@@ -197,7 +197,7 @@ namespace lib\client {
             $body = $this->mergeBodyWithFiles();
             if (!empty($body)) {
                 if ($this->signatureKey !== null) {
-                    $this->request->header()->set($this->signatureHeader, $this->sign($body));
+                    $this->request->header()->add($this->signatureHeader, $this->sign($body));
                 }
                 $content = DataConvertor::convertTo($body, $this->request->type);
                 if ($this->cipherKey !== null) {
