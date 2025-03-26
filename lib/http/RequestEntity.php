@@ -9,9 +9,9 @@
 
 namespace lib\http {
 
-    use lib\Map;
-    use lib\MediaType;
     use lib\URI;
+    use lib\MediaType;
+    use lib\IterableData;
     use shani\http\RequestRoute;
     use shani\http\UploadedFile;
 
@@ -50,7 +50,7 @@ namespace lib\http {
         public readonly array $files;
         private RequestRoute $route;
         private ?array $acceptedType = null;
-        private readonly array $cookies, $body, $queries;
+        public readonly IterableData $cookie, $body, $query;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, array $body, array $cookies, array $files,
@@ -61,10 +61,10 @@ namespace lib\http {
             $this->localhost = $ip === '127.0.0.1';
             $this->method = $method;
             $this->changeRoute($uri->path);
-            $this->cookies = $cookies;
-            $this->queries = $queries;
+            $this->cookie = new IterableData($cookies);
+            $this->query = new IterableData($queries);
+            $this->body = new IterableData($body);
             $this->files = $files;
-            $this->body = $body;
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
@@ -143,16 +143,6 @@ namespace lib\http {
         }
 
         /**
-         * Get HTTP request values obtained via HTTP request body.
-         * @param string $name named key
-         * @return string|null
-         */
-        public function body(string $name): ?string
-        {
-            return $this->body[$name] ?? null;
-        }
-
-        /**
          * Get request parameters sent via HTTP request endpoint
          * @param int $index Index of a request parameter
          * @return string|null
@@ -169,31 +159,10 @@ namespace lib\http {
             return $copy;
         }
 
-        /**
-         * Get HTTP queries
-         * @param string $name query string name
-         * @return string|null
-         */
-        public function query(string $name): ?string
-        {
-            return $this->queries[$name] ?? null;
-        }
-
-        /**
-         * Get HTTP cookie value(s)
-         * @param string|array $names named key
-         * @param bool $selected If set to true, only the selected values will be returned.
-         * @return type
-         */
-        public function cookies(string|array $names = null, bool $selected = true)
-        {
-            return Map::get($this->cookies, $names, $selected);
-        }
-
         public function withCookies(HttpCookie $cookie): self
         {
             $copy = clone $this;
-            $copy->cookies[$cookie->name()] = $cookie;
+            $copy->cookie->add($cookie->name(), $cookie);
             return $copy;
         }
     }

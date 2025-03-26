@@ -314,7 +314,7 @@ namespace shani\http {
 
         private function sendJsonp(?array $content, string $type): void
         {
-            $callback = $this->request->query('callback') ?? 'callback';
+            $callback = $this->request->query->get('callback', 'callback');
             $data = $callback . '(' . json_encode($content) . ');';
             $this->response->setBody($data, $type)->header()
                     ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);

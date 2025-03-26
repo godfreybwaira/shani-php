@@ -175,11 +175,12 @@ namespace lib {
         /**
          * Get an item from an iterable object
          * @param string|int $key Item to get
+         * @param type $default Default value to return if no value found
          * @return mixed
          */
-        public function get(string|int $key): mixed
+        public function get(string|int $key, $default = null): mixed
         {
-            return $this->data[$key] ?? null;
+            return $this->data[$key] ?? $default;
         }
 
         /**
@@ -214,14 +215,30 @@ namespace lib {
          * @param array $keys Items to get from an iterable object
          * @return array
          */
-        public function getAll(array $keys = null): array
+        public function toArray(): array
         {
-            if ($keys === null) {
-                return $this->data;
-            }
+            return $this->data;
+        }
+
+        /**
+         * Get an iterable object as array
+         * @param array $keys Items to get from an iterable object
+         * @param bool $selected When true, only selected items using $keys will be returned
+         * @return array
+         */
+        public function getAll(array $keys, bool $selected = true): array
+        {
             $rows = [];
-            foreach ($keys as $key) {
-                $rows[$key] = $this->get($key);
+            if ($selected) {
+                foreach ($keys as $key) {
+                    $rows[$key] = $this->get($key);
+                }
+            } else {
+                foreach ($this->data as $key => $value) {
+                    if (!in_array($key, $keys)) {
+                        $rows[$key] = $value;
+                    }
+                }
             }
             return $rows;
         }

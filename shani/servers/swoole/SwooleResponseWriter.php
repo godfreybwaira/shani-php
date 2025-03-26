@@ -28,7 +28,7 @@ namespace shani\servers\swoole {
             if ($this->res->isWritable()) {
                 $status = $res->status();
                 $this->res->status($status->value, $res->statusMessage() ?? $status->getMessage());
-                $headers = $res->header()->getAll();
+                $headers = $res->header()->toArray();
                 foreach ($headers as $key => $value) {
                     $this->res->header($key, $value);
                 }

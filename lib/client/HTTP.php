@@ -167,7 +167,7 @@ namespace lib\client {
 
         private function setCookies(): void
         {
-            $cookies = $this->request->cookies();
+            $cookies = $this->request->cookie->toArray();
             if (!empty($cookies)) {
                 foreach ($cookies as $cookie) {
                     $this->setOptions([CURLOPT_COOKIE => $cookie]);
@@ -210,7 +210,7 @@ namespace lib\client {
             }
             $this->setOptions([
                 CURLOPT_CUSTOMREQUEST => $method,
-                CURLOPT_HTTPHEADER => $this->request->header()->getAll()
+                CURLOPT_HTTPHEADER => $this->request->header()->toArray()
             ]);
         }
 
@@ -220,7 +220,7 @@ namespace lib\client {
             foreach ($this->request->files as $name => $file) {
                 $files[$name] = curl_file_create($file->stream->getPathname(), $file->type, $file->name);
             }
-            $body = $this->request->body();
+            $body = $this->request->body->toArray();
             if (!empty($files)) {
                 return !empty($body) ? array_merge($body, $files) : $files;
             }
@@ -319,7 +319,7 @@ namespace lib\client {
          */
         public function get(string $endpoint, callable $callback): self
         {
-            return $this->send('GET', self::merge($endpoint, $this->request->body()), $callback);
+            return $this->send('GET', self::merge($endpoint, $this->request->body->toArray()), $callback);
         }
 
         /**

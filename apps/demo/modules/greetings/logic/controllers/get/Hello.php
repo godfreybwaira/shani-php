@@ -41,7 +41,11 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
             $session = $this->app->session();
             $cart = $session->storage->cart('student');
             $cart->add('subjects', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $this->app->response->setBody($session->storage, 'json');
+            $cart->add('tacher', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
+            $cart->add('janitor', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
+            $cart->add('user', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
+            $data = $cart->getAll(['subjects', 'user'], true);
+            $this->app->response->setBody(json_encode($data), 'json');
             $this->app->send();
         }
     }

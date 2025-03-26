@@ -117,7 +117,38 @@ namespace lib {
                 self::TYPE_YAML, self::TYPE_YML => self::yaml2array($data),
                 default => null
             };
-            return \lib\Map::normalize($convertedData);
+            return self::normalize($convertedData);
+        }
+
+        /**
+         * Convert array string values to their internal representation. For example
+         * a string value 'null' is converted to NULL, string 'true' or 'false' is
+         * converted to boolean value true and false respectively etc.
+         * @param array|null $values array to normalize
+         * @return array|null normalized array
+         */
+        public static function normalize(?array $values): ?array
+        {
+            if (empty($values)) {
+                return $values;
+            }
+            $content = [];
+            foreach ($values as $key => $val) {
+                if (is_array($val)) {
+                    $content[$key] = self::normalize($val);
+                } elseif ($val === 'null') {
+                    $content[$key] = null;
+                } elseif ($val === 'true' || $val === 'false') {
+                    $content[$key] = ($val === 'true');
+                } elseif (preg_match('/^\d+$/', $val)) {
+                    $content[$key] = (int) $val;
+                } elseif (preg_match('/^\d*\.\d+$/', $val)) {
+                    $content[$key] = (double) $val;
+                } else {
+                    $content[$key] = $val;
+                }
+            }
+            return $content;
         }
 
         /**
