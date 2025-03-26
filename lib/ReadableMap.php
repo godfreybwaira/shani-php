@@ -128,6 +128,34 @@ namespace lib {
         }
 
         /**
+         * Convert iterable data to CSV
+         * @param string $separator Data separator
+         * @return string
+         */
+        public function toCsv(string $separator = ','): string
+        {
+            return DataConvertor::array2csv($this->data, $separator);
+        }
+
+        /**
+         * Convert iterable data to XML
+         * @return string
+         */
+        public function toXml(): string
+        {
+            return DataConvertor::array2xml($this->data);
+        }
+
+        /**
+         * Convert iterable data to JSON
+         * @return string
+         */
+        public function toJson(): string
+        {
+            return json_encode($this->data);
+        }
+
+        /**
          * Get an iterable object as array
          * @param array $keys Items to get from an iterable object
          * @param bool $selected When true, only selected items using $keys will be returned

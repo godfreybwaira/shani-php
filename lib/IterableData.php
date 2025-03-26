@@ -12,11 +12,6 @@ namespace lib {
     class IterableData extends ReadableMap
     {
 
-        public function __construct(array $data)
-        {
-            parent::__construct($data);
-        }
-
         /**
          * Add an item to an iterable object
          * @param stringInt $key Item name
