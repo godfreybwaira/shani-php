@@ -90,7 +90,7 @@ namespace shani\advisors {
             if ($policy === AccessPolicy::DISABLED) {
                 return;
             }
-            $this->app->response->header()->setAll([
+            $this->app->response->header()->addAll([
                 HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                 HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                 HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods()
@@ -104,7 +104,7 @@ namespace shani\advisors {
          */
         public function blockClickjacking(): self
         {
-            $this->app->response->header()->set(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
+            $this->app->response->header()->add(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
 //            $this->app->response->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
             return $this;
         }
@@ -140,7 +140,7 @@ namespace shani\advisors {
             if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
                 return $this;
             }
-            $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->setAll([
+            $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
                 HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods(),
                 HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
                 HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),

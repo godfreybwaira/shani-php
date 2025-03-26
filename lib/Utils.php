@@ -16,7 +16,7 @@ namespace lib {
         public static function errorHandler()
         {
             set_error_handler(function (int $errno, string $errstr, string $errfile, int $errline) {
-                throw new \Exception($errstr, $errno, E_ALL, $errfile, $errline);
+                throw new \ErrorException($errstr, $errno, E_ALL, $errfile, $errline);
             });
         }
 

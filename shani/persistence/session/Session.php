@@ -9,77 +9,19 @@
 
 namespace shani\persistence\session {
 
+    use lib\IterableData;
 
-    final class Session implements \JsonSerializable, \Stringable
+    final class Session extends IterableData
     {
 
         private int $lastActive;
-        private array $carts = [];
         private readonly int $createdAt;
 
         public function __construct(int $createdAt, int $lastActive)
         {
             $this->createdAt = $createdAt;
             $this->lastActive = $lastActive;
-        }
-
-        /**
-         * Add item to a session object
-         * @param Cart $cart
-         * @return self
-         */
-        private function add(Cart $cart): self
-        {
-            $this->carts[$cart->name] = $cart;
-            return $this;
-        }
-
-        /**
-         * Delete a cart
-         * @param string $cartName A cart to delete
-         * @return self
-         */
-        public function delete(string $cartName): self
-        {
-            unset($this->carts[$cartName]);
-            return $this;
-        }
-
-        /**
-         * Delete all items which satisfies the condition provided by the callback
-         * function.
-         * @param callable $callback A callback function that receive an item name as
-         * first parameter and an item value as second parameter. This function
-         * must return a boolean value.
-         * @return self
-         */
-        public function deleteAll(callable $callback): array
-        {
-            foreach ($this->carts as $name => $value) {
-                if ($callback($name, $value)) {
-                    unset($this->carts[$name]);
-                }
-            }
-            return $this;
-        }
-
-        /**
-         * Get all items which satisfies the condition provided by the callback
-         * function.
-         * @param callable $callback A callback function that receive an item name as
-         * first parameter and an item value as second parameter. This function
-         * must return a boolean value.
-         * @return array A list if items
-         */
-        public function where(callable $callback): array
-        {
-            $rows = [];
-            foreach ($this->carts as $name => $value) {
-                if ($callback($name, $value)) {
-                    $rows[$name] = $value;
-                }
-            }
-            return $rows;
+            parent::__construct([]);
         }
 
         /**
@@ -89,31 +31,6 @@ namespace shani\persistence\session {
         public function getLastActive(): int
         {
             return $this->lastActive;
-        }
-
-        /**
-         * Check if all carts mentioned exist in the current session object
-         * @param string $cartName List of cart names
-         * @return bool Returns true if all carts exists, false otherwise.
-         */
-        public function has(string ...$cartName): bool
-        {
-            foreach ($cartName as $name) {
-                if (!array_key_exists($name, $this->carts)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /**
-         * Remove all carts in a session object
-         * @return self
-         */
-        public function clear(): self
-        {
-            $this->carts = [];
-            return $this;
         }
 
         /**
@@ -128,15 +45,6 @@ namespace shani\persistence\session {
         }
 
         /**
-         * Returns total number of carts available
-         * @return int
-         */
-        public function count(): int
-        {
-            return count($this->carts);
-        }
-
-        /**
          * Session cart is used for storing and retrieving session data.
          * @param string $name Cart name, if cart does not exists, it is created
          * otherwise the available cart object is returned.
@@ -145,13 +53,7 @@ namespace shani\persistence\session {
         public function cart(string $name): Cart
         {
             $this->touch();
-            return ($this->carts[$name] ??= new Cart($name));
-        }
-
-        #[\Override]
-        public function __toString()
-        {
-            return json_encode($this);
+            return ($this->data[$name] ??= new Cart($name));
         }
 
         #[\Override]
@@ -160,7 +62,7 @@ namespace shani\persistence\session {
             return [
                 'createdAt' => $this->createdAt,
                 'lastActive' => $this->lastActive,
-                'carts' => $this->carts
+                'carts' => $this->data
             ];
         }
 
@@ -178,7 +80,7 @@ namespace shani\persistence\session {
                 foreach ($values as $key => $value) {
                     $cart->add($key, $value);
                 }
-                $session->add($cart);
+                $session->add($cart->name, $cart);
             }
 
             return $session;

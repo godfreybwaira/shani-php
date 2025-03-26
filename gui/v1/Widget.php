@@ -12,10 +12,11 @@ namespace gui\v1 {
     class Widget implements \Stringable
     {
 
-        //WHAT ARE THE COMPONENTS OF A WIDGET?
+        //EVERY WIDGET HAS...
         //attributes
         //classes
         //children
+        //parent
         //decoration
         private ?Widget $parent = null;
 

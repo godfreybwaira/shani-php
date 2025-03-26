@@ -34,7 +34,7 @@ namespace shani\advisors\web {
         /**
          *  Do not use resource access policy (Not recommended)
          */
-        case DISABLED = null;
+        case DISABLED = '';
     }
 
 }

@@ -51,13 +51,11 @@ namespace lib\http {
             }
         }
 
-        #[\Override]
         public function name(): string
         {
             return $this->cookie['name'];
         }
 
-        #[\Override]
         public function value(): string
         {
             return $this->cookie['value'];
