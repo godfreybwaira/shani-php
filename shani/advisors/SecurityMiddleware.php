@@ -47,7 +47,7 @@ namespace shani\advisors {
         {
             if ($this->app->config->csrfProtectionEnabled() && $this->app->config->csrfProtected()) {
                 $token = $this->app->request->cookies($this->app->config->csrfTokenName());
-                if ($token === null || !$this->app->csrfToken()->has($token)) {
+                if ($token === null || !$this->app->csrfToken()->exists($token)) {
                     throw HttpStatus::notAcceptable($this->app);
                 }
             }

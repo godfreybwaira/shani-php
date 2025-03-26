@@ -132,7 +132,7 @@ namespace lib {
          * @param callable $callback List of cart names
          * @return bool Returns true if all carts exists, false otherwise.
          */
-        public function has(callable $callback): bool
+        public function existsWhere(callable $callback): bool
         {
             foreach ($this->data as $key => $value) {
                 if ($callback($key, $value)) {
