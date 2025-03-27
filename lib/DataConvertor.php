@@ -29,30 +29,24 @@ namespace lib {
          * where value on index 0 has array keys as headers and index 1 has array
          * values as table body.
          * @param array $rows Array to convert
-         * @param array $headers Associative array whose keys must match with array keys
-         * and value becomes table headers (columns names)
-         * @return array A converted array
+         * @return string A converted array
          */
-        public static function array2table(array $rows, array $headers): array
+        public static function array2dataGrid(array $rows): string
         {
-            $table = [];
-            $isArray = isset($rows[0]) && is_array($rows[0]);
-            $data = $isArray ? $rows[0] : $rows;
-            foreach ($headers as $key => $value) {
-                $idx = is_int($key) ? $value : $key;
-                if (!array_key_exists($idx, $data)) {
-                    continue;
-                }
-                $table[0][] = $value;
-                if ($isArray) {
-                    foreach ($rows as $r => $row) {
-                        $table[1][$r][] = $row[$idx];
-                    }
-                } else {
-                    $table[1][0][] = $rows[$idx];
+            $headers = null;
+            $records = [];
+            if (isset($rows[0]) && is_array($rows[0])) {
+                $headers = array_keys($rows[0]);
+            } else {
+                $headers = array_keys($rows);
+                $rows = [$rows];
+            }
+            foreach ($rows as $r => $row) {
+                foreach ($headers as $key) {
+                    $records[$r][] = $row[$key];
                 }
             }
-            return $table;
+            return json_encode([$headers, $records]);
         }
 
         /**

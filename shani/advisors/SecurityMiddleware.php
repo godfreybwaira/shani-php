@@ -85,17 +85,17 @@ namespace shani\advisors {
          * @return void
          * @see Configuration::resourceAccessPolicy()
          */
-        public function resourceAccessPolicy(): void
+        public function resourceAccessPolicy(): self
         {
             $policy = $this->app->config->resourceAccessPolicy();
-            if ($policy === AccessPolicy::DISABLED) {
-                return;
+            if ($policy !== AccessPolicy::DISABLED) {
+                $this->app->response->header()->addAll([
+                    HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
+                    HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
+                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
+                ]);
             }
-            $this->app->response->header()->addAll([
-                HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
-                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
-            ]);
+            return $this;
         }
 
         /**

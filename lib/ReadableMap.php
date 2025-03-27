@@ -156,6 +156,16 @@ namespace lib {
         }
 
         /**
+         * Convert iterable data to datagrid, A json with first row as headers,
+         * and second row contains a list of values corresponding to given headers
+         * @return string
+         */
+        public function toDataGrid(): string
+        {
+            return DataConvertor::array2dataGrid($this->data);
+        }
+
+        /**
          * Get an iterable object as array
          * @param array $keys Items to get from an iterable object
          * @param bool $selected When true, only selected items using $keys will be returned

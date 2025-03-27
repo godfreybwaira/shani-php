@@ -8,6 +8,8 @@
 
 namespace shani\persistence {
 
+    use lib\IterableData;
+
     final class Database
     {
 
@@ -43,7 +45,7 @@ namespace shani\persistence {
          * @param array|null $data
          * @return int Number of rows affected
          */
-        public function runQuery(string $query, ?array $data = null): int
+        public function run(string $query, ?array $data = null): int
         {
             $result = $this->processQuery($query, $data);
             $result->closeCursor();
@@ -56,10 +58,9 @@ namespace shani\persistence {
          * @param array|null $data
          * @param bool $escapeHtml Whether to escape HTML special characters on SQL
          * output or not
-         * @return array Rows returned as the result of SQL query.
-         * @see Database::getResultAsTable()
+         * @return IterableData Iterable object contains rows returned as the result of SQL query.
          */
-        public function getResult(string $query, ?array $data = null, bool $escapeHtml = true): array
+        public function get(string $query, ?array $data = null, bool $escapeHtml = true): IterableData
         {
             $result = $this->processQuery($query, $data);
             $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
@@ -67,22 +68,7 @@ namespace shani\persistence {
             if (!empty($rows) && $escapeHtml) {
                 self::escapeHTML($rows);
             }
-            return $rows;
-        }
-
-        /**
-         * Execute SQL query and all rows (if available) found as table like array
-         * @param string $query A query to execute
-         * @param array|null $data Data to run with query
-         * @param bool $escapeHtml Whether to escape HTML special characters on SQL
-         * output or not
-         * @return array Rows returned as the result of SQL query.
-         * @see Database::getResult()
-         */
-        public function getResultAsTable(string $query, array $headers, ?array $data = null, bool $escapeHtml = true): array
-        {
-            $rows = $this->getResult($query, $data, $escapeHtml);
-            return \lib\DataConvertor::array2table($rows, $headers);
+            return new IterableData($rows);
         }
 
         private static function getConnectionString(string $driver, string $database, ?string $host, ?int $port): string
