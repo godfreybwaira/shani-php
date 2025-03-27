@@ -115,6 +115,7 @@ namespace lib\http {
         public static function methodNotAllowed(App &$app): \Exception
         {
             $app->res->setStatus(self::METHOD_NOT_ALLOWED);
+            $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $app->config->allowedRequestMethods());
             return new \Exception('Request Method not allowed');
         }
 

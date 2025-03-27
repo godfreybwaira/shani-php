@@ -27,11 +27,12 @@ namespace shani\advisors {
         /**
          * Check whether the client request method is allowed by the application.
          * @return bool
-         * @see Configuration::requestMethods()
+         * @see Configuration::allowedRequestMethods()
          */
         public function passedRequestMethodCheck(): bool
         {
-            if (in_array($this->app->request->method, $this->app->config->requestMethods())) {
+            $methods = $this->app->config->allowedRequestMethods();
+            if ($methods === '*' || str_contains($methods, $this->app->request->method)) {
                 return true;
             }
             throw HttpStatus::methodNotAllowed($this->app);
@@ -93,7 +94,7 @@ namespace shani\advisors {
             $this->app->response->header()->addAll([
                 HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                 HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods()
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
             ]);
         }
 
@@ -130,22 +131,14 @@ namespace shani\advisors {
          */
         public function preflightRequest(int $cacheTime = 86400): self
         {
-            if (!$this->app->config->preflightRequestEnabled() || $this->app->request->method !== 'options') {
-                return $this;
+            if ($this->app->request->method === 'options') {
+                $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
+                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods(),
+                    HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $this->app->config->allowedRequestHeaders(),
+                    HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
+                    HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
+                ]);
             }
-            $headers = $this->app->request->header()->getAll([
-                HttpHeader::ACCESS_CONTROL_REQUEST_METHOD,
-                HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS
-            ]);
-            if (empty($headers[HttpHeader::ACCESS_CONTROL_REQUEST_METHOD])) {
-                return $this;
-            }
-            $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->requestMethods(),
-                HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $headers[HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS] ?? '*',
-                HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
-                HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
-            ]);
             return $this;
         }
     }

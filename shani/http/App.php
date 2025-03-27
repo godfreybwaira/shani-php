@@ -398,13 +398,14 @@ namespace shani\http {
          */
         public function accessGranted(string $target): bool
         {
-            if ($this->config->authorizationEnabled()) {
+            if (!$this->config->authorizationEnabled()) {
                 return true;
             }
             if (empty($this->config->permissionList)) {
                 return false;
             }
-            return (preg_match('\b' . self::digest($target) . '\b', $this->config->permissionList) === 1);
+            return str_contains($this->config->permissionList, self::digest($target));
+//            return (preg_match('\b' . self::digest($target) . '\b', $this->config->permissionList) === 1);
         }
 
         /**

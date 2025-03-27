@@ -230,15 +230,30 @@ namespace shani\advisors {
         public abstract function home(): string;
 
         /**
-         * Returns an array of HTTP request methods supported by the application (in lower case)
+         * Returns a list of HTTP request methods supported by the application
+         * (in lower case) separated by a comma
          * @see SecurityMiddleware::passedRequestMethodCheck()
+         * @see SecurityMiddleware::preflightRequest()
          */
-        public abstract function requestMethods(): array;
+        public abstract function allowedRequestMethods(): string;
 
         /**
-         * Get a list of authenticated user's permissions separated by comma.
+         * Returns a list of HTTP request headers supported by the application
+         * (in lower case) separated by a comma
+         * @see SecurityMiddleware::passedRequestMethodCheck()
+         * @see SecurityMiddleware::preflightRequest()
+         */
+        public function allowedRequestHeaders(): string
+        {
+            return '*';
+        }
+
+        /**
+         * Get a list of authenticated user's permissions separated by a comma.
+         * Application must set permission using this function after a user is being
+         * logged in successfully.
          * @return string|null List of user permissions or null if no permission is granted
-         * @see App::hasAuthority()
+         * @see App::accessGranted()
          */
         public abstract function userPermissions(): ?string;
 
@@ -310,16 +325,6 @@ namespace shani\advisors {
         public function compressionMinSize(): int
         {
             return 1024; //1KB
-        }
-
-        /**
-         * Enable/disable preflight request sent by the browser
-         * @return bool
-         * @see SecurityMiddleware::preflightRequest()
-         */
-        public function preflightRequestEnabled(): bool
-        {
-            return true;
         }
 
         /**

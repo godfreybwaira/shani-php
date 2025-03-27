@@ -39,9 +39,9 @@ namespace apps\demo\config {
             return Definitions::DIR_APPS . '/demo/storage';
         }
 
-        public function requestMethods(): array
+        public function allowedRequestMethods(): string
         {
-            return ['get', 'post', 'head'];
+            return 'get,post,head';
         }
 
         public function middleware(Middleware &$mw): SecurityMiddleware

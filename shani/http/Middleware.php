@@ -51,10 +51,9 @@ namespace shani\http {
          */
         public function runWith(SecurityMiddleware &$advisor): void
         {
-            $advisor->validateSession();
+            $advisor->validateSession()->preflightRequest();
             $this->app->on('web', function () use (&$advisor) {
-                $advisor->blockClickjacking()->resourceAccessPolicy();
-                $advisor->preflightRequest()->csrfTest();
+                $advisor->blockClickjacking()->resourceAccessPolicy()->csrfTest();
             });
             if ($advisor->authorized() && $advisor->passedRequestMethodCheck()) {
                 if ($this->listener->listening('before')) {

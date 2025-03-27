@@ -54,13 +54,26 @@ namespace lib\client {
             }
             $status = HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
             $headers = self::collectHeaders($stream, $headerSize);
+            self::setReflectionHeaders($request, $headers);
+            $response = new ResponseEntity($request, $status, $headers);
+            $response->setBody(self::getContent($stream, $headerSize));
+            return $response;
+        }
+
+        private static function setReflectionHeaders(RequestEntity &$request, HttpHeader &$headers)
+        {
             $cookies = $headers->get(HttpHeader::SET_COOKIE, []);
             foreach ($cookies as $cookie) {
                 $request->header()->setCookie($cookie);
             }
-            $response = new ResponseEntity($request, $status, $headers);
-            $response->setBody(self::getContent($stream, $headerSize));
-            return $response;
+            $etag = $headers->get(HttpHeader::ETAG);
+            if ($etag !== null) {
+                $request->header()->add(HttpHeader::IF_NONE_MATCH, $etag);
+            }
+            $lastModified = $headers->get(HttpHeader::LAST_MODIFIED);
+            if ($lastModified !== null) {
+                $request->header()->add(HttpHeader::IF_MODIFIED_SINCE, $lastModified);
+            }
         }
     }
 
