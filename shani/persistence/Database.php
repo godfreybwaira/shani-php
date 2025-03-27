@@ -14,6 +14,7 @@ namespace shani\persistence {
     {
 
         public readonly \PDO $pdo;
+        private bool $escape = true;
 
         public function __construct(string $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
@@ -40,6 +41,17 @@ namespace shani\persistence {
         }
 
         /**
+         * Whether to escape HTML characters on result set or not.
+         * @param bool $escape When true, HTML characters will be escaped
+         * @return self
+         */
+        public function escapeHtml(bool $escape): self
+        {
+            $this->escape = $escape;
+            return $this;
+        }
+
+        /**
          * Execute SQL query and return number of rows affected
          * @param string $query A query to run
          * @param array|null $data
@@ -56,16 +68,14 @@ namespace shani\persistence {
          * Execute SQL query and all rows (if available) found
          * @param string $query A query to execute
          * @param array|null $data
-         * @param bool $escapeHtml Whether to escape HTML special characters on SQL
-         * output or not
          * @return IterableData Iterable object contains rows returned as the result of SQL query.
          */
-        public function get(string $query, ?array $data = null, bool $escapeHtml = true): IterableData
+        public function get(string $query, ?array $data = null): IterableData
         {
             $result = $this->processQuery($query, $data);
             $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
             $result->closeCursor();
-            if (!empty($rows) && $escapeHtml) {
+            if (!empty($rows) && $this->escape) {
                 self::escapeHTML($rows);
             }
             return new IterableData($rows);
