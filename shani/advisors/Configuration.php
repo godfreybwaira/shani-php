@@ -14,7 +14,7 @@ namespace shani\advisors {
     use lib\DataCompressionLevel;
     use shani\advisors\web\AccessPolicy;
     use shani\advisors\web\BrowsingPrivacy;
-    use shani\contracts\FileStorage;
+    use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
@@ -349,14 +349,13 @@ namespace shani\advisors {
 
         /**
          * Get file storage media where uploaded files will be saved and retrieved.
-         * To be able to use remote storage, you must override this method.
+         * To be able to use remote storage.
          * @param string $disk Storage media
-         * will be stored on this machine's disk
-         * @return FileStorage
+         * @return StorageMedia
          */
-        public function getStorageMedia(string $disk): ?FileStorage
+        public function getStorageMedia(string $disk): StorageMedia
         {
-            return null;
+            return new LocalStorage($this->app);
         }
     }
 

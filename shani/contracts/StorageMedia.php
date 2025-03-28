@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of FileStorage
+ * Description of StorageMedia
  * @author coder
  *
  * Created on: Mar 27, 2025 at 5:29:05 PM
@@ -11,7 +11,7 @@ namespace shani\contracts {
 
     use shani\http\UploadedFile;
 
-    interface FileStorage
+    interface StorageMedia
     {
 
         /**

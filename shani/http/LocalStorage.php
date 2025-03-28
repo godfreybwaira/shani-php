@@ -13,9 +13,9 @@ namespace shani\http {
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use shani\core\Definitions;
-    use shani\contracts\FileStorage;
+    use shani\contracts\StorageMedia;
 
-    final class LocalStorage implements FileStorage
+    final class LocalStorage implements StorageMedia
     {
 
         private readonly App $app;

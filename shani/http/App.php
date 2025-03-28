@@ -25,7 +25,7 @@ namespace shani\http {
     use shani\core\Framework;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
-    use shani\contracts\FileStorage;
+    use shani\contracts\StorageMedia;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
     use shani\ServerConfig;
@@ -262,13 +262,10 @@ namespace shani\http {
         /**
          * Get storage object representing application storage directory
          * @param string $disk Storage media. The default storage is 'local'
-         * @return FileStorage
+         * @return StorageMedia
          */
-        public function storage(string $disk = 'local'): FileStorage
+        public function storage(string $disk = 'local'): StorageMedia
         {
-            if ($disk === 'local') {
-                return ($this->storage[$disk] ??= new LocalStorage($this));
-            }
             return ($this->storage[$disk] ??= $this->config->getStorageMedia($disk));
         }
 
