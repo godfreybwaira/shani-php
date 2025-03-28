@@ -11,28 +11,29 @@
 namespace shani\http {
 
     use gui\UI;
-    use lib\Utils;
-    use lib\http\HttpCookie;
     use lib\DataConvertor;
+    use lib\http\HttpCookie;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
+    use lib\http\ResponseEntity;
+    use lib\MediaType;
+    use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
-    use shani\documentation\Generator;
-    use lib\http\ResponseEntity;
-    use shani\ServerConfig;
     use shani\core\Framework;
-    use lib\MediaType;
     use shani\core\VirtualHost;
-    use shani\persistence\session\SessionManager;
+    use shani\documentation\Generator;
+    use shani\contracts\FileStorage;
     use shani\persistence\session\Cart;
+    use shani\persistence\session\SessionManager;
+    use shani\ServerConfig;
 
     final class App
     {
 
-        private Storage $storage;
+        private array $storage = [];
         private SessionManager $session;
         private ?string $lang = null;
         private readonly ResponseWriter $writer;
@@ -94,7 +95,7 @@ namespace shani\http {
             if (!$this->vhost->running && !$this->config->appNotRunningHandled()) {
                 throw HttpStatus::offline($this);
             }
-            if (!Storage::tryServe($this)) {
+            if (!LocalStorage::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
                     $this->request->changeRoute($this->config->home());
                 }
@@ -260,12 +261,15 @@ namespace shani\http {
 
         /**
          * Get storage object representing application storage directory
-         * @return Storage
+         * @param string $disk Storage media. The default storage is 'local'
+         * @return FileStorage
          */
-        public function storage(): Storage
+        public function storage(string $disk = 'local'): FileStorage
         {
-            $this->storage ??= new Storage($this);
-            return $this->storage;
+            if ($disk === 'local') {
+                return ($this->storage[$disk] ??= new LocalStorage($this));
+            }
+            return ($this->storage[$disk] ??= $this->config->getStorageMedia($disk));
         }
 
         /**

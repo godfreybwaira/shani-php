@@ -183,18 +183,6 @@ namespace lib\http {
         }
 
         /**
-         * Output a file to user agent
-         * @param string $filename filename to send
-         * @return self
-         */
-        public function saveAs(string $filename = null): self
-        {
-            $name = $filename ? '; filename="' . $filename . '"' : '';
-            $this->headers->add(HttpHeader::CONTENT_DISPOSITION, 'attachment' . $name);
-            return $this;
-        }
-
-        /**
          * Set data compression strategy for a response body using user Accept-Encoding header.
          * This function cannot be called after <code>setBody</code> function.
          * @param DataCompressionLevel $level Compression level

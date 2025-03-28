@@ -47,13 +47,15 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 //            $data = \lib\DataConvertor::array2dataGrid(
 //                    ['name' => 'Maria', 'age' => 20, 'gender' => 'f']
 //            );
-            $data = json_encode([
+            $data = \lib\DataConvertor::array2dataGrid([
                 ['name' => 'Maria', 'age' => 20, 'gender' => 'f'],
                 ['name' => 'Mika', 'age' => 23, 'gender' => 'M'],
                 ['name' => 'Wanjara', 'age' => 10, 'gender' => 'M']
             ]);
 
             $this->app->response->setBody($data, 'json');
+            $file = $this->app->storage()->save($this->app->request->file($name));
+
             $this->app->send();
         }
     }

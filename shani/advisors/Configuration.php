@@ -10,10 +10,11 @@
 
 namespace shani\advisors {
 
-    use lib\DataCompressionLevel;
     use lib\Duration;
+    use lib\DataCompressionLevel;
     use shani\advisors\web\AccessPolicy;
     use shani\advisors\web\BrowsingPrivacy;
+    use shani\contracts\FileStorage;
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
@@ -344,6 +345,18 @@ namespace shani\advisors {
         public function authorizationEnabled(): bool
         {
             return false;
+        }
+
+        /**
+         * Get file storage media where uploaded files will be saved and retrieved.
+         * To be able to use remote storage, you must override this method.
+         * @param string $disk Storage media
+         * will be stored on this machine's disk
+         * @return FileStorage
+         */
+        public function getStorageMedia(string $disk): ?FileStorage
+        {
+            return null;
         }
     }
 

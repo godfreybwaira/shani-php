@@ -14,7 +14,7 @@ namespace lib\client {
     use lib\http\RequestEntity;
     use shani\core\Definitions;
 
-    final class HTTP
+    final class HttpClient
     {
 
         private int $retries;
@@ -425,7 +425,7 @@ namespace lib\client {
                     $progress($total, $loaded);
                 };
             }
-            return $this->send(null, $endpoint, $callback);
+            return $this->send($this->request->method, $endpoint, $callback);
         }
 
         private static function merge(string $endpoint, ?array $body): string
