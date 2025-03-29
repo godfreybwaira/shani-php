@@ -350,10 +350,10 @@ namespace shani\advisors {
         /**
          * Get file storage media where uploaded files will be saved and retrieved.
          * To be able to use remote storage.
-         * @param string $disk Storage media
+         * @param string $media Storage media
          * @return StorageMedia
          */
-        public function getStorageMedia(string $disk): StorageMedia
+        public function getStorageMedia(string $media): StorageMedia
         {
             return new LocalStorage($this->app);
         }

@@ -227,11 +227,11 @@ namespace shani\http {
         }
 
         /**
-         * Get HTTP preferred request context (platform) set by user agent. This
-         * value is set via HTTP accept-version header and the accepted values are
+         * Get HTTP preferred request context (platform) set by client application.
+         * This value is set via HTTP accept-version header and the accepted values are
          * 'web' and 'api'. User can also set application version after request context,
          * separated by semicolon. If none given, the 'web' context is assumed.
-         * @example accept-version=web;1.0
+         * @example accept-version=web
          * @return string|null
          */
         public function platform(): ?string
@@ -255,18 +255,17 @@ namespace shani\http {
          */
         public function session(): SessionManager
         {
-            $this->session ??= new SessionManager($this);
-            return $this->session;
+            return $this->session ??= new SessionManager($this);
         }
 
         /**
          * Get storage object representing application storage directory
-         * @param string $disk Storage media. The default storage is 'local'
+         * @param string $media Storage media. The default storage is 'local'
          * @return StorageMedia
          */
-        public function storage(string $disk = 'local'): StorageMedia
+        public function storage(string $media = 'local'): StorageMedia
         {
-            return ($this->storage[$disk] ??= $this->config->getStorageMedia($disk));
+            return ($this->storage[$media] ??= $this->config->getStorageMedia($media));
         }
 
         /**
@@ -275,8 +274,7 @@ namespace shani\http {
          */
         public function ui(): UI
         {
-            $this->ui ??= new UI($this);
-            return $this->ui;
+            return $this->ui ??= new UI($this);
         }
 
         /**
@@ -389,24 +387,6 @@ namespace shani\http {
         public function documentation(): array
         {
             return (new Generator($this))->generate();
-        }
-
-        /**
-         * Check whether a user has enough privileges to access a target resource
-         * @param string $target Route target, see self::documentation()
-         * @return bool True a user has enough privileges, false otherwise.
-         * @see self::documentation()
-         */
-        public function accessGranted(string $target): bool
-        {
-            if (!$this->config->authorizationEnabled()) {
-                return true;
-            }
-            if (empty($this->config->permissionList)) {
-                return false;
-            }
-            return str_contains($this->config->permissionList, self::digest($target));
-//            return (preg_match('\b' . self::digest($target) . '\b', $this->config->permissionList) === 1);
         }
 
         /**
