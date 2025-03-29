@@ -345,7 +345,7 @@ namespace shani\advisors {
          */
         public function authorizationEnabled(): bool
         {
-            return true;
+            return false;
         }
 
         /**
