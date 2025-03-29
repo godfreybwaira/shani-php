@@ -21,11 +21,12 @@ namespace shani\http {
     use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
+    use shani\contracts\StorageMedia;
     use shani\core\Definitions;
     use shani\core\Framework;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
-    use shani\contracts\StorageMedia;
+    use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
     use shani\ServerConfig;
@@ -67,22 +68,20 @@ namespace shani\http {
 
         public function __construct(ResponseEntity &$res, ResponseWriter $writer)
         {
-            $this->response = $res;
-            $this->writer = $writer;
-            $this->request = $res->request;
-            $this->response->header()->addAll([
-                HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
-                HttpHeader::SERVER => Framework::NAME
-            ]);
             try {
+                $this->response = $res;
+                $this->writer = $writer;
+                $this->request = $res->request;
+                $this->response->header()->addAll([
+                    HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
+                    HttpHeader::SERVER => Framework::NAME
+                ]);
                 $this->vhost = ServerConfig::host($this->request->uri->hostname);
                 $this->config = new $this->vhost->configFile($this);
+                $this->runApp();
             } catch (\Throwable $ex) {
-                $this->response->setBody($ex->getMessage())->setStatus(HttpStatus::BAD_REQUEST);
-                return $this->send();
+                $this->config->errorHandler($ex);
             }
-            set_exception_handler(fn(\Throwable $e) => $this->config->errorHandler($e));
-            $this->runApp();
         }
 
         /**

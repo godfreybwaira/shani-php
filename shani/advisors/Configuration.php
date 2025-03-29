@@ -11,13 +11,14 @@
 namespace shani\advisors {
 
     use lib\Duration;
+    use shani\http\App;
+    use shani\core\Framework;
+    use shani\http\Middleware;
     use lib\DataCompressionLevel;
+    use shani\contracts\StorageMedia;
+    use shani\persistence\LocalStorage;
     use shani\advisors\web\AccessPolicy;
     use shani\advisors\web\BrowsingPrivacy;
-    use shani\contracts\StorageMedia;
-    use shani\core\Framework;
-    use shani\http\App;
-    use shani\http\Middleware;
 
     abstract class Configuration
     {
@@ -141,8 +142,8 @@ namespace shani\advisors {
         public function errorHandler(\Throwable $t): void
         {
             echo 'Message: ' . $t->getMessage() . PHP_EOL;
-            echo 'File: ' . $t->getFile() . PHP_EOL;
-            echo 'Line: ' . $t->getLine() . PHP_EOL;
+            echo 'File: ' . $t->getFile() . ':' . $t->getLine() . PHP_EOL;
+            echo 'Cause: ' . PHP_EOL . $t->getTraceAsString();
             $this->app->send();
         }
 
@@ -344,7 +345,7 @@ namespace shani\advisors {
          */
         public function authorizationEnabled(): bool
         {
-            return false;
+            return true;
         }
 
         /**

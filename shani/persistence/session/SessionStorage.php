@@ -11,7 +11,7 @@ namespace shani\persistence\session {
 
     use lib\IterableData;
 
-    final class Session extends IterableData
+    final class SessionStorage extends IterableData
     {
 
         private int $lastActive;

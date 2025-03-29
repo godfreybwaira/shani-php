@@ -7,13 +7,15 @@
  * Created on: Feb 11, 2024 at 6:50:02 PM
  */
 
-namespace shani\http {
+namespace shani\persistence {
 
     use lib\http\HttpCache;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
-    use shani\core\Definitions;
     use shani\contracts\StorageMedia;
+    use shani\core\Definitions;
+    use shani\http\App;
+    use shani\http\UploadedFile;
 
     final class LocalStorage implements StorageMedia
     {

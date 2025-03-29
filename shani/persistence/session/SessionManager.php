@@ -16,9 +16,9 @@ namespace shani\persistence\session {
 
         /**
          * Session storage object
-         * @var Session
+         * @var SessionStorage
          */
-        public readonly Session $storage;
+        public readonly SessionStorage $storage;
         private readonly App $app;
         private readonly string $filepath;
         private readonly \DateTimeInterface $age;
@@ -30,10 +30,10 @@ namespace shani\persistence\session {
             $this->filepath = $this->createSavePath();
             if ($this->filepath !== null && is_file($this->filepath)) {
                 $content = file_get_contents($this->filepath);
-                $this->storage = Session::fromJson($content);
+                $this->storage = SessionStorage::fromJson($content);
             } else {
                 $now = time();
-                $this->storage = new Session($now, $now);
+                $this->storage = new SessionStorage($now, $now);
             }
         }
 
