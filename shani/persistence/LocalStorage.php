@@ -86,15 +86,17 @@ namespace shani\persistence {
 
         public function save(UploadedFile $file, string $bucket = null): ?string
         {
-            return self::persist($file, $this->app->config->appPublicStorage() . $bucket);
+            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
+            return self::persist($file, $this->storage, $path);
         }
 
         public function saveProtect(UploadedFile $file, string $bucket = null): ?string
         {
-            return self::persist($file, $this->app->config->appProtectedStorage() . $bucket);
+            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
+            return self::persist($file, $this->storage, $path);
         }
 
-        private static function persist(UploadedFile &$file, string $savePath): ?string
+        private static function persist(UploadedFile &$file, string $root, string $savePath): ?string
         {
             $directory = self::createDirectory($savePath . '/' . $file->type);
             $filepath = $directory . '/' . md5(random_bytes(random_int(10, 70))) . $file->extension;
@@ -111,7 +113,7 @@ namespace shani\persistence {
                 fclose($stream);
             }
             fclose($handle);
-            return substr($filepath, strlen($savePath));
+            return substr($filepath, strlen($root));
         }
 
         private static function createDirectory(string $destination): string
