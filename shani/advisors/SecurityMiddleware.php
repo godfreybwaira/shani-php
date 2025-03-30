@@ -26,14 +26,14 @@ namespace shani\advisors {
 
         /**
          * Check whether the client request method is allowed by the application.
-         * @return bool
+         * @return self
          * @see Configuration::allowedRequestMethods()
          */
-        public function passedRequestMethodCheck(): bool
+        public function passedRequestMethodCheck(): self
         {
             $methods = $this->app->config->allowedRequestMethods();
             if ($methods === '*' || str_contains($methods, $this->app->request->method)) {
-                return true;
+                return $this;
             }
             throw HttpStatus::methodNotAllowed($this->app);
         }
@@ -72,24 +72,25 @@ namespace shani\advisors {
         /**
          * Check if current application user is authorized to access the requested
          * resource. If not, then 401 HTTP error will be raised.
-         * @return bool True on success, false otherwise
+         * @return self
          */
-        public function authorized(): bool
+        public function authorized(): self
         {
             if (!$this->app->config->authorizationEnabled()) {
-                return false;
+                return $this;
             }
             $route = $this->app->request->route();
             if ($this->app->config->authenticated) {
                 if ($this->app->config->guestModule($route->module)) {
                     $this->app->request->changeRoute($this->app->config->home());
-                    return true;
+                    return $this;
                 }
                 if ($this->app->config->publicModule($route->module) || $this->accessGranted($route->target)) {
-                    return true;
+                    return $this;
                 }
+                throw HttpStatus::forbidden($this->app);
             } else if ($this->app->config->guestModule($route->module) || $this->app->config->publicModule($route->module)) {
-                return true;
+                return $this;
             }
             throw HttpStatus::notAuthorized($this->app);
         }

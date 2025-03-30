@@ -7,11 +7,11 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace apps\demo\modules\greetings\logic\controllers\get {
+namespace apps\demo\modules\greetings\logic\controllers\put {
 
     use shani\http\App;
 
-    final class World
+    final class Hello
     {
 
         private readonly App $app;
@@ -24,9 +24,11 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
         /**
          * Display greetings from Shani.
          */
-        public function helloWorld()
+        public function world()
         {
-
+            $file = $this->app->request->file('picha');
+            $file->save($this->app);
+            $this->app->render();
         }
     }
 

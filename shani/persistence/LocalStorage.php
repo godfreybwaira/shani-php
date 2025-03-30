@@ -20,11 +20,14 @@ namespace shani\persistence {
     final class LocalStorage implements StorageMedia
     {
 
+        /**
+         * Access to public assets in an asset directory. Everyone has an access.
+         */
+        public const ACCESS_ASSET = '/0';
+
         private readonly App $app;
         private readonly string $host, $storage;
 
-        private const ASSET_PREFIX = '/0';
-        private const STORAGE_PREFIX = '/1';
         private const FILE_MODE = 0700;
 
         public function __construct(App &$app)
@@ -50,22 +53,30 @@ namespace shani\persistence {
          */
         public static function tryServe(App &$app): bool
         {
-            $prefix = substr($app->request->uri->path, 0, strpos($app->request->uri->path, '/', 1));
-            return match ($prefix) {
-                self::ASSET_PREFIX => self::sendFile($app, Definitions::DIR_ASSETS, $prefix),
-                self::STORAGE_PREFIX => self::sendFile($app, $app->storage()->pathTo(), $prefix),
-                default => false
-            };
+            $path = $app->request->uri->path;
+            $prefix = substr($path, 0, strpos($path, '/', 1));
+            switch ($prefix) {
+                case self::ACCESS_ASSET:
+                    $file = substr($path, strlen($prefix));
+                    return self::sendFile($app, Definitions::DIR_ASSETS . $file);
+                case $app->config->appProtectedStorage():
+                    if (!$app->config->authenticated) {
+                        throw HttpStatus::forbidden($app);
+                    }
+                case $app->config->appPublicStorage():
+                    return self::sendFile($app, $app->storage()->pathTo($path));
+                default:
+                    return false;
+            }
         }
 
-        private static function sendFile(App &$app, string $rootPath, string $prefix): bool
+        private static function sendFile(App &$app, string $file): bool
         {
             $etag = md5($app->request->uri->path);
             if ($app->request->header()->get(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
                 $app->send();
             } else {
-                $file = $rootPath . substr($app->request->uri->path, strlen($prefix));
                 $cache = (new HttpCache())->setEtag($etag);
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
                 $app->stream($file);
@@ -75,7 +86,16 @@ namespace shani\persistence {
 
         public function save(UploadedFile $file, string $bucket = null): ?string
         {
-            $savePath = $this->pathTo($bucket);
+            return self::persist($file, $this->app->config->appPublicStorage() . $bucket);
+        }
+
+        public function saveProtect(UploadedFile $file, string $bucket = null): ?string
+        {
+            return self::persist($file, $this->app->config->appProtectedStorage() . $bucket);
+        }
+
+        private static function persist(UploadedFile &$file, string $savePath): ?string
+        {
             $directory = self::createDirectory($savePath . '/' . $file->type);
             $filepath = $directory . '/' . md5(random_bytes(random_int(10, 70))) . $file->extension;
             $handle = fopen($filepath, 'a+b');
@@ -104,7 +124,7 @@ namespace shani\persistence {
 
         public function url(string $filepath): string
         {
-            return $this->host . self::STORAGE_PREFIX . $filepath;
+            return $this->host . $filepath;
         }
 
         /**
@@ -112,7 +132,7 @@ namespace shani\persistence {
          * @param string|null $path File or directory
          * @return string Path to a file or directory
          */
-        public function pathTo(?string $path = null): string
+        private function pathTo(?string $path = null): string
         {
             return $this->storage . $path;
         }

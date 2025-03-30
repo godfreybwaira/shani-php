@@ -114,14 +114,14 @@ namespace lib\http {
 
         public static function methodNotAllowed(App &$app): \Exception
         {
-            $app->res->setStatus(self::METHOD_NOT_ALLOWED);
+            $app->response->setStatus(self::METHOD_NOT_ALLOWED);
             $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $app->config->allowedRequestMethods());
             return new \Exception('Request Method not allowed');
         }
 
         public static function notAcceptable(App &$app): \Exception
         {
-            $app->res->setStatus(self::NOT_ACCEPTABLE);
+            $app->response->setStatus(self::NOT_ACCEPTABLE);
             return new \Exception('Request not acceptable');
         }
         public static function fatal(App &$app): \Exception
@@ -146,6 +146,12 @@ namespace lib\http {
         {
             $app->response->setStatus(self::BAD_REQUEST);
             return new \Exception('Session has expired');
+        }
+
+        public static function forbidden(App &$app): \Exception
+        {
+            $app->response->setStatus(self::FORBIDDEN);
+            return new \Exception('Access denied');
         }
     }
 

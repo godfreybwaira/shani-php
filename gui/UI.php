@@ -11,6 +11,7 @@ namespace gui {
 
     use shani\core\Definitions;
     use shani\http\App;
+    use shani\persistence\LocalStorage;
 
     final class UI
     {
@@ -102,6 +103,7 @@ namespace gui {
 
         private static function createHeader(array &$head, string $url, array &$attributes): void
         {
+            $url = LocalStorage::ACCESS_ASSET . $url;
             $head[$url] = null;
             foreach ($attributes as $key => $val) {
                 $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
@@ -156,10 +158,10 @@ namespace gui {
             $head = $this->icon;
             $asset = $this->app->storage();
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->assetUrl($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->url($url) . '"/>';
             }
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $asset->assetUrl($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $asset->url($url) . '"></script>';
             }
             foreach ($this->details as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';

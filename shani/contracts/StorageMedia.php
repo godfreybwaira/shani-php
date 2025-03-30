@@ -15,12 +15,22 @@ namespace shani\contracts {
     {
 
         /**
-         * Save a file to a storage media
+         * Save a file to a public storage media. Public media is accessible
+         * by everyone
          * @param UploadedFile $file A file object to save
          * @param string|null $bucket A destination directory.
          * @return string|null Path to a saved file, null otherwise
          */
         public function save(UploadedFile $file, ?string $bucket = null): ?string;
+
+        /**
+         * Save a file to a protected storage media. Protected media is accessible
+         * by authenticated clients only
+         * @param UploadedFile $file A file object to save
+         * @param string|null $bucket A destination directory.
+         * @return string|null Path to a saved file, null otherwise
+         */
+        public function saveProtect(UploadedFile $file, ?string $bucket = null): ?string;
 
         /**
          * Get file URL

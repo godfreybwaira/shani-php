@@ -55,11 +55,9 @@ namespace shani\http {
             $this->app->on('web', function () use (&$advisor) {
                 $advisor->blockClickjacking()->resourceAccessPolicy()->csrfTest();
             });
-            if ($advisor->authorized() && $advisor->passedRequestMethodCheck()) {
-                if ($this->listener->listening('before')) {
-                    $this->listener->trigger('before');
-                    return;
-                }
+            $advisor->authorized()->passedRequestMethodCheck();
+            if ($this->listener->listening('before')) {
+                $this->listener->trigger('before');
             }
             $this->app->processRequest();
             $this->listener->trigger('after');

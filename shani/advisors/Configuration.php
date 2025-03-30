@@ -106,7 +106,7 @@ namespace shani\advisors {
          */
         public function csrfProtectionEnabled(): bool
         {
-            return true;
+            return false;
         }
 
         /**
@@ -225,6 +225,28 @@ namespace shani\advisors {
          * @return string Absolute path
          */
         public abstract function appStorage(): string;
+
+        /**
+         * Get Application protected storage directory for storing static contents.
+         * This directory is accessible only by authenticated clients.
+         * @return string Path to storage directory relative to appStorage()
+         * @see self::appStorage()
+         */
+        public function appProtectedStorage(): string
+        {
+            return '/00prt';
+        }
+
+        /**
+         * Get Application public storage directory for storing static contents.
+         * This directory is accessible by everyone.
+         * @return string Path to storage directory relative to appStorage()
+         * @see self::appStorage()
+         */
+        public function appPublicStorage(): string
+        {
+            return '/01pub';
+        }
 
         /**
          * Default path to homepage if '/' is provided by during HTTP request
