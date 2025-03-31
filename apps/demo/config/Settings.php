@@ -49,7 +49,7 @@ namespace apps\demo\config {
             return new Register($this->app, $mw);
         }
 
-        public function userPermissions(): ?string
+        public function clientPermissions(): ?string
         {
             return null;
         }
@@ -76,8 +76,7 @@ namespace apps\demo\config {
 
         public function isAsync(): bool
         {
-            return true;
-//            return $this->app->request->header()->get('X-Request-Mode') === 'async';
+            return $this->app->request->header()->get('X-Request-Mode') === 'async';
         }
     }
 

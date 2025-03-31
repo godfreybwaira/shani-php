@@ -34,7 +34,7 @@ namespace shani\advisors {
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->permissionList = $this->userPermissions();
+            $this->permissionList = $this->clientPermissions();
             $this->authenticated = $this->permissionList !== null;
         }
 
@@ -227,6 +227,16 @@ namespace shani\advisors {
         public abstract function appStorage(): string;
 
         /**
+         * Returns client group Id shared by one or more clients e.g company unique Id.
+         * This Id helps protecting shared resources (e.g uploaded files) against outsiders.
+         * @return string|null Shared unique id
+         */
+        public function clientGroupId(): ?string
+        {
+            return null;
+        }
+
+        /**
          * Get Application protected storage directory for storing static contents.
          * This directory is accessible only by authenticated clients.
          * @return string Path to storage directory relative to appStorage()
@@ -234,7 +244,7 @@ namespace shani\advisors {
          */
         public function appProtectedStorage(): string
         {
-            return '/00prt';
+            return '/0pvt';
         }
 
         /**
@@ -245,7 +255,7 @@ namespace shani\advisors {
          */
         public function appPublicStorage(): string
         {
-            return '/01pub';
+            return '/1pub';
         }
 
         /**
@@ -273,13 +283,13 @@ namespace shani\advisors {
         }
 
         /**
-         * Get a list of authenticated user's permissions separated by a comma.
-         * Application must set permission using this function after a user is being
+         * Get a list of authenticated client's permissions separated by a comma.
+         * Application must set permission using this function after a client is being
          * logged in successfully.
          * @return string|null List of user permissions or null if no permission is granted
          * @see App::accessGranted()
          */
-        public abstract function userPermissions(): ?string;
+        public abstract function clientPermissions(): ?string;
 
         /**
          * Check whether a given module is available among modules granted access to a public

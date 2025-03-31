@@ -18,19 +18,26 @@ namespace shani\contracts {
          * Save a file to a public storage media. Public media is accessible
          * by everyone
          * @param UploadedFile $file A file object to save
-         * @param string|null $bucket A destination directory.
          * @return string|null Path to a saved file, null otherwise
          */
-        public function save(UploadedFile $file, ?string $bucket = null): ?string;
+        public function save(UploadedFile $file): ?string;
 
         /**
          * Save a file to a protected storage media. Protected media is accessible
          * by authenticated clients only
          * @param UploadedFile $file A file object to save
-         * @param string|null $bucket A destination directory.
          * @return string|null Path to a saved file, null otherwise
          */
-        public function saveProtect(UploadedFile $file, ?string $bucket = null): ?string;
+        public function saveProtect(UploadedFile $file): ?string;
+
+        /**
+         * Save a file to a protected storage media. This resource is only accessible
+         * to authenticated clients with the same group Id
+         * @param UploadedFile $file A file object to save
+         * @return string|null Path to a saved file, null otherwise
+         * @see \shani\advisors\Configuration::clientGroupId()
+         */
+        public function savePrivate(UploadedFile $file): ?string;
 
         /**
          * Get file URL
@@ -57,10 +64,10 @@ namespace shani\contracts {
         /**
          * Move a file to a destination bucket
          * @param string $file Source file
-         * @param string $bucket Destination directory
+         * @param string $destination Destination directory
          * @return string
          */
-        public function moveTo(string $file, string $bucket): ?string;
+        public function moveTo(string $file, string $destination): ?string;
     }
 
 }

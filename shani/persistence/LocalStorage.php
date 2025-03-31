@@ -60,14 +60,25 @@ namespace shani\persistence {
                     $file = substr($path, strlen($prefix));
                     return self::sendFile($app, Definitions::DIR_ASSETS . $file);
                 case $app->config->appProtectedStorage():
-                    if (!$app->config->authenticated) {
-                        throw HttpStatus::forbidden($app);
-                    }
+                    return self::serveProtected($app, $path);
                 case $app->config->appPublicStorage():
                     return self::sendFile($app, $app->storage()->pathTo($path));
                 default:
                     return false;
             }
+        }
+
+        private static function serveProtected(App &$app, string $filepath): bool
+        {
+            if (!$app->config->authenticated) {
+                throw HttpStatus::forbidden($app);
+            }
+            $filename = basename($filepath);
+            $groupId = substr($filename, 0, strrpos($filename, '-'));
+            if (!empty($groupId) && $groupId !== $app->config->clientGroupId()) {
+                throw HttpStatus::forbidden($app);
+            }
+            return self::sendFile($app, $app->storage()->pathTo($filepath));
         }
 
         private static function sendFile(App &$app, string $file): bool
@@ -84,22 +95,33 @@ namespace shani\persistence {
             return true;
         }
 
-        public function save(UploadedFile $file, string $bucket = null): ?string
+        public function save(UploadedFile $file): ?string
         {
-            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
+            $path = $this->pathTo($this->app->config->appPublicStorage());
             return self::persist($file, $this->storage, $path);
         }
 
-        public function saveProtect(UploadedFile $file, string $bucket = null): ?string
+        public function saveProtect(UploadedFile $file): ?string
         {
-            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
+            $path = $this->pathTo($this->app->config->appProtectedStorage());
             return self::persist($file, $this->storage, $path);
         }
 
-        private static function persist(UploadedFile &$file, string $root, string $savePath): ?string
+        public function savePrivate(UploadedFile $file): ?string
         {
+            $path = $this->pathTo($this->app->config->appProtectedStorage());
+            $groupId = $this->app->config->clientGroupId();
+            if (empty($groupId)) {
+                throw new \Exception('Client group Id cannot be empty');
+            }
+            return self::persist($file, $this->storage, $path, $groupId . '-');
+        }
+
+        private static function persist(UploadedFile &$file, string $root, string $savePath, string $prefix = null): ?string
+        {
+            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 20);
             $directory = self::createDirectory($savePath . '/' . $file->type);
-            $filepath = $directory . '/' . md5(random_bytes(random_int(10, 70))) . $file->extension;
+            $filepath = $directory . '/' . $filename . $file->extension;
             $handle = fopen($filepath, 'a+b');
             $size = fstat($handle)['size'];
             if ($size < $file->size) {
@@ -155,14 +177,14 @@ namespace shani\persistence {
             return $this;
         }
 
-        public function moveTo(string $file, string $bucket): ?string
+        public function moveTo(string $file, string $destination): ?string
         {
             $filepath = $this->pathTo($file);
             if (is_file($filepath)) {
                 $filename = '/' . basename($filepath);
-                $destination = self::createDirectory($this->pathTo($bucket));
-                if (rename($filepath, $destination . $filename)) {
-                    return $bucket . $filename;
+                $folder = self::createDirectory($this->pathTo($destination));
+                if (rename($filepath, $folder . $filename)) {
+                    return $destination . $filename;
                 }
             }
             return null;
