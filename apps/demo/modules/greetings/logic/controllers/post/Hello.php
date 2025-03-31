@@ -27,8 +27,15 @@ namespace apps\demo\modules\greetings\logic\controllers\post {
         public function world()
         {
             $file = $this->app->request->file('picha');
-            $file->save($this->app);
-            $this->app->render();
+            $path = $this->app->storage()->save($file);
+            echo $this->app->storage()->url($path);
+            echo PHP_EOL;
+            $path = $this->app->storage()->savePrivate($file);
+            echo $this->app->storage()->url($path);
+            echo PHP_EOL;
+            $path = $this->app->storage()->saveProtect($file);
+            echo $this->app->storage()->url($path);
+            $this->app->send();
         }
     }
 

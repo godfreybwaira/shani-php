@@ -242,9 +242,9 @@ namespace shani\advisors {
          * @return string Path to storage directory relative to appStorage()
          * @see self::appStorage()
          */
-        public function appProtectedStorage(): string
+        public final function appProtectedStorage(): string
         {
-            return '/0pvt';
+            return '/0prt';
         }
 
         /**
@@ -253,7 +253,7 @@ namespace shani\advisors {
          * @return string Path to storage directory relative to appStorage()
          * @see self::appStorage()
          */
-        public function appPublicStorage(): string
+        public final function appPublicStorage(): string
         {
             return '/1pub';
         }

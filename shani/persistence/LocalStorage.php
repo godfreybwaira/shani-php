@@ -119,7 +119,7 @@ namespace shani\persistence {
 
         private static function persist(File &$file, string $root, string $savePath, string $prefix = null): ?string
         {
-            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 20);
+            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
             $directory = self::createDirectory($savePath . '/' . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
             $handle = fopen($filepath, 'a+b');

@@ -30,33 +30,12 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
         {
             //using global style
 //            $this->app->ui()->style('/css/styles.css');
-//            //passing data to current view (greetings/presentation/views/hello/world.php)
-//            $student = new Student('Godfrey', 'Bwaira', 20);
-//            $student->addSubject(new Subject('English', 'A', 89))
-//                    ->addSubject(new Subject('Kiswahili', 'B', 79))
-//                    ->addSubject(new Subject('Maths', 'C', 70.6));
-////            $this->app->render($student);
-////            $this->app->render($this->app->documentation());
-////            $this->app->stream('/home/coder/Videos/oceans.mp4');
-            $session = $this->app->session();
-            $cart = $session->storage->cart('student');
-            $cart->add('subjects', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $cart->add('tacher', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $cart->add('janitor', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-            $cart->add('user', [new Subject('English', 'A', 89), new Subject('Kiswahili', 'B', 79)]);
-//            $data = \lib\DataConvertor::array2dataGrid(
-//                    ['name' => 'Maria', 'age' => 20, 'gender' => 'f']
-//            );
-            $data = \lib\DataConvertor::array2dataGrid([
-                ['name' => 'Maria', 'age' => 20, 'gender' => 'f'],
-                ['name' => 'Mika', 'age' => 23, 'gender' => 'M'],
-                ['name' => 'Wanjara', 'age' => 10, 'gender' => 'M']
-            ]);
-
-//            $this->app->response->setBody($data, 'json');
-            echo $this->app->storage()->url('/00prt/application/pdf/275c30b14714370d3662762906349281.pdf');
-
-            $this->app->send();
+//            passing data to current view (greetings/presentation/views/hello/world.php)
+            $student = new Student('Godfrey', 'Bwaira', 20);
+            $student->addSubject(new Subject('English', 'A', 89))
+                    ->addSubject(new Subject('Kiswahili', 'B', 79))
+                    ->addSubject(new Subject('Maths', 'C', 70.6));
+            $this->app->render($student);
         }
     }
 
