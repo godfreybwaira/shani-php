@@ -9,13 +9,13 @@
 
 namespace shani\persistence {
 
+    use lib\File;
     use lib\http\HttpCache;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use shani\contracts\StorageMedia;
     use shani\core\Definitions;
     use shani\http\App;
-    use shani\http\UploadedFile;
 
     final class LocalStorage implements StorageMedia
     {
@@ -95,19 +95,19 @@ namespace shani\persistence {
             return true;
         }
 
-        public function save(UploadedFile $file): ?string
+        public function save(File $file): ?string
         {
             $path = $this->pathTo($this->app->config->appPublicStorage());
             return self::persist($file, $this->storage, $path);
         }
 
-        public function saveProtect(UploadedFile $file): ?string
+        public function saveProtect(File $file): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage());
             return self::persist($file, $this->storage, $path);
         }
 
-        public function savePrivate(UploadedFile $file): ?string
+        public function savePrivate(File $file): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage());
             $groupId = $this->app->config->clientGroupId();
@@ -117,7 +117,7 @@ namespace shani\persistence {
             return self::persist($file, $this->storage, $path, $groupId . '-');
         }
 
-        private static function persist(UploadedFile &$file, string $root, string $savePath, string $prefix = null): ?string
+        private static function persist(File &$file, string $root, string $savePath, string $prefix = null): ?string
         {
             $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 20);
             $directory = self::createDirectory($savePath . '/' . $file->type);

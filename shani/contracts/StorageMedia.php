@@ -9,7 +9,7 @@
 
 namespace shani\contracts {
 
-    use shani\http\UploadedFile;
+    use lib\File;
 
     interface StorageMedia
     {
@@ -17,27 +17,27 @@ namespace shani\contracts {
         /**
          * Save a file to a public storage media. Public media is accessible
          * by everyone
-         * @param UploadedFile $file A file object to save
+         * @param File $file A file object to save
          * @return string|null Path to a saved file, null otherwise
          */
-        public function save(UploadedFile $file): ?string;
+        public function save(File $file): ?string;
 
         /**
          * Save a file to a protected storage media. Protected media is accessible
          * by authenticated clients only
-         * @param UploadedFile $file A file object to save
+         * @param File $file A file object to save
          * @return string|null Path to a saved file, null otherwise
          */
-        public function saveProtect(UploadedFile $file): ?string;
+        public function saveProtect(File $file): ?string;
 
         /**
          * Save a file to a protected storage media. This resource is only accessible
          * to authenticated clients with the same group Id
-         * @param UploadedFile $file A file object to save
+         * @param File $file A file object to save
          * @return string|null Path to a saved file, null otherwise
          * @see \shani\advisors\Configuration::clientGroupId()
          */
-        public function savePrivate(UploadedFile $file): ?string;
+        public function savePrivate(File $file): ?string;
 
         /**
          * Get file URL

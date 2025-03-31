@@ -12,6 +12,7 @@ namespace shani\servers\swoole {
     use lib\Concurrency;
     use lib\DataConvertor;
     use lib\Event;
+    use lib\File;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\ResponseEntity;
@@ -21,7 +22,6 @@ namespace shani\servers\swoole {
     use lib\Utils;
     use shani\core\Definitions;
     use shani\http\App;
-    use shani\http\UploadedFile;
     use shani\ServerConfig;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
@@ -103,7 +103,7 @@ namespace shani\servers\swoole {
             }
             foreach ($files as $name => $file) {
                 if (!empty($file['tmp_name'])) {
-                    $uploaded[$name] = new UploadedFile(
+                    $uploaded[$name] = new File(
                             path: $file['tmp_name'], type: $file['type'],
                             size: $file['size'], name: $file['name'],
                             error: $file['error']

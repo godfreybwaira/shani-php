@@ -9,11 +9,11 @@
 
 namespace lib\http {
 
-    use lib\URI;
+    use lib\File;
     use lib\MediaType;
-    use shani\http\RequestRoute;
-    use shani\http\UploadedFile;
     use lib\ReadableMap;
+    use lib\URI;
+    use shani\http\RequestRoute;
 
     final class RequestEntity extends HttpEntity
     {
@@ -132,10 +132,10 @@ namespace lib\http {
          * Get uploaded file by name and optional file index
          * @param string $name Name value as given in upload form
          * @param int $index File index in array, default is zero
-         * @return UploadedFile|null Return uploaded file object if file is valid
+         * @return File|null Return uploaded file object if file is valid
          * and exists, false otherwise.
          */
-        public function file(string $name, int $index = null): ?UploadedFile
+        public function file(string $name, int $index = null): ?File
         {
             if ($index === null) {
                 return $this->files[$name] ?? null;
@@ -153,7 +153,7 @@ namespace lib\http {
             return $this->route->params[$index] ?? null;
         }
 
-        public function withFile(string $name, UploadedFile $file): self
+        public function withFile(string $name, File $file): self
         {
             $copy = clone $this;
             $copy->files[$name] = $file;
