@@ -46,6 +46,11 @@ namespace shani\persistence {
             throw new \Exception('Failed to create directory ' . $path);
         }
 
+        private static function getPrefix(string $path): string
+        {
+            return substr($path, 0, strpos($path, '/', 1));
+        }
+
         /**
          * Serve static content e.g CSS, images and other static files.
          * @param App $app Application object
@@ -54,11 +59,11 @@ namespace shani\persistence {
         public static function tryServe(App &$app): bool
         {
             $path = $app->request->uri->path;
-            $prefix = substr($path, 0, strpos($path, '/', 1));
+            $prefix = self::getPrefix($path);
             switch ($prefix) {
                 case self::ACCESS_ASSET:
-                    $file = substr($path, strlen($prefix));
-                    return self::sendFile($app, Definitions::DIR_ASSETS . $file);
+                    $filepath = substr($path, strlen($prefix));
+                    return self::sendFile($app, Definitions::DIR_ASSETS . $filepath);
                 case $app->config->appProtectedStorage():
                     return self::serveProtected($app, $path);
                 case $app->config->appPublicStorage():
@@ -81,7 +86,7 @@ namespace shani\persistence {
             return self::sendFile($app, $app->storage()->pathTo($filepath));
         }
 
-        private static function sendFile(App &$app, string $file): bool
+        private static function sendFile(App &$app, string $filepath): bool
         {
             $etag = md5($app->request->uri->path);
             if ($app->request->header()->get(HttpHeader::IF_NONE_MATCH) === $etag) {
@@ -90,26 +95,26 @@ namespace shani\persistence {
             } else {
                 $cache = (new HttpCache())->setEtag($etag);
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-                $app->stream($file);
+                $app->stream($filepath);
             }
             return true;
         }
 
-        public function save(File $file): ?string
+        public function save(File $file, string $bucket = '/'): ?string
         {
-            $path = $this->pathTo($this->app->config->appPublicStorage());
+            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
             return self::persist($file, $this->storage, $path);
         }
 
-        public function saveProtect(File $file): ?string
+        public function saveProtect(File $file, string $bucket = '/'): ?string
         {
-            $path = $this->pathTo($this->app->config->appProtectedStorage());
+            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             return self::persist($file, $this->storage, $path);
         }
 
-        public function savePrivate(File $file): ?string
+        public function savePrivate(File $file, string $bucket = '/'): ?string
         {
-            $path = $this->pathTo($this->app->config->appProtectedStorage());
+            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             $groupId = $this->app->config->clientGroupId();
             if (empty($groupId)) {
                 throw new \Exception('Client group Id cannot be empty');
@@ -120,7 +125,7 @@ namespace shani\persistence {
         private static function persist(File &$file, string $root, string $savePath, string $prefix = null): ?string
         {
             $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
-            $directory = self::createDirectory($savePath . '/' . $file->type);
+            $directory = self::createDirectory($savePath . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
             $handle = fopen($filepath, 'a+b');
             $size = fstat($handle)['size'];
@@ -153,7 +158,7 @@ namespace shani\persistence {
 
         /**
          * Get a full path to a file or directory
-         * @param string|null $path File or directory
+         * @param string|null $path File or a directory
          * @return string Path to a file or directory
          */
         private function pathTo(?string $path = null): string
@@ -161,33 +166,73 @@ namespace shani\persistence {
             return $this->storage . $path;
         }
 
-        public function download(string $file, ?string $filename = null): self
+        public function download(string $filepath, ?string $filename = null): self
         {
-            $disposition = 'attachment; filename="' . ($filename ?? basename($file)) . '"';
+            $disposition = 'attachment; filename="' . ($filename ?? basename($filepath)) . '"';
             $this->app->response->header()->add(HttpHeader::CONTENT_DISPOSITION, $disposition);
-            return $this->app->stream($file);
+            return $this->app->stream($filepath);
         }
 
-        public function delete(string $file): self
+        public function delete(string $filepath): self
         {
-            $path = $this->pathTo($file);
+            $path = $this->pathTo($filepath);
             if (is_file($path)) {
                 unlink($path);
             }
             return $this;
         }
 
-        public function moveTo(string $file, string $destination): ?string
+        public function moveProtect(string $filepath): ?string
         {
-            $filepath = $this->pathTo($file);
-            if (is_file($filepath)) {
-                $filename = '/' . basename($filepath);
-                $folder = self::createDirectory($this->pathTo($destination));
-                if (rename($filepath, $folder . $filename)) {
-                    return $destination . $filename;
+            $bucket = $this->app->config->appProtectedStorage();
+            return $this->moveFile($filepath, $bucket);
+        }
+
+        public function movePrivate(string $filepath): ?string
+        {
+            $bucket = $this->app->config->appProtectedStorage();
+            $groupId = $this->app->config->clientGroupId();
+            if (empty($groupId)) {
+                throw new \Exception('Client group Id cannot be empty');
+            }
+            return $this->moveFile($filepath, $bucket, $groupId . '-');
+        }
+
+        public function move(string $filepath): ?string
+        {
+            $bucket = $this->app->config->appPublicStorage();
+            return $this->moveFile($filepath, $bucket);
+        }
+
+        private function moveFile(string $filepath, string $bucket, string $groupId = null): ?string
+        {
+            $prefix = self::getPrefix($filepath);
+            if ($prefix !== $bucket && is_file($filepath)) {
+                //= /prefix/path/to/file.txt
+                $shortPath = substr($filepath, strlen($prefix));
+                //= /path/to/file.txt
+                $folder = $bucket . dirname($shortPath);
+                $filename = $groupId . self::getFilename(basename($shortPath));
+                $destination = self::createDirectory($this->pathTo($folder));
+                if (rename($filepath, $destination . '/' . $filename)) {
+                    return $folder . '/' . $filename;
                 }
             }
             return null;
+        }
+
+        /**
+         * Get a file name without client group Id
+         * @param string $file
+         * @return string
+         */
+        private static function getFilename(string $file): string
+        {
+            $pos = strrpos($file, '-');
+            if ($pos !== false) {
+                return substr($file, $pos + 1);
+            }
+            return $file;
         }
     }
 
