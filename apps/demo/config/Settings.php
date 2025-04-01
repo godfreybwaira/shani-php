@@ -24,7 +24,7 @@ namespace apps\demo\config {
             parent::__construct($app);
         }
 
-        public function root(): ?string
+        public function root(): string
         {
             return '/demo';
         }

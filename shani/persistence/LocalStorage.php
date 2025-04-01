@@ -34,13 +34,15 @@ namespace shani\persistence {
         {
             $this->app = $app;
             $this->host = $app->request->uri->host();
-            $this->storage = self::createPath($app->config->appStorage());
+            $this->storage = self::createPath($app->config->root(), $app->config->appStorage());
         }
 
-        private static function createPath(string $target): string
+        private static function createPath(string $root, string $target): string
         {
-            $path = Definitions::DIR_ASSETS . '/' . basename($target);
-            if (is_dir($path) || symlink($target, $path)) {
+            $pos = strpos($root, '/', 1);
+            $dirname = $pos === false ? $root : substr($root, 0, $pos);
+            $path = Definitions::DIR_STORAGE . $dirname;
+            if (is_link($path) || symlink($target, $path)) {
                 return $path;
             }
             throw new \Exception('Failed to create directory ' . $path);

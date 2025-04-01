@@ -39,14 +39,10 @@ namespace shani\advisors {
         }
 
         /**
-         * Get the application root directory with a leading /. If set to null
-         * then the application root directory will be the /apps directory
-         * @return string|null Application root directory relative to Apps directory
+         * Get the application root directory with a leading /.
+         * @return string Application root directory relative to Apps directory
          */
-        public function root(): ?string
-        {
-            return null;
-        }
+        public abstract function root(): string;
 
         /**
          * Set or get Session cookie name.
@@ -102,11 +98,11 @@ namespace shani\advisors {
 
         /**
          * Enable/disable CSRF protection mechanism.
-         * @return bool True to enable, to disable otherwise.
+         * @return bool True to skip, false otherwise.
          */
-        public function csrfProtectionEnabled(): bool
+        public function skipCsrfProtection(): bool
         {
-            return false;
+            return $this->app->platform() === 'api';
         }
 
         /**
@@ -284,8 +280,8 @@ namespace shani\advisors {
 
         /**
          * Get a list of authenticated client's permissions separated by a comma.
-         * Application must set permission using this function after a client is being
-         * logged in successfully.
+         * Application must set permission using this function after a client
+         * is being logged in successfully.
          * @return string|null List of user permissions or null if no permission is granted
          * @see App::accessGranted()
          */
@@ -312,8 +308,9 @@ namespace shani\advisors {
         }
 
         /**
-         * Returns a list of domains (FQDN), ip address or subdomains that a web browser
-         * will allow to access resources on this application. The list is separated by comma
+         * Returns a list of domains (FQDN), ip address or subdomains that a web
+         * browser will allow to access resources on this application. The list
+         * items are separated by comma.
          * @return string
          */
         public function whitelistedDomains(): string
@@ -372,12 +369,12 @@ namespace shani\advisors {
 
         /**
          * Enable/disable user authorization on restricted resources.
-         * (disabling is not recommended in production environment)
+         * (Permanent skipping authorization is not recommended in production environment)
          * @return bool
          */
-        public function authorizationEnabled(): bool
+        public function skipAuthorization(): bool
         {
-            return false;
+            return true;
         }
 
         /**
