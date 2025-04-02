@@ -287,19 +287,19 @@ namespace shani\http {
         public function render(\JsonSerializable $dto = null, bool $useBuffer = false): void
         {
             $customData = $dto ?? new HttpMessageDto($this->response->status());
-            $type = $this->response->type();
-            if ($type === DataConvertor::TYPE_HTML) {
+            $subtype = $this->response->subtype();
+            if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();
                 $this->ui()->render($customData->jsonSerialize());
-                $this->sendHtml(ob_get_clean(), $type);
-            } else if ($type === DataConvertor::TYPE_SSE) {
+                $this->sendHtml(ob_get_clean(), $subtype);
+            } else if ($subtype === DataConvertor::TYPE_SSE) {
                 ob_start();
                 $this->ui()->render($customData->jsonSerialize());
-                $this->sendSse(ob_get_clean(), $type);
-            } else if ($type === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($customData->jsonSerialize(), $type);
+                $this->sendSse(ob_get_clean(), $subtype);
+            } else if ($subtype === DataConvertor::TYPE_JS) {
+                $this->sendJsonp($customData->jsonSerialize(), $subtype);
             } else {
-                $this->response->setBody(DataConvertor::convertTo($customData->jsonSerialize(), $type), $type);
+                $this->response->setBody(DataConvertor::convertTo($customData->jsonSerialize(), $subtype), $subtype);
             }
             $this->send($useBuffer);
         }

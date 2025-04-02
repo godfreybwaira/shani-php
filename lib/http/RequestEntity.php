@@ -71,6 +71,11 @@ namespace lib\http {
             $this->ip = $ip;
         }
 
+        /**
+         * Change existing route to a new route
+         * @param string $path URI path
+         * @return self
+         */
         public function changeRoute(string $path): self
         {
             $this->route = new RequestRoute($this->method, $path);

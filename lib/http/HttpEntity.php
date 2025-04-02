@@ -21,6 +21,10 @@ namespace lib\http {
             $this->protocol = $protocol;
         }
 
+        /**
+         * Get HTTP protocol version number
+         * @return float
+         */
         public function protocolVersion(): float
         {
             return (float) explode('/', $this->protocol)[1];

@@ -166,7 +166,7 @@ namespace lib\http {
         }
 
         /**
-         * Set the given, single header value under the given name.
+         * Set the given, single header name with the given value.
          * @param string|int $headerName the header name
          * @param mixed $headerValue the header value
          * @see setIfAbsent(string, string)
@@ -183,6 +183,11 @@ namespace lib\http {
             return $this;
         }
 
+        /**
+         * Add a key-value pairs of HTTP headers
+         * @param array $headers
+         * @return self
+         */
         public function addAll(array $headers): self
         {
             foreach ($headers as $name => $value) {
@@ -196,7 +201,11 @@ namespace lib\http {
             return ucwords(strtolower($headerName), '-');
         }
 
-        public function size(): int
+        /**
+         * Get the size of all headers combined in bytes
+         * @return int
+         */
+        public function length(): int
         {
             return mb_strlen($this);
         }

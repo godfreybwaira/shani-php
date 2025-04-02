@@ -34,7 +34,11 @@ namespace lib\http {
             $this->compression = DataCompressionLevel::DISABLE;
         }
 
-        public function type(): string
+        /**
+         * Get subtype of a response. Example for application/xml, the subtype is xml
+         * @return string
+         */
+        public function subtype(): string
         {
             $contentType = $this->headers->get(HttpHeader::CONTENT_TYPE);
             if (!empty($contentType)) {
@@ -63,7 +67,7 @@ namespace lib\http {
          */
         public function size(): int
         {
-            return $this->bodySize() + $this->headers->size();
+            return $this->bodySize() + $this->headers->length();
         }
 
         /**
@@ -117,10 +121,16 @@ namespace lib\http {
             return $this->body;
         }
 
-        public function setBody(string $content, ?string $type = null): self
+        /**
+         * Set response body as string. This body will be sent to client.
+         * @param string $content Response body content
+         * @param string|null $subtype Response subtype
+         * @return self
+         */
+        public function setBody(string $content, ?string $subtype = null): self
         {
             if (!$this->headers->exists(HttpHeader::CONTENT_TYPE)) {
-                $this->headers->add(HttpHeader::CONTENT_TYPE, match ($type ?? $this->type()) {
+                $this->headers->add(HttpHeader::CONTENT_TYPE, match ($subtype ?? $this->subtype()) {
                     DataConvertor::TYPE_JSON => MediaType::JSON,
                     DataConvertor::TYPE_XML => MediaType::XML,
                     DataConvertor::TYPE_CSV => MediaType::TEXT_CSV,
@@ -133,6 +143,12 @@ namespace lib\http {
             return $this->compress($content);
         }
 
+        /**
+         * Set response status code
+         * @param HttpStatus $status Response status object
+         * @param string|null $message Optional message that will override the default status message.
+         * @return self
+         */
         public function setStatus(HttpStatus $status, ?string $message = null): self
         {
             $this->status = $status;

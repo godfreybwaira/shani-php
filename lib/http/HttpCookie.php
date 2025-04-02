@@ -51,11 +51,19 @@ namespace lib\http {
             }
         }
 
+        /**
+         * Get cookie name
+         * @return string
+         */
         public function name(): string
         {
             return $this->cookie['name'];
         }
 
+        /**
+         * Get cookie value
+         * @return string
+         */
         public function value(): string
         {
             return $this->cookie['value'];

@@ -31,6 +31,11 @@ namespace lib\http {
             $this->unique = false;
         }
 
+        /**
+         * Whether cache content will be reused or not
+         * @param bool $reuse
+         * @return self
+         */
         public function setReuse(bool $reuse): self
         {
             $this->reuse = $reuse;
