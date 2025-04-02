@@ -59,36 +59,19 @@ namespace shani\advisors {
         }
 
         /**
-         * Check whether a user has enough privileges to access a target resource
-         * @param string $target Route target, see self::documentation()
-         * @return bool True a user has enough privileges, false otherwise.
-         */
-        private function accessGranted(string $target): bool
-        {
-            if (empty($this->app->config->permissionList)) {
-                return false;
-            }
-            return str_contains($this->app->config->permissionList, App::digest($target));
-//            return (preg_match('\b' . App::digest($target) . '\b', $this->app->config->permissionList) === 1);
-        }
-
-        /**
          * Check if current application user is authorized to access the requested
          * resource. If not, then 401 HTTP error will be raised.
          * @return self
          */
         public function authorized(): self
         {
-            if ($this->app->config->skipAuthorization()) {
-                return $this;
-            }
             $route = $this->app->request->route();
             if ($this->app->config->authenticated) {
                 if ($this->app->config->guestModule($route->module)) {
                     $this->app->request->changeRoute($this->app->config->home());
                     return $this;
                 }
-                if ($this->app->config->publicModule($route->module) || $this->accessGranted($route->target)) {
+                if ($this->app->config->publicModule($route->module) || $this->app->accessGranted($route)) {
                     return $this;
                 }
                 throw HttpStatus::forbidden($this->app);

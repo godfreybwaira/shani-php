@@ -451,6 +451,24 @@ namespace shani\http {
             }
             return $this->lang;
         }
+
+        /**
+         * Check whether a client is granted access to a resource. If authorization
+         * is skipped this function will always return true.
+         * @param RequestRoute $route
+         * @return bool True if a client is granted access, false otherwise.
+         */
+        public function accessGranted(RequestRoute $route): bool
+        {
+            if ($this->config->skipAuthorization()) {
+                return true;
+            }
+            if (empty($this->config->permissionList)) {
+                return false;
+            }
+            return str_contains($this->config->permissionList, App::digest($route->target));
+//            return (preg_match('\b' . App::digest($target) . '\b', $this->app->config->permissionList) === 1);
+        }
     }
 
 }

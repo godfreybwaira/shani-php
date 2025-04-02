@@ -41,6 +41,11 @@ namespace shani\http {
          */
         public readonly string $target;
 
+        /**
+         * Create a new Request Rout object
+         * @param string $method Request method in lowercase e.g get, post etc
+         * @param string $path Request uri path e.g /users/0/profile
+         */
         public function __construct(string $method, string $path)
         {
             $cleanPath = strtolower(trim($path, '/'));
