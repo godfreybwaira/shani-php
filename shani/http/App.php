@@ -81,7 +81,13 @@ namespace shani\http {
                 $this->config = new $this->vhost->configFile($this);
                 $this->runApp();
             } catch (\Throwable $ex) {
-                $this->config->errorHandler($ex);
+                $fallback = $this->config->errorHandler($ex);
+                if ($fallback !== null) {
+                    $this->request->changeRoute($fallback);
+                    $this->processRequest();
+                } else {
+                    $this->send();
+                }
             }
         }
 
@@ -443,7 +449,7 @@ namespace shani\http {
                 $reqLangs = $this->request->languages();
                 $supportedLangs = $this->config->supportedLanguages();
                 foreach ($reqLangs as $lang) {
-                    if (!empty($supportedLangs[$lang])) {
+                    if (in_array($lang, $supportedLangs)) {
                         $this->lang = $lang;
                         return $lang;
                     }

@@ -131,16 +131,17 @@ namespace shani\advisors {
         public abstract function isAsync(): bool;
 
         /**
-         * Handle all application errors
-         * @param \Throwable $t
-         * @return void
+         * Handle all application errors. You can use this function to log
+         * application errors to your logger.
+         * @param \Throwable $t Error Object
+         * @return string|null A URI path as a fallback
          */
-        public function errorHandler(\Throwable $t): void
+        public function errorHandler(\Throwable $t): ?string
         {
             echo 'Message: ' . $t->getMessage() . PHP_EOL;
             echo 'File: ' . $t->getFile() . ':' . $t->getLine() . PHP_EOL;
             echo 'Cause: ' . PHP_EOL . $t->getTraceAsString();
-            $this->app->send();
+            return null;
         }
 
         /**
@@ -150,7 +151,7 @@ namespace shani\advisors {
          */
         public function supportedLanguages(): array
         {
-            return ['sw' => 'Kiswahili', 'en' => 'English'];
+            return ['sw', 'en'];
         }
 
         /**
