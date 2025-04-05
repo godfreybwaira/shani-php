@@ -26,6 +26,7 @@ namespace shani\http {
     use shani\core\Framework;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
+    use shani\exceptions\CustomException;
     use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
@@ -91,8 +92,8 @@ namespace shani\http {
         private function runApp(): void
         {
             $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-            if (!$this->vhost->running && !$this->config->appNotRunningHandled()) {
-                throw HttpStatus::offline($this);
+            if (!$this->vhost->running) {
+                throw CustomException::offline($this);
             }
             if (!LocalStorage::tryServe($this)) {
                 if ($this->request->uri->path === '/') {
@@ -132,7 +133,7 @@ namespace shani\http {
         public function stream(string $filepath, int $chunkSize = Definitions::BUFFER_SIZE): self
         {
             if (!is_file($filepath)) {
-                throw HttpStatus::notFound($this);
+                throw CustomException::notFound($this);
             }
             $file = stat($filepath);
             $range = $this->request->header()->get(HttpHeader::RANGE) ?? '=0-';
@@ -173,7 +174,7 @@ namespace shani\http {
                     $this->writer->stream($this->response, $path, $start, $length);
                 }
             } else {
-                throw HttpStatus::badRequest($this);
+                throw CustomException::badRequest($this);
             }
             return $this;
         }
@@ -337,7 +338,7 @@ namespace shani\http {
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
-                $file = $this->module($this->config->languageDir() . $route->resource . $route->callback . '/' . $this->language() . '.php');
+                $file = $this->module($this->config->languageDir() . $route->controller . $route->callback . '/' . $this->language() . '.php');
                 $this->dict = self::getFile($file, $dto);
             }
             return $this->dict;
@@ -358,7 +359,7 @@ namespace shani\http {
          */
         public function view(?string $path = null): string
         {
-            return $this->module($this->config->viewDir() . $this->request->route()->resource . ($path ?? $this->request->route()->callback) . '.php');
+            return $this->module($this->config->viewDir() . $this->request->route()->controller . ($path ?? $this->request->route()->callback) . '.php');
         }
 
         /**
@@ -376,7 +377,7 @@ namespace shani\http {
             $class = Definitions::DIRNAME_APPS . $this->config->root();
             $class .= $this->config->moduleDir() . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
-            return $class . '/' . str_replace('-', '', ucwords(substr($this->request->route()->resource, 1), '-'));
+            return $class . '/' . str_replace('-', '', ucwords(substr($this->request->route()->controller, 1), '-'));
         }
 
         /**
@@ -397,7 +398,7 @@ namespace shani\http {
         {
             $classPath = $this->classPath($this->request->method);
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
-                throw HttpStatus::notFound($this);
+                throw CustomException::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);
             $cb = Utils::kebab2camelCase(substr($this->request->route()->callback, 1));
@@ -455,10 +456,13 @@ namespace shani\http {
         /**
          * Check whether a client is granted access to a resource. If authorization
          * is skipped this function will always return true.
-         * @param RequestRoute $route
+         * @param string $method Request method e.g get, post etc
+         * @param string $module Requested module with trailing / e.g /users
+         * @param string $controller Requested controller with trailing / e.g /profile
+         * @param string $callback A callback function with trailing / e.g /activate
          * @return bool True if a client is granted access, false otherwise.
          */
-        public function accessGranted(RequestRoute $route): bool
+        public function accessGranted(string $method, string $module, string $controller, string $callback): bool
         {
             if ($this->config->skipAuthorization()) {
                 return true;
@@ -466,7 +470,8 @@ namespace shani\http {
             if (empty($this->config->permissionList)) {
                 return false;
             }
-            return str_contains($this->config->permissionList, App::digest($route->target));
+            $target = strtolower($method . $module . $controller . $callback);
+            return str_contains($this->config->permissionList, App::digest($target));
 //            return (preg_match('\b' . App::digest($target) . '\b', $this->app->config->permissionList) === 1);
         }
     }

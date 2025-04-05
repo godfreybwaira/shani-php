@@ -17,10 +17,10 @@ namespace shani\http {
         public readonly array $params;
 
         /**
-         * Current application resource name
+         * Current application controller name
          * @var string
          */
-        public readonly string $resource;
+        public readonly string $controller;
 
         /**
          * Current application module name
@@ -36,17 +36,16 @@ namespace shani\http {
 
         /**
          * The current request target referring to a path to a class function
-         * (i.e method/module/resource/callback)
+         * (i.e method/module/controller/callback)
          * @var string
          */
         public readonly string $target;
 
         /**
          * Create a new Request Rout object
-         * @param string $method Request method in lowercase e.g get, post etc
          * @param string $path Request uri path e.g /users/0/profile
          */
-        public function __construct(string $method, string $path)
+        public function __construct(string $path)
         {
             $cleanPath = strtolower(trim($path, '/'));
             $idx = strpos($cleanPath, '?');
@@ -55,10 +54,9 @@ namespace shani\http {
             }
             $url = explode('.', $cleanPath);
             $this->params = explode('/', $url[0]);
-            $this->resource = '/' . ($this->params[2] ?? $this->params[0]);
+            $this->controller = '/' . ($this->params[2] ?? $this->params[0]);
             $this->module = '/' . $this->params[0];
             $this->callback = '/' . ($this->params[4] ?? Definitions::HOME_FUNCTION);
-            $this->target = $method . $this->module . $this->resource . $this->callback;
         }
     }
 

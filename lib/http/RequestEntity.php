@@ -60,10 +60,10 @@ namespace lib\http {
         {
             parent::__construct($headers, $protocol);
             $this->localhost = $ip === '127.0.0.1';
-            $this->method = $method;
             $this->changeRoute($uri->path);
             $this->cookie = $cookies;
             $this->query = $queries;
+            $this->method = $method;
             $this->files = $files;
             $this->body = $body;
             $this->time = $time;
@@ -78,7 +78,7 @@ namespace lib\http {
          */
         public function changeRoute(string $path): self
         {
-            $this->route = new RequestRoute($this->method, $path);
+            $this->route = new RequestRoute($path);
             return $this;
         }
 

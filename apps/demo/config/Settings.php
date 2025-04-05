@@ -78,6 +78,11 @@ namespace apps\demo\config {
         {
             return $this->app->request->header()->get('X-Request-Mode') === 'async';
         }
+
+        public function accessibleByPublic(): bool
+        {
+            return in_array($this->app->request->route()->module, ['/greetings']);
+        }
     }
 
 }

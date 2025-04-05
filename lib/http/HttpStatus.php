@@ -7,8 +7,6 @@
 
 namespace lib\http {
 
-    use shani\http\App;
-
     enum HttpStatus: int
     {
 
@@ -97,61 +95,6 @@ namespace lib\http {
         public function isError(): bool
         {
             return $this->is4xx() || $this->is5xx();
-        }
-        //////////////EXCEPTIONS///////////////
-
-        public static function notFound(App &$app): \Exception
-        {
-            $app->response->setStatus(self::NOT_FOUND);
-            return new \Exception('Resource not found');
-        }
-
-        public static function badRequest(App &$app): \Exception
-        {
-            $app->response->setStatus(self::BAD_REQUEST);
-            return new \Exception('Malformed request');
-        }
-
-        public static function methodNotAllowed(App &$app): \Exception
-        {
-            $app->response->setStatus(self::METHOD_NOT_ALLOWED);
-            $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $app->config->allowedRequestMethods());
-            return new \Exception('Request Method not allowed');
-        }
-
-        public static function notAcceptable(App &$app): \Exception
-        {
-            $app->response->setStatus(self::NOT_ACCEPTABLE);
-            return new \Exception('Request not acceptable');
-        }
-        public static function fatal(App &$app): \Exception
-        {
-            $app->response->setStatus(self::INTERNAL_SERVER_ERROR);
-            return new \Exception('Could not process the request');
-        }
-
-        public static function notAuthorized(App &$app): \Exception
-        {
-            $app->response->setStatus(self::UNAUTHORIZED);
-            return new \Exception('Not authorized to access the resource');
-        }
-
-        public static function offline(App &$app): \Exception
-        {
-            $app->response->setStatus(self::SERVICE_UNAVAILABLE);
-            return new \Exception('Server is offline');
-        }
-
-        public static function sessionExpired(App &$app): \Exception
-        {
-            $app->response->setStatus(self::BAD_REQUEST);
-            return new \Exception('Session has expired');
-        }
-
-        public static function forbidden(App &$app): \Exception
-        {
-            $app->response->setStatus(self::FORBIDDEN);
-            return new \Exception('Access denied');
         }
     }
 

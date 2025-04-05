@@ -15,6 +15,8 @@ namespace shani\persistence {
     use lib\http\HttpStatus;
     use shani\contracts\StorageMedia;
     use shani\core\Definitions;
+    use shani\exceptions\CustomException;
+    use shani\exceptions\ServerException;
     use shani\http\App;
 
     final class LocalStorage implements StorageMedia
@@ -45,7 +47,7 @@ namespace shani\persistence {
             if (is_link($path) || symlink($target, $path)) {
                 return $path;
             }
-            throw new \Exception('Failed to create directory ' . $path);
+            throw new ServerException('Failed to create directory ' . $path);
         }
 
         private static function getPrefix(string $path): string
@@ -78,12 +80,12 @@ namespace shani\persistence {
         private static function serveProtected(App &$app, string $filepath): bool
         {
             if (!$app->config->authenticated) {
-                throw HttpStatus::forbidden($app);
+                throw CustomException::forbidden($app);
             }
             $filename = basename($filepath);
             $groupId = substr($filename, 0, strrpos($filename, '-'));
             if (!empty($groupId) && $groupId !== $app->config->clientGroupId()) {
-                throw HttpStatus::forbidden($app);
+                throw CustomException::forbidden($app);
             }
             return self::sendFile($app, $app->storage()->pathTo($filepath));
         }
@@ -119,7 +121,7 @@ namespace shani\persistence {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             $groupId = $this->app->config->clientGroupId();
             if (empty($groupId)) {
-                throw new \Exception('Client group Id cannot be empty');
+                throw new ServerException('Client group Id cannot be empty');
             }
             return self::persist($file, $this->storage, $path, $groupId . '-');
         }
@@ -150,7 +152,7 @@ namespace shani\persistence {
             if (is_dir($destination) || mkdir($destination, self::FILE_MODE, true)) {
                 return $destination;
             }
-            throw new \Exception('Failed to create directory ' . $destination);
+            throw new ServerException('Failed to create directory ' . $destination);
         }
 
         public function url(string $filepath): string
@@ -195,7 +197,7 @@ namespace shani\persistence {
             $bucket = $this->app->config->appProtectedStorage();
             $groupId = $this->app->config->clientGroupId();
             if (empty($groupId)) {
-                throw new \Exception('Client group Id cannot be empty');
+                throw new ServerException('Client group Id cannot be empty');
             }
             return $this->moveFile($filepath, $bucket, $groupId . '-');
         }

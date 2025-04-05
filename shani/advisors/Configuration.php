@@ -144,16 +144,6 @@ namespace shani\advisors {
         }
 
         /**
-         * When app running state is false and your application will handle the
-         * situation then return true, otherwise return false
-         * @return bool
-         */
-        public function appNotRunningHandled(): bool
-        {
-            return false;
-        }
-
-        /**
          * Get all application supported languages where a key is a language code
          * and a value is a language name.
          * @return array Associative array of supported languages.
@@ -288,21 +278,20 @@ namespace shani\advisors {
         public abstract function clientPermissions(): ?string;
 
         /**
-         * Check whether a given module is available among modules granted access to a public
-         * @param string $module Module name
+         * Check whether a given resource is available to both authenticated and
+         * unauthenticated clients.
          * @return bool True on success, false otherwise.
          */
-        public function publicModule(string $module): bool
+        public function accessibleByPublic(): bool
         {
             return false;
         }
 
         /**
-         * Check whether a given module is available among modules granted access to a guest user
-         * @param string $module Module name
+         * Check whether a given resource is available only to unauthenticated clients.
          * @return bool True on success, false otherwise.
          */
-        public function guestModule(string $module): bool
+        public function accessibleByGuest(): bool
         {
             return false;
         }
@@ -374,7 +363,7 @@ namespace shani\advisors {
          */
         public function skipAuthorization(): bool
         {
-            return true;
+            return false;
         }
 
         /**

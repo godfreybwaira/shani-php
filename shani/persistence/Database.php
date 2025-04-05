@@ -9,6 +9,7 @@
 namespace shani\persistence {
 
     use lib\IterableData;
+    use shani\exceptions\ServerException;
 
     final class Database
     {
@@ -100,7 +101,7 @@ namespace shani\persistence {
                 case 'odbc'://for sqlserver
                     return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
             }
-            throw new \Exception('Driver "' . $driver . '" not supported');
+            throw new ServerException('Driver "' . $driver . '" not supported');
         }
     }
 

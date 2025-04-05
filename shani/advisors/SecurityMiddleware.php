@@ -12,6 +12,7 @@ namespace shani\advisors {
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use shani\advisors\web\AccessPolicy;
+    use shani\exceptions\CustomException;
     use shani\http\App;
 
     abstract class SecurityMiddleware
@@ -35,7 +36,7 @@ namespace shani\advisors {
             if ($methods === '*' || str_contains($methods, $this->app->request->method)) {
                 return $this;
             }
-            throw HttpStatus::methodNotAllowed($this->app);
+            throw CustomException::methodNotAllowed($this->app);
         }
 
         /**
@@ -52,7 +53,7 @@ namespace shani\advisors {
             if ($this->app->config->csrfProtected()) {
                 $token = $this->app->request->cookie->get($this->app->config->csrfTokenName());
                 if ($token === null || !$this->app->csrfToken()->exists($token)) {
-                    throw HttpStatus::notAcceptable($this->app);
+                    throw CustomException::notAcceptable($this->app);
                 }
             }
             return $this;
@@ -65,20 +66,20 @@ namespace shani\advisors {
          */
         public function authorized(): self
         {
-            $route = $this->app->request->route();
             if ($this->app->config->authenticated) {
-                if ($this->app->config->guestModule($route->module)) {
+                if ($this->app->config->accessibleByGuest()) {
                     $this->app->request->changeRoute($this->app->config->home());
                     return $this;
                 }
-                if ($this->app->config->publicModule($route->module) || $this->app->accessGranted($route)) {
+                $route = $this->app->request->route();
+                if ($this->app->config->accessibleByPublic() || $this->app->accessGranted($this->app->request->method, $route->module, $route->controller, $route->callback)) {
                     return $this;
                 }
-                throw HttpStatus::forbidden($this->app);
-            } else if ($this->app->config->guestModule($route->module) || $this->app->config->publicModule($route->module)) {
+                throw CustomException::forbidden($this->app);
+            } else if ($this->app->config->accessibleByGuest() || $this->app->config->accessibleByPublic()) {
                 return $this;
             }
-            throw HttpStatus::notAuthorized($this->app);
+            throw CustomException::notAuthorized($this->app);
         }
 
         /**
@@ -118,7 +119,7 @@ namespace shani\advisors {
         public function validateSession(): self
         {
             if ($this->app->config->sessionEnabled() && $this->app->session()->expired()) {
-                throw HttpStatus::sessionExpired($this->app);
+                throw CustomException::sessionExpired($this->app);
             }
             return $this;
         }
