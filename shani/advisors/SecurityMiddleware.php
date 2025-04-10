@@ -72,7 +72,7 @@ namespace shani\advisors {
                     return $this;
                 }
                 $route = $this->app->request->route();
-                if ($this->app->config->accessibleByPublic() || $this->app->accessGranted($this->app->request->method, $route->module, $route->controller, $route->callback)) {
+                if ($this->app->config->accessibleByPublic() || $this->app->config->accessGranted($this->app->request->method, $route->module, $route->controller, $route->action)) {
                     return $this;
                 }
                 throw CustomException::forbidden($this->app);
@@ -93,9 +93,9 @@ namespace shani\advisors {
             if ($policy !== AccessPolicy::DISABLED) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
-                    HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
                 ]);
+                return $this->addAllowOrigin();
             }
             return $this;
         }
@@ -137,9 +137,18 @@ namespace shani\advisors {
                 $this->app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods(),
                     HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $this->app->config->allowedRequestHeaders(),
-                    HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN => $this->app->config->whitelistedDomains(),
                     HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
                 ]);
+                return $this->addAllowOrigin();
+            }
+            return $this;
+        }
+
+        private function addAllowOrigin(): self
+        {
+            $origin = $this->app->request->header()->get(HttpHeader::ORIGIN);
+            if (!empty($origin) && $this->app->config->whitelistedDomain($origin)) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $origin);
             }
             return $this;
         }

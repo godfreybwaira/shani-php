@@ -18,7 +18,6 @@ namespace shani\http {
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
     use lib\MediaType;
-    use lib\Utils;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
@@ -31,17 +30,18 @@ namespace shani\http {
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
     use shani\ServerConfig;
+    use shani\core\log\Logger;
 
     final class App
     {
 
         private array $storage = [];
         private SessionManager $session;
-        private ?string $lang = null;
         private readonly ResponseWriter $writer;
         private ?UI $ui = null;
         private ?array $dict = null;
-        private ?string $platform = null;
+        private ?Logger $logger = null;
+        private ?string $lang = null, $platform = null;
 
         /**
          * Application virtual host configuration
@@ -81,13 +81,7 @@ namespace shani\http {
                 $this->config = new $this->vhost->configFile($this);
                 $this->runApp();
             } catch (\Throwable $ex) {
-                $fallback = $this->config->errorHandler($ex);
-                if ($fallback !== null) {
-                    $this->request->changeRoute($fallback);
-                    $this->processRequest();
-                } else {
-                    $this->send();
-                }
+                $this->handleException($ex);
             }
         }
 
@@ -255,6 +249,22 @@ namespace shani\http {
         }
 
         /**
+         * Create and return logger object.
+         * @return SessionManager
+         */
+        public function logger(): Logger
+        {
+            if (!isset($this->logger)) {
+                $filename = $this->config->logFileName();
+                if (strpos($filename, '://') === false) {
+                    $filename = $this->storage()->pathTo('/' . $filename);
+                }
+                $this->logger = new Logger($filename);
+            }
+            return $this->logger;
+        }
+
+        /**
          * Create and return session object. If session is not started, it will be started,
          * otherwise it will be resumed.
          * @return SessionManager
@@ -344,7 +354,7 @@ namespace shani\http {
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
-                $file = $this->module($this->config->languageDir() . $route->controller . $route->callback . '/' . $this->language() . '.php');
+                $file = $this->module($this->config->languageDir() . $route->controller . $route->action . '/' . $this->language() . '.php');
                 $this->dict = self::getFile($file, $dto);
             }
             return $this->dict;
@@ -365,7 +375,7 @@ namespace shani\http {
          */
         public function view(?string $path = null): string
         {
-            return $this->module($this->config->viewDir() . $this->request->route()->controller . ($path ?? $this->request->route()->callback) . '.php');
+            return $this->module($this->config->viewDir() . $this->request->route()->controller . ($path ?? $this->request->route()->action) . '.php');
         }
 
         /**
@@ -407,8 +417,18 @@ namespace shani\http {
                 throw CustomException::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);
-            $cb = Utils::kebab2camelCase(substr($this->request->route()->callback, 1));
+            $cb = self::kebab2camelCase(substr($this->request->route()->action, 1));
             (new $className($this))->$cb();
+        }
+
+        private static function kebab2camelCase(string $str, string $separator = '-'): string
+        {
+            if (str_contains($str, $separator)) {
+//                $str = preg_replace_callback('/(?<=-)[a-z]/', fn($ch) => mb_strtoupper($ch[0]), $str);
+                $str = lcfirst(ucwords($str, $separator));
+                return str_replace($separator, '', $str);
+            }
+            return $str;
         }
 
         public static function digest(string $str, string $algorithm = 'sha1', int $length = 7): string
@@ -459,26 +479,20 @@ namespace shani\http {
             return $this->lang;
         }
 
-        /**
-         * Check whether a client is granted access to a resource. If authorization
-         * is skipped this function will always return true.
-         * @param string $method Request method e.g get, post etc
-         * @param string $module Requested module with trailing / e.g /users
-         * @param string $controller Requested controller with trailing / e.g /profile
-         * @param string $callback A callback function with trailing / e.g /activate
-         * @return bool True if a client is granted access, false otherwise.
-         */
-        public function accessGranted(string $method, string $module, string $controller, string $callback): bool
+        private function handleException(\Throwable $ex): void
         {
-            if ($this->config->skipAuthorization()) {
-                return true;
+            if (isset($this->config)) {
+                $fallback = $this->config->errorHandler($ex);
+                if (!empty($fallback)) {
+                    $this->request->changeRoute($fallback);
+                    $this->processRequest();
+                    return;
+                }
+            } else {
+                $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                //log error
             }
-            if (empty($this->config->permissionList)) {
-                return false;
-            }
-            $target = strtolower($method . $module . $controller . $callback);
-            return str_contains($this->config->permissionList, App::digest($target));
-//            return (preg_match('\b' . App::digest($target) . '\b', $this->app->config->permissionList) === 1);
+            $this->send();
         }
     }
 

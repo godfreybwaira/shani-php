@@ -7,7 +7,7 @@
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib {
+namespace lib\map {
 
     class IterableData extends ReadableMap
     {
@@ -91,13 +91,13 @@ namespace lib {
         }
 
         /**
-         * Apply a callback function for each value of a collection i.e array
-         * @param callable $callback A callback function that receive an item name
-         * as first parameter and an item value as second parameter. This function
-         * must return a value.
+         * Apply a callback function for each value of a collection i.e array.
+         * The returned value of a function overwrites the current value.
+         * @param callable $callback A callback function that receives an item name
+         * and value as first and second parameters.
          * @return bool
          */
-        public function each(callable $callback): self
+        public function map(callable $callback): self
         {
             foreach ($this->data as $key => $value) {
                 $this->data[$key] = $callback($key, $value);

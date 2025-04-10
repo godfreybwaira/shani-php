@@ -8,7 +8,7 @@
 
 namespace shani\persistence\session {
 
-    use lib\IterableData;
+    use lib\map\IterableData;
 
     final class Cart extends IterableData
     {

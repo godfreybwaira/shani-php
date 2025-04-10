@@ -160,12 +160,7 @@ namespace shani\persistence {
             return $this->host . $filepath;
         }
 
-        /**
-         * Get a full path to a file or directory
-         * @param string|null $path File or a directory
-         * @return string Path to a file or directory
-         */
-        private function pathTo(?string $path = null): string
+        public function pathTo(?string $path = null): string
         {
             return $this->storage . $path;
         }

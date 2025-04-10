@@ -2,7 +2,7 @@
 
 namespace lib\http {
 
-    use lib\IterableData;
+    use lib\map\IterableData;
 
     final class HttpHeader extends IterableData
     {

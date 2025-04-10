@@ -7,7 +7,9 @@
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib {
+namespace lib\map {
+
+    use lib\DataConvertor;
 
     class ReadableMap implements \Stringable, \JsonSerializable
     {
@@ -233,6 +235,20 @@ namespace lib {
             foreach ($this->data as $key => $value) {
                 yield [$key => $value];
             }
+        }
+
+        /**
+         * Apply a callback function for each value of a collection i.e array.
+         * @param callable $callback A callback function that receives an item name
+         * and value as first and second parameters.
+         * @return bool
+         */
+        public function each(callable $callback): self
+        {
+            foreach ($this->data as $key => $value) {
+                $callback($key, $value);
+            }
+            return $this;
         }
     }
 

@@ -8,7 +8,7 @@
 
 namespace shani\persistence {
 
-    use lib\IterableData;
+    use lib\map\IterableData;
     use shani\exceptions\ServerException;
 
     final class Database

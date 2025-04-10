@@ -9,7 +9,7 @@
 
 namespace shani\persistence\session {
 
-    use lib\IterableData;
+    use lib\map\IterableData;
 
     final class SessionStorage extends IterableData
     {

@@ -11,6 +11,7 @@ namespace lib {
 
     use lib\http\HttpHeader;
     use lib\http\RequestEntity;
+    use lib\map\ReadableMap;
 
     final class RequestEntityBuilder
     {
@@ -19,14 +20,23 @@ namespace lib {
         private ?URI $uri;
         private array $files = [];
         private ?HttpHeader $headers;
-        private ?string $method, $ip, $protocol;
+        private ?string $method, $ip, $protocol, $rawBody;
         private ReadableMap $cookies, $queries, $body;
 
         public function __construct()
         {
+            $this->rawBody = null;
             $this->body = new ReadableMap();
             $this->queries = new ReadableMap();
             $this->cookies = new ReadableMap();
+        }
+
+        public function rawBody(?string $body): self
+        {
+            if (!empty($body)) {
+                $this->rawBody = $body;
+            }
+            return $this;
         }
 
         public function body(?array $body): self
@@ -103,7 +113,7 @@ namespace lib {
                     uri: $this->uri, headers: $this->headers, body: $this->body,
                     cookies: $this->cookies, files: $this->files, ip: $this->ip,
                     time: $this->time, queries: $this->queries, method: $this->method,
-                    protocol: $this->protocol
+                    protocol: $this->protocol, rawBody: $this->rawBody
             );
         }
     }

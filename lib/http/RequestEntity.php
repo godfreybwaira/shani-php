@@ -10,8 +10,8 @@
 namespace lib\http {
 
     use lib\File;
+    use lib\map\ReadableMap;
     use lib\MediaType;
-    use lib\ReadableMap;
     use lib\URI;
     use shani\http\RequestRoute;
 
@@ -43,6 +43,12 @@ namespace lib\http {
         public readonly string $ip;
 
         /**
+         * Raw request body
+         * @var string|null
+         */
+        public readonly ?string $raw;
+
+        /**
          * Check whether the request comes from local machine
          * @var string
          */
@@ -55,7 +61,7 @@ namespace lib\http {
         public function __construct(
                 URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
                 array $files, string $method, string $ip, int $time, ReadableMap $queries,
-                string $protocol
+                string $protocol, ?string $rawBody = null
         )
         {
             parent::__construct($headers, $protocol);
@@ -64,6 +70,7 @@ namespace lib\http {
             $this->cookie = $cookies;
             $this->query = $queries;
             $this->method = $method;
+            $this->raw = $rawBody;
             $this->files = $files;
             $this->body = $body;
             $this->time = $time;

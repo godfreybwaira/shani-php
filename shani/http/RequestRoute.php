@@ -32,14 +32,7 @@ namespace shani\http {
          * Current application callback name
          * @var string
          */
-        public readonly string $callback;
-
-        /**
-         * The current request target referring to a path to a class function
-         * (i.e method/module/controller/callback)
-         * @var string
-         */
-        public readonly string $target;
+        public readonly string $action;
 
         /**
          * Create a new Request Rout object
@@ -56,7 +49,7 @@ namespace shani\http {
             $this->params = explode('/', $url[0]);
             $this->controller = '/' . ($this->params[2] ?? $this->params[0]);
             $this->module = '/' . $this->params[0];
-            $this->callback = '/' . ($this->params[4] ?? Definitions::HOME_FUNCTION);
+            $this->action = '/' . ($this->params[4] ?? Definitions::HOME_FUNCTION);
         }
     }
 

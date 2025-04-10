@@ -179,7 +179,7 @@ namespace gui {
             $bc = $route->module . $this->app->config->breadcrumbDir();
             $str = self::loadFile($bc . $route->module);
             $str .= self::loadFile($bc . $route->controller . $route->controller);
-            $str .= self::loadFile($bc . $route->controller . $this->app->config->breadcrumbMethodsDir() . $route->callback);
+            $str .= self::loadFile($bc . $route->controller . $this->app->config->breadcrumbMethodsDir() . $route->action);
             return $str;
         }
 

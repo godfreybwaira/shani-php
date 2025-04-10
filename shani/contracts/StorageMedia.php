@@ -87,6 +87,13 @@ namespace shani\contracts {
          * @return string|null A path to a new location, or null otherwise
          */
         public function movePrivate(string $filepath): ?string;
+
+        /**
+         * Get a full path to a storage destination
+         * @param string|null $path File or a directory
+         * @return string Path to a storage destination (endpoint)
+         */
+        public function pathTo(?string $path = null): string;
     }
 
 }

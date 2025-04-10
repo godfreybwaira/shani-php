@@ -95,7 +95,11 @@ namespace gui\v1 {
 
         public static function getStyles(array $keys): array
         {
-            return Map::get(self::PROPS, $keys);
+            $styles = [];
+            foreach ($keys as $key) {
+                $styles[$key] = self::PROPS[$key] ?? null;
+            }
+            return $styles;
         }
     }
 

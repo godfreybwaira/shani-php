@@ -9,16 +9,25 @@
 
 namespace lib\validation {
 
-    interface PasswordComplexity {
+    final class PasswordComplexity
+    {
 
-        public const MIN_LENGTH = 8;
-        public const MAX_LENGTH = 20; //can be > 0 or NULL
-        public const DIGITS = false;
-        public const UPPER_CASE = false;
-        public const LOWER_CASE = false;
-        public const LETTERS = true;
-        public const SYMBOLS = false;
-        public const RESET_VALIDITY = 15; //minutes
+        public readonly int $minLength, $maxLength;
+        public readonly bool $digits, $upperCase, $lowerCase, $symbols;
+
+        public function __construct(
+                int $minLength = 6, int $maxLength = 20, bool $digits = true,
+                bool $upperCase = false, bool $lowerCase = true, bool $symbols = true
+        )
+        {
+
+            $this->minLength = $minLength;
+            $this->maxLength = $maxLength;
+            $this->digits = $digits;
+            $this->upperCase = $upperCase;
+            $this->lowerCase = $lowerCase;
+            $this->symbols = $symbols;
+        }
     }
 
 }

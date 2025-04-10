@@ -19,7 +19,6 @@ namespace shani\servers\swoole {
     use lib\MediaType;
     use lib\RequestEntityBuilder;
     use lib\URI;
-    use lib\Utils;
     use shani\core\Definitions;
     use shani\http\App;
     use shani\ServerConfig;
@@ -76,6 +75,7 @@ namespace shani\servers\swoole {
                     ->time($req->server['request_time'])
                     ->files(self::getFiles($req->files))
                     ->ip($req->server['remote_addr'])
+                    ->rawBody($req->rawcontent())
                     ->body(self::getBody($req))
                     ->cookies($req->cookie)
                     ->query($req->get)
@@ -134,7 +134,6 @@ namespace shani\servers\swoole {
         public static function start(): void
         {
             self::checkFrameworkRequirements();
-            Utils::errorHandler();
             $cnf = ServerConfig::getConfig();
             $server = self::configure($cnf);
             $server->on('start', function () {

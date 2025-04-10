@@ -10,15 +10,16 @@
 
 namespace shani\advisors {
 
-    use lib\Duration;
-    use shani\http\App;
-    use shani\core\Framework;
-    use shani\http\Middleware;
     use lib\DataCompressionLevel;
-    use shani\contracts\StorageMedia;
-    use shani\persistence\LocalStorage;
+    use lib\Duration;
     use shani\advisors\web\AccessPolicy;
     use shani\advisors\web\BrowsingPrivacy;
+    use shani\contracts\StorageMedia;
+    use shani\core\Framework;
+    use shani\core\log\LogLevel;
+    use shani\http\App;
+    use shani\http\Middleware;
+    use shani\persistence\LocalStorage;
 
     abstract class Configuration
     {
@@ -28,7 +29,7 @@ namespace shani\advisors {
          * @var bool
          */
         public readonly bool $authenticated;
-        public readonly ?string $permissionList;
+        private readonly ?string $permissionList;
         protected readonly App $app;
 
         public function __construct(App &$app)
@@ -138,9 +139,7 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t): ?string
         {
-            echo 'Message: ' . $t->getMessage() . PHP_EOL;
-            echo 'File: ' . $t->getFile() . ':' . $t->getLine() . PHP_EOL;
-            echo 'Cause: ' . PHP_EOL . $t->getTraceAsString();
+            $this->app->logger()->log($t, LogLevel::ERROR);
             return null;
         }
 
@@ -298,14 +297,15 @@ namespace shani\advisors {
         }
 
         /**
-         * Returns a list of domains (FQDN), ip address or subdomains that a web
-         * browser will allow to access resources on this application. The list
-         * items are separated by comma.
+         * Check if a requesting domain (origin) in allowed to access resource
+         * on this server. Usually this is achieved via Origin header which is
+         * sent by the web browser.
+         * @param string $domain Domain name (FQDN) or IP address
          * @return string
          */
-        public function whitelistedDomains(): string
+        public function whitelistedDomain(string $domain): bool
         {
-            return '*';
+            return false;
         }
 
         /**
@@ -376,6 +376,41 @@ namespace shani\advisors {
         public function getStorageMedia(string $media): StorageMedia
         {
             return new LocalStorage($this->app);
+        }
+
+        /**
+         * Check whether a client is granted access to a resource. If authorization
+         * is skipped this function will always return true.
+         * @param string $method Request method e.g get, post etc
+         * @param string $module Requested module with trailing / e.g /users
+         * @param string $controller Requested controller with trailing / e.g /profile
+         * @param string $action A callback function with trailing / e.g /activate
+         * @return bool True if a client is granted access, false otherwise.
+         */
+        public function accessGranted(string $method, string $module = null, string $controller = null, string $action = null): bool
+        {
+            if ($this->skipAuthorization()) {
+                return true;
+            }
+            if (empty($this->permissionList)) {
+                return false;
+            }
+            $target = $method . $module . $controller . $action;
+            if ($target !== $method) {
+                $target = App::digest(strtolower($target));
+            }
+            return str_contains($this->permissionList, $target);
+//            return (preg_match('\b' . $target . '\b', $this->permissionList) === 1);
+        }
+
+        /**
+         * Return a name of a log file
+         * @return string
+         */
+        public function logFileName(): string
+        {
+//            return date('Y-m-d') . '.log';
+            return 'php://stdout';
         }
     }
 
