@@ -91,7 +91,7 @@ namespace shani\servers\swoole {
             if (!empty($req->post) || empty($contentType)) {
                 return $req->post;
             }
-            $type = MediaType::explode(strtolower($contentType))[1];
+            $type = MediaType::subtype(strtolower($contentType));
             return DataConvertor::convertFrom($req->rawcontent(), $type);
         }
 

@@ -1,19 +1,15 @@
 <?php
 
 /**
- * Description of AccessPolicy
+ * Description of RespourceAccessPolicy
  * @author coder
  *
  * Created on: Mar 25, 2025 at 10:09:50 AM
  */
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPEnum.php to edit this template
- */
 
 namespace shani\advisors\web {
 
-    enum AccessPolicy: string
+    enum RespourceAccessPolicy: string
     {
 
         /**

@@ -12,8 +12,9 @@ namespace shani\advisors {
 
     use lib\DataCompressionLevel;
     use lib\Duration;
-    use shani\advisors\web\AccessPolicy;
     use shani\advisors\web\BrowsingPrivacy;
+    use shani\advisors\web\ContentSecurityPolicy;
+    use shani\advisors\web\RespourceAccessPolicy;
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\core\log\LogLevel;
@@ -309,14 +310,23 @@ namespace shani\advisors {
         }
 
         /**
+         * Whether to send CSP (Content Security Policy) headers or not.
+         * @return ContentSecurityPolicy
+         */
+        public function csp(): ContentSecurityPolicy
+        {
+            return ContentSecurityPolicy::BASIC;
+        }
+
+        /**
          * Tells a web browser how to decide which domain can access resources
          * on this application.
-         * @return AccessPolicy
+         * @return RespourceAccessPolicy
          * @see SecurityMiddleware::resourceAccessPolicy()
          */
-        public function resourceAccessPolicy(): AccessPolicy
+        public function resourceAccessPolicy(): RespourceAccessPolicy
         {
-            return AccessPolicy::THIS_DOMAIN_AND_SUBDOMAIN;
+            return RespourceAccessPolicy::THIS_DOMAIN_AND_SUBDOMAIN;
         }
 
         /**

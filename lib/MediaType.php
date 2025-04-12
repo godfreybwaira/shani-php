@@ -1268,18 +1268,19 @@ namespace lib {
         }
 
         /**
-         * Explode a mime string and return array of two values where first value
-         * is the generic value and the second value is specific value
-         * @param string|null $mimeStr A valid mime string
-         * @return array|null
+         * Get a subtype from media type
+         * @param string|null $mimeStr Media type
+         * @return string|null
          */
-        public static function explode(?string $mimeStr): ?array
+        public static function subtype(?string $mimeStr): ?string
         {
             if ($mimeStr === null) {
                 return null;
             }
             $mime = self::parse($mimeStr)[0];
-            return explode('/', $mime);
+            $subtype = explode('/', $mime)[1];
+            $plusPos = strpos($subtype, '+');
+            return $plusPos === false ? $subtype : substr($subtype, $plusPos + 1);
         }
     }
 

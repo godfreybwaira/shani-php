@@ -42,14 +42,14 @@ namespace lib\http {
         {
             $contentType = $this->headers->get(HttpHeader::CONTENT_TYPE);
             if (!empty($contentType)) {
-                return MediaType::explode($contentType)[1];
+                return MediaType::subtype($contentType);
             }
             $parts = explode('.', $this->request->uri->path);
             $size = count($parts);
             if ($size > 1) {
                 return strtolower($parts[$size - 1]);
             }
-            return MediaType::explode($this->request->header()->get(HttpHeader::ACCEPT))[1] ?? '';
+            return MediaType::subtype($this->request->header()->get(HttpHeader::ACCEPT)) ?? '';
         }
 
         /**

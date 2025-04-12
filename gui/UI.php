@@ -23,7 +23,6 @@ namespace gui {
 
         public function __construct(App &$app)
         {
-            $this->meta('referrer-policy', $app->config->browsingPrivacy()->value);
             $this->scripts = $this->styles = $this->data = $this->attributes = [];
             $this->title = $this->icon = null;
             $this->app = $app;

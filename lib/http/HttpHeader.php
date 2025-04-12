@@ -58,10 +58,12 @@ namespace lib\http {
         public const PROXY_AUTHORIZATION = 'Proxy-Authorization';
         public const RANGE = 'Range';
         public const REFERER = 'Referer';
+        public const REFERRER_POLICY = 'Referrer-Policy';
         public const RETRY_AFTER = 'Retry-After';
         public const SERVER = 'Server';
         public const SET_COOKIE = 'Set-Cookie';
         public const SET_COOKIE2 = 'Set-Cookie2';
+        public const STRICT_TRANSPORT_SECURITY = 'Strict-Transport-Security';
         public const TE = 'TE';
         public const TRAILER = 'Trailer';
         public const TRANSFER_ENCODING = 'Transfer-Encoding';

@@ -9,9 +9,12 @@
 
 namespace shani\advisors {
 
+    use lib\Duration;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
-    use shani\advisors\web\AccessPolicy;
+    use shani\advisors\web\BrowsingPrivacy;
+    use shani\advisors\web\ContentSecurityPolicy;
+    use shani\advisors\web\RespourceAccessPolicy;
     use shani\exceptions\CustomException;
     use shani\http\App;
 
@@ -23,6 +26,10 @@ namespace shani\advisors {
         protected function __construct(App &$app)
         {
             $this->app = $app;
+            $policy = $app->config->browsingPrivacy()->value;
+            if ($policy !== BrowsingPrivacy::DISABLED) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy);
+            }
         }
 
         /**
@@ -90,7 +97,7 @@ namespace shani\advisors {
         public function resourceAccessPolicy(): self
         {
             $policy = $this->app->config->resourceAccessPolicy();
-            if ($policy !== AccessPolicy::DISABLED) {
+            if ($policy !== RespourceAccessPolicy::DISABLED) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
@@ -101,14 +108,21 @@ namespace shani\advisors {
         }
 
         /**
-         * Tells a web browser to disable other sites from embedding your website
-         * to theirs, e.g via iframe tag
+         * Adding basic Content-Security-Policy (CSP) header values
          * @return self
          */
-        public function blockClickjacking(): self
+        public function cspHeaders(): self
         {
-            $this->app->response->header()->add(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
-//            $this->app->response->header()->set(HttpHeader::CONTENT_SECURITY_POLICY, "frame-ancestors 'self'");
+            $policy = $this->app->config->csp();
+            if ($policy !== ContentSecurityPolicy::DISABLE) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
+                $this->app->response->header()->addIfAbsent(HttpHeader::CONTENT_SECURITY_POLICY, $policy);
+                if ($this->app->request->uri->secure()) {
+                    $duration = Duration::of(2, Duration::YEARS)->getTimestamp() - time();
+                    $hsts = 'max-age=' . $duration . ';includeSubDomains;preload';
+                    $this->app->response->header()->addIfAbsent(HttpHeader::STRICT_TRANSPORT_SECURITY, $hsts);
+                }
+            }
             return $this;
         }
 

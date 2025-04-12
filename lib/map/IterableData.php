@@ -52,7 +52,7 @@ namespace lib\map {
         /**
          * Delete all items metioned from  an iterable object
          * @param array $keys Items to delete
-         * @return array self
+         * @return self
          */
         public function deleteAll(array $keys): self
         {
@@ -68,7 +68,7 @@ namespace lib\map {
          * @param callable $callback A callback function that receive an item name as
          * first parameter and an item value as second parameter. This function
          * must return a boolean value.
-         * @return array self
+         * @return self
          */
         public function deleteWhere(callable $callback): self
         {
@@ -81,7 +81,7 @@ namespace lib\map {
         }
 
         /**
-         * Remove all items in an iterable object. The cart itself remains
+         * Remove all items in an iterable object. The object itself remains
          * @return self
          */
         public function clear(): self
@@ -95,7 +95,7 @@ namespace lib\map {
          * The returned value of a function overwrites the current value.
          * @param callable $callback A callback function that receives an item name
          * and value as first and second parameters.
-         * @return bool
+         * @return self
          */
         public function map(callable $callback): self
         {

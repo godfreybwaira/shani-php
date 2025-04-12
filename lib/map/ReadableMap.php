@@ -37,9 +37,9 @@ namespace lib\map {
         }
 
         /**
-         * Check if all carts mentioned exist in the current session object
-         * @param callable $callback List of cart names
-         * @return bool Returns true if all carts exists, false otherwise.
+         * Check if all items mentioned exist in the current iterable object
+         * @param callable $callback List of item names
+         * @return bool Returns true if all items exists, false otherwise.
          */
         public function existsWhere(callable $callback): bool
         {
@@ -241,7 +241,7 @@ namespace lib\map {
          * Apply a callback function for each value of a collection i.e array.
          * @param callable $callback A callback function that receives an item name
          * and value as first and second parameters.
-         * @return bool
+         * @return self
          */
         public function each(callable $callback): self
         {

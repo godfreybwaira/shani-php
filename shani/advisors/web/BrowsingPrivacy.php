@@ -33,6 +33,11 @@ namespace shani\advisors\web {
          * URL without the path on cross-origin requests
          */
         case NONE = 'strict-origin-when-cross-origin';
+
+        /**
+         * Disable sending Referrer-Policy header (Not recommended for browser apps)
+         */
+        case DISABLED = '';
     }
 
 }
