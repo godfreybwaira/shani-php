@@ -43,18 +43,13 @@ namespace lib\http {
         public readonly string $ip;
 
         /**
-         * Raw request body
-         * @var string|null
-         */
-        public readonly ?string $raw;
-
-        /**
          * Check whether the request comes from local machine
          * @var string
          */
-        public readonly string $localhost;
-        public readonly array $files;
+        private ?string $raw;
         private RequestRoute $route;
+        public readonly array $files;
+        public readonly string $localhost;
         private ?array $acceptedType = null;
         public readonly ReadableMap $cookie, $body, $query;
 
@@ -76,6 +71,21 @@ namespace lib\http {
             $this->time = $time;
             $this->uri = $uri;
             $this->ip = $ip;
+        }
+
+        public function withRawBody(string $body): self
+        {
+            $this->raw = $body;
+            return $this;
+        }
+
+        /**
+         * Raw request body
+         * @return string|null Raw input data or null
+         */
+        public function raw(): ?string
+        {
+            return $this->raw;
         }
 
         /**
@@ -133,13 +143,6 @@ namespace lib\http {
             return false;
         }
 
-        public function withUri(URI $uri): self
-        {
-            $copy = clone $this;
-            $copy->uri = $uri;
-            return $copy;
-        }
-
         /**
          * Get uploaded file by name and optional file index
          * @param string $name Name value as given in upload form
@@ -163,20 +166,6 @@ namespace lib\http {
         public function params(int $index): ?string
         {
             return $this->route->params[$index] ?? null;
-        }
-
-        public function withFile(string $name, File $file): self
-        {
-            $copy = clone $this;
-            $copy->files[$name] = $file;
-            return $copy;
-        }
-
-        public function withCookies(HttpCookie $cookie): self
-        {
-            $copy = clone $this;
-            $copy->cookie->add($cookie->name(), $cookie);
-            return $copy;
         }
     }
 

@@ -17,20 +17,23 @@ namespace shani\contracts {
         /**
          * Send output to a client application
          * @param ResponseEntity $res Response object
-         * @param bool $sendOnlyHeaders When true, only HTTP headers will be send
-         * otherwise response body also will be sent
          * @return self
          */
-        public function send(ResponseEntity &$res, bool $sendOnlyHeaders = false): self;
+        public function send(ResponseEntity &$res): self;
+
+        /**
+         * Send HTTP response headers to client application
+         * @param ResponseEntity $res Response object
+         * @return self
+         */
+        public function sendHeaders(ResponseEntity &$res): self;
 
         /**
          * Send output to a client application and close connection
          * @param ResponseEntity $res Response object
-         * @param bool $sendOnlyHeaders When true, only HTTP headers will be send
-         * otherwise response body also will be sent
          * @return self
          */
-        public function close(ResponseEntity &$res, bool $sendOnlyHeaders = false): self;
+        public function close(ResponseEntity &$res): self;
 
         /**
          * Send a file in a small chunks to a client application. This is useful

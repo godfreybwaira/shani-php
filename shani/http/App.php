@@ -81,7 +81,6 @@ namespace shani\http {
                 ]);
                 $this->vhost = ServerConfig::host($this->request->uri->hostname);
                 $this->config = new $this->vhost->configFile($this);
-                $this->runApp();
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
             }
@@ -91,35 +90,42 @@ namespace shani\http {
          * Start executing user application
          * @return void
          */
-        private function runApp(): void
+        public function runApp(): void
         {
-            $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
-            if (!$this->vhost->running) {
-                throw CustomException::offline($this);
-            }
-            if (!LocalStorage::tryServe($this)) {
+            try {
+                $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
+                if (!$this->vhost->running) {
+                    throw CustomException::offline($this);
+                }
+                if (LocalStorage::tryServe($this)) {
+                    return;
+                }
                 if ($this->request->uri->path === '/') {
                     $this->request->changeRoute($this->config->home());
                 }
                 $middleware = new Middleware($this);
                 $securityAdvisor = $this->config->middleware($middleware);
                 $middleware->runWith($securityAdvisor);
+            } catch (\Throwable $ex) {
+                $this->handleException($ex);
             }
         }
 
         /**
          * Send content to a client application
-         * @param bool $useBuffer Set output buffer on so that output can be sent
+         * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output will be sent afterward.
          * @return void
          */
-        public function send(bool $useBuffer = false): void
+        public function send(?bool $useBuffer = null): void
         {
+            $scheme = $this->request->uri->scheme;
+            $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
             if ($this->request->method === 'head') {
                 $this->response->setStatus(HttpStatus::NO_CONTENT);
-                $this->writer->send($this->response, true);
-            } else if ($useBuffer) {
+                $this->writer->sendHeaders($this->response);
+            } else if ($buffer) {
                 $this->writer->send($this->response);
             } else {
                 $this->writer->close($this->response);
@@ -298,12 +304,12 @@ namespace shani\http {
         /**
          * Render HTML document to user agent and close the HTTP connection.
          * @param \JsonSerializable $dto Data to send with the response or to pass to a view file
-         * @param bool $useBuffer Set output buffer on so that output can be sent
+         * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable $dto = null, bool $useBuffer = false): void
+        public function render(\JsonSerializable $dto = null, ?bool $useBuffer = null): void
         {
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {

@@ -179,12 +179,11 @@ namespace lib {
 
         /**
          * Check if request URI was made through secure connection
-         * @param type $scheme URI scheme
          * @return bool True on success, false otherwise
          */
-        public function secure($scheme = 'https'): bool
+        public function secure(): bool
         {
-            return $this->scheme === $scheme;
+            return $this->scheme === 'https' || $this->scheme === 'wss';
         }
     }
 

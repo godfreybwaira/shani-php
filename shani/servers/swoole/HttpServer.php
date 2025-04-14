@@ -19,6 +19,7 @@ namespace shani\servers\swoole {
     use lib\MediaType;
     use lib\RequestEntityBuilder;
     use lib\URI;
+    use shani\contracts\ResponseWriter;
     use shani\core\Definitions;
     use shani\http\App;
     use shani\ServerConfig;
@@ -65,7 +66,7 @@ namespace shani\servers\swoole {
             return new URI($path);
         }
 
-        private static function handleHTTP(string $scheme, Request &$req, Response &$res)
+        private static function handleHTTP(string $scheme, Request &$req, ResponseWriter $writer): App
         {
             $uri = self::makeURI($scheme, $req->header['host'], $req->server);
             $request = (new RequestEntityBuilder())
@@ -82,7 +83,7 @@ namespace shani\servers\swoole {
                     ->uri($uri)
                     ->build();
             $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
-            new App($response, new SwooleResponseWriter($res));
+            return new App($response, $writer);
         }
 
         private static function getBody(Request &$req): ?array
@@ -136,21 +137,27 @@ namespace shani\servers\swoole {
             self::checkFrameworkRequirements();
             $cnf = ServerConfig::getConfig();
             $server = self::configure($cnf);
+            $clients = [];
             $server->on('start', function () {
                 echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
             });
             $server->on('request', function (Request $req, Response $res) use (&$cnf) {
                 $scheme = $cnf->portHttp === $req->server['server_port'] ? 'http' : 'https';
-                self::handleHTTP($scheme, $req, $res);
+                $app = self::handleHTTP($scheme, $req, new SwooleHttpResponseWriter($res));
+                $app->runApp();
             });
-            $server->on('open', function (WSocket $server, Request $req) {
-
+            $server->on('open', function (WSocket $server, Request $req) use (&$clients, &$cnf) {
+                $scheme = $cnf->portHttp === $req->server['server_port'] ? 'ws' : 'wss';
+                $app = self::handleHTTP($scheme, $req, new SwooleWebSocketResponseWriter($server, $req->fd));
+                $clients[$req->fd] = $app;
             });
-            $server->on('message', function (WSocket $server, Frame $frame) {
-
+            $server->on('message', function (WSocket $server, Frame $frame) use (&$clients) {
+                $app = $clients[$frame->fd] ?? null;
+                $app?->request->withRawBody($frame->data);
+                $app?->runApp();
             });
-            $server->on('close', function (WSocket $server, int $fd) {
-
+            $server->on('close', function (WSocket $server, int $fd) use (&$clients) {
+                unset($clients[$fd]);
             });
             $server->on('task', fn() => null);
             $server->start();

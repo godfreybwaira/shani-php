@@ -7,8 +7,11 @@
  * Created on: Mar 5, 2024 at 10:22:08 AM
  */
 
-namespace lib {
+namespace lib\tasks {
 
+    use lib\Duration;
+    use lib\Event;
+    use shani\contracts\Concurrency;
 
     final class Task
     {
@@ -18,14 +21,9 @@ namespace lib {
         private bool $paused = false, $cancelled = false;
         private int $frequency = 1, $steps = 1, $repeat = 0;
 
-        /**
-         * Supported task events
-         */
-        public const EVENTS = ['start', 'running', 'pause', 'resume', 'error', 'complete', 'cancel', 'repeat'];
-
         public function __construct()
         {
-            $this->listener = new Event(self::EVENTS);
+            $this->listener = new Event(array_map(fn(TaskEvent $e) => $e->name, TaskEvent::cases()));
         }
 
         /**
@@ -35,18 +33,18 @@ namespace lib {
          */
         public function startAt(\DateTimeInterface $duration): self
         {
-            return $this->startAfter($duration->getTimestamp() - time());
+            return $this->startAfter($duration);
         }
 
         /**
          * Set handler for given task event
-         * @param string $event Event name. Name must be from a list of supported events.
+         * @param TaskEvent $event Event name.
          * @param callable $callback Function to execute when event is triggered.
          * @return self
          */
-        public function on(string $event, callable $callback): self
+        public function on(TaskEvent $event, callable $callback): self
         {
-            $this->listener->on($event, $callback);
+            $this->listener->on($event->name, $callback);
             return $this;
         }
 
@@ -56,26 +54,27 @@ namespace lib {
          */
         public function startNow(): self
         {
-            return $this->startAfter(0);
+            return $this->startAfter(Duration::of(0, Duration::SECONDS));
         }
 
         /**
          * Execute a task after a given seconds from now
-         * @param int $seconds
+         * @param \DateTimeInterface $duration
          * @return self
          */
-        public function startAfter(int $seconds): self
+        public function startAfter(\DateTimeInterface $duration): self
         {
+            $seconds = $duration->getTimestamp() - time();
             Concurrency::async(function ()use (&$seconds) {
-                $this->listener->trigger('start');
+                $this->listener->trigger(TaskEvent::START->name);
                 $counter = 0;
                 do {
                     try {
                         Concurrency::sleep($seconds);
                         $this->execTask($counter)->handleRepetition($counter);
-                    } catch (\ErrorException $exc) {
+                    } catch (\Exception $exc) {
                         $this->exception = $exc;
-                        $this->listener->trigger('error');
+                        $this->listener->trigger(TaskEvent::ERROR->name);
                     }
                 } while (!$this->cancelled && ($this->repeated() || $counter < $this->frequency));
             });
@@ -90,7 +89,7 @@ namespace lib {
                     Concurrency::sleep(floor($this->steps - $diff));
                 }
                 $start = time();
-                $this->listener->trigger('running');
+                $this->listener->trigger(TaskEvent::RUNNING->name);
                 $diff = time() - $start;
             }
             return $this;
@@ -103,22 +102,22 @@ namespace lib {
                     if ($this->repeat > 0) {
                         $this->repeat--;
                     }
-                    $this->listener->trigger('repeat');
+                    $this->listener->trigger(TaskEvent::REPEAT->name);
                     $counter = 0;
                 } else {
-                    $this->listener->trigger('complete');
+                    $this->listener->trigger(TaskEvent::COMPLETE->name);
                 }
             }
         }
 
         /**
          * Set number of steps to pause execution of a task before the next execution.
-         * @param int $seconds Number of seconds to pause.
+         * @param DateTimeInterface $duration Duration to pause the execution of a task.
          * @return self
          */
-        public function steps(int $seconds): self
+        public function steps(\DateTimeInterface $duration): self
         {
-            $this->steps = $seconds;
+            $this->steps = $duration->getTimestamp() - time();
             return $this;
         }
 
@@ -152,7 +151,7 @@ namespace lib {
         public function pause(): self
         {
             $this->paused = true;
-            return $this->listener->trigger('pause');
+            return $this->listener->trigger(TaskEvent::PAUSE->name);
         }
 
         /**
@@ -162,7 +161,7 @@ namespace lib {
         public function resume(): self
         {
             $this->paused = false;
-            return $this->listener->trigger('resume');
+            return $this->listener->trigger(TaskEvent::RESUME->name);
         }
 
         /**
@@ -183,7 +182,7 @@ namespace lib {
         public function cancel(): void
         {
             $this->cancelled = true;
-            $this->listener->trigger('cancel');
+            $this->listener->trigger(TaskEvent::CANCEL->name);
         }
 
         /**
