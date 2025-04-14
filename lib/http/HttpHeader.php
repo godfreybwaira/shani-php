@@ -185,19 +185,6 @@ namespace lib\http {
             return $this;
         }
 
-        /**
-         * Add a key-value pairs of HTTP headers
-         * @param array $headers
-         * @return self
-         */
-        public function addAll(array $headers): self
-        {
-            foreach ($headers as $name => $value) {
-                $this->add($name, $value);
-            }
-            return $this;
-        }
-
         public static function createName($headerName): string
         {
             return ucwords(strtolower($headerName), '-');

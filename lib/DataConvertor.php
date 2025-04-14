@@ -107,7 +107,7 @@ namespace lib {
                 self::TYPE_JSON => json_decode($data, true),
                 self::TYPE_XML => self::xml2array($data),
                 self::TYPE_CSV => str_getcsv($data),
-                self::TYPE_URL_ENCODE => self::toUrlEncode($data),
+                self::TYPE_URL_ENCODE => self::fromUrlEncode($data),
                 self::TYPE_YAML, self::TYPE_YML => self::yaml2array($data),
                 default => null
             };
@@ -173,13 +173,13 @@ namespace lib {
                 self::TYPE_JSON => json_encode($data),
                 self::TYPE_XML => self::array2xml($data),
                 self::TYPE_CSV => self::array2csv($data),
-                self::TYPE_URL_ENCODE => self::toUrlEncode($data),
+                self::TYPE_URL_ENCODE => http_build_query($data),
                 self::TYPE_YAML, self::TYPE_YML => yaml_emit($data),
                 default => serialize($data)
             };
         }
 
-        private static function toUrlEncode(string $data): ?string
+        private static function fromUrlEncode(string $data): ?array
         {
             $rawData = null;
             parse_str($data, $rawData);

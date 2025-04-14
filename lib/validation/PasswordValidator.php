@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Password
+ * Description of PasswordValidator
  * @author coder
  *
  * Created on: Jan 28, 2021 at 2:20:20 PM
@@ -19,6 +19,11 @@ namespace lib\validation {
             $this->password = $password;
         }
 
+        /**
+         * Validate a password using Password complexity provided.
+         * @param PasswordComplexity $complexity Password Complexity Object
+         * @return bool True if password validation passes, false otherwise.
+         */
         public function validate(PasswordComplexity $complexity): bool
         {
             $expression = null;

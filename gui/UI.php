@@ -9,6 +9,7 @@
 
 namespace gui {
 
+    use lib\map\ReadableMap;
     use shani\core\Definitions;
     use shani\http\App;
     use shani\persistence\LocalStorage;
@@ -19,11 +20,12 @@ namespace gui {
         private readonly App $app;
         private array $details = [];
         private ?string $title, $icon;
-        private ?array $scripts, $styles, $data, $attributes;
+        private array $scripts, $styles;
+        private ?ReadableMap $data = null;
 
         public function __construct(App &$app)
         {
-            $this->scripts = $this->styles = $this->data = $this->attributes = [];
+            $this->scripts = $this->styles = [];
             $this->title = $this->icon = null;
             $this->app = $app;
         }
@@ -116,7 +118,7 @@ namespace gui {
          */
         public function render(?array $data): void
         {
-            $this->data = $data ?? [];
+            $this->data = new ReadableMap($data ?? []);
             if ($this->app->config->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
@@ -125,26 +127,12 @@ namespace gui {
         }
 
         /**
-         * Get immutable data that will be available to all views.
-         * @param string $key Key
+         * Get immutable data object.
+         * @return ReadableMap ReadableMap object
          */
-        public function data(string $key = null)
+        public function data(): ReadableMap
         {
-            return $key === null ? $this->data : $this->data[$key] ?? null;
-        }
-
-        /**
-         * Set or get mutable data. Use this function to pass data from one view to another
-         * @param string $key Attribute name
-         * @param type $value Attribute value
-         * @return type On get, returns attribute/data specified by $name
-         */
-        public function attrib(string $key, $value = null)
-        {
-            if ($value === null) {
-                return $this->attributes[$key] ?? null;
-            }
-            $this->attributes[$key] = $value;
+            return $this->data;
         }
 
         /**
@@ -185,12 +173,12 @@ namespace gui {
         /**
          * Import a template file. The template imported also has access to $app object
          * @param string $template Path to template file
-         * @param bool $allow If true then import will be done, false otherwise.
+         * @param bool $success If true then import will be done, false otherwise.
          * @return void
          */
-        public function import(string $template, bool $allow = true): self
+        public function import(string $template, bool $success = true): self
         {
-            if ($allow) {
+            if ($success) {
                 self::load($this->app, $template);
             }
             return $this;
@@ -201,7 +189,7 @@ namespace gui {
             require $loadedFile;
         }
 
-        private static function loadFile($file): ?string
+        private static function loadFile(string $file): ?string
         {
             if (is_file($file . '.php')) {
                 ob_start();

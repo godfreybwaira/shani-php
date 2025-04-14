@@ -115,8 +115,8 @@ namespace shani\advisors {
         {
             $policy = $this->app->config->csp();
             if ($policy !== ContentSecurityPolicy::DISABLE) {
-                $this->app->response->header()->addIfAbsent(HttpHeader::X_FRAME_OPTIONS, 'SAMEORIGIN');
-                $this->app->response->header()->addIfAbsent(HttpHeader::CONTENT_SECURITY_POLICY, $policy);
+                $this->app->response->header()->addIfAbsent(HttpHeader::X_FRAME_OPTIONS, 'sameorigin');
+                $this->app->response->header()->addIfAbsent(HttpHeader::CONTENT_SECURITY_POLICY, $policy->value);
                 if ($this->app->request->uri->secure()) {
                     $duration = Duration::of(2, Duration::YEARS)->getTimestamp() - time();
                     $hsts = 'max-age=' . $duration . ';includeSubDomains;preload';

@@ -17,12 +17,14 @@ namespace shani\http {
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
+    use lib\map\IterableData;
     use lib\MediaType;
     use shani\advisors\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
     use shani\core\Definitions;
     use shani\core\Framework;
+    use shani\core\log\Logger;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
     use shani\exceptions\CustomException;
@@ -30,17 +32,17 @@ namespace shani\http {
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
     use shani\ServerConfig;
-    use shani\core\log\Logger;
 
     final class App
     {
 
-        private array $storage = [];
-        private SessionManager $session;
-        private readonly ResponseWriter $writer;
         private ?UI $ui = null;
         private ?array $dict = null;
+        private array $storage = [];
         private ?Logger $logger = null;
+        private SessionManager $session;
+        private readonly ResponseWriter $writer;
+        private ?IterableData $appData = null;
         private ?string $lang = null, $platform = null;
 
         /**
@@ -295,7 +297,7 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable $dto Data object that will be passed to a view file
+         * @param \JsonSerializable $dto Data to send with the response or to pass to a view file
          * @param bool $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
@@ -303,20 +305,19 @@ namespace shani\http {
          */
         public function render(\JsonSerializable $dto = null, bool $useBuffer = false): void
         {
-            $customData = $dto ?? new HttpMessageDto($this->response->status());
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($customData->jsonSerialize());
+                $this->ui()->render($dto?->jsonSerialize());
                 $this->sendHtml(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($customData->jsonSerialize());
+                $this->ui()->render($dto?->jsonSerialize());
                 $this->sendSse(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($customData->jsonSerialize(), $subtype);
+                $this->sendJsonp($dto?->jsonSerialize(), $subtype);
             } else {
-                $this->response->setBody(DataConvertor::convertTo($customData->jsonSerialize(), $subtype), $subtype);
+                $this->response->setBody(DataConvertor::convertTo($dto?->jsonSerialize(), $subtype), $subtype);
             }
             $this->send($useBuffer);
         }
@@ -346,21 +347,19 @@ namespace shani\http {
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param \JsonSerializable $dto Data to pass to dictionary file.
-         * @return array Associative array where key is the word/sentence unique
-         * code and the value is the actual word/sentence.
+         * @return array A key-value pair of a keyword and a sentence/word.
          */
-        public function dictionary(\JsonSerializable $dto = null): array
+        public function dictionary(): array
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
                 $file = $this->module($this->config->languageDir() . $route->controller . $route->action . '/' . $this->language() . '.php');
-                $this->dict = self::getFile($file, $dto);
+                $this->dict = self::getFile($file, $this);
             }
             return $this->dict;
         }
 
-        private static function getFile(string $loadedFile, \JsonSerializable $dto = null): array
+        private static function getFile(string $loadedFile, App &$app): array
         {
             return require $loadedFile;
         }
@@ -493,6 +492,16 @@ namespace shani\http {
                 //log error
             }
             $this->send();
+        }
+
+        /**
+         * Create application temporary data storage. This function is ideal for
+         * data exchange within application (e.g among views)
+         * @return IterableData Iterable object
+         */
+        public function attributes(): IterableData
+        {
+            return $this->appData ??= new IterableData();
         }
     }
 

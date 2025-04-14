@@ -53,7 +53,7 @@ namespace shani\http {
         {
             $advisor->validateSession()->preflightRequest();
             $this->app->on('web', function () use (&$advisor) {
-                $advisor->addCSPHeaders()->resourceAccessPolicy()->csrfTest();
+                $advisor->cspHeaders()->resourceAccessPolicy()->csrfTest();
             });
             $advisor->authorized()->passedRequestMethodCheck();
             if ($this->listener->listening('before')) {

@@ -25,6 +25,19 @@ namespace lib\map {
         }
 
         /**
+         * Add a key-value pairs of items
+         * @param array $items Items to add
+         * @return self
+         */
+        public function addAll(array $items): self
+        {
+            foreach ($items as $name => $value) {
+                $this->add($name, $value);
+            }
+            return $this;
+        }
+
+        /**
          * Add an item to an iterable object if it does not exists
          * @param stringInt $key Item name
          * @param mixed $value Item value

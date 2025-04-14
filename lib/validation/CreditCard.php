@@ -12,8 +12,6 @@ namespace lib\validation {
     final class CreditCard
     {
 
-        private const ERROR = 'is not valid credit card number';
-
         private static $cards = [
             'American Express' => [
                 'name' => 'amex',
@@ -143,7 +141,7 @@ namespace lib\validation {
             ],
         ];
 
-        public static function check(string $ccNumber, string $type): ?string
+        public static function check(string $ccNumber, string $type): bool
         {
             $type = strtolower($type);
             $info = null;
@@ -158,7 +156,7 @@ namespace lib\validation {
 
             // If empty, it's not a card type we recognize, or invalid type.
             if (empty($info)) {
-                return self::ERROR;
+                return false;
             }
 
             // Remove any spaces and dashes
@@ -167,7 +165,7 @@ namespace lib\validation {
             // Non-numeric values cannot be a number
             // Make sure it's a valid length for this card
             if (!is_numeric($ccNumber) || !in_array(strlen($ccNumber), $info['length'])) {
-                return self::ERROR;
+                return false;
             }
 
             // Make sure it has a valid prefix
@@ -180,13 +178,13 @@ namespace lib\validation {
             }
 
             if ($validPrefix === false) {
-                return self::ERROR;
+                return false;
             }
 
             if ($info['checkdigit'] === true) {
-                return self::isValidLuhn($ccNumber) ? null : self::ERROR;
+                return self::isValidLuhn($ccNumber);
             }
-            return null;
+            return true;
         }
 
         private static function isValidLuhn(string $number = null): bool

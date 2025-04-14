@@ -28,7 +28,6 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
          */
         public function world()
         {
-            throw new \Exception('Some exception thrown');
             //using global style
 //            $this->app->ui()->style('/css/styles.css');
 //            passing data to current view (greetings/presentation/views/hello/world.php)
