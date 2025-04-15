@@ -20,6 +20,7 @@ namespace shani\http {
     use lib\map\IterableData;
     use lib\MediaType;
     use shani\advisors\Configuration;
+    use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
     use shani\core\Definitions;
@@ -104,8 +105,8 @@ namespace shani\http {
                     $this->request->changeRoute($this->config->home());
                 }
                 $middleware = new Middleware($this);
-                $securityAdvisor = $this->config->middleware($middleware);
-                $middleware->runWith($securityAdvisor);
+                $this->config->registerMiddleware($middleware);
+                $middleware->runWith(new SecurityMiddleware($this));
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
             }
@@ -222,24 +223,24 @@ namespace shani\http {
          * for API application, but can define and handle different application context
          * depending on type of application needs. Client application can supply
          * this context via accept-version header.
-         * @param string $context Application execution context.
+         * @param string $version Application execution context.
          * @param callable $cb A callback to execute that accept application object as an argument.
          * @return self
          */
-        public function on(string $context, callable $cb): self
+        public function on(string $version, callable $cb): self
         {
-            if ($this->platform() === $context) {
+            if ($this->platform() === $version) {
                 $cb($this);
             }
             return $this;
         }
 
         /**
-         * Get HTTP preferred request context (platform) set by client application.
-         * This value is set via HTTP accept-version header and the accepted values are
-         * 'web' and 'api'. User can also set application version after request context,
-         * separated by semicolon. If none given, the 'web' context is assumed.
-         * @example accept-version=web
+         * Get HTTP application platform set by client application.
+         * This value is set via HTTP accept-version header. Currently, accepted
+         * values are 'web' for web application and 'api' for api application.
+         * If none given, 'web' is assumed.
+         * @example accept-version:web
          * @return string|null
          */
         public function platform(): ?string

@@ -155,12 +155,12 @@ namespace shani\advisors {
         }
 
         /**
-         * Execute user defined middlewares. This function provide access for user
+         * Register user defined middlewares. This function provide access for user
          * to register and execute middlewares
          * @param Middleware $mw Middleware object
-         * @return SecurityMiddleware
+         * @return void
          */
-        public abstract function middleware(Middleware &$mw): SecurityMiddleware;
+        public abstract function registerMiddleware(Middleware &$mw): void;
 
         /**
          * Get or set application modules directory

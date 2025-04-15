@@ -18,12 +18,12 @@ namespace shani\advisors {
     use shani\exceptions\CustomException;
     use shani\http\App;
 
-    abstract class SecurityMiddleware
+    final class SecurityMiddleware
     {
 
-        protected readonly App $app;
+        private readonly App $app;
 
-        protected function __construct(App &$app)
+        public function __construct(App &$app)
         {
             $this->app = $app;
             $policy = $app->config->browsingPrivacy()->value;

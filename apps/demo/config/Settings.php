@@ -9,9 +9,8 @@
 
 namespace apps\demo\config {
 
-    use apps\demo\middleware\Register;
+    use apps\demo\middleware\Test;
     use shani\advisors\Configuration;
-    use shani\advisors\SecurityMiddleware;
     use shani\core\Definitions;
     use shani\http\App;
     use shani\http\Middleware;
@@ -44,9 +43,10 @@ namespace apps\demo\config {
             return 'get,post,head';
         }
 
-        public function middleware(Middleware &$mw): SecurityMiddleware
+        public function registerMiddleware(Middleware &$mw): void
         {
-            return new Register($this->app, $mw);
+            $mw->on('before', fn() => Test::m1($this->app));
+            $mw->on('before', fn() => Test::m2($this->app));
         }
 
         public function clientPermissions(): ?string
