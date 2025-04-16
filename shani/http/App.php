@@ -285,12 +285,12 @@ namespace shani\http {
 
         /**
          * Get storage object representing application storage directory
-         * @param string $media Storage media. The default storage is 'local'
+         * @param string $name Storage name. The default storage is 'local'
          * @return StorageMedia
          */
-        public function storage(string $media = 'local'): StorageMedia
+        public function storage(string $name = 'local'): StorageMedia
         {
-            return ($this->storage[$media] ??= $this->config->getStorageMedia($media));
+            return ($this->storage[$name] ??= $this->config->getStorageMedia($name));
         }
 
         /**

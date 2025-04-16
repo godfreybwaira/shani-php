@@ -30,7 +30,7 @@ namespace shani\contracts {
          * @param string $bucket A destination directory
          * @return string|null Path to a File, null otherwise
          */
-        public function saveProtect(File $file, string $bucket = '/'): ?string;
+        public function save2protect(File $file, string $bucket = '/'): ?string;
 
         /**
          * Save a file to a protected directory. This resource is only accessible
@@ -40,7 +40,7 @@ namespace shani\contracts {
          * @return string Path to a File, null otherwise
          * @see \shani\advisors\Configuration::clientGroupId()
          */
-        public function savePrivate(File $file, string $bucket = '/'): ?string;
+        public function save2private(File $file, string $bucket = '/'): ?string;
 
         /**
          * Get file URL
@@ -78,7 +78,7 @@ namespace shani\contracts {
          * @param string $filepath Source file to move
          * @return string|null A path to a new location, or null otherwise
          */
-        public function moveProtect(string $filepath): ?string;
+        public function move2protect(string $filepath): ?string;
 
         /**
          * Move a file to a private directory. If the file is already in private
@@ -86,7 +86,7 @@ namespace shani\contracts {
          * @param string $filepath Source file to move
          * @return string|null A path to a new location, or null otherwise
          */
-        public function movePrivate(string $filepath): ?string;
+        public function move2private(string $filepath): ?string;
 
         /**
          * Get a full path to a storage destination

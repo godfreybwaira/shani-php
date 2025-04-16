@@ -380,7 +380,7 @@ namespace shani\advisors {
         /**
          * Get file storage media where uploaded files will be saved and retrieved.
          * To be able to use remote storage.
-         * @param string $media Storage media
+         * @param string $media Storage name
          * @return StorageMedia
          */
         public function getStorageMedia(string $media): StorageMedia

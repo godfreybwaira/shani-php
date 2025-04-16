@@ -110,13 +110,13 @@ namespace shani\persistence {
             return self::persist($file, $this->storage, $path);
         }
 
-        public function saveProtect(File $file, string $bucket = '/'): ?string
+        public function save2protect(File $file, string $bucket = '/'): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             return self::persist($file, $this->storage, $path);
         }
 
-        public function savePrivate(File $file, string $bucket = '/'): ?string
+        public function save2private(File $file, string $bucket = '/'): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             $groupId = $this->app->config->clientGroupId();
@@ -181,13 +181,13 @@ namespace shani\persistence {
             return $this;
         }
 
-        public function moveProtect(string $filepath): ?string
+        public function move2protect(string $filepath): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
             return $this->moveFile($filepath, $bucket);
         }
 
-        public function movePrivate(string $filepath): ?string
+        public function move2private(string $filepath): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
             $groupId = $this->app->config->clientGroupId();
