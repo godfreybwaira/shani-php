@@ -108,94 +108,6 @@ namespace gui\v1 {
             return implode(' ', array_keys($this->classList));
         }
 
-        /**
-         * Check if a given attribute exists in a component
-         * @param string $name Attribute to check
-         * @return bool True on success, false otherwise
-         */
-        public function hasAttribute(string $name): bool
-        {
-            return in_array($name, $this->attributes);
-        }
-
-        /**
-         * Remove attribute(s) from a component
-         * @param string $names Attribute(s) to remove
-         * @return self
-         */
-        public function removeAttribute(string ...$names): self
-        {
-            foreach ($names as $value) {
-                if (isset($this->attributes[$value])) {
-                    unset($this->attributes[$value]);
-                }
-            }
-            return $this;
-        }
-
-        /**
-         * Set HTML attribute to a component
-         * @param string $name Attribute name
-         * @param type $value Attribute value. If not set the attribute value will
-         * follow normal HTML rules for setting attribute
-         * @return self
-         * @see Component::copyAttributes()
-         */
-        public function setAttribute(string $name, $value = null): self
-        {
-            $this->attributes[$name] = $value;
-            return $this;
-        }
-
-        /**
-         * Copy attributes from source component and set to this component.
-         * @param Component $source Source component to copy from
-         * @param bool $skipDuplicates If set to true, it will skip all duplicate(s),
-         * otherwise it will override current existing attribute(s)
-         * @return self
-         * @see Component::setAttribute()
-         */
-        public function copyAttributes(Component &$source, bool $skipDuplicates = true): self
-        {
-            $attrs = $source->getAttributes();
-            foreach ($attrs as $name => $value) {
-                if (!$skipDuplicates || !$this->hasAttribute($name)) {
-                    $this->setAttribute($name, $value);
-                }
-            }
-            return $this;
-        }
-
-        /**
-         * Get single attribute value
-         * @param string $name Attribute name
-         * @return type Attribute value
-         * @see Component::getAttributes()
-         */
-        public function getAttribute(string $name)
-        {
-            return $this->attributes[$name] ?? null;
-        }
-
-        /**
-         * Get all attributes
-         * @return array Component attribute(s)
-         * @see Component::getAttribute()
-         */
-        public function getAttributes(): array
-        {
-            return $this->attributes;
-        }
-
-        private function serializeChildren(): ?string
-        {
-            $result = null;
-            foreach ($this->children as $child) {
-                $result .= $child->build();
-            }
-            return $result;
-        }
-
         private function applyStyles(array &$styles, array $sourceStyles): self
         {
             foreach ($styles as $key => $value) {
@@ -218,15 +130,6 @@ namespace gui\v1 {
                 return null;
             }
             return ' class="' . trim(implode(' ', array_keys($this->classList))) . '"';
-        }
-
-        private function serializeAttributes(): ?string
-        {
-            $result = null;
-            foreach ($this->attributes as $name => $value) {
-                $result .= ' ' . $name . ($value !== null ? '="' . $value . '"' : null);
-            }
-            return $result;
         }
 
         /**
@@ -342,17 +245,6 @@ namespace gui\v1 {
         private function removeExternalStyle(string $name): self
         {
             unset($this->externalStyles[$name]);
-            return $this;
-        }
-
-        /**
-         * Set content as HTML markups or texts
-         * @param string|null $content HTML markups or text content
-         * @return self
-         */
-        public function setContent(?string $content): self
-        {
-            $this->content = $content;
             return $this;
         }
 
@@ -535,55 +427,6 @@ namespace gui\v1 {
         }
 
         /**
-         * Toggle component attribute
-         * @param string $name Attribute name
-         * @param type $value Attribute value
-         * @return self
-         * @see Component::setAttribute()
-         */
-        public function toggleAttr(string $name, $value = null): self
-        {
-            if ($this->hasAttribute($name)) {
-                return $this->removeAttribute($name);
-            }
-            return $this->setAttribute($name, $value);
-        }
-
-        /**
-         * Get all children components
-         * @return array
-         */
-        public function getChildren(): array
-        {
-            return $this->children;
-        }
-
-        /**
-         * Check if a component has one or more children. It does not include
-         * text content or HTML markup
-         * @return bool
-         */
-        public function hasChildren(): bool
-        {
-            return !empty($this->children);
-        }
-
-        public function hasContent(): bool
-        {
-            return !empty($this->children);
-        }
-
-        /**
-         * Remove all child elements of this component.
-         * @return self
-         */
-        public function removeChildren(): self
-        {
-            $this->children = [];
-            return $this;
-        }
-
-        /**
          * Get child component by index
          * @param int $index Index of a child component
          * @return Component|null
@@ -594,22 +437,6 @@ namespace gui\v1 {
                 return $this->children[$index] ?? null;
             }
             return $this->children[count($this->children) + $index] ?? null;
-        }
-
-        /**
-         * Remove child(ren) from Component
-         * @param int $index Child(ren) index number to remove
-         * @return self
-         * @see Component::replaceChild()
-         */
-        public function removeChild(int ...$index): self
-        {
-            foreach ($index as $value) {
-                if (isset($this->children[$value])) {
-                    unset($this->children[$value]);
-                }
-            }
-            return $this;
         }
 
         /**
@@ -635,37 +462,6 @@ namespace gui\v1 {
         public function setParent(Component &$parent): self
         {
             $parent->addExternalStyle('relative_position')->appendChildren($this);
-            return $this;
-        }
-
-        /**
-         * Add child(ren) component(s), removing all existing children
-         * @param Component|null $children Component(s) to add as child(ren)
-         * @return self
-         * @see Component::appendChildren()
-         */
-        public function setChildren(?Component ...$children): self
-        {
-            $this->children = [];
-            if ($children !== null) {
-                return $this->appendChildren(...$children);
-            }
-            return $this;
-        }
-
-        /**
-         * Add child(ren) component(s).
-         * @param Component|null $children Component(s) to add as child(ren)
-         * @return self
-         * @see Component::setChildren()
-         */
-        public function appendChildren(?Component ...$children): self
-        {
-            foreach ($children as $child) {
-                if ($child !== null) {
-                    $this->children[] = $child;
-                }
-            }
             return $this;
         }
 
@@ -718,15 +514,6 @@ namespace gui\v1 {
                 return $this->addExternalStyle('active');
             }
             return $this->removeExternalStyle('active');
-        }
-
-        /**
-         * Create unique ID
-         * @return string
-         */
-        public static function createId(): string
-        {
-            return 'id' . substr(hrtime(true), 8);
         }
     }
 

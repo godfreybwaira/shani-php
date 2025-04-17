@@ -102,7 +102,7 @@ namespace shani\core\log {
             return $this;
         }
 
-        public function read(): ?ReadableMap
+        public function read(): ReadableMap
         {
             return new ReadableMap($this->stream->fgetcsv("\t"));
         }

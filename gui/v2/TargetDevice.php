@@ -8,7 +8,7 @@
  * Created on: Jul 26, 2024 at 7:00:12 PM
  */
 
-namespace gui\v1 {
+namespace gui\v2 {
 
     enum TargetDevice: int
     {
