@@ -9,8 +9,6 @@
 
 namespace gui\v2\decoration {
 
-    use gui\v2\Component;
-
     abstract class Decorator
     {
 
@@ -20,7 +18,16 @@ namespace gui\v2\decoration {
         public function __construct(string $decorationName)
         {
             $this->className = $decorationName;
-            $this->classId = Component::createId();
+            $this->classId = self::createId();
+        }
+
+        /**
+         * Create unique ID
+         * @return string
+         */
+        private static function createId(string $prefix = 'id'): string
+        {
+            return $prefix . substr(hrtime(true), 8);
         }
 
         /**

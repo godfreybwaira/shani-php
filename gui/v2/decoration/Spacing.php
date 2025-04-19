@@ -27,7 +27,7 @@ namespace gui\v2\decoration {
          * @param float $size
          * @return void
          */
-        public function all(float $size = 1): void
+        public function all(float $size): void
         {
             $this->values = $size . $this->unit->value;
         }
@@ -54,7 +54,7 @@ namespace gui\v2\decoration {
          * @param float $size
          * @return void
          */
-        public function vertical(float $size = 1): void
+        public function vertical(float $size): void
         {
             $pd = $size . $this->unit->value;
             $this->values = '0 ' . $pd . ' 0 ' . $pd . ';';
@@ -65,7 +65,7 @@ namespace gui\v2\decoration {
          * @param float $size
          * @return void
          */
-        public function horizontal(float $size = 1): void
+        public function horizontal(float $size): void
         {
             $pd = $size . $this->unit->value;
             $this->values = $pd . ' 0 ' . $pd . ' 0';

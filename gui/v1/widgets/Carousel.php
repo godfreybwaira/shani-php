@@ -69,7 +69,7 @@ namespace gui\v1\widgets {
             $nav->addStyle(self::CAROUSEL_NAV);
             for ($i = 0; $i < $count; $i++) {
                 $dot = new Component('li');
-                $dot->setAttribute('for', $this->slideIds[$i])->setContent('&nbsp;');
+                $dot->setAttribute('for', $this->slideIds[$i])->setText('&nbsp;');
                 $nav->appendChildren($dot);
             }
             $nextBtn = new ActionButton(ActionButton::TYPE_NEXT);

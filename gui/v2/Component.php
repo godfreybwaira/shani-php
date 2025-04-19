@@ -14,15 +14,16 @@ namespace gui\v2 {
     class Component implements \Stringable
     {
 
+        private static array $styles = [];
         private readonly string $tag;
         private ?string $content = null;
         private ?Component $parent = null;
-        private array $children, $attributes, $classList, $decorations;
+        private array $children, $attributes, $classList;
 
         public function __construct(string $tag = 'div')
         {
             $this->tag = $tag;
-            $this->children = $this->attributes = $this->classList = $this->decorations = [];
+            $this->children = $this->attributes = $this->classList = [];
         }
 
         /**
@@ -33,7 +34,7 @@ namespace gui\v2 {
          */
         public function prependChild(Component ...$children): self
         {
-            $kids = array_map(fn(Component $child) => $child->withParent($this), $children);
+            $kids = array_map(fn(Component &$child) => $child->withParent($this), $children);
             array_unshift($this->children, ...$kids);
             return $this;
         }
@@ -46,7 +47,7 @@ namespace gui\v2 {
          */
         public function appendChild(Component ...$children): self
         {
-            foreach ($children as $child) {
+            foreach ($children as &$child) {
                 $this->children[] = $child->withParent($this);
             }
             return $this;
@@ -72,15 +73,23 @@ namespace gui\v2 {
         }
 
         /**
+         * Get parent of a component. If a component has no parent, null is returned
+         * @return self Parent component
+         */
+        public function getParent(): ?self
+        {
+            return $this->parent;
+        }
+
+        /**
          * Get a copy of this component with a new parent
          * @param Component $parent Parent component
          * @return self
          */
         private function withParent(Component &$parent): self
         {
-            $child = clone $this;
-            $child->parent = $parent;
-            return $child;
+            $this->parent = $parent;
+            return $this;
         }
 
         /**
@@ -163,12 +172,12 @@ namespace gui\v2 {
          * Add one or more children to a Component, removing all existing children
          * @param Component $children Component(s) to add as child(ren)
          * @return self
-         * @see Component::appendChildren()
+         * @see Component::appendChild()
          */
-        public function setChildren(Component ...$children): self
+        public function setChild(Component ...$children): self
         {
             $this->children = [];
-            return $this->appendChildren(...$children);
+            return $this->appendChild(...$children);
         }
 
         /**
@@ -183,6 +192,9 @@ namespace gui\v2 {
 
         private function serializeAttributes(): ?string
         {
+            if (!empty($this->classList)) {
+                $this->setAttribute('class', implode(' ', $this->classList));
+            }
             $result = null;
             foreach ($this->attributes as $name => $value) {
                 $result .= ' ' . $name . ($value !== null ? '="' . $value . '"' : null);
@@ -199,29 +211,17 @@ namespace gui\v2 {
             return $result;
         }
 
-        private function saveDecoration(Decorator &$decorator, string $decoration): self
-        {
-            if ($this->parent !== null) {
-                $this->parent->saveDecoration($decorator);
-            } else {
-                $this->decorations[$decorator->getName()] = $decoration;
-            }
-            return $this;
-        }
-
         /**
-         * Apply decorations (styles) to a Component
-         * @param Decorator $decorator
+         * Add decorations (styles) to a Component
+         * @param Decorator $decorators
          * @return self
          */
-        public function decorate(Decorator $decorator): self
+        public function addDecoration(Decorator ...$decorators): self
         {
-            $decoration = $decorator->getDecoration();
-            if (!empty($decoration)) {
-                $this->saveDecoration($decorator, $decoration);
-                $this->classList[$decorator->getName()] = $decorator->getCss();
-            } else {
-                unset($this->classList[$decorator->getName()]);
+            foreach ($decorators as &$decorator) {
+                $id = $decorator->getName();
+                $this->classList[$id] = $decorator->getCss();
+                self::$styles[$id] = $decorator->getDecoration();
             }
             return $this;
         }
@@ -240,30 +240,43 @@ namespace gui\v2 {
         }
 
         /**
+         * Get component HTML tag
+         * @return string
+         */
+        public function getTag(): string
+        {
+            return $this->tag;
+        }
+
+        /**
          * Set text content, replacing other children but are not removed.
          * @param string|null $content Text content
          * @return self
          */
-        public function setContent(?string $content): self
+        public function setText(?string $content): self
         {
             $this->content = $content;
             return $this;
         }
 
+        private function getStyles(): ?string
+        {
+            $markup = null;
+            if ($this->parent === null && !empty(self::$styles)) {
+                $markup = '<style type="text/css">' . implode('', self::$styles) . '</style>';
+                self::$styles = [];
+            }
+            return $markup;
+        }
+
         /**
-         * Generate HTML markups. This is the final method to be called after
+         * Generate HTML markups. This is the last method to call after
          * creating a Component.
          * @return string HTML string representing a Component
          */
         public function build(): string
         {
-            $markup = null;
-            if (!empty($this->classList)) {
-                $this->setAttribute('class', implode(' ', $this->classList));
-            }
-            if (!empty($this->decorations)) {
-                $markup = '<style type="text/css">' . implode(null, $this->decorations) . '</style>';
-            }
+            $markup = $this->getStyles();
             if (!empty($this->content)) {
                 $markup .= '<' . $this->tag . $this->serializeAttributes() . '>';
                 return $markup . $this->content . '</' . $this->tag . '>';
@@ -279,15 +292,6 @@ namespace gui\v2 {
         public function __toString(): string
         {
             return $this->build();
-        }
-
-        /**
-         * Create unique ID
-         * @return string
-         */
-        public static function createId(string $prefix = 'id'): string
-        {
-            return $prefix . substr(hrtime(true), 8);
         }
     }
 

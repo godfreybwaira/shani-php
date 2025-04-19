@@ -91,7 +91,7 @@ namespace gui\v1\widgets {
                     }
                 }
                 $style = new Component('style');
-                $style->setAttribute('type', 'text/css')->setContent($css);
+                $style->setAttribute('type', 'text/css')->setText($css);
                 $this->appendChildren($style);
             }
             $this->appendChildren(...$this->children);
