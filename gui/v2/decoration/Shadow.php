@@ -9,7 +9,7 @@
 
 namespace gui\v2\decoration {
 
-    final class Shadow extends Decorator
+    final class Shadow implements Decorator
     {
 
         private readonly DimUnit $unit;
@@ -19,7 +19,6 @@ namespace gui\v2\decoration {
 
         public function __construct(DimUnit $unit = DimUnit::EM)
         {
-            parent::__construct('shadow');
             $this->unit = $unit;
         }
 
@@ -91,19 +90,13 @@ namespace gui\v2\decoration {
             return $this;
         }
 
-        public function getDecoration(): ?string
+        public function getProperty(): ?string
         {
             if ($this->shadow === null) {
                 return null;
             }
             $shadow = $this->inset . $this->shadow . $this->blur . $this->spread . $this->color;
-            return '.' . $this->classId . '{box-shadow:' . $shadow . '}';
-        }
-
-        public function remove(): self
-        {
-            $this->shadow = null;
-            return $this;
+            return 'box-shadow:' . $shadow . ';';
         }
     }
 

@@ -9,7 +9,7 @@
 
 namespace gui\v2\decoration {
 
-    final class RoundCorner extends Decorator
+    final class RoundCorner implements Decorator
     {
 
         private ?string $radius;
@@ -17,7 +17,6 @@ namespace gui\v2\decoration {
 
         public function __construct(DimUnit $unit = DimUnit::EM)
         {
-            parent::__construct('round-corner');
             $this->unit = $unit;
         }
 
@@ -105,18 +104,12 @@ namespace gui\v2\decoration {
             return $this;
         }
 
-        public function getDecoration(): ?string
+        public function getProperty(): ?string
         {
             if ($this->radius === null) {
                 return null;
             }
-            return '.' . $this->classId . '{border-radius:' . $this->radius . '}';
-        }
-
-        public function remove(): self
-        {
-            $this->radius = null;
-            return $this;
+            return 'border-radius:' . $this->radius . ';';
         }
     }
 

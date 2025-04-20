@@ -10,7 +10,7 @@
 namespace gui\v2\decoration {
 
 
-    final class Dimension extends Decorator
+    final class Dimension implements Decorator
     {
 
         private ?string $width, $height;
@@ -18,7 +18,6 @@ namespace gui\v2\decoration {
 
         public function __construct(DimUnit $unit = DimUnit::EM)
         {
-            parent::__construct('dimension');
             $this->unit = $unit;
             $this->width = null;
             $this->height = null;
@@ -30,7 +29,7 @@ namespace gui\v2\decoration {
          */
         public function all(float $size): self
         {
-            return $this->width($size)->height($size);
+            return $this->only($size, $size);
         }
 
         /**
@@ -45,27 +44,7 @@ namespace gui\v2\decoration {
             return $this;
         }
 
-        /**
-         * Set width of a component
-         * @param float $size
-         */
-        public function width(float $size): self
-        {
-            $this->width = $size;
-            return $this;
-        }
-
-        /**
-         * Set height of a component
-         * @param float $size
-         */
-        public function height(float $size): self
-        {
-            $this->height = $size;
-            return $this;
-        }
-
-        public function getDecoration(): ?string
+        public function getProperty(): ?string
         {
             $decoration = null;
             if ($this->width !== null) {
@@ -74,17 +53,7 @@ namespace gui\v2\decoration {
             if ($this->height !== null) {
                 $decoration .= 'height:' . $this->height . $this->unit->value . ';';
             }
-            if ($decoration !== null) {
-                return '.' . $this->classId . '{' . $decoration . '}';
-            }
-            return null;
-        }
-
-        public function remove(): self
-        {
-            $this->width = null;
-            $this->height = null;
-            return $this;
+            return $decoration;
         }
     }
 

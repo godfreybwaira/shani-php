@@ -9,9 +9,9 @@
 
 namespace gui\v2 {
 
-    use gui\v2\decoration\Decorator;
+    use gui\v2\decoration\Theme;
 
-    class Component implements \Stringable
+    abstract class Component implements \Stringable
     {
 
         private static array $styles = [];
@@ -19,8 +19,9 @@ namespace gui\v2 {
         private ?string $content = null;
         private ?Component $parent = null;
         private array $children, $attributes, $classList;
+        private ?Theme $theme = null;
 
-        public function __construct(string $tag = 'div')
+        protected function __construct(string $tag = 'div')
         {
             $this->tag = $tag;
             $this->children = $this->attributes = $this->classList = [];
@@ -213,28 +214,14 @@ namespace gui\v2 {
 
         /**
          * Add decorations (styles) to a Component
-         * @param Decorator $decorators
          * @return self
          */
-        public function addDecoration(Decorator ...$decorators): self
+        private function applyTheme(): self
         {
-            foreach ($decorators as &$decorator) {
-                $id = $decorator->getName();
-                $this->classList[$id] = $decorator->getCss();
-                self::$styles[$id] = $decorator->getDecoration();
-            }
-            return $this;
-        }
-
-        /**
-         * Copy decorations (styles) from a Component
-         * @param Component $source Source component to copy decorations from
-         * @return self
-         */
-        public function copyDecoration(Component $source): self
-        {
-            foreach ($source->classList as $name => $value) {
-                $this->classList[$name] = $value;
+            if (!empty($this->theme)) {
+                $name = $this->theme->getName();
+                $this->classList[$name] = $this->theme->getId();
+                self::$styles[$name] = $this->theme->getDecoration();
             }
             return $this;
         }
@@ -259,9 +246,16 @@ namespace gui\v2 {
             return $this;
         }
 
+        protected function setTheme(Theme $theme): self
+        {
+            $this->theme = $theme;
+            return $this;
+        }
+
         private function getStyles(): ?string
         {
             $markup = null;
+            $this->applyTheme();
             if ($this->parent === null && !empty(self::$styles)) {
                 $markup = '<style type="text/css">' . implode('', self::$styles) . '</style>';
                 self::$styles = [];
@@ -270,9 +264,9 @@ namespace gui\v2 {
         }
 
         /**
-         * Generate HTML markups. This is the last method to call after
-         * creating a Component.
-         * @return string HTML string representing a Component
+         * Generate HTML markups. This is the last method to call after creating
+         * a component.
+         * @return string HTML string representing a component
          */
         public function build(): string
         {

@@ -9,16 +9,15 @@
 
 namespace gui\v2\decoration {
 
-    abstract class Spacing extends Decorator
+    abstract class Spacing implements Decorator
     {
 
         private ?string $values = null;
-        private readonly string $spacing;
+        private readonly string $spaceName;
 
-        protected function __construct(string $spacing, DimUnit $unit = DimUnit::EM)
+        protected function __construct(string $name, DimUnit $unit = DimUnit::EM)
         {
-            parent::__construct($spacing);
-            $this->spacing = $spacing;
+            $this->spaceName = $name;
             $this->unit = $unit;
         }
 
@@ -71,18 +70,12 @@ namespace gui\v2\decoration {
             $this->values = $pd . ' 0 ' . $pd . ' 0';
         }
 
-        public function getDecoration(): string
+        public function getProperty(): ?string
         {
             if ($this->values === null) {
                 return null;
             }
-            return '.' . $this->classId . '{' . $this->spacing . ':' . $this->values . '}';
-        }
-
-        public function remove(): self
-        {
-            $this->values = null;
-            return $this;
+            return $this->spaceName . ':' . $this->values . ';';
         }
     }
 
