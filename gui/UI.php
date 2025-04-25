@@ -43,6 +43,16 @@ namespace gui {
         }
 
         /**
+         * Set theme color
+         * @param string $color theme color in hexadecimal (6 digits e.g #0000ff)
+         * @return self
+         */
+        public function setThemeColor(string $color): self
+        {
+            return $this;
+        }
+
+        /**
          * Set meta description on a HTML document.
          * @param string $content Descriptive content about your application
          * @return self

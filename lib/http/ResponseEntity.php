@@ -40,7 +40,7 @@ namespace lib\http {
          */
         public function subtype(): string
         {
-            $contentType = $this->headers->get(HttpHeader::CONTENT_TYPE);
+            $contentType = $this->headers->getOne(HttpHeader::CONTENT_TYPE);
             if (!empty($contentType)) {
                 return MediaType::subtype($contentType);
             }
@@ -49,7 +49,7 @@ namespace lib\http {
             if ($size > 1) {
                 return strtolower($parts[$size - 1]);
             }
-            return MediaType::subtype($this->request->header()->get(HttpHeader::ACCEPT)) ?? '';
+            return MediaType::subtype($this->request->header()->getOne(HttpHeader::ACCEPT)) ?? '';
         }
 
         /**
@@ -92,23 +92,23 @@ namespace lib\http {
         {
             if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
                 $this->body = $content;
-                $this->headers->add(HttpHeader::CONTENT_LENGTH, $this->bodySize());
+                $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
                 return $this;
             }
-            $encoding = $this->request->header()->get(HttpHeader::ACCEPT_ENCODING);
+            $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
             if (str_contains($encoding, 'gzip')) {
-                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'gzip');
+                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'gzip');
                 $this->body = gzencode($content, $this->compression->value);
             } elseif (str_contains($encoding, 'deflate')) {
-                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'deflate');
+                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'deflate');
                 $this->body = gzdeflate($content, $this->compression->value);
             } elseif (str_contains($encoding, 'compress')) {
-                $this->headers->add(HttpHeader::CONTENT_ENCODING, 'compress');
+                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'compress');
                 $this->body = gzcompress($content, $this->compression->value);
             } else {
                 $this->body = $content;
             }
-            $this->headers->add(HttpHeader::CONTENT_LENGTH, $this->bodySize());
+            $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
             return $this;
         }
 
@@ -130,7 +130,7 @@ namespace lib\http {
         public function setBody(string $content, ?string $subtype = null): self
         {
             if (!$this->headers->exists(HttpHeader::CONTENT_TYPE)) {
-                $this->headers->add(HttpHeader::CONTENT_TYPE, match ($subtype ?? $this->subtype()) {
+                $this->headers->addOne(HttpHeader::CONTENT_TYPE, match ($subtype ?? $this->subtype()) {
                     DataConvertor::TYPE_JSON => MediaType::JSON,
                     DataConvertor::TYPE_XML => MediaType::XML,
                     DataConvertor::TYPE_CSV => MediaType::TEXT_CSV,
@@ -165,9 +165,9 @@ namespace lib\http {
         {
             $etag = $cache->etag();
             if (!empty($etag)) {
-                $this->headers->add(HttpHeader::ETAG, $etag);
+                $this->headers->addOne(HttpHeader::ETAG, $etag);
             }
-            $this->headers->add(HttpHeader::CACHE_CONTROL, $cache);
+            $this->headers->addOne(HttpHeader::CACHE_CONTROL, $cache);
             return $this;
         }
 
@@ -194,7 +194,7 @@ namespace lib\http {
             foreach ($links as $name => $link) {
                 $lnk .= ',<' . $link . '>; rel="' . $name . '"';
             }
-            $this->headers->add(HttpHeader::LINK, substr($lnk, 1));
+            $this->headers->addOne(HttpHeader::LINK, substr($lnk, 1));
             return $this;
         }
 

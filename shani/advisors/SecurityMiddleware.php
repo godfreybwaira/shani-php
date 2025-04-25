@@ -58,7 +58,7 @@ namespace shani\advisors {
                 return $this;
             }
             if ($this->app->config->csrfProtected()) {
-                $token = $this->app->request->cookie->get($this->app->config->csrfTokenName());
+                $token = $this->app->request->cookie->getOne($this->app->config->csrfTokenName());
                 if ($token === null || !$this->app->csrfToken()->exists($token)) {
                     throw CustomException::notAcceptable($this->app);
                 }
@@ -160,7 +160,7 @@ namespace shani\advisors {
 
         private function addAllowOrigin(): self
         {
-            $origin = $this->app->request->header()->get(HttpHeader::ORIGIN);
+            $origin = $this->app->request->header()->getOne(HttpHeader::ORIGIN);
             if (!empty($origin) && $this->app->config->whitelistedDomain($origin)) {
                 $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $origin);
             }

@@ -8,9 +8,9 @@
 
 namespace shani\persistence\session {
 
-    use lib\map\IterableData;
+    use lib\map\MutableMap;
 
-    final class Cart extends IterableData
+    final class Cart extends MutableMap
     {
 
         public readonly string $name;
@@ -30,7 +30,7 @@ namespace shani\persistence\session {
         {
             foreach ($rows as $row) {
                 $key = array_key_first($row);
-                parent::add($key, $row[$key]);
+                parent::addOne($key, $row[$key]);
             }
             return $this;
         }

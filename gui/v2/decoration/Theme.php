@@ -13,6 +13,7 @@ namespace gui\v2\decoration {
     {
 
         private readonly string $themeName, $themeId;
+        private static string $themeColor = '#041e49'; //dark blue
 
         /**
          * Create a theme with unique name
@@ -21,16 +22,35 @@ namespace gui\v2\decoration {
         protected function __construct(string $themeName)
         {
             $this->themeName = $themeName;
-            $this->themeId = 'id' . substr(hrtime(true), 8);
+            $this->themeId = self::createId();
         }
 
         /**
-         * Get default component theme
+         * Create unique ID
+         * @return string
          */
-        public static abstract function getDefaultTheme(): self;
+        public static function createId(): string
+        {
+            return 'd' . substr(hrtime(true), 8);
+        }
 
         /**
-         * Get theme name
+         * Change theme color
+         * @param string $color Hexadecimal color e.g #0000ff
+         * @return void
+         */
+        public static function changeColor(string $color): void
+        {
+            self::$themeColor = $color;
+        }
+
+        public static function getColor(): string
+        {
+            return self::$themeColor;
+        }
+
+        /**
+         * Get theme unique name
          * @return string
          */
         public final function getName(): string
@@ -39,10 +59,10 @@ namespace gui\v2\decoration {
         }
 
         /**
-         * Get unique theme identifier. This is usually a CSS class
+         * Get CSS class
          * @return string
          */
-        public final function getId(): string
+        public final function getClass(): string
         {
             return $this->themeId;
         }

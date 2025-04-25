@@ -106,10 +106,10 @@ namespace gui\v2\decoration {
 
         public function getProperty(): ?string
         {
-            if ($this->radius === null) {
-                return null;
+            if ($this->radius !== null) {
+                return 'border-radius:' . $this->radius . ';';
             }
-            return 'border-radius:' . $this->radius . ';';
+            return null;
         }
     }
 

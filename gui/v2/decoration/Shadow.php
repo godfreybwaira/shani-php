@@ -92,11 +92,11 @@ namespace gui\v2\decoration {
 
         public function getProperty(): ?string
         {
-            if ($this->shadow === null) {
-                return null;
+            if ($this->shadow !== null) {
+                $shadow = $this->inset . $this->shadow . $this->blur . $this->spread . $this->color;
+                return 'box-shadow:' . $shadow . ';';
             }
-            $shadow = $this->inset . $this->shadow . $this->blur . $this->spread . $this->color;
-            return 'box-shadow:' . $shadow . ';';
+            return null;
         }
     }
 

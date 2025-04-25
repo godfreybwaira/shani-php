@@ -72,10 +72,10 @@ namespace gui\v2\decoration {
 
         public function getProperty(): ?string
         {
-            if ($this->values === null) {
-                return null;
+            if ($this->values !== null) {
+                return $this->spaceName . ':' . $this->values . ';';
             }
-            return $this->spaceName . ':' . $this->values . ';';
+            return null;
         }
     }
 

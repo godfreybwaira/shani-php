@@ -62,17 +62,17 @@ namespace lib\client {
 
         private static function setReflectionHeaders(RequestEntity &$request, HttpHeader &$headers)
         {
-            $cookies = $headers->get(HttpHeader::SET_COOKIE, []);
+            $cookies = $headers->getOne(HttpHeader::SET_COOKIE, []);
             foreach ($cookies as $cookie) {
                 $request->header()->setCookie($cookie);
             }
-            $etag = $headers->get(HttpHeader::ETAG);
+            $etag = $headers->getOne(HttpHeader::ETAG);
             if ($etag !== null) {
-                $request->header()->add(HttpHeader::IF_NONE_MATCH, $etag);
+                $request->header()->addOne(HttpHeader::IF_NONE_MATCH, $etag);
             }
-            $lastModified = $headers->get(HttpHeader::LAST_MODIFIED);
+            $lastModified = $headers->getOne(HttpHeader::LAST_MODIFIED);
             if ($lastModified !== null) {
-                $request->header()->add(HttpHeader::IF_MODIFIED_SINCE, $lastModified);
+                $request->header()->addOne(HttpHeader::IF_MODIFIED_SINCE, $lastModified);
             }
         }
     }

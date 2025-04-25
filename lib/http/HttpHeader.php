@@ -2,9 +2,9 @@
 
 namespace lib\http {
 
-    use lib\map\IterableData;
+    use lib\map\MutableMap;
 
-    final class HttpHeader extends IterableData
+    final class HttpHeader extends MutableMap
     {
 
         public const ACCEPT = 'Accept';
@@ -94,7 +94,7 @@ namespace lib\http {
          */
         public function setBasicAuth(string $username, string $password): self
         {
-            return parent::add(self::AUTHORIZATION, 'Basic ' . base64_encode($username . ':' . $password));
+            return parent::addOne(self::AUTHORIZATION, 'Basic ' . base64_encode($username . ':' . $password));
         }
 
         /**
@@ -104,7 +104,7 @@ namespace lib\http {
          */
         public function setBearerAuth(string $token): self
         {
-            return parent::add(self::AUTHORIZATION, 'Bearer ' . $token);
+            return parent::addOne(self::AUTHORIZATION, 'Bearer ' . $token);
         }
 
         /**
@@ -134,7 +134,7 @@ namespace lib\http {
         public function addIfAbsent(string|int $headerName, mixed $headerValue): self
         {
             if (!array_key_exists($headerName, $this->data)) {
-                $this->add($headerName, $headerValue);
+                $this->addOne($headerName, $headerValue);
             }
             return $this;
         }
@@ -155,7 +155,7 @@ namespace lib\http {
          */
         public function setCookie(HttpCookie $cookie): self
         {
-            return $this->add(self::SET_COOKIE, [$cookie->name() => $cookie]);
+            return $this->addOne(self::SET_COOKIE, [$cookie->name() => $cookie]);
         }
 
         /**
@@ -164,7 +164,7 @@ namespace lib\http {
          */
         public function getCookies(): array
         {
-            return $this->get(self::SET_COOKIE);
+            return $this->getOne(self::SET_COOKIE);
         }
 
         /**
@@ -173,11 +173,11 @@ namespace lib\http {
          * @param mixed $headerValue the header value
          * @see setIfAbsent(string, string)
          */
-        public function add(string|int $headerName, mixed $headerValue): self
+        public function addOne(string|int $headerName, mixed $headerValue): self
         {
             $name = self::createName($headerName);
             if (!is_array($headerValue)) {
-                return parent::add($name, $headerValue);
+                return parent::addOne($name, $headerValue);
             }
             foreach ($headerValue as $key => $value) {
                 $this->data[$name][$key] = $value;

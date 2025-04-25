@@ -11,6 +11,8 @@
 namespace shani\http {
 
     use lib\Event;
+    use lib\http\HttpHeader;
+    use lib\MediaType;
     use shani\advisors\SecurityMiddleware;
 
     final class Middleware
@@ -43,6 +45,15 @@ namespace shani\http {
             return $this;
         }
 
+        private function setProperContentType()
+        {
+            $type = $this->app->request->header()->getOne(HttpHeader::ACCEPT);
+            if ($type === '*/*' || $type === null) {
+                $type = $this->app->platform() === 'web' ? MediaType::TEXT_HTML : MediaType::JSON;
+                $this->app->request->header()->addOne(HttpHeader::ACCEPT, $type);
+            }
+        }
+
         /**
          * Execute all registered middlewares according to their orders.
          * @param SecurityMiddleware $security Security middleware object
@@ -50,6 +61,7 @@ namespace shani\http {
          */
         public function runWith(SecurityMiddleware $security): void
         {
+            $this->setProperContentType();
             $security->validateSession()->preflightRequest();
             $this->app->on('web', function () use (&$security) {
                 $security->cspHeaders()->resourceAccessPolicy()->csrfTest();

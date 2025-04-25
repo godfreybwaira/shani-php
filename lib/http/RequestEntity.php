@@ -111,7 +111,7 @@ namespace lib\http {
          */
         public function languages(): array
         {
-            $acceptedLanguages = $this->headers->get(HttpHeader::ACCEPT_LANGUAGE);
+            $acceptedLanguages = $this->headers->getOne(HttpHeader::ACCEPT_LANGUAGE);
             if ($acceptedLanguages !== null) {
                 $langs = explode(',', $acceptedLanguages);
                 return array_map(fn($val) => strtolower(trim(explode(';', $val)[0])), $langs);
@@ -127,7 +127,7 @@ namespace lib\http {
         public function accepted(string $type): bool
         {
             if (empty($this->acceptedType)) {
-                $this->acceptedType = MediaType::parse($this->headers->get(HttpHeader::ACCEPT));
+                $this->acceptedType = MediaType::parse($this->headers->getOne(HttpHeader::ACCEPT));
             }
             if (!empty($this->acceptedType)) {
                 if (str_contains($type, '/')) {

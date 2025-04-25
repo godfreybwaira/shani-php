@@ -9,19 +9,33 @@
 
 namespace lib\map {
 
-    class IterableData extends ReadableMap
+    class MutableMap extends ReadableMap
     {
 
         /**
          * Add an item to an iterable object
-         * @param stringInt $key Item name
+         * @param string|int $key Item name
          * @param mixed $value Item value
          * @return self
          */
-        public function add(string|int $key, mixed $value): self
+        public function addOne(string|int $key, mixed $value): self
         {
             $this->data[$key] = $value;
             return $this;
+        }
+
+        /**
+         * Remove an item if exists, else add it.
+         * @param string $key Item to add or remove
+         * @param mixed $value Item value
+         * @return self
+         */
+        public function toggle(string $key, mixed $value = null): self
+        {
+            if ($this->exists($key)) {
+                return $this->delete($key);
+            }
+            return $this->addOne($key, $value);
         }
 
         /**
@@ -32,21 +46,21 @@ namespace lib\map {
         public function addAll(array $items): self
         {
             foreach ($items as $name => $value) {
-                $this->add($name, $value);
+                $this->addOne($name, $value);
             }
             return $this;
         }
 
         /**
          * Add an item to an iterable object if it does not exists
-         * @param stringInt $key Item name
+         * @param string|int $key Item name
          * @param mixed $value Item value
          * @return self
          */
         public function addIfAbsent(string|int $key, mixed $value): self
         {
             if (!array_key_exists($key, $this->data)) {
-                return $this->add($key, $value);
+                return $this->addOne($key, $value);
             }
             return $this;
         }

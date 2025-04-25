@@ -58,7 +58,7 @@ namespace shani\persistence\session {
             }
             $path = $this->app->config->sessionSavePath();
             $name = $this->app->config->sessionName();
-            $oldId = $this->app->request->cookie->get($name);
+            $oldId = $this->app->request->cookie->getOne($name);
             if ($oldId !== null && $this->app->config->isAsync()) {
                 $this->sendCookie($name, $oldId);
                 return $path . '/' . $oldId;

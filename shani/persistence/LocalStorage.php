@@ -93,7 +93,7 @@ namespace shani\persistence {
         private static function sendFile(App &$app, string $filepath): bool
         {
             $etag = md5($app->request->uri->path);
-            if ($app->request->header()->get(HttpHeader::IF_NONE_MATCH) === $etag) {
+            if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
                 $app->send();
             } else {
@@ -168,7 +168,7 @@ namespace shani\persistence {
         public function download(string $filepath, ?string $filename = null): self
         {
             $disposition = 'attachment; filename="' . ($filename ?? basename($filepath)) . '"';
-            $this->app->response->header()->add(HttpHeader::CONTENT_DISPOSITION, $disposition);
+            $this->app->response->header()->addOne(HttpHeader::CONTENT_DISPOSITION, $disposition);
             return $this->app->stream($filepath);
         }
 

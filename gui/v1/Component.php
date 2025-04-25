@@ -47,65 +47,12 @@ namespace gui\v1 {
         }
 
         /**
-         * Check whether a component has a given CSS class.
-         * @param string $css CSS class to check
-         * @return bool
-         */
-        public function hasClass(string $css): bool
-        {
-            return array_key_exists($css, $this->classList);
-        }
-
-        /**
-         * Remove CSS class or list of classes
-         * @param string $classes CSS class(es) to remove separated by space
-         * @return self
-         */
-        public function removeClass(string $classes): self
-        {
-            $values = explode(' ', trim($classes));
-            foreach ($values as $css) {
-                if ($this->hasClass($css)) {
-                    unset($this->classList[$css]);
-                }
-            }
-            return $this;
-        }
-
-        /**
          * Get the content of a component as HTML markups or texts
          * @return string|null
          */
         public function getContent(): ?string
         {
             return $this->content;
-        }
-
-        /**
-         * Add custom CSS class(es). It does not replace existing class(es)
-         * @param string $classes CSS class(es) to add separated by space
-         * @return self
-         * @see Component::setClass()
-         */
-        public function addClass(string $classes): self
-        {
-            $values = explode(' ', trim($classes));
-            foreach ($values as $val) {
-                $css = trim($val);
-                if ($css !== '') {
-                    $this->classList[$css] = null;
-                }
-            }
-            return $this;
-        }
-
-        /**
-         * Get all custom CSS classes defined by user
-         * @return string CSS classes separated by space
-         */
-        public function getClass(): string
-        {
-            return implode(' ', array_keys($this->classList));
         }
 
         private function applyStyles(array &$styles, array $sourceStyles): self
@@ -130,36 +77,6 @@ namespace gui\v1 {
                 return null;
             }
             return ' class="' . trim(implode(' ', array_keys($this->classList))) . '"';
-        }
-
-        /**
-         * Toggle CSS class(es)
-         * @param string $classes CSS class(es) to toggle separated by space
-         * @return self
-         */
-        public function toggleClass(string $classes): self
-        {
-            $values = explode(' ', trim($classes));
-            foreach ($values as $css) {
-                if ($this->hasClass($css)) {
-                    $this->removeClass($css);
-                } else {
-                    $this->addClass($css);
-                }
-            }
-            return $this;
-        }
-
-        /**
-         * Add custom CSS class(es), removing all existing class(es)
-         * @param string $classes CSS class(es) to add separated by space
-         * @return self
-         * @see Component::addClass()
-         */
-        public function setClass(string $classes): self
-        {
-            $this->classList = [];
-            return $this->addClass($classes);
         }
 
         /**

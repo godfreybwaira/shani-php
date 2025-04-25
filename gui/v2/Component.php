@@ -9,22 +9,23 @@
 
 namespace gui\v2 {
 
-    use gui\v2\decoration\Theme;
 
-    abstract class Component implements \Stringable
+    class Component implements \Stringable
     {
 
-        private static array $styles = [];
+        private array $children;
         private readonly string $tag;
         private ?string $content = null;
         private ?Component $parent = null;
-        private array $children, $attributes, $classList;
-        private ?Theme $theme = null;
+        public readonly StyleClass $classList;
+        public readonly Attribute $attribute;
 
-        protected function __construct(string $tag = 'div')
+        public function __construct(string $tag = 'div')
         {
             $this->tag = $tag;
-            $this->children = $this->attributes = $this->classList = [];
+            $this->classList = new StyleClass();
+            $this->attribute = new Attribute();
+            $this->children = [];
         }
 
         /**
@@ -94,82 +95,6 @@ namespace gui\v2 {
         }
 
         /**
-         * Check if a given attribute exists in a component
-         * @param string $name Attribute to check
-         * @return bool True on success, false otherwise
-         */
-        public function hasAttribute(string $name): bool
-        {
-            return in_array($name, $this->attributes);
-        }
-
-        /**
-         * Copy attributes from a component
-         * @param Component $source Source component to copy attributes from
-         * @return self
-         */
-        public function copyAttributes(Component $source): self
-        {
-            foreach ($source->attributes as $name => $value) {
-                $this->setAttribute($name, $value);
-            }
-            return $this;
-        }
-
-        /**
-         * Remove attribute(s) from a component
-         * @param string $names Attribute(s) to remove
-         * @return self
-         */
-        public function removeAttribute(string ...$names): self
-        {
-            foreach ($names as $value) {
-                unset($this->attributes[$value]);
-            }
-            return $this;
-        }
-
-        /**
-         * Toggle component attribute
-         * @param string $name Attribute name
-         * @param type $value Attribute value
-         * @return self
-         * @see Component::setAttribute()
-         */
-        public function toggleAttribute(string $name, $value = null): self
-        {
-            if ($this->hasAttribute($name)) {
-                return $this->removeAttribute($name);
-            }
-            return $this->setAttribute($name, $value);
-        }
-
-        /**
-         * Set HTML attribute to a component
-         * @param string $name Attribute name
-         * @param type $value Attribute value. If not set the attribute value will
-         * follow normal HTML rules for setting attribute
-         * @return self
-         * @see Component::copyAttributes()
-         */
-        public function setAttribute(string $name, $value = null): self
-        {
-            $this->attributes[$name] = $value;
-            return $this;
-        }
-
-        /**
-         * Get single attribute value
-         * @param string $name Attribute name
-         * @return type Attribute value
-         * @see Component::getAttributes()
-         */
-        public function getAttribute(string $name)
-        {
-            return $this->attributes[$name] ?? null;
-        }
-
-        /**
          * Add one or more children to a Component, removing all existing children
          * @param Component $children Component(s) to add as child(ren)
          * @return self
@@ -181,28 +106,6 @@ namespace gui\v2 {
             return $this->appendChild(...$children);
         }
 
-        /**
-         * Get all attributes
-         * @return array Component attribute(s)
-         * @see Component::getAttribute()
-         */
-        public function getAttributes(): array
-        {
-            return $this->attributes;
-        }
-
-        private function serializeAttributes(): ?string
-        {
-            if (!empty($this->classList)) {
-                $this->setAttribute('class', implode(' ', $this->classList));
-            }
-            $result = null;
-            foreach ($this->attributes as $name => $value) {
-                $result .= ' ' . $name . ($value !== null ? '="' . $value . '"' : null);
-            }
-            return $result;
-        }
-
         private function serializeChildren(): ?string
         {
             $result = null;
@@ -210,20 +113,6 @@ namespace gui\v2 {
                 $result .= $child->build();
             }
             return $result;
-        }
-
-        /**
-         * Add decorations (styles) to a Component
-         * @return self
-         */
-        private function applyTheme(): self
-        {
-            if (!empty($this->theme)) {
-                $name = $this->theme->getName();
-                $this->classList[$name] = $this->theme->getId();
-                self::$styles[$name] = $this->theme->getDecoration();
-            }
-            return $this;
         }
 
         /**
@@ -246,23 +135,6 @@ namespace gui\v2 {
             return $this;
         }
 
-        protected function setTheme(Theme $theme): self
-        {
-            $this->theme = $theme;
-            return $this;
-        }
-
-        private function getStyles(): ?string
-        {
-            $markup = null;
-            $this->applyTheme();
-            if ($this->parent === null && !empty(self::$styles)) {
-                $markup = '<style type="text/css">' . implode('', self::$styles) . '</style>';
-                self::$styles = [];
-            }
-            return $markup;
-        }
-
         /**
          * Generate HTML markups. This is the last method to call after creating
          * a component.
@@ -270,16 +142,20 @@ namespace gui\v2 {
          */
         public function build(): string
         {
+
+            if (!$this->classList->isEmpty()) {
+                $this->attribute->addOne('class', $this->classList->asString());
+            }
             $markup = $this->getStyles();
             if (!empty($this->content)) {
-                $markup .= '<' . $this->tag . $this->serializeAttributes() . '>';
+                $markup .= '<' . $this->tag . $this->attribute . '>';
                 return $markup . $this->content . '</' . $this->tag . '>';
             }
             if (!empty($this->children)) {
-                $markup .= '<' . $this->tag . $this->serializeAttributes() . '>';
+                $markup .= '<' . $this->tag . $this->attribute . '>';
                 return $markup . $this->serializeChildren() . '</' . $this->tag . '>';
             }
-            return $markup . '<' . $this->tag . $this->serializeAttributes() . '/>';
+            return $markup . '<' . $this->tag . $this->attribute . '/>';
         }
 
         #[\Override]

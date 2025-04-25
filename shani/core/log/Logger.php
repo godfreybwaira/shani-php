@@ -48,10 +48,9 @@ namespace shani\core\log {
                 LogLevel::ERROR => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_RED],
                 LogLevel::INFO => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_BLUE],
             };
-            $text = $structure->time . $space;
+            $text = '[' . $structure->time . ']' . $space;
             $text .= ConsolePrinter::colorText(' ' . $structure->level . ' ', $textColor, $bgColor);
-            $text .= $space . $structure->message . $space . $structure->context . $space;
-            return $text . $structure->extra . PHP_EOL;
+            return $text . $space . $structure->message . $space . $structure->extra . PHP_EOL;
         }
 
         public function warning(string $message, ?array $context = null): self

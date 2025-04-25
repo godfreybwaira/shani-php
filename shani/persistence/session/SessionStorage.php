@@ -9,9 +9,9 @@
 
 namespace shani\persistence\session {
 
-    use lib\map\IterableData;
+    use lib\map\MutableMap;
 
-    final class SessionStorage extends IterableData
+    final class SessionStorage extends MutableMap
     {
 
         private int $lastActive;
@@ -78,9 +78,9 @@ namespace shani\persistence\session {
             foreach ($data['carts'] as $name => $values) {
                 $cart = new Cart($name);
                 foreach ($values as $key => $value) {
-                    $cart->add($key, $value);
+                    $cart->addOne($key, $value);
                 }
-                $session->add($cart->name, $cart);
+                $session->addOne($cart->name, $cart);
             }
 
             return $session;

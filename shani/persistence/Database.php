@@ -8,7 +8,7 @@
 
 namespace shani\persistence {
 
-    use lib\map\IterableData;
+    use lib\map\MutableMap;
     use shani\exceptions\ServerException;
 
     final class Database
@@ -69,9 +69,9 @@ namespace shani\persistence {
          * Execute SQL query and all rows (if available) found
          * @param string $query A query to execute
          * @param array|null $data
-         * @return IterableData Iterable object contains rows returned as the result of SQL query.
+         * @return MutableMap Iterable object contains rows returned as the result of SQL query.
          */
-        public function get(string $query, ?array $data = null): IterableData
+        public function get(string $query, ?array $data = null): MutableMap
         {
             $result = $this->processQuery($query, $data);
             $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
@@ -79,7 +79,7 @@ namespace shani\persistence {
             if (!empty($rows) && $this->escape) {
                 self::escapeHTML($rows);
             }
-            return new IterableData($rows);
+            return new MutableMap($rows);
         }
 
         private static function getConnectionString(string $driver, string $database, ?string $host, ?int $port): string

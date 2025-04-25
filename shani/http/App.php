@@ -17,7 +17,7 @@ namespace shani\http {
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
-    use lib\map\IterableData;
+    use lib\map\MutableMap;
     use lib\MediaType;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
@@ -43,7 +43,7 @@ namespace shani\http {
         private ?Logger $logger = null;
         private SessionManager $session;
         private readonly ResponseWriter $writer;
-        private ?IterableData $appData = null;
+        private ?MutableMap $appData = null;
         private ?string $lang = null, $platform = null;
 
         /**
@@ -145,7 +145,7 @@ namespace shani\http {
                 throw CustomException::notFound($this);
             }
             $file = stat($filepath);
-            $range = $this->request->header()->get(HttpHeader::RANGE) ?? '=0-';
+            $range = $this->request->header()->getOne(HttpHeader::RANGE) ?? '=0-';
             if ($range === '=0-' && $file['size'] <= $chunkSize) {
                 $this->response->setStatus(HttpStatus::OK);
                 return $this->doStream($filepath, $file['size'], 0, $file['size'] - 1);
@@ -156,7 +156,7 @@ namespace shani\http {
                 HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
                 HttpHeader::ACCEPT_RANGES => 'bytes'
             ]);
-            $this->response->header()->add(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
+            $this->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             return $this->doStream($filepath, $file['size'], $start, $end);
         }
 
@@ -196,7 +196,7 @@ namespace shani\http {
          */
         public function redirectBack(HttpStatus $status = HttpStatus::FOUND): bool
         {
-            $url = $this->request->header()->get(HttpHeader::REFERER);
+            $url = $this->request->header()->getOne(HttpHeader::REFERER);
             if ($url !== null) {
                 $this->redirect($url, $status);
                 return true;
@@ -212,7 +212,7 @@ namespace shani\http {
          */
         public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
         {
-            $this->response->setStatus($status)->header()->add(HttpHeader::LOCATION, $url);
+            $this->response->setStatus($status)->header()->addOne(HttpHeader::LOCATION, $url);
             return $this;
         }
 
@@ -246,7 +246,7 @@ namespace shani\http {
         public function platform(): ?string
         {
             if ($this->platform === null) {
-                $str = $this->request->header()->get(HttpHeader::ACCEPT_VERSION) ?? 'web';
+                $str = $this->request->header()->getOne(HttpHeader::ACCEPT_VERSION) ?? 'web';
                 $this->platform = strtolower($str);
             }
             return $this->platform;
@@ -337,7 +337,7 @@ namespace shani\http {
 
         private function sendJsonp(?array $content, string $type): void
         {
-            $callback = $this->request->query->get('callback', 'callback');
+            $callback = $this->request->query->getOne('callback', 'callback');
             $data = $callback . '(' . json_encode($content) . ');';
             $this->response->setBody($data, $type)->header()
                     ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
@@ -454,7 +454,7 @@ namespace shani\http {
             $url = $urlPath ?? $this->request->uri->path;
             if (!$this->config->skipCsrfProtection()) {
                 $token = base64_encode(random_bytes(6));
-                $this->csrfToken()->add($token, null);
+                $this->csrfToken()->addOne($token, null);
                 $cookie = (new HttpCookie())->setName($this->config->csrfTokenName())
                         ->setSameSite(HttpCookie::SAME_SITE_LAX)
                         ->setValue($token)->setPath($url)->setHttpOnly(true)
@@ -504,11 +504,11 @@ namespace shani\http {
         /**
          * Create application temporary data storage. This function is ideal for
          * data exchange within application (e.g among views)
-         * @return IterableData Iterable object
+         * @return MutableMap Iterable object
          */
-        public function attributes(): IterableData
+        public function attributes(): MutableMap
         {
-            return $this->appData ??= new IterableData();
+            return $this->appData ??= new MutableMap();
         }
     }
 

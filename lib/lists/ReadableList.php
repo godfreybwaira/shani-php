@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Represent iterable data objects such as array or map
+ * Represent iterable data objects such as array list
  * @author coder
  *
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\map {
+namespace lib\lists {
 
     use lib\DataConvertor;
 
-    class ReadableMap implements \Stringable, \JsonSerializable
+    class ReadableList implements \Stringable, \JsonSerializable
     {
 
         protected array $data;
@@ -23,13 +23,13 @@ namespace lib\map {
 
         /**
          * Check if an iterable object has given item
-         * @param string|int $key Items to check
+         * @param string|int $values Items to check
          * @return bool
          */
-        public function exists(string|int ...$key): bool
+        public function exists(string|int ...$values): bool
         {
-            foreach ($key as $key) {
-                if (!array_key_exists($key, $this->data)) {
+            foreach ($values as $value) {
+                if (!array_key_exists($value, $this->data)) {
                     return false;
                 }
             }
@@ -43,8 +43,9 @@ namespace lib\map {
          */
         public function existsWhere(callable $callback): bool
         {
-            foreach ($this->data as $key => $value) {
-                if ($callback($key, $value)) {
+            $values = $this->toArray();
+            foreach ($values as $value) {
+                if ($callback($value)) {
                     return true;
                 }
             }
@@ -72,32 +73,20 @@ namespace lib\map {
         #[\Override]
         public function jsonSerialize(): array
         {
-            return $this->data;
+            return $this->toArray();
         }
 
         #[\Override]
         public function __toString()
         {
-            return json_encode($this);
-        }
-
-        /**
-         * Get an item from an iterable object
-         * @param string|int $key Item to get
-         * @param type $default Default value to return if no value found
-         * @return mixed
-         */
-        public function getOne(string|int $key, $default = null): mixed
-        {
-            return $this->data[$key] ?? $default;
+            return implode(',', $this->toJson());
         }
 
         /**
          * Get all items which satisfies the condition provided by the callback
          * function.
-         * @param callable $callback A callback function that receive an item name as
-         * first parameter and an item value as second parameter. This function
-         * must return a boolean value.
+         * @param callable $callback A callback function that receive an item.
+         * This function must return a boolean value.
          * @param int|null $limit When to stop finding
          * @return array A list if items
          */
@@ -108,9 +97,10 @@ namespace lib\map {
             if ($limit <= $count) {
                 return $rows;
             }
-            foreach ($this->data as $key => $value) {
-                if ($callback($key, $value)) {
-                    $rows[$key] = $value;
+            $values = $this->toArray();
+            foreach ($values as $value) {
+                if ($callback($value)) {
+                    $rows[] = $value;
                 }
                 if ($limit !== null && ++$count === $limit) {
                     return $rows;
@@ -126,7 +116,7 @@ namespace lib\map {
          */
         public function toArray(): array
         {
-            return $this->data;
+            return array_keys($this->data);
         }
 
         /**
@@ -136,7 +126,7 @@ namespace lib\map {
          */
         public function toCsv(string $separator = ','): string
         {
-            return DataConvertor::array2csv($this->data, $separator);
+            return DataConvertor::array2csv($this->toArray(), $separator);
         }
 
         /**
@@ -145,7 +135,7 @@ namespace lib\map {
          */
         public function toXml(): string
         {
-            return DataConvertor::array2xml($this->data);
+            return DataConvertor::array2xml($this->toArray());
         }
 
         /**
@@ -154,7 +144,7 @@ namespace lib\map {
          */
         public function toJson(): string
         {
-            return json_encode($this->data);
+            return json_encode($this->toArray());
         }
 
         /**
@@ -164,37 +154,14 @@ namespace lib\map {
          */
         public function toDataGrid(): string
         {
-            return DataConvertor::array2dataGrid($this->data);
-        }
-
-        /**
-         * Get an iterable object as array
-         * @param array $keys Items to get from an iterable object
-         * @param bool $selected When true, only selected items using $keys will be returned
-         * @return array
-         */
-        public function getAll(array $keys, bool $selected = true): array
-        {
-            $rows = [];
-            if ($selected) {
-                foreach ($keys as $key) {
-                    $rows[$key] = $this->getOne($key);
-                }
-            } else {
-                foreach ($this->data as $key => $value) {
-                    if (!in_array($key, $keys)) {
-                        $rows[$key] = $value;
-                    }
-                }
-            }
-            return $rows;
+            return DataConvertor::array2dataGrid($this->toArray());
         }
 
         /**
          * Reduce an array to a scalar value, for example when finding sum or
          * average of an array column
-         * @param callable $callback a callback that accepts three arguments,
-         * an array key, array value and accumulator. The type of accumulator
+         * @param callable $callback a callback that accepts two arguments,
+         * an array value and accumulator. The type of accumulator
          * is same as that of <code>$initialValue</code>
          * @param type $initialValue An initial accumulator value
          * @return type A single scalar value
@@ -202,51 +169,23 @@ namespace lib\map {
         public function reduce(callable $callback, $initialValue = null)
         {
             $accumulator = $initialValue;
-            foreach ($this->data as $key => $value) {
-                $accumulator = $callback($key, $value, $accumulator);
+            $values = $this->toArray();
+            foreach ($values as $value) {
+                $accumulator = $callback($value, $accumulator);
             }
             return $accumulator;
         }
 
         /**
-         * Returns array of keys from an iterable object
-         * @return array
-         */
-        public function keySet(): array
-        {
-            return array_keys($this->data);
-        }
-
-        /**
-         * Get all values from an iterable object
-         * @return array
-         */
-        public function values(): array
-        {
-            return array_values($this->data);
-        }
-
-        /**
-         * Generate a key-value set for each item in iterable object
-         * @return \Generator
-         */
-        public function entrySet(): \Generator
-        {
-            foreach ($this->data as $key => $value) {
-                yield [$key => $value];
-            }
-        }
-
-        /**
          * Apply a callback function for each value of a collection i.e array.
-         * @param callable $callback A callback function that receives an item name
-         * and value as first and second parameters.
+         * @param callable $callback A callback function that receives an item value.
          * @return self
          */
         public function each(callable $callback): self
         {
-            foreach ($this->data as $key => $value) {
-                $callback($key, $value);
+            $values = $this->toArray();
+            foreach ($values as $value) {
+                $callback($value);
             }
             return $this;
         }

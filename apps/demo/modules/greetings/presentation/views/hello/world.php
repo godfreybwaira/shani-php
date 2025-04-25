@@ -1,26 +1,6 @@
 <?php $app->ui()->import($app->view('/shani')); ?>
-
-<?php $data = $app->ui()->data()->toArray(); ?>
-<h2>Student details</h2>
-<ul>
-    <?php foreach ($data as $key => $value): ?>
-        <?php if (is_array($value)): ?>
-            <li>
-                <?= $key . ':'; ?>
-                <?php foreach ($value as $v): ?>
-                    <ul>
-                        <li><?= 'name: ' . $v['name']; ?></li>
-                        <li><?= 'grade: ' . $v['grade']; ?></li>
-                        <li><?= 'marks: ' . $v['marks']; ?></li>
-                    </ul>
-                    <hr/>
-                <?php endforeach; ?>
-            </li>
-        <?php else: ?>
-            <li><?= $key . ': ' . $value; ?></li>
-        <?php endif; ?>
-    <?php endforeach; ?>
-</ul>
-<?php
-$button = new \gui\v2\controls\FlatButton('Hello There');
-echo $button;
+<div shanify="*" shani-header="x-request-mode:async" shani-on="click" shani-fn="r" style="background: red;padding: 3rem">
+    <a href="/greetings/0/hello/0/test" shani-fn="r" shani-watcher="#box,#box2">Testing</a>
+    <div id="box" watch-on="200" shani-insert="after" shani-plugin="init:drawer">BOX 1</div>
+    <div id="box2" action="/greetings/0/hello/0/other" watch-on="end" shani-xss="true" shani-insert="before">BOX 2</div>
+</div>
