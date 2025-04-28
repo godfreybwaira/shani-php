@@ -10,22 +10,36 @@
 namespace lib\client {
 
     use lib\Concurrency;
-    use lib\DataConvertor;
-    use lib\http\RequestEntity;
+    use lib\crypto\DigitalSignature;
+    use lib\crypto\Encryption;
+    use lib\File;
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
+    use lib\http\ResponseEntity;
+    use lib\RequestEntityBuilder;
+    use lib\URI;
     use shani\core\Definitions;
 
     final class HttpClient
     {
 
         private int $retries;
-        private array $curlOptions;
-        private ?string $signatureKey = null, $signatureAlgorithm = null;
-        private ?string $signatureHeader = null, $cipherKey = null;
-        private ?string $cipherAlgorithm = null, $initVector = null;
-        private array $specialOptions = [];
-        private readonly RequestEntity $request;
+        private bool $asyncMode = true;
+        private array $curlOptions, $specialOptions = [], $body = [];
+        private HttpHeader $header;
+        private ?DigitalSignature $signature = null;
+        private ?Encryption $encryption = null;
+        private ?string $headerName = null;
+        private readonly string $host;
+        private array $files = [];
 
-        public function __construct(RequestEntity $request, int $retries = 3, int $timeout = 20)
+        /**
+         * Create HTTP connection to a remote server
+         * @param URI $uri URI object
+         * @param int $retries number of time a client has to retry connecting to a remote server
+         * @param int $timeout Timeout in seconds before this client terminating the connection if the server is not responding
+         */
+        public function __construct(URI $uri, int $retries = 3, int $timeout = 20)
         {
             $this->retries = $retries;
             $this->curlOptions = [
@@ -35,13 +49,101 @@ namespace lib\client {
                 CURLOPT_UPLOAD_BUFFERSIZE => Definitions::BUFFER_SIZE,
                 CURLOPT_BUFFERSIZE => Definitions::BUFFER_SIZE
             ];
-            $this->request = $request;
+            $this->header = new HttpHeader();
+            $this->host = $uri->host();
         }
 
-        public function withRequest(RequestEntity $request): self
+        /**
+         * Whether to enable asynchronous communication between client and server
+         * machine. Default is true
+         * @param bool $enable
+         * @return self
+         */
+        public function enableAsync(bool $enable = true): self
+        {
+            $this->asyncMode = $enable;
+            return $this;
+        }
+
+        /**
+         * Clone existing request and return a new request but with new header object.
+         * @param HttpHeader $header
+         * @return self
+         */
+        public function withHeader(HttpHeader $header): self
         {
             $copy = clone $this;
-            $copy->request = $request;
+            $copy->header = $header;
+            return $copy;
+        }
+
+        /**
+         * Set HTTP headers, overriding existing headers
+         * @param HttpHeader $header
+         * @return self
+         */
+        public function setHeader(HttpHeader $header): self
+        {
+            $this->header = $header;
+            return $this;
+        }
+
+        public function withoutBody(): self
+        {
+            $copy = clone $this;
+            $copy->body = [];
+            return $copy;
+        }
+
+        /**
+         * Clone existing request and return a new request but with new body.
+         * @param array $body
+         * @return self
+         */
+        public function withBody(array $body): self
+        {
+            $copy = clone $this;
+            $copy->body = $body;
+            return $copy;
+        }
+
+        public function setBody(array $body): self
+        {
+            $this->body = $body;
+            return $this;
+        }
+
+        /**
+         * Add a file to send together with request.
+         * @param File $file File object
+         * @return self
+         */
+        public function addFile(File $file): self
+        {
+            $this->files[$file->name] = $file;
+            return $this;
+        }
+
+        /**
+         * Clone existing request and return a new request but with additional file(s).
+         * @param File $file File object
+         * @return self
+         */
+        public function withFile(File $file): self
+        {
+            $copy = clone $this;
+            $copy->files[$file->name] = $file;
+            return $copy;
+        }
+
+        /**
+         * Clone existing request and return a new request without file(s).
+         * @return self
+         */
+        public function withoutFiles(): self
+        {
+            $copy = clone $this;
+            $copy->files = [];
             return $copy;
         }
 
@@ -57,14 +159,14 @@ namespace lib\client {
 
         /**
          * Set proxy server for this request
-         * @param string $host Server name or ip address
+         * @param URI $uri URI pointing to a proxy server machine
          * @param string $username server username
          * @param string $password server password
          * @return self
          */
-        public function proxy(string $host, string $username = null, string $password = null): self
+        public function proxy(URI $uri, string $username = null, string $password = null): self
         {
-            $this->setOptions([CURLOPT_PROXY => $host, CURLOPT_HTTPPROXYTUNNEL => true]);
+            $this->setOptions([CURLOPT_PROXY => $uri->host(), CURLOPT_HTTPPROXYTUNNEL => true]);
             if ($username !== null) {
                 $this->setOptions([CURLOPT_PROXYUSERPWD => $username . ':' . $password]);
             }
@@ -73,72 +175,13 @@ namespace lib\client {
 
         /**
          * Set encryption credentials to be used on encryption/decryption of HTTP message
-         * @param string $key Encryption key
-         * @param string $initVector Initialization vector
-         * @param string $algorithm Encryption algorithm
+         * @param Encryption $encryption Encryption object
          * @return self
          */
-        public function encryption(string $key, string $initVector, string $algorithm = 'aes-256-cbc'): self
+        public function encryption(Encryption $encryption): self
         {
-            $this->cipherKey = $key;
-            $this->cipherAlgorithm = $algorithm;
-            $this->initVector = $initVector;
+            $this->encryption = $encryption;
             return $this;
-        }
-
-        /**
-         * Sign data using provided signature credentials
-         * @param string $data Data to sign
-         * @return string
-         * @throws \RuntimeException
-         */
-        private function sign(string $data): string
-        {
-            try {
-                return hash_hmac($this->signatureAlgorithm, $data, $this->signatureKey);
-            } catch (\ErrorException $e) {
-                throw new \RuntimeException('Missing signature key.');
-            }
-        }
-
-        /**
-         * Encrypt data using provided encryption credentials
-         * @param string $data Data to encrypt
-         * @return string Encrypted data
-         * @throws \RuntimeException
-         */
-        private function encrypt(string $data): string
-        {
-            try {
-                return openssl_encrypt($data, $this->cipherAlgorithm, $this->cipherKey, 0, $this->initVector);
-            } catch (\ErrorException $e) {
-                throw new \RuntimeException('Missing encryption key.');
-            }
-        }
-
-        /**
-         * Decrypt once encrypted data using provided decryption keys
-         * @param string $data Encrypted data
-         * @return string Decrypted data
-         * @throws \RuntimeException
-         */
-        public function decrypt(string $data): string
-        {
-            try {
-                return openssl_decrypt($data, $this->cipherAlgorithm, $this->cipherKey, 0, $this->initVector);
-            } catch (\ErrorException $e) {
-                throw new \RuntimeException('Missing decryption key.');
-            }
-        }
-
-        public static function cipherKeys(string $algorithm): array
-        {
-            $keyLen = openssl_cipher_key_length($algorithm);
-            $ivLen = openssl_cipher_iv_length($algorithm);
-            return [
-                'key' => base64_encode(openssl_random_pseudo_bytes($keyLen)),
-                'iv' => base64_encode(openssl_random_pseudo_bytes($ivLen))
-            ];
         }
 
         /**
@@ -150,81 +193,99 @@ namespace lib\client {
          */
         public function send(string $method, string $endpoint, callable $callback): self
         {
-            Concurrency::async(function ()use (&$method, &$endpoint, &$callback) {
-                $stream = null;
-                $this->finalize($method);
-                if (!isset($this->specialOptions[CURLOPT_FILE])) {
-                    $stream = fopen('php://temp', 'r+b');
-                } else {
-                    $stream = fopen($this->specialOptions[CURLOPT_FILE], 'a+b');
-                    $this->specialOptions[CURLOPT_RESUME_FROM] = fstat($stream)['size'];
-                }
-                $this->done($stream, $endpoint, $callback);
-                fclose($stream);
-            });
+            if ($this->asyncMode) {
+                Concurrency::async(fn() => $this->sendSync($method, $endpoint, $callback));
+            } else {
+                $this->sendSync($method, $endpoint, $callback);
+            }
             return $this;
         }
 
-        private function setCookies(): void
+        private function sendSync(string $method, string $endpoint, callable &$callback): void
         {
-            $cookies = $this->request->cookie->toArray();
-            if (!empty($cookies)) {
-                foreach ($cookies as $cookie) {
-                    $this->setOptions([CURLOPT_COOKIE => $cookie]);
-                }
+            $stream = null;
+            $this->createBody();
+            if (!isset($this->specialOptions[CURLOPT_FILE])) {
+                $stream = fopen('php://temp', 'r+b');
+            } else {
+                $stream = fopen($this->specialOptions[CURLOPT_FILE], 'a+b');
+                $this->specialOptions[CURLOPT_RESUME_FROM] = fstat($stream)['size'];
             }
+            $this->done($stream, $method, new URI($this->host . $endpoint), $callback);
+            fclose($stream);
         }
 
-        private function done(&$stream, string $endpoint, ?callable &$callback): void
+        private function done(&$stream, string $method, URI $endpoint, callable &$callback): void
         {
             $retry = 0;
-            $curl = curl_init($this->request->uri->host() . $endpoint);
-            if ($curl === false) {
-                throw new \ErrorException('Connection to a host failed.');
-            }
-            curl_setopt_array($curl, $this->curlOptions);
-            $this->specialOptions[CURLOPT_FILE] = $stream;
-            curl_setopt_array($curl, $this->specialOptions);
-            while (curl_exec($curl) === false && $retry < $this->retries) {
+            while (($curl = curl_init($endpoint)) === false && $retry < $this->retries) {
                 Concurrency::sleep(++$retry);
             }
-            $callback(ResponseBuilder::build($this->request, $curl, $stream));
-            curl_close($curl);
-        }
-
-        private function finalize(string $method): void
-        {
-            $body = $this->mergeBodyWithFiles();
-            if (!empty($body)) {
-                if ($this->signatureKey !== null) {
-                    $this->request->header()->addOne($this->signatureHeader, $this->sign($body));
-                }
-                $content = DataConvertor::convertTo($body, $this->request->type);
-                if ($this->cipherKey !== null) {
-                    $this->setOptions([
-                        CURLOPT_POSTFIELDS => $this->encrypt($content)
-                    ]);
-                } else {
-                    $this->setOptions([CURLOPT_POSTFIELDS => $content]);
-                }
+            if ($curl === false) {
+                throw new \Exception('Connection to a host machine failed.');
             }
             $this->setOptions([
                 CURLOPT_CUSTOMREQUEST => $method,
-                CURLOPT_HTTPHEADER => $this->request->header()->toArray()
+                CURLOPT_HTTPHEADER => $this->header->map(fn($name, $value) => $name . ':' . $value)->toArray()
             ]);
+            curl_setopt_array($curl, $this->curlOptions);
+            $this->specialOptions[CURLOPT_FILE] = $stream;
+            curl_setopt_array($curl, $this->specialOptions);
+            if (curl_exec($curl) === false) {
+                throw new \Exception('Failed to execute command.');
+            }
+            $response = $this->prepareResponse($curl, $stream, $method, $endpoint);
+            if ($this->signature !== null) {
+                $response = $this->verifySignature($response);
+            }
+            if ($this->encryption !== null) {
+                $response->setBody($this->encryption->decrypt($response->body()));
+            }
+            $callback($response);
+            curl_close($curl);
+        }
+
+        public function prepareResponse(\CurlHandle &$curl, &$stream, string $method, URI &$endpoint): ResponseEntity
+        {
+            $request = (new RequestEntityBuilder())
+                    ->headers($this->header)
+                    ->files($this->files)
+                    ->body($this->body)
+                    ->method($method)
+                    ->uri($endpoint)
+                    ->ip(curl_getinfo($curl, CURLINFO_LOCAL_IP))
+                    ->protocol(curl_getinfo($curl, CURLINFO_PROTOCOL))
+                    ->cookies($this->header->getCookies())
+                    ->build();
+            return ResponseBuilder::build($request, $curl, $stream);
+        }
+
+        private function createBody(): void
+        {
+            $body = $this->mergeBodyWithFiles();
+            if (empty($body)) {
+                return;
+            }
+            $content = http_build_query($body);
+            if ($this->signature !== null) {
+                $this->header->addOne($this->headerName, $this->signature->sign($content));
+            }
+            if ($this->encryption !== null) {
+                $content = $this->encryption->encrypt($content);
+            }
+            $this->setOptions([CURLOPT_POSTFIELDS => $content]);
         }
 
         private function mergeBodyWithFiles(): array
         {
             $files = [];
-            foreach ($this->request->files as $name => $file) {
-                $files[$name] = curl_file_create($file->stream->getPathname(), $file->type, $file->name);
+            foreach ($this->files as $name => $file) {
+                $files[$name] = new \CURLFile($file->path, $file->type, basename($file->path));
             }
-            $body = $this->request->body->toArray();
             if (!empty($files)) {
-                return !empty($body) ? array_merge($body, $files) : $files;
+                return !empty($this->body) ? array_merge($this->body, $files) : $files;
             }
-            return $body;
+            return $this->body;
         }
 
         /**
@@ -242,17 +303,14 @@ namespace lib\client {
 
         /**
          * Sign HTTP request with signature
-         * @param string|null $secretKey Secret key used for signing
-         * @param string $algorithm Signature algorithm supported by hash_hmac_algos()
-         * @param string $headerName HTTP Header that will hold signature
+         * @param DigitalSignature $signature
+         * @param string $headerName HTTP Header that will hold signature. Default is <code>X-Signature</code>
          * @return self
-         * @see hash_hmac_algos()
          */
-        public function signature(?string $secretKey, string $algorithm = 'sha256', string $headerName = 'X-Signature'): self
+        public function signature(DigitalSignature $signature, string $headerName = 'X-Signature'): self
         {
-            $this->signatureKey = $secretKey;
-            $this->signatureAlgorithm = $algorithm;
-            $this->signatureHeader = $headerName;
+            $this->signature = $signature;
+            $this->headerName = $headerName;
             return $this;
         }
 
@@ -263,7 +321,7 @@ namespace lib\client {
         public function withoutSignature(): self
         {
             $copy = clone $this;
-            $copy->signatureKey = $copy->signatureAlgorithm = $copy->signatureHeader = null;
+            $copy->signature = null;
             return $copy;
         }
 
@@ -274,7 +332,7 @@ namespace lib\client {
         public function withoutEncryption(): self
         {
             $copy = clone $this;
-            $this->cipherKey = $this->cipherAlgorithm = $this->initVector = null;
+            $copy->encryption = null;
             return $copy;
         }
 
@@ -319,7 +377,7 @@ namespace lib\client {
          */
         public function get(string $endpoint, callable $callback): self
         {
-            return $this->send('GET', self::merge($endpoint, $this->request->body->toArray()), $callback);
+            return $this->send('GET', self::merge($endpoint, $this->body), $callback);
         }
 
         /**
@@ -406,7 +464,8 @@ namespace lib\client {
          * Upload a file to remote server
          * @param string $endpoint Request destination endpoint
          * @param string $source A path to a source file to upload
-         * @param callable $callback A callback that must accept ResponseEntity object
+         * @param callable $callback A callback that accept ResponseEntity object
+         * as a parameter
          * @param callable $progress A callback for showing progress during upload
          * where the first argument is total bytes to load and the second is
          * total bytes loaded
@@ -425,7 +484,7 @@ namespace lib\client {
                     $progress($total, $loaded);
                 };
             }
-            return $this->send($this->request->method, $endpoint, $callback);
+            return $this->put($endpoint, $callback);
         }
 
         private static function merge(string $endpoint, ?array $body): string
@@ -435,6 +494,18 @@ namespace lib\client {
                 $endpoint .= $connector . http_build_query($body);
             }
             return $endpoint;
+        }
+
+        private function verifySignature(ResponseEntity $response): ResponseEntity
+        {
+            try {
+                $signature = $response->header()->getOne($this->headerName);
+                $this->signature->verify($response->body(), $signature);
+            } catch (\Exception $exc) {
+                $response->setStatus(HttpStatus::BAD_REQUEST, $exc->getMessage());
+            } finally {
+                return $response;
+            }
         }
     }
 

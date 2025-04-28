@@ -23,7 +23,7 @@ namespace lib {
             $this->name = $name ?? basename($path);
             $this->size = $size ?? stat($path)['size'];
             $this->error = self::getFileErrors($error);
-            $this->extension = self::getExtension($this->name);
+            $this->extension = self::getExtension($path);
         }
 
         /**

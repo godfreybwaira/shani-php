@@ -37,6 +37,11 @@ namespace apps\demo\modules\greetings\logic\controllers\post {
             echo $this->app->storage()->url($path);
             $this->app->send();
         }
+
+        public function test()
+        {
+            $this->app->render($this->app->request->body()->toArray());
+        }
     }
 
 }

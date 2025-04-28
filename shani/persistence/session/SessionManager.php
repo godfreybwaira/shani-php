@@ -20,7 +20,7 @@ namespace shani\persistence\session {
          */
         public readonly SessionStorage $storage;
         private readonly App $app;
-        private readonly string $filepath;
+        private readonly ?string $filepath;
         private readonly \DateTimeInterface $age;
 
         public function __construct(App &$app)
@@ -98,7 +98,7 @@ namespace shani\persistence\session {
             $cookie = (new HttpCookie())->setHttpOnly(true)
                     ->setName($name)->setValue($sessId)
                     ->setSecure($this->app->request->uri->secure())
-                    ->setDomain($this->app->request->uri->hostname)
+                    ->setDomain($this->app->request->uri->hostname())
                     ->setMaxAge($this->age);
             $this->app->response->header()->setCookie($cookie);
         }

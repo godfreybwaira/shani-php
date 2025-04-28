@@ -80,7 +80,7 @@ namespace shani\http {
                     HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
                     HttpHeader::SERVER => Framework::NAME
                 ]);
-                $this->vhost = ServerConfig::host($this->request->uri->hostname);
+                $this->vhost = ServerConfig::host($this->request->uri->hostname());
                 $this->config = new $this->vhost->configFile($this);
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
@@ -101,7 +101,7 @@ namespace shani\http {
                 if (LocalStorage::tryServe($this)) {
                     return;
                 }
-                if ($this->request->uri->path === '/') {
+                if ($this->request->uri->path() === '/') {
                     $this->request->changeRoute($this->config->home());
                 }
                 $middleware = new Middleware($this);
@@ -121,7 +121,7 @@ namespace shani\http {
          */
         public function send(?bool $useBuffer = null): void
         {
-            $scheme = $this->request->uri->scheme;
+            $scheme = $this->request->uri->scheme();
             $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
             if ($this->request->method === 'head') {
                 $this->response->setStatus(HttpStatus::NO_CONTENT);
@@ -304,27 +304,27 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable $dto Data to send with the response or to pass to a view file
+         * @param array $data Data to send with the response or to pass to a view file
          * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable $dto = null, ?bool $useBuffer = null): void
+        public function render(array $data = null, ?bool $useBuffer = null): void
         {
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($dto?->jsonSerialize());
+                $this->ui()->render($data);
                 $this->sendHtml(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($dto?->jsonSerialize());
+                $this->ui()->render($data);
                 $this->sendSse(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($dto?->jsonSerialize(), $subtype);
+                $this->sendJsonp($data, $subtype);
             } else {
-                $this->response->setBody(DataConvertor::convertTo($dto?->jsonSerialize(), $subtype), $subtype);
+                $this->response->setBody(DataConvertor::convertTo($data, $subtype), $subtype);
             }
             $this->send($useBuffer);
         }
@@ -423,8 +423,12 @@ namespace shani\http {
                 throw CustomException::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);
-            $cb = self::kebab2camelCase(substr($this->request->route()->action, 1));
-            (new $className($this))->$cb();
+            $callback = self::kebab2camelCase(substr($this->request->route()->action, 1));
+            $obj = new $className($this);
+            if (!is_callable([$obj, $callback])) {
+                throw CustomException::notFound($this);
+            }
+            $obj->$callback();
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string
@@ -451,7 +455,7 @@ namespace shani\http {
          */
         public function csrf(?string $urlPath = null): string
         {
-            $url = $urlPath ?? $this->request->uri->path;
+            $url = $urlPath ?? $this->request->uri->path();
             if (!$this->config->skipCsrfProtection()) {
                 $token = base64_encode(random_bytes(6));
                 $this->csrfToken()->addOne($token, null);

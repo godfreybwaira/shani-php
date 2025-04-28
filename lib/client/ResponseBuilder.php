@@ -9,6 +9,7 @@
 
 namespace lib\client {
 
+    use lib\http\HttpCookie;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
@@ -28,8 +29,8 @@ namespace lib\client {
                 if (!str_contains($line, ':')) {
                     continue;
                 }
-                list($key, $value) = explode(': ', $line, 2);
-                $headers[$key] = $value;
+                $header = explode(': ', $line);
+                $headers[$header[0]] = $header[1] ?? null;
             }
             return new HttpHeader($headers);
         }
@@ -62,7 +63,7 @@ namespace lib\client {
 
         private static function setReflectionHeaders(RequestEntity &$request, HttpHeader &$headers)
         {
-            $cookies = $headers->getOne(HttpHeader::SET_COOKIE, []);
+            $cookies = new HttpCookie($headers->getOne(HttpHeader::SET_COOKIE));
             foreach ($cookies as $cookie) {
                 $request->header()->setCookie($cookie);
             }

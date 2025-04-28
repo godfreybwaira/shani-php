@@ -122,15 +122,16 @@ namespace lib\lists {
          * The returned value of a function overwrites the current value.
          * @param callable $callback A callback function that receives an item
          * as an argument.
-         * @return self
+         * @return self A new object
          */
         public function map(callable $callback): self
         {
+            $rows = [];
             $values = $this->toArray();
             foreach ($values as $value) {
-                $this->delete($value)->addOne($callback($value));
+                $rows[] = $callback($value);
             }
-            return $this;
+            return new self($rows);
         }
     }
 

@@ -38,9 +38,9 @@ namespace lib\http {
 
         /**
          * User IP address
-         * @var string
+         * @var string|null
          */
-        public readonly string $ip;
+        public readonly ?string $ip;
 
         /**
          * Check whether the request comes from local machine
@@ -51,7 +51,8 @@ namespace lib\http {
         public readonly array $files;
         public readonly string $localhost;
         private ?array $acceptedType = null;
-        public readonly ReadableMap $cookie, $body, $query;
+        private readonly ReadableMap $body;
+        public readonly ReadableMap $cookie, $query;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
@@ -61,7 +62,7 @@ namespace lib\http {
         {
             parent::__construct($headers, $protocol);
             $this->localhost = $ip === '127.0.0.1';
-            $this->changeRoute($uri->path);
+            $this->changeRoute($uri->path());
             $this->cookie = $cookies;
             $this->query = $queries;
             $this->method = $method;
@@ -86,6 +87,15 @@ namespace lib\http {
         public function raw(): ?string
         {
             return $this->raw;
+        }
+
+        /**
+         * Request body
+         * @return ReadableMap
+         */
+        public function body(): ReadableMap
+        {
+            return $this->body;
         }
 
         /**

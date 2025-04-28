@@ -40,7 +40,7 @@ namespace apps\demo\config {
 
         public function allowedRequestMethods(): string
         {
-            return 'get,post,head';
+            return 'get,post,head,put';
         }
 
         public function registerMiddleware(Middleware &$mw): void
@@ -52,6 +52,11 @@ namespace apps\demo\config {
         public function clientPermissions(): ?string
         {
             return null;
+        }
+
+        public function skipCsrfProtection(): bool
+        {
+            return true;
         }
 
         public function breadcrumbDir(): string

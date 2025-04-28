@@ -25,7 +25,9 @@ namespace lib {
 
         public function __construct()
         {
-            $this->rawBody = null;
+            $this->time = time();
+            $this->rawBody = $this->method = $this->ip = $this->protocol = null;
+            $this->headers = new HttpHeader();
             $this->body = new ReadableMap();
             $this->queries = new ReadableMap();
             $this->cookies = new ReadableMap();
@@ -55,9 +57,11 @@ namespace lib {
             return $this;
         }
 
-        public function headers(HttpHeader $headers): self
+        public function headers(?HttpHeader $headers): self
         {
-            $this->headers = $headers;
+            if (!empty($headers)) {
+                $this->headers = $headers;
+            }
             return $this;
         }
 

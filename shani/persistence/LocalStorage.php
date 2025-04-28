@@ -62,7 +62,7 @@ namespace shani\persistence {
          */
         public static function tryServe(App &$app): bool
         {
-            $path = $app->request->uri->path;
+            $path = $app->request->uri->path();
             $prefix = self::getPrefix($path);
             switch ($prefix) {
                 case self::ACCESS_ASSET:
@@ -92,7 +92,7 @@ namespace shani\persistence {
 
         private static function sendFile(App &$app, string $filepath): bool
         {
-            $etag = md5($app->request->uri->path);
+            $etag = md5($app->request->uri->path());
             if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
                 $app->send();

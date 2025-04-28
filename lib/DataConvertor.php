@@ -163,12 +163,15 @@ namespace lib {
 
         /**
          * Convert array data to string data.
-         * @param array $data Data to convert
+         * @param array|null $data Data to convert
          * @param string $type target data type of DataConvertor::TYPE_*.
-         * @return string A result from conversion
+         * @return string|null A result from conversion
          */
-        public static function convertTo(array $data, string $type): string
+        public static function convertTo(?array $data, string $type): ?string
         {
+            if ($data === null) {
+                return null;
+            }
             return match ($type) {
                 self::TYPE_JSON => json_encode($data),
                 self::TYPE_XML => self::array2xml($data),

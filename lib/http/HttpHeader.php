@@ -160,9 +160,9 @@ namespace lib\http {
 
         /**
          * Get HTTP cookie header object(s) as array
-         * @return array
+         * @return array|null
          */
-        public function getCookies(): array
+        public function getCookies(): ?array
         {
             return $this->getOne(self::SET_COOKIE);
         }

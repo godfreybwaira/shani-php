@@ -122,14 +122,15 @@ namespace lib\map {
          * The returned value of a function overwrites the current value.
          * @param callable $callback A callback function that receives an item name
          * and value as first and second parameters.
-         * @return self
+         * @return self A new object
          */
         public function map(callable $callback): self
         {
+            $rows = [];
             foreach ($this->data as $key => $value) {
-                $this->data[$key] = $callback($key, $value);
+                $rows[$key] = $callback($key, $value);
             }
-            return $this;
+            return new self($rows);
         }
     }
 

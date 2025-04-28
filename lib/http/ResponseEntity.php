@@ -23,7 +23,7 @@ namespace lib\http {
         public readonly RequestEntity $request;
         private DataCompressionLevel $compression;
         private int $compressionMinSize = 1024; //1KB
-        private ?string $statusMessage = null, $body = null;
+        private ?string $statusMessage = null, $rawBody = null;
         private HttpStatus $status;
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
@@ -44,7 +44,7 @@ namespace lib\http {
             if (!empty($contentType)) {
                 return MediaType::subtype($contentType);
             }
-            $parts = explode('.', $this->request->uri->path);
+            $parts = explode('.', $this->request->uri->path());
             $size = count($parts);
             if ($size > 1) {
                 return strtolower($parts[$size - 1]);
@@ -58,7 +58,7 @@ namespace lib\http {
          */
         public function bodySize(): int
         {
-            return $this->body === null ? 0 : mb_strlen($this->body);
+            return $this->rawBody === null ? 0 : mb_strlen($this->rawBody);
         }
 
         /**
@@ -88,48 +88,48 @@ namespace lib\http {
             return $this->statusMessage;
         }
 
-        private function compress(string &$content): self
+        private function compress(?string &$content): self
         {
             if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
-                $this->body = $content;
+                $this->rawBody = $content;
                 $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
                 return $this;
             }
             $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
             if (str_contains($encoding, 'gzip')) {
                 $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'gzip');
-                $this->body = gzencode($content, $this->compression->value);
+                $this->rawBody = gzencode($content, $this->compression->value);
             } elseif (str_contains($encoding, 'deflate')) {
                 $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'deflate');
-                $this->body = gzdeflate($content, $this->compression->value);
+                $this->rawBody = gzdeflate($content, $this->compression->value);
             } elseif (str_contains($encoding, 'compress')) {
                 $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'compress');
-                $this->body = gzcompress($content, $this->compression->value);
+                $this->rawBody = gzcompress($content, $this->compression->value);
             } else {
-                $this->body = $content;
+                $this->rawBody = $content;
             }
             $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
             return $this;
         }
 
         /**
-         * Get response body
+         * Raw response body
          * @return string|null
          */
         public function body(): ?string
         {
-            return $this->body;
+            return $this->rawBody;
         }
 
         /**
          * Set response body as string. This body will be sent to client.
-         * @param string $content Response body content
+         * @param string|null $content Response body content
          * @param string|null $subtype Response subtype
          * @return self
          */
-        public function setBody(string $content, ?string $subtype = null): self
+        public function setBody(?string $content, ?string $subtype = null): self
         {
-            if (!$this->headers->exists(HttpHeader::CONTENT_TYPE)) {
+            if (!$this->headers->exists(HttpHeader::CONTENT_TYPE) && $content !== null) {
                 $this->headers->addOne(HttpHeader::CONTENT_TYPE, match ($subtype ?? $this->subtype()) {
                     DataConvertor::TYPE_JSON => MediaType::JSON,
                     DataConvertor::TYPE_XML => MediaType::XML,

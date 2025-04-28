@@ -318,6 +318,7 @@ namespace lib {
         public const FM = 'application/vnd.framemaker';
         public const FNC = 'application/vnd.frogans.fnc';
         public const FO = 'application/vnd.software602.filler.form+xml';
+        public const FORM_DATA = 'multipart/form-data';
         public const TEXT_FOR = 'text/x-fortran';
         public const IMAGE_FPX = 'image/vnd.fpx';
         public const FRAME = 'application/vnd.framemaker';
