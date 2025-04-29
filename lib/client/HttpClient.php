@@ -303,14 +303,14 @@ namespace lib\client {
         private function createBody(): void
         {
             $content = $this->formatBody();
-            if ($content === null) {
+            if ($content === null || $content === '') {
                 return;
-            }
-            if ($this->encryption !== null) {
-                $content = $this->encryption->encrypt($content);
             }
             if ($this->signature !== null) {
                 $this->requestHeader->addOne($this->headerName, $this->signature->sign($content));
+            }
+            if ($this->encryption !== null) {
+                $content = $this->encryption->encrypt($content);
             }
             $this->setOptions([CURLOPT_POSTFIELDS => $content]);
         }
