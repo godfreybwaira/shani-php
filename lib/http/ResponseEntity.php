@@ -90,25 +90,23 @@ namespace lib\http {
 
         private function compress(?string &$content): self
         {
-            if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
-                $this->rawBody = $content;
-                $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
-                return $this;
-            }
-            $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
-            if (str_contains($encoding, 'gzip')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'gzip');
-                $this->rawBody = gzencode($content, $this->compression->value);
-            } elseif (str_contains($encoding, 'deflate')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'deflate');
-                $this->rawBody = gzdeflate($content, $this->compression->value);
-            } elseif (str_contains($encoding, 'compress')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'compress');
-                $this->rawBody = gzcompress($content, $this->compression->value);
+            if ($this->compression !== DataCompressionLevel::DISABLE && $this->compressionMinSize < $this->bodySize()) {
+                $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
+                if (str_contains($encoding, 'gzip')) {
+                    $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'gzip');
+                    $this->rawBody = gzencode($content, $this->compression->value);
+                } elseif (str_contains($encoding, 'deflate')) {
+                    $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'deflate');
+                    $this->rawBody = gzdeflate($content, $this->compression->value);
+                } elseif (str_contains($encoding, 'compress')) {
+                    $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'compress');
+                    $this->rawBody = gzcompress($content, $this->compression->value);
+                } else {
+                    $this->rawBody = $content;
+                }
             } else {
                 $this->rawBody = $content;
             }
-            $this->headers->addOne(HttpHeader::CONTENT_LENGTH, $this->bodySize());
             return $this;
         }
 
@@ -141,6 +139,12 @@ namespace lib\http {
                 });
             }
             return $this->compress($content);
+        }
+
+        public function saveAs(string $filename): self
+        {
+            $this->headers->setFilename($filename);
+            return $this;
         }
 
         /**

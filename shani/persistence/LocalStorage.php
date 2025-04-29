@@ -167,8 +167,7 @@ namespace shani\persistence {
 
         public function download(string $filepath, ?string $filename = null): self
         {
-            $disposition = 'attachment; filename="' . ($filename ?? basename($filepath)) . '"';
-            $this->app->response->header()->addOne(HttpHeader::CONTENT_DISPOSITION, $disposition);
+            $this->app->response->saveAs($filename ?? basename($filepath));
             return $this->app->stream($filepath);
         }
 

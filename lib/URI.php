@@ -22,7 +22,9 @@ namespace lib {
             if (!is_array($this->parts)) {
                 throw new \InvalidArgumentException('Invalid URI detected.');
             }
-            $this->parts['path'] = '/' . trim(str_replace([chr(0), '/..', '/.'], '', $this->parts['path']), '/');
+            if (!empty($this->parts['path'])) {
+                $this->parts['path'] = '/' . trim(str_replace([chr(0), '/..', '/.'], '', $this->parts['path']), '/');
+            }
         }
 
         private static function valueOf($value, $default = null)
@@ -85,7 +87,7 @@ namespace lib {
          * Get sanitized URL path
          * @return string
          */
-        public function path(): string
+        public function path(): ?string
         {
             return $this->parts['path'];
         }

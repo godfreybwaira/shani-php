@@ -30,13 +30,6 @@ namespace lib\http {
             return (float) explode('/', $this->protocol)[1];
         }
 
-        public function withHeaders(HttpHeader $headers): self
-        {
-            $copy = clone $this;
-            $copy->headers = $headers;
-            return $copy;
-        }
-
         /**
          * Get HTTP header object
          * @return HttpHeader

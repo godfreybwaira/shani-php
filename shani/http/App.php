@@ -123,6 +123,7 @@ namespace shani\http {
         {
             $scheme = $this->request->uri->scheme();
             $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
+            $this->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->response->bodySize());
             if ($this->request->method === 'head') {
                 $this->response->setStatus(HttpStatus::NO_CONTENT);
                 $this->writer->sendHeaders($this->response);
@@ -323,7 +324,7 @@ namespace shani\http {
                 $this->sendSse(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($data, $subtype);
-            } else {
+            } else if ($data !== null) {
                 $this->response->setBody(DataConvertor::convertTo($data, $subtype), $subtype);
             }
             $this->send($useBuffer);

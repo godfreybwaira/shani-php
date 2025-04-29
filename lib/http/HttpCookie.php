@@ -19,7 +19,7 @@ namespace lib\http {
 
         private array $cookie;
 
-        public function __construct(string $rawCookie = null)
+        public function __construct(?string $rawCookie = null)
         {
             if ($rawCookie !== null) {
                 $attributes = preg_split('/\s*;\s*/', $rawCookie, -1, PREG_SPLIT_NO_EMPTY);

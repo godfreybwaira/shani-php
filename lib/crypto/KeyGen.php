@@ -32,11 +32,12 @@ namespace lib\crypto {
 
         /**
          * Generates a random unique signature using
-         * @return string Encodes output using hexadecimal format for easier integration.
+         * @param int $length Byte length
+         * @return string Encodes output using base 64 format for easier storage.
          */
-        public static function signature(): string
+        public static function signature(int $length = 32): string
         {
-            return bin2hex(random_bytes(32));
+            return base64_encode(random_bytes($length));
         }
 
         /**

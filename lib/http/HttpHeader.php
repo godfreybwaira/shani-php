@@ -199,6 +199,20 @@ namespace lib\http {
             return mb_strlen($this);
         }
 
+        /**
+         * Get a file name from Content-Disposition header (If available)
+         * @return string|null
+         */
+        public function getFilename(): ?string
+        {
+            $disposition = $this->getOne(self::CONTENT_DISPOSITION);
+            if ($disposition === null) {
+                return null;
+            }
+            $name = substr($disposition, strpos($disposition, '=') + 2);
+            return substr($name, 0, strlen($name) - 1);
+        }
+
         #[\Override]
         public function __toString(): string
         {
@@ -208,6 +222,24 @@ namespace lib\http {
                 $headerString .= "\r\n" . $key = ': ' . $val;
             }
             return ltrim($headerString);
+        }
+
+        /**
+         * Set Content-Disposition header
+         * @param string $filename A file name.
+         * @param bool $overwrite If true, the existing Content-Disposition header
+         * will be overwritten.
+         * @return self
+         */
+        public function setFilename(string $filename, bool $overwrite = false): self
+        {
+            $disposition = 'attachment; filename="' . $filename . '"';
+            if ($overwrite) {
+                $this->addOne(self::CONTENT_DISPOSITION, $disposition);
+            } else {
+                $this->addIfAbsent(self::CONTENT_DISPOSITION, $disposition);
+            }
+            return $this;
         }
     }
 
