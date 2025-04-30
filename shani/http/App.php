@@ -94,6 +94,8 @@ namespace shani\http {
         public function runApp(): void
         {
             try {
+                $this->response->sign($this->config->signature());
+                $this->response->encrypt($this->config->encryption());
                 $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
                 if (!$this->vhost->running) {
                     throw CustomException::offline($this);

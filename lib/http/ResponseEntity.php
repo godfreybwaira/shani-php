@@ -232,11 +232,11 @@ namespace lib\http {
 
         /**
          * Sign response body with provided digital signature
-         * @param DigitalSignature $signature Digital signature object
+         * @param DigitalSignature|null $signature Digital signature object
          * @param string $headerName Header name that will hold signature
          * @return self
          */
-        public function sign(DigitalSignature $signature, string $headerName = 'X-Signature'): self
+        public function sign(?DigitalSignature $signature, string $headerName = 'X-Signature'): self
         {
             $this->signature = $signature;
             $this->signatureHeader = $headerName;
@@ -245,10 +245,10 @@ namespace lib\http {
 
         /**
          * Encrypt response body with the given encryption keys
-         * @param Encryption $encription Encryption object
+         * @param Encryption|null $encription Encryption object
          * @return self
          */
-        public function encrypt(Encryption $encription): self
+        public function encrypt(?Encryption $encription): self
         {
             $this->encryption = $encription;
             return $this;

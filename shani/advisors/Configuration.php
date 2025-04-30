@@ -10,6 +10,8 @@
 
 namespace shani\advisors {
 
+    use lib\crypto\DigitalSignature;
+    use lib\crypto\Encryption;
     use lib\DataCompressionLevel;
     use lib\Duration;
     use shani\advisors\web\BrowsingPrivacy;
@@ -421,6 +423,26 @@ namespace shani\advisors {
         {
 //            return date('Y-m-d') . '.log';
             return 'php://stdout';
+        }
+
+        /**
+         * Return digital signature used to sign response body, and to verify
+         * request body
+         * @return DigitalSignature|null Digital signature object
+         */
+        public function signature(): ?DigitalSignature
+        {
+            return null;
+        }
+
+        /**
+         * Return encryption object used to encrypt response body, and to decrypt
+         * request body.
+         * @return Encryption|null Encryption object
+         */
+        public function encryption(): ?Encryption
+        {
+            return null;
         }
     }
 
