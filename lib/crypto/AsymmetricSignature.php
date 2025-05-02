@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of OpenSSLSignature
+ * Description of AsymmetricSignature
  * @author coder
  *
  * Created on: Apr 28, 2025 at 11:44:18 AM
@@ -9,7 +9,7 @@
 
 namespace lib\crypto {
 
-    final class OpenSSLSignature implements DigitalSignature
+    final class AsymmetricSignature implements DigitalSignature
     {
 
         public readonly string $privateKey, $algorithm, $publicKey;
@@ -23,7 +23,7 @@ namespace lib\crypto {
          * @param string $algorithm Specifies the hashing algorithm (e.g., SHA256, SHA512, etc.).
          * @see openssl_get_md_methods()
          */
-        public function __construct(string $privateKey, string $publicKey, string $algorithm)
+        public function __construct(string $privateKey, string $publicKey, string $algorithm = 'sha256')
         {
             $this->privateKey = $privateKey;
             $this->publicKey = $publicKey;

@@ -15,8 +15,9 @@ namespace lib\crypto {
     {
 
         /**
-         * Generates encryption keys (key and IV) for symmetric encryption (AES).
-         * @param string $algorithm Any algorithm accepted by openssl
+         * Generates encryption keys (key and IV) for using in symmetric encryption (e.g: AES).
+         * @param string $algorithm Any algorithm accepted by openssl. These
+         * values MUST be decoded first before using them.
          * @return array Returns the keys Base64-encoded for easy storage
          * @see openssl_get_cipher_methods()
          */
@@ -25,13 +26,13 @@ namespace lib\crypto {
             $keyLen = openssl_cipher_key_length($algorithm);
             $ivLen = openssl_cipher_iv_length($algorithm);
             return [
-                'key' => base64_encode(openssl_random_pseudo_bytes($keyLen)),
-                'iv' => base64_encode(openssl_random_pseudo_bytes($ivLen))
+                'password' => base64_encode(openssl_random_pseudo_bytes($keyLen)),
+                'initVector' => base64_encode(openssl_random_pseudo_bytes($ivLen))
             ];
         }
 
         /**
-         * Generates a random unique signature using
+         * Generates a random unique value for using in symmetric digital signature
          * @param int $length Byte length
          * @return string Encodes output using base 64 format for easier storage.
          */
@@ -71,6 +72,9 @@ namespace lib\crypto {
          */
         public static function ed25519(string $destination): bool
         {
+            if (!defined('OPENSSL_KEYTYPE_ED25519')) {
+                define('OPENSSL_KEYTYPE_ED25519', 5); // 5 is the expected internal value for Ed25519
+            }
             $configs = ['private_key_type' => OPENSSL_KEYTYPE_ED25519];
             return self::generate($configs, $destination, 'ed25519');
         }
@@ -80,11 +84,13 @@ namespace lib\crypto {
          * If keys exists, they will be overwritten.
          * @param int $keySize Key size. Must be a multiple of 128, higher value
          * means more secure but slower.
+         * @param string $algorithm The hashing algorithm used (e.g., SHA256, SHA512, etc.).
          * @return bool True on success, false otherwise
          */
-        public static function rsa(string $destination, int $keySize = 2048): string
+        public static function rsa(string $destination, int $keySize = 2048, string $algorithm = 'sha256'): string
         {
             $configs = [
+                'digest_alg' => $algorithm,
                 'private_key_bits' => $keySize,
                 'private_key_type' => OPENSSL_KEYTYPE_RSA
             ];

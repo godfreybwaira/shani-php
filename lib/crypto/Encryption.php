@@ -9,45 +9,24 @@
 
 namespace lib\crypto {
 
-    final class Encryption
+    interface Encryption
     {
 
-        public readonly string $password, $algorithm, $initVector;
-
-        public function __construct(string $password, string $initVector, string $algorithm = 'aes-256-cbc')
-        {
-            $this->password = $password;
-            $this->algorithm = $algorithm;
-            $this->initVector = $initVector;
-        }
-
         /**
-         * Encrypt data using provided encryption credentials
+         * Encrypt data using provided public encryption key or password
          * @param string $payload Data to encrypt
-         * @return string Returns the encrypted string on success.
+         * @return string On success, returns the encrypted string encoded in base 64.
+         * @throws Exception When encryption fails
          */
-        public function encrypt(string $payload): string|false
-        {
-            $result = openssl_encrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
-            if ($result !== false) {
-                return $result;
-            }
-            throw new \Exception('Failed to encrypt data');
-        }
+        public function encrypt(string $payload): string;
 
         /**
-         * Decrypt once encrypted data using provided decryption keys
+         * Decrypt encrypted data using provided private decryption key or password
          * @param string $payload Encrypted data
          * @return string The decrypted string on success
+         * @throws Exception When decryption fails
          */
-        public function decrypt(string $payload): string
-        {
-            $result = openssl_decrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
-            if ($result !== false) {
-                return $result;
-            }
-            throw new \Exception('Failed to decrypt data');
-        }
+        public function decrypt(string $payload): string;
     }
 
 }

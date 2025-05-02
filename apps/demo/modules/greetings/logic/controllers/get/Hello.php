@@ -43,32 +43,6 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
                     ->addSubject(new Subject('Maths', 'C', 70.6));
             $this->app->render($student->jsonSerialize());
         }
-
-        public function test()
-        {
-            $header = new HttpHeader();
-            $header->addOne(HttpHeader::ACCEPT_VERSION, 'api');
-            $header->addOne(HttpHeader::ACCEPT, $this->app->request->header()->getOne(HttpHeader::ACCEPT));
-            $uri = new \lib\URI('http://localhost:8008');
-            $client = new HttpClient($uri);
-            $client->setBody((new Subject('Mathemtics', 'D', 70.6))->jsonSerialize());
-            $client->setHeader($header);
-            $file = '/home/coder/Pictures';
-//            $client->signature('abc');
-            $client->download('/greetings/0/hello/0/abc', $file, 'abcb.png', function (ResponseEntity $response) {
-                print_r($response->header()->toArray());
-                print_r($response->header()->getFilename());
-                $this->app->response->setStatus($response->status())->setBody($response->body());
-                $this->app->send();
-            });
-        }
-
-        public function abc()
-        {
-            $file = '/home/coder/Pictures/Screenshot from 2022-11-05 18-34-36.png';
-            $this->app->response->saveAs(basename($file));
-            $this->app->stream($file);
-        }
     }
 
 }

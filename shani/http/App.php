@@ -267,7 +267,7 @@ namespace shani\http {
         {
             if (!isset($this->logger)) {
                 $filename = $this->config->logFileName();
-                if ($filename !== null) {
+                if (strpos($filename, '://') === false) {
                     $filename = $this->storage()->pathTo('/' . $filename);
                 }
                 $this->logger = new Logger($filename);

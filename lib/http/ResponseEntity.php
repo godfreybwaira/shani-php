@@ -117,6 +117,7 @@ namespace lib\http {
                 });
             }
             $this->rawBody = $content;
+            return $this;
         }
 
         public function saveAs(string $filename): self
@@ -208,7 +209,7 @@ namespace lib\http {
          */
         public function sign(?DigitalSignature $signature, string $headerName): self
         {
-            if ($signature !== null) {
+            if ($signature !== null && !empty($this->rawBody)) {
                 $this->headers->addOne($headerName, $signature->sign($this->rawBody));
             }
             return $this;
@@ -221,7 +222,7 @@ namespace lib\http {
          */
         public function encrypt(?Encryption $encryption): self
         {
-            if ($encryption !== null) {
+            if ($encryption !== null && !empty($this->rawBody)) {
                 $this->rawBody = $encryption->encrypt($this->rawBody);
             }
             return $this;

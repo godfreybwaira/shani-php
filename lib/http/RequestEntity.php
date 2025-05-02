@@ -193,8 +193,10 @@ namespace lib\http {
          */
         public function decompress(): self
         {
-            $encoding = $this->headers->getOne(HttpHeader::CONTENT_ENCODING);
-            $this->raw = DataCompression::decompress($this->raw, $encoding);
+            if (!empty($this->raw)) {
+                $encoding = $this->headers->getOne(HttpHeader::CONTENT_ENCODING);
+                $this->raw = DataCompression::decompress($this->raw, $encoding);
+            }
             return $this;
         }
 
@@ -206,7 +208,7 @@ namespace lib\http {
          */
         public function verify(?DigitalSignature $signature, string $headerName): self
         {
-            if ($signature !== null) {
+            if ($signature !== null && !empty($this->raw)) {
                 $signature->verify($this->raw, $this->headers->getOne($headerName));
             }
             return $this;
@@ -219,7 +221,7 @@ namespace lib\http {
          */
         public function decrypt(?Encryption $encryption): self
         {
-            if ($encryption !== null) {
+            if ($encryption !== null && !empty($this->raw)) {
                 $this->raw = $encryption->decrypt($this->raw);
             }
             return $this;

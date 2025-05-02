@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of HmacSignature
+ * Description of SymmetricSignature
  * @author coder
  *
  * Created on: Apr 28, 2025 at 11:44:18 AM
@@ -9,7 +9,7 @@
 
 namespace lib\crypto {
 
-    final class HmacSignature implements DigitalSignature
+    final class SymmetricSignature implements DigitalSignature
     {
 
         /**
@@ -32,7 +32,7 @@ namespace lib\crypto {
          * @param string $algorithm The hashing algorithm used (e.g., SHA256, SHA512, etc.).
          * @see @see hash_hmac_algos()
          */
-        public function __construct(string $password, string $algorithm)
+        public function __construct(string $password, string $algorithm = 'sha256')
         {
             $this->password = $password;
             $this->algorithm = $algorithm;
