@@ -12,7 +12,7 @@ namespace shani\advisors {
 
     use lib\crypto\DigitalSignature;
     use lib\crypto\Encryption;
-    use lib\DataCompressionLevel;
+    use lib\DataCompression;
     use lib\Duration;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
@@ -342,12 +342,12 @@ namespace shani\advisors {
         }
 
         /**
-         * Set level for compression algorithm. Default level is DataCompressionLevel::BEST
-         * @return DataCompressionLevel
+         * Set level for compression algorithm. Default level is DataCompression::BEST
+         * @return DataCompression
          */
-        public function compressionLevel(): DataCompressionLevel
+        public function compressionLevel(): DataCompression
         {
-            return DataCompressionLevel::BEST;
+            return DataCompression::BEST;
         }
 
         /**
@@ -443,6 +443,42 @@ namespace shani\advisors {
         public function encryption(): ?Encryption
         {
             return null;
+        }
+
+        /**
+         * Return header name that will hold digital signature. All signature
+         * are send via HTTP header.
+         * @return string
+         */
+        public function signatureHeaderName(): string
+        {
+            return 'X-Signature';
+        }
+
+        /**
+         * Modify response before sending to client. Example signing a response,
+         * encrypting, compressing response body etc
+         * @return void
+         */
+        public function responseMutator(): void
+        {
+            $this->app->response
+                    ->compress($this->compressionMinSize(), $this->compressionLevel())
+                    ->sign($this->signature(), $this->signatureHeaderName())
+                    ->encrypt($this->encryption());
+        }
+
+        /**
+         * Modify request before processing it. Example verifying signature,
+         * decrypting, decompressing request body etc
+         * @return void
+         */
+        public function requestMutator(): void
+        {
+            $this->app->request
+                    ->decrypt($this->encryption())
+                    ->verify($this->signature(), $this->signatureHeaderName())
+                    ->decompress();
         }
     }
 

@@ -94,9 +94,7 @@ namespace shani\http {
         public function runApp(): void
         {
             try {
-                $this->response->sign($this->config->signature());
-                $this->response->encrypt($this->config->encryption());
-                $this->response->setCompression($this->config->compressionLevel(), $this->config->compressionMinSize());
+                $this->config->requestMutator();
                 if (!$this->vhost->running) {
                     throw CustomException::offline($this);
                 }
@@ -125,6 +123,7 @@ namespace shani\http {
         {
             $scheme = $this->request->uri->scheme();
             $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
+            $this->config->responseMutator();
             $this->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->response->bodySize());
             if ($this->request->method === 'head') {
                 $this->response->setStatus(HttpStatus::NO_CONTENT);
@@ -268,7 +267,7 @@ namespace shani\http {
         {
             if (!isset($this->logger)) {
                 $filename = $this->config->logFileName();
-                if (strpos($filename, '://') === false) {
+                if ($filename !== null) {
                     $filename = $this->storage()->pathTo('/' . $filename);
                 }
                 $this->logger = new Logger($filename);

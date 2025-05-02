@@ -9,6 +9,9 @@
 
 namespace lib\http {
 
+    use lib\crypto\DigitalSignature;
+    use lib\crypto\Encryption;
+    use lib\DataCompression;
     use lib\File;
     use lib\map\ReadableMap;
     use lib\MediaType;
@@ -51,7 +54,7 @@ namespace lib\http {
         public readonly array $files;
         public readonly string $localhost;
         private ?array $acceptedType = null;
-        private readonly ReadableMap $body;
+        private ReadableMap $body;
         public readonly ReadableMap $cookie, $query;
 
         public function __construct(
@@ -77,6 +80,12 @@ namespace lib\http {
         public function withRawBody(string $body): self
         {
             $this->raw = $body;
+            return $this;
+        }
+
+        public function withBody(ReadableMap $body): self
+        {
+            $this->body = $body;
             return $this;
         }
 
@@ -176,6 +185,44 @@ namespace lib\http {
         public function params(int $index): ?string
         {
             return $this->route->params[$index] ?? null;
+        }
+
+        /**
+         * Decompress raw request body
+         * @return self
+         */
+        public function decompress(): self
+        {
+            $encoding = $this->headers->getOne(HttpHeader::CONTENT_ENCODING);
+            $this->raw = DataCompression::decompress($this->raw, $encoding);
+            return $this;
+        }
+
+        /**
+         * Verify request raw body with provided digital signature
+         * @param DigitalSignature|null $signature Digital signature object
+         * @param string $headerName Header name that will hold signature
+         * @return self
+         */
+        public function verify(?DigitalSignature $signature, string $headerName): self
+        {
+            if ($signature !== null) {
+                $signature->verify($this->raw, $this->headers->getOne($headerName));
+            }
+            return $this;
+        }
+
+        /**
+         * Encrypt response body with the given encryption keys
+         * @param Encryption|null $encryption Encryption object
+         * @return self
+         */
+        public function decrypt(?Encryption $encryption): self
+        {
+            if ($encryption !== null) {
+                $this->raw = $encryption->decrypt($this->raw);
+            }
+            return $this;
         }
     }
 

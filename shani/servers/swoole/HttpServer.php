@@ -74,10 +74,10 @@ namespace shani\servers\swoole {
                     ->method($req->server['request_method'])
                     ->headers(new HttpHeader($req->header))
                     ->time($req->server['request_time'])
-                    ->files(self::getFiles($req->files))
+                    ->files(self::getPostedFiles($req->files))
                     ->ip($req->server['remote_addr'])
                     ->rawBody($req->rawcontent())
-                    ->body(self::getBody($req))
+                    ->body(self::getPostedBody($req))
                     ->cookies($req->cookie)
                     ->query($req->get)
                     ->uri($uri)
@@ -86,7 +86,7 @@ namespace shani\servers\swoole {
             return new App($response, $writer);
         }
 
-        private static function getBody(Request &$req): ?array
+        private static function getPostedBody(Request &$req): ?array
         {
             $contentType = $req->header['content-type'] ?? null;
             if (!empty($req->post) || empty($contentType)) {
@@ -96,7 +96,7 @@ namespace shani\servers\swoole {
             return DataConvertor::convertFrom($req->rawcontent(), $type);
         }
 
-        private static function getFiles(?array $files): array
+        private static function getPostedFiles(?array $files): array
         {
             $uploaded = [];
             if (empty($files)) {
@@ -110,7 +110,7 @@ namespace shani\servers\swoole {
                             error: $file['error']
                     );
                 } else {
-                    $uploaded[$name] = self::getFiles($file);
+                    $uploaded[$name] = self::getPostedFiles($file);
                 }
             }
             return $uploaded;
@@ -119,24 +119,35 @@ namespace shani\servers\swoole {
         private static function checkFrameworkRequirements()
         {
             if (version_compare(Definitions::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
-                exit('PHP version ' . Definitions::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
+                fwrite(STDERR, 'PHP version ' . Definitions::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
+                exit(1);
             }
             foreach (Definitions::REQUIRED_EXTENSIONS as $extension) {
                 if (!extension_loaded($extension)) {
-                    exit('Please install PHP ' . $extension . ' extension' . PHP_EOL);
+                    fwrite(STDERR, 'Please install PHP ' . $extension . ' extension' . PHP_EOL);
+                    exit(1);
                 }
             }
         }
 
         /**
          * Starting the server. When started, server becomes ready to accept requests
+         * @param array $arguments CLI arguments
          * @return void
          */
-        public static function start(): void
+        public static function start(array $arguments): void
         {
             self::checkFrameworkRequirements();
-            $cnf = ServerConfig::getConfig();
+            $cnf = ServerConfig::getConfig($arguments);
             $server = self::configure($cnf);
+            self::runServer($server, $cnf);
+//            if ($server->isTesting) {
+//                $server->test($cnf);
+//            }
+        }
+
+        private static function runServer(WSocket &$server, ServerConfig &$cnf): void
+        {
             $clients = [];
             $server->on('start', function () {
                 echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;

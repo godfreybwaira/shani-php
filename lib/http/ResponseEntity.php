@@ -11,7 +11,7 @@ namespace lib\http {
 
     use lib\crypto\DigitalSignature;
     use lib\crypto\Encryption;
-    use lib\DataCompressionLevel;
+    use lib\DataCompression;
     use lib\DataConvertor;
     use lib\MediaType;
 
@@ -24,18 +24,14 @@ namespace lib\http {
          */
         private HttpStatus $status;
         public readonly RequestEntity $request;
-        private DataCompressionLevel $compression;
-        private int $compressionMinSize = 1024; //1KB
-        private ?DigitalSignature $signature = null;
         private ?Encryption $encryption = null;
-        private ?string $statusMessage = null, $rawBody = null, $signatureHeader = null;
+        private ?string $statusMessage = null, $rawBody = null;
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
         {
             parent::__construct($headers, $request->protocol);
             $this->status = $status;
             $this->request = $request;
-            $this->compression = DataCompressionLevel::DISABLE;
         }
 
         /**
@@ -92,25 +88,6 @@ namespace lib\http {
             return $this->statusMessage;
         }
 
-        private function compress(): self
-        {
-            if ($this->compression === DataCompressionLevel::DISABLE || $this->compressionMinSize >= $this->bodySize()) {
-                return $this;
-            }
-            $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
-            if (str_contains($encoding, 'gzip')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'gzip');
-                $this->rawBody = gzencode($this->rawBody, $this->compression->value);
-            } elseif (str_contains($encoding, 'deflate')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'deflate');
-                $this->rawBody = gzdeflate($this->rawBody, $this->compression->value);
-            } elseif (str_contains($encoding, 'compress')) {
-                $this->headers->addOne(HttpHeader::CONTENT_ENCODING, 'compress');
-                $this->rawBody = gzcompress($this->rawBody, $this->compression->value);
-            }
-            return $this;
-        }
-
         /**
          * Raw response body
          * @return string|null
@@ -139,12 +116,7 @@ namespace lib\http {
                     default => MediaType::BIN
                 });
             }
-            if ($content === null || $content === '') {
-                $this->rawBody = $content;
-                return $this;
-            }
             $this->rawBody = $content;
-            return $this->applySignature()->compress()->applyEncryption();
         }
 
         public function saveAs(string $filename): self
@@ -211,21 +183,19 @@ namespace lib\http {
         /**
          * Set data compression strategy for a response body using user Accept-Encoding header.
          * This function cannot be called after <code>setBody</code> function.
-         * @param DataCompressionLevel $level Compression level
-         * @param int $minSize Minimum number of bytes to compress. Default size is 1KB
+         * @param int $minSize Minimum number of bytes to compress.
+         * @param DataCompression $level Compression level
          * @return self
          */
-        public function setCompression(DataCompressionLevel $level, int $minSize = 1024): self
+        public function compress(int $minSize, DataCompression $level): self
         {
-            $this->compression = $level;
-            $this->compressionMinSize = $minSize;
-            return $this;
-        }
-
-        private function applySignature(): self
-        {
-            if ($this->signature !== null) {
-                $this->headers->addOne($this->signatureHeader, $this->signature->sign($this->rawBody));
+            if ($minSize < $this->bodySize()) {
+                $encoding = $this->request->header()->getOne(HttpHeader::ACCEPT_ENCODING);
+                $algorithm = DataCompression::algorithm($encoding);
+                if ($algorithm !== null) {
+                    $this->rawBody = DataCompression::compress($this->rawBody, $algorithm, $level);
+                    $this->headers->addOne(HttpHeader::CONTENT_ENCODING, $algorithm);
+                }
             }
             return $this;
         }
@@ -236,28 +206,23 @@ namespace lib\http {
          * @param string $headerName Header name that will hold signature
          * @return self
          */
-        public function sign(?DigitalSignature $signature, string $headerName = 'X-Signature'): self
+        public function sign(?DigitalSignature $signature, string $headerName): self
         {
-            $this->signature = $signature;
-            $this->signatureHeader = $headerName;
+            if ($signature !== null) {
+                $this->headers->addOne($headerName, $signature->sign($this->rawBody));
+            }
             return $this;
         }
 
         /**
          * Encrypt response body with the given encryption keys
-         * @param Encryption|null $encription Encryption object
+         * @param Encryption|null $encryption Encryption object
          * @return self
          */
-        public function encrypt(?Encryption $encription): self
+        public function encrypt(?Encryption $encryption): self
         {
-            $this->encryption = $encription;
-            return $this;
-        }
-
-        private function applyEncryption(): string
-        {
-            if ($this->encryption !== null) {
-                $this->rawBody = $this->encryption->encrypt($this->rawBody);
+            if ($encryption !== null) {
+                $this->rawBody = $encryption->encrypt($this->rawBody);
             }
             return $this;
         }

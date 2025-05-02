@@ -12,6 +12,7 @@ namespace lib\client {
     use lib\Concurrency;
     use lib\crypto\DigitalSignature;
     use lib\crypto\Encryption;
+    use lib\DataCompression;
     use lib\File;
     use lib\http\HttpCookie;
     use lib\http\HttpHeader;
@@ -30,12 +31,14 @@ namespace lib\client {
         private bool $asyncMode = true;
         private HttpHeader $requestHeader, $responseHeader;
         private ?DigitalSignature $signature = null;
+        private ?DataCompression $compression = null;
         private ?Encryption $encryption = null;
-        private ?string $headerName = null;
+        private ?string $headerName = null, $encoding = null;
         private readonly string $host;
         private array $files = [], $curlOptions;
         private string|array|null $body = null;
         private string $stream, $streamMode;
+        private int $compressionMinSize = 0;
 
         /**
          * Create HTTP connection to a remote server
@@ -220,12 +223,13 @@ namespace lib\client {
             if ($this->stream === 'php://temp') {
                 $response->setBody(stream_get_contents($this->curlOptions[CURLOPT_FILE], null, 0));
             }
-            if ($this->signature !== null) {
-                $response = $this->verifySignature($response);
-            }
             if ($this->encryption !== null) {
                 $response->setBody($this->encryption->decrypt($response->body()));
             }
+            if ($this->signature !== null) {
+                $response = $this->verifySignature($response);
+            }
+            $this->decompress($response);
             $callback($response);
             if (isset($this->curlOptions[CURLOPT_INFILE])) {
                 fclose($this->curlOptions[CURLOPT_INFILE]);
@@ -305,6 +309,10 @@ namespace lib\client {
             $content = $this->formatBody();
             if ($content === null || $content === '') {
                 return;
+            }
+            if ($this->compression !== null && $this->compressionMinSize < mb_strlen($content)) {
+                $content = DataCompression::compress($content, $this->encoding, $this->compression);
+                $this->requestHeader->addOne(HttpHeader::CONTENT_ENCODING, $this->encoding);
             }
             if ($this->signature !== null) {
                 $this->requestHeader->addOne($this->headerName, $this->signature->sign($content));
@@ -554,6 +562,35 @@ namespace lib\client {
             } finally {
                 return $response;
             }
+        }
+
+        /**
+         * Encode request body using supported encoding algorithms supported by <code>DataCompression</code>
+         * @param int $minSize Minimum body size that should not be encoded
+         * @param string $algorithm Encoding algorithm
+         * @param DataCompression $level Data compression object
+         * @return self
+         * @throws \Exception Throws exception if encoding algorithm is not supported.
+         * @see DataCompression::algorithm()
+         */
+        public function setCompression(int $minSize, string $algorithm = 'gzip', DataCompression $level = null): self
+        {
+            $this->encoding = DataCompression::algorithm($algorithm);
+            if ($this->encoding === null) {
+                throw new \Exception('Encoding algorithm not supported');
+            }
+            $this->compressionMinSize = $minSize;
+            $this->compression = $level ?? DataCompression::BEST;
+            return $this;
+        }
+
+        private function decompress(ResponseEntity &$response): self
+        {
+            $encoding = $response->header()->getOne(HttpHeader::CONTENT_ENCODING);
+            if ($encoding !== null) {
+                $response->setBody(DataCompression::decompress($response->body(), $encoding));
+            }
+            return $this;
         }
     }
 
