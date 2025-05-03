@@ -15,6 +15,7 @@ namespace shani\advisors {
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\RespourceAccessPolicy;
+    use shani\core\Framework;
     use shani\exceptions\CustomException;
     use shani\http\App;
 
@@ -30,6 +31,10 @@ namespace shani\advisors {
             if ($policy !== BrowsingPrivacy::DISABLED) {
                 $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy);
             }
+            $this->app->response->header()->addAll([
+                HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
+                HttpHeader::SERVER => Framework::NAME
+            ]);
         }
 
         /**

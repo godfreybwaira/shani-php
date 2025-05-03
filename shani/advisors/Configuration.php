@@ -23,6 +23,7 @@ namespace shani\advisors {
     use shani\http\App;
     use shani\http\Middleware;
     use shani\persistence\LocalStorage;
+    use test\TestResult;
 
     abstract class Configuration
     {
@@ -484,7 +485,7 @@ namespace shani\advisors {
         /**
          * Run unit test
          */
-        public static abstract function test(): void;
+        public static abstract function runTest(): TestResult;
     }
 
 }

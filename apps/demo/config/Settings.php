@@ -89,7 +89,7 @@ namespace apps\demo\config {
             return in_array($this->app->request->route()->module, ['/greetings']);
         }
 
-        public static function test(): void
+        public static function runTest(): void
         {
 
         }

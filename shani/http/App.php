@@ -24,7 +24,6 @@ namespace shani\http {
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
     use shani\core\Definitions;
-    use shani\core\Framework;
     use shani\core\log\Logger;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
@@ -76,10 +75,6 @@ namespace shani\http {
                 $this->response = $res;
                 $this->writer = $writer;
                 $this->request = $res->request;
-                $this->response->header()->addAll([
-                    HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
-                    HttpHeader::SERVER => Framework::NAME
-                ]);
                 $this->vhost = ServerConfig::host($this->request->uri->hostname());
                 $this->config = new $this->vhost->configFile($this);
             } catch (\Throwable $ex) {

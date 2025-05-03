@@ -14,6 +14,8 @@ namespace apps\demo\config {
     use shani\core\Definitions;
     use shani\http\App;
     use shani\http\Middleware;
+    use test\TestCase;
+    use test\TestResult;
 
     final class TestSettings extends Configuration
     {
@@ -89,9 +91,31 @@ namespace apps\demo\config {
             return in_array($this->app->request->route()->module, ['/greetings']);
         }
 
-        public static function test(): void
+        public static function runTest(): TestResult
         {
-            print_r('testing...');
+            $result = new TestResult();
+            $case1 = new TestCase('User module');
+            $case1->test('User can login', function () {
+                return true;
+            });
+            $case1->test('User can logout', function () {
+                return false;
+            });
+            $case1->test('Delete user', function () {
+                return false;
+            });
+            $case1->test('Add user', function () {
+                return true;
+            });
+            $case2 = new TestCase('Sales module');
+            $case2->test('Make a sale', function () {
+                return false;
+            });
+            $case2->test('Make an order', function () {
+                return true;
+            });
+            $result->addCase($case1, $case2);
+            return $result;
         }
     }
 

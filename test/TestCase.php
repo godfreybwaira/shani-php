@@ -4,63 +4,50 @@
  * Description of TestCase
  * @author coder
  *
- * Created on: May 3, 2025 at 9:49:06 AM
+ * Created on: May 3, 2025 at 2:40:16 PM
  */
 
 namespace test {
 
-    use shani\core\Definitions;
-    use shani\core\VirtualHost;
-
     final class TestCase
     {
 
-        private static string $source, $destination;
+        private array $testResult;
+        public readonly string $description;
 
-        public static function config(array $args): void
+        /**
+         * Create a test case (scenario) and give it a name
+         * @param string $description Test case description (name)
+         */
+        public function __construct(string $description)
         {
-            $params = self::getTestParams($args);
-            if ($params === null) {
-                return;
-            }
-            self::$source = Definitions::DIR_HOSTS . '/' . $params['host'] . '.yml';
-            self::$destination = self::$source . '.bak';
-            if (!copy(self::$source, self::$destination)) {
-                throw new \Exception('Host not available.');
-            }
-            $content = yaml_parse_file(self::$source);
-            if (!array_key_exists($params['env'], $content['ENVIRONMENTS'])) {
-                throw new \Exception('Could not start a test because the environment "' . $params['env'] . '" is not found.');
-            }
-            if (file_put_contents(self::$source, yaml_emit($content)) === false) {
-                self::endTest();
-                throw new \Exception('Could not start a test.');
-            }
-            $content['CACHE'] = false;
-            $content['ACTIVE_ENVIRONMENT'] = $params['env'];
-            $vhost = new VirtualHost($content);
-            $vhost->configFile::test();
+            $this->testResult = [];
+            $this->description = $description;
         }
 
-        public static function endTest(): void
+        /**
+         * Get collection of individual test result in this case
+         * @return array
+         */
+        public function getResult(): array
         {
-            if (is_file(self::$source) && is_file(self::$destination)) {
-                rename(self::$destination, self::$source);
-            }
+            return $this->testResult;
         }
 
-        private static function getTestParams(array &$params): ?array
+        /**
+         * Perform a test case and return a result of a test case
+         * @param string $description Test description
+         * @param callable $callback A callback that returns boolean. True when
+         * test passes or false when a test fails
+         * @return self
+         */
+        public function test(string $description, callable $callback): self
         {
-            $values = [];
-            $size = count($params);
-            for ($i = 1; $i < $size; $i++) {
-                if ($params[$i] === '--test') {
-                    $values['host'] = $params[++$i];
-                } else if ($params[$i] === '--env') {
-                    $values['env'] = $params[++$i];
-                }
-            }
-            return !empty($values) ? $values : null;
+            $this->testResult[] = [
+                'result' => $callback(),
+                'description' => $description
+            ];
+            return $this;
         }
     }
 
