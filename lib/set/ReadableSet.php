@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Represent iterable data objects such as array list
+ * Represent iterable data set with unique values
  * @author coder
  *
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\lists {
+namespace lib\set {
 
     use lib\DataConvertor;
 
-    class ReadableList implements \Stringable, \JsonSerializable
+    class ReadableSet implements \Stringable, \JsonSerializable
     {
 
         protected array $data;

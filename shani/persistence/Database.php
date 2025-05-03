@@ -9,7 +9,6 @@
 namespace shani\persistence {
 
     use lib\map\MutableMap;
-    use shani\exceptions\ServerException;
 
     final class Database
     {
@@ -17,7 +16,7 @@ namespace shani\persistence {
         public readonly \PDO $pdo;
         private bool $escape = true;
 
-        public function __construct(string $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
+        public function __construct(DatabaseDriver $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
             $connectionString = self::getConnectionString($driver, $database, $host, $port);
             $this->pdo = new \PDO($connectionString, $username, $password);
@@ -82,26 +81,25 @@ namespace shani\persistence {
             return new MutableMap($rows);
         }
 
-        private static function getConnectionString(string $driver, string $database, ?string $host, ?int $port): string
+        private static function getConnectionString(DatabaseDriver $driver, string $database, ?string $host, ?int $port): string
         {
             switch ($driver) {
-                case 'mysql':
-                case 'pgsql':
-                case 'sybase':
-                case 'mssql':
-                    return $driver . ':host=' . $host . ':' . $port . ';dbname=' . $database;
-                case 'dblib': //for sqlserver & sybase
+                case DatabaseDriver::MYSQL:
+                case DatabaseDriver::POSTGRES:
+                case DatabaseDriver::SYBASE:
+                case DatabaseDriver::MSSQL:
+                    return $driver->value . ':host=' . $host . ':' . $port . ';dbname=' . $database;
+                case DatabaseDriver::DBLIB:
                     return 'dblib:host=' . $host . ':dbname=' . $database;
-                case 'oci': //for oracle
+                case DatabaseDriver::ORACLE:
                     return 'oci:dbname=//' . $host . ':' . $port . '/' . $database;
-                case 'sqlite':
+                case DatabaseDriver::SQLITE:
                     return 'sqlite:' . $database;
-                case 'sqlsrv'://for sqlserver
+                case DatabaseDriver::SQL_SERVER:
                     return 'sqlsrv:Server=' . $host . ';Database=' . $database;
-                case 'odbc'://for sqlserver
+                case DatabaseDriver::ODBC:
                     return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
             }
-            throw new ServerException('Driver "' . $driver . '" not supported');
         }
     }
 

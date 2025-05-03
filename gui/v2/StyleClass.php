@@ -9,9 +9,9 @@
 
 namespace gui\v2 {
 
-    use lib\lists\MutableList;
+    use lib\set\MutableSet;
 
-    final class StyleClass extends MutableList
+    final class StyleClass extends MutableSet
     {
 
         /**

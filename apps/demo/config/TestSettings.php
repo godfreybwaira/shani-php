@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Settings
+ * Description of TestSettings
  * @author coder
  *
  * Created on: Feb 18, 2024 at 2:20:26 PM
@@ -15,7 +15,7 @@ namespace apps\demo\config {
     use shani\http\App;
     use shani\http\Middleware;
 
-    final class Settings extends Configuration
+    final class TestSettings extends Configuration
     {
 
         public function __construct(App &$app)
@@ -91,7 +91,7 @@ namespace apps\demo\config {
 
         public static function test(): void
         {
-
+            print_r('testing...');
         }
     }
 

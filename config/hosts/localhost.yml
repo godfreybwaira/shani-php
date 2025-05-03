@@ -3,6 +3,7 @@
 ENVIRONMENTS:
   # Must extends shani\advisors\Configuration
   DEV: \apps\demo\config\Settings
+  TEST: \apps\demo\config\TestSettings
   # Active environment can be any one of the provided above.
 ACTIVE_ENVIRONMENT: DEV
 # Whether an application is able to run or not

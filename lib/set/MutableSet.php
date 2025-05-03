@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Represent iterable data objects such as array list
+ * Represent iterable data set with unique values
  * @author coder
  *
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\lists {
+namespace lib\set {
 
-    class MutableList extends ReadableList
+    class MutableSet extends ReadableSet
     {
 
         /**
@@ -77,7 +77,7 @@ namespace lib\lists {
         }
 
         /**
-         * Delete all items metioned from  an iterable object
+         * Delete all items mentioned from  an iterable object
          * @param array $values Items to delete
          * @return self
          */
@@ -126,12 +126,12 @@ namespace lib\lists {
          */
         public function map(callable $callback): self
         {
-            $rows = [];
+            $set = new self();
             $values = $this->toArray();
             foreach ($values as $value) {
-                $rows[] = $callback($value);
+                $set->addOne($callback($value));
             }
-            return new self($rows);
+            return $set;
         }
     }
 

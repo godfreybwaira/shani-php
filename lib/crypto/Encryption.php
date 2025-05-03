@@ -15,7 +15,7 @@ namespace lib\crypto {
         /**
          * Encrypt data using provided public encryption key or password
          * @param string $payload Data to encrypt
-         * @return string On success, returns the encrypted string encoded in base 64.
+         * @return string Returns encrypted string encoded in base 64 on success.
          * @throws Exception When encryption fails
          */
         public function encrypt(string $payload): string;

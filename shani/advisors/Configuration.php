@@ -480,6 +480,11 @@ namespace shani\advisors {
                     ->verify($this->signature(), $this->signatureHeaderName())
                     ->decompress();
         }
+
+        /**
+         * Run unit test
+         */
+        public static abstract function test(): void;
     }
 
 }

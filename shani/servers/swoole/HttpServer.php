@@ -27,6 +27,7 @@ namespace shani\servers\swoole {
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
     use Swoole\WebSocket\Server as WSocket;
+    use test\TestCase;
 
     final class HttpServer
     {
@@ -138,19 +139,17 @@ namespace shani\servers\swoole {
         public static function start(array $arguments): void
         {
             self::checkFrameworkRequirements();
-            $cnf = ServerConfig::getConfig($arguments);
+            $cnf = ServerConfig::getConfig();
             $server = self::configure($cnf);
-            self::runServer($server, $cnf);
-//            if ($server->isTesting) {
-//                $server->test($cnf);
-//            }
+            self::runServer($server, $cnf, $arguments);
         }
 
-        private static function runServer(WSocket &$server, ServerConfig &$cnf): void
+        private static function runServer(WSocket &$server, ServerConfig &$cnf, array &$arguments): void
         {
             $clients = [];
-            $server->on('start', function () {
+            $server->on('start', function () use (&$arguments) {
                 echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
+                TestCase::config($arguments);
             });
             $server->on('request', function (Request $req, Response $res) use (&$cnf) {
                 $scheme = $cnf->portHttp === $req->server['server_port'] ? 'http' : 'https';

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SMTP
+ * Description of SMTPClient
  * @author coder
  *
  * Created on: Apr 2, 2024 at 12:59:02 PM
@@ -11,7 +11,7 @@ namespace lib\client {
 
     use shani\core\Definitions;
 
-    final class SMTP
+    final class SMTPClient
     {
 
         private ?string $body = null, $subject = null, $from = null, $replyTo = null;
@@ -38,8 +38,7 @@ namespace lib\client {
 
         /**
          * Choose security mechanism to use when transporting e-mail
-         * @param string $security Security mechanism, either 'tls' or 'ssl' while
-         * 'ssl' being the default.
+         * @param string $security Security mechanism set using SMTPClient::SECURITY_*
          * @return self
          * @throws \InvalidArgumentException
          */
