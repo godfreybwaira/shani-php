@@ -15,10 +15,11 @@ namespace test {
     {
 
         public const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}-test-report\.txt$/';
-        public const KEYWORD_PASS = 'TEST PASSED';
-        public const KEYWORD_FAIL = 'TEST FAILED';
-        public const KEYWORD_TIMESTAMP = 'TIMESTAMP';
-        public const KEYWORD_CASES = 'TOTAL TESTS';
+        public const KEYWORD_PASS = ' TEST PASSED';
+        public const KEYWORD_FAIL = ' TEST FAILED';
+        public const KEYWORD_TIMESTAMP = ' TIMESTAMP';
+        public const KEYWORD_CASES = ' TOTAL TESTS';
+        public const KEYWORD_COMMENTS = ' COMMENTS';
 
         private array $testCases = [];
         private ?string $description;
@@ -85,7 +86,7 @@ namespace test {
                     } else {
                         ++$fail;
                     }
-                    $details = (++$count) . '. ' . $cr['description'];
+                    $details = ' ' . (++$count) . '. ' . $cr['description'];
                     $longestString = max(mb_strlen($details), $longestString);
                     $content[] = $details;
                     $values[] = $cr['result'] ? $passLabel : $failLabel;
@@ -102,7 +103,7 @@ namespace test {
             $values[] = $pass . ' (' . $percentPass . '%)';
             $content[] = self::KEYWORD_FAIL;
             $values[] = $fail . ' (' . (100 - $percentPass) . '%)';
-            $content[] = 'COMMENTS';
+            $content[] = self::KEYWORD_COMMENTS;
             $values[] = $pass === $total ? $passLabel : $failLabel;
             $content[] = self::KEYWORD_TIMESTAMP;
             $values[] = time();
