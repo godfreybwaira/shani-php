@@ -18,6 +18,7 @@ namespace test {
         public const KEYWORD_PASS = 'TEST PASSED';
         public const KEYWORD_FAIL = 'TEST FAILED';
         public const KEYWORD_TIMESTAMP = 'TIMESTAMP';
+        public const KEYWORD_CASES = 'TOTAL TESTS';
 
         private array $testCases = [];
         private ?string $description;
@@ -95,7 +96,7 @@ namespace test {
             $percentPass = round($pass * 100 / $total, 2);
             $content[] = PHP_EOL . str_repeat('-', $longestString + 1);
             $values[] = null;
-            $content[] = 'TOTAL TESTS';
+            $content[] = self::KEYWORD_CASES;
             $values[] = $total;
             $content[] = self::KEYWORD_PASS;
             $values[] = $pass . ' (' . $percentPass . '%)';
