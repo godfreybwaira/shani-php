@@ -53,7 +53,7 @@ namespace test {
             $fd = fopen($file, 'rb');
             $reading = false;
             $passed = $failed = $timestamp = null;
-            while ($line = fgets($fd)) {
+            while (($line = fgets($fd)) !== false) {
                 if (!str_starts_with($line, '----')) {
                     $reading = true;
                 }
