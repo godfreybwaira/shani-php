@@ -9,6 +9,8 @@
 
 namespace test {
 
+    use lib\map\ReadableMap;
+
     final class ResultAnalysis implements \JsonSerializable
     {
 
@@ -34,18 +36,19 @@ namespace test {
         /**
          * Analyze test result
          * @param string $location Location where test results are stored
-         * @return array Collection test analysis
+         * @return ReadableMap Collection of test analysis
          */
-        public static function analyze(string $location): array
+        public static function analyze(string $location): ReadableMap
         {
             $contents = scandir($location);
             $analysis = [];
             foreach ($contents as $file) {
                 if (preg_match(TestResult::FILENAME_PATTERN, $file) === 1 && is_file($location . '/' . $file)) {
-                    $analysis[] = self::parseFile($location . '/' . $file);
+                    $analysis[] = self::parseFile($location . '/' . $file)->jsonSerialize();
                 }
             }
-            return $analysis;
+            usort($analysis, fn($a, $b) => $a['timestamp'] <=> $b['timestamp']);
+            return new ReadableMap($analysis);
         }
 
         private static function parseFile(string $file): ResultAnalysis
