@@ -483,7 +483,7 @@ namespace shani\advisors {
         }
 
         /**
-         * Run unit test
+         * Run unit and integration test
          */
         public static abstract function runTest(): TestResult;
     }

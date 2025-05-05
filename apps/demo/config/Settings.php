@@ -14,6 +14,7 @@ namespace apps\demo\config {
     use shani\core\Definitions;
     use shani\http\App;
     use shani\http\Middleware;
+    use test\TestResult;
 
     final class Settings extends Configuration
     {
@@ -89,7 +90,7 @@ namespace apps\demo\config {
             return in_array($this->app->request->route()->module, ['/greetings']);
         }
 
-        public static function runTest(): void
+        public static function runTest(): TestResult
         {
 
         }

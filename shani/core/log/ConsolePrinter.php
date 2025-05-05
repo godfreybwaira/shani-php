@@ -21,9 +21,10 @@ namespace shani\core\log {
         case COLOR_WHITE = 37;
         case COLOR_MAGENTA = 35;
 
-        public static function colorText(string $text, ConsolePrinter $textColor, ConsolePrinter $backgroundColor): string
+        public static function colorText(string $text, ConsolePrinter $textColor, ConsolePrinter $backgroundColor = null): string
         {
-            $bg = ';' . (10 + $backgroundColor->value) . 'm';
+            $bgcolor = $backgroundColor?->value ?? self::COLOR_BLACK->value;
+            $bg = ';' . (10 + $bgcolor) . 'm';
             return "\033[0;{$textColor->value}{$bg}$text\033[0m";
         }
     }

@@ -15,6 +15,24 @@ namespace test {
     {
 
         private array $testCases = [];
+        private ?string $description;
+        private ?string $location = null;
+
+        public function __construct(string $description = null)
+        {
+            $this->description = $description;
+        }
+
+        /**
+         * Location where test report will be saved.
+         * @param string $location Location on disk
+         * @return self
+         */
+        public function saveTo(string $location): self
+        {
+            $this->location = $location;
+            return $this;
+        }
 
         /**
          * Collect all test case results together
@@ -45,36 +63,79 @@ namespace test {
          */
         public static function processResult(TestResult $result): bool
         {
-            $content = null;
+            $content = $values = [];
             $cases = $result->getCases();
-            $separator = str_repeat('-', 10);
-            $pass = $fail = $longestString = 0;
-            $passLabel = ConsolePrinter::colorText(' PASS ', ConsolePrinter::COLOR_WHITE, ConsolePrinter::COLOR_GREEN);
-            $failLabel = ConsolePrinter::colorText(' FAIL ', ConsolePrinter::COLOR_WHITE, ConsolePrinter::COLOR_RED);
+            $pass = $fail = $longestString = $count = 0;
+            $passLabel = $result->formatLabel('PASS', ConsolePrinter::COLOR_GREEN);
+            $failLabel = $result->formatLabel('FAIL', ConsolePrinter::COLOR_RED);
             foreach ($cases as $case) {
-                $longestString = max(mb_strlen($case->description), $longestString);
-                $content .= $case->description . PHP_EOL;
                 $caseResults = $case->getResult();
+                $label = strtoupper($case->description) . ' (' . count($caseResults) . ' Tests)';
+                $content[] = PHP_EOL . $result->formatLabel($label, ConsolePrinter::COLOR_YELLOW);
+                $values[] = null;
                 foreach ($caseResults as $cr) {
                     if ($cr['result']) {
                         ++$pass;
                     } else {
                         ++$fail;
                     }
-                    $longestString = max(mb_strlen($cr['description']), $longestString);
-                    $content .= $cr['description'] . $separator . ($cr['result'] ? $passLabel : $failLabel) . PHP_EOL;
+                    $details = (++$count) . '. ' . $cr['description'];
+                    $longestString = max(mb_strlen($details), $longestString);
+                    $content[] = $details;
+                    $values[] = $cr['result'] ? $passLabel : $failLabel;
                 }
             }
+            $longestString += 10;
             $total = $pass + $fail;
             $percentPass = round($pass * 100 / $total, 2);
-            $content .= str_repeat('--', 50) . PHP_EOL;
-            $content .= 'TEST RESULTS:' . PHP_EOL;
-            $content .= 'TOTAL TESTS: ' . $total . PHP_EOL;
-            $content .= 'TEST PASSED: ' . $pass . ' (' . $percentPass . '%)' . PHP_EOL;
-            $content .= 'TEST FAILED: ' . $fail . ' (' . (100 - $percentPass) . '%)' . PHP_EOL;
-            $content .= str_repeat('--', 50) . PHP_EOL;
-            print_r($content);
+            $content[] = PHP_EOL . str_repeat('-', $longestString + 1);
+            $values[] = null;
+            $content[] = 'TOTAL TESTS';
+            $values[] = $total;
+            $content[] = 'TEST PASSED';
+            $values[] = $pass . ' (' . $percentPass . '%)';
+            $content[] = 'TEST FAILED';
+            $values[] = $fail . ' (' . (100 - $percentPass) . '%)';
+            $content[] = 'COMMENTS';
+            $values[] = $pass === $total ? $passLabel : $failLabel;
+
+            $str = $result->description !== null ? strtoupper($result->description) . PHP_EOL : null;
+            $str .= self::formatContent($content, $values, $longestString);
+            $result->save($str);
             return $pass === $total;
+        }
+
+        private static function formatContent(array &$content, array &$values, int $length): string
+        {
+            $size = count($values);
+            $str = null;
+            for ($i = 0; $i < $size; $i++) {
+                if ($values[$i] !== null) {
+                    $mylen = mb_strlen($content[$i]);
+                    $str .= $content[$i] . ' ' . str_repeat('-', $length - $mylen) . ' ' . $values[$i] . PHP_EOL;
+                } else {
+                    $str .= $content[$i] . PHP_EOL;
+                }
+            }
+            return $str;
+        }
+
+        private function save(string $data): self
+        {
+            if ($this->location !== null) {
+                file_put_contents($this->location . '/' . date('Y-m-d.Hi') . '-test-report.txt', $data);
+            } else {
+                echo $data;
+            }
+            return $this;
+        }
+
+        private function formatLabel(string $label, ConsolePrinter $textColor): string
+        {
+            if ($this->location !== null) {
+                return $label;
+            }
+            return ConsolePrinter::colorText($label, $textColor);
         }
     }
 

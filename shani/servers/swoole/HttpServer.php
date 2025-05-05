@@ -148,7 +148,7 @@ namespace shani\servers\swoole {
             $clients = [];
             $testResult = null;
             $server->on('start', function () use (&$arguments, &$server, &$testResult) {
-                echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
+                echo 'Server started on ' . date(DATE_RSS) . PHP_EOL . PHP_EOL;
                 $testResult = TestConfig::config($arguments);
                 if ($testResult !== null) {
                     $server->shutdown();

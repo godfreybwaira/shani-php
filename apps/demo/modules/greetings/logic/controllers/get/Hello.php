@@ -11,10 +11,6 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 
     use apps\demo\modules\greetings\data\dto\Student;
     use apps\demo\modules\greetings\data\dto\Subject;
-    use lib\client\HttpClient;
-    use lib\http\HttpHeader;
-    use lib\http\ResponseEntity;
-    use lib\MediaType;
     use shani\http\App;
 
     final class Hello
