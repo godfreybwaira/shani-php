@@ -14,6 +14,11 @@ namespace test {
     final class TestResult
     {
 
+        public const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}-test-report\.txt$/';
+        public const KEYWORD_PASS = 'TEST PASSED';
+        public const KEYWORD_FAIL = 'TEST FAILED';
+        public const KEYWORD_TIMESTAMP = 'TIMESTAMP';
+
         private array $testCases = [];
         private ?string $description;
         private ?string $location = null;
@@ -92,12 +97,14 @@ namespace test {
             $values[] = null;
             $content[] = 'TOTAL TESTS';
             $values[] = $total;
-            $content[] = 'TEST PASSED';
+            $content[] = self::KEYWORD_PASS;
             $values[] = $pass . ' (' . $percentPass . '%)';
-            $content[] = 'TEST FAILED';
+            $content[] = self::KEYWORD_FAIL;
             $values[] = $fail . ' (' . (100 - $percentPass) . '%)';
             $content[] = 'COMMENTS';
             $values[] = $pass === $total ? $passLabel : $failLabel;
+            $content[] = self::KEYWORD_TIMESTAMP;
+            $values[] = time();
 
             $str = $result->description !== null ? strtoupper($result->description) . PHP_EOL : null;
             $str .= self::formatContent($content, $values, $longestString);
@@ -123,7 +130,11 @@ namespace test {
         private function save(string $data): self
         {
             if ($this->location !== null) {
-                file_put_contents($this->location . '/' . date('Y-m-d.Hi') . '-test-report.txt', $data);
+                $filename = date('Y-m-d.Hi') . '-test-report.txt';
+                if (preg_match(self::FILENAME_PATTERN, $filename) !== 1) {
+                    throw new \Exception('Invalid file name');
+                }
+                file_put_contents($this->location . '/' . $filename, $data);
             } else {
                 echo $data;
             }

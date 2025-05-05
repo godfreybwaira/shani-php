@@ -14,6 +14,7 @@ namespace apps\demo\config {
     use shani\core\Definitions;
     use shani\http\App;
     use shani\http\Middleware;
+    use test\TestCase;
     use test\TestResult;
 
     final class TestSettings extends Configuration
