@@ -93,7 +93,46 @@ namespace apps\demo\config {
 
         public static function runTest(): TestResult
         {
-
+            $client = new \lib\client\HttpClient(new \lib\URI('http://localhost:8008/'));
+            $client->enableAsync(false);
+            $result = new TestResult('Testing My app');
+            $result->saveTo('/home/coder/Desktop');
+            $case1 = new TestCase('User module');
+            $case1->test('GET / returns 200 OK', function ()use (&$client) {
+                $status = null;
+                $header = new \lib\http\HttpHeader([
+                    \lib\http\HttpHeader::ACCEPT_VERSION => 'api',
+                    \lib\http\HttpHeader::ACCEPT => 'application/json'
+                ]);
+                $client->setHeader($header);
+                $client->get('/', function (\lib\http\ResponseEntity $response) use (&$status) {
+                    $status = $response->header();
+                });
+                return $status->getOne(\lib\http\HttpHeader::CONTENT_LENGTH) === '193';
+            });
+            $case1->test('User can logout', function () {
+                return false;
+            });
+            $case1->test('Delete user', function () {
+                return false;
+            });
+            $case1->test('Add user', function () {
+                return true;
+            });
+            $case1->test('Update user', function () {
+                return true;
+            });
+            $case2 = new TestCase('Sales module');
+            $case2->test('Make a sale', function () {
+                return false;
+            });
+            $case2->test('Make an order', function () {
+                return true;
+            });
+            $result->addCase($case1, $case2);
+            $a = \test\ResultAnalysis::analyze('/home/coder/Desktop');
+            print_r(json_encode($a));
+            return $result;
         }
     }
 

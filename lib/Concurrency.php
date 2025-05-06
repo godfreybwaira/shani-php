@@ -31,6 +31,10 @@ namespace lib {
          */
         public static function async(callable $callback): void
         {
+            if (!isset(self::$obj)) {
+                $callback();
+                return;
+            }
             self::$obj->async($callback);
         }
 
@@ -43,6 +47,10 @@ namespace lib {
         public static function sleep(int $seconds): void
         {
             if ($seconds > 0) {
+                if (!isset(self::$obj)) {
+                    sleep($seconds);
+                    return;
+                }
                 self::$obj->sleep($seconds);
             }
         }

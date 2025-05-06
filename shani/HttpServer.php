@@ -11,34 +11,13 @@ namespace shani {
 
     use shani\core\Definitions;
     use shani\core\VirtualHost;
+    use shani\servers\swoole\SwooleServer;
+    use test\TestConfig;
 
-    final class ServerConfig
+    final class HttpServer
     {
 
-        public readonly string $ip;
-        public readonly string $schedulingAlgorithm;
-        public readonly int $portHttp, $portHttps;
-        public readonly string $sslKey, $sslCert, $timezone;
-        public readonly bool $http2Enabled, $isDaemon, $showErrors;
-        public readonly int $maxConnections, $maxWorkerRequests, $maxWaitTime;
         private static array $mime = [], $hosts = [];
-
-        private function __construct(array $conf)
-        {
-            $this->ip = $conf['IP'];
-            $this->portHttp = $conf['PORTS']['HTTP'];
-            $this->portHttps = $conf['PORTS']['HTTPS'];
-            $this->schedulingAlgorithm = $conf['SCHEDULING_ALGORITHM'];
-            $this->http2Enabled = $conf['ENABLE_HTTP2'];
-            $this->maxWorkerRequests = $conf['MAX_WORKER_REQUESTS'];
-            $this->maxWaitTime = $conf['MAX_WAIT_TIME'];
-            $this->maxConnections = $conf['MAX_CONNECTIONS'];
-            $this->isDaemon = $conf['RUNAS_DAEMON'];
-            $this->showErrors = $conf['DISPLAY_ERRORS'];
-            $this->timezone = $conf['TIME_ZONE'];
-            $this->sslCert = Definitions::DIR_SSL . $conf['SSL']['CERT'];
-            $this->sslKey = Definitions::DIR_SSL . $conf['SSL']['KEY'];
-        }
 
         public static function mime(string $extension): ?string
         {
@@ -73,9 +52,39 @@ namespace shani {
             throw new \Exception('Host "' . $name . '" not found');
         }
 
-        public static function getConfig(): self
+        private static function checkFrameworkRequirements()
         {
-            return new self(yaml_parse_file(Definitions::DIR_CONFIG . '/server.yml'));
+            if (version_compare(Definitions::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
+                echo'Please version ' . Definitions::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL;
+                exit(1);
+            }
+            foreach (Definitions::REQUIRED_EXTENSIONS as $extension) {
+                if (!extension_loaded($extension)) {
+                    echo'Please install PHP ' . $extension . ' extension' . PHP_EOL;
+                    exit(1);
+                }
+            }
+        }
+
+        /**
+         * Starting the server. When started, server becomes ready to accept requests
+         * @param array $arguments CLI arguments
+         * @return void
+         */
+        public static function start(array $arguments): void
+        {
+            self::checkFrameworkRequirements();
+            $config = new HttpServerConfig(yaml_parse_file(Definitions::DIR_CONFIG . '/server.yml'));
+            $server = new SwooleServer($config);
+            $result = null;
+            $server->start(function () use (&$arguments, &$server, &$result) {
+                echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
+                $result = TestConfig::config($arguments);
+                if ($result !== null) {
+                    $server->stop();
+                }
+            });
+            exit($result ? 0 : 1);
         }
     }
 

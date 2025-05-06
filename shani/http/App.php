@@ -31,7 +31,7 @@ namespace shani\http {
     use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
-    use shani\ServerConfig;
+    use shani\HttpServer;
 
     final class App
     {
@@ -75,7 +75,7 @@ namespace shani\http {
                 $this->response = $res;
                 $this->writer = $writer;
                 $this->request = $res->request;
-                $this->vhost = ServerConfig::host($this->request->uri->hostname());
+                $this->vhost = HttpServer::host($this->request->uri->hostname());
                 $this->config = new $this->vhost->configFile($this);
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
