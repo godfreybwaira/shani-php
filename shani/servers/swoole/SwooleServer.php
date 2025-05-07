@@ -21,7 +21,6 @@ namespace shani\servers\swoole {
     use lib\URI;
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
-    use shani\core\Definitions;
     use shani\FrameworkConfig;
     use shani\http\App;
     use Swoole\Http\Request;
@@ -41,7 +40,7 @@ namespace shani\servers\swoole {
 
         public function __construct(FrameworkConfig $config)
         {
-            $swoole = yaml_parse_file(Definitions::DIR_CONFIG . '/swoole.yml');
+            $swoole = yaml_parse_file(__DIR__ . '/config.yml');
             new Concurrency(new SwooleConcurrency());
             Event::setHandler(new SwooleEvent());
             $this->server = new Server($config->serverIp, $config->httpPort);
