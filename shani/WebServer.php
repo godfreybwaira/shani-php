@@ -9,13 +9,13 @@
 
 namespace shani {
 
-    use shani\contracts\SupportedHttpServer;
+    use shani\contracts\SupportedWebServer;
     use shani\core\Definitions;
     use shani\core\VirtualHost;
     use shani\servers\swoole\SwooleServer;
     use test\TestConfig;
 
-    final class HttpServer
+    final class WebServer
     {
 
         private static array $mime = [], $hosts = [];
@@ -55,11 +55,11 @@ namespace shani {
 
         /**
          * Starting the server. When started, server becomes ready to accept requests
-         * @param SupportedHttpServer $server Server application capable of handling HTTP requests
+         * @param SupportedWebServer $server Server application capable of handling HTTP requests
          * @param array $arguments CLI arguments
          * @return void
          */
-        public static function start(SupportedHttpServer $server, array $arguments): void
+        public static function start(SupportedWebServer $server, array $arguments): void
         {
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {

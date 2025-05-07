@@ -9,7 +9,7 @@
 
 namespace lib {
 
-    use shani\HttpServer;
+    use shani\WebServer;
 
     final class MediaType
     {
@@ -1252,7 +1252,7 @@ namespace lib {
         public static function fromFilename(string $filename): ?string
         {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            return !empty($ext) ? HttpServer::mime(strtolower($ext)) : null;
+            return !empty($ext) ? WebServer::mime(strtolower($ext)) : null;
         }
 
         /**

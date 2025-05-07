@@ -20,7 +20,7 @@ namespace shani\servers\swoole {
     use lib\RequestEntityBuilder;
     use lib\URI;
     use shani\contracts\ResponseWriter;
-    use shani\contracts\SupportedHttpServer;
+    use shani\contracts\SupportedWebServer;
     use shani\core\Definitions;
     use shani\FrameworkConfig;
     use shani\http\App;
@@ -29,7 +29,7 @@ namespace shani\servers\swoole {
     use Swoole\WebSocket\Frame;
     use Swoole\WebSocket\Server;
 
-    final class SwooleServer implements SupportedHttpServer
+    final class SwooleServer implements SupportedWebServer
     {
 
         private const SOCKET_TCP = 1, SSL = 512;

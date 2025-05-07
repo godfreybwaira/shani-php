@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use shani\FrameworkConfig;
-use shani\HttpServer;
+use shani\WebServer;
 use shani\servers\swoole\SwooleServer;
 
 /**
@@ -15,4 +15,4 @@ spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
 $config = new FrameworkConfig();
-HttpServer::start(new SwooleServer($config), $argv);
+WebServer::start(new SwooleServer($config), $argv);
