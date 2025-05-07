@@ -21,8 +21,9 @@ namespace shani\servers\swoole {
     use lib\URI;
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedHttpServer;
+    use shani\core\Definitions;
+    use shani\FrameworkConfig;
     use shani\http\App;
-    use shani\HttpServerConfig;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
@@ -35,42 +36,42 @@ namespace shani\servers\swoole {
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private readonly Server $server;
-        private readonly HttpServerConfig $config;
+        private readonly FrameworkConfig $config;
         private array $clients = [];
 
-        public function __construct(HttpServerConfig $config)
+        public function __construct(FrameworkConfig $config)
         {
+            $swoole = yaml_parse_file(Definitions::DIR_CONFIG . '/swoole.yml');
             new Concurrency(new SwooleConcurrency());
-
             Event::setHandler(new SwooleEvent());
-            $this->server = new Server($config->serverIp, $config->portHttp);
+            $this->server = new Server($config->serverIp, $config->httpPort);
             $this->config = $config;
             $cores = swoole_cpu_num();
             $this->server->set([
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
-                'reload_async' => true, 'max_wait_time' => $config->maxWaitTime,
-                'open_http2_protocol' => $config->http2Enabled, 'backlog' => $cores * 30, // number of connections in queue
-                'max_request' => $config->maxWorkerRequests, 'http_compression' => true,
-                'max_conn' => $config->maxConnections, 'task_enable_coroutine' => true,
-                'http_compression_level' => 3, 'daemonize' => $config->isDaemon,
-                'dispatch_mode' => self::SCHEDULING[$config->schedulingAlgorithm],
+                'reload_async' => true, 'max_wait_time' => $swoole['MAX_WAIT_TIME'],
+                'open_http2_protocol' => $swoole['ENABLE_HTTP2'], 'backlog' => $cores * 30, // number of connections in queue
+                'max_request' => $swoole['MAX_WORKER_REQUESTS'], 'http_compression' => true,
+                'max_conn' => $swoole['MAX_CONNECTIONS'], 'task_enable_coroutine' => true,
+                'http_compression_level' => 3, 'daemonize' => $swoole['RUNAS_DAEMON'],
+                'dispatch_mode' => self::SCHEDULING[$swoole['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
                 'ssl_cert_file' => $config->sslCert, 'ssl_key_file' => $config->sslKey
             ]);
-            $this->server->addListener($config->serverIp, $config->portHttps, self::SOCKET_TCP | self::SSL);
+            $this->server->addListener($config->serverIp, $config->httpsPort, self::SOCKET_TCP | self::SSL);
         }
 
         public function start(callable $callback): void
         {
             $this->server->on('start', fn() => $callback());
             $this->server->on('request', function (Request $req, Response $res) {
-                $scheme = $this->config->portHttp === $req->server['server_port'] ? 'http' : 'https';
+                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'http' : 'https';
                 $app = self::handleHTTP($scheme, $req, new SwooleHttpResponseWriter($res));
                 $app->runApp();
             });
             $this->server->on('open', function (Server $server, Request $req) {
-                $scheme = $this->config->portHttp === $req->server['server_port'] ? 'ws' : 'wss';
+                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
                 $app = self::handleHTTP($scheme, $req, new SwooleWebSocketResponseWriter($server, $req->fd));
                 $this->clients[$req->fd] = $app;
             });

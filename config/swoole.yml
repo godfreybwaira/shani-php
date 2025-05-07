@@ -1,10 +1,5 @@
-## Shani Server Configuration.
+## Swoole Server Configuration.
 ---
-#The IP address server is running on.
-IP: "0.0.0.0"
-PORTS:
-  HTTP: 8008
-  HTTPS: 44380
 # SCHEDULING_ALGORITHM: "ROUND_ROBIN, FIXED, PREEMPTIVE, IPMOD. When ENABLE_HTTP2
 # is true, scheduling algorithm MUST be either FIXED or IPMOD"
 SCHEDULING_ALGORITHM: "PREEMPTIVE"
@@ -17,12 +12,5 @@ MAX_WORKER_REQUESTS: 1000
 # Time in seconds that the server will wait for worker processes to exit
 # gracefully before forcing termination.
 MAX_WAIT_TIME: 60
-SSL:
-  KEY: "/server.key"
-  CERT: "/server.crt"
 # Run the server in background
 RUNAS_DAEMON: false
-# Display all application errors and server errors. This variable can be
-# overridden by application.
-DISPLAY_ERRORS: false
-TIME_ZONE: Africa/Dar_Es_Salaam

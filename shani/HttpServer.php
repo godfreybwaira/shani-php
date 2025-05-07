@@ -9,6 +9,7 @@
 
 namespace shani {
 
+    use shani\contracts\SupportedHttpServer;
     use shani\core\Definitions;
     use shani\core\VirtualHost;
     use shani\servers\swoole\SwooleServer;
@@ -52,30 +53,14 @@ namespace shani {
             throw new \Exception('Host "' . $name . '" not found');
         }
 
-        private static function checkFrameworkRequirements()
-        {
-            if (version_compare(Definitions::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
-                echo'Please version ' . Definitions::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL;
-                exit(1);
-            }
-            foreach (Definitions::REQUIRED_EXTENSIONS as $extension) {
-                if (!extension_loaded($extension)) {
-                    echo'Please install PHP ' . $extension . ' extension' . PHP_EOL;
-                    exit(1);
-                }
-            }
-        }
-
         /**
          * Starting the server. When started, server becomes ready to accept requests
+         * @param SupportedHttpServer $server Server application capable of handling HTTP requests
          * @param array $arguments CLI arguments
          * @return void
          */
-        public static function start(array $arguments): void
+        public static function start(SupportedHttpServer $server, array $arguments): void
         {
-            self::checkFrameworkRequirements();
-            $config = new HttpServerConfig(yaml_parse_file(Definitions::DIR_CONFIG . '/server.yml'));
-            $server = new SwooleServer($config);
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {
                 echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
