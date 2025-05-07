@@ -10,7 +10,7 @@
 
 namespace shani\http {
 
-    use gui\UI;
+    use gui\WebUI;
     use lib\DataConvertor;
     use lib\http\HttpCookie;
     use lib\http\HttpHeader;
@@ -36,7 +36,7 @@ namespace shani\http {
     final class App
     {
 
-        private ?UI $ui = null;
+        private ?WebUI $ui = null;
         private ?array $dict = null;
         private array $storage = [];
         private ?Logger $logger = null;
@@ -292,36 +292,37 @@ namespace shani\http {
 
         /**
          * Manage Graphical User interface with this function
-         * @return UI
+         * @return WebUI
          */
-        public function ui(): UI
+        public function ui(): WebUI
         {
-            return $this->ui ??= new UI($this);
+            return $this->ui ??= new WebUI($this);
         }
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param array $data Data to send with the response or to pass to a view file
+         * @param \JsonSerializable|array $data Data to send with the response or to pass to a view file
          * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(array $data = null, ?bool $useBuffer = null): void
+        public function render(\JsonSerializable|array $data = null, ?bool $useBuffer = null): void
         {
+            $content = ($data instanceof \JsonSerializable) ? $data->jsonSerialize() : $data;
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($data);
+                $this->ui()->render($content);
                 $this->sendHtml(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_SSE) {
                 ob_start();
-                $this->ui()->render($data);
+                $this->ui()->render($content);
                 $this->sendSse(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($data, $subtype);
-            } else if ($data !== null) {
-                $this->response->setBody(DataConvertor::convertTo($data, $subtype), $subtype);
+                $this->sendJsonp($content, $subtype);
+            } else if ($content !== null) {
+                $this->response->setBody(DataConvertor::convertTo($content, $subtype), $subtype);
             }
             $this->send($useBuffer);
         }

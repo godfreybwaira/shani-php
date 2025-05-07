@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UI
+ * Description of WebUI
  * @author coder
  *
  * Created on: Feb 19, 2024 at 1:07:12 PM
@@ -14,7 +14,7 @@ namespace gui {
     use shani\http\App;
     use shani\persistence\LocalStorage;
 
-    final class UI
+    final class WebUI
     {
 
         private readonly App $app;

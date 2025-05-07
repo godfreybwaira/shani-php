@@ -38,7 +38,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
                     ->addSubject(new Subject('Kiswahili', 'B', 79))
                     ->addSubject(new Subject('Maths', 'C', 70.6));
 //            $analysis = \test\ResultAnalysis::analyze('/home/coder/Desktop');
-            $this->app->render($student->jsonSerialize());
+            $this->app->render($student);
         }
     }
 
