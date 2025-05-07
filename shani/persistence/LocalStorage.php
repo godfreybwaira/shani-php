@@ -131,19 +131,21 @@ namespace shani\persistence {
             $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
             $directory = self::createDirectory($savePath . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
-            $handle = fopen($filepath, 'a+b');
-            $size = fstat($handle)['size'];
-            if ($size < $file->size) {
-                fseek($handle, $size);
-                $stream = fopen($file->path, 'rb');
-                fseek($stream, $size);
-                $chunk = $size > 0 && $size <= Definitions::BUFFER_SIZE ? $size : Definitions::BUFFER_SIZE;
-                while (!feof($stream)) {
-                    fwrite($handle, fread($stream, $chunk));
+            \lib\Concurrency::thread(function ()use ($filepath, &$file) {
+                $handle = fopen($filepath, 'a+b');
+                $size = fstat($handle)['size'];
+                if ($size < $file->size) {
+                    fseek($handle, $size);
+                    $stream = fopen($file->path, 'rb');
+                    fseek($stream, $size);
+                    $chunk = $size > 0 && $size <= Definitions::BUFFER_SIZE ? $size : Definitions::BUFFER_SIZE;
+                    while (!feof($stream)) {
+                        fwrite($handle, fread($stream, $chunk));
+                    }
+                    fclose($stream);
                 }
-                fclose($stream);
-            }
-            fclose($handle);
+                fclose($handle);
+            });
             return substr($filepath, strlen($root));
         }
 
@@ -212,9 +214,8 @@ namespace shani\persistence {
                 $folder = $bucket . dirname($shortPath);
                 $filename = $groupId . self::getFilename(basename($shortPath));
                 $destination = self::createDirectory($this->pathTo($folder));
-                if (rename($filepath, $destination . '/' . $filename)) {
-                    return $folder . '/' . $filename;
-                }
+                \lib\Concurrency::thread(fn() => rename($filepath, $destination . '/' . $filename));
+                return $folder . '/' . $filename;
             }
             return null;
         }

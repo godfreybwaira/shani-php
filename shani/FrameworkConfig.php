@@ -15,7 +15,9 @@ namespace shani {
     {
 
         public readonly string $serverIp, $sslKey, $sslCert;
-        public readonly int $httpPort, $httpsPort;
+        public readonly int $httpPort, $httpsPort, $payloadSize;
+
+        private const MB_1 = 1048576;
 
         public function __construct()
         {
@@ -27,6 +29,7 @@ namespace shani {
             $this->httpsPort = $config['PORTS']['HTTPS'];
             $this->sslCert = Definitions::DIR_SSL . $config['SSL']['CERT'];
             $this->sslKey = Definitions::DIR_SSL . $config['SSL']['KEY'];
+            $this->payloadSize = $config['MAX_PAYLOAD_SIZE'] * self::MB_1;
             /////////////////////////////////////
             ini_set('display_errors', $config['DISPLAY_ERRORS']);
             date_default_timezone_set($config['TIME_ZONE']);

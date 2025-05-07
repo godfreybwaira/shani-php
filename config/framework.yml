@@ -12,3 +12,5 @@ SSL:
 # overridden by application.
 DISPLAY_ERRORS: false
 TIME_ZONE: Africa/Dar_Es_Salaam
+# Maximum payload size in MB allowed to upload.
+MAX_PAYLOAD_SIZE: 100

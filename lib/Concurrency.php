@@ -39,6 +39,20 @@ namespace lib {
         }
 
         /**
+         * Call a callback function in a separate lightweight thread.
+         * @param callable $callback A callback function to execute
+         * @return void
+         */
+        public static function thread(callable $callback): void
+        {
+            if (!isset(self::$obj)) {
+                $callback();
+                return;
+            }
+            self::$obj->thread($callback);
+        }
+
+        /**
          * Cause a program to sleep at a given interval before continuing
          * execution.
          * @param int $seconds Number of seconds to sleep

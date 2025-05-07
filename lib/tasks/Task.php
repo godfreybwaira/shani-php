@@ -9,9 +9,9 @@
 
 namespace lib\tasks {
 
+    use lib\Concurrency;
     use lib\Duration;
     use lib\Event;
-    use shani\contracts\Concurrency;
 
     final class Task
     {
@@ -65,7 +65,7 @@ namespace lib\tasks {
         public function startAfter(\DateTimeInterface $duration): self
         {
             $seconds = $duration->getTimestamp() - time();
-            Concurrency::async(function ()use (&$seconds) {
+            Concurrency::thread(function ()use (&$seconds) {
                 $this->listener->trigger(TaskEvent::START->name);
                 $counter = 0;
                 do {

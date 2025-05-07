@@ -25,12 +25,15 @@ namespace lib {
         /**
          * Decompress data using gzip, deflate or compress algorithms
          * @param string $data Compressed data
-         * @param string $encoding list of optional encoding to choose from
+         * @param string|null $encoding list of optional encoding to choose from
          * @return string Decompressed string
          * @throws \Exception Throws exception if encoding algorithm is not supported.
          */
-        public static function decompress(string $data, string $encoding): string
+        public static function decompress(string $data, ?string $encoding): string
         {
+            if (empty($encoding)) {
+                return $data;
+            }
             if (str_contains($encoding, 'gzip')) {
                 return gzdecode($data);
             }
@@ -46,13 +49,16 @@ namespace lib {
         /**
          * Compress data using supported algorithms i.e gzip, deflate and compress
          * @param string $data Data to compress
-         * @param string $encoding list of optional encoding to choose from
+         * @param string|null $encoding list of optional encoding to choose from
          * @param DataCompression $level Compression level
          * @return string Compressed string
          * @throws \Exception Throws exception if encoding algorithm is not supported.
          */
-        public static function compress(string $data, string $encoding, DataCompression $level): string
+        public static function compress(string $data, ?string $encoding, DataCompression $level): string
         {
+            if (empty($encoding)) {
+                return $data;
+            }
             if (str_contains($encoding, 'gzip')) {
                 return gzencode($data, $level->value);
             }
@@ -67,10 +73,10 @@ namespace lib {
 
         /**
          * Get supported encoding algorithm
-         * @param string $encoding list of optional encoding to choose from
+         * @param string|null $encoding list of optional encoding to choose from
          * @return string|null Return null if algorithm is not supported
          */
-        public static function algorithm(string $encoding): ?string
+        public static function algorithm(?string $encoding): ?string
         {
             if (str_contains($encoding, 'gzip')) {
                 return 'gzip';

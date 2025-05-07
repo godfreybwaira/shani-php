@@ -48,6 +48,7 @@ namespace shani\servers\swoole {
             $this->config = $config;
             $cores = swoole_cpu_num();
             $this->server->set([
+                'package_max_length' => $config->payloadSize,
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
                 'reload_async' => true, 'max_wait_time' => $swoole['MAX_WAIT_TIME'],
