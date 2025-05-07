@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use shani\core\Definitions;
+    use shani\core\Framework;
 
     final class RequestRoute
     {
@@ -49,7 +49,7 @@ namespace shani\http {
             $this->params = explode('/', $url[0]);
             $this->controller = '/' . ($this->params[2] ?? $this->params[0]);
             $this->module = '/' . $this->params[0];
-            $this->action = '/' . ($this->params[4] ?? Definitions::HOME_FUNCTION);
+            $this->action = '/' . ($this->params[4] ?? Framework::HOME_FUNCTION);
         }
     }
 

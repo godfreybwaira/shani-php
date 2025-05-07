@@ -22,7 +22,7 @@ namespace lib\client {
     use lib\MediaType;
     use lib\RequestEntityBuilder;
     use lib\URI;
-    use shani\core\Definitions;
+    use shani\core\Framework;
 
     final class HttpClient
     {
@@ -53,8 +53,8 @@ namespace lib\client {
                 CURLOPT_SSL_VERIFYPEER => true, CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => true, CURLOPT_SSL_VERIFYHOST => 2,
                 CURLOPT_HEADER => false, CURLOPT_CONNECTTIMEOUT => $timeout,
-                CURLOPT_UPLOAD_BUFFERSIZE => Definitions::BUFFER_SIZE,
-                CURLOPT_BUFFERSIZE => Definitions::BUFFER_SIZE,
+                CURLOPT_UPLOAD_BUFFERSIZE => Framework::BUFFER_SIZE,
+                CURLOPT_BUFFERSIZE => Framework::BUFFER_SIZE,
                 CURLOPT_HEADERFUNCTION => function (\CurlHandle $curl, string $headerLine) {
                     return $this->collectResponseHeaders($headerLine);
                 }

@@ -10,9 +10,8 @@
 namespace shani {
 
     use shani\contracts\SupportedWebServer;
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\core\VirtualHost;
-    use shani\servers\swoole\SwooleServer;
     use test\TestConfig;
 
     final class WebServer
@@ -23,7 +22,7 @@ namespace shani {
         public static function mime(string $extension): ?string
         {
             if (!isset(self::$mime[$extension])) {
-                $mime = yaml_parse_file(Definitions::DIR_CONFIG . '/mime.yml')[$extension] ?? null;
+                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$extension] ?? null;
                 if ($mime === null) {
                     return null;
                 }
@@ -37,7 +36,7 @@ namespace shani {
             if (!empty(self::$hosts[$name])) {
                 return self::$hosts[$name];
             }
-            $yaml = Definitions::DIR_HOSTS . '/' . $name . '.yml';
+            $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
                 $config = new VirtualHost(yaml_parse_file($yaml));
                 if ($config->cache) {
@@ -45,7 +44,7 @@ namespace shani {
                 }
                 return $config;
             }
-            $alias = Definitions::DIR_HOSTS . '/' . $name . '.alias';
+            $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {
                 $host = file_get_contents($alias);
                 return static::host(trim($host));

@@ -22,7 +22,7 @@ namespace shani\documentation {
 
         public function __construct(App &$app)
         {
-            $modulesPath = \shani\core\Definitions::DIR_APPS . $app->config->root() . $app->config->moduleDir();
+            $modulesPath = \shani\core\Framework::DIR_APPS . $app->config->root() . $app->config->moduleDir();
             $moduleColletion = self::scanModules($modulesPath, $app->config->controllers());
             $this->userApp = new UserAppDto($app->config->appName());
             foreach ($moduleColletion as $moduleName => $reqMethods) {

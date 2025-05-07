@@ -11,7 +11,7 @@ namespace apps\demo\config {
 
     use apps\demo\middleware\Test;
     use shani\advisors\Configuration;
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
     use test\TestResult;
@@ -36,7 +36,7 @@ namespace apps\demo\config {
 
         public function appStorage(): string
         {
-            return Definitions::DIR_APPS . '/demo/storage';
+            return Framework::DIR_APPS . '/demo/storage';
         }
 
         public function allowedRequestMethods(): string

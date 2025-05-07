@@ -14,7 +14,7 @@ namespace shani\persistence {
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use shani\contracts\StorageMedia;
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\exceptions\CustomException;
     use shani\exceptions\ServerException;
     use shani\http\App;
@@ -43,7 +43,7 @@ namespace shani\persistence {
         {
             $pos = strpos($root, '/', 1);
             $dirname = $pos === false ? $root : substr($root, 0, $pos);
-            $path = Definitions::DIR_STORAGE . $dirname;
+            $path = Framework::DIR_STORAGE . $dirname;
             if (is_link($path) || symlink($target, $path)) {
                 return $path;
             }
@@ -67,7 +67,7 @@ namespace shani\persistence {
             switch ($prefix) {
                 case self::ACCESS_ASSET:
                     $filepath = substr($path, strlen($prefix));
-                    return self::sendFile($app, Definitions::DIR_ASSETS . $filepath);
+                    return self::sendFile($app, Framework::DIR_ASSETS . $filepath);
                 case $app->config->appProtectedStorage():
                     return self::serveProtected($app, $path);
                 case $app->config->appPublicStorage():
@@ -138,7 +138,7 @@ namespace shani\persistence {
                     fseek($handle, $size);
                     $stream = fopen($file->path, 'rb');
                     fseek($stream, $size);
-                    $chunk = $size > 0 && $size <= Definitions::BUFFER_SIZE ? $size : Definitions::BUFFER_SIZE;
+                    $chunk = $size > 0 && $size <= Framework::BUFFER_SIZE ? $size : Framework::BUFFER_SIZE;
                     while (!feof($stream)) {
                         fwrite($handle, fread($stream, $chunk));
                     }

@@ -10,7 +10,7 @@
 namespace gui {
 
     use lib\map\ReadableMap;
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\http\App;
     use shani\persistence\LocalStorage;
 
@@ -132,7 +132,7 @@ namespace gui {
             if ($this->app->config->isAsync()) {
                 self::load($this->app, $this->app->view());
             } else {
-                self::load($this->app, Definitions::DIR_GUI . '/html/main.php');
+                self::load($this->app, Framework::DIR_GUI . '/html/main.php');
             }
         }
 

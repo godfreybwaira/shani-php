@@ -9,7 +9,7 @@
 
 namespace test {
 
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\core\VirtualHost;
 
     final class TestConfig
@@ -21,7 +21,7 @@ namespace test {
             if ($params === null) {
                 return null;
             }
-            $source = Definitions::DIR_HOSTS . '/' . $params['host'] . '.yml';
+            $source = Framework::DIR_HOSTS . '/' . $params['host'] . '.yml';
             $destination = $source . '.bak';
             self::createBackupFile($source, $destination);
             $content = yaml_parse_file($source);

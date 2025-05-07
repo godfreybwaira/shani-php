@@ -23,7 +23,7 @@ namespace shani\http {
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
-    use shani\core\Definitions;
+    use shani\core\Framework;
     use shani\core\log\Logger;
     use shani\core\VirtualHost;
     use shani\documentation\Generator;
@@ -136,7 +136,7 @@ namespace shani\http {
          * @param int $chunkSize Number of bytes to stream every turn, default is 1MB
          * @return self
          */
-        public function stream(string $filepath, int $chunkSize = Definitions::BUFFER_SIZE): self
+        public function stream(string $filepath, int $chunkSize = Framework::BUFFER_SIZE): self
         {
             if (!is_file($filepath)) {
                 throw CustomException::notFound($this);
@@ -388,12 +388,12 @@ namespace shani\http {
          */
         public function module(?string $path = null): string
         {
-            return Definitions::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
+            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
         }
 
         private function classPath(string $method): string
         {
-            $class = Definitions::DIRNAME_APPS . $this->config->root();
+            $class = Framework::DIRNAME_APPS . $this->config->root();
             $class .= $this->config->moduleDir() . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->request->route()->controller, 1), '-'));

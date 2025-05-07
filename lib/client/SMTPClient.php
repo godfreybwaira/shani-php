@@ -9,7 +9,7 @@
 
 namespace lib\client {
 
-    use shani\core\Definitions;
+    use shani\core\Framework;
 
     final class SMTPClient
     {
@@ -288,7 +288,7 @@ namespace lib\client {
         {
             stream_filter_append($src, 'convert.base64-encode');
             while (!feof($src)) {
-                fwrite($dst, chunk_split(fread($src, Definitions::BUFFER_SIZE)));
+                fwrite($dst, chunk_split(fread($src, Framework::BUFFER_SIZE)));
             }
         }
     }
