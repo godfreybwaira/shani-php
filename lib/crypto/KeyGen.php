@@ -11,6 +11,8 @@
 
 namespace lib\crypto {
 
+    use lib\DataConvertor;
+
     final class KeyGen
     {
 
@@ -39,6 +41,16 @@ namespace lib\crypto {
         public static function signature(int $length = 32): string
         {
             return base64_encode(random_bytes($length));
+        }
+
+        /**
+         * Generate a unique random OTP password
+         * @param int $length Length of a password
+         * @return string OTP password
+         */
+        public static function otpPassword(int $length = 32): string
+        {
+            return DataConvertor::base32Encode(random_bytes($length));
         }
 
         /**

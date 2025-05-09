@@ -224,6 +224,67 @@ namespace lib {
             }
             return $xml . '</' . $tag . '>';
         }
+
+        /**
+         * Encodes a given string into Base32 format.
+         *
+         * @param string $data The input string to encode.
+         * @return string The Base32-encoded string.
+         */
+        public static function base32Encode(string $data)
+        {
+            // Base32 alphabet as per RFC 4648.
+            $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            $binaryString = '';
+            $dataLength = strlen($data);
+            for ($i = 0; $i < $dataLength; $i++) {
+                $binaryString .= str_pad(decbin(ord($data[$i])), 8, '0', STR_PAD_LEFT);
+            }
+            $output = '';
+            $binaryLength = strlen($binaryString);
+            for ($i = 0; $i < $binaryLength; $i += 5) {
+                $chunk = substr($binaryString, $i, 5);
+                if (strlen($chunk) < 5) {
+                    $chunk = str_pad($chunk, 5, '0', STR_PAD_RIGHT);
+                }
+                $index = bindec($chunk);
+                $output .= $alphabet[$index];
+            }
+            while (strlen($output) % 8 !== 0) {
+                $output .= '=';
+            }
+            return $output;
+        }
+
+        /**
+         * Decodes a Base32-encoded string back to its original value.
+         * @param string $encoded String to decode
+         * @return string Decoded string
+         * @throws \Exception If invalid base 32 character found.
+         */
+        public static function base32Decode(string $encoded): string
+        {
+            $b32 = strtoupper($encoded);
+            $strLen = strlen($b32);
+            $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+            $binary = null;
+            for ($i = 0; $i < $strLen; $i++) {
+                $position = strpos($alphabet, $b32[$i]);
+                if ($position === false) {
+                    throw new \Exception('Invalid character found');
+                }
+                $binary .= str_pad(decbin($position), 5, '0', STR_PAD_LEFT);
+            }
+            $result = null;
+            $binLen = strlen($binary);
+            for ($i = 0; $i < $binLen; $i += 8) {
+                $byte = substr($binary, $i, 8);
+                if (strlen($byte) === 8) {
+                    $result .= chr(bindec($byte));
+                }
+            }
+            return $result;
+        }
     }
 
 }
