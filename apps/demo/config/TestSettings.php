@@ -14,7 +14,7 @@ namespace apps\demo\config {
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
-    use test\TestCase;
+    use shani\persistence\Database;
     use test\TestResult;
 
     final class TestSettings extends Configuration
@@ -32,7 +32,7 @@ namespace apps\demo\config {
 
         public function home(): string
         {
-            return '/greetings/0/hello/1/world';
+            return '/schools/0/students/1/index';
         }
 
         public function appStorage(): string
@@ -88,10 +88,15 @@ namespace apps\demo\config {
 
         public function accessibleByPublic(): bool
         {
-            return in_array($this->app->request->route()->module, ['/greetings']);
+            return in_array($this->app->request->route()->module, ['/schools']);
         }
 
         public static function runTest(): TestResult
+        {
+
+        }
+
+        public function database(string $connName = null): Database
         {
 
         }

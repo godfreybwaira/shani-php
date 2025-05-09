@@ -9,7 +9,7 @@
 
 namespace gui {
 
-    use lib\map\ReadableMap;
+    use lib\ds\map\ReadableMap;
     use shani\core\Framework;
     use shani\http\App;
     use shani\persistence\LocalStorage;

@@ -9,7 +9,7 @@
 
 namespace test {
 
-    use lib\map\ReadableMap;
+    use lib\ds\map\ReadableMap;
 
     final class ResultAnalysis implements \JsonSerializable
     {

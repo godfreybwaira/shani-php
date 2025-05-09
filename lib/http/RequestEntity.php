@@ -13,7 +13,7 @@ namespace lib\http {
     use lib\crypto\Encryption;
     use lib\DataCompression;
     use lib\File;
-    use lib\map\ReadableMap;
+    use lib\ds\map\ReadableMap;
     use lib\MediaType;
     use lib\URI;
     use shani\http\RequestRoute;

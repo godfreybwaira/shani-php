@@ -96,14 +96,14 @@ All folders below can be renamed. A typical user application folder structure ma
                             module1_name.php (must match module name)
 
 Let's assume we want to create an application called `demo`, our application has
-one module called `greetings` and one resource file called `Hello.php`.
+one module called `school` and one resource file called `Hello.php`.
 
 Now, look at the following example of a resource file:
 
 ```php
 <?php
 
-namespace apps\demo\modules\greetings\logic\controllers\get {
+namespace apps\demo\modules\schools\logic\controllers\get {
 
 	use shani\http\App;
 
@@ -117,7 +117,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
         }
 
         /**
-         * Display greetings from Shani.
+         * Display school from Shani.
          */
         public function world()
         {
@@ -129,7 +129,7 @@ namespace apps\demo\modules\greetings\logic\controllers\get {
 ```
 
 Creating a view file:
-(`apps/demo/modules/greetings/presentation/views/hello/world.php`)
+(`apps/demo/modules/schools/presentation/views/hello/world.php`)
 
 ```php
 <h1>Hello From Shani</h1>
@@ -140,7 +140,7 @@ Considering our example above, our application folder structure will be like thi
     apps/
         demo/
             modules/
-                greetings/
+                schools/
                     data
                         dto
                         models
@@ -234,7 +234,7 @@ As we have seen, all `.alias` files must contains a host name they point to. Thi
 Again, let's assume our application is available via `localhost:8008`. The default ports for our web server is `8008` for HTTP and port `44380` for HTTPS. We can use the following URL to call our function `world`.
 
 ```bash
-$ curl http://localhost:8008/greetings/0/hello/0/world
+$ curl http://localhost:8008/schools/0/hello/0/world
 ```
 
 Congratulation! You have completed the first step to become a *Shani developer*.

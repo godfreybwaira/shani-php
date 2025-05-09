@@ -8,7 +8,7 @@
 
 namespace shani\persistence {
 
-    use lib\map\MutableMap;
+    use lib\ds\map\ReadableMap;
 
     final class Database
     {
@@ -22,13 +22,13 @@ namespace shani\persistence {
             $this->pdo = new \PDO($connectionString, $username, $password);
         }
 
-        private static function escapeHTML(&$var): void
+        private static function escapeHtmlChars(&$var): void
         {
             if (is_string($var)) {
                 $var = htmlspecialchars($var, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
             } elseif (is_array($var)) {
                 foreach ($var as &$value) {
-                    self::escapeHTML($value);
+                    self::escapeHtmlChars($value);
                 }
             }
         }
@@ -68,17 +68,17 @@ namespace shani\persistence {
          * Execute SQL query and all rows (if available) found
          * @param string $query A query to execute
          * @param array|null $data
-         * @return MutableMap Iterable object contains rows returned as the result of SQL query.
+         * @return ReadableMap Iterable object contains rows returned as the result of SQL query.
          */
-        public function get(string $query, ?array $data = null): MutableMap
+        public function get(string $query, ?array $data = null): ReadableMap
         {
             $result = $this->processQuery($query, $data);
             $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
             $result->closeCursor();
             if (!empty($rows) && $this->escape) {
-                self::escapeHTML($rows);
+                self::escapeHtmlChars($rows);
             }
-            return new MutableMap($rows);
+            return new ReadableMap($rows);
         }
 
         private static function getConnectionString(DatabaseDriver $driver, string $database, ?string $host, ?int $port): string

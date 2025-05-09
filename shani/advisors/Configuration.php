@@ -22,6 +22,7 @@ namespace shani\advisors {
     use shani\core\log\LogLevel;
     use shani\http\App;
     use shani\http\Middleware;
+    use shani\persistence\Database;
     use shani\persistence\LocalStorage;
     use test\TestResult;
 
@@ -486,6 +487,14 @@ namespace shani\advisors {
          * Run unit and integration test
          */
         public static abstract function runTest(): TestResult;
+
+        /**
+         * Get database connection object specified by connection name. If no
+         * connection name specified then default connection will be returned
+         * @param string $connName Connection name
+         * @return Database Database connection
+         */
+        public abstract function database(string $connName = null): Database;
     }
 
 }

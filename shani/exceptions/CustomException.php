@@ -16,59 +16,59 @@ namespace shani\exceptions {
     final class CustomException
     {
 
-        public static function notFound(App &$app): ClientException
+        public static function notFound(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::NOT_FOUND);
-            return new ClientException('File or resource not found');
+            return new ClientException($message ?? 'File or resource not found');
         }
 
-        public static function badRequest(App &$app): ClientException
+        public static function badRequest(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::BAD_REQUEST);
-            return new ClientException('Malformed request');
+            return new ClientException($message ?? 'Malformed request');
         }
 
-        public static function methodNotAllowed(App &$app): ClientException
+        public static function methodNotAllowed(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
             $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $app->config->allowedRequestMethods());
-            return new ClientException('Request Method not allowed');
+            return new ClientException($message ?? 'Request Method not allowed');
         }
 
-        public static function notAcceptable(App &$app): ClientException
+        public static function notAcceptable(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::NOT_ACCEPTABLE);
-            return new ClientException('Request not acceptable');
+            return new ClientException($message ?? 'Request not acceptable');
         }
 
-        public static function serverError(App &$app): ServerException
+        public static function serverError(App &$app, string $message = null): ServerException
         {
             $app->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-            return new ServerException('Could not process the request');
+            return new ServerException($message ?? 'Could not process the request');
         }
 
-        public static function notAuthorized(App &$app): ClientException
+        public static function notAuthorized(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::UNAUTHORIZED);
-            return new ClientException('Not authorized to access the resource');
+            return new ClientException($message ?? 'Not authorized to access the resource');
         }
 
-        public static function offline(App &$app): ServerException
+        public static function offline(App &$app, string $message = null): ServerException
         {
             $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-            return new ServerException('Server is offline');
+            return new ServerException($message ?? 'Server is offline');
         }
 
-        public static function sessionExpired(App &$app): ClientException
+        public static function sessionExpired(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::BAD_REQUEST);
-            return new ClientException('Session has expired');
+            return new ClientException($message ?? 'Session has expired');
         }
 
-        public static function forbidden(App &$app): ClientException
+        public static function forbidden(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::FORBIDDEN);
-            return new ClientException('Access denied');
+            return new ClientException($message ?? 'Access denied');
         }
     }
 

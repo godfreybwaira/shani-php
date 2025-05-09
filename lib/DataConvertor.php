@@ -207,6 +207,9 @@ namespace lib {
         {
             $tag = preg_replace('/[ ]+/', '-', $tagName);
             $xml = '<' . $tag . '>';
+            if ($obj instanceof \JsonSerializable) {
+                $obj = $obj->jsonSerialize();
+            }
             if (is_array($obj)) {
                 foreach ($obj as $key => $val) {
                     $xml .= self::toxml($val, is_int($key) ? 'item' : $key);

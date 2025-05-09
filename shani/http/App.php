@@ -17,7 +17,7 @@ namespace shani\http {
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
-    use lib\map\MutableMap;
+    use lib\ds\map\MutableMap;
     use lib\MediaType;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
@@ -301,13 +301,13 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable|array $data Data to send with the response or to pass to a view file
+         * @param \JsonSerializable|array|null $data Data to send with the response or to pass to a view file
          * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable|array $data = null, ?bool $useBuffer = null): void
+        public function render(\JsonSerializable|array|null $data = null, ?bool $useBuffer = null): void
         {
             $content = ($data instanceof \JsonSerializable) ? $data->jsonSerialize() : $data;
             $subtype = $this->response->subtype();
@@ -321,7 +321,7 @@ namespace shani\http {
                 $this->sendSse(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($content, $subtype);
-            } else if ($content !== null) {
+            } else {
                 $this->response->setBody(DataConvertor::convertTo($content, $subtype), $subtype);
             }
             $this->send($useBuffer);

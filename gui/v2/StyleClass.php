@@ -9,7 +9,7 @@
 
 namespace gui\v2 {
 
-    use lib\set\MutableSet;
+    use lib\ds\set\MutableSet;
 
     final class StyleClass extends MutableSet
     {

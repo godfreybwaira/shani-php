@@ -2,7 +2,7 @@
 
 namespace lib\http {
 
-    use lib\map\MutableMap;
+    use lib\ds\map\MutableMap;
 
     final class HttpHeader extends MutableMap
     {

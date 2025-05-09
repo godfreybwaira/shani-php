@@ -11,7 +11,7 @@ namespace lib {
 
     use lib\http\HttpHeader;
     use lib\http\RequestEntity;
-    use lib\map\ReadableMap;
+    use lib\ds\map\ReadableMap;
 
     final class RequestEntityBuilder
     {

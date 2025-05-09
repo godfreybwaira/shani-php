@@ -8,7 +8,7 @@
 
 namespace shani\persistence\session {
 
-    use lib\map\MutableMap;
+    use lib\ds\map\MutableMap;
 
     final class Cart extends MutableMap
     {
