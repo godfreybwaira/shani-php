@@ -13,16 +13,11 @@ namespace shani\servers\swoole {
     use lib\DataConvertor;
     use lib\Event;
     use lib\File;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
-    use lib\http\ResponseEntity;
+    use lib\http\RequestEntity;
     use lib\MediaType;
     use lib\RequestEntityBuilder;
-    use lib\URI;
-    use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
     use shani\FrameworkConfig;
-    use shani\http\App;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
@@ -65,20 +60,9 @@ namespace shani\servers\swoole {
         public function start(callable $callback): void
         {
             $this->server->on('start', fn() => $callback());
-            $this->server->on('request', function (Request $req, Response $res) {
-                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'http' : 'https';
-                $app = self::handleHTTP($scheme, $req, new SwooleHttpResponseWriter($res));
-                $app->runApp();
-            });
             $this->server->on('open', function (Server $server, Request $req) {
                 $scheme = $this->config->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
-                $app = self::handleHTTP($scheme, $req, new SwooleWebSocketResponseWriter($server, $req->fd));
-                $this->clients[$req->fd] = $app;
-            });
-            $this->server->on('message', function (Server $server, Frame $frame) {
-                $app = $this->clients[$frame->fd] ?? null;
-                $app?->request->withRawBody($frame->data);
-                $app?->runApp();
+                $this->clients[$req->fd] = self::createRequest($scheme, $req);
             });
             $this->server->on('close', function (Server $server, int $fd) {
                 unset($this->clients[$fd]);
@@ -87,36 +71,48 @@ namespace shani\servers\swoole {
             $this->server->start();
         }
 
+        public function request(callable $callback): self
+        {
+            $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
+                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'http' : 'https';
+                $request = self::createRequest($scheme, $req);
+                $writer = new SwooleHttpResponseWriter($res);
+                $callback($request, $writer);
+            });
+            $this->server->on('message', function (Server $server, Frame $frame) use (&$callback) {
+                $request = $this->clients[$frame->fd] ?? null;
+                if (!empty($request)) {
+                    $request->withRawBody($frame->data);
+                    $writer = new SwooleWebSocketResponseWriter($server, $frame->fd);
+                    $callback($request, $writer);
+                }
+            });
+            return $this;
+        }
+
         public function stop(): void
         {
             $this->server->shutdown();
         }
 
-        private static function makeURI(string $scheme, string $host, array &$server): URI
+        private static function createRequest(string $scheme, Request &$req): RequestEntity
         {
-            $query = !empty($server['query_string']) ? '?' . $server['query_string'] : null;
-            $path = $scheme . '://' . $host . $server['path_info'] . $query;
-            return new URI($path);
-        }
-
-        private static function handleHTTP(string $scheme, Request &$req, ResponseWriter $writer): App
-        {
-            $uri = self::makeURI($scheme, $req->header['host'], $req->server);
+            $query = !empty($req->server['query_string']) ? '?' . $req->server['query_string'] : null;
+            $path = $scheme . '://' . $req->header['host'] . $req->server['path_info'] . $query;
             $request = (new RequestEntityBuilder())
                     ->protocol($req->server['server_protocol'])
-                    ->method($req->server['request_method'])
-                    ->headers(new HttpHeader($req->header))
-                    ->time($req->server['request_time'])
                     ->files(self::getPostedFiles($req->files))
+                    ->method($req->server['request_method'])
+                    ->time($req->server['request_time'])
                     ->ip($req->server['remote_addr'])
-                    ->rawBody($req->rawcontent())
                     ->body(self::getPostedBody($req))
+                    ->rawBody($req->rawcontent())
+                    ->headers($req->header)
                     ->cookies($req->cookie)
                     ->query($req->get)
-                    ->uri($uri)
+                    ->uri($path)
                     ->build();
-            $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
-            return new App($response, $writer);
+            return $request;
         }
 
         private static function getPostedBody(Request &$req): ?array

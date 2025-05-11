@@ -9,9 +9,15 @@
 
 namespace shani {
 
+    use lib\http\HttpHeader;
+    use lib\http\HttpStatus;
+    use lib\http\RequestEntity;
+    use lib\http\ResponseEntity;
+    use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
     use shani\core\Framework;
     use shani\core\VirtualHost;
+    use shani\http\App;
     use test\TestConfig;
 
     final class WebServer
@@ -60,6 +66,11 @@ namespace shani {
          */
         public static function start(SupportedWebServer $server, array $arguments): void
         {
+            $server->request(function (RequestEntity $request, ResponseWriter $writer) {
+                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
+                $app = new App($response, $writer);
+                $app->runApp();
+            });
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {
                 echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
@@ -68,7 +79,9 @@ namespace shani {
                     $server->stop();
                 }
             });
-            exit($result ? 0 : 1);
+            if ($result !== null) {
+                exit($result ? 0 : 1);
+            }
         }
     }
 

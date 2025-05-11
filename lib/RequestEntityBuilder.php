@@ -57,17 +57,17 @@ namespace lib {
             return $this;
         }
 
-        public function headers(?HttpHeader $headers): self
+        public function headers(HttpHeader|array|null $headers): self
         {
             if (!empty($headers)) {
-                $this->headers = $headers;
+                $this->headers = is_array($headers) ? new HttpHeader($headers) : $headers;
             }
             return $this;
         }
 
-        public function uri(URI $uri): self
+        public function uri(URI|string $uri): self
         {
-            $this->uri = $uri;
+            $this->uri = $uri instanceof URI ? $uri : new URI($uri);
             return $this;
         }
 
