@@ -31,7 +31,6 @@ namespace shani\http {
     use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
-    use shani\WebServer;
 
     final class App
     {
@@ -69,14 +68,15 @@ namespace shani\http {
          */
         public readonly Configuration $config;
 
-        public function __construct(ResponseEntity &$res, ResponseWriter $writer)
+        public function __construct(VirtualHost $vhost, ResponseEntity &$res, ResponseWriter $writer)
         {
             try {
                 $this->response = $res;
                 $this->writer = $writer;
                 $this->request = $res->request;
-                $this->vhost = WebServer::host($this->request->uri->hostname());
-                $this->config = new $this->vhost->configFile($this);
+                $this->vhost = $vhost;
+                $this->config = new $vhost->configFile($this);
+                $this->runApp();
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
             }
@@ -86,7 +86,7 @@ namespace shani\http {
          * Start executing user application
          * @return void
          */
-        public function runApp(): void
+        private function runApp(): void
         {
             try {
                 $this->config->requestMutator();

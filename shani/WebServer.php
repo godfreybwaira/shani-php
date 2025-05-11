@@ -37,7 +37,7 @@ namespace shani {
             return self::$mime[$extension];
         }
 
-        public static function host(string $name): VirtualHost
+        private static function host(string $name): VirtualHost
         {
             if (!empty(self::$hosts[$name])) {
                 return self::$hosts[$name];
@@ -68,8 +68,8 @@ namespace shani {
         {
             $server->request(function (RequestEntity $request, ResponseWriter $writer) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
-                $app = new App($response, $writer);
-                $app->runApp();
+                $vhost = self::host($request->uri->hostname());
+                new App($vhost, $response, $writer);
             });
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {
