@@ -70,16 +70,12 @@ namespace shani\http {
 
         public function __construct(VirtualHost $vhost, ResponseEntity &$res, ResponseWriter $writer)
         {
-            try {
-                $this->response = $res;
-                $this->writer = $writer;
-                $this->request = $res->request;
-                $this->vhost = $vhost;
-                $this->config = new $vhost->configFile($this);
-                $this->runApp();
-            } catch (\Throwable $ex) {
-                $this->handleException($ex);
-            }
+            $this->vhost = $vhost;
+            $this->response = $res;
+            $this->writer = $writer;
+            $this->request = $res->request;
+            $this->config = new $vhost->configFile($this);
+            $this->runApp();
         }
 
         /**

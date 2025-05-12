@@ -68,8 +68,14 @@ namespace shani {
         {
             $server->request(function (RequestEntity $request, ResponseWriter $writer) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
-                $vhost = self::host($request->uri->hostname());
-                new App($vhost, $response, $writer);
+                try {
+                    $vhost = self::host($request->uri->hostname());
+                    new App($vhost, $response, $writer);
+                } catch (\Throwable $ex) {
+                    //log error
+                    $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                    $writer->close($response);
+                }
             });
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {
