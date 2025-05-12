@@ -16,8 +16,7 @@ namespace lib\crypto {
 
         /**
          * Encrypt/decrypt data using symmetric keys
-         * @param string $password Password used to encrypt/decrypt data encoded
-         * in base 64
+         * @param string $password Password used to encrypt/decrypt data.
          * @param string $initVector Initialization vector encoded in base 64
          * @param string $algorithm see openssl_get_cipher_methods()
          */
@@ -30,7 +29,7 @@ namespace lib\crypto {
 
         public function encrypt(string $payload): string
         {
-            $result = openssl_encrypt($payload, $this->algorithm, base64_decode($this->password), 0, $this->initVector);
+            $result = openssl_encrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
             if ($result !== false) {
                 return $result;
             }
@@ -39,7 +38,7 @@ namespace lib\crypto {
 
         public function decrypt(string $payload): string
         {
-            $result = openssl_decrypt($payload, $this->algorithm, base64_decode($this->password), 0, $this->initVector);
+            $result = openssl_decrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
             if ($result !== false) {
                 return $result;
             }
