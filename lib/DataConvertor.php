@@ -23,6 +23,9 @@ namespace lib {
         public const TYPE_CSV = 'csv';
         public const TYPE_SSE = 'event-stream';
         public const TYPE_URL_ENCODE = 'x-www-form-urlencoded';
+        //////////////////////////
+        // Base32 alphabet as per RFC 4648.
+        public const BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
         /**
          * Convert normal array to table like array. A table like array has two values
@@ -233,8 +236,6 @@ namespace lib {
          */
         public static function base32Encode(string $data)
         {
-            // Base32 alphabet as per RFC 4648.
-            $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             $binaryString = '';
             $dataLength = strlen($data);
             for ($i = 0; $i < $dataLength; $i++) {
@@ -248,7 +249,7 @@ namespace lib {
                     $chunk = str_pad($chunk, 5, '0', STR_PAD_RIGHT);
                 }
                 $index = bindec($chunk);
-                $output .= $alphabet[$index];
+                $output .= self::BASE32_CHARS[$index];
             }
             while (strlen($output) % 8 !== 0) {
                 $output .= '=';
@@ -266,10 +267,9 @@ namespace lib {
         {
             $b32 = strtoupper($encoded);
             $strLen = strlen($b32);
-            $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
             $binary = null;
             for ($i = 0; $i < $strLen; $i++) {
-                $position = strpos($alphabet, $b32[$i]);
+                $position = strpos(self::BASE32_CHARS, $b32[$i]);
                 if ($position === false) {
                     throw new \Exception('Invalid character found');
                 }

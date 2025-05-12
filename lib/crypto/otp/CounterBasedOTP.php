@@ -51,8 +51,7 @@ namespace lib\crypto\otp {
 
         /**
          * Generates a Count-based one time password (HOTP)
-         * @param string $password A shared secret key in raw binary form. If you
-         * have a Base32 secret, you'll need to decode it first.
+         * @param string $password A shared secret key in base 32 format.
          * @param int $counter The starting counter for HOTP.
          * @param int $length The number of OTP digits (default 6).
          * @param string $issuer The issuer or organization name.
@@ -72,7 +71,7 @@ namespace lib\crypto\otp {
          * Generates a Counter-based One-Time Password (HOTP) as per RFC 4226.
          * @return string The generated OTP code as a zero-padded string.
          */
-        public function generate()
+        public function generate(): string
         {
             // Convert the counter to an 8-byte (64-bit) big-endian binary string.
             $counterBytes = pack('N*', 0, $this->counter);
@@ -95,10 +94,10 @@ namespace lib\crypto\otp {
 
         /**
          * Check if generated OTP code matches with the existing one
-         * @param int $otp Existing OTP
+         * @param string $otp Existing OTP
          * @return bool Returns true on success, false otherwise
          */
-        public function verify(int $otp): bool
+        public function verify(string $otp): bool
         {
             $newOtp = new self($this->password, $this->counter, strlen($otp));
             return $newOtp->generate() === $otp;

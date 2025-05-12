@@ -50,7 +50,12 @@ namespace lib\crypto {
          */
         public static function otpPassword(int $length = 32): string
         {
-            return DataConvertor::base32Encode(random_bytes($length));
+            $chars = null;
+            $charsLength = strlen(DataConvertor::BASE32_CHARS);
+            for ($i = 0; $i < $length; $i++) {
+                $chars .= DataConvertor::BASE32_CHARS[random_int(0, $charsLength - 1)];
+            }
+            return $chars;
         }
 
         /**
@@ -65,6 +70,7 @@ namespace lib\crypto {
         private static function generate(array $configs, string $destination, string $prefix): bool
         {
             if (is_writable($destination) || mkdir($destination, 0600, true)) {
+                $privateKey = null;
                 $filename = $destination . '/' . date('Y-m-d') . '_' . $prefix;
                 $res = openssl_pkey_new($configs);
                 openssl_pkey_export($res, $privateKey);

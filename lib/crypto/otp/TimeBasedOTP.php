@@ -51,8 +51,7 @@ namespace lib\crypto\otp {
 
         /**
          * Generates a Time-based one time password (TOTP)
-         * @param string $password A shared secret key in raw binary form. If you
-         * have a Base32 secret, you'll need to decode it first.
+         * @param string $password A shared secret key in base 32 format.
          * @param int $length The number of OTP digits (default 6).
          * @param string $issuer The issuer or organization name.
          * @param string $accountName The user's account name or email.
@@ -70,9 +69,9 @@ namespace lib\crypto\otp {
 
         /**
          * Generate OTP code
-         * @return int OTP code
+         * @return string OTP code
          */
-        public function generate(): int
+        public function generate(): string
         {
             $timeSlice = floor(time() / $this->period);
             // Pack time interval as a binary string of 8 bytes (big endian)
@@ -90,10 +89,10 @@ namespace lib\crypto\otp {
 
         /**
          * Check if generated OTP code matches with the existing one
-         * @param int $otp Existing OTP
+         * @param string $otp Existing OTP
          * @return bool Returns true on success, false otherwise
          */
-        public function verify(int $otp): bool
+        public function verify(string $otp): bool
         {
             $newOtp = new self($this->password, strlen($otp));
             return $newOtp->generate() === $otp;
