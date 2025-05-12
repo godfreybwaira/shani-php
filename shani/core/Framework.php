@@ -59,6 +59,11 @@ namespace shani\core {
         public const DIR_STORAGE = SERVER_ROOT . '/storage';
 
         /**
+         * Storage directory path
+         */
+        public const DIR_SERVER_STORAGE = self::DIR_STORAGE . '/.svr';
+
+        /**
          * Asset directory path
          */
         public const DIR_ASSETS = self::DIR_GUI . '/assets';

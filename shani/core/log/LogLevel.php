@@ -9,13 +9,13 @@
 
 namespace shani\core\log {
 
-    enum LogLevel
+    enum LogLevel: string
     {
 
-        case WARNING;
-        case ERROR;
-        case INFO;
-        case EMERGENCY;
+        case WARNING = 'warning';
+        case ERROR = 'error';
+        case INFO = 'info';
+        case EMERGENCY = 'emergency';
     }
 
 }

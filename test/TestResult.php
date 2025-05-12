@@ -73,8 +73,8 @@ namespace test {
             $content = $values = [];
             $cases = $result->getCases();
             $pass = $fail = $longestString = $count = 0;
-            $passLabel = $result->formatLabel('PASS', ConsolePrinter::COLOR_GREEN);
-            $failLabel = $result->formatLabel('FAIL', ConsolePrinter::COLOR_RED);
+            $passLabel = '[ ' . $result->formatLabel('PASS', ConsolePrinter::COLOR_GREEN) . ' ]';
+            $failLabel = '[ ' . $result->formatLabel('FAIL', ConsolePrinter::COLOR_RED) . ' ]';
             foreach ($cases as $case) {
                 $caseResults = $case->getResult();
                 $label = strtoupper($case->description) . ' (' . count($caseResults) . ' Tests)';
@@ -93,25 +93,25 @@ namespace test {
                 }
             }
             $longestString += 10;
-            $total = $pass + $fail;
-            $percentPass = round($pass * 100 / $total, 2);
+            $totalTests = $pass + $fail;
+            $percentPass = round($pass * 100 / $totalTests, 2);
             $content[] = PHP_EOL . str_repeat('-', $longestString + 1);
             $values[] = null;
             $content[] = self::KEYWORD_CASES;
-            $values[] = $total;
+            $values[] = $totalTests;
             $content[] = self::KEYWORD_PASS;
             $values[] = $pass . ' (' . $percentPass . '%)';
             $content[] = self::KEYWORD_FAIL;
             $values[] = $fail . ' (' . (100 - $percentPass) . '%)';
             $content[] = self::KEYWORD_COMMENTS;
-            $values[] = $pass === $total ? $passLabel : $failLabel;
+            $values[] = $pass === $totalTests ? $passLabel : $failLabel;
             $content[] = self::KEYWORD_TIMESTAMP;
             $values[] = time();
 
             $str = $result->description !== null ? strtoupper($result->description) . PHP_EOL : null;
             $str .= self::formatContent($content, $values, $longestString);
             $result->save($str);
-            return $pass === $total;
+            return $pass === $totalTests;
         }
 
         private static function formatContent(array &$content, array &$values, int $length): string

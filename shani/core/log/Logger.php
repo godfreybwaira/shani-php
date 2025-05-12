@@ -14,96 +14,97 @@ namespace shani\core\log {
     final class Logger
     {
 
-        private array $handlers = [];
-        private \SplFileObject $stream;
+        private $handler = null;
+        private ?\SplFileObject $stream = null;
 
-        public function __construct(string $filepath)
+        public function __construct(?string $filepath = null)
         {
-            $this->stream = new \SplFileObject($filepath, 'a+b');
-        }
-
-        private function createMessage(string $message, LogLevel $level, ?array $context = null, ?string $extra = null): string
-        {
-            $structure = new LogStructure($message, $level, $context, $extra);
-            $text = $structure->time . "\t" . $structure->level . "\t";
-            $text .= $structure->message . "\t" . $structure->context . "\t";
-            $text .= $structure->extra . PHP_EOL;
-            try {
-                if ($this->stream->getSize() === 0) {
-                    $header = "time\tlevel\tmessage\tcontext\textra" . PHP_EOL;
-                    return $header . $text;
-                }
-            } catch (\Throwable $t) {
-                $text = $this->createConsoleMessage($structure, $level);
+            if ($filepath !== null) {
+                $this->stream = new \SplFileObject($filepath, 'a+b');
             }
-            return $text;
         }
 
-        private function createConsoleMessage(LogStructure $structure, LogLevel $level): string
+        public function __destruct()
+        {
+            if ($this->stream !== null) {
+                unset($this->stream);
+            }
+        }
+
+        private function writeMessage(string $message, LogLevel $level): self
+        {
+            $structure = new LogStructure($message, $level);
+            if ($this->stream !== null) {
+                $this->stream->fwrite($structure);
+                return $this;
+            }
+            return $this->writeConsoleMessage($structure, $level);
+        }
+
+        private function writeConsoleMessage(LogStructure $structure, LogLevel $level): self
         {
             $space = str_repeat(' ', 3);
-            list($textColor, $bgColor) = match ($level) {
-                LogLevel::EMERGENCY => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_MAGENTA],
-                LogLevel::WARNING => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_YELLOW],
-                LogLevel::ERROR => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_RED],
-                LogLevel::INFO => [ConsolePrinter::COLOR_BLACK, ConsolePrinter::COLOR_BLUE],
+            $textColor = match ($level) {
+                LogLevel::EMERGENCY => ConsolePrinter::COLOR_MAGENTA,
+                LogLevel::WARNING => ConsolePrinter::COLOR_YELLOW,
+                LogLevel::ERROR => ConsolePrinter::COLOR_RED,
+                LogLevel::INFO => ConsolePrinter::COLOR_CYAN,
             };
-            $text = '[' . $structure->time . ']' . $space;
-            $text .= ConsolePrinter::colorText(' ' . $structure->level . ' ', $textColor, $bgColor);
-            return $text . $space . $structure->message . $space . $structure->extra . PHP_EOL;
-        }
-
-        public function warning(string $message, ?array $context = null): self
-        {
-            $text = $this->createMessage($message, LogLevel::WARNING, $context);
-            $this->stream->fwrite($text);
+            $text = $structure->time . $space;
+            $text .= '[ ' . ConsolePrinter::colorText($structure->level, $textColor) . ' ]';
+            echo $text . $space . $structure->message . PHP_EOL;
             return $this;
         }
 
-        public function error(string $message, ?array $context = null): self
+        public function warning(string $message): self
         {
-            $text = $this->createMessage($message, LogLevel::ERROR, $context);
-            $this->stream->fwrite($text);
-            return $this;
+            return $this->log(LogLevel::WARNING, $message);
         }
 
-        public function emergency(string $message, ?array $context = null): self
+        public function error(string $message): self
         {
-            $text = $this->createMessage($message, LogLevel::EMERGENCY, $context);
-            $this->stream->fwrite($text);
-            return $this;
+            return $this->log(LogLevel::ERROR, $message);
         }
 
-        public function info(string $message, ?array $context = null): self
+        public function emergency(string $message): self
         {
-            $text = $this->createMessage($message, LogLevel::INFO, $context);
-            $this->stream->fwrite($text);
-            return $this;
+            return $this->log(LogLevel::EMERGENCY, $message);
         }
 
-        public function log(\Throwable $t, LogLevel $level, ?array $context = null): self
+        public function info(string $message): self
         {
-            $extra = 'File: ' . $t->getFile() . ':' . $t->getLine();
-            $structure = new LogStructure($t->getMessage(), $level, $context, $extra);
-            $text = $this->createMessage($t->getMessage(), $level, $context, $extra);
-            $this->stream->fwrite($text);
-            foreach ($this->handlers as $levelName => $cb) {
-                if ($levelName === $level->name) {
-                    $cb($structure);
-                }
+            return $this->log(LogLevel::INFO, $message);
+        }
+
+        /**
+         * Log exceptions to a log file/destination
+         * @param LogLevel $level Log level
+         * @param string $message Message to log
+         * @return self
+         */
+        public function log(LogLevel $level, string $message): self
+        {
+            if (empty($this->handler)) {
+                return $this->writeMessage($message, $level);
+            }
+            $structure = new LogStructure($message, $level);
+            $cb = $this->handler;
+            $data = $cb($structure);
+            if ($this->stream !== null && ($data !== null || $data !== '')) {
+                $this->stream->fwrite($data);
             }
             return $this;
         }
 
-        public function addHandler(LogLevel $level, callable $cb): self
+        /**
+         * Set a logger handler for handling logs
+         * @param callable $cb A callback for handling log i.e <code>$cb(LogStructure $s):?string</code>
+         * @return self
+         */
+        public function setHandler(callable $cb): self
         {
-            $this->handlers[$level->name] = $cb;
+            $this->handler = $cb;
             return $this;
-        }
-
-        public function read(): ReadableMap
-        {
-            return new ReadableMap($this->stream->fgetcsv("\t"));
         }
     }
 

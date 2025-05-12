@@ -16,6 +16,8 @@ namespace shani {
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
     use shani\core\Framework;
+    use shani\core\log\Logger;
+    use shani\core\log\LogLevel;
     use shani\core\VirtualHost;
     use shani\http\App;
     use test\TestConfig;
@@ -70,16 +72,17 @@ namespace shani {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
                 try {
                     $vhost = self::host($request->uri->hostname());
-                    new App($vhost, $response, $writer);
+                    $app = new App($vhost, $response, $writer);
+                    $app->runApp();
                 } catch (\Throwable $ex) {
-                    //log error
                     $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                     $writer->close($response);
+                    self::log(LogLevel::EMERGENCY, $ex->getMessage());
                 }
             });
             $result = null;
             $server->start(function () use (&$arguments, &$server, &$result) {
-                echo 'Server started on ' . date(DATE_RSS) . PHP_EOL;
+                self::log(LogLevel::INFO, 'Server started');
                 $result = TestConfig::config($arguments);
                 if ($result !== null) {
                     $server->stop();
@@ -88,6 +91,13 @@ namespace shani {
             if ($result !== null) {
                 exit($result ? 0 : 1);
             }
+        }
+
+        private static function log(LogLevel $level, string $message): void
+        {
+            echo $message . PHP_EOL;
+            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '-' . $level->value . '.log';
+            (new Logger($file))->log($level, $message);
         }
     }
 

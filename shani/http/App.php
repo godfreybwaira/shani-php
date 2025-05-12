@@ -75,14 +75,13 @@ namespace shani\http {
             $this->writer = $writer;
             $this->request = $res->request;
             $this->config = new $vhost->configFile($this);
-            $this->runApp();
         }
 
         /**
          * Start executing user application
          * @return void
          */
-        private function runApp(): void
+        public function runApp(): void
         {
             try {
                 $this->config->requestMutator();

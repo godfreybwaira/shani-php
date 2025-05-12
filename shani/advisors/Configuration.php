@@ -144,7 +144,7 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t): ?string
         {
-            $this->app->logger()->log($t, LogLevel::ERROR);
+            $this->app->logger()->log(LogLevel::ERROR, $t->getMessage());
             return null;
         }
 
