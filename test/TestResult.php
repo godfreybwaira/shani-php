@@ -14,7 +14,7 @@ namespace test {
     final class TestResult
     {
 
-        public const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}-test-report\.txt$/';
+        public const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}_test-report\.txt$/';
         public const KEYWORD_PASS = ' TEST PASSED';
         public const KEYWORD_FAIL = ' TEST FAILED';
         public const KEYWORD_TIMESTAMP = ' TIMESTAMP';
@@ -132,7 +132,7 @@ namespace test {
         private function save(string $data): self
         {
             if ($this->location !== null) {
-                $filename = date('Y-m-d.Hi') . '-test-report.txt';
+                $filename = date('Y-m-d.Hi') . '_test-report.txt';
                 if (preg_match(self::FILENAME_PATTERN, $filename) !== 1) {
                     throw new \Exception('Invalid file name');
                 }

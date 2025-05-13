@@ -24,7 +24,6 @@ namespace lib\http {
          */
         private HttpStatus $status;
         public readonly RequestEntity $request;
-        private ?Encryption $encryption = null;
         private ?string $statusMessage = null, $rawBody = null;
 
         public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)

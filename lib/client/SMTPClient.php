@@ -228,7 +228,7 @@ namespace lib\client {
          */
         public function send(callable $callback = null): void
         {
-            \lib\Concurrency::thread(function () use (&$callback) {
+            \lib\Concurrency::parallel(function () use (&$callback) {
                 $this->conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
                 $success = $this->conn->initialize($this->from, $this->password, $this->token);
                 if ($success) {

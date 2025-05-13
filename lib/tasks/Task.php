@@ -65,7 +65,7 @@ namespace lib\tasks {
         public function startAfter(\DateTimeInterface $duration): self
         {
             $seconds = $duration->getTimestamp() - time();
-            Concurrency::thread(function ()use (&$seconds) {
+            Concurrency::parallel(function ()use (&$seconds) {
                 $this->listener->trigger(TaskEvent::START->name);
                 $counter = 0;
                 do {

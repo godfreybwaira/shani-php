@@ -205,7 +205,7 @@ namespace lib\client {
         public function send(string $method, string $endpoint, callable $callback): self
         {
             if ($this->asyncMode) {
-                Concurrency::thread(fn() => $this->sendSync($method, $endpoint, $callback));
+                Concurrency::parallel(fn() => $this->sendSync($method, $endpoint, $callback));
             } else {
                 $this->sendSync($method, $endpoint, $callback);
             }

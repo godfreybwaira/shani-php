@@ -244,7 +244,7 @@ namespace lib\ds\map {
         public function entrySet(): \Generator
         {
             foreach ($this->data as $key => $value) {
-                yield [$key => $value];
+                yield $key => $value;
             }
         }
 

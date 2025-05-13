@@ -75,7 +75,8 @@ namespace shani {
                     $app = new App($vhost, $response, $writer);
                     $app->runApp();
                 } catch (\Throwable $ex) {
-                    $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                    $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR)->header()
+                            ->addOne(HttpHeader::SERVER, Framework::NAME);
                     $writer->close($response);
                     self::log(LogLevel::EMERGENCY, $ex->getMessage());
                 }
@@ -96,7 +97,7 @@ namespace shani {
         private static function log(LogLevel $level, string $message): void
         {
             echo $message . PHP_EOL;
-            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '-' . $level->value . '.log';
+            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);
         }
     }

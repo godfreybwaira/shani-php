@@ -17,7 +17,7 @@ namespace shani\servers\swoole {
             \Swoole\Event::defer($callback);
         }
 
-        public function thread(callable $callback): void
+        public function parallel(callable $callback): void
         {
             \Swoole\Coroutine\go($callback);
         }

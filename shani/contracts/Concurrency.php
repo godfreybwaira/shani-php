@@ -14,7 +14,7 @@ namespace shani\contracts {
 
         public function async(callable $callback): void;
 
-        public function thread(callable $callback): void;
+        public function parallel(callable $callback): void;
 
         public function sleep(int $seconds): void;
     }

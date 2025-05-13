@@ -43,13 +43,13 @@ namespace lib {
          * @param callable $callback A callback function to execute
          * @return void
          */
-        public static function thread(callable $callback): void
+        public static function parallel(callable $callback): void
         {
             if (!isset(self::$obj)) {
                 $callback();
                 return;
             }
-            self::$obj->thread($callback);
+            self::$obj->parallel($callback);
         }
 
         /**

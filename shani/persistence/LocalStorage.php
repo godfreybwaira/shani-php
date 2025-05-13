@@ -131,7 +131,7 @@ namespace shani\persistence {
             $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
             $directory = self::createDirectory($savePath . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
-            \lib\Concurrency::thread(function ()use ($filepath, &$file) {
+            \lib\Concurrency::parallel(function ()use ($filepath, &$file) {
                 $handle = fopen($filepath, 'a+b');
                 $size = fstat($handle)['size'];
                 if ($size < $file->size) {
@@ -214,7 +214,7 @@ namespace shani\persistence {
                 $folder = $bucket . dirname($shortPath);
                 $filename = $groupId . self::getFilename(basename($shortPath));
                 $destination = self::createDirectory($this->pathTo($folder));
-                \lib\Concurrency::thread(fn() => rename($filepath, $destination . '/' . $filename));
+                \lib\Concurrency::parallel(fn() => rename($filepath, $destination . '/' . $filename));
                 return $folder . '/' . $filename;
             }
             return null;
