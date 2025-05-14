@@ -28,6 +28,7 @@ namespace gui {
             $this->scripts = $this->styles = [];
             $this->title = $this->icon = null;
             $this->app = $app;
+            $this->style('/css/main.css');
         }
 
         /**
