@@ -2,12 +2,12 @@
 @use '../utils/variables' as var;
 @use '../utils/animation' as ani;
 .modal{
-    box-shadow: map-get(var.$shadows,sm);
+    box-shadow: map-get(var.$shadows,md);
     background-color: #fff;
     position: fixed;
     &-background{
         top: 0;
-        background-color: rgba(0,0,0, 0.6);
+        background-color: rgba(0,0,0,0.8);
         @extend %full_size,%position_fixed;
         z-index: map-get(var.$z_index,md);
     }

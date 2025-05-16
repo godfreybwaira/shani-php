@@ -72,18 +72,18 @@
         top: $pos;
         left: $pos;
     }
-    @elseif($location == left){
+    @else if($location == left){
         top: $pos;
     }
-    @elseif($location == right){
+    @else if($location == right){
         top: $pos;
         right: 0;
     }
-    @elseif($location == bottom){
+    @else if($location == bottom){
         bottom: 0;
         left: $pos;
     }
-    @elseif($location == top){
+    @else if($location == top){
         top: 0;
         left: $pos;
     }

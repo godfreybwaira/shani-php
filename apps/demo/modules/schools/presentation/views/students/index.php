@@ -27,4 +27,9 @@ $left->setText('LEFT');
 $main->setText('MAIN');
 $footer->setText('FOOTER');
 
-echo $box;
+$modal = new \gui\v2\containers\modals\HorizontalModal();
+$modal->addSize(\gui\v2\DeviceSize::MOBILE, 5);
+$modal->addSize(\gui\v2\DeviceSize::LAPTOP, 1);
+$modal->alignBottom();
+$modal->appendChild($box);
+echo $modal;

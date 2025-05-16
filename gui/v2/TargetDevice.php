@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TargetDevice interface define the screen size of the view port. All units are in
+ * TargetDevice define the screen size of the view port. All units are in
  * rem or em (1rem = 16px)
  * @author coder
  *
