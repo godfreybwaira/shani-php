@@ -162,8 +162,8 @@ namespace shani\http {
          */
         private function doStream(string $path, int $filesize, int $start, int $end): self
         {
-            if ($filesize > $end && $start < $end && $start >= 0) {
-                $length = $end - $start + 1;
+            $length = $end - $start + 1;
+            if ($length > 0 && $length <= $filesize) {
                 $this->response->header()->addAll([
                     HttpHeader::CONTENT_LENGTH => $length,
                     HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)

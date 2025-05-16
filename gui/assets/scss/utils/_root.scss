@@ -1,0 +1,19 @@
+@use 'mixins';
+@use 'variables' as var;
+@use 'animation' as anim;
+:root{
+    --font-size:#{var.$font_size};
+    --spacing:#{var.$spacing};
+    @include mixins.colors(var.$color_theme);
+}
+@include mixins.createThemeColors(var.$color_theme);
+@include mixins.createColumns(var.$breakpoints,var.$grid_colmns);
+@include anim.riseUp;
+@include anim.zoomOut;
+@include anim.zoomIn;
+@include anim.slideLeft;
+@include anim.slideRight;
+@include anim.slideUp;
+@include anim.slideDown;
+@include anim.grow;
+@include anim.shrink;

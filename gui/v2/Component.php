@@ -19,12 +19,14 @@ namespace gui\v2 {
         private ?Component $parent = null;
         public readonly StyleClass $classList;
         public readonly Attribute $attribute;
+        public readonly InlineStyle $style;
 
         public function __construct(string $tag = 'div')
         {
             $this->tag = $tag;
             $this->classList = new StyleClass();
             $this->attribute = new Attribute();
+            $this->style = new InlineStyle();
             $this->children = [];
         }
 
@@ -142,11 +144,13 @@ namespace gui\v2 {
          */
         public function build(): string
         {
-
             if (!$this->classList->isEmpty()) {
                 $this->attribute->addOne('class', $this->classList->asString());
             }
-            $markup = $this->getStyles();
+            if (!$this->style->isEmpty()) {
+                $this->attribute->addOne('style', $this->style->asString());
+            }
+            $markup = null;
             if (!empty($this->content)) {
                 $markup .= '<' . $this->tag . $this->attribute . '>';
                 return $markup . $this->content . '</' . $this->tag . '>';

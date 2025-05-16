@@ -1,5 +1,30 @@
 <?php $app->ui()->import($app->view('/shani')); ?>
-<div shanify="*" shani-header="x-request-mode:async" shani-on="click" shani-fn="r" style="background: red;padding: 3rem">
-    <a href="/schools/0/students/1/all" shani-fn="r" shani-watcher="#box" shani-log="true">Testing</a>
-    <div id="box" watch-on="200" shani-insert="after" shani-plugin="init:fs">BOX 1</div>
-</div>
+<?php
+
+$box = new gui\v2\containers\GridLayout();
+$header = new gui\v2\containers\GridArea();
+$left = new gui\v2\containers\GridArea();
+$main = new gui\v2\containers\GridArea();
+$footer = new gui\v2\containers\GridArea();
+//////////////////////
+$mobile = \gui\v2\TargetDevice::MOBILE;
+$tablet = \gui\v2\TargetDevice::TABLET;
+$laptop = \gui\v2\TargetDevice::LAPTOP;
+//////////////////////
+$box->addArea($mobile, $header);
+$box->addArea($mobile, $left);
+$box->addArea($mobile, $main);
+$box->addArea($mobile, $footer);
+//////////////////////
+$box->addArea($laptop, $header, $header, $header);
+$box->addArea($laptop, $left, $main, $main);
+$box->addArea($laptop, $left, $main, $main);
+$box->addArea($laptop, $footer, $footer, $footer);
+//////////////////////
+
+$header->setText('HEADER');
+$left->setText('LEFT');
+$main->setText('MAIN');
+$footer->setText('FOOTER');
+
+echo $box;

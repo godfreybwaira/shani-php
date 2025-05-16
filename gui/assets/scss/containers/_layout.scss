@@ -1,0 +1,9 @@
+@use '../utils/mixins';
+
+.grid-layout{
+    display: grid;
+    @extend %full_size;
+    &,>*{
+        overflow: auto;
+    }
+}

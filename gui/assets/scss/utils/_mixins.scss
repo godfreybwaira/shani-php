@@ -1,0 +1,100 @@
+@use 'functions' as fn;
+@use 'sass:color';
+@use 'sass:math';
+
+@mixin dimension($size,$center:false){
+    width: $size;
+    height: $size;
+    @if($center){
+        @include centerItem($size);
+    }
+}
+
+@mixin spacing($size){
+    padding: $size;
+    margin: $size;
+}
+
+@mixin colors($theme_color){
+    @for $i from 0 through 10 {
+        $color: color.scale($theme_color, $lightness: ($i - 5) * 20%);
+        @if($i == 5){
+            --color-theme: #{$color};
+        }
+        @else{
+            --color-#{$i}: #{$color};
+        }
+    }
+}
+
+@mixin createThemeColors($theme_color){
+    @for $i from 0 through 10 {
+        $color: color.scale($theme_color, $lightness: ($i - 5) * 20%);
+        @if($i == 5){
+            .color-theme,::selection,::-webkit-scrollbar-thumb{
+                color: fn.getTextColor($color);
+                background-color: var(--color-theme);
+            }
+        }
+        @else{
+            .color-#{$i}{
+                color: fn.getTextColor($color);
+                background-color: var(--color-#{$i});
+            }
+        }
+    }
+}
+
+@mixin media($size, $feature: min-width) {
+    @media($feature: $size) {
+        @content;
+    }
+}
+@mixin createColumns($breakpoints,$columns) {
+    $ratio: math.div(100%, $columns);
+
+    @each $key, $size in $breakpoints {
+        @include media($size) {
+            @for $col from 1 through $columns {
+                .width-#{$key}-#{$col} {
+                    width: $ratio * $col;
+                }
+            }
+        }
+    }
+}
+/**
+* Center an item (component)
+*/
+@mixin centerItem($length,$location: center){
+    $pos: calc((100% - $length)/2);
+    @if($location == center){
+        top: $pos;
+        left: $pos;
+    }
+    @elseif($location == left){
+        top: $pos;
+    }
+    @elseif($location == right){
+        top: $pos;
+        right: 0;
+    }
+    @elseif($location == bottom){
+        bottom: 0;
+        left: $pos;
+    }
+    @elseif($location == top){
+        top: 0;
+        left: $pos;
+    }
+}
+%full_size{
+    @include dimension(100%);
+}
+
+%half_size{
+    @include dimension(50%);
+}
+%position_fixed{
+    position: fixed;
+}

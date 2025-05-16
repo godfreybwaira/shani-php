@@ -1,0 +1,25 @@
+@use 'functions' as fn;
+@use 'sass:math';
+
+$font_size: 1rem;
+$spacing: 1rem;
+$color_theme: #007bff;
+$grid_colmns: 24;
+$breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
+$z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 150);
+
+$animation_duration: 0.2s;
+$animation_timing: ease-in;
+
+$shadows:(
+'xs': (0 0 fn.px2rem(1px) black, 0 fn.px2rem(1px) fn.px2rem(1px) black),
+'sm': 0 0 fn.px2rem(3px) fn.px2rem(-1px) black
+);
+$border_radius: (
+'xs': math.div($spacing, 4),
+'sm': math.div($spacing, 2),
+'md': $spacing,
+'lg': 50%,
+);
+
+$component_min_size: 12.5%;

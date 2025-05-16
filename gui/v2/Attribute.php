@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Rrepresent attributes of a component
+ * Represent attributes of a component
  * @author coder
  *
  * Created on: Apr 22, 2025 at 9:49:53 AM
@@ -15,9 +15,9 @@ namespace gui\v2 {
     {
 
         #[\Override]
-        public function __toString(): ?string
+        public function __toString(): string
         {
-            $result = null;
+            $result = '';
             foreach ($this->data as $name => $value) {
                 $result .= ' ' . $name . ($value !== null ? '="' . $value . '"' : null);
             }
