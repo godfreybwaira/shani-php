@@ -1,10 +1,9 @@
 @use '../utils/mixins';
 @use '../utils/variables' as var;
-@use '../utils/animation' as ani;
 .modal{
     box-shadow: map-get(var.$shadows,md);
     background-color: #fff;
-    position: fixed;
+    overflow: hidden;
     &-background{
         top: 0;
         background-color: rgba(0,0,0,0.8);
@@ -14,31 +13,10 @@
     &-center{
         border-radius: map-get(var.$border_radius,xs);
     }
-    &-vertical{
+    &-v{
         height: 100%;
     }
-    &-horizontal{
+    &-h{
         width: 100%;
-    }
-    &-pos-bottom{
-        bottom: 0;
-    }
-    &-pos-right{
-        right: 0;
-    }
-    @each $key, $size in var.$breakpoints {
-        @include mixins.media($size) {
-            @for $col from 3 through 7 {
-                &-center-#{$key}-#{$col - 2} {
-                    @include mixins.dimension(var.$component_min_size * $col,true);
-                }
-                &-vertical-#{$key}-#{$col - 2} {
-                    width: var.$component_min_size * ($col - 1);
-                }
-                &-horizontal-#{$key}-#{$col - 2} {
-                    height: var.$component_min_size * ($col - 1);
-                }
-            }
-        }
     }
 }

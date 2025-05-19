@@ -16,13 +16,11 @@ namespace gui\v2\containers\modals {
     {
 
         private bool $wrapped = false;
-        private readonly string $className;
         private readonly Component $wrapper;
 
         protected function __construct(string $className)
         {
             parent::__construct('div');
-            $this->className = $className;
             $this->classList->addAll(['modal', $className]);
             $this->wrapper = new Component('div');
             $this->wrapper->classList->addOne('modal-background');
@@ -32,14 +30,10 @@ namespace gui\v2\containers\modals {
         /**
          * Set different size based on the device width
          * @param DeviceSize $device Device size
-         * @param int $size Size from 1 to 5
+         * @param int $size Size from 1 to 12
          * @return self
          */
-        public function addSize(DeviceSize $device, int $size): self
-        {
-            $this->classList->addOne($this->className . '-' . $device->value . '-' . $size);
-            return $this;
-        }
+        public abstract function addSize(DeviceSize $device, int $size): self;
 
         public function build(): string
         {

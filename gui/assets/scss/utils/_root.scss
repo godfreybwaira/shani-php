@@ -4,16 +4,17 @@
 :root{
     --font-size:#{var.$font_size};
     --spacing:#{var.$spacing};
+    --accent-color:#{var.$accent_color};
     @include mixins.colors(var.$color_theme);
 }
 @include mixins.createThemeColors(var.$color_theme);
 @include mixins.createColumns(var.$breakpoints,var.$grid_colmns);
-@include anim.riseUp;
+@include mixins.createSpacing(padding);
+@include mixins.createSpacing(margin);
+@include mixins.createGap();
 @include anim.zoomOut;
 @include anim.zoomIn;
 @include anim.slideLeft;
 @include anim.slideRight;
 @include anim.slideUp;
 @include anim.slideDown;
-@include anim.grow;
-@include anim.shrink;

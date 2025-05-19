@@ -47,36 +47,6 @@
     }
 }
 
-@keyframes shrink {
-    100% {
-        opacity: 0;
-        transform: rotateX(90deg);
-    }
-}
-
-@keyframes grow {
-    0% {
-        opacity: 0;
-        transform: rotateX(90deg);
-    }
-
-    100% {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-@keyframes riseUp {
-    0% {
-        opacity: 0;
-        transform: rotate(90deg);
-    }
-
-    100% {
-        opacity: 1;
-        transform: none;
-    }
-}
 
 @keyframes zoomIn {
     0% {
@@ -98,12 +68,6 @@
 }
 @function _getDuration($duration){
     @return if($duration == null,.35s,$duration);
-}
-@mixin riseUp($duration:null, $timing:ease-in) {
-    .animation-rise-up{
-        transform-origin: bottom left;
-        animation: riseUp _getDuration($duration) $timing;
-    }
 }
 
 @mixin zoomOut($duration:null, $timing:ease-in) {
@@ -139,17 +103,5 @@
 @mixin slideDown($duration:null, $timing:ease-in) {
     .animation-slide-down{
         animation: slideDown _getDuration($duration) $timing;
-    }
-}
-
-@mixin shrink($duration:null, $timing:ease-in) {
-    .animation-shrink{
-        animation: shrink _getDuration($duration) $timing;
-    }
-}
-
-@mixin grow($duration:null, $timing:ease-in) {
-    .animation-grow{
-        animation: grow _getDuration($duration) $timing;
     }
 }

@@ -14,18 +14,10 @@ namespace gui\v2\containers {
     final class GridArea extends Component
     {
 
-        private readonly string $name;
-
         public function __construct()
         {
             parent::__construct('div');
-            $this->name = 'd' . substr(hrtime(true), 8);
             $this->style->addOne('grid-area', $this->name);
-        }
-
-        public function getName(): string
-        {
-            return $this->name;
         }
     }
 

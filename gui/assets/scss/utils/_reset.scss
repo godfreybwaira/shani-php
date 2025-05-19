@@ -1,11 +1,10 @@
 @use 'mixins';
-@use 'variables' as var;
 
 html {
     @extend %full_size;
 }
 body {
-    font-size: var.$font_size;
+    font-size: var(--font-size);
     font-weight: normal;
     line-height: 1.5;
     @extend %full_size;
@@ -19,14 +18,14 @@ body,fieldset {
 
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
-    margin-bottom: calc(var.$spacing/2);
+    margin-bottom: calc(var(--spacing) / 2);
 }
 p,ol,ul,dl, pre{
     margin-top: 0;
-    margin-bottom: var.$spacing;
+    margin-bottom: var(--spacing);
 }
 blockquote,figure {
-    margin: 0 0 var.$spacing;
+    margin: 0 0 var(--spacing);
 }
 b,strong {
     font-weight: bolder;
@@ -41,10 +40,10 @@ sub,sup {
     vertical-align: baseline;
 }
 sub {
-    bottom: calc(var.$spacing/-4);
+    bottom: calc(var(--spacing) / -4);
 }
 sup {
-    top: calc(var.$spacing/-2);
+    top: calc(var(--spacing) / -2);
 }
 a {
     color: var(--color-accent);
@@ -84,8 +83,8 @@ table {
     border-collapse: collapse;
 }
 caption {
-    padding-top: var.$spacing * 0.75;
-    padding-bottom: var.$spacing * 0.75;
+    padding-top: calc(var(--spacing) * 0.75);
+    padding-bottom: calc(var(--spacing) * 0.75);
     text-align: left;
 }
 th {
@@ -143,7 +142,7 @@ legend {
     display: block;
     max-width: 100%;
     padding: 0;
-    margin-bottom: calc(var.$spacing/2);
+    margin-bottom: calc(var(--spacing)/2);
     line-height: inherit;
     color: inherit;
     white-space: normal;
@@ -173,5 +172,5 @@ input,
 textarea,
 button,
 select {
-    accent-color: var(--color-theme);
+    accent-color: var(--accent-color);
 }

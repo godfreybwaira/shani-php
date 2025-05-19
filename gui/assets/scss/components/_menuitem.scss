@@ -1,0 +1,22 @@
+.menu-item {
+    display: grid;
+    padding: calc(var(--spacing)/2) var(--spacing);
+    align-items: center;
+    justify-content: center;
+    &-h{
+        grid-template-columns: auto 1fr;
+        gap:  var(--spacing);
+    }
+    &-v{
+        grid-template-rows: auto 1fr;
+    }
+    &>.icon{
+        font-size: calc(var(--font-size) * 1.5);
+    }
+    &>.label{
+        font-size: 85%;
+    }
+    &>*{
+        text-align: center;
+    }
+}

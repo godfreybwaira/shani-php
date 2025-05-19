@@ -1,0 +1,92 @@
+@use 'mixins';
+
+$_gap_center: 50%;
+
+%_r50 {
+    right: $_gap_center;
+}
+
+%_b50 {
+    bottom: $_gap_center;
+}
+
+%_x50 {
+    @extend %_r50;
+    transform: translateX($_gap_center);
+}
+
+%_y50 {
+    @extend %_b50;
+    transform: translateY($_gap_center);
+}
+
+%_top {
+    top: var(--spacing);
+}
+
+%_top_0 {
+    top: 0;
+}
+
+%_bottom {
+    bottom: var(--spacing);
+}
+
+%_left {
+    left: var(--spacing);
+}
+
+%_left_0 {
+    left: 0;
+}
+
+%_right {
+    right: var(--spacing);
+}
+
+%_right_0 {
+    right: 0;
+}
+
+.pos {
+    &-top {
+        @extend %position_absolute, %_top;
+        &-left {
+            @extend %position_absolute, %_top, %_left;
+        }
+        &-center {
+            @extend %position_absolute, %_top, %_x50;
+        }
+        &-right {
+            @extend %position_absolute, %_top, %_right;
+        }
+    }
+    &-bottom {
+        @extend %position_absolute, %_bottom;
+        &-left {
+            @extend %position_absolute, %_bottom, %_left;
+        }
+        &-center {
+            @extend %position_absolute, %_bottom, %_x50;
+        }
+        &-right {
+            @extend %position_absolute, %_bottom, %_right;
+        }
+    }
+    &-left {
+        @extend %position_absolute, %_top_0, %_left_0;
+    }
+    &-right {
+        @extend %position_absolute, %_top_0, %_right_0;
+    }
+    &-center {
+        transform: translate($_gap_center, $_gap_center);
+        @extend %position_absolute, %_r50, %_b50;
+        &-left {
+            @extend %position_absolute, %_y50, %_left;
+        }
+        &-right {
+            @extend %position_absolute, %_y50, %_right;
+        }
+    }
+}

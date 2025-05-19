@@ -30,3 +30,9 @@
 
     @error 'only px unit allowed!';
 }
+
+@function boxShadow($color){
+    @return 0 px2rem(2px) px2rem(2px) 0 rgba(0, 0, 0, .14),
+    0 px2rem(3px) px2rem(1px) px2rem(-2px) $color,
+    0 px2rem(1px) px2rem(5px) 0 rgba(0, 0, 0, .12);
+}

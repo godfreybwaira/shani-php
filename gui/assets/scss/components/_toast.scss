@@ -1,0 +1,11 @@
+@use '../utils/variables' as var;
+@use '../utils/functions' as fn;
+@use '../utils/mixins';
+.toast{
+    z-index: map-get(var.$z_index,lg);
+    @extend %position_fixed;
+    border-radius: map-get(var.$border_radius,xs);
+    box-shadow: fn.boxShadow(var.$shadow_color);
+    overflow-y: auto;
+    max-height: 30%;
+}

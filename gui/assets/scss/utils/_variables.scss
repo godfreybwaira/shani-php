@@ -4,17 +4,19 @@
 $font_size: 1rem;
 $spacing: 1rem;
 $color_theme: #007bff;
-$grid_colmns: 24;
+$grid_colmns: 12;
 $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
 $z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 150);
-
+$shadow_color: #3b3b3b;
+$border_color: var(--color-9);
+$accent_color: var(--color-theme);
 $animation_duration: 0.2s;
 $animation_timing: ease-in;
 
 $shadows:(
-'xs': (0 0 fn.px2rem(1px) #2a2a2a, 0 fn.px2rem(1px) fn.px2rem(1px) #2a2a2a),
-'sm': 0 0 fn.px2rem(3px) fn.px2rem(-1px) #2a2a2a,
-'md': 0 0 fn.px2rem(5px) fn.px2rem(3px) #2a2a2a,
+'xs': (0 0 fn.px2rem(1px) $shadow_color, 0 fn.px2rem(1px) fn.px2rem(1px) $shadow_color),
+'sm': 0 0 fn.px2rem(3px) fn.px2rem(-1px) $shadow_color,
+'md': 0 0 fn.px2rem(5px) fn.px2rem(3px) $shadow_color,
 );
 $border_radius: (
 'xs': math.div($spacing, 4),

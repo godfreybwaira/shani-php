@@ -1,0 +1,154 @@
+@use '../utils/mixins';
+@use '../utils/functions' as fn;
+@use '../utils/variables' as var;
+
+$_border_color: var(--color-8);
+$_bolder: fn.px2rem(3px);
+$_bold: fn.px2rem(1px);
+
+%_border_right{
+    border-right: $_bold solid $_border_color;
+}
+%_border_bottom{
+    border-bottom: $_bold solid $_border_color;
+}
+%_flex_column{
+    flex-direction: column;
+}
+%_tl_0{
+    top: 0;
+    left: 0;
+}
+%_tr_0{
+    top: 0;
+    right: 0;
+}
+%_bl_0{
+    bottom: 0;
+    left: 0;
+}
+.tab {
+    $tab: &;
+    display: grid;
+    height: 100%;
+    &-top{
+        grid-template-rows: auto 1fr;
+        >#{$tab}-menu>*{
+            &:before{
+                width: 100%;
+            }
+            &:not(:last-child){
+                @extend %_border_right;
+            }
+            &.active:before{
+                @extend %_tl_0;
+                height: $_bolder;
+            }
+            &:not(.active){
+                &:before{
+                    @extend %_bl_0;
+                    height: $_bold;
+                }
+            }
+        }
+    }
+    &-bottom{
+        grid-template-rows: 1fr auto;
+        >#{$tab}-menu>*{
+            &:before{
+                width: 100%;
+            }
+            &:not(:last-child){
+                @extend %_border_right;
+            }
+            &.active:before{
+                @extend %_bl_0;
+                height: $_bolder;
+            }
+            &:not(.active){
+                &:before{
+                    @extend %_tl_0;
+                    height: $_bold;
+                }
+            }
+        }
+    }
+    &-left{
+        >#{$tab}-menu{
+            @extend %_flex_column;
+            >*{
+                &:before{
+                    height: 100%;
+                }
+                &:not(:last-child){
+                    @extend %_border_bottom;
+                }
+                &.active:before{
+                    @extend %_tl_0;
+                    width: $_bolder;
+                }
+                &:not(.active){
+                    &:before{
+                        @extend %_tr_0;
+                        width: $_bold;
+                    }
+                }
+            }
+        }
+    }
+    &-right{
+        >#{$tab}-menu{
+            @extend %_flex_column;
+            >*{
+                &:before{
+                    height: 100%;
+                }
+                &:not(:last-child){
+                    @extend %_border_bottom;
+                }
+                &.active:before{
+                    @extend %_tr_0;
+                    width: $_bolder;
+                }
+                &:not(.active){
+                    &:before{
+                        @extend %_tl_0;
+                        width: $_bold;
+                    }
+                }
+            }
+        }
+    }
+    &-menu{
+        display: flex;
+        overflow-x: auto;
+        @include mixins.spacing(0);
+        list-style-type: none;
+        &>* {
+            flex: 1 1 auto;
+            position: relative;
+            &:before{
+                content: '';
+                @extend %position_absolute;
+            }
+            &.active,&:hover {
+                color: var(--color-theme);
+            }
+            &.active:before{
+                background-color: var(--accent-color);
+            }
+            &:not(.active){
+                &:hover {
+                    cursor: pointer;
+                }
+                background-color: var.$border_color;
+                &:before{
+                    background-color: $_border_color;
+                }
+            }
+        }
+    }
+    &-body{
+        overflow-y: auto;
+    }
+}

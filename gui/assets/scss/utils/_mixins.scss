@@ -2,14 +2,6 @@
 @use 'sass:color';
 @use 'sass:math';
 
-@mixin dimension($size,$center:false){
-    width: $size;
-    height: $size;
-    @if($center){
-        @include centerItem($size);
-    }
-}
-
 @mixin spacing($size){
     padding: $size;
     margin: $size;
@@ -52,15 +44,52 @@
 }
 @mixin createColumns($breakpoints,$columns) {
     $ratio: math.div(100%, $columns);
-
     @each $key, $size in $breakpoints {
         @include media($size) {
             @for $col from 1 through $columns {
                 .width-#{$key}-#{$col} {
                     width: $ratio * $col;
                 }
+                .height-#{$key}-#{$col} {
+                    height: $ratio * $col;
+                }
             }
         }
+    }
+}
+@mixin createSpacing($name){
+    .#{$name}-x{
+        #{$name}-top: var(--spacing);
+        #{$name}-bottom: var(--spacing);
+    }
+    .#{$name}-y{
+        #{$name}-left: var(--spacing);
+        #{$name}-right: var(--spacing);
+    }
+    .#{$name}-xy{
+        #{$name}: var(--spacing);
+    }
+    .#{$name}-x-sm{
+        #{$name}-top: calc(var(--spacing)/2);
+        #{$name}-bottom: calc(var(--spacing)/2);
+    }
+    .#{$name}-y-sm{
+        #{$name}-left: calc(var(--spacing)/2);
+        #{$name}-right: calc(var(--spacing)/2);
+    }
+    .#{$name}-xy-sm{
+        #{$name}: calc(var(--spacing)/2);
+    }
+}
+@mixin createGap(){
+    .gap-x{
+        gap: var(--spacing) 0;
+    }
+    .gap-y{
+        gap: 0 var(--spacing);
+    }
+    .gap-xy{
+        gap: var(--spacing);
     }
 }
 /**
@@ -89,12 +118,13 @@
     }
 }
 %full_size{
-    @include dimension(100%);
+    width: 100%;
+    height: 100%;
 }
 
-%half_size{
-    @include dimension(50%);
-}
 %position_fixed{
     position: fixed;
+}
+%position_absolute{
+    position: absolute;
 }

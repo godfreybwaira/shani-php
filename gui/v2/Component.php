@@ -9,6 +9,7 @@
 
 namespace gui\v2 {
 
+    use gui\v2\decoration\Animation;
 
     class Component implements \Stringable
     {
@@ -17,17 +18,33 @@ namespace gui\v2 {
         private readonly string $tag;
         private ?string $content = null;
         private ?Component $parent = null;
+        private ?Animation $animation = null;
         public readonly StyleClass $classList;
         public readonly Attribute $attribute;
         public readonly InlineStyle $style;
+        private readonly string $name;
 
+        /**
+         * Create a representation of HTML component
+         * @param string $tag HTML tag
+         */
         public function __construct(string $tag = 'div')
         {
             $this->tag = $tag;
             $this->classList = new StyleClass();
             $this->attribute = new Attribute();
             $this->style = new InlineStyle();
+            $this->name = 'd' . substr(hrtime(true), 8);
             $this->children = [];
+        }
+
+        /**
+         * Get component unique name
+         * @return string
+         */
+        public function getUniqueName(): string
+        {
+            return $this->name;
         }
 
         /**
@@ -144,22 +161,54 @@ namespace gui\v2 {
          */
         public function build(): string
         {
+            return $this->open() . $this->close();
+        }
+
+        /**
+         * Set animation
+         * @param Animation $animation Animation object
+         * @return self
+         */
+        public function setAnimation(Animation $animation): self
+        {
+            $this->animation = $animation;
+            return $this;
+        }
+
+        /**
+         * Start outputting component as HTML
+         * @return string HTML open tag and content (including children)
+         * @see self::close()
+         */
+        public function open(): string
+        {
+            if ($this->animation !== null) {
+                $this->classList->addOne($this->animation->value);
+            }
             if (!$this->classList->isEmpty()) {
                 $this->attribute->addOne('class', $this->classList->asString());
             }
             if (!$this->style->isEmpty()) {
                 $this->attribute->addOne('style', $this->style->asString());
             }
-            $markup = null;
             if (!empty($this->content)) {
-                $markup .= '<' . $this->tag . $this->attribute . '>';
-                return $markup . $this->content . '</' . $this->tag . '>';
+                return '<' . $this->tag . $this->attribute . '>' . $this->content;
+            } elseif (!empty($this->children)) {
+                return '<' . $this->tag . $this->attribute . '>' . $this->serializeChildren();
             }
-            if (!empty($this->children)) {
-                $markup .= '<' . $this->tag . $this->attribute . '>';
-                return $markup . $this->serializeChildren() . '</' . $this->tag . '>';
+            return '<' . $this->tag . $this->attribute . '/>';
+        }
+
+        /**
+         * Return HTML closing tag
+         * @return string Return empty string if the HTML tag is a single tag
+         */
+        public function close(): string
+        {
+            if (!empty($this->content) || !empty($this->children)) {
+                return '</' . $this->tag . '>';
             }
-            return $markup . '<' . $this->tag . $this->attribute . '/>';
+            return '';
         }
 
         #[\Override]

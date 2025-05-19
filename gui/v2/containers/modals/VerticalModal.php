@@ -9,12 +9,15 @@
 
 namespace gui\v2\containers\modals {
 
+    use gui\v2\DeviceSize;
+    use gui\v2\Position;
+
     final class VerticalModal extends ModalWrapper
     {
 
         public function __construct()
         {
-            parent::__construct('modal-vertical');
+            parent::__construct('modal-v');
         }
 
         /**
@@ -25,10 +28,16 @@ namespace gui\v2\containers\modals {
         public function alignRight(bool $align = true): self
         {
             if ($align) {
-                $this->classList->addOne('modal-pos-right');
+                $this->classList->addOne(Position::RIGHT->value);
             } else {
-                $this->classList->delete('modal-pos-right');
+                $this->classList->delete(Position::RIGHT->value);
             }
+            return $this;
+        }
+
+        public function addSize(DeviceSize $device, int $size): self
+        {
+            $this->classList->addOne('height-' . $device->value . '-' . $size);
             return $this;
         }
     }

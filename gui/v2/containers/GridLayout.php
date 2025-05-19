@@ -43,7 +43,7 @@ namespace gui\v2\containers {
             }
             $names = null;
             foreach ($areas as $area) {
-                $name = $area->getName();
+                $name = $area->getUniqueName();
                 $names .= ' ' . $name;
                 $this->kids[$name] ??= $area;
             }
