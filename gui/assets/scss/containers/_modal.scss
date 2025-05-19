@@ -14,9 +14,9 @@
         border-radius: map-get(var.$border_radius,xs);
     }
     &-v{
-        height: 100%;
+        @extend %full_height;
     }
     &-h{
-        width: 100%;
+        @extend %full_width;
     }
 }

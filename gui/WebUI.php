@@ -29,6 +29,9 @@ namespace gui {
             $this->title = $this->icon = null;
             $this->app = $app;
             $this->style('/css/main.css');
+            $this->script('/js/ui.js', ['defer']);
+            $this->script('/js/shani-ob-2.0.js', ['defer']);
+            $this->script('/js/shani-plugins.js', ['defer']);
         }
 
         /**

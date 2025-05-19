@@ -1,0 +1,39 @@
+@use '../utils/mixins';
+
+.table {
+    @extend %full_width;
+
+    &-container {
+        overflow-x: auto;
+    }
+
+    &-bordered {
+        td {
+            border-top: var(--thin-border);
+        }
+    }
+
+    td {
+        /*@extend %paddingXY-md;*/
+    }
+
+    th {
+        /*@extend %paddingXY-md;*/
+    }
+
+    tr:hover {
+        /*@extend %hoverShadow;*/
+    }
+
+    &-even {
+        tr:not(:hover):nth-of-type(2n)>td {
+            background-color: var(--color-8);
+        }
+    }
+
+    &-odd {
+        tr:not(:hover):nth-of-type(2n+1)>td {
+            background-color: var(--color-8);
+        }
+    }
+}

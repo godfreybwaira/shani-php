@@ -36,3 +36,7 @@
     0 px2rem(3px) px2rem(1px) px2rem(-2px) $color,
     0 px2rem(1px) px2rem(5px) 0 rgba(0, 0, 0, .12);
 }
+
+@function getBorder($size:1px,$color:var(--color-8)){
+    @return px2rem($size) solid $color;
+}

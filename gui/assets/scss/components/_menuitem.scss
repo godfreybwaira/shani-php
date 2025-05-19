@@ -3,6 +3,9 @@
     padding: calc(var(--spacing)/2) var(--spacing);
     align-items: center;
     justify-content: center;
+    &:hover{
+        text-decoration: none;
+    }
     &-h{
         grid-template-columns: auto 1fr;
         gap:  var(--spacing);

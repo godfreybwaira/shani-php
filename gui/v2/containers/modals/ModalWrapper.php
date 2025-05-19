@@ -25,6 +25,7 @@ namespace gui\v2\containers\modals {
             $this->wrapper = new Component('div');
             $this->wrapper->classList->addOne('modal-background');
             $this->wrapper->setChild($this);
+            $this->setAutoclose(true);
         }
 
         /**
@@ -34,6 +35,21 @@ namespace gui\v2\containers\modals {
          * @return self
          */
         public abstract function addSize(DeviceSize $device, int $size): self;
+
+        /**
+         * Whether to close the modal When clicking outside
+         * @param bool $autoclose True to close, false to persist
+         * @return self
+         */
+        public function setAutoclose(bool $autoclose): self
+        {
+            if ($autoclose) {
+                $this->wrapper->classList->delete('no-close');
+            } else {
+                $this->wrapper->classList->addOne('no-close');
+            }
+            return $this;
+        }
 
         public function build(): string
         {

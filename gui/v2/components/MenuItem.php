@@ -22,7 +22,7 @@ namespace gui\v2\components {
 
         public function __construct(string $label, float $fontSize = 1.0, bool $showLabel = true)
         {
-            parent::__construct('li');
+            parent::__construct('a');
             $this->label = $label;
             $this->fontSize = $fontSize;
             $this->showLabel = $showLabel;
@@ -61,6 +61,7 @@ namespace gui\v2\components {
                 }
                 $this->appendChild($label);
             }
+            $this->attribute->addIfAbsent('href', '#');
             return parent::open();
         }
     }

@@ -117,11 +117,16 @@
         left: $pos;
     }
 }
-%full_size{
+
+%full_width{
     width: 100%;
+}
+%full_height{
     height: 100%;
 }
-
+%full_size{
+    @extend %full_width, %full_height;
+}
 %position_fixed{
     position: fixed;
 }

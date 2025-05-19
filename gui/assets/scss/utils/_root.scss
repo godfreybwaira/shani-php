@@ -1,13 +1,22 @@
 @use 'mixins';
+@use 'functions' as fn;
 @use 'variables' as var;
 @use 'animation' as anim;
+
 :root{
     --font-size:#{var.$font_size};
     --spacing:#{var.$spacing};
     --accent-color:#{var.$accent_color};
-    @include mixins.colors(var.$color_theme);
+    @include mixins.colors(var.$theme_color);
+    @each $name,$color in var.$action_colors{
+        --color-#{$name}: #{$color};
+    }
+    --thin-border: #{fn.getBorder()};
 }
-@include mixins.createThemeColors(var.$color_theme);
+*{
+    transition: all .2s;
+}
+@include mixins.createThemeColors(var.$theme_color);
 @include mixins.createColumns(var.$breakpoints,var.$grid_colmns);
 @include mixins.createSpacing(padding);
 @include mixins.createSpacing(margin);

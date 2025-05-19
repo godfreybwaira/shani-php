@@ -15,23 +15,22 @@ namespace gui\v2\containers {
     final class Tab extends Component
     {
 
-        private readonly Component $menuItem;
-        private readonly Component $body;
+        private readonly Component $menu, $body;
 
         public function __construct(TabPosition $pos = TabPosition::TOP)
         {
             parent::__construct('div');
             $this->classList->addAll(['tab', $pos->value]);
             $this->body = new Component();
-            $this->menuItem = new Component('ul');
-            $menuName = $this->menuItem->getUniqueName();
+            $this->menu = new Component();
+            $menuName = $this->menu->getUniqueName();
             $bodyName = $this->body->getUniqueName();
             $this->style->addOne('grid-template-areas', self::getTemplateArea($pos, $menuName, $bodyName));
-            $this->menuItem->style->addOne('grid-area', $menuName);
-            $this->menuItem->classList->addOne('tab-menu');
+            $this->menu->style->addOne('grid-area', $menuName);
+            $this->menu->classList->addOne('tab-menu');
             $this->body->style->addOne('grid-area', $bodyName);
             $this->body->classList->addAll(['tab-body', 'padding-xy']);
-            $this->appendChild($this->menuItem);
+            $this->appendChild($this->menu);
         }
 
         private static function getTemplateArea(TabPosition $pos, string $menuName, string $bodyName): string
@@ -52,8 +51,18 @@ namespace gui\v2\containers {
          */
         public function addMenuItem(MenuItem $item): self
         {
-            $this->menuItem->appendChild($item);
+            $this->menu->appendChild($item);
             return $this;
+        }
+
+        public function getBody(): Component
+        {
+            return $this->body;
+        }
+
+        public function getMenu(): Component
+        {
+            return $this->menu;
         }
 
         public function open(): string

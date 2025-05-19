@@ -3,7 +3,17 @@
 
 $font_size: 1rem;
 $spacing: 1rem;
-$color_theme: #007bff;
+$theme_color: #007bff;
+
+$action_colors: (
+'success': #2eb85c,
+'grey': #e8e8e8,
+'danger':#d40000,
+'alert':#ffc105,
+'info':#3498db,
+/*'yellow': #f9b115*/
+);
+
 $grid_colmns: 12;
 $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
 $z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 150);
