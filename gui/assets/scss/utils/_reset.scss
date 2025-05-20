@@ -1,4 +1,4 @@
-@use 'mixins';
+@use 'callables/extensions';
 
 html {
     @extend %full_size;
@@ -7,10 +7,7 @@ body {
     font-size: var(--font-size);
     font-weight: normal;
     line-height: 1.5;
-    @extend %full_size;
-}
-body,fieldset {
-    @include mixins.spacing(0);
+    @extend %full_size, %spacing_0;
 }
 *, *::before, *::after {
     box-sizing: border-box;
@@ -50,9 +47,6 @@ a {
     text-decoration: none;
     background-color: transparent;
 }
-a:hover {
-    text-decoration: underline;
-}
 pre,code,kbd,samp {
     font-family: monospace;
 }
@@ -83,12 +77,10 @@ table {
     border-collapse: collapse;
 }
 caption {
-    padding-top: calc(var(--spacing) * 0.75);
-    padding-bottom: calc(var(--spacing) * 0.75);
-    text-align: left;
+    padding: calc(var(--spacing) * 0.75) 0;
+    text-align: center;
 }
 th {
-
     text-align: inherit;
 }
 label {
@@ -137,6 +129,7 @@ textarea {
 fieldset {
     min-width: 0;
     border: 0;
+    @extend %spacing_0;
 }
 legend {
     display: block;

@@ -1,4 +1,28 @@
-@use 'variables' as var;
+$_duration:.35s;
+$_timing: ease-in;
+
+.animation-spin{
+    animation: spin $_duration infinite $_timing;
+}
+.animation-zoom-out{
+    animation: zoomOut $_duration $_timing;
+}
+.animation-zoom-in{
+    animation: zoomIn $_duration $_timing;
+}
+.animation-slide-left{
+    animation: slideLeft $_duration $_timing;
+}
+.animation-slide-right{
+    animation: slideRight $_duration $_timing;
+}
+.animation-slide-up{
+    animation: slideUp $_duration $_timing;
+}
+.animation-slide-down{
+    animation: slideDown $_duration $_timing;
+}
+
 @keyframes slideUp {
     0% {
         opacity: 0;
@@ -20,6 +44,12 @@
     100% {
         opacity: 1;
         transform: none;
+    }
+}
+
+@keyframes spin{
+    100%{
+        transform:rotate(359deg)
     }
 }
 
@@ -64,44 +94,5 @@
     100% {
         opacity: 0;
         transform: scale(1.2);
-    }
-}
-@function _getDuration($duration){
-    @return if($duration == null,.35s,$duration);
-}
-
-@mixin zoomOut($duration:null, $timing:ease-in) {
-    .animation-zoom-out{
-        animation: zoomOut _getDuration($duration) $timing;
-    }
-}
-
-@mixin zoomIn($duration:null, $timing:ease-in) {
-    .animation-zoom-in{
-        animation: zoomIn _getDuration($duration) $timing;
-    }
-}
-
-@mixin slideLeft($duration:null, $timing:ease-in) {
-    .animation-slide-left{
-        animation: slideLeft _getDuration($duration) $timing;
-    }
-}
-
-@mixin slideRight($duration:null, $timing:ease-in) {
-    .animation-slide-right{
-        animation: slideRight _getDuration($duration) $timing;
-    }
-}
-
-@mixin slideUp($duration:null, $timing:ease-in) {
-    .animation-slide-up{
-        animation: slideUp _getDuration($duration) $timing;
-    }
-}
-
-@mixin slideDown($duration:null, $timing:ease-in) {
-    .animation-slide-down{
-        animation: slideDown _getDuration($duration) $timing;
     }
 }

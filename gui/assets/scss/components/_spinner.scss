@@ -1,0 +1,23 @@
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
+
+.spinner{
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    @extend %full_size,%position_fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,0.3);
+    &:before{
+        content: '';
+        border-radius: 50%;
+        width: var.$spacing * 2.5;
+        height: var.$spacing * 2.5;
+        border: fn.px2rem(4px) solid var(--accent-color);
+        border-top-color: transparent;
+        border-left-color: transparent;
+        animation: spin .4s linear infinite;
+    }
+}

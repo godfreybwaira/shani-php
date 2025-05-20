@@ -1,13 +1,4 @@
 <style type="text/css">
-    .grid-layout{
-        gap: 1rem;
-        grid-template-areas:
-            "header header header"
-            "main main main"
-            "footer footer section";
-    }
-    .grid-layout>div{
-    }
     .tab-top{
         grid-template-areas: "a1""a2";
     }
@@ -21,7 +12,6 @@
         grid-template-areas: "a1 a2";
     }
 </style>
-<div class="grid-layout color-theme"></div>
 <div class="modal-background">
     <div class="modal modal-center pos-center width-xs-10 height-xs-10">
         <div class="tab tab-top">
@@ -41,7 +31,27 @@
                 </a>
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla a mollitia tenetur voluptate esse nostrum saepe aut. Iure rem placeat maxime beatae ipsam amet porro officia minima, consequatur, velit. Similique.</p>
+                <div class="table-container">
+                    <table class="table table-border table-stripes-h">
+                        <caption>My Caption</caption>
+                        <thead>
+                            <tr>
+                                <th>Column 1</th><th>Column 2</th>
+                                <th>Column 3</th><th>Column 4</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

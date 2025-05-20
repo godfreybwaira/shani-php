@@ -1,15 +1,14 @@
-@use '../utils/mixins';
-@use '../utils/functions' as fn;
-@use '../utils/variables' as var;
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
 
-$_bolder: fn.px2rem(3px);
-$_bold: fn.px2rem(1px);
+$_bolder_line: fn.px2rem(3px);
+$_bold_line: fn.px2rem(1px);
 
 %_border_right{
-    border-right: var(--thin-border);
+    border-right: fn.getBorder();
 }
 %_border_bottom{
-    border-bottom: var(--thin-border);
+    border-bottom: fn.getBorder();
 }
 %_flex_column{
     flex-direction: column;
@@ -41,12 +40,12 @@ $_bold: fn.px2rem(1px);
             }
             &.active:before{
                 @extend %_tl_0;
-                height: $_bolder;
+                height: $_bolder_line;
             }
             &:not(.active){
                 &:before{
                     @extend %_bl_0;
-                    height: $_bold;
+                    height: $_bold_line;
                 }
             }
         }
@@ -62,12 +61,12 @@ $_bold: fn.px2rem(1px);
             }
             &.active:before{
                 @extend %_bl_0;
-                height: $_bolder;
+                height: $_bolder_line;
             }
             &:not(.active){
                 &:before{
                     @extend %_tl_0;
-                    height: $_bold;
+                    height: $_bold_line;
                 }
             }
         }
@@ -84,12 +83,12 @@ $_bold: fn.px2rem(1px);
                 }
                 &.active:before{
                     @extend %_tl_0;
-                    width: $_bolder;
+                    width: $_bolder_line;
                 }
                 &:not(.active){
                     &:before{
                         @extend %_tr_0;
-                        width: $_bold;
+                        width: $_bold_line;
                     }
                 }
             }
@@ -107,12 +106,12 @@ $_bold: fn.px2rem(1px);
                 }
                 &.active:before{
                     @extend %_tr_0;
-                    width: $_bolder;
+                    width: $_bolder_line;
                 }
                 &:not(.active){
                     &:before{
                         @extend %_tl_0;
-                        width: $_bold;
+                        width: $_bold_line;
                     }
                 }
             }
@@ -121,7 +120,7 @@ $_bold: fn.px2rem(1px);
     &-menu{
         display: flex;
         overflow-x: auto;
-        @include mixins.spacing(0);
+        @extend %spacing_0;
         list-style-type: none;
         &>* {
             flex: 1 1 auto;
@@ -131,7 +130,7 @@ $_bold: fn.px2rem(1px);
                 @extend %position_absolute;
             }
             &.active,&:hover {
-                color: var(--color-theme);
+                color: var(--theme-color);
             }
             &.active:before{
                 background-color: var(--accent-color);
@@ -140,9 +139,9 @@ $_bold: fn.px2rem(1px);
                 &:hover {
                     cursor: pointer;
                 }
-                background-color: var.$border_color;
+                background-color: var(--faint-bg);
                 &:before{
-                    background-color: var(--color-8);
+                    background-color: var(--border-color);
                 }
             }
         }

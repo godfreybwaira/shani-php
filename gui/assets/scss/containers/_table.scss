@@ -1,39 +1,41 @@
-@use '../utils/mixins';
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
 
 .table {
-    @extend %full_width;
-
     &-container {
         overflow-x: auto;
+        >table{
+            @extend %full_width;
+        }
     }
-
-    &-bordered {
-        td {
-            border-top: var(--thin-border);
+    &-border {
+        border: fn.getBorder();
+        tr:not(:last-child)>td,th {
+            border-bottom: fn.getBorder();
+        }
+        td:not(:last-child) {
+            border-right: fn.getBorder();
         }
     }
 
-    td {
-        /*@extend %paddingXY-md;*/
-    }
-
-    th {
-        /*@extend %paddingXY-md;*/
+    td,th {
+        padding: calc(var(--spacing)/2) var(--spacing);
     }
 
     tr:hover {
-        /*@extend %hoverShadow;*/
+        background-color: var(--color-17);
     }
 
-    &-even {
-        tr:not(:hover):nth-of-type(2n)>td {
-            background-color: var(--color-8);
+    &-stripes {
+        &-h{
+            tr:not(:hover):nth-of-type(2n) {
+                background-color: var(--faint-bg);
+            }
         }
-    }
-
-    &-odd {
-        tr:not(:hover):nth-of-type(2n+1)>td {
-            background-color: var(--color-8);
+        &-v{
+            tr:not(:hover)>td:nth-of-type(2n+1) {
+                background-color: var(--faint-bg);
+            }
         }
     }
 }

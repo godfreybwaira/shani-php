@@ -1,5 +1,6 @@
-@use '../utils/mixins';
-@use '../utils/variables' as var;
+@use '../utils/callables/extensions';
+@use '../utils/callables/variables' as var;
+
 .modal{
     box-shadow: map-get(var.$shadows,md);
     background-color: #fff;

@@ -1,0 +1,93 @@
+@use 'utils/callables/functions' as fn;
+@use 'utils/callables/extensions' as ext;
+@use 'utils/callables/variables' as var;
+@use 'sass:color';
+@use 'sass:math';
+
+@mixin _createColors($colorMap, $theme_color){
+    $median: 10;
+    @for $i from 1 through 19 {
+        $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
+        @if($i == $median){
+            --theme-color:#{$color};
+        }
+        @else{
+            --color-#{$i}:#{$color};
+        }
+    }
+    @each $name,$color in $colorMap{
+        --color-#{$name}:#{$color};
+    }
+}
+
+@mixin _createThemeColors($theme_color){
+    $median: 10;
+    @for $i from 1 through 19 {
+        $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
+        @if($i == $median){
+            .color-theme,::selection,::-webkit-scrollbar-thumb{
+                color: fn.getTextColor($color);
+                background-color: var(--theme-color);
+            }
+        }
+        @else{
+            .color-#{$i}{
+                color: fn.getTextColor($color);
+                background-color: var(--color-#{$i});
+            }
+        }
+    }
+}
+
+@mixin _createColumns($breakpoints,$columns) {
+    $ratio: math.div(100%, $columns);
+    @each $key, $size in $breakpoints {
+        @include ext.media($size) {
+            @for $col from 1 through $columns {
+                .width-#{$key}-#{$col} {
+                    width: $ratio * $col;
+                }
+                .height-#{$key}-#{$col} {
+                    height: $ratio * $col;
+                }
+            }
+        }
+    }
+}
+
+@mixin _createSpacing($name){
+    .#{$name}-x{
+        @extend %#{$name}_x;
+    }
+    .#{$name}-y{
+        @extend %#{$name}_y;
+    }
+    .#{$name}-xy{
+        @extend %#{$name}_xy;
+    }
+    .#{$name}-x-sm{
+        @extend %#{$name}_x_sm;
+    }
+    .#{$name}-y-sm{
+        @extend %#{$name}_y_sm;
+    }
+    .#{$name}-xy-sm{
+        @extend %#{$name}_xy_sm;
+    }
+}
+:root{
+    @include _createColors(var.$action_colors,var.$theme_color);
+    --font-size:#{var.$font_size};
+    --spacing:#{var.$spacing};
+    --accent-color:#{var.$accent_color};
+    --thin-border: #{fn.getBorder()};
+    --faint-bg: var(--color-19);
+    --border-color: var(--color-17);
+}
+*{
+    transition: all .2s;
+}
+@include _createSpacing(margin);
+@include _createSpacing(padding);
+@include _createThemeColors(var.$theme_color);
+@include _createColumns(var.$breakpoints,var.$grid_colmns);

@@ -1,6 +1,7 @@
-@use '../utils/variables' as var;
-@use '../utils/functions' as fn;
-@use '../utils/mixins';
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
+
 .toast{
     z-index: map-get(var.$z_index,lg);
     @extend %position_fixed;

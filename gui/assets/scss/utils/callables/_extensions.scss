@@ -1,0 +1,101 @@
+
+@mixin centerItem($length,$location: center){
+    $pos: calc((100% - $length)/2);
+    @if($location == center){
+        top: $pos;
+        left: $pos;
+    }
+    @else if($location == left){
+        top: $pos;
+    }
+    @else if($location == right){
+        top: $pos;
+        right: 0;
+    }
+    @else if($location == bottom){
+        bottom: 0;
+        left: $pos;
+    }
+    @else if($location == top){
+        top: 0;
+        left: $pos;
+    }
+}
+
+@mixin media($size, $feature: min-width) {
+    @media($feature: $size) {
+        @content;
+    }
+}
+
+@mixin spacing($size){
+    padding: $size;
+    margin: $size;
+}
+
+%full_width{
+    width: 100%;
+}
+%full_height{
+    height: 100%;
+}
+%full_size{
+    @extend %full_width, %full_height;
+}
+%position_fixed{
+    position: fixed;
+}
+%position_absolute{
+    position: absolute;
+}
+%spacing_0{
+    @include spacing(0);
+}
+
+%padding_x{
+    padding: var(--spacing) 0;
+}
+
+%padding_y{
+    padding: 0 var(--spacing);
+}
+
+%padding_xy{
+    padding: var(--spacing);
+}
+
+%margin_x{
+    margin: var(--spacing) 0;
+}
+
+%margin_y{
+    margin: 0 var(--spacing);
+}
+
+%margin_xy{
+    margin: var(--spacing);
+}
+
+%padding_x_sm{
+    padding: calc(var(--spacing)/2) 0;
+}
+
+%padding_y_sm{
+    padding: 0 calc(var(--spacing)/2);
+}
+
+%padding_xy_sm{
+    padding: calc(var(--spacing)/2);
+}
+
+%margin_x_sm{
+    margin: calc(var(--spacing)/2) 0;
+}
+
+%margin_y_sm{
+    margin: 0 calc(var(--spacing)/2);
+}
+
+%margin_xy_sm{
+    margin: calc(var(--spacing)/2);
+}

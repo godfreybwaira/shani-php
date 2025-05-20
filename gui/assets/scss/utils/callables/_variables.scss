@@ -7,7 +7,7 @@ $theme_color: #007bff;
 
 $action_colors: (
 'success': #2eb85c,
-'grey': #e8e8e8,
+'disable': #e8e8e8,
 'danger':#d40000,
 'alert':#ffc105,
 'info':#3498db,
@@ -16,10 +16,9 @@ $action_colors: (
 
 $grid_colmns: 12;
 $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
-$z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 150);
+$z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 200);
 $shadow_color: #3b3b3b;
-$border_color: var(--color-9);
-$accent_color: var(--color-theme);
+$accent_color: var(--theme-color);
 $animation_duration: 0.2s;
 $animation_timing: ease-in;
 
@@ -34,5 +33,3 @@ $border_radius: (
 'md': $spacing,
 'lg': 50%,
 );
-
-$component_min_size: 12.5%;
