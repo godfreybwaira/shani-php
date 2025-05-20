@@ -1,0 +1,54 @@
+@use '../utils/callables/extensions';
+@use 'sass:math';
+
+.list {
+    $list: &;
+    display: grid;
+    max-width: 100%;
+    list-style-type: none;
+    @extend %spacing_0;
+
+    &:not(&-h)>* {
+        display: block;
+    }
+    &-h{
+        grid-auto-columns: auto;
+    }
+
+    &-border{
+        border: var(--thin-border);
+        &#{$list}-h>:not(:last-child){
+            border-right: var(--thin-border);
+        }
+    }
+
+    &-border{
+        &#{$list}-v>:not(:first-child){
+            border-top: var(--thin-border);
+        }
+    }
+
+    &>:hover {
+        background-color: var(--color-18);
+    }
+
+    &-even {
+        &>:not(:hover):nth-of-type(2n) {
+            background-color: var(--faint-bg);
+        }
+    }
+
+    &-odd {
+        &>:not(:hover):nth-of-type(2n+1) {
+            background-color: var(--faint-bg);
+        }
+    }
+
+    &-size-sm>* {
+        @extend %padding_xy_sm, %font_sm;
+    }
+
+    &-size-md>* {
+        @extend %padding_standard;
+    }
+}

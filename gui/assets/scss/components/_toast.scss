@@ -4,9 +4,8 @@
 
 .toast{
     z-index: map-get(var.$z_index,lg);
-    @extend %position_fixed;
+    @extend %position_fixed,%box_shadow;
     border-radius: map-get(var.$border_radius,xs);
-    box-shadow: fn.boxShadow(var.$shadow_color);
     overflow-y: auto;
     max-height: 30%;
 }

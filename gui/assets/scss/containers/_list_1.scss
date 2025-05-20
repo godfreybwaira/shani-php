@@ -1,0 +1,120 @@
+@use 'sass:math';
+@use '../global/vars';
+@use '../global/colors';
+@use '../global/extensions';
+@use '../global/callables' as cb;
+
+.list {
+    $list: &;
+    padding: 0;
+    max-width: 100%;
+    $angle: 45deg;
+    @extend %resetList, %radiusDefault;
+
+    &:not(&-h)>* {
+        display: block;
+    }
+
+    &-h:not(&-type-accordion) {
+        overflow-x: auto;
+        @extend %flexible, %flex-1;
+
+        &:not(#{$list}-stretch)>* {
+            flex: 0 0 auto;
+        }
+
+        &#{$list}-stretch>* {
+            flex: 1 0 auto;
+        }
+    }
+
+    &-bordered#{&}-h>:not(:last-child) {
+        border-right: colors.line();
+    }
+
+    &-bordered:not(&-h)>:not(:first-child) {
+        border-top: colors.line();
+    }
+
+    &>:hover {
+        @extend %hoverShadow;
+    }
+
+    &-even {
+        &>:not(:hover):nth-of-type(2n) {
+            @extend %theme-color-l1;
+        }
+    }
+
+    &-odd {
+        &>:not(:hover):nth-of-type(2n+1) {
+            @extend %theme-color-l1;
+        }
+    }
+
+    &-size-md>* {
+        @extend %paddingXY-md;
+    }
+
+    &-size-sm>* {
+        @extend %paddingXY-sm, %font-sm;
+    }
+
+    &-item-title {
+        $dim: cb.px2rem(7px);
+        align-items: center;
+        color: currentColor;
+        @extend %height-md, %flexible, %paddingY-md, %cursorPointer, %posRelative;
+
+        &:before {
+            height: $dim;
+            width: $dim;
+            transform: rotate($angle);
+            $border: cb.px2rem(1px) solid currentColor;
+            right: map-get(vars.$paddingSquare, 'md');
+            border-left: $border;
+            border-bottom: $border;
+            @extend %emptyContent, %posAbsolute;
+        }
+
+        &:hover {
+            text-decoration: none;
+        }
+
+    }
+
+    &-type-accordion {
+
+        #{$list}-item-title~* {
+            @extend %paddingY-md;
+        }
+
+        &>:not(.active)>:not(#{$list}-item-title) {
+            margin: 0;
+            max-height: 0;
+        }
+
+        &>.active,
+        &>:not(.active)>:not(#{$list}-item-title) {
+            overflow: hidden;
+        }
+
+        &>.active>#{$list}-item-title:before {
+            transform: rotate(-$angle);
+        }
+
+        &>.active>:not(#{$list}-item-title) {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        &#{$list}-stretch {
+            flex-direction: column;
+            @extend %fullHeight, %flexible;
+        }
+
+        &#{$list}-stretch>.active {
+            @extend %flex-1;
+        }
+    }
+}

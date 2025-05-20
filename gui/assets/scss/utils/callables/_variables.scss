@@ -25,7 +25,7 @@ $animation_timing: ease-in;
 $shadows:(
 'xs': (0 0 fn.px2rem(1px) $shadow_color, 0 fn.px2rem(1px) fn.px2rem(1px) $shadow_color),
 'sm': 0 0 fn.px2rem(3px) fn.px2rem(-1px) $shadow_color,
-'md': 0 0 fn.px2rem(5px) fn.px2rem(3px) $shadow_color,
+'md': 0 fn.px2rem(3px) fn.px2rem(10px) fn.px2rem(-2px) $shadow_color
 );
 $border_radius: (
 'xs': math.div($spacing, 4),

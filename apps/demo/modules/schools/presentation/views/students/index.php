@@ -31,27 +31,18 @@
                 </a>
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
-                <div class="table-container">
-                    <table class="table table-border table-stripes-h">
-                        <caption>My Caption</caption>
-                        <thead>
-                            <tr>
-                                <th>Column 1</th><th>Column 2</th>
-                                <th>Column 3</th><th>Column 4</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                            <tr><td>46</td><td>36</td><td>57</td><td>70</td></tr>
-                        </tbody>
-                    </table>
-                </div>
+                <ul class="list list-size-md list-h shadow-sm list-border">
+                    <li>Hello from here</li>
+                    <li>hello from here</li>
+                    <li>Hello from here</li>
+                    <li>hello from here</li>
+                    <li>Hello from here</li>
+                    <li>hello from here</li>
+                    <li>Hello from hereq</li>
+                    <li>hello from herea</li>
+                    <li>Hello from here</li>
+                    <li>hello from herse</li>
+                </ul>
             </div>
         </div>
     </div>

@@ -5,10 +5,10 @@ $_bolder_line: fn.px2rem(3px);
 $_bold_line: fn.px2rem(1px);
 
 %_border_right{
-    border-right: fn.getBorder();
+    border-right: var(--thin-border);
 }
 %_border_bottom{
-    border-bottom: fn.getBorder();
+    border-bottom: var(--thin-border);
 }
 %_flex_column{
     flex-direction: column;
@@ -72,6 +72,7 @@ $_bold_line: fn.px2rem(1px);
         }
     }
     &-left{
+        grid-template-columns: auto 1fr;
         >#{$tab}-menu{
             @extend %_flex_column;
             >*{
@@ -95,6 +96,7 @@ $_bold_line: fn.px2rem(1px);
         }
     }
     &-right{
+        grid-template-columns: 1fr auto;
         >#{$tab}-menu{
             @extend %_flex_column;
             >*{

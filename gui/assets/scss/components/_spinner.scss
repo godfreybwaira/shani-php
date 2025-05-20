@@ -3,10 +3,7 @@
 @use '../utils/callables/variables' as var;
 
 .spinner{
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    @extend %full_size,%position_fixed;
+    @extend %full_size, %position_fixed, %center_grid;
     top: 0;
     left: 0;
     background-color: rgba(0,0,0,0.3);

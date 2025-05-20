@@ -1,8 +1,7 @@
+@use '../utils/callables/extensions';
+
 .menu-item {
-    display: grid;
-    padding: calc(var(--spacing)/2) var(--spacing);
-    align-items: center;
-    justify-content: center;
+    @extend %center_grid, %padding_standard;
     &:hover{
         text-decoration: none;
     }

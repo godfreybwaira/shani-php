@@ -99,3 +99,18 @@
 %margin_xy_sm{
     margin: calc(var(--spacing)/2);
 }
+%center_grid{
+    display: grid;
+    align-items: center;
+    justify-content: center;
+}
+
+%padding_standard{
+    padding: calc(var(--spacing)/2) var(--spacing);
+}
+%font_sm{
+    font-size: 80%;
+}
+%box_shadow{
+    box-shadow: var(--box-shadow);
+}
