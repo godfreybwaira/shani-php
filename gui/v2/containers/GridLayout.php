@@ -10,7 +10,7 @@
 namespace gui\v2\containers {
 
     use gui\v2\Component;
-    use gui\v2\TargetDevice;
+    use gui\v2\props\TargetDevice;
 
     final class GridLayout extends Component
     {

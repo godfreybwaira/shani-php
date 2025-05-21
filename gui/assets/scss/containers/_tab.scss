@@ -29,91 +29,93 @@ $_bold_line: fn.px2rem(1px);
     $tab: &;
     display: grid;
     @extend %full_height;
-    &-top{
-        grid-template-rows: auto 1fr;
-        >#{$tab}-menu>*{
-            &:before{
-                @extend %full_width;
-            }
-            &:not(:last-child){
-                @extend %_border_right;
-            }
-            &.active:before{
-                @extend %_tl_0;
-                height: $_bolder_line;
-            }
-            &:not(.active){
+    &-pos{
+        &-t{
+            grid-template-rows: auto 1fr;
+            >#{$tab}-menu>*{
                 &:before{
-                    @extend %_bl_0;
-                    height: $_bold_line;
-                }
-            }
-        }
-    }
-    &-bottom{
-        grid-template-rows: 1fr auto;
-        >#{$tab}-menu>*{
-            &:before{
-                @extend %full_width;
-            }
-            &:not(:last-child){
-                @extend %_border_right;
-            }
-            &.active:before{
-                @extend %_bl_0;
-                height: $_bolder_line;
-            }
-            &:not(.active){
-                &:before{
-                    @extend %_tl_0;
-                    height: $_bold_line;
-                }
-            }
-        }
-    }
-    &-left{
-        grid-template-columns: auto 1fr;
-        >#{$tab}-menu{
-            @extend %_flex_column;
-            >*{
-                &:before{
-                    @extend %full_height;
+                    @extend %full_width;
                 }
                 &:not(:last-child){
-                    @extend %_border_bottom;
+                    @extend %_border_right;
                 }
                 &.active:before{
                     @extend %_tl_0;
-                    width: $_bolder_line;
+                    height: $_bolder_line;
                 }
                 &:not(.active){
                     &:before{
-                        @extend %_tr_0;
-                        width: $_bold_line;
+                        @extend %_bl_0;
+                        height: $_bold_line;
                     }
                 }
             }
         }
-    }
-    &-right{
-        grid-template-columns: 1fr auto;
-        >#{$tab}-menu{
-            @extend %_flex_column;
-            >*{
+        &-b{
+            grid-template-rows: 1fr auto;
+            >#{$tab}-menu>*{
                 &:before{
-                    @extend %full_height;
+                    @extend %full_width;
                 }
                 &:not(:last-child){
-                    @extend %_border_bottom;
+                    @extend %_border_right;
                 }
                 &.active:before{
-                    @extend %_tr_0;
-                    width: $_bolder_line;
+                    @extend %_bl_0;
+                    height: $_bolder_line;
                 }
                 &:not(.active){
                     &:before{
                         @extend %_tl_0;
-                        width: $_bold_line;
+                        height: $_bold_line;
+                    }
+                }
+            }
+        }
+        &-l{
+            grid-template-columns: auto 1fr;
+            >#{$tab}-menu{
+                @extend %_flex_column;
+                >*{
+                    &:before{
+                        @extend %full_height;
+                    }
+                    &:not(:last-child){
+                        @extend %_border_bottom;
+                    }
+                    &.active:before{
+                        @extend %_tl_0;
+                        width: $_bolder_line;
+                    }
+                    &:not(.active){
+                        &:before{
+                            @extend %_tr_0;
+                            width: $_bold_line;
+                        }
+                    }
+                }
+            }
+        }
+        &-r{
+            grid-template-columns: 1fr auto;
+            >#{$tab}-menu{
+                @extend %_flex_column;
+                >*{
+                    &:before{
+                        @extend %full_height;
+                    }
+                    &:not(:last-child){
+                        @extend %_border_bottom;
+                    }
+                    &.active:before{
+                        @extend %_tr_0;
+                        width: $_bolder_line;
+                    }
+                    &:not(.active){
+                        &:before{
+                            @extend %_tl_0;
+                            width: $_bold_line;
+                        }
                     }
                 }
             }

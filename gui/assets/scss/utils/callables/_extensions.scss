@@ -1,24 +1,24 @@
 
-@mixin centerItem($length,$location: center){
-    $pos: calc((100% - $length)/2);
+@mixin positionItem($length, $location){
+    $value: calc((100% - $length)/2);
     @if($location == center){
-        top: $pos;
-        left: $pos;
+        top: $value;
+        left: $value;
     }
     @else if($location == left){
-        top: $pos;
+        top: $value;
     }
     @else if($location == right){
-        top: $pos;
+        top: $value;
         right: 0;
     }
     @else if($location == bottom){
         bottom: 0;
-        left: $pos;
+        left: $value;
     }
     @else if($location == top){
         top: 0;
-        left: $pos;
+        left: $value;
     }
 }
 
@@ -101,16 +101,30 @@
 }
 %center_grid{
     display: grid;
-    align-items: center;
-    justify-content: center;
+    place-items: center;
 }
 
-%padding_standard{
-    padding: calc(var(--spacing)/2) var(--spacing);
+%padding_md{
+    padding: var(--spacing-md);
+}
+
+%padding_sm{
+    padding: var(--spacing-sm);
+}
+
+%margin_md{
+    margin: var(--spacing-md);
+}
+%margin_sm{
+    margin: var(--spacing-sm);
 }
 %font_sm{
     font-size: 80%;
 }
 %box_shadow{
     box-shadow: var(--box-shadow);
+}
+%theme_color{
+    color: var(--theme-text);
+    background-color: var(--theme-color);
 }

@@ -10,6 +10,7 @@
         $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
         @if($i == $median){
             --theme-color:#{$color};
+            --theme-text: #{fn.getTextColor($color)};
         }
         @else{
             --color-#{$i}:#{$color};
@@ -25,13 +26,12 @@
     @for $i from 1 through 19 {
         $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
         @if($i == $median){
-            .color-theme,::selection,::-webkit-scrollbar-thumb{
-                color: fn.getTextColor($color);
-                background-color: var(--theme-color);
+            .color-theme,.color-theme-hover:hover{
+                @extend %theme_color;
             }
         }
         @else{
-            .color-#{$i}{
+            .color-#{$i},.color-#{$i}-hover:hover{
                 color: fn.getTextColor($color);
                 background-color: var(--color-#{$i});
             }
@@ -74,6 +74,12 @@
     .#{$name}-xy-sm{
         @extend %#{$name}_xy_sm;
     }
+    .#{$name}-md{
+        @extend %#{$name}_md;
+    }
+    .#{$name}-sm{
+        @extend %#{$name}_sm;
+    }
 }
 :root{
     @include _createColors(var.$action_colors,var.$theme_color);
@@ -84,12 +90,23 @@
     --faint-bg: var(--color-19);
     --border-color: var(--color-17);
     --box-shadow: #{fn.boxShadow(var.$shadow_color)};
+    --spacing-md: calc(var(--spacing)/2) var(--spacing);
+    --spacing-sm: calc(var(--spacing)/4) calc(var(--spacing)/2);
 }
 *{
     transition: all .2s;
 }
 .shadow-sm{
     @extend %box_shadow;
+}
+.font-sm{
+    @extend %font_sm;
+}
+.gap-sm{
+    gap: calc(var(--spacing)/2);
+}
+.gap-md{
+    gap: var(--spacing);
 }
 @include _createSpacing(margin);
 @include _createSpacing(padding);

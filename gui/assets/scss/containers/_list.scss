@@ -1,54 +1,68 @@
-@use '../utils/callables/extensions';
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
 @use 'sass:math';
 
 .list {
     $list: &;
     display: grid;
-    max-width: 100%;
     list-style-type: none;
-    @extend %spacing_0;
+    @extend %spacing_0, %full_width;
 
-    &:not(&-h)>* {
-        display: block;
-    }
-    &-h{
-        grid-auto-columns: auto;
+    &.size-md>*{
+        @extend %padding_md;
     }
 
-    &-border{
+    &.size-sm>*{
+        @extend %padding_sm, %font_sm;
+    }
+    &-dir{
+        &-v{
+            &.borders>:not(:first-child){
+                border-top: var(--thin-border);
+            }
+            >*{
+                display: block;
+            }
+        }
+        &-h{
+            overflow-x: auto;
+            grid-auto-flow: column;
+            justify-content: center;
+            $sizes: ('sm':40%,'md':23%,'lg':15%);
+            @each $name, $size in var.$breakpoints{
+                @include ext.media($size){
+                    &{
+                        grid-auto-columns: map-get($sizes, $name);
+                    }
+                }
+            }
+            &.borders>:not(:last-child){
+                border-right: var(--thin-border);
+            }
+        }
+    }
+
+    &.borders{
         border: var(--thin-border);
-        &#{$list}-h>:not(:last-child){
-            border-right: var(--thin-border);
+    }
+
+    &>:hover:not(.active) {
+        background-color: var(--color-19);
+    }
+
+    &>.active {
+        @extend %theme_color;
+    }
+    &-stripes{
+        &-even {
+            &>:not(:hover,.active):nth-of-type(2n) {
+                background-color: var(--faint-bg);
+            }
         }
-    }
-
-    &-border{
-        &#{$list}-v>:not(:first-child){
-            border-top: var(--thin-border);
+        &-odd {
+            &>:not(:hover,.active):nth-of-type(2n+1) {
+                background-color: var(--faint-bg);
+            }
         }
-    }
-
-    &>:hover {
-        background-color: var(--color-18);
-    }
-
-    &-even {
-        &>:not(:hover):nth-of-type(2n) {
-            background-color: var(--faint-bg);
-        }
-    }
-
-    &-odd {
-        &>:not(:hover):nth-of-type(2n+1) {
-            background-color: var(--faint-bg);
-        }
-    }
-
-    &-size-sm>* {
-        @extend %padding_xy_sm, %font_sm;
-    }
-
-    &-size-md>* {
-        @extend %padding_standard;
     }
 }

@@ -6,6 +6,13 @@
     z-index: map-get(var.$z_index,lg);
     @extend %position_fixed,%box_shadow;
     border-radius: map-get(var.$border_radius,xs);
+    height: max-content;
     overflow-y: auto;
     max-height: 30%;
+    &.pos-tc{
+        animation: slideDown var.$animation_duration var.$animation_timing;
+    }
+    &.pos-bc{
+        animation: slideUp var.$animation_duration var.$animation_timing;
+    }
 }

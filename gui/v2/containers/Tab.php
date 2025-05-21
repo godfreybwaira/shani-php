@@ -11,6 +11,7 @@ namespace gui\v2\containers {
 
     use gui\v2\Component;
     use gui\v2\components\MenuItem;
+    use gui\v2\decorators\TabPosition;
 
     final class Tab extends Component
     {
@@ -20,7 +21,7 @@ namespace gui\v2\containers {
         public function __construct(TabPosition $pos = TabPosition::TOP)
         {
             parent::__construct('div');
-            $this->classList->addAll(['tab', $pos->value]);
+            $this->classList->addAll(['tab', 'tab-' . $pos->value]);
             $this->body = new Component();
             $this->menu = new Component();
             $menuName = $this->menu->getUniqueName();
@@ -49,9 +50,11 @@ namespace gui\v2\containers {
          * @param MenuItem $item A tab
          * @return self
          */
-        public function addMenuItem(MenuItem $item): self
+        public function addMenuItem(MenuItem ...$items): self
         {
-            $this->menu->appendChild($item);
+            foreach ($items as $item) {
+                $this->menu->appendChild($item);
+            }
             return $this;
         }
 

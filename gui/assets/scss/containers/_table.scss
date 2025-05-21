@@ -7,7 +7,7 @@
             @extend %full_width;
         }
     }
-    &-border {
+    &.borders {
         border: var(--thin-border);
         tr:not(:last-child)>td,th {
             border-bottom: var(--thin-border);
@@ -25,7 +25,7 @@
         background-color: var(--color-17);
     }
 
-    &-stripes {
+    &-dir{
         &-h{
             tr:not(:hover):nth-of-type(2n) {
                 background-color: var(--faint-bg);

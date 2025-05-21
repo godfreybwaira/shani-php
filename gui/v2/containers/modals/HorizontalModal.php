@@ -9,15 +9,15 @@
 
 namespace gui\v2\containers\modals {
 
-    use gui\v2\DeviceSize;
-    use gui\v2\Position;
+    use gui\v2\decorators\Position;
+    use gui\v2\props\DeviceSize;
 
     final class HorizontalModal extends ModalWrapper
     {
 
         public function __construct()
         {
-            parent::__construct('modal-h');
+            parent::__construct('modal-type-h');
         }
 
         /**
@@ -35,10 +35,9 @@ namespace gui\v2\containers\modals {
             return $this;
         }
 
-        public function addSize(DeviceSize $device, int $size): self
+        public function addHeight(DeviceSize $device, int $height): self
         {
-            $this->classList->addOne('width-' . $device->value . '-' . $size);
-            return $this;
+            return $this->addDimension($device, null, $height);
         }
     }
 

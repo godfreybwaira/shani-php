@@ -2,6 +2,7 @@
 
 html {
     @extend %full_size;
+    scroll-behavior: smooth;
 }
 body {
     font-size: var(--font-size);
@@ -166,4 +167,8 @@ textarea,
 button,
 select {
     accent-color: var(--accent-color);
+}
+
+::selection,::-webkit-scrollbar-thumb{
+    @extend %theme_color;
 }

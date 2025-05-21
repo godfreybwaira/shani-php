@@ -11,13 +11,30 @@
         @extend %full_size,%position_fixed;
         z-index: map-get(var.$z_index,md);
     }
-    &-center{
-        border-radius: map-get(var.$border_radius,xs);
-    }
-    &-v{
-        @extend %full_height;
-    }
-    &-h{
-        @extend %full_width;
+    &-type{
+        &-c{
+            border-radius: map-get(var.$border_radius,xs);
+            &.pos-c{
+                animation: zoomIn var.$animation_duration var.$animation_timing;
+            }
+        }
+        &-v{
+            @extend %full_height;
+            &.pos-r{
+                animation: slideLeft var.$animation_duration var.$animation_timing;
+            }
+            &.pos-l{
+                animation: slideRight var.$animation_duration var.$animation_timing;
+            }
+        }
+        &-h{
+            @extend %full_width;
+            &.pos-t{
+                animation: slideDown var.$animation_duration var.$animation_timing;
+            }
+            &.pos-b{
+                animation: slideUp var.$animation_duration var.$animation_timing;
+            }
+        }
     }
 }

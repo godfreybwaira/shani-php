@@ -9,7 +9,11 @@
 
 namespace gui\v2 {
 
-    use gui\v2\decoration\Animation;
+    use gui\v2\decorators\Animation;
+    use gui\v2\props\Attribute;
+    use gui\v2\props\DeviceSize;
+    use gui\v2\props\InlineStyle;
+    use gui\v2\props\StyleClass;
 
     class Component implements \Stringable
     {
@@ -36,6 +40,24 @@ namespace gui\v2 {
             $this->style = new InlineStyle();
             $this->name = 'd' . substr(hrtime(true), 8);
             $this->children = [];
+        }
+
+        /**
+         * Set different size based on the device width
+         * @param DeviceSize $device Device size
+         * @param int|null $width Size from 1 to 12
+         * @param int|null $height Size from 1 to 12
+         * @return self
+         */
+        public function addDimension(DeviceSize $device, ?int $width, ?int $height): self
+        {
+            if ($width !== null) {
+                $this->classList->addOne('width-' . $device->value . '-' . $width);
+            }
+            if ($height !== null) {
+                $this->classList->addOne('height-' . $device->value . '-' . $height);
+            }
+            return $this;
         }
 
         /**

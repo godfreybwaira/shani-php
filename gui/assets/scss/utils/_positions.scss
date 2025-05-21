@@ -1,92 +1,79 @@
 @use 'callables/extensions';
 
-$_gap_center: 50%;
-
-%_r50 {
-    right: $_gap_center;
-}
-
-%_b50 {
-    bottom: $_gap_center;
-}
-
-%_x50 {
-    @extend %_r50;
-    transform: translateX($_gap_center);
-}
-
-%_y50 {
-    @extend %_b50;
-    transform: translateY($_gap_center);
-}
-
 %_top {
-    top: var(--spacing);
-}
-
-%_top_0 {
     top: 0;
 }
 
-%_bottom {
-    bottom: var(--spacing);
-}
-
-%_left {
-    left: var(--spacing);
-}
-
-%_left_0 {
-    left: 0;
-}
-
 %_right {
-    right: var(--spacing);
-}
-
-%_right_0 {
     right: 0;
 }
 
+%_bottom {
+    bottom: 0;
+}
+
+%_left {
+    left: 0;
+}
+
+%_center{
+    inset: 0;
+    margin: auto;
+}
+%_left_center{
+    inset: 0;
+    margin: auto 0;
+}
+%_top_center{
+    inset: 0;
+    margin: 0 auto;
+}
+%_bottom_center{
+    inset: auto 0 0 0;
+    margin: auto;
+}
+%_right_center{
+    inset: 0 0 0 auto;
+    margin: auto;
+}
 .pos {
-    &-top {
+    &-t {
         @extend %position_absolute, %_top;
-        &-left {
+        &l {
             @extend %position_absolute, %_top, %_left;
         }
-        &-center {
-            @extend %position_absolute, %_top, %_x50;
+        &c {
+            @extend %position_absolute, %_top_center;
         }
-        &-right {
+        &r {
             @extend %position_absolute, %_top, %_right;
         }
     }
-    &-bottom {
+    &-b {
         @extend %position_absolute, %_bottom;
-        &-left {
-            @extend %position_absolute, %_bottom, %_left;
+        &l {
+            @extend %position_absolute, %_bottom,%_left;
         }
-        &-center {
-            @extend %position_absolute, %_bottom, %_x50;
+        &c {
+            @extend %position_absolute, %_bottom_center;
         }
-        &-right {
+        &r {
             @extend %position_absolute, %_bottom, %_right;
         }
     }
-    &-left {
-        @extend %position_absolute, %_top_0, %_left_0;
-    }
-    &-right {
-        @extend %position_absolute, %_top_0, %_right_0;
-    }
-    &-center {
-        transform: translate($_gap_center, $_gap_center);
-        @extend %position_absolute, %_r50, %_b50;
-        &-left {
-            @extend %position_absolute, %_y50, %_left;
+    &-c {
+        @extend %position_absolute, %_center;
+        &l {
+            @extend %position_absolute, %_left_center;
         }
-        &-right {
-            @extend %position_absolute, %_y50, %_right;
+        &r {
+            @extend %position_absolute, %_right_center;
         }
+    }
+    &-l {
+        @extend %position_absolute, %_top, %_left;
+    }
+    &-r {
+        @extend %position_absolute, %_top, %_right;
     }
 }

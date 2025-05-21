@@ -1,26 +1,25 @@
-$_duration:.35s;
-$_timing: ease-in;
+@use 'callables/variables' as var;
 
 .animation-spin{
-    animation: spin $_duration infinite $_timing;
+    animation: spin var.$animation_duration infinite var.$animation_timing;
 }
 .animation-zoom-out{
-    animation: zoomOut $_duration $_timing;
+    animation: zoomOut var.$animation_duration var.$animation_timing;
 }
 .animation-zoom-in{
-    animation: zoomIn $_duration $_timing;
+    animation: zoomIn var.$animation_duration var.$animation_timing;
 }
 .animation-slide-left{
-    animation: slideLeft $_duration $_timing;
+    animation: slideLeft var.$animation_duration var.$animation_timing;
 }
 .animation-slide-right{
-    animation: slideRight $_duration $_timing;
+    animation: slideRight var.$animation_duration var.$animation_timing;
 }
 .animation-slide-up{
-    animation: slideUp $_duration $_timing;
+    animation: slideUp var.$animation_duration var.$animation_timing;
 }
 .animation-slide-down{
-    animation: slideDown $_duration $_timing;
+    animation: slideDown var.$animation_duration var.$animation_timing;
 }
 
 @keyframes slideUp {

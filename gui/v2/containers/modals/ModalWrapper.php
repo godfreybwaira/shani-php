@@ -10,7 +10,6 @@
 namespace gui\v2\containers\modals {
 
     use gui\v2\Component;
-    use gui\v2\DeviceSize;
 
     abstract class ModalWrapper extends Component
     {
@@ -27,14 +26,6 @@ namespace gui\v2\containers\modals {
             $this->wrapper->setChild($this);
             $this->setAutoclose(true);
         }
-
-        /**
-         * Set different size based on the device width
-         * @param DeviceSize $device Device size
-         * @param int $size Size from 1 to 12
-         * @return self
-         */
-        public abstract function addSize(DeviceSize $device, int $size): self;
 
         /**
          * Whether to close the modal When clicking outside

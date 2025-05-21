@@ -11,15 +11,17 @@ $action_colors: (
 'danger':#d40000,
 'alert':#ffc105,
 'info':#3498db,
-/*'yellow': #f9b115*/
+// 'yellow': #f9b115
 );
 
 $grid_colmns: 12;
-$breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
+$breakpoints: ('sm':0,'md':36rem,'lg':48rem);
+// $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
 $z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 200);
 $shadow_color: #3b3b3b;
 $accent_color: var(--theme-color);
-$animation_duration: 0.2s;
+
+$animation_duration: 0.35s;
 $animation_timing: ease-in;
 
 $shadows:(
@@ -31,5 +33,5 @@ $border_radius: (
 'xs': math.div($spacing, 4),
 'sm': math.div($spacing, 2),
 'md': $spacing,
-'lg': 50%,
+'lg': 50rem,
 );

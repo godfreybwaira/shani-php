@@ -1,22 +1,21 @@
 @use '../utils/callables/extensions';
 
 .menu-item {
-    @extend %center_grid, %padding_standard;
+    @extend %center_grid, %padding_md;
     &:hover{
         text-decoration: none;
     }
-    &-h{
-        grid-template-columns: auto 1fr;
-        gap:  var(--spacing);
+    &-dir{
+        &-h{
+            grid-template-columns: auto 1fr;
+            gap:  var(--spacing);
+        }
+        &-v{
+            grid-template-rows: auto 1fr;
+        }
     }
-    &-v{
-        grid-template-rows: auto 1fr;
-    }
-    &>.icon{
+    &>.size-md{
         font-size: calc(var(--font-size) * 1.5);
-    }
-    &>.label{
-        font-size: 85%;
     }
     &>*{
         text-align: center;

@@ -16,11 +16,11 @@ namespace gui\v2\components {
     final class Toast extends Component
     {
 
-        public function __construct(Position $pos = Position::TOP_RIGHT)
+        public function __construct(Position $pos = Position::TOP_CENTER)
         {
             parent::__construct('div');
-            $this->classList->addAll(['toast', 'padding-xy', 'width-xs-9', 'width-sm-4', $pos->value]);
-            $this->setAnimation(Animation::SLIDE_LEFT);
+            $this->classList->addAll(['toast', 'padding-xy', 'width-sm-10', 'width-md-4', $pos->value]);
+            $this->setAnimation(Animation::SLIDE_DOWN);
         }
     }
 

@@ -7,7 +7,7 @@
  * Created on: Apr 22, 2025 at 9:36:08 AM
  */
 
-namespace gui\v2 {
+namespace gui\v2\props {
 
     use lib\ds\set\MutableSet;
 
