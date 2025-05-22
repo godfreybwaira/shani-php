@@ -1,32 +1,32 @@
 <?php
 
 /**
- * Description of SwooleConcurrency
+ * Description of CgiConcurrency
  * @author coder
  *
- * Created on: Apr 5, 2024 at 11:37:53 PM
+ * Created on: May 22, 2025 at 11:41:30 AM
  */
 
-namespace shani\servers\swoole {
+namespace shani\servers\cgi {
 
     use shani\contracts\ConcurrencyInterface;
 
-    final class SwooleConcurrency implements ConcurrencyInterface
+    final class CgiConcurrency implements ConcurrencyInterface
     {
 
         public function async(callable $callback): void
         {
-            \Swoole\Event::defer($callback);
+            $callback();
         }
 
         public function parallel(callable $callback): void
         {
-            \Swoole\Coroutine\go($callback);
+            $callback();
         }
 
         public function sleep(int $seconds): void
         {
-            \Swoole\Coroutine::sleep($seconds);
+            sleep($seconds);
         }
     }
 

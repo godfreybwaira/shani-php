@@ -10,19 +10,21 @@
 
 namespace lib {
 
-    final class Event implements \shani\contracts\Handler
+    use shani\contracts\EventHandler;
+
+    final class Event
     {
 
         private $onDone = null;
         private array $callbacks = [], $events;
-        private static \shani\contracts\Event $handler;
+        private static EventHandler $handler;
 
         public function __construct(array $supportedEvents = [])
         {
             $this->events = $supportedEvents;
         }
 
-        public static function setHandler($handler): void
+        public static function setHandler(EventHandler $handler): void
         {
             self::$handler = $handler;
         }

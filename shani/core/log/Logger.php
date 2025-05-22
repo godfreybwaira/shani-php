@@ -52,7 +52,9 @@ namespace shani\core\log {
             };
             $text = $structure->time . $space;
             $text .= '[ ' . ConsolePrinter::colorText($structure->level, $textColor) . ' ]';
-            echo $text . $space . $structure->message . PHP_EOL;
+            if (PHP_SAPI === 'cli') {
+                echo $text . $space . $structure->message . PHP_EOL;
+            }
             return $this;
         }
 

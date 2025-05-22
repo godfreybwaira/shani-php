@@ -1,0 +1,34 @@
+.accordion {
+
+    #{$list}-item-title~* {
+        @extend %paddingY-md;
+    }
+
+    &>:not(.active)>:not(#{$list}-item-title) {
+        margin: 0;
+        max-height: 0;
+    }
+
+    &>.active,
+    &>:not(.active)>:not(#{$list}-item-title) {
+        overflow: hidden;
+    }
+
+    &>.active>#{$list}-item-title:before {
+        transform: rotate(-$angle);
+    }
+
+    &>.active>:not(#{$list}-item-title) {
+        max-height: 100%;
+        overflow-y: auto;
+    }
+
+    &#{$list}-stretch {
+        flex-direction: column;
+        @extend %fullHeight, %flexible;
+    }
+
+    &#{$list}-stretch>.active {
+        @extend %flex-1;
+    }
+}

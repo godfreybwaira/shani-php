@@ -9,6 +9,7 @@
 
 namespace shani\contracts {
 
+
     interface SupportedWebServer
     {
 
@@ -33,6 +34,18 @@ namespace shani\contracts {
          * @return void
          */
         public function stop(): void;
+
+        /**
+         * Return concurrency handler for a web server that supports concurrency
+         * @return ConcurrencyInterface
+         */
+        public function getConcurrencyHandler(): ConcurrencyInterface;
+
+        /**
+         * Return event handler
+         * @return EventHandler
+         */
+        public function getEventHandler(): EventHandler;
     }
 
 }

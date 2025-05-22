@@ -9,6 +9,8 @@
 
 namespace shani {
 
+    use lib\Concurrency;
+    use lib\Event;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
@@ -63,11 +65,13 @@ namespace shani {
         /**
          * Starting the server. When started, server becomes ready to accept requests
          * @param SupportedWebServer $server Server application capable of handling HTTP requests
-         * @param array $arguments CLI arguments
+         * @param array $args CLI arguments
          * @return void
          */
-        public static function start(SupportedWebServer $server, array $arguments): void
+        public static function start(SupportedWebServer $server, array $args = null): void
         {
+            new Concurrency($server->getConcurrencyHandler());
+            Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
                 try {
@@ -82,13 +86,15 @@ namespace shani {
                 }
             });
             $result = null;
-            $server->start(function () use (&$arguments, &$server, &$result) {
-                self::log(LogLevel::INFO, 'Server started');
-                $result = TestConfig::config($arguments);
-                if ($result !== null) {
-                    $server->stop();
-                }
-            });
+            if ($args !== null) {
+                $server->start(function () use (&$args, &$server, &$result) {
+                    self::log(LogLevel::INFO, 'Server started');
+                    $result = TestConfig::config($args);
+                    if ($result !== null) {
+                        $server->stop();
+                    }
+                });
+            }
             if ($result !== null) {
                 exit($result ? 0 : 1);
             }
@@ -96,7 +102,9 @@ namespace shani {
 
         private static function log(LogLevel $level, string $message): void
         {
-            echo $message . PHP_EOL;
+            if (PHP_SAPI === 'cli') {
+                echo $message . PHP_EOL;
+            }
             $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);
         }

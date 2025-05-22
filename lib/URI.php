@@ -116,7 +116,8 @@ namespace lib {
          */
         public function host(): string
         {
-            $host = $this->parts['host'] . ($this->parts['port'] ? ':' . $this->parts['port'] : null);
+            $port = $this->port();
+            $host = $this->parts['host'] . ($port !== null ? ':' . $port : null);
             return $this->parts['scheme'] !== null ? $this->parts['scheme'] . '://' . $host : $host;
         }
 

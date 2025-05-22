@@ -9,13 +9,13 @@
 
 namespace shani\servers\swoole {
 
-    use lib\Concurrency;
     use lib\DataConvertor;
-    use lib\Event;
     use lib\File;
     use lib\http\RequestEntity;
     use lib\MediaType;
     use lib\RequestEntityBuilder;
+    use shani\contracts\ConcurrencyInterface;
+    use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
     use shani\FrameworkConfig;
     use Swoole\Http\Request;
@@ -35,9 +35,8 @@ namespace shani\servers\swoole {
 
         public function __construct(FrameworkConfig $config)
         {
+            self::CheckRequirements();
             $swoole = yaml_parse_file(__DIR__ . '/config.yml');
-            new Concurrency(new SwooleConcurrency());
-            Event::setHandler(new SwooleEvent());
             $this->server = new Server($config->serverIp, $config->httpPort);
             $this->config = $config;
             $cores = swoole_cpu_num();
@@ -55,6 +54,14 @@ namespace shani\servers\swoole {
                 'ssl_cert_file' => $config->sslCert, 'ssl_key_file' => $config->sslKey
             ]);
             $this->server->addListener($config->serverIp, $config->httpsPort, self::SOCKET_TCP | self::SSL);
+        }
+
+        public static function CheckRequirements(): void
+        {
+            if (!extension_loaded('swoole')) {
+                fwrite(STDERR, 'Please install PHP swoole extension' . PHP_EOL);
+                exit(1);
+            }
         }
 
         public function start(callable $callback): void
@@ -143,6 +150,16 @@ namespace shani\servers\swoole {
                 }
             }
             return $uploaded;
+        }
+
+        public function getConcurrencyHandler(): ConcurrencyInterface
+        {
+            return new SwooleConcurrency();
+        }
+
+        public function getEventHandler(): EventHandler
+        {
+            return new SwooleEvent();
         }
     }
 

@@ -9,7 +9,9 @@
 
 namespace shani\servers\swoole {
 
-    class SwooleEvent implements \shani\contracts\Event
+    use shani\contracts\EventHandler;
+
+    class SwooleEvent implements EventHandler
     {
 
         public function dispatch(array $callbacks, callable $finish, ...$params): self

@@ -10,7 +10,7 @@ SSL:
   CERT: "/server.crt"
 # Display all application errors and server errors. This variable can be
 # overridden by application.
-DISPLAY_ERRORS: false
+DISPLAY_ERRORS: true
 TIME_ZONE: Africa/Dar_Es_Salaam
 # Maximum payload size in MB allowed to upload.
 MAX_PAYLOAD_SIZE: 100

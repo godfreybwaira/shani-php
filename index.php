@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use shani\FrameworkConfig;
 use shani\WebServer;
-use shani\servers\swoole\SwooleServer;
 
 /**
  * Server root directory
@@ -15,4 +14,12 @@ spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
 $config = new FrameworkConfig();
-WebServer::start(new SwooleServer($config), $argv);
+
+if (PHP_SAPI === 'cli') {
+    // Run the application using Swoole server. It requires swoole extension
+    // to be installed
+    WebServer::start(new \shani\servers\swoole\SwooleServer($config), $argv);
+} else {
+    // Run the application using any CGI server e.g apache or nginx
+    WebServer::start(new shani\servers\cgi\CgiServer($config));
+}
