@@ -2,7 +2,6 @@
 @use '../utils/callables/variables' as var;
 
 .modal{
-    box-shadow: map-get(var.$shadows,md);
     background-color: #fff;
     overflow: hidden;
     &-background{

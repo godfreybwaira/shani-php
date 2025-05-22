@@ -18,16 +18,14 @@ $grid_colmns: 12;
 $breakpoints: ('sm':0,'md':36rem,'lg':48rem);
 // $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
 $z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 200);
-$shadow_color: #3b3b3b;
 $accent_color: var(--theme-color);
 
 $animation_duration: 0.35s;
 $animation_timing: ease-in;
 
 $shadows:(
-'xs': (0 0 fn.px2rem(1px) $shadow_color, 0 fn.px2rem(1px) fn.px2rem(1px) $shadow_color),
-'sm': 0 0 fn.px2rem(3px) fn.px2rem(-1px) $shadow_color,
-'md': 0 fn.px2rem(3px) fn.px2rem(10px) fn.px2rem(-2px) $shadow_color
+'sm': (0 0 fn.px2rem(1px) #d1d1d1, 0 fn.px2rem(1px) fn.px2rem(1px) #50565a),
+'md': (0 fn.px2rem(2px) fn.px2rem(5px) #aaa, 0 fn.px2rem(-1px) fn.px2rem(4px) #aaa),
 );
 $border_radius: (
 'xs': math.div($spacing, 4),

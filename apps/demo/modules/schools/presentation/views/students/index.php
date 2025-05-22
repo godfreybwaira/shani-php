@@ -12,7 +12,7 @@
         grid-template-areas: "a1 a2";
     }
 </style>
-<div class="toast color-7 width-sm-10 width-md-4 pos-tc">
+<div class="toast color-7 width-sm-10 width-md-4 pos-tc padding-xy">
     Lorem ipsum dolor
 </div>
 <div class="modal-background">
@@ -34,7 +34,7 @@
                 </a>
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
-                <ul class="list list-dir-h size-sm borders gap-md">
+                <ul class="list list-dir-v size-md shadow-sm">
                     <li>hello from here</li>
                     <li>Hello from here. Can this be too long?</li>
                     <li>hello from here</li>

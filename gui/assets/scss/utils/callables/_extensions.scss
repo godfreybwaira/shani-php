@@ -121,8 +121,11 @@
 %font_sm{
     font-size: 80%;
 }
-%box_shadow{
-    box-shadow: var(--box-shadow);
+%box_shadow_sm{
+    box-shadow: var(--shadow-sm);
+}
+%box_shadow_md{
+    box-shadow: var(--shadow-md);
 }
 %theme_color{
     color: var(--theme-text);
