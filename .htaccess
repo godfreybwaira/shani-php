@@ -1,7 +1,7 @@
 ## For apache web server only
 RewriteEngine on
-RewriteCond %{HTTPS} on
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-RewriteCond %{REQUEST_URI} !^/index\.php
+RewriteCond %{REQUEST_URI} !^/index\.php [NC]
 RewriteRule ^(.*)$ /index.php/$1 [L]
