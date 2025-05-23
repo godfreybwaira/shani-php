@@ -15,7 +15,7 @@
     &.size-sm>*{
         @extend %padding_sm, %font_sm;
     }
-    &-dir{
+    &.dir{
         &-v{
             &.borders>:not(:first-child){
                 border-top: var(--thin-border);

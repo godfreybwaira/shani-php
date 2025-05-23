@@ -11,6 +11,7 @@ namespace shani\servers\swoole {
 
     use lib\DataConvertor;
     use lib\File;
+    use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\MediaType;
     use lib\RequestEntityBuilder;
@@ -31,6 +32,7 @@ namespace shani\servers\swoole {
 
         private readonly Server $server;
         private readonly FrameworkConfig $config;
+        private readonly bool $forceRedirection;
         private array $clients = [];
 
         public function __construct(FrameworkConfig $config)
@@ -38,6 +40,7 @@ namespace shani\servers\swoole {
             self::CheckRequirements();
             $swoole = yaml_parse_file(__DIR__ . '/config.yml');
             $this->server = new Server($config->serverIp, $config->httpPort);
+            $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
             $this->config = $config;
             $cores = swoole_cpu_num();
             $this->server->set([
@@ -83,8 +86,15 @@ namespace shani\servers\swoole {
             $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
                 $scheme = $this->config->httpPort === $req->server['server_port'] ? 'http' : 'https';
                 $request = self::createRequest($scheme, $req);
-                $writer = new SwooleHttpResponseWriter($res);
-                $callback($request, $writer);
+                if ($scheme === 'https') {
+                    $writer = new SwooleHttpResponseWriter($res);
+                    $callback($request, $writer);
+                } elseif ($this->forceRedirection) {
+                    $uri = $request->uri->withPort($this->config->httpsPort)->withScheme('https');
+                    $res->status(HttpStatus::MOVED_PERMANENTLY->value);
+                    $res->header('location', $uri);
+                    $res->end();
+                }
             });
             $this->server->on('message', function (Server $server, Frame $frame) use (&$callback) {
                 $request = $this->clients[$frame->fd] ?? null;

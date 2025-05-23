@@ -23,7 +23,7 @@ namespace gui\v2\containers\lists {
         public function __construct(Size $size = Size::MEDIUM, string $tag = 'ul')
         {
             parent::__construct($size, $tag);
-            $this->classList->addOne('list-' . Direction::VERTICAL->value);
+            $this->classList->addOne(Direction::VERTICAL->value);
         }
     }
 

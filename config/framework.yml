@@ -4,7 +4,7 @@
 IP: "0.0.0.0"
 PORTS:
   HTTP: 8008
-  HTTPS: 44380
+  HTTPS: 44343
 SSL:
   KEY: "/server.key"
   CERT: "/server.crt"

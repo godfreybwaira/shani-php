@@ -1,7 +1,10 @@
 ## For apache web server only
+# switching mod_rewrite on
 RewriteEngine on
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+# Force insecure requests to https
+ RewriteCond %{HTTPS} off
+ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+# Force all requests to handled by index.php file
 RewriteCond %{REQUEST_URI} !^/index\.php [NC]
 RewriteRule ^(.*)$ /index.php/$1 [L]

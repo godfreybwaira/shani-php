@@ -17,24 +17,24 @@
 </div>
 <div class="modal-background">
     <div class="modal modal-type-c pos-c width-sm-11 width-md-9 height-sm-9">
-        <div class="tab tab-pos-t">
+        <div class="tab tab-pos-b">
             <div class="tab-menu" style="grid-area: a1;">
                 <a class="menu-item">Menu One</a>
-                <a class="active menu-item menu-item-dir-v">
-                    <i class="mdi mdi-account-box size-md"></i>
-                    <span class="label">Menu One here</span>
+                <a class="active menu-item dir-v">
+                    <i class="mdi mdi-professional-hexagon size-md"></i>
+                    <span class="label font-sm">Menu One here</span>
                 </a>
-                <a class="menu-item menu-item-dir-v">
+                <a class="menu-item dir-v">
                     <i class="mdi mdi-account-box"></i>
                     <span class="label">Menu One here</span>
                 </a>
-                <a class="menu-item menu-item--dir-v">
+                <a class="menu-item dir-v">
                     <i class="mdi mdi-account-box"></i>
                     <span class="label">Menu One here</span>
                 </a>
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
-                <ul class="list list-dir-v size-md shadow-sm">
+                <ul class="list dir-v size-md shadow-sm borders">
                     <li>hello from here</li>
                     <li>Hello from here. Can this be too long?</li>
                     <li>hello from here</li>
@@ -43,8 +43,7 @@
                     <li>Hello from hereq</li>
                     <li>hello from herea</li>
                     <li>Hello from here</li>
-                    <li>hello from herse</li>
-                    <li>Last row</li>
+                    <li>hello from here1</li>
                 </ul>
             </div>
         </div>

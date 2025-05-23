@@ -81,7 +81,7 @@ namespace shani\core {
         /**
          * Mandatory extensions required by Shani framework
          */
-        public const REQUIRED_EXTENSIONS = ['yaml', 'mbstring'];
+        public const REQUIRED_EXTENSIONS = ['yaml'];
     }
 
 }

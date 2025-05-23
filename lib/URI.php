@@ -45,7 +45,12 @@ namespace lib {
         #[\Override]
         public function __toString(): string
         {
-            return $this->uri;
+//            URI = scheme ":" ["//" authority] path ["?" query] ["#" fragment]
+            $query = $this->query();
+            $fragment = $this->fragment();
+            $uri = $this->scheme() . '://' . $this->authority() . $this->path();
+            $uri .= ($query !== null ? '?' . $query : null) . ($fragment !== null ? '#' . $fragment : null);
+            return $uri;
         }
 
         public function authority(): string
@@ -150,7 +155,10 @@ namespace lib {
         public function userInfo(): ?string
         {
             $pass = !empty($this->parts['pass']) ? ':' . $this->parts['pass'] : null;
-            return self::valueOf($this->parts['user'] . $pass);
+            if (!empty($this->parts['user'])) {
+                return $this->parts['user'] . $pass;
+            }
+            return $pass;
         }
 
         public function withFragment(string $fragment): self

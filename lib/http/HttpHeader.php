@@ -196,7 +196,7 @@ namespace lib\http {
          */
         public function length(): int
         {
-            return mb_strlen($this);
+            return strlen($this);
         }
 
         /**

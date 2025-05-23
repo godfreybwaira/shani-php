@@ -6,8 +6,9 @@
     overflow: hidden;
     &-background{
         top: 0;
+        left: 0;
         background-color: rgba(0,0,0,0.8);
-        @extend %full_size,%position_fixed;
+        @extend %full_size,%position_absolute;
         z-index: map-get(var.$z_index,md);
     }
     &-type{

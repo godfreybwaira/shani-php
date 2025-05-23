@@ -49,7 +49,8 @@ namespace shani\servers\cgi {
 
         private static function createRequest(): RequestEntity
         {
-            $path = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+            $protocol = $_SERVER['REQUEST_SCHEME'] ?? (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
+            $path = $protocol . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             $raw = file_get_contents('php://input');
             $request = (new RequestEntityBuilder())
                     ->protocol($_SERVER['SERVER_PROTOCOL'])

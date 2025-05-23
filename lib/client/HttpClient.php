@@ -310,7 +310,7 @@ namespace lib\client {
             if ($content === null || $content === '') {
                 return;
             }
-            if ($this->compression !== null && $this->compressionMinSize < mb_strlen($content)) {
+            if ($this->compression !== null && $this->compressionMinSize < strlen($content)) {
                 $content = DataCompression::compress($content, $this->encoding, $this->compression);
                 $this->requestHeader->addOne(HttpHeader::CONTENT_ENCODING, $this->encoding);
             }

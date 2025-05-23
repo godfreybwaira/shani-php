@@ -14,3 +14,5 @@ MAX_WORKER_REQUESTS: 1000
 MAX_WAIT_TIME: 60
 # Run the server in background
 RUNAS_DAEMON: false
+# Redirect insecure HTTP to HTTPS
+REDIRECT_INSECURE_REQUEST: true

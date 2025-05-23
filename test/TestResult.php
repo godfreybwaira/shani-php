@@ -87,7 +87,7 @@ namespace test {
                         ++$fail;
                     }
                     $details = ' ' . (++$count) . '. ' . $cr['description'];
-                    $longestString = max(mb_strlen($details), $longestString);
+                    $longestString = max(strlen($details), $longestString);
                     $content[] = $details;
                     $values[] = $cr['result'] ? $passLabel : $failLabel;
                 }
@@ -120,7 +120,7 @@ namespace test {
             $str = null;
             for ($i = 0; $i < $size; $i++) {
                 if ($values[$i] !== null) {
-                    $mylen = mb_strlen($content[$i]);
+                    $mylen = strlen($content[$i]);
                     $str .= $content[$i] . ' ' . str_repeat('-', $length - $mylen) . ' ' . $values[$i] . PHP_EOL;
                 } else {
                     $str .= $content[$i] . PHP_EOL;

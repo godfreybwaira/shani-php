@@ -17,7 +17,6 @@ namespace gui\v2\components {
     {
 
         private ?Component $icon = null;
-        private readonly Direction $direction;
         private readonly bool $showLabel;
 
         private const CSS_CLASSNAME = 'menu-item';
@@ -33,8 +32,7 @@ namespace gui\v2\components {
             parent::__construct('a');
             $this->label = $label;
             $this->showLabel = $showLabel;
-            $this->direction = $direction;
-            $this->classList->addAll([self::CSS_CLASSNAME, self::CSS_CLASSNAME . '-' . $direction]);
+            $this->classList->addAll([self::CSS_CLASSNAME, $direction->value]);
             $this->attribute->addOne('title', $label);
         }
 

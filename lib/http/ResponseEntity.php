@@ -57,7 +57,7 @@ namespace lib\http {
          */
         public function bodySize(): int
         {
-            return $this->rawBody === null ? 0 : mb_strlen($this->rawBody);
+            return $this->rawBody === null ? 0 : strlen($this->rawBody);
         }
 
         /**
