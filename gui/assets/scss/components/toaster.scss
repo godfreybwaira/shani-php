@@ -2,7 +2,7 @@
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/variables' as var;
 
-.toast{
+.toaster{
     z-index: map-get(var.$z_index,lg);
     @extend %position_fixed;
     box-shadow: 0 fn.px2rem(2px) fn.px2rem(2px) 0 rgba(0,0,0,.14),

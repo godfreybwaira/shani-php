@@ -140,9 +140,7 @@ $_bold_line: fn.px2rem(1px);
                 background-color: var(--accent-color);
             }
             &:not(.active){
-                &:hover {
-                    cursor: pointer;
-                }
+                cursor: pointer;
                 background-color: var(--faint-bg);
                 &:before{
                     background-color: var(--border-color);

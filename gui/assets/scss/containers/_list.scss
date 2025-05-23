@@ -1,9 +1,7 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
-@use 'sass:math';
 
 .list {
-    $list: &;
     display: grid;
     list-style-type: none;
     @extend %spacing_0, %full_width;
@@ -14,6 +12,30 @@
 
     &.size-sm>*{
         @extend %padding_sm, %font_sm;
+    }
+
+    &.borders{
+        border: var(--thin-border);
+    }
+
+    &>:hover:not(.active) {
+        background-color: var(--color-19);
+    }
+
+    &>.active {
+        @extend %theme_color;
+    }
+    &.stripes{
+        &-even {
+            &>:not(:hover,.active):nth-of-type(2n) {
+                background-color: var(--faint-bg);
+            }
+        }
+        &-odd {
+            &>:not(:hover,.active):nth-of-type(2n+1) {
+                background-color: var(--faint-bg);
+            }
+        }
     }
     &.dir{
         &-v{
@@ -38,30 +60,6 @@
             }
             &.borders>:not(:last-child){
                 border-right: var(--thin-border);
-            }
-        }
-    }
-
-    &.borders{
-        border: var(--thin-border);
-    }
-
-    &>:hover:not(.active) {
-        background-color: var(--color-19);
-    }
-
-    &>.active {
-        @extend %theme_color;
-    }
-    &-stripes{
-        &-even {
-            &>:not(:hover,.active):nth-of-type(2n) {
-                background-color: var(--faint-bg);
-            }
-        }
-        &-odd {
-            &>:not(:hover,.active):nth-of-type(2n+1) {
-                background-color: var(--faint-bg);
             }
         }
     }

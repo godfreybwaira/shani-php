@@ -1,34 +1,46 @@
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+@use '../utils/callables/functions' as fn;
+
+$_angle: 45deg;
 .accordion {
+    list-style-type: none;
+    border: var(--thin-border);
+    @extend %spacing_0;
 
-    #{$list}-item-title~* {
-        @extend %paddingY-md;
+    &.borders>:not(:first-child){
+        border-top: var(--thin-border);
     }
-
-    &>:not(.active)>:not(#{$list}-item-title) {
-        margin: 0;
+    &-body{
+        @extend %padding_xy;
+    }
+    &-title{
+        @extend %padding_md;
+        display: grid;
+        font-weight: bold;
+        position: relative;
+        align-items: center;
+        cursor: pointer;
+        &:hover{
+            background-color: var(--color-19);
+        }
+        &:before{
+            content: '';
+            right: var(--spacing);
+            @extend %position_absolute;
+            width: calc(var.$spacing/2);
+            height: calc(var.$spacing/2);
+            transform: rotate($_angle);
+            border: fn.px2rem(1px) solid currentColor;
+            border-left: transparent;
+            border-bottom: transparent;
+        }
+    }
+    &>:not(.active){
         max-height: 0;
-    }
-
-    &>.active,
-    &>:not(.active)>:not(#{$list}-item-title) {
         overflow: hidden;
     }
-
-    &>.active>#{$list}-item-title:before {
-        transform: rotate(-$angle);
-    }
-
-    &>.active>:not(#{$list}-item-title) {
-        max-height: 100%;
-        overflow-y: auto;
-    }
-
-    &#{$list}-stretch {
-        flex-direction: column;
-        @extend %fullHeight, %flexible;
-    }
-
-    &#{$list}-stretch>.active {
-        @extend %flex-1;
-    }
+}
+.active>.accordion-title:before{
+    transform: rotate($_angle * 3);
 }

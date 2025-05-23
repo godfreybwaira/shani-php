@@ -29,7 +29,7 @@ namespace gui\v2\containers\lists {
          */
         public function setStripes(Stripes $stripe): self
         {
-            $this->classList->addOne('list-' . $stripe->value);
+            $this->classList->addOne($stripe->value);
         }
     }
 
