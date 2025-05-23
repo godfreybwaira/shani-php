@@ -43,6 +43,16 @@ namespace gui\v2 {
         }
 
         /**
+         * Set list stripes
+         * @param Stripes $stripe
+         * @return self
+         */
+        public function setStripes(Stripes $stripe): self
+        {
+            $this->classList->addOne($stripe->value);
+        }
+
+        /**
          * Set different size based on the device width
          * @param DeviceSize $device Device size
          * @param int|null $width Size from 1 to 12

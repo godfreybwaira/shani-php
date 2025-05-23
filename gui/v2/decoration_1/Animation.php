@@ -12,7 +12,6 @@ namespace gui\v2\decoration {
     enum Animation: string
     {
 
-        case ZOOM_OUT = 'animation-zoom-out';
         case ZOOM_IN = 'animation-zoom-in';
         case SLIDE_LEFT = 'animation-slide-left';
         case SLIDE_RIGHT = 'animation-slide-right';

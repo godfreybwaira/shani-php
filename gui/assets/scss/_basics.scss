@@ -112,6 +112,18 @@
 .gap-md{
     gap: var(--spacing);
 }
+.stripes{
+    &-even {
+        &>:not(:hover,.active):nth-of-type(2n) {
+            background-color: var(--faint-bg);
+        }
+    }
+    &-odd {
+        &>:not(:hover,.active):nth-of-type(2n+1) {
+            background-color: var(--faint-bg);
+        }
+    }
+}
 @include _createSpacing(margin);
 @include _createSpacing(padding);
 @include _createThemeColors(var.$theme_color);

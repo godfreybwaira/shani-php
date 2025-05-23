@@ -35,7 +35,7 @@
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
                 <ul class="accordion shadow-sm borders accordion-collapse">
-                    <li class="active">
+                    <li>
                         <div class="accordion-title">My Title goes here</div>
                         <div class="accordion-body">
                             <p>
@@ -46,7 +46,7 @@
                             </p>
                         </div>
                     </li>
-                    <li>
+                    <li class="active">
                         <div class="accordion-title">My Title 2 goes here</div>
                         <div class="accordion-body">
                             <p>

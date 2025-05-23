@@ -11,7 +11,6 @@ namespace gui\v2\containers\lists {
 
     use gui\v2\Component;
     use gui\v2\decorators\Size;
-    use gui\v2\decorators\Stripes;
 
     abstract class ListItem extends Component
     {
@@ -20,16 +19,6 @@ namespace gui\v2\containers\lists {
         {
             parent::__construct($tag);
             $this->classList->addAll(['list', $size->value]);
-        }
-
-        /**
-         * Set list stripes
-         * @param Stripes $stripe
-         * @return self
-         */
-        public function setStripes(Stripes $stripe): self
-        {
-            $this->classList->addOne($stripe->value);
         }
     }
 

@@ -25,18 +25,6 @@
     &>.active {
         @extend %theme_color;
     }
-    &.stripes{
-        &-even {
-            &>:not(:hover,.active):nth-of-type(2n) {
-                background-color: var(--faint-bg);
-            }
-        }
-        &-odd {
-            &>:not(:hover,.active):nth-of-type(2n+1) {
-                background-color: var(--faint-bg);
-            }
-        }
-    }
     &.dir{
         &-v{
             &.borders>:not(:first-child){

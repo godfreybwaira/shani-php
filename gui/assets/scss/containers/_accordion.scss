@@ -11,9 +11,6 @@ $_angle: 45deg;
     &.borders>:not(:first-child){
         border-top: var(--thin-border);
     }
-    &-body{
-        @extend %padding_xy;
-    }
     &-title{
         @extend %padding_md;
         display: grid;
@@ -36,9 +33,14 @@ $_angle: 45deg;
             border-bottom: transparent;
         }
     }
-    &>:not(.active){
-        max-height: 0;
+    &>:not(.active)>&-body{
+        height: 0;
         overflow: hidden;
+        @extend %padding_y;
+    }
+    &>.active>&-body{
+        @extend %padding_xy;
+        animation: fadeIn var.$animation_duration var.$animation_timing;
     }
 }
 .active>.accordion-title:before{
