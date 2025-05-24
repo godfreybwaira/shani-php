@@ -25,10 +25,11 @@ namespace gui {
 
         public function __construct(App &$app)
         {
+            $this->app = $app;
             $this->scripts = $this->styles = [];
             $this->title = $this->icon = null;
-            $this->app = $app;
             $this->style('/css/main.css');
+            $this->style('/css/icons/mdi.css');
             $this->script('/js/ui.js', ['defer']);
             $this->script('/js/shani-ob-2.0.js', ['defer']);
             $this->script('/js/shani-plugins.js', ['defer']);
@@ -43,16 +44,6 @@ namespace gui {
         public function icon(string $path, string $mediaType): self
         {
             $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mediaType . '"/>';
-            return $this;
-        }
-
-        /**
-         * Set theme color
-         * @param string $color theme color in hexadecimal (6 digits e.g #0000ff)
-         * @return self
-         */
-        public function setThemeColor(string $color): self
-        {
             return $this;
         }
 
@@ -116,9 +107,18 @@ namespace gui {
             return $this;
         }
 
+        /**
+         * Get asset URI
+         * @param string $path asset location relative to asset directory
+         * @return string URI pointing to asset
+         */
+        public function asset(string $path): string
+        {
+            return $this->app->storage()->url(LocalStorage::ACCESS_ASSET . $path);
+        }
+
         private static function createHeader(array &$head, string $url, array &$attributes): void
         {
-            $url = LocalStorage::ACCESS_ASSET . $url;
             $head[$url] = null;
             foreach ($attributes as $key => $val) {
                 $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
@@ -157,12 +157,11 @@ namespace gui {
         public function head(): string
         {
             $head = $this->icon;
-            $asset = $this->app->storage();
             foreach ($this->styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $asset->url($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->asset($url) . '"/>';
             }
             foreach ($this->scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $asset->url($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $this->asset($url) . '"></script>';
             }
             foreach ($this->details as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';

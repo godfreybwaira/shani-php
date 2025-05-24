@@ -11,8 +11,8 @@
     $luminance: $red * 0.2126 + $green * 0.7152 + $blue * 0.0722;
     @return $luminance < 0.179;
 }
-@function getTextColor($background_color){
-    @return if(isDarkColor($background_color),#fff,#000);
+@function getTextColor($background_color, $dark_color:#000){
+    @return if(isDarkColor($background_color),#fff,$dark_color);
 }
 
 @function px2rem($px, $return_unit: true) {

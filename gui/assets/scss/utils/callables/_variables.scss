@@ -28,8 +28,7 @@ $shadows:(
 'md': (0 fn.px2rem(2px) fn.px2rem(5px) #aaa, 0 fn.px2rem(-1px) fn.px2rem(4px) #aaa),
 );
 $border_radius: (
-'xs': math.div($spacing, 4),
-'sm': math.div($spacing, 2),
-'md': $spacing,
+'sm': math.div($spacing, 4),
+'md': math.div($spacing, 2),
 'lg': 50rem,
 );

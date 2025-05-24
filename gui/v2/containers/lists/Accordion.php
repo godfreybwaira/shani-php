@@ -14,6 +14,8 @@ namespace gui\v2\containers\lists {
     final class Accordion extends Component
     {
 
+        private const CSS_CLASS = 'accordion';
+
         /**
          * Create Accordion
          * @param bool $collapse If true, then all the items are collapsed except
@@ -22,9 +24,9 @@ namespace gui\v2\containers\lists {
         protected function __construct(bool $collapse = true)
         {
             parent::__construct('ul');
-            $this->classList->addAll(['accordion', 'borders']);
+            $this->classList->addAll([self::CSS_CLASS, 'borders']);
             if ($collapse) {
-                $this->classList->addOne('accordion-collapse');
+                $this->classList->addOne(self::CSS_CLASS . '-collapse');
             }
         }
 
@@ -38,6 +40,8 @@ namespace gui\v2\containers\lists {
         public function addItem(Component $title, Component $body, bool $active = false): self
         {
             $list = new Component('li');
+            $title->classList->addOne(self::CSS_CLASS . '-title');
+            $body->classList->addOne(self::CSS_CLASS . '-body');
             $list->appendChild($title, $body);
             if ($active) {
                 $list->classList->addOne('active');

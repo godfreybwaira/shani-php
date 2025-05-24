@@ -17,6 +17,7 @@ namespace gui\v2\decorators {
         case SLIDE_RIGHT = 'animation-slide-right';
         case SLIDE_UP = 'animation-slide-up';
         case SLIDE_DOWN = 'animation-slide-down';
+        case FADE_IN = 'animation-fade-in';
         case SPIN = 'animation-spin';
     }
 

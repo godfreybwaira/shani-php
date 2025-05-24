@@ -10,6 +10,8 @@
 namespace gui\v2 {
 
     use gui\v2\decorators\Animation;
+    use gui\v2\decorators\Color;
+    use gui\v2\decorators\Stripes;
     use gui\v2\props\Attribute;
     use gui\v2\props\DeviceSize;
     use gui\v2\props\InlineStyle;
@@ -23,6 +25,7 @@ namespace gui\v2 {
         private ?string $content = null;
         private ?Component $parent = null;
         private ?Animation $animation = null;
+        private ?Color $color = null;
         public readonly StyleClass $classList;
         public readonly Attribute $attribute;
         public readonly InlineStyle $style;
@@ -40,6 +43,17 @@ namespace gui\v2 {
             $this->style = new InlineStyle();
             $this->name = 'd' . substr(hrtime(true), 8);
             $this->children = [];
+        }
+
+        /**
+         * Set informative color
+         * @param Color $color color to set
+         * @return self
+         */
+        public function setInformativeColor(Color $color): self
+        {
+            $this->color = $color;
+            return $this;
         }
 
         /**
@@ -214,6 +228,9 @@ namespace gui\v2 {
          */
         public function open(): string
         {
+            if ($this->color !== null) {
+                $this->classList->addOne($this->color->value);
+            }
             if ($this->animation !== null) {
                 $this->classList->addOne($this->animation->value);
             }

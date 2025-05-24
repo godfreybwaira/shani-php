@@ -1,0 +1,50 @@
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+@use '../utils/callables/functions' as fn;
+.card {
+    $card: &;
+    display: grid;
+    overflow: hidden;
+    border-radius: calc(var(--spacing)/2);
+    &.size-sm>&-body{
+        @extend %padding_xy_sm;
+    }
+    &.size-sm>&-title{
+        @extend %padding_xy_sm;
+    }
+    &.size-md>&-body{
+        @extend %padding_xy;
+    }
+    &.size-md>&-title{
+        @extend %padding_xy;
+    }
+    &.borders{
+        border: var(--thin-border);
+    }
+    &-body{
+        text-align: justify;
+    }
+    &-title{
+        font-weight: bold;
+    }
+    &>img {
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+    }
+    @include ext.media(map-get(var.$breakpoints,lg)){
+        &.dir-h{
+            grid-auto-flow: column;
+            grid-template-areas: "img title""img body";
+            &>img{
+                height: 100%;
+                grid-area: img;
+            }
+            &>#{$card}-body{
+                grid-area: body;
+            }
+            &>#{$card}-title{
+                grid-area: title;
+            }
+        }
+    }
+}

@@ -1,0 +1,10 @@
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/extensions' as ext;
+
+.callout {
+    font-style: italic;
+    @extend %padding_xy,%margin_xy;
+    border-radius: var(--radius-sm);
+    outline: fn.px2rem(1px) dashed #fff;
+    outline-offset: calc(var(--spacing)/2 * -1);
+}

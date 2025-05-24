@@ -13,7 +13,7 @@
     }
     &-type{
         &-c{
-            border-radius: map-get(var.$border_radius,xs);
+            border-radius: var(--radius-sm);
             &.pos-c{
                 animation: zoomIn var.$animation_duration var.$animation_timing;
             }

@@ -3,6 +3,7 @@
 @use '../utils/callables/variables' as var;
 
 .toaster{
+    $radius: var(--radius-sm);
     z-index: map-get(var.$z_index,lg);
     @extend %position_fixed;
     box-shadow: 0 fn.px2rem(2px) fn.px2rem(2px) 0 rgba(0,0,0,.14),
@@ -12,9 +13,11 @@
     overflow-y: auto;
     max-height: 30%;
     &.pos-tc{
+        border-radius: 0 0 $radius $radius;
         animation: slideDown var.$animation_duration var.$animation_timing;
     }
     &.pos-bc{
+        border-radius: $radius $radius 0 0;
         animation: slideUp var.$animation_duration var.$animation_timing;
     }
 }

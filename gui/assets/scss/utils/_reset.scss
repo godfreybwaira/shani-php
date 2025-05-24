@@ -56,7 +56,8 @@ pre,textarea {
     overflow: auto;
 }
 img {
-    vertical-align: middle;
+    height: auto;
+    max-width: 100%;
     border-style: none;
 }
 svg:not(:root) {

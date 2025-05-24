@@ -2,6 +2,7 @@
 @use '../utils/callables/variables' as var;
 
 .list {
+    $list: &;
     display: grid;
     list-style-type: none;
     @extend %spacing_0, %full_width;
@@ -25,30 +26,31 @@
     &>.active {
         @extend %theme_color;
     }
-    &.dir{
-        &-v{
-            &.borders>:not(:first-child){
-                border-top: var(--thin-border);
-            }
-            >*{
-                display: block;
-            }
+    &.dir-v{
+        &.borders>:not(:first-child){
+            border-top: var(--thin-border);
         }
-        &-h{
-            overflow-x: auto;
-            grid-auto-flow: column;
-            justify-content: center;
-            $sizes: ('sm':40%,'md':23%,'lg':15%);
-            @each $name, $size in var.$breakpoints{
-                @include ext.media($size){
-                    &{
-                        grid-auto-columns: map-get($sizes, $name);
-                    }
-                }
-            }
-            &.borders>:not(:last-child){
-                border-right: var(--thin-border);
-            }
+        >*{
+            display: block;
+        }
+    }
+    &.dir-h{
+        overflow: hidden;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        border-radius: var(--radius-sm);
+        &.borders>:not(:last-child){
+            border-right: var(--thin-border);
+        }
+        #{$list}-title{
+            display: block;
+            font-weight: bold;
+            text-align: center;
+        }
+        #{$list}-body{
+            color: #333;
+            text-align: center;
+            @extend %font_sm;
         }
     }
 }
