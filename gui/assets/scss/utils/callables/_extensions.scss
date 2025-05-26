@@ -33,6 +33,26 @@
     margin: $size;
 }
 
+@mixin createRightAngle($size,$border_width){
+    content: '';
+    transform: rotate(45deg);
+    width: $size;
+    height: $size;
+    border: $border_width solid currentColor;
+    border-bottom: transparent;
+    border-left: transparent;
+}
+
+@mixin createLeftAngle($size,$border_width){
+    content: '';
+    transform: rotate(45deg);
+    width: $size;
+    height: $size;
+    border: $border_width solid currentColor;
+    border-top: transparent;
+    border-right: transparent;
+}
+
 %full_width{
     width: 100%;
 }

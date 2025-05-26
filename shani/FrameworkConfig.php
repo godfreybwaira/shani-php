@@ -33,6 +33,8 @@ namespace shani {
             $this->sslKey = Framework::DIR_SSL . $config['SSL']['KEY'];
             $this->payloadSize = $config['MAX_PAYLOAD_SIZE'] * self::MB_1;
             /////////////////////////////////////
+            ini_set('upload_max_filesize', $this->payloadSize);
+            ini_set('post_max_size', $this->payloadSize + self::MB_1);
             ini_set('display_errors', $this->showErrors);
             date_default_timezone_set($config['TIME_ZONE']);
         }

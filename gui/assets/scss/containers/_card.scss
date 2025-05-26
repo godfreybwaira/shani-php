@@ -18,9 +18,6 @@
     &.size-md>&-title{
         @extend %padding_xy;
     }
-    &.borders{
-        border: var(--thin-border);
-    }
     &-body{
         text-align: justify;
     }

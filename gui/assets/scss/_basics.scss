@@ -91,6 +91,8 @@
     --accent-color:#{var.$accent_color};
     --thin-border: #{fn.getBorder()};
     --faint-bg: var(--color-19);
+    --hover-color-1: rgba(0,0,0,.27);
+    --hover-color-2: var(--color-18);
     --border-color: var(--color-17);
     --shadow-sm: #{map-get(var.$shadows,sm)};
     --shadow-md: #{map-get(var.$shadows,md)};
@@ -99,7 +101,7 @@
     --radius-sm: #{map-get(var.$border_radius,sm)};
 }
 *,:before,:after{
-    transition: all .2s;
+    transition: all var.$animation_duration;
 }
 .shadow-sm{
     @extend %box_shadow_sm;
@@ -115,6 +117,12 @@
 }
 .gap-md{
     gap: var(--spacing);
+}
+.borders{
+    border: var(--thin-border);
+}
+.border-h>:not(:first-child){
+    border-top: var(--thin-border);
 }
 .stripes{
     &-even {

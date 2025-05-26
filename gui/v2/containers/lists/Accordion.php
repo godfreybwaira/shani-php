@@ -26,7 +26,7 @@ namespace gui\v2\containers\lists {
             parent::__construct('ul');
             $this->classList->addAll([self::CSS_CLASS, 'borders']);
             if ($collapse) {
-                $this->classList->addOne(self::CSS_CLASS . '-collapse');
+                $this->attribute->addOne('ui-collapse', 'true');
             }
         }
 

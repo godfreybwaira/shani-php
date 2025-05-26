@@ -2,15 +2,11 @@
 @use '../utils/callables/variables' as var;
 @use '../utils/callables/functions' as fn;
 
-$_angle: 45deg;
 .accordion {
-    list-style-type: none;
-    border: var(--thin-border);
+    $_angle: 45deg;
     @extend %spacing_0;
+    list-style-type: none;
 
-    &.borders>:not(:first-child){
-        border-top: var(--thin-border);
-    }
     &-title{
         @extend %padding_md;
         display: grid;
@@ -19,30 +15,25 @@ $_angle: 45deg;
         align-items: center;
         cursor: pointer;
         &:hover{
-            background-color: var(--color-19);
+            background-color: var(--hover-color-2);
         }
-        &:before{
-            content: '';
+        &:not(:only-child):before{
             right: var(--spacing);
             @extend %position_absolute;
-            width: calc(var.$spacing/2);
-            height: calc(var.$spacing/2);
-            transform: rotate($_angle);
-            border: fn.px2rem(1px) solid currentColor;
-            border-left: transparent;
-            border-bottom: transparent;
+            @include ext.createRightAngle(calc(var.$spacing/2),fn.px2rem(1px));
         }
     }
-    &>:not(.active)>&-body{
-        height: 0;
+    &>*{
+        display: grid;
+        grid-template-rows: auto 0fr;
+    }
+    &>.active{
+        grid-template-rows: auto 1fr;
+    }
+    &>.active>&-title:before{
+        transform: rotate($_angle * 3);
+    }
+    &-body{
         overflow: hidden;
-        @extend %padding_y;
     }
-    &>.active>&-body{
-        @extend %padding_xy;
-        animation: fadeIn var.$animation_duration var.$animation_timing;
-    }
-}
-.active>.accordion-title:before{
-    transform: rotate($_angle * 3);
 }

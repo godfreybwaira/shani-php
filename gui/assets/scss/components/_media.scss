@@ -1,0 +1,15 @@
+@use '../utils/callables/extensions' as ext;
+
+.media{
+    @extend %full_size;
+    &>img{
+        aspect-ratio: 16/9;
+        object-fit: cover;
+        @extend %full_size;
+    }
+    &-caption{
+        overflow-y: auto;
+        @extend %padding_xy;
+        background-color: var(--hover-color-1);
+    }
+}

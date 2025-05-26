@@ -15,14 +15,9 @@
         @extend %padding_sm, %font_sm;
     }
 
-    &.borders{
-        border: var(--thin-border);
-    }
-
     &>:hover:not(.active) {
-        background-color: var(--color-19);
+        background-color: var(--hover-color-2);
     }
-
     &>.active {
         @extend %theme_color;
     }

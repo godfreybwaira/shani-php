@@ -1,0 +1,50 @@
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+@use '../utils/callables/functions' as fn;
+
+.carousel {
+    $square: fn.px2rem(40px);
+    display: grid;
+    align-items: center;
+    grid-auto-flow: column;
+    grid-template-columns: $square 1fr $square;
+    @extend %full_size;
+    &-body {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-sm);
+        @extend %full_height;
+    }
+    &-item {
+        top: 0;
+        left: 0;
+        list-style: none;
+        background-color: white;
+        @extend %full_size, %position_absolute;
+        &.active{
+            z-index: 1;
+        }
+        &:not(.active){
+            opacity: 0;
+        }
+    }
+    &-next,&-prev{
+        display: grid;
+        height: $square;
+        cursor: pointer;
+        border-radius: 50%;
+        align-items: center;
+        justify-items: center;
+        &:hover{
+            background-color: var(--hover-color-1);
+        }
+    }
+    &-next:after{
+        @include ext.createRightAngle(var.$spacing,fn.px2rem(3px));
+        border-radius: fn.px2rem(2px);
+    }
+    &-prev:before{
+        border-radius: fn.px2rem(2px);
+        @include ext.createLeftAngle(var.$spacing,fn.px2rem(3px));
+    }
+}

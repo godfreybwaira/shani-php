@@ -17,7 +17,7 @@
 </div>
 <div class="modal-background">
     <div class="modal modal-type-c pos-c width-sm-11 width-md-10 height-sm-10">
-        <div class="tab tab-pos-b">
+        <div class="tab tab-pos-t">
             <div class="tab-menu" style="grid-area: a1;">
                 <a class="menu-item">Menu One</a>
                 <a class="active menu-item dir-v">
@@ -34,24 +34,36 @@
                 </a>
             </div>
             <div class="tab-body padding-xy" style="grid-area: a2;">
-                <ul class="list dir-h borders size-md">
-                    <li>
-                        <span class="list-title">Maths</span>
-                        <div class="list-body">26.9%</div>
-                    </li><li>
-                        <span class="list-title">English</span>
-                        <div class="list-body">54.19%</div>
-                    </li><li>
-                        <span class="list-title">Civics</span>
-                        <div class="list-body">0.9%</div>
-                    </li>
-                </ul>
-                <div class="card size-md shadow-sm dir-h">
-                    <div class="card-title">My Title Here</div>
-                    <img src="<?= $app->ui()->asset('/img/cross.jpg'); ?>" alt="cross" title="Cross">
-                    <div class="card-body">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                <div class="carousel">
+                    <div class="carousel-prev"></div>
+                    <div class="carousel-body shadow-sm">
+                        <div class="carousel-item active">
+                            <div class="media">
+                                <img src="/0/img/pic1.jpg" alt="pic1"/>
+                                <div class="media-caption pos-tr height-sm-12 width-md-3">
+                                    Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item">
+                            <div class="media">
+                                <img src="/0/img/pic2.jpg" alt="pic1"/>
+                                <div class="media-caption pos-l width-md-3 height-sm-12">
+                                    Fusce convallis, mauris imperdiet gravida bibendum, nisl turpis suscipit mauris, sed placerat ipsum urna sed risus. In convallis tellus a mauris. Curabitur non elit ut libero tristique sodales. Mauris a lacus. Donec mattis semper leo.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="media">
+                                <img src="/0/img/pic3.jpg" alt="pic1"/>
+                                <div class="media-caption pos-bl height-sm-3">
+                                    Fusce convallis, mauris imperdiet gravida bibendum, nisl turpis suscipit mauris, sed placerat ipsum urna sed risus. In convallis tellus a mauris. Curabitur non elit ut libero tristique sodales. Mauris a lacus. Donec mattis semper leo.
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    <div class="carousel-next"></div>
                 </div>
             </div>
         </div>
