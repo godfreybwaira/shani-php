@@ -9,6 +9,7 @@ body {
     font-weight: normal;
     line-height: 1.5;
     @extend %full_size, %spacing_0;
+    background-color: var(--primary-color);
 }
 *, *::before, *::after {
     box-sizing: border-box;
@@ -32,7 +33,7 @@ small {
     font-size: 80%;
 }
 sub,sup {
-    position: relative;
+    @extend %position_relative;
     font-size: 75%;
     line-height: 0;
     vertical-align: baseline;

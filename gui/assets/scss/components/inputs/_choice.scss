@@ -1,0 +1,33 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+@use '../../utils/callables/variables' as var;
+
+.choice-group{
+    $gap: calc(var(--spacing)/4);
+    outline: var(--thin-border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    display: grid;
+    gap: $gap;
+    padding: $gap;
+    @extend %position_relative;
+    &>*{
+        cursor: pointer;
+        @extend %padding_sm;
+        border-radius: var(--radius-sm);
+        outline: var(--thin-border);
+        &:has(:checked){
+            color: fn.getTextColor(var.$accent_color);
+            background-color: var.$accent_color;
+        }
+    }
+    &.size-sm>*{
+        @extend %font_sm;
+    }
+    input{
+        appearance: none;
+    }
+    &.dir-h{
+        grid-auto-flow: column;
+    }
+}

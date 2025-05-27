@@ -5,27 +5,27 @@
 .carousel {
     $square: fn.px2rem(40px);
     display: grid;
+    gap: var(--spacing);
     align-items: center;
     grid-auto-flow: column;
     grid-template-columns: $square 1fr $square;
     @extend %full_size;
     &-body {
-        position: relative;
         overflow: hidden;
         border-radius: var(--radius-sm);
-        @extend %full_height;
-    }
-    &-item {
-        top: 0;
-        left: 0;
-        list-style: none;
-        background-color: white;
-        @extend %full_size, %position_absolute;
-        &.active{
-            z-index: 1;
-        }
-        &:not(.active){
-            opacity: 0;
+        @extend %full_height, %position_relative;
+        &>* {
+            top: 0;
+            left: 0;
+            list-style: none;
+            background-color: var(--primary-color);
+            @extend %full_size, %position_absolute;
+            &.active{
+                z-index: 1;
+            }
+            &:not(.active){
+                opacity: 0;
+            }
         }
     }
     &-next,&-prev{
@@ -35,6 +35,8 @@
         border-radius: 50%;
         align-items: center;
         justify-items: center;
+        border: none;
+        background: none;
         &:hover{
             background-color: var(--hover-color-1);
         }

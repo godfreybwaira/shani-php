@@ -1,0 +1,16 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+@use '../../utils/callables/variables' as var;
+
+.input-mask{
+    &:after{
+        content:'';
+        top: 0;
+        left: 0;
+        @extend %position_absolute, %full_size;
+        background-color: var.$primary_color;
+    }
+    &:hover:after,&:focus:after,&:has(:focus):after{
+        transform: translateY(-100%);
+    }
+}

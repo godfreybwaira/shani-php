@@ -58,11 +58,19 @@ namespace gui\v2\containers {
             return $this;
         }
 
+        /**
+         * Get Tab body (content)
+         * @return Component
+         */
         public function getBody(): Component
         {
             return $this->body;
         }
 
+        /**
+         * Get Tab menu
+         * @return Component
+         */
         public function getMenu(): Component
         {
             return $this->menu;

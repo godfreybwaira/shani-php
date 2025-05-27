@@ -108,7 +108,7 @@ $_thin_line: fn.px2rem(1px);
         list-style-type: none;
         &>* {
             flex: 1 1 auto;
-            position: relative;
+            @extend %position_relative;
             &:before,&:after{
                 content: '';
                 @extend %position_absolute;

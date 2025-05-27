@@ -1,0 +1,25 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+
+.button {
+    border: none;
+    border-radius: var(--radius-sm);
+    &.size-sm{
+        @extend %padding_sm, %font_sm;
+    }
+    &.size-md{
+        @extend %padding_md;
+    }
+    &:hover {
+        cursor: pointer;
+        text-decoration: none;
+    }
+    &-type-1 {
+        outline: fn.px2rem(2px) solid currentColor;
+        background: none !important;
+    }
+
+    &-block {
+        @extend %full_width;
+    }
+}

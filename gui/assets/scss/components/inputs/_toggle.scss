@@ -1,0 +1,41 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+@use '../../utils/callables/variables' as var;
+
+.toggle {
+    $height: fn.px2rem(18px);
+    $width: $height * 2.4;
+
+    cursor: pointer;
+    appearance: none;
+    height: $height;
+    width: $width;
+    overflow: hidden;
+    @extend %position_relative;
+    border-radius: var(--spacing);
+    outline: fn.px2rem(1px) solid;
+    vertical-align: text-bottom;
+
+    &:before {
+        content: '';
+        height: $height * .75;
+        width: $height * .75;
+        left: calc($height * .25 /2);
+        top: calc($height * .25 /2);
+        border-radius: 50%;
+        @extend %position_absolute;
+    }
+    &:not(:checked){
+        outline-color: map-get(var.$action_colors,disable);
+        &:before{
+            background-color: map-get(var.$action_colors,disable);
+        }
+    }
+    &:checked:before{
+        left: calc($width - ($height * .75 + $height * .25 /2));
+        background-color: var(--accent-color);
+    }
+    &:checked,&:focus{
+        outline-color: var(--accent-color);
+    }
+}

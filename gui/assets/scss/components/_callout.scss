@@ -5,6 +5,6 @@
     font-style: italic;
     @extend %padding_xy,%margin_xy;
     border-radius: var(--radius-sm);
-    outline: fn.px2rem(1px) dashed #fff;
+    outline: fn.px2rem(1px) dashed var(--primary-color);
     outline-offset: calc(var(--spacing)/2 * -1);
 }

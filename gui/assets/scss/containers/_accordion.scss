@@ -8,10 +8,9 @@
     list-style-type: none;
 
     &-title{
-        @extend %padding_md;
+        @extend %padding_md, %position_relative;
         display: grid;
         font-weight: bold;
-        position: relative;
         align-items: center;
         cursor: pointer;
         &:hover{

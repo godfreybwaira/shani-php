@@ -4,7 +4,7 @@
 @use 'sass:color';
 @use 'sass:math';
 
-@mixin _createColors($colorMap, $theme_color){
+@mixin _createColors($action_colors, $theme_color){
     $median: 10;
     @for $i from 1 through 19 {
         $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
@@ -16,10 +16,13 @@
             --color-#{$i}:#{$color};
         }
     }
-    @each $name,$color in $colorMap{
+    @each $name,$color in $action_colors{
         .color-#{$name}{
             color: mix($color, #222, 5%);
             background-color: $color;
+        }
+        .color-#{$name}:hover{
+            background-color: mix($color, #222, 75%);
         }
     }
 }
@@ -94,6 +97,7 @@
     --hover-color-1: rgba(0,0,0,.27);
     --hover-color-2: var(--color-18);
     --border-color: var(--color-17);
+    --primary-color: #{var.$primary_color};
     --shadow-sm: #{map-get(var.$shadows,sm)};
     --shadow-md: #{map-get(var.$shadows,md)};
     --spacing-md: calc(var(--spacing)/2) var(--spacing);
@@ -101,7 +105,7 @@
     --radius-sm: #{map-get(var.$border_radius,sm)};
 }
 *,:before,:after{
-    transition: all var.$animation_duration;
+    transition: all .3s;
 }
 .shadow-sm{
     @extend %box_shadow_sm;
