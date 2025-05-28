@@ -45,9 +45,11 @@ sup {
     top: calc(var(--spacing) / -2);
 }
 a {
-    color: var(--color-accent);
     text-decoration: none;
     background-color: transparent;
+}
+a:hover{
+    text-decoration: underline;
 }
 pre,code,kbd,samp {
     font-family: monospace;
@@ -73,7 +75,6 @@ label,
 select,
 summary,
 textarea {
-    -ms-touch-action: manipulation;
     touch-action: manipulation;
 }
 table {

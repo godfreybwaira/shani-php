@@ -4,16 +4,15 @@
 
 .choice-group{
     $gap: calc(var(--spacing)/4);
-    outline: var(--thin-border);
     border-radius: var(--radius-sm);
+    outline: var(--thin-border);
     overflow: hidden;
     display: grid;
-    gap: $gap;
     padding: $gap;
+    gap: $gap;
     @extend %position_relative;
     &>*{
         cursor: pointer;
-        @extend %padding_sm;
         border-radius: var(--radius-sm);
         outline: var(--thin-border);
         &:has(:checked){
@@ -21,8 +20,14 @@
             background-color: var.$accent_color;
         }
     }
+    &:not(.size-sm,.size-md)>*{
+        @extend %padding_sm;
+    }
     &.size-sm>*{
-        @extend %font_sm;
+        @extend %padding_sm;
+    }
+    &.size-md>*{
+        @extend %padding_md;
     }
     input{
         appearance: none;

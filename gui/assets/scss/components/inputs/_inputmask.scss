@@ -1,14 +1,19 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
-@use '../../utils/callables/variables' as var;
 
 .input-mask{
     &:after{
-        content:'';
         top: 0;
         left: 0;
+        content: attr(data-label);
         @extend %position_absolute, %full_size;
-        background-color: var.$primary_color;
+        background-color: var(--primary-color);
+    }
+    &[data-label]{
+        &:after{
+            color: #777;
+            @extend %padding_md;
+        }
     }
     &:hover:after,&:focus:after,&:has(:focus):after{
         transform: translateY(-100%);

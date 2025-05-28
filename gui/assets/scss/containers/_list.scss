@@ -4,15 +4,14 @@
 .list {
     $list: &;
     display: grid;
-    list-style-type: none;
-    @extend %spacing_0, %full_width;
+    @extend %list_reset, %full_width;
 
     &.size-md>*{
         @extend %padding_md;
     }
 
     &.size-sm>*{
-        @extend %padding_sm, %font_sm;
+        @extend %padding_sm;
     }
 
     &>:hover:not(.active) {

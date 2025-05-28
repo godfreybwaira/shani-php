@@ -57,7 +57,7 @@ namespace gui\v2\components {
         {
             if ($this->showLabel) {
                 $label = new Component('span');
-                $label->setText($this->label)->classList->addOne('label');
+                $label->setText($this->label);
                 if ($this->icon !== null) {
                     $label->style->addOne('font-sm');
                 }

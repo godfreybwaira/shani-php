@@ -4,12 +4,7 @@
 .button {
     border: none;
     border-radius: var(--radius-sm);
-    &.size-sm{
-        @extend %padding_sm, %font_sm;
-    }
-    &.size-md{
-        @extend %padding_md;
-    }
+
     &:hover {
         cursor: pointer;
         text-decoration: none;

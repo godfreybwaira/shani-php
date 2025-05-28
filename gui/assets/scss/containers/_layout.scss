@@ -1,9 +1,87 @@
-@use '../utils/callables/extensions';
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
 
 .grid-layout{
     display: grid;
     @extend %full_size;
     &,>*{
         overflow: auto;
+    }
+}
+
+.layout{
+    &-content{
+        flex: 1;
+        z-index: -1;
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
+        background: var(--primary-color);
+    }
+    &-menu{
+        order: 1;
+        display: flex;
+        overflow-x: auto;
+        justify-content: space-between;
+        box-shadow: var(--shadow-md);
+        .menu-group{
+            display: flex;
+        }
+        .menu-item{
+            &:hover{
+                background-color: var(--hover-color-1);
+            }
+            &.active{
+                background-color: var(--faint-bg);
+                @extend %position_relative;
+                &:after{
+                    left: 0;
+                    bottom: 0;
+                    content: '';
+                    height: calc(var(--spacing)/5);
+                    background-color: currentColor;
+                    @extend %position_absolute, %full_width;
+                }
+            }
+        }
+        @include ext.media(map-get(var.$breakpoints, md)) {
+            & {
+                order: -1;
+            }
+            &,.menu-group{
+                flex-direction: column;
+            }
+            .menu-item.active:after{
+                height: 100%;
+                width: calc(var(--spacing)/5);
+            }
+        }
+    }
+    &-container{
+        display: flex;
+        @extend %full_size;
+        flex-direction: column;
+        @include ext.media(map-get(var.$breakpoints, md)) {
+            & {
+                flex-direction: row;
+            }
+        }
+    }
+}
+
+.content{
+    &-navbar{
+        display: flex;
+        justify-content: space-between;
+        background: linear-gradient(rgba(22, 22, 23, 0.25), transparent);
+        @include ext.media(map-get(var.$breakpoints, md)) {
+            &{
+                padding: var(--spacing-sm);
+            }
+        }
+    }
+    &-body{
+        flex: 1;
+        overflow-y: auto;
     }
 }

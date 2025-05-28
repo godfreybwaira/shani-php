@@ -104,10 +104,10 @@ $_thin_line: fn.px2rem(1px);
     &-menu{
         display: flex;
         overflow-x: auto;
-        @extend %spacing_0;
-        list-style-type: none;
+        @extend %list_reset;
         &>* {
             flex: 1 1 auto;
+            justify-content: center;
             @extend %position_relative;
             &:before,&:after{
                 content: '';
@@ -116,11 +116,15 @@ $_thin_line: fn.px2rem(1px);
             &.active,&:hover {
                 color: var(--theme-color);
             }
-            &.active:before{
-                background-color: var(--accent-color);
+            &.active{
+                &:before{
+                    background-color: var(--accent-color);
+                }
+                &:hover{
+                    cursor: default;
+                }
             }
             &:not(.active){
-                cursor: pointer;
                 background-color: var(--faint-bg);
                 &:after{
                     background-color: var(--border-color);

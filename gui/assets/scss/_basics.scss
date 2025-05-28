@@ -94,7 +94,7 @@
     --accent-color:#{var.$accent_color};
     --thin-border: #{fn.getBorder()};
     --faint-bg: var(--color-19);
-    --hover-color-1: rgba(0,0,0,.27);
+    --hover-color-1: rgba(0,0,0,.2);
     --hover-color-2: var(--color-18);
     --border-color: var(--color-17);
     --primary-color: #{var.$primary_color};
@@ -139,6 +139,14 @@
             background-color: var(--faint-bg);
         }
     }
+}
+
+input:invalid {
+    color: map-get(var.$action_colors,danger);
+}
+select{
+    appearance: none;
+    background: none;
 }
 @include _createSpacing(margin);
 @include _createSpacing(padding);

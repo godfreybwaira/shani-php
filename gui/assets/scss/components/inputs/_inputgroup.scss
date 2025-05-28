@@ -1,0 +1,48 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+
+.input-group{
+    display: flex;
+    overflow: hidden;
+    outline: var(--thin-border);
+    border-radius: var(--radius-sm);
+    @extend %position_relative;
+    &.size-md>*{
+        @extend %padding_md;
+    }
+    &>*{
+        border: none;
+        border-radius: 0;
+        outline: var(--thin-border);
+    }
+    &.size-md>textarea{
+        height: fn.px2rem(40px);
+        min-height: fn.px2rem(40px);
+    }
+    &>label{
+        background-color: var(--faint-bg);
+    }
+    &.dir-h>:not(select,input,textarea){
+        width: max-content;
+    }
+    select,input,textarea{
+        flex: 1;
+    }
+    select{
+        outline: none;
+    }
+    &.dir-v{
+        flex-direction: column;
+    }
+}
+.input-box{
+    $input: &;
+    border: none;
+    outline: var(--thin-border);
+    border-radius: var(--radius-sm);
+    @extend %full_width;
+}
+textarea.input-box{
+    height: fn.px2rem(40px);
+    min-height: fn.px2rem(40px);
+}

@@ -1,0 +1,18 @@
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
+
+
+.tag{
+    border-radius: map-get(var.$border_radius,lg);
+    @extend %font_sm,%padding_sm;
+    &-group{
+        display: grid;
+        overflow: hidden;
+        grid-auto-flow: column;
+        border-radius: map-get(var.$border_radius,lg);
+        &>*{
+            border-radius: 0;
+        }
+    }
+}

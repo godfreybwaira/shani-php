@@ -1,0 +1,19 @@
+@use '../utils/callables/extensions' as ext;
+
+.divider{
+    color: #777;
+    display: flex;
+    cursor: default;
+    align-items: center;
+    text-align: center;
+    @extend %margin_x,%full_width,%font_sm;
+    &:not(:empty){
+        gap: var(--spacing);
+    }
+
+    &:before,&:after{
+        flex: 1;
+        content: '';
+        border-bottom: var(--thin-border);
+    }
+}

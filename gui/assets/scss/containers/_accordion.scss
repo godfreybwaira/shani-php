@@ -4,8 +4,7 @@
 
 .accordion {
     $_angle: 45deg;
-    @extend %spacing_0;
-    list-style-type: none;
+    @extend %list_reset;
 
     &-title{
         @extend %padding_md, %position_relative;

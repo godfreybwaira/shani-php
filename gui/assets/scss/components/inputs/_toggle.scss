@@ -31,11 +31,11 @@
             background-color: map-get(var.$action_colors,disable);
         }
     }
-    &:checked:before{
-        left: calc($width - ($height * .75 + $height * .25 /2));
-        background-color: var(--accent-color);
-    }
-    &:checked,&:focus{
+    &:checked{
         outline-color: var(--accent-color);
+        &:before{
+            left: calc($width - ($height * .75 + $height * .25 /2));
+            background-color: var(--accent-color);
+        }
     }
 }

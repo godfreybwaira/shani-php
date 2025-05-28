@@ -1,0 +1,31 @@
+@use '../utils/callables/extensions' as ext;
+
+.dropdown{
+    display: inline-block;
+    @extend %position_relative;
+    &-body{
+        z-index: 1;
+        overflow: hidden;
+        min-width: max-content;
+        @extend %position_absolute,%full_width;
+        border-radius: var(--radius-sm);
+        background-color: var(--primary-color);
+        &.pos{
+            &-tl{
+                inset: auto 0 100% auto;
+            }
+            &-bl{
+                inset: auto 0 auto auto;
+            }
+            &-tr{
+                inset: auto 0 100% 0;
+            }
+            &-br{
+                inset: auto 0 auto 0;
+            }
+        }
+    }
+    &:not(:hover)>&-body {
+        display: none;
+    }
+}

@@ -1,23 +1,22 @@
 @use '../utils/callables/extensions';
 
 .menu-item {
-    @extend %center_grid, %padding_md;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    @extend %padding_md;
     &:hover{
         text-decoration: none;
     }
     &.dir{
         &-h{
-            grid-template-columns: auto 1fr;
-            gap:  var(--spacing);
+            gap: var(--spacing);
         }
         &-v{
-            grid-template-rows: auto 1fr;
+            flex-direction: column;
         }
     }
-    &>.size-md{
-        font-size: calc(var(--font-size) * 1.5);
-    }
-    &>*{
-        text-align: center;
-    }
+}
+a:not(.menu-item){
+    color: var(--theme-color);
 }

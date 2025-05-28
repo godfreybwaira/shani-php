@@ -1,0 +1,23 @@
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/extensions' as ext;
+
+.breadcrumb{
+    $size: fn.px2rem(5px);
+
+    top: 0;
+    gap: $size;
+    display: flex;
+    flex-wrap: wrap;
+    position: sticky;
+    @extend %list_reset, %font_sm;
+    background-color: var(--primary-color);
+    &>*{
+        display: flex;
+        gap: $size;
+        align-items: center;
+    }
+    &>:not(:last-child):after{
+        display: inline-block;
+        @include ext.createRightAngle($size,fn.px2rem(1px));
+    }
+}

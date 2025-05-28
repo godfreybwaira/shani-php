@@ -154,3 +154,8 @@
     color: var(--theme-text);
     background-color: var(--theme-color);
 }
+
+%list_reset{
+    @extend %spacing_0;
+    list-style-type: none;
+}
