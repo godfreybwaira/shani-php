@@ -61,16 +61,6 @@ namespace apps\demo\config {
             return true;
         }
 
-        public function breadcrumbDir(): string
-        {
-            return '/presentation/breadcrumb';
-        }
-
-        public function breadcrumbMethodsDir(): string
-        {
-            return '/function';
-        }
-
         public function languageDir(): string
         {
             return '/presentation/lang';

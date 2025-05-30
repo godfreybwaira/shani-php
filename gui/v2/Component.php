@@ -23,13 +23,11 @@ namespace gui\v2 {
         private array $children;
         private readonly string $tag;
         private ?string $content = null;
-        private ?Component $parent = null;
         private ?Animation $animation = null;
         private ?Color $color = null;
         public readonly StyleClass $classList;
         public readonly Attribute $attribute;
         public readonly InlineStyle $style;
-        private readonly string $name;
 
         /**
          * Create a representation of HTML component
@@ -41,8 +39,8 @@ namespace gui\v2 {
             $this->classList = new StyleClass();
             $this->attribute = new Attribute();
             $this->style = new InlineStyle();
-            $this->name = 'd' . substr(hrtime(true), 8);
             $this->children = [];
+            $this->attribute->addOne('id', 'd' . substr(hrtime(true), 8));
         }
 
         /**
@@ -85,12 +83,12 @@ namespace gui\v2 {
         }
 
         /**
-         * Get component unique name
+         * Get component unique id
          * @return string
          */
-        public function getUniqueName(): string
+        public function getId(): string
         {
-            return $this->name;
+            return $this->attribute->getOne('id');
         }
 
         /**
@@ -101,8 +99,7 @@ namespace gui\v2 {
          */
         public function prependChild(Component ...$children): self
         {
-            $kids = array_map(fn(Component &$child) => $child->withParent($this), $children);
-            array_unshift($this->children, ...$kids);
+            array_unshift($this->children, ...$children);
             return $this;
         }
 
@@ -115,18 +112,20 @@ namespace gui\v2 {
         public function appendChild(Component ...$children): self
         {
             foreach ($children as &$child) {
-                $this->children[] = $child->withParent($this);
+                $this->children[] = $child;
             }
             return $this;
         }
 
         /**
          * Get all children components
-         * @return array
+         * @return \Generator
          */
-        public function getChildren(): array
+        public function getChildren(): \Generator
         {
-            return $this->children;
+            foreach ($this->children as $key => $child) {
+                yield $key => $child;
+            }
         }
 
         /**
@@ -140,22 +139,17 @@ namespace gui\v2 {
         }
 
         /**
-         * Get parent of a component. If a component has no parent, null is returned
-         * @return self Parent component
-         */
-        public function getParent(): ?self
-        {
-            return $this->parent;
-        }
-
-        /**
-         * Get a copy of this component with a new parent
-         * @param Component $parent Parent component
+         * Remove child element from this component.
+         * @param callable $cb A callback function with signature <code>$cb(Component $child):bool</code>
          * @return self
          */
-        private function withParent(Component &$parent): self
+        public function removeChild(callable $cb): self
         {
-            $this->parent = $parent;
+            foreach ($this->children as $idx => $kid) {
+                if ($cb($kid)) {
+                    unset($this->children[$idx]);
+                }
+            }
             return $this;
         }
 
@@ -173,6 +167,9 @@ namespace gui\v2 {
 
         private function serializeChildren(): ?string
         {
+            if (count($this->children) === 1) {
+                return $this->children[0]->open();
+            }
             $result = null;
             foreach ($this->children as $child) {
                 $result .= $child->build();
@@ -221,6 +218,9 @@ namespace gui\v2 {
             return $this;
         }
 
+        private static $counter = 0;
+        private bool $opened = false;
+
         /**
          * Start outputting component as HTML
          * @return string HTML open tag and content (including children)
@@ -228,6 +228,10 @@ namespace gui\v2 {
          */
         public function open(): string
         {
+            if ($this->opened) {
+                return '';
+            }
+            $this->opened = true;
             if ($this->color !== null) {
                 $this->classList->addOne($this->color->value);
             }
@@ -245,19 +249,24 @@ namespace gui\v2 {
             } elseif (!empty($this->children)) {
                 return '<' . $this->tag . $this->attribute . '>' . $this->serializeChildren();
             }
-            return '<' . $this->tag . $this->attribute . '/>';
+            return '<' . $this->tag . $this->attribute . '>';
         }
 
         /**
          * Return HTML closing tag
-         * @return string Return empty string if the HTML tag is a single tag
+         * @return string Return the HTML closing tag.
          */
         public function close(): string
         {
-            if (!empty($this->content) || !empty($this->children)) {
-                return '</' . $this->tag . '>';
+            $html = '';
+            if (!$this->opened) {
+                return $html;
             }
-            return '';
+            $this->opened = false;
+            foreach ($this->children as $child) {
+                $html .= $child->close();
+            }
+            return $html . '</' . $this->tag . '>';
         }
 
         #[\Override]

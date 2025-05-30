@@ -1,16 +1,29 @@
 @use '../utils/callables/extensions';
 
+.menubar{
+    display: flex;
+    overflow-x: auto;
+    @extend %full_height;
+    &-hide-labels .menu-label{
+        display: none;
+    }
+}
+
 .menu-item {
+    flex: 1;
     display: flex;
     cursor: pointer;
+    flex-wrap: wrap;
+    text-align: center;
     align-items: center;
-    @extend %padding_md;
+    justify-content: center;
+    @extend %padding_md, %position_relative;
     &:hover{
         text-decoration: none;
     }
     &.dir{
         &-h{
-            gap: var(--spacing);
+            column-gap: var(--spacing);
         }
         &-v{
             flex-direction: column;

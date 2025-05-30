@@ -25,12 +25,14 @@ $_thin_line: fn.px2rem(1px);
     bottom: 0;
     left: 0;
 }
+
 .tab {
     $tab: &;
     display: grid;
     @extend %full_height;
     &-pos{
         &-t{
+            grid-template-areas: "tm""tb";
             grid-template-rows: auto 1fr;
             >#{$tab}-menu>*{
                 &:before{
@@ -47,6 +49,7 @@ $_thin_line: fn.px2rem(1px);
             }
         }
         &-b{
+            grid-template-areas: "tb""tm";
             grid-template-rows: 1fr auto;
             >#{$tab}-menu>*{
                 &:before{
@@ -63,6 +66,7 @@ $_thin_line: fn.px2rem(1px);
             }
         }
         &-l{
+            grid-template-areas: "tm tb";
             grid-template-columns: auto 1fr;
             >#{$tab}-menu{
                 @extend %_flex_column;
@@ -82,6 +86,7 @@ $_thin_line: fn.px2rem(1px);
             }
         }
         &-r{
+            grid-template-areas: "tb tm";
             grid-template-columns: 1fr auto;
             >#{$tab}-menu{
                 @extend %_flex_column;
@@ -102,13 +107,8 @@ $_thin_line: fn.px2rem(1px);
         }
     }
     &-menu{
-        display: flex;
-        overflow-x: auto;
-        @extend %list_reset;
-        &>* {
-            flex: 1 1 auto;
-            justify-content: center;
-            @extend %position_relative;
+        grid-area: tm;
+        &.menubar>* {
             &:before,&:after{
                 content: '';
                 @extend %position_absolute;
@@ -133,6 +133,7 @@ $_thin_line: fn.px2rem(1px);
         }
     }
     &-body{
+        grid-area: tb;
         overflow-y: auto;
     }
 }

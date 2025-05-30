@@ -14,8 +14,8 @@ namespace gui\v2\containers\modals {
     abstract class ModalWrapper extends Component
     {
 
-        private bool $wrapped = false;
         private readonly Component $wrapper;
+        private bool $opened = false;
 
         protected function __construct(string $className)
         {
@@ -32,23 +32,32 @@ namespace gui\v2\containers\modals {
          * @param bool $autoclose True to close, false to persist
          * @return self
          */
-        public function setAutoclose(bool $autoclose): self
+        public function setAutoclose(bool $autoclose = true): self
         {
             if ($autoclose) {
-                $this->wrapper->classList->delete('no-close');
+                $this->wrapper->attribute->addOne('ui-close', '#' . $this->wrapper->getId());
             } else {
-                $this->wrapper->classList->addOne('no-close');
+                $this->wrapper->attribute->delete('ui-close');
             }
             return $this;
         }
 
-        public function build(): string
+        public function open(): string
         {
-            if (!$this->wrapped) {
-                $this->wrapped = true;
-                return $this->wrapper->build();
+            if (!$this->opened) {
+                $this->opened = true;
+                return $this->wrapper->open();
             }
-            return parent::build();
+            return parent::open();
+        }
+
+        public function close(): string
+        {
+            if ($this->opened) {
+                $this->opened = false;
+                return $this->wrapper->close();
+            }
+            return parent::close();
         }
     }
 

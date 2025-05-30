@@ -10,52 +10,24 @@
 namespace gui\v2\containers {
 
     use gui\v2\Component;
-    use gui\v2\components\MenuItem;
+    use gui\v2\components\Menubar;
     use gui\v2\decorators\TabPosition;
 
     final class Tab extends Component
     {
 
-        private readonly Component $menu, $body;
+        private readonly Component $body;
+        private readonly Menubar $menubar;
 
-        public function __construct(TabPosition $pos = TabPosition::TOP)
+        public function __construct(Menubar $menubar, TabPosition $pos = TabPosition::TOP)
         {
             parent::__construct('div');
-            $this->classList->addAll(['tab', 'tab-' . $pos->value]);
+            $this->menubar = $menubar;
             $this->body = new Component();
-            $this->menu = new Component();
-            $menuName = $this->menu->getUniqueName();
-            $bodyName = $this->body->getUniqueName();
-            $this->style->addOne('grid-template-areas', self::getTemplateArea($pos, $menuName, $bodyName));
-            $this->menu->style->addOne('grid-area', $menuName);
-            $this->menu->classList->addOne('tab-menu');
-            $this->body->style->addOne('grid-area', $bodyName);
+            $this->appendChild($this->menubar);
+            $this->menubar->classList->addOne('tab-menu');
             $this->body->classList->addAll(['tab-body', 'padding-xy']);
-            $this->appendChild($this->menu);
-        }
-
-        private static function getTemplateArea(TabPosition $pos, string $menuName, string $bodyName): string
-        {
-            $area = match ($pos) {
-                TabPosition::TOP => $menuName . '""' . $bodyName,
-                TabPosition::BOTTOM => $bodyName . '""' . $menuName,
-                TabPosition::LEFT => $menuName . ' ' . $bodyName,
-                TabPosition::RIGHT => $bodyName . ' ' . $menuName,
-            };
-            return '"' . $area . '"';
-        }
-
-        /**
-         * Add a new tab as menu item
-         * @param MenuItem $item A tab
-         * @return self
-         */
-        public function addMenuItem(MenuItem ...$items): self
-        {
-            foreach ($items as $item) {
-                $this->menu->appendChild($item);
-            }
-            return $this;
+            $this->classList->addAll(['tab', 'tab-' . $pos->value]);
         }
 
         /**
@@ -69,11 +41,11 @@ namespace gui\v2\containers {
 
         /**
          * Get Tab menu
-         * @return Component
+         * @return Menubar
          */
-        public function getMenu(): Component
+        public function getMenu(): Menubar
         {
-            return $this->menu;
+            return $this->menubar;
         }
 
         public function open(): string

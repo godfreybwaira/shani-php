@@ -176,18 +176,6 @@ namespace shani\advisors {
         }
 
         /**
-         * Get a user defined breadcrumb directory.
-         * @return string Path relative to current module directory
-         */
-        public abstract function breadcrumbDir(): string;
-
-        /**
-         * Get or set user defined breadcrumb methods directory.
-         * @return string Path relative to current breadcrumb directory
-         */
-        public abstract function breadcrumbMethodsDir(): string;
-
-        /**
          * Get or set user defined view directory.
          * @return string Path relative to current module directory
          */

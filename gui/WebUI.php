@@ -170,17 +170,20 @@ namespace gui {
         }
 
         /**
-         * Create and return breadcrumb.
-         * @return string Created breadcrumb
+         * Load the default HTML layout
+         * @param string $menu Full path to HTML menu file
+         * @param string $navbar Full path to HTML navbar file
+         * @param string $body Full path to HTML body file
+         * @return void
          */
-        public function breadcrumb(): string
+        public function layout(string $menu, string $navbar, string $body): void
         {
-            $route = $this->app->request->route();
-            $bc = $route->module . $this->app->config->breadcrumbDir();
-            $str = self::loadFile($bc . $route->module);
-            $str .= self::loadFile($bc . $route->controller . $route->controller);
-            $str .= self::loadFile($bc . $route->controller . $this->app->config->breadcrumbMethodsDir() . $route->action);
-            return $str;
+            self::loadLayout($this->app, $menu, $navbar, $body);
+        }
+
+        private static function loadLayout(App &$app, string $menu_, string $navbar_, string $body_): void
+        {
+            require Framework::DIR_GUI . '/html/layout.php';
         }
 
         /**
