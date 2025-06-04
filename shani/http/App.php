@@ -503,7 +503,7 @@ namespace shani\http {
          * data exchange within application (e.g among views)
          * @return MutableMap Iterable object
          */
-        public function attributes(): MutableMap
+        public function attr(): MutableMap
         {
             return $this->appData ??= new MutableMap();
         }

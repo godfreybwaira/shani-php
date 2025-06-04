@@ -1,0 +1,36 @@
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+
+.row {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+    &-wrap {
+        flex-wrap: wrap;
+    }
+    &>.col{
+        &:not([class*=width-]) {
+            flex: 1;
+        }
+        &:not(:last-child){
+            padding-right: var(--spacing);
+        }
+    }
+    &:not(:last-child) {
+        margin-bottom: var(--spacing);
+    }
+
+    &-stretch {
+        @extend %full_height;
+
+        &>.col {
+            @extend %full_height;
+        }
+    }
+
+    @include ext.media(map-get(var.$breakpoints, md)) {
+        & {
+            flex-direction: row;
+        }
+    }
+}

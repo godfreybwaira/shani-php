@@ -1,9 +1,9 @@
 @use '../utils/callables/extensions' as ext;
-@use '../utils/callables/variables' as var;
-@use '../utils/callables/functions' as fn;
+
 .card {
     $card: &;
-    display: grid;
+    display: flex;
+    flex-flow: column;
     overflow: hidden;
     border-radius: calc(var(--spacing)/2);
     &.size-sm>&-body{
@@ -27,21 +27,5 @@
     &>img {
         aspect-ratio: 16 / 9;
         object-fit: cover;
-    }
-    @include ext.media(map-get(var.$breakpoints,lg)){
-        &.dir-h{
-            grid-auto-flow: column;
-            grid-template-areas: "img title""img body";
-            &>img{
-                height: 100%;
-                grid-area: img;
-            }
-            &>#{$card}-body{
-                grid-area: body;
-            }
-            &>#{$card}-title{
-                grid-area: title;
-            }
-        }
     }
 }

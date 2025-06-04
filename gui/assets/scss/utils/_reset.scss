@@ -77,9 +77,6 @@ summary,
 textarea {
     touch-action: manipulation;
 }
-table {
-    border-collapse: collapse;
-}
 caption {
     padding: calc(var(--spacing) * 0.75) 0;
     text-align: center;
@@ -152,7 +149,6 @@ progress {
     height: auto;
 }
 [type="search"] {
-    outline-offset: -2px;
     -webkit-appearance: none;
 }
 output {

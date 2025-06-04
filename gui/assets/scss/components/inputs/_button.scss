@@ -1,9 +1,18 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
 
+%_cross{
+    width: 55%;
+    content: '';
+    height: fn.px2rem(1px);
+    @extend %position_center;
+    background-color: currentColor;
+}
 .button {
     border: none;
-    border-radius: var(--radius-sm);
+    &:not(&-times){
+        border-radius: var(--radius-sm);
+    }
 
     &:hover {
         cursor: pointer;
@@ -16,5 +25,22 @@
 
     &-block {
         @extend %full_width;
+    }
+
+    &-times{
+        $_angle: 45deg;
+
+        width: fn.px2rem(27px);
+        height: fn.px2rem(27px);
+        @extend %position_relative, %round_corner;
+        &:before {
+            transform: rotate($_angle);
+            @extend %_cross, %position_absolute;
+        }
+
+        &:after {
+            transform: rotate(-$_angle);
+            @extend %_cross, %position_absolute;
+        }
     }
 }

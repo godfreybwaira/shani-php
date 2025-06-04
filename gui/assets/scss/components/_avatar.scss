@@ -1,0 +1,37 @@
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/extensions' as ext;
+
+.avatar{
+    overflow: hidden;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    outline: fn.px2rem(2px) solid var(--primary-color);
+    font-size: calc(var(--font-size) * 1.8);
+    @extend %round_corner;
+    &>img,&>picture{
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: 16/9;
+    }
+    &.size-sm{
+        width: calc(var(--spacing) * 2.5);
+        height: calc(var(--spacing) * 2.5);
+    }
+    &.size-md{
+        width: calc(var(--spacing) * 4);
+        height: calc(var(--spacing) * 4);
+    }
+    &-container{
+        display: flex;
+        align-items: center;
+        &>:not(:first-child){
+            margin-left: calc(var(--spacing) * -.5);
+        }
+        &>:hover{
+            z-index: 1;
+        }
+    }
+}

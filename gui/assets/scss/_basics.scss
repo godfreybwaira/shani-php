@@ -116,17 +116,20 @@
 .font-sm{
     @extend %font_sm;
 }
-.gap-sm{
-    gap: calc(var(--spacing)/2);
+.container{
+    @extend %position_relative;
 }
-.gap-md{
-    gap: var(--spacing);
+.radius-sm{
+    border-radius: var(--radius-sm);
 }
 .borders{
     border: var(--thin-border);
 }
 .border-h>:not(:first-child){
     border-top: var(--thin-border);
+}
+.hide{
+    display: none;
 }
 .stripes{
     &-even {

@@ -1,0 +1,37 @@
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/extensions' as ext;
+
+//badge container MUST have .container class
+.badge{
+    width: var(--size);
+    height: var(--size);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    outline: fn.px2rem(1px) solid var(--primary-color);
+    @extend %round_corner;
+    &.pos-tl{
+        top: calc(var(--size)/-2);
+        left: calc(var(--size)/-2);
+    }
+    &.pos-tr{
+        top: calc(var(--size)/-2);
+        right: calc(var(--size)/-2);
+    }
+    &.pos-bl{
+        bottom: calc(var(--size)/-2);
+        left: calc(var(--size)/-2);
+    }
+    &.pos-br{
+        bottom: calc(var(--size)/-2);
+        right: calc(var(--size)/-2);
+    }
+    &:not(&-empty){
+        --size: calc(var(--spacing)*1.24);
+        @extend %font_sm;
+    }
+    &-empty{
+        --size: calc(var(--spacing)*.62);
+        font-size: 0;
+    }
+}

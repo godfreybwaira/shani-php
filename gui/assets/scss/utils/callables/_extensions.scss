@@ -1,4 +1,3 @@
-
 @mixin positionItem($length, $location){
     $value: calc((100% - $length)/2);
     @if($location == center){
@@ -87,18 +86,6 @@
     padding: var(--spacing);
 }
 
-%margin_x{
-    margin: var(--spacing) 0;
-}
-
-%margin_y{
-    margin: 0 var(--spacing);
-}
-
-%margin_xy{
-    margin: var(--spacing);
-}
-
 %padding_x_sm{
     padding: calc(var(--spacing)/2) 0;
 }
@@ -109,6 +96,26 @@
 
 %padding_xy_sm{
     padding: calc(var(--spacing)/2);
+}
+
+%padding_md{
+    padding: var(--spacing-md);
+}
+
+%padding_sm{
+    padding: var(--spacing-sm);
+}
+
+%margin_x{
+    margin: var(--spacing) 0;
+}
+
+%margin_y{
+    margin: 0 var(--spacing);
+}
+
+%margin_xy{
+    margin: var(--spacing);
 }
 
 %margin_x_sm{
@@ -122,25 +129,47 @@
 %margin_xy_sm{
     margin: calc(var(--spacing)/2);
 }
-%center_grid{
-    display: grid;
-    place-items: center;
-}
-
-%padding_md{
-    padding: var(--spacing-md);
-}
-
-%padding_sm{
-    padding: var(--spacing-sm);
-}
-
 %margin_md{
     margin: var(--spacing-md);
 }
 %margin_sm{
     margin: var(--spacing-sm);
 }
+
+%gap_x{
+    gap: var(--spacing) 0;
+}
+
+%gap_y{
+    gap: 0 var(--spacing);
+}
+
+%gap_xy{
+    gap: var(--spacing);
+}
+
+%gap_x_sm{
+    gap: calc(var(--spacing)/2) 0;
+}
+
+%gap_y_sm{
+    gap: 0 calc(var(--spacing)/2);
+}
+
+%gap_xy_sm{
+    gap: calc(var(--spacing)/2);
+}
+%gap_md{
+    gap: var(--spacing-md);
+}
+%gap_sm{
+    gap: var(--spacing-sm);
+}
+%center_grid{
+    display: grid;
+    place-items: center;
+}
+
 %font_sm{
     font-size: 80%;
 }
@@ -154,8 +183,15 @@
     color: var(--theme-text);
     background-color: var(--theme-color);
 }
-
+%round_corner{
+    border-radius: 50%;
+}
 %list_reset{
     @extend %spacing_0;
     list-style-type: none;
+}
+
+%position_center{
+    inset: 0;
+    margin: auto;
 }

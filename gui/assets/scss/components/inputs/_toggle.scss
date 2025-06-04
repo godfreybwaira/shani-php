@@ -4,7 +4,9 @@
 
 .toggle {
     $height: fn.px2rem(18px);
-    $width: $height * 2.4;
+    $width: $height * 2.23;
+    $pos: calc($height * .25 /2);
+    $size: $height * .75;
 
     cursor: pointer;
     appearance: none;
@@ -18,12 +20,11 @@
 
     &:before {
         content: '';
-        height: $height * .75;
-        width: $height * .75;
-        left: calc($height * .25 /2);
-        top: calc($height * .25 /2);
-        border-radius: 50%;
-        @extend %position_absolute;
+        height: $size;
+        width: $size;
+        left: $pos;
+        top: $pos;
+        @extend %position_absolute, %round_corner;
     }
     &:not(:checked){
         outline-color: map-get(var.$action_colors,disable);
@@ -34,7 +35,7 @@
     &:checked{
         outline-color: var(--accent-color);
         &:before{
-            left: calc($width - ($height * .75 + $height * .25 /2));
+            left: calc($width - ($size + $pos));
             background-color: var(--accent-color);
         }
     }

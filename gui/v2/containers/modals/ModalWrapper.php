@@ -24,22 +24,6 @@ namespace gui\v2\containers\modals {
             $this->wrapper = new Component('div');
             $this->wrapper->classList->addOne('modal-background');
             $this->wrapper->setChild($this);
-            $this->setAutoclose(true);
-        }
-
-        /**
-         * Whether to close the modal When clicking outside
-         * @param bool $autoclose True to close, false to persist
-         * @return self
-         */
-        public function setAutoclose(bool $autoclose = true): self
-        {
-            if ($autoclose) {
-                $this->wrapper->attribute->addOne('ui-close', '#' . $this->wrapper->getId());
-            } else {
-                $this->wrapper->attribute->delete('ui-close');
-            }
-            return $this;
         }
 
         public function open(): string

@@ -1,17 +1,23 @@
 @use '../utils/callables/extensions';
 
 .table {
+    overflow: hidden;
+    border-collapse: collapse;
     &-container {
         overflow-x: auto;
         >table{
             @extend %full_width;
         }
     }
-    &.borders {
-        tr:not(:last-child)>td,th {
+    &.border-h {
+        border: var(--thin-border);
+        tr:not(:last-child) {
             border-bottom: var(--thin-border);
         }
-        td:not(:last-child) {
+    }
+    &.border-v {
+        border: var(--thin-border);
+        td:not(:last-child), th:not(:last-child) {
             border-right: var(--thin-border);
         }
     }
@@ -22,18 +28,5 @@
 
     tr:hover {
         background-color: var(--hover-color-2);
-    }
-
-    &.dir{
-        &-h{
-            tr:not(:hover):nth-of-type(2n) {
-                background-color: var(--faint-bg);
-            }
-        }
-        &-v{
-            tr:not(:hover)>td:nth-of-type(2n+1) {
-                background-color: var(--faint-bg);
-            }
-        }
     }
 }

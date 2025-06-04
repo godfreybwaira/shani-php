@@ -16,10 +16,6 @@
     left: 0;
 }
 
-%_center{
-    inset: 0;
-    margin: auto;
-}
 %_left_center{
     inset: 0;
     margin: auto 0;
@@ -62,7 +58,7 @@
         }
     }
     &-c {
-        @extend %position_absolute, %_center;
+        @extend %position_absolute, %position_center;
         &l {
             @extend %position_absolute, %_left_center;
         }

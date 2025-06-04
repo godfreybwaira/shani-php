@@ -32,11 +32,11 @@
         display: grid;
         height: $square;
         cursor: pointer;
-        border-radius: 50%;
         align-items: center;
         justify-items: center;
         border: none;
         background: none;
+        @extend %round_corner;
         &:hover{
             background-color: var(--hover-color-1);
         }

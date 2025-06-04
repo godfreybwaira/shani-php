@@ -9,12 +9,12 @@
     background-color: rgba(0,0,0,0.3);
     &:before{
         content: '';
-        border-radius: 50%;
         width: var.$spacing * 2.5;
         height: var.$spacing * 2.5;
         border: fn.px2rem(4px) solid var(--accent-color);
         border-top-color: transparent;
         border-left-color: transparent;
         animation: spin .4s linear infinite;
+        @extend %round_corner;
     }
 }

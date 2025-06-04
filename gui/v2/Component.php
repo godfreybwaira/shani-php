@@ -23,6 +23,7 @@ namespace gui\v2 {
         private array $children;
         private readonly string $tag;
         private ?string $content = null;
+        private ?Component $parent = null;
         private ?Animation $animation = null;
         private ?Color $color = null;
         public readonly StyleClass $classList;
@@ -99,7 +100,8 @@ namespace gui\v2 {
          */
         public function prependChild(Component ...$children): self
         {
-            array_unshift($this->children, ...$children);
+            $kids = array_map(fn(Component &$child) => $child->withParent($this), $children);
+            array_unshift($this->children, ...$kids);
             return $this;
         }
 
@@ -112,7 +114,7 @@ namespace gui\v2 {
         public function appendChild(Component ...$children): self
         {
             foreach ($children as &$child) {
-                $this->children[] = $child;
+                $this->children[] = $child->withParent($this);
             }
             return $this;
         }
@@ -150,6 +152,26 @@ namespace gui\v2 {
                     unset($this->children[$idx]);
                 }
             }
+            return $this;
+        }
+
+        /**
+         * Get parent of a component. If a component has no parent, null is returned
+         * @return self Parent component
+         */
+        public function getParent(): ?self
+        {
+            return $this->parent;
+        }
+
+        /**
+         * Get a copy of this component with a new parent
+         * @param Component $parent Parent component
+         * @return self
+         */
+        private function withParent(Component &$parent): self
+        {
+            $this->parent = $parent;
             return $this;
         }
 
