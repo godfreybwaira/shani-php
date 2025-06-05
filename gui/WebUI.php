@@ -171,17 +171,17 @@ namespace gui {
 
         /**
          * Load the default HTML layout
-         * @param string $menu Full path to HTML menu file
          * @param string $navbar Full path to HTML navbar file
          * @param string $body Full path to HTML body file
+         * @param string|null $menu Full path to HTML menu file
          * @return void
          */
-        public function layout(string $menu, string $navbar, string $body): void
+        public function layout(string $navbar, string $body, ?string $menu = null): void
         {
             self::loadLayout($this->app, $menu, $navbar, $body);
         }
 
-        private static function loadLayout(App &$app, string $menu_, string $navbar_, string $body_): void
+        private static function loadLayout(App &$app, ?string $menu_, string $navbar_, string $body_): void
         {
             require Framework::DIR_GUI . '/html/layout.php';
         }

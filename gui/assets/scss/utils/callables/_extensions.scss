@@ -136,35 +136,6 @@
     margin: var(--spacing-sm);
 }
 
-%gap_x{
-    gap: var(--spacing) 0;
-}
-
-%gap_y{
-    gap: 0 var(--spacing);
-}
-
-%gap_xy{
-    gap: var(--spacing);
-}
-
-%gap_x_sm{
-    gap: calc(var(--spacing)/2) 0;
-}
-
-%gap_y_sm{
-    gap: 0 calc(var(--spacing)/2);
-}
-
-%gap_xy_sm{
-    gap: calc(var(--spacing)/2);
-}
-%gap_md{
-    gap: var(--spacing-md);
-}
-%gap_sm{
-    gap: var(--spacing-sm);
-}
 %center_grid{
     display: grid;
     place-items: center;
@@ -194,4 +165,9 @@
 %position_center{
     inset: 0;
     margin: auto;
+}
+
+%center_content{
+    justify-content: center;
+    align-items: center;
 }

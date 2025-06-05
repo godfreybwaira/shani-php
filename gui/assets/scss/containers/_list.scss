@@ -6,11 +6,11 @@
     display: grid;
     @extend %list_reset, %full_width;
 
-    &.size-md>*{
+    &-md>*{
         @extend %padding_md;
     }
 
-    &.size-sm>*{
+    &-sm>*{
         @extend %padding_sm;
     }
 
@@ -20,7 +20,7 @@
     &>.active {
         @extend %theme_color;
     }
-    &.dir-v{
+    &-dir-v{
         &.borders>:not(:first-child){
             border-top: var(--thin-border);
         }
@@ -28,7 +28,7 @@
             display: block;
         }
     }
-    &.dir-h{
+    &-dir-h{
         overflow: hidden;
         grid-auto-flow: column;
         grid-auto-columns: 1fr;

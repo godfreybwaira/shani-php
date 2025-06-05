@@ -24,7 +24,7 @@ namespace gui\v2\containers\lists {
         public function __construct(Direction $dir, Size $size = Size::MEDIUM)
         {
             parent::__construct('ul');
-            $this->classList->addAll(['list', $size->value, $dir->value]);
+            $this->classList->addAll(['list', 'list-' . $size->value, 'list-' . $dir->value]);
         }
     }
 

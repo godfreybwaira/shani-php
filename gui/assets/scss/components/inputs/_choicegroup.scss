@@ -20,19 +20,19 @@
             background-color: var.$accent_color;
         }
     }
-    &:not(.size-sm,.size-md)>*{
+    &:not(&-sm,&-md)>*{
         @extend %padding_sm;
     }
-    &.size-sm>*{
+    &-sm>*{
         @extend %padding_sm;
     }
-    &.size-md>*{
+    &-md>*{
         @extend %padding_md;
     }
     input{
         appearance: none;
     }
-    &.dir-h{
+    &-dir-h{
         grid-auto-flow: column;
     }
 }

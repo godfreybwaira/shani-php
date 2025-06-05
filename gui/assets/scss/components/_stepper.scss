@@ -1,0 +1,70 @@
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
+
+.stepper{
+    $_line_width: fn.px2rem(2px);
+    --size: calc(var(--spacing) * 2.5);
+
+    text-align: center;
+    counter-reset: num;
+    @extend %list_reset;
+
+    &-dir-h {
+        display: flex;
+        overflow-x: auto;
+        &>* {
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            @extend %padding_y;
+        }
+        &>:before {
+            margin-bottom: var(--spacing);
+        }
+        &>:not(:last-child):after{
+            height: $_line_width;
+            top: calc(var(--size)/2 - $_line_width/2);
+            left: calc(50% + var(--size)/2);
+            width: calc(100% - var(--size));
+        }
+    }
+
+    &>:before {
+        counter-increment: num;
+        content: counter(num, decimal);
+        width: var(--size);
+        height: var(--size);
+        font-size: calc(var(--font-size) * 1.8);
+        outline-offset: -$_line_width;
+        @extend %round_corner;
+    }
+    &>:not(:last-child):after{
+        content:'';
+        @extend %position_absolute;
+    }
+    &-active:before{
+        background-color: var(--theme-color);
+    }
+    &-complete{
+        &:before{
+            outline: $_line_width solid var(--theme-color);
+        }
+        &:after{
+            background-color: var(--theme-color);
+        }
+    }
+    &>:not(&-complete):after{
+        background-color: var(--color-18);
+    }
+    &>:not(&-active, &-complete) {
+        color: var(--font-grey);
+        &:before {
+            background-color: var(--color-18);
+        }
+    }
+    &>* {
+        display: flex;
+        @extend %position_relative;
+    }
+}

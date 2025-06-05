@@ -3,19 +3,19 @@
 </div>
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar">
-        <a class="menu-item dir-h">
+        <a class="menu-item menu-item-dir-h">
             <i class="mdi mdi-professional-hexagon"></i>
             <span class="font-sm">Professional</span>
         </a>
-        <a class="active menu-item dir-h">
+        <a class="active menu-item menu-item-dir-h">
             <i class="mdi mdi-account-group"></i>
             <span class="font-sm">All Users</span>
         </a>
-        <a class="menu-item dir-h">
+        <a class="menu-item menu-item-dir-h">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm">Settings</span>
         </a>
-        <a class="menu-item dir-h">
+        <a class="menu-item menu-item-dir-h">
             <i class="mdi mdi-account"></i>
             <span class="font-sm">Profile</span>
         </a>
@@ -31,7 +31,7 @@
                             Guest
                         </a>
                         <div class="dropdown-body shadow-sm">
-                            <div class="list size-sm">
+                            <div class="list list-sm">
                                 <a href="#">Class 1</a>
                                 <a href="#">Class 2</a>
                             </div>
@@ -42,7 +42,7 @@
                     <div class="dropdown">
                         <a href="#">Accounts</a>
                         <div class="dropdown-body shadow-sm">
-                            <ul class="list size-sm">
+                            <ul class="list list-sm">
                                 <li><a href="#">Function 1</a></li>
                                 <li><a href="#">Function 2</a></li>
                             </ul>
@@ -66,16 +66,28 @@
             </button>
             <div class="divider color-2">Avatars</div>
             <div class="avatar-container">
-                <div class="avatar size-sm color-danger">L</div>
-                <div class="avatar size-sm">
+                <div class="avatar avatar-sm color-danger">L</div>
+                <div class="avatar avatar-sm">
                     <img src="/0/img/pic1.jpg" alt="avatar"/>
                 </div>
-                <div class="avatar size-sm color-success">M</div>
-                <div class="avatar size-sm">
+                <div class="avatar avatar-sm color-success">M</div>
+                <div class="avatar avatar-sm">
                     <img src="/0/img/pic2.jpg" alt="avatar"/>
                 </div>
-                <div class="avatar size-sm color-alert">G</div>
+                <div class="avatar avatar-sm color-alert">G</div>
             </div>
+            <div class="divider color-3">Stepper</div>
+            <ul class="stepper stepper-dir-h">
+                <li class="stepper-complete">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, recusandae, modi ad mollitia dolorum iusto delectus error molestiae eos exercitationem ipsa ut aliquid animi doloribus qui perferendis earum voluptatem facilis!
+                </li>
+                <li class="stepper-complete">
+                    Accusamus, recusandae, modi ad mollitia dolorum iusto delectus error molestiae eos exercitationem ipsa ut aliquid animi doloribus qui perferendis earum voluptatem facilis!
+                </li>
+                <li class="stepper-active">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</li>
+                <li>Step 4</li>
+                <li>Step 5</li>
+            </ul>
             <div class="divider color-2">divider</div>
             <a href="#">Link</a>
             <div class="divider color-2">divider</div>
@@ -83,7 +95,8 @@
                 <input class="toggle input-mask" type="checkbox" name="choose" id="toggle">
                 Choose Me
             </label>
-            <div class="choice-group input-mask dir-h" data-label="Choose Month">
+            <div class="divider color-3">Choice Input</div>
+            <div class="choice-group input-mask choice-group-dir-h" data-label="Choose Month">
                 <label>
                     <input class="choice" type="radio" name="choice">
                     <span>Jan</span>
@@ -118,7 +131,7 @@
                 </label>
             </div>
             <div class="margin-x">&nbsp;</div>
-            <div class="input-group size-md dir-h">
+            <div class="input-group input-group-md input-group-dir-h">
                 <label>Age</label>
                 <input type="number" name="choice">
                 <label>Email</label>
@@ -147,7 +160,7 @@
 
             </div>
             <div class="divider">divider</div>
-            <div class="input-group size-md dir-h">
+            <div class="input-group input-group-md input-group-dir-h">
                 <input placeholder="Please enter your name..." type="text" name="choice">
             </div>
             <div class="margin-x">&nbsp;</div>
@@ -210,7 +223,7 @@
                 </div>
             </div>
             <div class="divider color-2">Card</div>
-            <div class="card shadow-sm size-md">
+            <div class="card shadow-sm card-md">
                 <div class="card-title">About Card</div>
                 <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
                 <div class="card-body">
@@ -218,7 +231,7 @@
                 </div>
             </div>
             <div class="margin-x">&nbsp;</div>
-            <div class="card shadow-sm size-md dir-h">
+            <div class="card shadow-sm card-md card-dir-h">
                 <div class="card-body">
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
@@ -257,8 +270,23 @@
                 <div class="col color-8 width-md-2">Col3</div>
                 <div class="col color-12 width-md-6">Col4</div>
             </div>
+            <div class="divider color-2">Details</div>
+            <div class="details">
+                <div class="details-col">
+                    <div class="details-label width-md-1">Name:</div>
+                    <div class="details-desc">Godfrey Bwaira</div>
+                    <div class="details-label">Profession:</div>
+                    <div class="details-desc">Software Developer</div>
+                </div>
+                <div class="details-col">
+                    <div class="details-label width-md-1">Bio:</div>
+                    <div class="details-desc">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur corrupti expedita amet dolorem. Libero, dolorem, odio, laudantium et delectus omnis blanditiis vero dolores numquam voluptates quo sapiente optio fuga officiis?
+                    </div>
+                </div>
+            </div>
             <div class="divider color-2">Table</div>
-            <div class="input-group size-md dir-h">
+            <div class="input-group input-group-md input-group-dir-h">
                 <label>Search</label>
                 <input type="search" placeholder="Search..." shani-fn="filter" shani-on="input" ui-filter="#users">
                 <button shani-fn="print" shani-watcher=".table-container">

@@ -7,7 +7,7 @@
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
     @extend %position_relative;
-    &.size-md>*{
+    &-md>*{
         @extend %padding_md;
     }
     &>*{
@@ -15,14 +15,14 @@
         border-radius: 0;
         outline: var(--thin-border);
     }
-    &.size-md>textarea{
+    &-md>textarea{
         height: fn.px2rem(40px);
         min-height: fn.px2rem(40px);
     }
     &>label{
         background-color: var(--faint-bg);
     }
-    &.dir-h>:not(select,input,textarea){
+    &-dir-h>:not(select,input,textarea){
         width: max-content;
     }
     select,input,textarea{
@@ -31,7 +31,7 @@
     select{
         outline: none;
     }
-    &.dir-v{
+    &-dir-v{
         flex-direction: column;
     }
 }

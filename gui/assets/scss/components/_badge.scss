@@ -6,10 +6,8 @@
     width: var(--size);
     height: var(--size);
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
     outline: fn.px2rem(1px) solid var(--primary-color);
-    @extend %round_corner;
+    @extend %round_corner, %center_content;
     &.pos-tl{
         top: calc(var(--size)/-2);
         left: calc(var(--size)/-2);

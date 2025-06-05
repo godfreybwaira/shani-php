@@ -28,7 +28,7 @@ namespace gui\v2\components {
             $this->icon = new Component('i');
             $this->label = new Component('span');
             $this->appendChild($this->icon, $this->label);
-            $this->classList->addAll(['menu-item', $direction->value]);
+            $this->classList->addAll(['menu-item', 'menu-item-' . $direction->value]);
             $this->label->setText($hint)->classList->addOne('menu-label');
             $this->attribute->addAll(['title' => $hint, 'href' => 'javascript:;']);
         }

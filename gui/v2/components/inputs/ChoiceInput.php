@@ -15,8 +15,6 @@ namespace gui\v2\components\inputs {
     final class ChoiceInput extends Input
     {
 
-        private const CSS_CLASS = 'choice';
-
         private readonly bool $type;
         private readonly string $name;
 
@@ -31,7 +29,7 @@ namespace gui\v2\components\inputs {
             parent::__construct('div');
             $this->name = $name;
             $this->type = $multiselect ? 'checkbox' : 'radio';
-            $this->classList->addAll([self::CSS_CLASS . '-group', 'size-md', $dir->value]);
+            $this->classList->addAll(['choice-group', 'choice-md', 'choice-' . $dir->value]);
         }
 
         /**
@@ -47,7 +45,7 @@ namespace gui\v2\components\inputs {
             $span = new Component('span');
             $span->setText($label);
             $input = new Component('input');
-            $input->classList->addOne(self::CSS_CLASS);
+            $input->classList->addOne('choice');
             $input->attribute->addAll([
                 'name' => $this->name, 'type' => $this->type,
                 'value' => $value

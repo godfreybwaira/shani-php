@@ -6,16 +6,16 @@
     flex-flow: column;
     overflow: hidden;
     border-radius: calc(var(--spacing)/2);
-    &.size-sm>&-body{
+    &-sm>&-body{
         @extend %padding_xy_sm;
     }
-    &.size-sm>&-title{
+    &-sm>&-title{
         @extend %padding_xy_sm;
     }
-    &.size-md>&-body{
+    &-md>&-body{
         @extend %padding_xy;
     }
-    &.size-md>&-title{
+    &-md>&-title{
         @extend %padding_xy;
     }
     &-body{

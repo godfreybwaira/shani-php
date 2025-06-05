@@ -12,8 +12,8 @@ namespace gui\v2\decorators {
     enum Size: string
     {
 
-        case SMALL = 'size-sm';
-        case MEDIUM = 'size-md';
+        case SMALL = 'sm';
+        case MEDIUM = 'md';
     }
 
 }

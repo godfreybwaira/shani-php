@@ -19,9 +19,9 @@ namespace gui\v2\containers {
         public function __construct(Size $size = Size::MEDIUM, Direction $dir = null)
         {
             parent::__construct('div');
-            $this->classList->addAll([$size->value, 'shadow-sm']);
+            $this->classList->addAll(['card-' . $size->value, 'shadow-sm']);
             if ($dir !== null) {
-                $this->classList->addOne($dir->value);
+                $this->classList->addOne('card-' . $dir->value);
             }
         }
 

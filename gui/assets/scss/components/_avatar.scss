@@ -5,22 +5,20 @@
     overflow: hidden;
     cursor: pointer;
     display: inline-flex;
-    justify-content: center;
-    align-items: center;
     font-weight: bold;
     outline: fn.px2rem(2px) solid var(--primary-color);
     font-size: calc(var(--font-size) * 1.8);
-    @extend %round_corner;
+    @extend %round_corner, %center_content;
     &>img,&>picture{
         height: 100%;
         object-fit: cover;
         aspect-ratio: 16/9;
     }
-    &.size-sm{
+    &-sm{
         width: calc(var(--spacing) * 2.5);
         height: calc(var(--spacing) * 2.5);
     }
-    &.size-md{
+    &-md{
         width: calc(var(--spacing) * 4);
         height: calc(var(--spacing) * 4);
     }

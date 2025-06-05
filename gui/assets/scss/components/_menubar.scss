@@ -15,19 +15,15 @@
     cursor: pointer;
     flex-wrap: wrap;
     text-align: center;
-    align-items: center;
-    justify-content: center;
-    @extend %padding_md, %position_relative;
+    @extend %padding_md, %position_relative, %center_content;
     &:hover{
         text-decoration: none;
     }
-    &.dir{
-        &-h{
-            column-gap: var(--spacing);
-        }
-        &-v{
-            flex-direction: column;
-        }
+    &-dir-h{
+        column-gap: var(--spacing);
+    }
+    &-dir-v{
+        flex-direction: column;
     }
 }
 a:not(.menu-item){

@@ -1,0 +1,27 @@
+@use '../utils/callables/extensions' as ext;
+
+.details{
+    overflow: hidden;
+    outline: var(--thin-border);
+    border-radius: var(--radius-sm);
+
+    &-col{
+        display: flex;
+        flex-wrap: wrap;
+        &>*{
+            @extend %padding_md;
+            outline: var(--thin-border);
+        }
+    }
+    &-label{
+        color: var(--font-grey);
+        min-width: max-content;
+        background-color: var(--faint-bg);
+    }
+    &-desc{
+        background-color: var(--primary-color);
+        &:not([class*=width-]) {
+            flex: 1;
+        }
+    }
+}

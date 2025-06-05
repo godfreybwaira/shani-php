@@ -22,7 +22,7 @@
             background-color: $color;
         }
         .color-#{$name}:hover{
-            background-color: mix($color, #222, 75%);
+            background-color: mix($color, #222, 85%);
         }
     }
 }
@@ -89,8 +89,9 @@
 }
 :root{
     @include _createColors(var.$action_colors,var.$theme_color);
-    --font-size:#{var.$font_size};
+    --font-grey: #555;
     --spacing:#{var.$spacing};
+    --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
     --thin-border: #{fn.getBorder()};
     --faint-bg: var(--color-19);
