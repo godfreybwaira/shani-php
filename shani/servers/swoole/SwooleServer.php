@@ -18,6 +18,7 @@ namespace shani\servers\swoole {
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
+    use shani\core\Framework;
     use shani\FrameworkConfig;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
@@ -31,18 +32,24 @@ namespace shani\servers\swoole {
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private readonly Server $server;
-        private readonly FrameworkConfig $config;
         private readonly bool $forceRedirection;
+        private readonly int $httpPort, $httpsPort;
+        private readonly string $ip;
         private array $clients = [];
 
         public function __construct(FrameworkConfig $config)
         {
             self::CheckRequirements();
             $swoole = yaml_parse_file(__DIR__ . '/config.yml');
-            $this->server = new Server($config->serverIp, $config->httpPort);
-            $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
-            $this->config = $config;
             $cores = swoole_cpu_num();
+
+            $this->httpPort = $swoole['PORTS']['HTTP'];
+            $this->httpsPort = $swoole['PORTS']['HTTPS'];
+            $this->ip = $swoole['IP'];
+
+            $this->server = new Server($this->ip, $this->httpPort);
+            $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
+
             $this->server->set([
                 'package_max_length' => $config->payloadSize,
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
@@ -54,9 +61,10 @@ namespace shani\servers\swoole {
                 'http_compression_level' => 3, 'daemonize' => $swoole['RUNAS_DAEMON'],
                 'dispatch_mode' => self::SCHEDULING[$swoole['SCHEDULING_ALGORITHM']],
                 'websocket_compression' => true, 'ssl_allow_self_signed' => true,
-                'ssl_cert_file' => $config->sslCert, 'ssl_key_file' => $config->sslKey
+                'ssl_cert_file' => Framework::DIR_SSL . $swoole['SSL']['CERT'],
+                'ssl_key_file' => Framework::DIR_SSL . $swoole['SSL']['KEY']
             ]);
-            $this->server->addListener($config->serverIp, $config->httpsPort, self::SOCKET_TCP | self::SSL);
+            $this->server->addListener($this->ip, $this->httpsPort, self::SOCKET_TCP | self::SSL);
         }
 
         public static function CheckRequirements(): void
@@ -71,7 +79,7 @@ namespace shani\servers\swoole {
         {
             $this->server->on('start', fn() => $callback());
             $this->server->on('open', function (Server $server, Request $req) {
-                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
+                $scheme = $this->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
                 $this->clients[$req->fd] = self::createRequest($scheme, $req);
             });
             $this->server->on('close', function (Server $server, int $fd) {
@@ -84,13 +92,13 @@ namespace shani\servers\swoole {
         public function request(callable $callback): self
         {
             $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
-                $scheme = $this->config->httpPort === $req->server['server_port'] ? 'http' : 'https';
+                $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';
                 $request = self::createRequest($scheme, $req);
                 if ($scheme === 'https') {
                     $writer = new SwooleHttpResponseWriter($res);
                     $callback($request, $writer);
                 } elseif ($this->forceRedirection) {
-                    $uri = $request->uri->withPort($this->config->httpsPort)->withScheme('https');
+                    $uri = $request->uri->withPort($this->httpsPort)->withScheme('https');
                     $res->status(HttpStatus::MOVED_PERMANENTLY->value);
                     $res->header('location', $uri);
                     $res->end();

@@ -14,8 +14,7 @@ namespace shani {
     final class FrameworkConfig
     {
 
-        public readonly string $serverIp, $sslKey, $sslCert;
-        public readonly int $httpPort, $httpsPort, $payloadSize;
+        public readonly int $payloadSize;
         public readonly bool $showErrors;
 
         private const MB_1 = 1048576;
@@ -25,12 +24,7 @@ namespace shani {
             self::checkFrameworkRequirements();
             $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
             /////////////////////////////////////
-            $this->serverIp = $config['IP'];
-            $this->httpPort = $config['PORTS']['HTTP'];
-            $this->httpsPort = $config['PORTS']['HTTPS'];
             $this->showErrors = $config['DISPLAY_ERRORS'];
-            $this->sslCert = Framework::DIR_SSL . $config['SSL']['CERT'];
-            $this->sslKey = Framework::DIR_SSL . $config['SSL']['KEY'];
             $this->payloadSize = $config['MAX_PAYLOAD_SIZE'] * self::MB_1;
             /////////////////////////////////////
             ini_set('upload_max_filesize', $this->payloadSize);
