@@ -77,14 +77,14 @@
                 <div class="avatar avatar-sm color-alert">G</div>
             </div>
             <div class="divider color-3">Stepper</div>
-            <ul class="stepper stepper-dir-h">
-                <li class="stepper-complete">
+            <ul class="step step-dir-h">
+                <li class="step-complete">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus, recusandae, modi ad mollitia dolorum iusto delectus error molestiae eos exercitationem ipsa ut aliquid animi doloribus qui perferendis earum voluptatem facilis!
                 </li>
-                <li class="stepper-complete">
+                <li class="step-complete">
                     Accusamus, recusandae, modi ad mollitia dolorum iusto delectus error molestiae eos exercitationem ipsa ut aliquid animi doloribus qui perferendis earum voluptatem facilis!
                 </li>
-                <li class="stepper-active">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</li>
+                <li class="step-active">Lorem ipsum dolor sit amet, consectetur adipisicing elit.</li>
                 <li>Step 4</li>
                 <li>Step 5</li>
             </ul>

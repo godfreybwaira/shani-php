@@ -2,7 +2,7 @@
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/variables' as var;
 
-.stepper{
+.step{
     $_line_width: fn.px2rem(2px);
     --size: calc(var(--spacing) * 2.5);
 
@@ -31,13 +31,14 @@
     }
 
     &>:before {
+        display: flex;
         counter-increment: num;
         content: counter(num, decimal);
         width: var(--size);
         height: var(--size);
-        font-size: calc(var(--font-size) * 1.8);
+        font-size: calc(var(--font-size) * 1.6);
         outline-offset: -$_line_width;
-        @extend %round_corner;
+        @extend %round_corner, %center_content;
     }
     &>:not(:last-child):after{
         content:'';

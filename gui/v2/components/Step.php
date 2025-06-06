@@ -12,13 +12,13 @@ namespace gui\v2\components {
     use gui\v2\Component;
     use gui\v2\decorators\StepperStatus;
 
-    final class Stepper extends Component
+    final class Step extends Component
     {
 
         public function __construct()
         {
             parent::__construct('ul');
-            $this->classList->addAll(['stepper', 'stepper-dir-h']);
+            $this->classList->addAll(['step', 'step-dir-h']);
         }
 
         public function addDescription(Component $description, StepperStatus $status = null): self
@@ -26,7 +26,7 @@ namespace gui\v2\components {
             $li = new Component('li');
             $li->appendChild($description);
             if ($status !== null) {
-                $li->classList->addOne('stepper-' . $status->value);
+                $li->classList->addOne('step-' . $status->value);
             }
             return $this->appendChild($li);
         }
