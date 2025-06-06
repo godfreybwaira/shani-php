@@ -49,7 +49,7 @@ namespace shani\core {
             $this->activeEnv = $config['ACTIVE_ENVIRONMENT'];
             $this->configFile = $this->env[$this->activeEnv];
             $this->running = $config['RUNNING'];
-            $this->cache = $config['CACHE'];
+            $this->cache = $config['CACHE_CONFIG'];
         }
     }
 

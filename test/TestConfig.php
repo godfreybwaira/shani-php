@@ -32,7 +32,7 @@ namespace test {
                 self::removeBackupFile($source, $destination);
                 throw new \Exception('Could not start a test.');
             }
-            $content['CACHE'] = false;
+            $content['CACHE_CONFIG'] = false;
             $content['ACTIVE_ENVIRONMENT'] = $params['env'];
             $vhost = new VirtualHost($content);
             self::removeBackupFile($source, $destination);

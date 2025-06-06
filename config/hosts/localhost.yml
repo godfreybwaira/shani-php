@@ -9,4 +9,4 @@ ACTIVE_ENVIRONMENT: DEV
 # Whether an application is able to run or not
 RUNNING: true
 # Whether to cache these configurations in memory or not
-CACHE: true
+CACHE_CONFIG: true
