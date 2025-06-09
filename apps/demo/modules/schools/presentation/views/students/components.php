@@ -60,7 +60,8 @@
                 <a href="#" class="tag color-disable">Disabled</a>
             </div>
             <div class="margin-x">&nbsp;</div>
-            <button class="button color-theme padding-md container">
+            <button class="button color-theme padding-md container" shani-fn="fs"
+                    shani-css="200:add disable,404:remove disable" shani-target=".table-container,.accordion">
                 Click Me
                 <span class="badge color-danger pos-tr badge-empty">9+</span>
             </button>
