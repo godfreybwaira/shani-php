@@ -1,10 +1,18 @@
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+@use 'sass:color';
 
 .callout {
     font-style: italic;
     @extend %padding_xy,%margin_xy;
     border-radius: var(--radius-sm);
-    outline: fn.px2rem(1px) dashed var(--primary-color);
-    outline-offset: calc(var(--spacing)/2 * -1);
+    border-left: fn.px2rem(5px) solid currentColor;
+    @each $name,$color in var.$action_colors{
+        &-#{$name}{
+            color: color.mix(#000,$color,55%);
+            background-color: color.scale($color,$lightness: 70%);
+        }
+    }
+
 }

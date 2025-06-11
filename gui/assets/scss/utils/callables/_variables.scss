@@ -1,10 +1,11 @@
 @use 'functions' as fn;
 @use 'sass:math';
+@use 'sass:color';
 
 $font_size: 1rem;
 $spacing: 1rem;
 $theme_color: #007bff;
-$primary_color: #fff;
+$primary_color: color.mix($theme_color,#fff,1.5%);
 
 $action_colors: (
 'success': #2eb85c,

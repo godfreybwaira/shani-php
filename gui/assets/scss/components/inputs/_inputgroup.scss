@@ -27,6 +27,7 @@
     }
     select,input,textarea{
         flex: 1;
+        background-color: var(--primary-color);
     }
     select{
         outline: none;
@@ -40,6 +41,7 @@
     border: none;
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
+    background-color: var(--primary-color);
     @extend %full_width;
 }
 textarea.input-box{

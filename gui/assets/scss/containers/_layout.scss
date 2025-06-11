@@ -1,5 +1,6 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
+@use '../utils/callables/functions' as fn;
 
 .grid-layout{
     display: grid;
@@ -27,7 +28,7 @@
         display: flex;
         overflow-y: auto;
         flex-direction: column;
-        background: var(--primary-color);
+        background-color: var(--primary-color);
     }
     &-menu{
         order: 1;
@@ -38,7 +39,8 @@
                 background-color: var(--hover-color-1);
             }
             &.active{
-                background-color: var(--faint-bg);
+                color: fn.getTextColor(var.$primary_color);
+                background-color: var.$primary_color;
                 &:after{
                     left: 0;
                     bottom: 0;

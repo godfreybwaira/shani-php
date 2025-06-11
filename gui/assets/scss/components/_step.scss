@@ -45,7 +45,8 @@
         @extend %position_absolute;
     }
     &-active:before{
-        background-color: var(--theme-color);
+        color: fn.getTextColor(var.$theme_color);
+        background-color: var.$theme_color;
     }
     &-complete{
         &:before{

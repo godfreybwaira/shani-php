@@ -2,7 +2,7 @@
     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sit, at, esse magnam quaerat recusandae cum necessitatibus nemo praesentium assumenda suscipit velit harum omnis exercitationem unde fuga modi rem! Natus, esse.
 </div>
 <div class="tab tab-pos-b">
-    <div class="tab-menu menubar">
+    <div class="tab-menu menubar" shani-fn="select" shani-class="active blur">
         <a class="menu-item menu-item-dir-h">
             <i class="mdi mdi-professional-hexagon"></i>
             <span class="font-sm">Professional</span>
@@ -59,8 +59,14 @@
                 <a href="#" class="tag color-success">Tag line</a>
                 <a href="#" class="tag color-disable">Disabled</a>
             </div>
+            <div class="divider color-2">Callout</div>
+            <div class="callout callout-alert">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui, harum dolorem odio debitis nemo a autem enim maxime sunt maiores esse reiciendis nisi magnam adipisci hic ducimus earum molestiae commodi.</div>
+            <div class="callout callout-disable">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui, harum dolorem odio debitis nemo a autem enim maxime sunt maiores esse reiciendis nisi magnam adipisci hic ducimus earum molestiae commodi.</div>
+            <div class="callout callout-info">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui, harum dolorem odio debitis nemo a autem enim maxime sunt maiores esse reiciendis nisi magnam adipisci hic ducimus earum molestiae commodi.</div>
+            <div class="callout callout-danger">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui, harum dolorem odio debitis nemo a autem enim maxime sunt maiores esse reiciendis nisi magnam adipisci hic ducimus earum molestiae commodi.</div>
+            <div class="callout callout-success">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Qui, harum dolorem odio debitis nemo a autem enim maxime sunt maiores esse reiciendis nisi magnam adipisci hic ducimus earum molestiae commodi.</div>
             <div class="margin-x">&nbsp;</div>
-            <button class="button color-theme padding-md container" shani-fn="fs"
+            <button class="button color-theme padding-md container" shani-fn="print"
                     shani-css="200:add disable,404:remove disable" shani-target=".table-container,.accordion">
                 Click Me
                 <span class="badge color-danger pos-tr badge-empty">9+</span>
@@ -167,7 +173,7 @@
             <div class="margin-x">&nbsp;</div>
             <input class="input-box padding-md" placeholder="Please enter your name..." type="text" name="choice">
             <div class="divider color-2">Accordion</div>
-            <ul class="accordion borders border-h radius-sm" ui-collapse>
+            <ul class="accordion borders border-h radius-sm" shani-fn="toggle" shani-class="active blur">
                 <li>
                     <span class="accordion-title">My Title</span>
                     <div class="accordion-body">
@@ -289,8 +295,8 @@
             <div class="divider color-2">Table</div>
             <div class="input-group input-group-md input-group-dir-h">
                 <label>Search</label>
-                <input type="search" placeholder="Search..." shani-fn="filter" shani-on="input" ui-filter="#users">
-                <button shani-fn="print" shani-watcher=".table-container">
+                <input type="search" placeholder="Search..." shani-fn="search" shani-on="input" shani-target="#users">
+                <button shani-fn="print" shani-target=".table-container">
                     <i class="mdi mdi-printer"></i> Print
                 </button>
             </div>

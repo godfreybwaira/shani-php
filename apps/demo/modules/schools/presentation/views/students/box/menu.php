@@ -1,4 +1,4 @@
-<div class="menubar color-theme">
+<div class="menubar color-theme" shani-fn="select" shani-class="active">
     <a class="menu-item menu-item-dir-v">
         <i class="mdi mdi-professional-hexagon"></i>
         <span class="font-sm menu-label">Professional</span>
