@@ -6,7 +6,7 @@
     width: var(--size);
     height: var(--size);
     display: inline-flex;
-    outline: fn.px2rem(1px) solid var(--primary-color);
+    outline: fn.px2rem(1px) solid var(--bg-color);
     @extend %round_corner, %center_content;
     &.pos-tl{
         top: calc(var(--size)/-2);

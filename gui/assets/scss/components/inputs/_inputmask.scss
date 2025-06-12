@@ -7,7 +7,7 @@
         left: 0;
         content: attr(data-label);
         @extend %position_absolute, %full_size;
-        background-color: var(--primary-color);
+        background-color: var(--bg-color);
     }
     &[data-label]{
         &:after{

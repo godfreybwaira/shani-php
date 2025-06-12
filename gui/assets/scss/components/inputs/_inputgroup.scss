@@ -20,14 +20,14 @@
         min-height: fn.px2rem(40px);
     }
     &>label{
-        background-color: var(--faint-bg);
+        background-color: var(--fg-color-1);
     }
     &-dir-h>:not(select,input,textarea){
         width: max-content;
     }
     select,input,textarea{
         flex: 1;
-        background-color: var(--primary-color);
+        background-color: var(--bg-color);
     }
     select{
         outline: none;
@@ -41,7 +41,7 @@
     border: none;
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
-    background-color: var(--primary-color);
+    background-color: var(--bg-color);
     @extend %full_width;
 }
 textarea.input-box{

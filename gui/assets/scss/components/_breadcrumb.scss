@@ -10,7 +10,7 @@
     flex-wrap: wrap;
     position: sticky;
     @extend %list_reset, %font_sm;
-    background-color: var(--primary-color);
+    background-color: var(--bg-color);
     &>*{
         display: flex;
         gap: $size;

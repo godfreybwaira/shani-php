@@ -4,8 +4,11 @@
 
 $font_size: 1rem;
 $spacing: 1rem;
-$theme_color: #007bff;
-$primary_color: color.mix($theme_color,#fff,1.5%);
+$accent_color: #007bff;
+$bg_color: white;
+$fg_color_1: color.scale($bg_color,$lightness:-10%);
+$fg_color_2: color.scale($bg_color,$lightness:-2%);
+$fg_border_color: color.scale($bg_color,$lightness:-20%);
 
 $action_colors: (
 'success': #2eb85c,
@@ -20,7 +23,6 @@ $grid_colmns: 12;
 $breakpoints: ('sm':0,'md':36rem,'lg':48rem);
 // $breakpoints: ('xs':0,'sm':36rem,'md':48rem,'lg':62rem,'xl':75rem);
 $z_index: ('xs': 1,'sm': 50,'md': 100,'lg': 200);
-$accent_color: $theme_color;
 
 $animation_duration: 0.35s;
 $animation_timing: ease-in;

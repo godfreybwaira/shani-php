@@ -2,7 +2,7 @@
 @use '../utils/callables/variables' as var;
 
 .modal{
-    background-color: var(--primary-color);
+    background-color: var(--bg-color);
     overflow: hidden;
     &-background{
         top: 0;

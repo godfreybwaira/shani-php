@@ -4,10 +4,10 @@
 @use 'sass:color';
 @use 'sass:math';
 
-@mixin _createColors($action_colors, $theme_color){
+@mixin _createColors($action_colors, $accent_color){
     $median: 10;
     @for $i from 1 through 19 {
-        $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
+        $color: color.scale($accent_color, $lightness: ($i - $median) * 10%);
         @if($i == $median){
             --theme-color:#{$color};
             --theme-text: #{fn.getTextColor($color)};
@@ -27,10 +27,10 @@
     }
 }
 
-@mixin _createThemeColors($theme_color){
+@mixin _createAccentColors($accent_color){
     $median: 10;
     @for $i from 1 through 19 {
-        $color: color.scale($theme_color, $lightness: ($i - $median) * 10%);
+        $color: color.scale($accent_color, $lightness: ($i - $median) * 10%);
         @if($i == $median){
             .color-theme,.color-theme-hover:hover{
                 @extend %theme_color;
@@ -88,17 +88,18 @@
     }
 }
 :root{
-    @include _createColors(var.$action_colors,var.$theme_color);
+    @include _createColors(var.$action_colors,var.$accent_color);
     --font-grey: #555;
     --spacing:#{var.$spacing};
     --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
     --thin-border: #{fn.getBorder()};
-    --faint-bg: var(--color-19);
+    --fg-color-1: #{var.$fg_color_1};
+    --fg-color-2: #{var.$fg_color_2};
     --hover-color-1: rgba(0,0,0,.2);
     --hover-color-2: var(--color-18);
-    --border-color: var(--color-17);
-    --primary-color: #{var.$primary_color};
+    --border-color: #{var.$fg_border_color};
+    --bg-color: #{var.$bg_color};
     --shadow-sm: #{map-get(var.$shadows,sm)};
     --shadow-md: #{map-get(var.$shadows,md)};
     --spacing-md: calc(var(--spacing)/2) var(--spacing);
@@ -135,12 +136,12 @@
 .stripes{
     &-even {
         &>:not(:hover,.active):nth-of-type(2n) {
-            background-color: var(--faint-bg);
+            background-color: var(--fg-color-1);
         }
     }
     &-odd {
         &>:not(:hover,.active):nth-of-type(2n+1) {
-            background-color: var(--faint-bg);
+            background-color: var(--fg-color-1);
         }
     }
 }
@@ -154,5 +155,5 @@ select{
 }
 @include _createSpacing(margin);
 @include _createSpacing(padding);
-@include _createThemeColors(var.$theme_color);
+@include _createAccentColors(var.$accent_color);
 @include _createColumns(var.$breakpoints,var.$grid_colmns);

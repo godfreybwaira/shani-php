@@ -16,10 +16,10 @@
     &-label{
         color: var(--font-grey);
         min-width: max-content;
-        background-color: var(--faint-bg);
+        background-color: var(--fg-color-1);
     }
     &-desc{
-        background-color: var(--primary-color);
+        background-color: var(--bg-color);
         &:not([class*=width-]) {
             flex: 1;
         }

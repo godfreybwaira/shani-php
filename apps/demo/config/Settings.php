@@ -33,7 +33,7 @@ namespace apps\demo\config {
 
         public function home(): string
         {
-            return '/schools/0/students/1/index';
+            return '/shani/0/components/0/all';
         }
 
         public function appStorage(): string
@@ -79,7 +79,7 @@ namespace apps\demo\config {
 
         public function accessibleByPublic(): bool
         {
-            return in_array($this->app->request->route()->module, ['/schools']);
+            return in_array($this->app->request->route()->module, ['/schools', '/shani']);
         }
 
         public static function runTest(): TestResult

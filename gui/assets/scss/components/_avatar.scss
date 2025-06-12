@@ -6,7 +6,7 @@
     cursor: pointer;
     display: inline-flex;
     font-weight: bold;
-    outline: fn.px2rem(2px) solid var(--primary-color);
+    outline: fn.px2rem(2px) solid var(--bg-color);
     font-size: calc(var(--font-size) * 1.6);
     @extend %round_corner, %center_content;
     &>img,&>picture{

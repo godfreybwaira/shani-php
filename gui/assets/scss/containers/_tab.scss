@@ -125,7 +125,7 @@ $_thin_line: fn.px2rem(1px);
                 }
             }
             &:not(.active){
-                background-color: var(--faint-bg);
+                background-color: var(--fg-color-1);
                 &:after{
                     background-color: var(--border-color);
                 }

@@ -9,7 +9,7 @@ body {
     font-weight: normal;
     line-height: 1.5;
     @extend %full_size, %spacing_0;
-    background-color: var(--primary-color);
+    background-color: var(--bg-color);
 }
 *, *::before, *::after {
     box-sizing: border-box;

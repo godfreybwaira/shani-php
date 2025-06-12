@@ -18,7 +18,7 @@
             top: 0;
             left: 0;
             list-style: none;
-            background-color: var(--primary-color);
+            background-color: var(--bg-color);
             @extend %full_size, %position_absolute;
             &.active{
                 z-index: 1;
