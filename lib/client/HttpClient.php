@@ -508,7 +508,7 @@ namespace lib\client {
         {
             $this->stream = $destination . '/' . $filename;
             $this->streamMode = 'a+b';
-            if (is_file($destination)) {
+            if (is_readable($destination)) {
                 $this->setOptions([CURLOPT_RESUME_FROM => filesize($destination)]);
             }
             if ($progress !== null) {

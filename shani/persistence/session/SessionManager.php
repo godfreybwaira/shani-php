@@ -19,17 +19,18 @@ namespace shani\persistence\session {
          * @var SessionStorage
          */
         public readonly SessionStorage $storage;
-        private readonly App $app;
-        private readonly ?string $filepath;
         private readonly \DateTimeInterface $age;
+        private ?string $filepath = null;
+        private readonly App $app;
 
         public function __construct(App &$app)
         {
             $this->app = $app;
             $this->age = $app->config->cookieMaxAge();
-            $this->filepath = $this->createSavePath();
-            if ($this->filepath !== null && is_file($this->filepath)) {
-                $content = file_get_contents($this->filepath);
+            $path = $this->createSavePath();
+            if ($path !== null && is_readable($path)) {
+                $this->filepath = $path;
+                $content = file_get_contents($path);
                 $this->storage = SessionStorage::fromJson($content);
             } else {
                 $now = time();
@@ -64,7 +65,7 @@ namespace shani\persistence\session {
                 return $path . '/' . $oldId;
             }
             $newId = sha1(random_bytes(random_int(20, 70)));
-            if (is_file($path . '/' . $oldId)) {
+            if (is_readable($path . '/' . $oldId)) {
                 rename($path . '/' . $oldId, $path . '/' . $newId);
             }
             $this->sendCookie($name, $newId);
@@ -77,7 +78,7 @@ namespace shani\persistence\session {
          */
         public function stop(): void
         {
-            if ($this->filepath !== null && is_file($this->filepath)) {
+            if ($this->filepath !== null && is_readable($this->filepath)) {
                 unlink($this->filepath);
             }
             $this->storage->clear();

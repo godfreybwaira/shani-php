@@ -133,7 +133,7 @@ namespace shani\http {
          */
         public function stream(string $filepath, int $chunkSize = Framework::BUFFER_SIZE): self
         {
-            if (!is_file($filepath)) {
+            if (!is_readable($filepath)) {
                 throw CustomException::notFound($this);
             }
             $file = stat($filepath);
@@ -387,11 +387,11 @@ namespace shani\http {
             return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
         }
 
-        private function classPath(string $method): string
+        private function getClassPath(): string
         {
             $class = Framework::DIRNAME_APPS . $this->config->root();
             $class .= $this->config->moduleDir() . $this->request->route()->module;
-            $class .= $this->config->controllers() . '/' . ($method !== 'head' ? $method : 'get');
+            $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
             return $class . '/' . str_replace('-', '', ucwords(substr($this->request->route()->controller, 1), '-'));
         }
 
@@ -411,7 +411,7 @@ namespace shani\http {
          */
         public function processRequest(): void
         {
-            $classPath = $this->classPath($this->request->method);
+            $classPath = $this->getClassPath();
             if (!is_file(SERVER_ROOT . $classPath . '.php')) {
                 throw CustomException::notFound($this);
             }

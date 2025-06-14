@@ -45,7 +45,7 @@ namespace shani\http {
             return $this;
         }
 
-        private function setProperContentType()
+        private function setProperContentType(): void
         {
             $type = $this->app->request->header()->getOne(HttpHeader::ACCEPT);
             if ($type === '*/*' || $type === null) {

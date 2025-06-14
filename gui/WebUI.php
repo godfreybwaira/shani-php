@@ -26,8 +26,9 @@ namespace gui {
         public function __construct(App &$app)
         {
             $this->app = $app;
+            $this->title = null;
             $this->scripts = $this->styles = [];
-            $this->title = $this->icon = null;
+            $this->icon = '<link rel="icon" href="data:,">';
             $this->style('/css/main.css');
             $this->style('/css/icons/mdi.css');
             $this->script('/js/ui.js', ['defer']);

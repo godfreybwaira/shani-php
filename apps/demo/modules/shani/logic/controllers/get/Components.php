@@ -28,6 +28,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function all()
         {
+            $this->app->ui()->description('Shani web framework')->title('Home Page');
             return $this->app->render();
         }
 

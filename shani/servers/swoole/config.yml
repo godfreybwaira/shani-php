@@ -10,8 +10,8 @@ SSL:
   CERT: "/server.crt"
 # SCHEDULING_ALGORITHM: "ROUND_ROBIN, FIXED, PREEMPTIVE, IPMOD. When ENABLE_HTTP2
 # is true, scheduling algorithm MUST be either FIXED or IPMOD"
-SCHEDULING_ALGORITHM: "PREEMPTIVE"
-ENABLE_HTTP2: false
+SCHEDULING_ALGORITHM: "FIXED"
+ENABLE_HTTP2: true
 # maximum number of concurrent connections
 MAX_CONNECTIONS: 1024
 # maximum number of requests a worker process should execute before it is

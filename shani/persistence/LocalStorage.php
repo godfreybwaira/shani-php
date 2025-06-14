@@ -176,7 +176,7 @@ namespace shani\persistence {
         public function delete(string $filepath): self
         {
             $path = $this->pathTo($filepath);
-            if (is_file($path)) {
+            if (is_readable($path)) {
                 unlink($path);
             }
             return $this;
