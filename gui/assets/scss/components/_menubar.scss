@@ -19,7 +19,7 @@
     &:hover{
         text-decoration: none;
     }
-    &-dir-h{
+    &:not(&-dir-v){
         column-gap: var(--spacing);
     }
     &-dir-v{

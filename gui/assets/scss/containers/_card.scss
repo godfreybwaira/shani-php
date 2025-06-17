@@ -1,31 +1,30 @@
 @use '../utils/callables/extensions' as ext;
+@use '../utils/callables/functions' as fn;
 
 .card {
     $card: &;
     display: flex;
-    flex-flow: column;
     overflow: hidden;
-    border-radius: calc(var(--spacing)/2);
-    &-sm>&-body{
-        @extend %padding_xy_sm;
-    }
-    &-sm>&-title{
-        @extend %padding_xy_sm;
-    }
-    &-md>&-body{
-        @extend %padding_xy;
-    }
-    &-md>&-title{
-        @extend %padding_xy;
+    outline: var(--thin-border);
+    border-radius: calc(var(--spacing)/3);
+    @extend %full_height;
+    &:not(&-dir-h){
+        flex-flow: column;
     }
     &-body{
-        text-align: justify;
+        flex: 1;
+        overflow-y: auto;
+        @extend %padding_xy;
+        &>#{$card}-title{
+            margin-bottom: var(--spacing);
+        }
     }
     &-title{
+        @extend %padding_xy;
         font-weight: bold;
     }
     &>img {
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 16/9;
         object-fit: cover;
     }
 }

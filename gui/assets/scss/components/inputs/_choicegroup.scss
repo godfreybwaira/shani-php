@@ -11,6 +11,9 @@
     padding: $gap;
     gap: $gap;
     @extend %position_relative;
+    &:has(:focus){
+        outline-color: var(--accent-color);
+    }
     &>*{
         cursor: pointer;
         border-radius: var(--radius-sm);
@@ -20,19 +23,16 @@
             background-color: var.$accent_color;
         }
     }
-    &:not(&-sm,&-md)>*{
+    &:not(&-sm)>*{
         @extend %padding_sm;
     }
     &-sm>*{
-        @extend %padding_sm;
-    }
-    &-md>*{
-        @extend %padding_md;
+        padding: calc(var(--spacing-sm)/2);
     }
     input{
         appearance: none;
     }
-    &-dir-h{
+    &:not(&-dir-v){
         grid-auto-flow: column;
     }
 }

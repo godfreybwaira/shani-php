@@ -19,7 +19,7 @@ namespace shani\exceptions {
         public static function notFound(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::NOT_FOUND);
-            return new ClientException($message ?? 'File or resource not found');
+            return new ClientException($message ?? 'Resource not found');
         }
 
         public static function badRequest(App &$app, string $message = null): ClientException
@@ -56,7 +56,7 @@ namespace shani\exceptions {
         public static function offline(App &$app, string $message = null): ServerException
         {
             $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-            return new ServerException($message ?? 'Server is offline');
+            return new ServerException($message ?? HttpStatus::SERVICE_UNAVAILABLE->getMessage());
         }
 
         public static function sessionExpired(App &$app, string $message = null): ClientException

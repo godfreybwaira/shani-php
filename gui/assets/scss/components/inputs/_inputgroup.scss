@@ -7,8 +7,14 @@
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
     @extend %position_relative;
-    &-md>*{
+    &:has(:focus){
+        outline-color: var(--accent-color);
+    }
+    &:not(&-sm)>*{
         @extend %padding_md;
+    }
+    &-sm>*{
+        @extend %padding_sm;
     }
     &>*{
         border: none;
@@ -22,9 +28,6 @@
     &>label{
         background-color: var(--fg-color-1);
     }
-    &-dir-h>:not(select,input,textarea){
-        width: max-content;
-    }
     select,input,textarea{
         flex: 1;
         background-color: var(--bg-color);
@@ -32,19 +35,28 @@
     select{
         outline: none;
     }
-    &-dir-v{
-        flex-direction: column;
-    }
 }
 .input-box{
-    $input: &;
     border: none;
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
     background-color: var(--bg-color);
     @extend %full_width;
+    &:not(&-sm){
+        @extend %padding_md;
+    }
+    &-sm{
+        @extend %padding_sm;
+    }
+    &:focus{
+        outline-color: var(--accent-color);
+    }
 }
 textarea.input-box{
     height: fn.px2rem(40px);
     min-height: fn.px2rem(40px);
+}
+input::file-selector-button{
+    border: none;
+    background: none;
 }

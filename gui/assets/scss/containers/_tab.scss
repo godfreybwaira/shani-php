@@ -29,6 +29,8 @@ $_thin_line: fn.px2rem(1px);
 .tab {
     $tab: &;
     display: grid;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
     @extend %full_height;
     &-pos{
         &-t{
@@ -135,5 +137,6 @@ $_thin_line: fn.px2rem(1px);
     &-body{
         grid-area: tb;
         overflow-y: auto;
+        @extend %padding_xy;
     }
 }

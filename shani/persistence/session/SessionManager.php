@@ -65,7 +65,7 @@ namespace shani\persistence\session {
                 return $path . '/' . $oldId;
             }
             $newId = sha1(random_bytes(random_int(20, 70)));
-            if (is_readable($path . '/' . $oldId)) {
+            if ($oldId !== null && is_readable($path . '/' . $oldId)) {
                 rename($path . '/' . $oldId, $path . '/' . $newId);
             }
             $this->sendCookie($name, $newId);

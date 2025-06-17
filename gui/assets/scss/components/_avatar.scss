@@ -2,25 +2,19 @@
 @use '../utils/callables/extensions' as ext;
 
 .avatar{
-    overflow: hidden;
     cursor: pointer;
-    display: inline-flex;
+    overflow: hidden;
     font-weight: bold;
+    display: inline-flex;
     outline: fn.px2rem(2px) solid var(--bg-color);
     font-size: calc(var(--font-size) * 1.6);
     @extend %round_corner, %center_content;
+    width: calc(var(--spacing) * 2.5);
+    height: calc(var(--spacing) * 2.5);
     &>img,&>picture{
         height: 100%;
         object-fit: cover;
         aspect-ratio: 16/9;
-    }
-    &-sm{
-        width: calc(var(--spacing) * 2.5);
-        height: calc(var(--spacing) * 2.5);
-    }
-    &-md{
-        width: calc(var(--spacing) * 4);
-        height: calc(var(--spacing) * 4);
     }
     &-container{
         display: flex;

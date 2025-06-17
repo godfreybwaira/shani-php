@@ -121,6 +121,9 @@
 .container{
     @extend %position_relative;
 }
+.full-size{
+    @extend %full_size;
+}
 .radius-sm{
     border-radius: var(--radius-sm);
 }
@@ -130,8 +133,18 @@
 .border-h>:not(:first-child){
     border-top: var(--thin-border);
 }
+.border-v>:not(:last-child){
+    border-right: var(--thin-border);
+}
 .hide{
     display: none;
+}
+.justify-right{
+    display: grid;
+    justify-content: right;
+}
+.justify-center>*{
+    margin: 0 auto;
 }
 .stripes{
     &-even {

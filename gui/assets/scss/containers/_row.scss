@@ -3,7 +3,12 @@
 
 .row {
     display: flex;
-    flex-direction: column;
+    &:not(&-static){
+        flex-direction: column;
+    }
+    &-static{
+        flex-direction: row;
+    }
     &-wrap {
         flex-wrap: wrap;
     }
@@ -28,7 +33,7 @@
     }
 
     @include ext.media(map-get(var.$breakpoints, md)) {
-        & {
+        &:not(&-static){
             flex-direction: row;
         }
     }

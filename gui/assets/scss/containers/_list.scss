@@ -4,9 +4,11 @@
 .list {
     $list: &;
     display: grid;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
     @extend %list_reset, %full_width;
 
-    &-md>*{
+    &:not(&-sm)>*{
         @extend %padding_md;
     }
 
@@ -20,6 +22,14 @@
     &>.active {
         @extend %theme_color;
     }
+    &-title{
+        display: block;
+        font-weight: bold;
+    }
+    &-body{
+        color: #333;
+        @extend %font_sm;
+    }
     &-dir-v{
         &.borders>:not(:first-child){
             border-top: var(--thin-border);
@@ -28,23 +38,14 @@
             display: block;
         }
     }
-    &-dir-h{
-        overflow: hidden;
+    &:not(&-dir-v){
         grid-auto-flow: column;
         grid-auto-columns: 1fr;
-        border-radius: var(--radius-sm);
         &.borders>:not(:last-child){
             border-right: var(--thin-border);
         }
-        #{$list}-title{
-            display: block;
-            font-weight: bold;
+        #{$list}-title,#{$list}-body{
             text-align: center;
-        }
-        #{$list}-body{
-            color: #333;
-            text-align: center;
-            @extend %font_sm;
         }
     }
 }

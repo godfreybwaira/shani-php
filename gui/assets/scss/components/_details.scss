@@ -5,7 +5,7 @@
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
 
-    &-col{
+    &-row{
         display: flex;
         flex-wrap: wrap;
         &>*{
