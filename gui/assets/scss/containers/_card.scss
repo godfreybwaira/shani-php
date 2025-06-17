@@ -1,5 +1,4 @@
 @use '../utils/callables/extensions' as ext;
-@use '../utils/callables/functions' as fn;
 
 .card {
     $card: &;
