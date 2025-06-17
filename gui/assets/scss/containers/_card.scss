@@ -14,14 +14,18 @@
     &-body{
         flex: 1;
         overflow-y: auto;
-        @extend %padding_xy;
         &>#{$card}-title{
             margin-bottom: var(--spacing);
         }
     }
     &-title{
-        @extend %padding_xy;
         font-weight: bold;
+    }
+    &>&-title{
+        @extend %padding_xy;
+    }
+    &>&-body{
+        @extend %padding_xy;
     }
     &>img {
         aspect-ratio: 16/9;
