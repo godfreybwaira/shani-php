@@ -133,9 +133,6 @@
 .border-h>:not(:first-child){
     border-top: var(--thin-border);
 }
-.border-v>:not(:last-child){
-    border-right: var(--thin-border);
-}
 .hide{
     display: none;
 }

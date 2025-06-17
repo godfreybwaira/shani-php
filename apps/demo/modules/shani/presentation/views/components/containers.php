@@ -374,7 +374,7 @@
     </div>
     <div class="col">
         <div class="table-container">
-            <table class="table border-h border-v">
+            <table class="table border-h">
                 <caption>Users</caption>
                 <thead>
                     <tr>
@@ -436,24 +436,6 @@
                     <li>
                         <a href="#" class="list-title">5,028hrs</a>
                         <div class="list-body">Up Time</div>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                <ul class="list border-v">
-                    <li>
-                        <div class="list-body">Total Users</div>
-                        <a href="#" class="list-title">20,020</a>
-                    </li>
-                    <li>
-                        <div class="list-body">Average System Usage</div>
-                        <a href="#" class="list-title">50.03%</a>
-                    </li>
-                    <li>
-                        <div class="list-body">Up Time</div>
-                        <a href="#" class="list-title">5,028hrs</a>
                     </li>
                 </ul>
             </div>
