@@ -34,21 +34,16 @@
         order: 1;
         z-index: 1;
         box-shadow: var(--shadow-md);
-        .menu-item{
-            &:hover{
-                background-color: var(--hover-color-1);
-            }
-            &.active{
-                color: fn.getTextColor(var.$bg_color);
-                background-color: var.$bg_color;
-                &:after{
-                    left: 0;
-                    bottom: 0;
-                    content: '';
-                    height: calc(var(--spacing)/5);
-                    background-color: currentColor;
-                    @extend %position_absolute, %full_width;
-                }
+        .menu-item.active{
+            color: fn.getTextColor(var.$bg_color);
+            background-color: var.$bg_color;
+            &:after{
+                left: 0;
+                bottom: 0;
+                content: '';
+                height: calc(var(--spacing)/5);
+                background-color: currentColor;
+                @extend %position_absolute, %full_width;
             }
         }
         @include ext.media(map-get(var.$breakpoints, md)) {

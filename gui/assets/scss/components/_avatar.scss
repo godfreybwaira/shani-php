@@ -6,6 +6,7 @@
     overflow: hidden;
     font-weight: bold;
     display: inline-flex;
+    vertical-align: middle;
     outline: fn.px2rem(2px) solid var(--bg-color);
     font-size: calc(var(--font-size) * 1.6);
     @extend %round_corner, %center_content;
@@ -16,7 +17,10 @@
         object-fit: cover;
         aspect-ratio: 16/9;
     }
-    &-container{
+    &:hover{
+        text-decoration: none;
+    }
+    &-group{
         display: flex;
         align-items: center;
         &>:not(:first-child){

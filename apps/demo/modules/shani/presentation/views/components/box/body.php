@@ -17,5 +17,5 @@
             <span class="font-sm">Profile</span>
         </a>
     </div>
-    <div class="tab-body padding-xy"></div>
+    <div class="tab-body"></div>
 </div>

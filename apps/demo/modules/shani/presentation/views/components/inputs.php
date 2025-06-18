@@ -1,5 +1,5 @@
 <div class="divider">Buttons</div>
-<div class="row">
+<div class="row row-no-gap row-stretch">
     <div class="col">
         <button class="button color-theme">
             Simple Button
@@ -27,7 +27,7 @@
     </div>
 </div>
 <div class="divider">Toggle Buttons</div>
-<div class="row">
+<div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
             <input class="toggle" type="checkbox">
@@ -42,7 +42,7 @@
     </div>
 </div>
 <div class="divider">Choice inputs</div>
-<div class="row">
+<div class="row row-no-gap row-stretch">
     <div class="col">
         <label>Multi-select Input</label>
         <div class="choice-group">
@@ -88,7 +88,7 @@
     </div>
 </div>
 <div class="divider">Input Groups</div>
-<div class="row">
+<div class="row row-no-gap row-stretch">
     <div class="col width-sm-4">
         <label class="font-sm">Your Website</label>
         <div class="input-group">
@@ -107,7 +107,7 @@
         </div>
     </div>
 </div>
-<div class="row">
+<div class="row row-no-gap row-stretch">
     <div class="col width-sm-4">
         <label>Single Input Box</label>
         <div class="input-group">

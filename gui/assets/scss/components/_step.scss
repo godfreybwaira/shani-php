@@ -10,7 +10,7 @@
     counter-reset: num;
     @extend %list_reset;
 
-    &-dir-h {
+    &:not(&-dir-v) {
         display: flex;
         overflow-x: auto;
         &>* {

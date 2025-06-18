@@ -7,7 +7,7 @@
         z-index: 1;
         overflow: hidden;
         min-width: max-content;
-        @extend %position_absolute,%full_width;
+        @extend %position_absolute,%full_width,%box_shadow_sm;
         border-radius: var(--radius-sm);
         background-color: var(--bg-color);
         &.pos{

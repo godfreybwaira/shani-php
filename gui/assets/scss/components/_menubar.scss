@@ -12,12 +12,17 @@
 .menu-item {
     flex: 1;
     display: flex;
-    cursor: pointer;
     flex-wrap: wrap;
     text-align: center;
     @extend %padding_md, %position_relative, %center_content;
     &:hover{
         text-decoration: none;
+        &:not(.active){
+            background-color: var(--hover-color-1);
+        }
+    }
+    &.active{
+        cursor: default;
     }
     &:not(&-dir-v){
         column-gap: var(--spacing);

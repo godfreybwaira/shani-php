@@ -17,5 +17,7 @@
             <span class="font-sm">Profile</span>
         </a>
     </div>
-    <div class="tab-body" id="content"></div>
+    <div class="tab-body" id="content">
+        <?php $app->ui()->import($app->view('/all')); ?>
+    </div>
 </div>

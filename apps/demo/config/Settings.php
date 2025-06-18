@@ -33,7 +33,7 @@ namespace apps\demo\config {
 
         public function home(): string
         {
-            return '/shani/0/components/0/all';
+            return '/shani/0/components/0/index';
         }
 
         public function appStorage(): string

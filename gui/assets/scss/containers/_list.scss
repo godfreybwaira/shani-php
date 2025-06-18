@@ -30,22 +30,22 @@
         color: #333;
         @extend %font_sm;
     }
-    &-dir-v{
-        &.borders>:not(:first-child){
-            border-top: var(--thin-border);
+    &-dir-h{
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        #{$list}-title,#{$list}-body{
+            text-align: center;
         }
         >*{
             display: block;
         }
-    }
-    &:not(&-dir-v){
-        grid-auto-flow: column;
-        grid-auto-columns: 1fr;
         &.borders>:not(:last-child){
             border-right: var(--thin-border);
         }
-        #{$list}-title,#{$list}-body{
-            text-align: center;
+    }
+    &:not(&-dir-h){
+        &.borders>:not(:first-child){
+            border-top: var(--thin-border);
         }
     }
 }

@@ -5,7 +5,7 @@
             Shani v2.0.0 <i class="mdi mdi-chevron-down"></i>
         </span>
     </a>
-    <div class="dropdown-body shadow-sm">
+    <div class="dropdown-body">
         <ul class="list">
             <li><a href="#">Sometime this could be a long sentence</a></li>
             <li><a href="#">Module 2</a></li>

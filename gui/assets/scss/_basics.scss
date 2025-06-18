@@ -21,9 +21,6 @@
             color: mix($color, #222, 5%);
             background-color: $color;
         }
-        .color-#{$name}:hover{
-            background-color: mix($color, #222, 85%);
-        }
     }
 }
 

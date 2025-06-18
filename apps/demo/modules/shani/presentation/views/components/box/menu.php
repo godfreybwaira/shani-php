@@ -1,5 +1,5 @@
 <div class="menubar color-theme" shani-fn="select" shani-class="active">
-    <a href="/shani/0/components" shani-header="x-request-mode:async" shani-fn="r" shani-on="click load" shani-target="#content" class="menu-item menu-item-dir-v">
+    <a href="/shani/0/components/0/all" shani-header="x-request-mode:async" shani-fn="r" shani-on="click" shani-target="#content" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-tab"></i>
         <span class="font-sm menu-label">Components</span>
     </a>

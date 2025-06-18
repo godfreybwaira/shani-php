@@ -96,7 +96,7 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="justify-center">
-    <div class="carousel width-sm-7">
+    <div class="carousel width-md-7 width-sm-12">
         <button class="carousel-prev"></button>
         <div class="carousel-body">
             <div class="media">
@@ -123,7 +123,7 @@
 </div>
 <div class="divider">Vertical Cards</div>
 <div class="row">
-    <div class="col width-sm-3">
+    <div class="col width-md-3 width-sm-12">
         <div class="card">
             <div class="card-title">About Card</div>
             <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
@@ -132,7 +132,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-3">
+    <div class="col width-md-3 width-sm-12">
         <div class="card">
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -141,7 +141,7 @@
             <div class="card-title">About Card</div>
         </div>
     </div>
-    <div class="col width-sm-3">
+    <div class="col width-md-3 width-sm-12">
         <div class="card">
             <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
             <div class="card-title">About Card</div>
@@ -150,7 +150,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-3">
+    <div class="col width-md-3 width-sm-12">
         <div class="card">
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -188,32 +188,54 @@
     </div>
 </div>
 <div class="divider">Rows</div>
-<div class="row row-wrap color-danger">
+<div class="row">
     <div class="col color-4 width-md-6">Col1</div>
     <div class="col color-8 width-md-6">Col2</div>
 </div>
-<div class="row row-wrap color-danger">
-    <div class="col color-4">Col1</div>
-    <div class="col color-8">Col2</div>
-    <div class="col color-12">Col3</div>
-</div>
-<div class="row row-wrap color-danger">
+<div class="row">
     <div class="col color-4 width-md-4">Col1</div>
     <div class="col color-16 width-md-4">Col2</div>
     <div class="col color-12 width-md-4">Col3</div>
 </div>
-<div class="row row-wrap color-danger">
+<div class="row">
     <div class="col color-4 width-md-3">Col1</div>
     <div class="col color-16 width-md-3">Col2</div>
     <div class="col color-8 width-md-3">Col3</div>
     <div class="col color-12 width-md-3">Col4</div>
 </div>
-<div class="row row-wrap color-danger">
+<div class="row">
     <div class="col color-4 width-md-3">Col1</div>
     <div class="col color-16 width-md-3">Col2</div>
     <div class="col color-12 width-md-6">Col3</div>
 </div>
-<div class="row row-wrap color-danger">
+<div class="row">
+    <div class="col color-4 width-md-2">Col1</div>
+    <div class="col color-16 width-md-2">Col2</div>
+    <div class="col color-8 width-md-2">Col3</div>
+    <div class="col color-12 width-md-6">Col4</div>
+</div>
+<div class="divider">Form Rows</div>
+<div class="row row-no-gap row-stretch">
+    <div class="col color-4 width-md-6">Col1</div>
+    <div class="col color-8 width-md-6">Col2</div>
+</div>
+<div class="row row-no-gap row-stretch">
+    <div class="col color-4 width-md-4">Col1</div>
+    <div class="col color-16 width-md-4">Col2</div>
+    <div class="col color-12 width-md-4">Col3</div>
+</div>
+<div class="row row-no-gap row-stretch">
+    <div class="col color-4 width-md-3">Col1</div>
+    <div class="col color-16 width-md-3">Col2</div>
+    <div class="col color-8 width-md-3">Col3</div>
+    <div class="col color-12 width-md-3">Col4</div>
+</div>
+<div class="row row-no-gap row-stretch">
+    <div class="col color-4 width-md-3">Col1</div>
+    <div class="col color-16 width-md-3">Col2</div>
+    <div class="col color-12 width-md-6">Col3</div>
+</div>
+<div class="row row-no-gap row-stretch">
     <div class="col color-4 width-md-2">Col1</div>
     <div class="col color-16 width-md-2">Col2</div>
     <div class="col color-8 width-md-2">Col3</div>
@@ -236,7 +258,7 @@
 </div>
 <div class="divider">Horizontal Tabs</div>
 <div class="row">
-    <div class="col width-sm-6">
+    <div class="col width-md-6 width-sm-12">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -257,7 +279,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-6">
+    <div class="col width-md-6 width-sm-12">
         <div class="tab tab-pos-b borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item">
@@ -281,7 +303,7 @@
 </div>
 <div class="divider">Vertical Tabs</div>
 <div class="row">
-    <div class="col width-sm-6">
+    <div class="col width-md-6 width-sm-12">
         <div class="tab tab-pos-l borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -302,7 +324,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-6">
+    <div class="col width-md-6 width-sm-12">
         <div class="tab tab-pos-r borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item">
@@ -325,7 +347,7 @@
     </div>
 </div>
 <div class="divider">Tables</div>
-<div class="row">
+<div class="row row-stretch">
     <div class="col">
         <div class="table-container">
             <table class="table border-v">
@@ -421,10 +443,10 @@
 </div>
 <div class="divider">Lists</div>
 <div class="row">
-    <div class="col width-sm-6">
+    <div class="col width-sm-12 width-md-6">
         <div class="row">
             <div class="col">
-                <ul class="list borders">
+                <ul class="list list-dir-h borders">
                     <li>
                         <a href="#" class="list-title">20,020</a>
                         <div class="list-body">Total Users</div>
@@ -442,10 +464,10 @@
         </div>
     </div>
     <div class="col width-sm-12 width-md-6">
-        <ul class="list list-dir-v borders">
+        <ul class="list borders">
             <li>
-                <div class="row row-static">
-                    <div class="col width-md-1 width-sm-2">
+                <div class="row row-no-wrap">
+                    <div class="col">
                         <div class="avatar">
                             <img src="/0/img/pic1.jpg" alt="photo"/>
                         </div>
@@ -457,8 +479,8 @@
                 </div>
             </li>
             <li>
-                <div class="row row-static">
-                    <div class="col width-md-1 width-sm-2">
+                <div class="row row-no-wrap">
+                    <div class="col">
                         <span class="avatar color-alert">A</span>
                     </div>
                     <div class="col">
@@ -468,8 +490,8 @@
                 </div>
             </li>
             <li>
-                <div class="row row-static">
-                    <div class="col width-md-1 width-sm-2">
+                <div class="row row-no-wrap">
+                    <div class="col">
                         <div class="avatar">
                             <img src="/0/img/pic2.jpg" alt="photo"/>
                         </div>
@@ -485,10 +507,11 @@
 </div>
 <div class="divider">Modals</div>
 <ul>
-    <li><a href="/shani/0/components/0/modals?type=c" shani-fn="r" shani-target="#modals">Type C</a></li>
-    <li><a href="/shani/0/components/0/modals?type=vr" shani-fn="r" shani-target="#modals">Type VR</a></li>
-    <li><a href="/shani/0/components/0/modals?type=vl" shani-fn="r" shani-target="#modals">Type VL</a></li>
-    <li><a href="/shani/0/components/0/modals?type=ht" shani-fn="r" shani-target="#modals">Type HT</a></li>
-    <li><a href="/shani/0/components/0/modals?type=hb" shani-fn="r" shani-target="#modals">Type HB</a></li>
+    <li><a href="/shani/0/components/0/modals?type=c" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type C</a></li>
+    <li><a href="/shani/0/components/0/modals?type=cl" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type C With layout</a></li>
+    <li><a href="/shani/0/components/0/modals?type=vr" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type VR</a></li>
+    <li><a href="/shani/0/components/0/modals?type=vl" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type VL</a></li>
+    <li><a href="/shani/0/components/0/modals?type=ht" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type HT</a></li>
+    <li><a href="/shani/0/components/0/modals?type=hb" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type HB</a></li>
 </ul>
 <div id="modals"></div>

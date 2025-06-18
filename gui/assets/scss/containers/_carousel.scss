@@ -5,7 +5,6 @@
 .carousel {
     $square: fn.px2rem(40px);
     display: grid;
-    gap: var(--spacing);
     align-items: center;
     grid-auto-flow: column;
     grid-template-columns: $square 1fr $square;

@@ -29,6 +29,10 @@
         <div class="modal modal-type-h height-sm-4 pos-b">
             <button shani-fn="close" class="button color-danger" shani-target=".modal-background">Close</button>
         </div>
+    <?php elseif ($app->request->query->getOne('type') === 'cl'): ?>
+        <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
+            <?php $app->ui()->layout($app->view('/box/modal_nav'), $app->view('/body'), $app->view('/box/menu')); ?>
+        </div>
     <?php else: ?>
         Not available!
     <?php endif; ?>

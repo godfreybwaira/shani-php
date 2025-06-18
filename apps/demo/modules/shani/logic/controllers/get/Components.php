@@ -23,12 +23,12 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function index()
         {
+            $this->app->ui()->description('Shani web framework')->title('Home Page');
             return $this->app->render();
         }
 
         public function all()
         {
-            $this->app->ui()->description('Shani web framework')->title('Home Page');
             return $this->app->render();
         }
 
@@ -43,6 +43,11 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         }
 
         public function modals()
+        {
+            return $this->app->render();
+        }
+
+        public function toaster()
         {
             return $this->app->render();
         }

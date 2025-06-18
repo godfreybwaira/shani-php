@@ -122,9 +122,6 @@ $_thin_line: fn.px2rem(1px);
                 &:before{
                     background-color: var(--accent-color);
                 }
-                &:hover{
-                    cursor: default;
-                }
             }
             &:not(.active){
                 background-color: var(--fg-color-1);

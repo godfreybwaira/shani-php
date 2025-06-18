@@ -3,38 +3,35 @@
 
 .row {
     display: flex;
-    &:not(&-static){
+    &:not(&-no-wrap){
+        gap: var(--spacing) 0;
         flex-direction: column;
     }
-    &-static{
-        flex-direction: row;
-    }
-    &-wrap {
-        flex-wrap: wrap;
-    }
     &>.col{
-        &:not([class*=width-]) {
-            flex: 1;
-        }
-        &:not(:last-child){
-            padding-right: var(--spacing);
-        }
+        max-height: 100%;
     }
-    &:not(:last-child) {
+    &-no-wrap{
+        gap: 0 var(--spacing);
+    }
+    &:not(:last-child){
         margin-bottom: var(--spacing);
     }
-
-    &-stretch {
-        @extend %full_height;
-
-        &>.col {
-            @extend %full_height;
-        }
+    &:not(&-stretch)>.col:not([class*=width-]) {
+        max-width: max-content;
+    }
+    &-stretch>.col:not([class*=width-]) {
+        flex: 1;
     }
 
     @include ext.media(map-get(var.$breakpoints, md)) {
-        &:not(&-static){
+        &:not(&-no-wrap){
             flex-direction: row;
+        }
+        &:not(&-no-gap){
+            gap: 0 var(--spacing);
+        }
+        &-no-gap>.col:not(:last-child){
+            padding-right: var(--spacing);
         }
     }
 }
