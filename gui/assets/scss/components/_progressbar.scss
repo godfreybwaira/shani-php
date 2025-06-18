@@ -1,4 +1,16 @@
+@use '../utils/callables/extensions';
+@use '../utils/callables/variables' as var;
 
 .progress{
-
+    border:none;
+    display: flex;
+    min-height: calc(var(--spacing)/2);
+    @extend %font_sm, %center_content;
+    &-bar{
+        overflow: hidden;
+        background-color: rgba(90,90,90,.25);
+    }
+    &,&-bar{
+        border-radius: map-get(var.$border_radius,lg);
+    }
 }

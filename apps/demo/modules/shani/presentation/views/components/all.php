@@ -9,12 +9,16 @@
     </div>
 </div>
 <div class="divider">Pill Group</div>
-<div class="pill-group">
-    <a href="#" class="pill color-alert">My awesome pill</a>
-    <a href="#" class="pill color-danger">awesome pill</a>
-    <a href="#" class="pill color-info">My pill</a>
-    <a href="#" class="pill color-success">pill line</a>
-    <a href="#" class="pill color-disable">Disabled</a>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="pill-group">
+            <a href="#" class="pill color-alert">My awesome pill</a>
+            <a href="#" class="pill color-danger">awesome pill</a>
+            <a href="#" class="pill color-info">My pill</a>
+            <a href="#" class="pill color-success">pill line</a>
+            <a href="#" class="pill color-disable">Disabled</a>
+        </div>
+    </div>
 </div>
 <div class="divider">Dropdown Menu</div>
 <div class="row row-stretch">
@@ -69,6 +73,58 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+<div class="divider">Progress Bars</div>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="progress-bar">
+            <div class="progress color-danger" style="width: 34%">34%</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress-bar">
+            <div class="progress color-success" style="width: 23%"></div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="progress-bar">
+            <div class="progress color-danger" style="width: 42%"></div>
+            <div class="progress color-success" style="width: 51%"></div>
+        </div>
+    </div>
+</div>
+<div class="divider">Breadcrumb</div>
+<div class="row row-stretch">
+    <div class="col">
+        <ul class="breadcrumb">
+            <li><a href="/"><i class="mdi mdi-home"></i></a></li>
+            <li>
+                <div class="dropdown">
+                    <a href="#">
+                        Guest
+                    </a>
+                    <div class="dropdown-body">
+                        <div class="list list-sm">
+                            <a href="#">Class 1</a>
+                            <a href="#">Class 2</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="dropdown">
+                    <a href="#">Accounts</a>
+                    <div class="dropdown-body">
+                        <ul class="list list-sm">
+                            <li><a href="#">Function 1</a></li>
+                            <li><a href="#">Function 2</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </li>
+            <li title="You are here"><b>Home</b></li>
+        </ul>
     </div>
 </div>
 <div class="divider">Callout</div>
