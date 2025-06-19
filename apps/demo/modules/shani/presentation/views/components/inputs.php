@@ -13,7 +13,7 @@
             Button Block
         </button>
     </div>
-    <div class="col width-sm-3">
+    <div class="col width-sm-max width-md-max">
         <button class="button color-theme container">
             Button with empty Badge
             <span class="badge color-danger pos-tr badge-empty">9+</span>
@@ -60,7 +60,7 @@
             </label>
         </div>
     </div>
-    <div class="col width-sm-3">
+    <div class="col width-sm-max width-md-3">
         <label>Single-select Input</label>
         <div class="choice-group">
             <label>
@@ -89,7 +89,7 @@
 </div>
 <div class="divider">Input Groups</div>
 <div class="row row-no-gap row-stretch">
-    <div class="col width-sm-4">
+    <div class="col width-sm-max width-md-4">
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
@@ -97,7 +97,7 @@
             <label>.com</label>
         </div>
     </div>
-    <div class="col width-sm-8">
+    <div class="col width-md-8 width-sm-max">
         <label class="font-sm">Login</label>
         <div class="input-group">
             <label>Username</label>
@@ -108,17 +108,17 @@
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
-    <div class="col width-sm-4">
+    <div class="col width-sm-max width-md-4">
         <label>Single Input Box</label>
         <div class="input-group">
             <input placeholder="Please enter your name..." type="text" name="name">
         </div>
     </div>
-    <div class="col width-sm-4">
+    <div class="col width-sm-max width-md-4">
         <label>Simple Input Box</label>
         <input class="input-box" placeholder="Please enter your location..." type="text" name="location">
     </div>
-    <div class="col width-sm-4">
+    <div class="col width-sm-max width-md-4">
         <label>Simple File Input</label>
         <div class="input-group">
             <label>Photo</label>
