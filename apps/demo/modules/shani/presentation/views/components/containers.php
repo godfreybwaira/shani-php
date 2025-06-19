@@ -96,7 +96,7 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="justify-center">
-    <div class="carousel width-md-7 width-sm-12">
+    <div class="carousel width-md-7 width-sm-max">
         <button class="carousel-prev"></button>
         <div class="carousel-body">
             <div class="media">
@@ -107,13 +107,13 @@
             </div>
             <div class="media active">
                 <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt="">
-                <div class="media-caption pos-l width-sm-4 height-sm-12">
+                <div class="media-caption pos-l width-sm-4 height-sm-max">
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
             </div>
             <div class="media">
                 <img src="<?= $app->ui()->asset('/img/pic3.jpg'); ?>" alt="">
-                <div class="media-caption pos-r width-sm-4 height-sm-12">
+                <div class="media-caption pos-r width-sm-4 height-sm-max">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
                 </div>
             </div>
@@ -123,7 +123,7 @@
 </div>
 <div class="divider">Vertical Cards</div>
 <div class="row">
-    <div class="col width-md-3 width-sm-12">
+    <div class="col width-md-3 width-sm-max">
         <div class="card">
             <div class="card-title">About Card</div>
             <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
@@ -132,7 +132,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-3 width-sm-12">
+    <div class="col width-md-3 width-sm-max">
         <div class="card">
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -141,7 +141,7 @@
             <div class="card-title">About Card</div>
         </div>
     </div>
-    <div class="col width-md-3 width-sm-12">
+    <div class="col width-md-3 width-sm-max">
         <div class="card">
             <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
             <div class="card-title">About Card</div>
@@ -150,7 +150,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-3 width-sm-12">
+    <div class="col width-md-3 width-sm-max">
         <div class="card">
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -258,7 +258,7 @@
 </div>
 <div class="divider">Horizontal Tabs</div>
 <div class="row">
-    <div class="col width-md-6 width-sm-12">
+    <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -279,7 +279,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-6 width-sm-12">
+    <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-b borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item">
@@ -303,7 +303,7 @@
 </div>
 <div class="divider">Vertical Tabs</div>
 <div class="row">
-    <div class="col width-md-6 width-sm-12">
+    <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-l borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -324,7 +324,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-6 width-sm-12">
+    <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-r borders">
             <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
                 <a href="#" class="active menu-item">
@@ -443,7 +443,7 @@
 </div>
 <div class="divider">Lists</div>
 <div class="row">
-    <div class="col width-sm-12 width-md-6">
+    <div class="col width-sm-max width-md-6">
         <div class="row">
             <div class="col">
                 <ul class="list list-dir-h borders">
@@ -463,7 +463,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-12 width-md-6">
+    <div class="col width-sm-max width-md-6">
         <ul class="list borders">
             <li>
                 <div class="row row-no-wrap">

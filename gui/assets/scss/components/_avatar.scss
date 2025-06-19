@@ -10,8 +10,9 @@
     outline: fn.px2rem(2px) solid var(--bg-color);
     font-size: calc(var(--font-size) * 1.6);
     @extend %round_corner, %center_content;
-    width: calc(var(--spacing) * 2.5);
-    height: calc(var(--spacing) * 2.5);
+    --size:2.5rem;
+    width: var(--size);
+    height: var(--size);
     &>img,&>picture{
         height: 100%;
         object-fit: cover;

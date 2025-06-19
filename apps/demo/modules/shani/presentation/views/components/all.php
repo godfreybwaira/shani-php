@@ -78,20 +78,24 @@
 <div class="divider">Progress Bars</div>
 <div class="row row-stretch">
     <div class="col">
+        <div class="progress-bar" style="--size:3rem">
+            <div class="progress" style="--progress: 70%;" data-value="70%"></div>
+        </div>
         <div class="progress-bar">
-            <div class="progress color-danger" style="width: 34%">34%</div>
+            <div class="progress" style="--progress: 30%;--color:green" data-value="30%"></div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress" style="--progress: 49%;--color:red" data-value="49%"></div>
         </div>
     </div>
+</div>
+<div class="divider">Progress Circles</div>
+<div class="row">
     <div class="col">
-        <div class="progress-bar">
-            <div class="progress color-success" style="width: 23%"></div>
-        </div>
+        <div class="progress-circle font-sm" data-value="10%" style="--progress: 10%;"></div>
     </div>
     <div class="col">
-        <div class="progress-bar">
-            <div class="progress color-danger" style="width: 42%"></div>
-            <div class="progress color-success" style="width: 51%"></div>
-        </div>
+        <div class="progress-circle" data-value="25%" style="--progress: 25%;--size:5rem;--color:red"></div>
     </div>
 </div>
 <div class="divider">Breadcrumb</div>
@@ -140,15 +144,15 @@
 <div class="divider">Avatars</div>
 <div class="row">
     <div class="col">
-        <a href="#" class="avatar avatar-sm color-danger">L</a>
+        <a href="#" class="avatar avatar-sm color-danger" style="--size:2rem">L</a>
         <a href="#" class="avatar avatar-sm">
-            <img src="/0/img/pic1.jpg" alt="avatar"/>
+            <img src="/0/img/pic1.jpg"/>
         </a>
-        <a href="#" class="avatar avatar-sm color-success">M</a>
-        <a href="#" class="avatar avatar-sm">
-            <img src="/0/img/pic2.jpg" alt="avatar"/>
+        <a href="#" class="avatar avatar-sm color-success" style="--size:3rem">M</a>
+        <a href="#" class="avatar avatar-sm" style="--size:3.5rem">
+            <img src="/0/img/pic2.jpg"/>
         </a>
-        <a href="#" class="avatar avatar-sm color-alert">G</a>
+        <a href="#" class="avatar avatar-sm color-alert" style="--size:4rem">G</a>
     </div>
 </div>
 <div class="divider">Avatar Group</div>
@@ -157,11 +161,11 @@
         <div class="avatar-group">
             <div class="avatar avatar-sm color-danger">L</div>
             <div class="avatar avatar-sm">
-                <img src="/0/img/pic1.jpg" alt="avatar"/>
+                <img src="/0/img/pic1.jpg"/>
             </div>
             <div class="avatar avatar-sm color-success">M</div>
             <div class="avatar avatar-sm">
-                <img src="/0/img/pic2.jpg" alt="avatar"/>
+                <img src="/0/img/pic2.jpg"/>
             </div>
             <div class="avatar avatar-sm color-alert">G</div>
         </div>
@@ -183,7 +187,7 @@
         </ul>
     </div>
 </div>
-<div class="divider">Menubar with Vertical Menu</div>
+<div class="divider">Menubar with Vertical Alignment</div>
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
@@ -206,7 +210,7 @@
         </div>
     </div>
 </div>
-<div class="divider">Menubar with Horizontal Menu</div>
+<div class="divider">Menubar with Horizontal Alignment</div>
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">

@@ -5,10 +5,11 @@
     @extend %full_size, %position_absolute, %center_grid;
     top: 0;
     left: 0;
+    --size: 2.5rem;
     &:before{
         content: '';
-        width: calc(var(--spacing) * 2.5);
-        height: calc(var(--spacing) * 2.5);
+        width: var(--size);
+        height: var(--size);
         border: fn.px2rem(4px) solid var(--accent-color);
         border-top-color: transparent;
         border-left-color: transparent;

@@ -3,7 +3,7 @@
         <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
             <button shani-fn="close" class="button color-danger" shani-target=".modal-background">Close</button>
             <div class="container height-sm-10">
-                <div class="spinner"></div>
+                <div class="spinner" style="--size:2.5rem"></div>
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vl'): ?>
@@ -13,7 +13,7 @@
                     <button shani-fn="close" class="button button-times color-danger" shani-target=".modal-background"></button>
                 </div>
                 <div class="card-body container">
-                    <div class="spinner"></div>
+                    <div class="spinner" style="--size:2.5rem"></div>
                 </div>
             </div>
         </div>

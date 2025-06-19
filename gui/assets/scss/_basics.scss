@@ -47,10 +47,11 @@
     @each $key, $size in $breakpoints {
         @include ext.media($size) {
             @for $col from 1 through $columns {
-                .width-#{$key}-#{$col} {
+                $name: if($col==12,max,$col);
+                .width-#{$key}-#{$name} {
                     width: $ratio * $col;
                 }
-                .height-#{$key}-#{$col} {
+                .height-#{$key}-#{$name} {
                     height: $ratio * $col;
                 }
             }
