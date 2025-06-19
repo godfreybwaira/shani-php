@@ -90,7 +90,7 @@
     </div>
 </div>
 <div class="divider">Progress Circles</div>
-<div class="row">
+<div class="row row-no-wrap">
     <div class="col">
         <div class="progress-circle font-sm" data-value="10%" style="--progress: 10%;"></div>
     </div>
