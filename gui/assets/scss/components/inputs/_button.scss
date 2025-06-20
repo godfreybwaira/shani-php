@@ -31,10 +31,10 @@
 
     &-times{
         $_angle: 45deg;
-
-        width: fn.px2rem(27px);
-        height: fn.px2rem(27px);
-        @extend %position_relative, %round_corner;
+        display: flex;
+        width: fn.px2rem(25px);
+        height: fn.px2rem(25px);
+        @extend %position_relative, %round_corner, %center_content;
         &:before {
             transform: rotate($_angle);
             @extend %_cross, %position_absolute;
