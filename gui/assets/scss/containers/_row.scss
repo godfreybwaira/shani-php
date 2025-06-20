@@ -1,17 +1,27 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
 
+.grid{
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing);
+    overflow: auto;
+    align-items: start;
+}
+
 .row {
     display: flex;
-    &:not(&-no-wrap){
-        gap: var(--spacing) 0;
+    &:not(&-no-gap){
+        gap: var(--spacing);
+    }
+    &:not(&-nowrap){
         flex-direction: column;
+    }
+    &-nowrap{
+        flex-direction: row;
     }
     &>.col{
         max-height: 100%;
-    }
-    &-no-wrap{
-        gap: 0 var(--spacing);
     }
     &:not(:last-child){
         margin-bottom: var(--spacing);
@@ -24,11 +34,8 @@
     }
 
     @include ext.media(map-get(var.$breakpoints, md)) {
-        &:not(&-no-wrap){
+        &:not(&-nowrap){
             flex-direction: row;
-        }
-        &:not(&-no-gap){
-            gap: 0 var(--spacing);
         }
         &-no-gap>.col:not(:last-child){
             padding-right: var(--spacing);

@@ -1,55 +1,93 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
 
-.input-group{
-    display: flex;
-    overflow: hidden;
-    outline: var(--thin-border);
-    border-radius: var(--radius-sm);
-    @extend %position_relative;
-    &:has(:focus){
-        outline-color: var(--accent-color);
-    }
-    &:not(&-sm)>*{
-        @extend %padding_md;
-    }
-    &-sm>*{
-        @extend %padding_sm;
-    }
-    &>*{
-        border: none;
-        border-radius: 0;
+.input{
+    &-group{
+        display: flex;
+        overflow-x: auto;
         outline: var(--thin-border);
+        border-radius: var(--radius-sm);
+        @extend %position_relative;
+        &:has(:focus){
+            outline-color: var(--accent-color);
+        }
+        &:not(&-sm)>*{
+            @extend %padding_md;
+        }
+        &-sm>*{
+            @extend %padding_sm;
+        }
+        &>*,input-line>*{
+            border: none;
+            border-radius: 0;
+            outline: var(--thin-border);
+        }
+        &-md>textarea,input-line-md>textarea{
+            height: fn.px2rem(40px);
+            min-height: fn.px2rem(40px);
+        }
+        &>label{
+            background-color: var(--fg-color-1);
+        }
+        select,input,textarea{
+            flex: 1;
+            background-color: var(--bg-color);
+        }
+        select{
+            outline: none;
+        }
     }
-    &-md>textarea{
-        height: fn.px2rem(40px);
-        min-height: fn.px2rem(40px);
-    }
-    &>label{
-        background-color: var(--fg-color-1);
-    }
-    select,input,textarea{
-        flex: 1;
+
+    &-box{
+        border: none;
+        outline: var(--thin-border);
+        border-radius: var(--radius-sm);
         background-color: var(--bg-color);
+        @extend %full_width;
+        &:not(&-sm){
+            @extend %padding_md;
+        }
+        &-sm{
+            @extend %padding_sm;
+        }
+        &:focus{
+            outline-color: var(--accent-color);
+        }
     }
-    select{
-        outline: none;
-    }
-}
-.input-box{
-    border: none;
-    outline: var(--thin-border);
-    border-radius: var(--radius-sm);
-    background-color: var(--bg-color);
-    @extend %full_width;
-    &:not(&-sm){
-        @extend %padding_md;
-    }
-    &-sm{
-        @extend %padding_sm;
-    }
-    &:focus{
-        outline-color: var(--accent-color);
+
+    &-line{
+        display: flex;
+        margin-top: var(--spacing);
+        border-bottom: var(--thin-border);
+        @extend %position_relative;
+        &:not(&-sm)>*{
+            @extend %padding_md;
+        }
+        &-sm>*{
+            @extend %padding_sm;
+        }
+        select,input,textarea{
+            flex: 1;
+            border: none;
+            outline: none;
+            background-color: var(--bg-color);
+        }
+        &>label{
+            top: 0;
+            width: 100%;
+            pointer-events: none;
+            @extend %position_absolute;
+        }
+        :focus~label,[type=file]~label,:not(:placeholder-shown)~label{
+            top: -50%;
+            padding: 0;
+        }
+        :not(:focus)::placeholder{
+            opacity: 0;
+        }
+        &:has(:focus){
+            border-color: var(--accent-color);
+        }
     }
 }
 textarea.input-box{

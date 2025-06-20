@@ -3,8 +3,9 @@
 
 
 .pill{
+    padding: calc(var(--spacing)/6) var(--spacing);
     border-radius: map-get(var.$border_radius,lg);
-    @extend %font_sm, %padding_sm;
+    @extend %font_sm;
     &-group{
         overflow: hidden;
         display: inline-flex;

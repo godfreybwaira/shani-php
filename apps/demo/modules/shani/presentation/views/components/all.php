@@ -1,12 +1,10 @@
 <div class="divider">Pills</div>
-<div class="row">
-    <div class="col">
-        <a href="#" class="pill color-alert">My awesome pill</a>
-        <a href="#" class="pill color-danger">awesome pill</a>
-        <a href="#" class="pill color-info">My pill</a>
-        <a href="#" class="pill color-success">pill line</a>
-        <a href="#" class="pill color-disable">Disabled</a>
-    </div>
+<div class="grid" style="height: 50px;">
+    <a href="#" class="pill color-alert">My awesome pill</a>
+    <a href="#" class="pill color-danger">another pill</a>
+    <a href="#" class="pill color-info">My pill</a>
+    <a href="#" class="pill color-success">pill line</a>
+    <a href="#" class="pill color-disable">Disabled</a>
 </div>
 <div class="divider">Pill Group</div>
 <div class="row row-stretch">
@@ -15,7 +13,6 @@
             <a href="#" class="pill color-alert">My awesome pill</a>
             <a href="#" class="pill color-danger">awesome pill</a>
             <a href="#" class="pill color-info">My pill</a>
-            <a href="#" class="pill color-success">pill line</a>
             <a href="#" class="pill color-disable">Disabled</a>
         </div>
     </div>
@@ -78,24 +75,24 @@
 <div class="divider">Progress Bars</div>
 <div class="row row-stretch">
     <div class="col">
-        <div class="progress-bar" style="--size:3rem">
+        <div class="progress-bar" style="--size:3.5rem">
             <div class="progress" style="--progress: 70%;" data-value="70%"></div>
         </div>
         <div class="progress-bar">
             <div class="progress" style="--progress: 30%;--color:green" data-value="30%"></div>
         </div>
-        <div class="progress-bar">
-            <div class="progress" style="--progress: 49%;--color:red" data-value="49%"></div>
+        <div class="progress-bar" style="--size:8px" title="49%">
+            <div class="progress" style="--progress: 49%;--color:red"></div>
         </div>
     </div>
 </div>
 <div class="divider">Progress Circles</div>
-<div class="row row-no-wrap">
+<div class="row">
     <div class="col">
         <div class="progress-circle font-sm" data-value="10%" style="--progress: 10%;"></div>
     </div>
     <div class="col">
-        <div class="progress-circle" data-value="25%" style="--progress: 25%;--size:5rem;--color:red"></div>
+        <div class="progress-circle" data-value="25%" style="--progress: 25%;--size:4rem;--color:red"></div>
     </div>
 </div>
 <div class="divider">Breadcrumb</div>

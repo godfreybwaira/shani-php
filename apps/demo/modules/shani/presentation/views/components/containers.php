@@ -466,7 +466,7 @@
     <div class="col width-sm-max width-md-6">
         <ul class="list borders">
             <li>
-                <div class="row row-no-wrap">
+                <div class="row row-nowrap">
                     <div class="col">
                         <div class="avatar">
                             <img src="/0/img/pic1.jpg" alt="photo"/>
@@ -479,7 +479,7 @@
                 </div>
             </li>
             <li>
-                <div class="row row-no-wrap">
+                <div class="row row-nowrap">
                     <div class="col">
                         <span class="avatar color-alert">A</span>
                     </div>
@@ -490,7 +490,7 @@
                 </div>
             </li>
             <li>
-                <div class="row row-no-wrap">
+                <div class="row row-nowrap">
                     <div class="col">
                         <div class="avatar">
                             <img src="/0/img/pic2.jpg" alt="photo"/>

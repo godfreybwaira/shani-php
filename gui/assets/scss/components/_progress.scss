@@ -20,13 +20,13 @@
     }
     &:after{
         display: flex;
+        overflow: hidden;
         width: var(--size);
         height: var(--size);
         border-radius: 50%;
         animation: pg_after .8s;
         content: attr(data-value);
         background: var(--bg-color);
-        outline-offset: fn.px2rem(-2px);
         border: fn.px2rem(2px) solid var(--color);
         left: max(0%,calc(var(--progress) - var(--size)));
         @extend %position_absolute, %center_content;
