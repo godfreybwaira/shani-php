@@ -155,32 +155,3 @@
         </div>
     </div>
 </div>
-<div class="row row-no-gap row-stretch">
-    <div class="col width-sm-max width-md-4">
-        <div class="input-line">
-            <!--order matters-->
-            <input type="text" name="name" placeholder="E.g: Misas Miubka">
-            <label>Your name</label>
-        </div>
-    </div>
-    <div class="col width-sm-max width-md-4">
-        <div class="input-line">
-            <!--order matters-->
-            <select name="number" id="num" required>
-                <option value="">Select a number</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-                <option value="4">Four</option>
-            </select>
-            <label>Choose a number</label>
-        </div>
-    </div>
-    <div class="col width-sm-max width-md-4">
-        <div class="input-line">
-            <!--order matters-->
-            <input type="file" name="file">
-            <label>Upload your photo</label>
-        </div>
-    </div>
-</div>
