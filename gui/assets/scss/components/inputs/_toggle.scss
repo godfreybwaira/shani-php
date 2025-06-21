@@ -1,6 +1,5 @@
 @use '../../utils/callables/functions' as fn;
-@use '../../utils/callables/extensions' as ext;
-@use '../../utils/callables/variables' as var;
+@use '../../utils/callables/extensions';
 
 .toggle {
     $height: fn.px2rem(18px);
@@ -27,9 +26,9 @@
         @extend %position_absolute, %round_corner;
     }
     &:not(:checked){
-        outline-color: map-get(var.$action_colors,disable);
+        outline-color: var(--border-color);
         &:before{
-            background-color: map-get(var.$action_colors,disable);
+            background-color: var(--border-color);
         }
     }
     &:checked{

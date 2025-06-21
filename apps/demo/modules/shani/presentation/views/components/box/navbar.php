@@ -21,7 +21,7 @@
                 User<i class="mdi mdi-chevron-down"></i>
             </span>
         </a>
-        <div class="dropdown-body pos-bl shadow-sm">
+        <div class="dropdown-body pos-bl">
             <div class="list">
                 <a href="#" class="menu-item">
                     <i class="mdi mdi-account-circle"></i>

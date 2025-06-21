@@ -87,16 +87,16 @@
 }
 :root{
     @include _createColors(var.$action_colors,var.$accent_color);
-    --font-grey: #555;
+    --font-grey: #{if(fn.isDarkColor(var.$bg_color),#555,#888)};
+    --font-color: #{fn.getTextColor(var.$bg_color)};
     --spacing:#{var.$spacing};
     --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
     --thin-border: #{fn.getBorder()};
-    --fg-color-1: #{var.$fg_color_1};
-    --fg-color-2: #{var.$fg_color_2};
-    --hover-color-1: rgba(0,0,0,.2);
-    --hover-color-2: var(--color-18);
-    --border-color: #{var.$fg_border_color};
+    --fg-color: #{var.$fg_color};
+    //--fg-color: #{if(fn.isDarkColor(var.$bg_color),var(--color-1),var(--color-19))};
+    --hover-color: #{if(fn.isDarkColor(var.$bg_color),rgba(60,60,60,.2),rgba(50,50,50,.2))};
+    --border-color: #{var.$border_color};
     --bg-color: #{var.$bg_color};
     --shadow-sm: #{map-get(var.$shadows,sm)};
     --shadow-md: #{map-get(var.$shadows,md)};
@@ -108,10 +108,20 @@
     transition: all .3s;
 }
 .shadow-sm{
-    @extend %box_shadow_sm;
+    @if(fn.isDarkColor(var.$bg_color)==false){
+        @extend %box_shadow_sm;
+    }
+    @else{
+        outline: var(--thin-border);
+    }
 }
 .shadow-md{
-    @extend %box_shadow_md;
+    @if(fn.isDarkColor(var.$bg_color)==false){
+        @extend %box_shadow_md;
+    }
+    @else{
+        outline: var(--thin-border);
+    }
 }
 .font-sm{
     @extend %font_sm;
@@ -144,12 +154,12 @@
 .stripes{
     &-even {
         &>:not(:hover,.active):nth-of-type(2n) {
-            background-color: var(--fg-color-1);
+            background-color: var(--fg-color);
         }
     }
     &-odd {
         &>:not(:hover,.active):nth-of-type(2n+1) {
-            background-color: var(--fg-color-1);
+            background-color: var(--fg-color);
         }
     }
 }

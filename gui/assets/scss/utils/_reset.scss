@@ -5,6 +5,7 @@ html {
     scroll-behavior: smooth;
 }
 body {
+    color: var(--font-color);
     font-size: var(--font-size);
     font-weight: normal;
     line-height: 1.5;
@@ -14,7 +15,9 @@ body {
 *, *::before, *::after {
     box-sizing: border-box;
 }
-
+*::placeholder{
+    color: var(--font-grey);
+}
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
     margin-bottom: calc(var(--spacing) / 2);
@@ -168,6 +171,9 @@ select {
     accent-color: var(--accent-color);
 }
 
+select{
+    color: inherit;
+}
 ::selection,::-webkit-scrollbar-thumb{
     @extend %theme_color;
 }

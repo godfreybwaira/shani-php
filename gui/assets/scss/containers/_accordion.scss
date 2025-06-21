@@ -5,6 +5,7 @@
 .accordion {
     $_angle: 45deg;
     @extend %list_reset;
+    @include ext.addBackground(var.$bg_color);
 
     &-title{
         @extend %padding_md, %position_relative;
@@ -13,7 +14,7 @@
         align-items: center;
         cursor: pointer;
         &:hover{
-            background-color: var(--hover-color-2);
+            background-color: var(--hover-color);
         }
         &:not(:only-child):before{
             right: var(--spacing);

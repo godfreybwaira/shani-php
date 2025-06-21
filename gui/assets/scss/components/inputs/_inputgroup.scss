@@ -27,7 +27,7 @@
             min-height: fn.px2rem(40px);
         }
         &>label{
-            background-color: var(--fg-color-1);
+            background-color: var(--fg-color);
         }
         select,input,textarea{
             flex: 1;

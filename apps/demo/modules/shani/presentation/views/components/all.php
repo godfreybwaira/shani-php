@@ -21,7 +21,7 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="dropdown">
-            <div class="button color-alert">Top Right</div>
+            <button class="button color-alert">Top Right</button>
             <div class="dropdown-body pos-tr">
                 <div class="list">
                     <a href="#">My list item 1</a>
@@ -34,7 +34,7 @@
     </div>
     <div class="col">
         <div class="dropdown">
-            <div class="button color-success">Top Left</div>
+            <button class="button color-success">Top Left</button>
             <div class="dropdown-body pos-tl">
                 <div class="list">
                     <a href="#">My list item 1</a>
@@ -47,7 +47,7 @@
     </div>
     <div class="col">
         <div class="dropdown">
-            <div class="button color-alert">Bottom Right</div>
+            <button class="button color-alert">Bottom Right</button>
             <div class="dropdown-body pos-br">
                 <div class="list">
                     <a href="#">My list item 1</a>
@@ -60,7 +60,7 @@
     </div>
     <div class="col">
         <div class="dropdown">
-            <div class="button color-info">Bottom Left</div>
+            <button class="button color-info">Bottom Left</button>
             <div class="dropdown-body pos-bl">
                 <div class="list">
                     <a href="#">My list item 1</a>

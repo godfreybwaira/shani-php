@@ -1,4 +1,6 @@
 @use '../utils/callables/extensions' as ext;
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
 
 .media{
     @extend %full_size;
@@ -10,6 +12,7 @@
     &-caption{
         overflow-y: auto;
         @extend %padding_xy;
-        background-color: var(--hover-color-1);
+        color: #000;
+        background-color: rgba(0,0,0,.25);
     }
 }

@@ -5,6 +5,7 @@
 .carousel {
     $square: fn.px2rem(40px);
     display: grid;
+    gap: calc(var(--spacing)/2);
     align-items: center;
     grid-auto-flow: column;
     grid-template-columns: $square 1fr $square;
@@ -34,10 +35,11 @@
         align-items: center;
         justify-items: center;
         border: none;
-        background: none;
+        outline: var(--thin-border);
+        background: var(--fg-color);
         @extend %round_corner;
         &:hover{
-            background-color: var(--hover-color-1);
+            background-color: var(--hover-color);
         }
     }
     &-next:after{

@@ -1,6 +1,4 @@
-@use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
-@use '../../utils/callables/variables' as var;
 
 .choice-group{
     $gap: calc(var(--spacing)/4);
@@ -19,8 +17,7 @@
         border-radius: var(--radius-sm);
         outline: var(--thin-border);
         &:has(:checked){
-            color: fn.getTextColor(var.$accent_color);
-            background-color: var.$accent_color;
+            @extend %theme_color;
         }
     }
     &:not(&-sm)>*{

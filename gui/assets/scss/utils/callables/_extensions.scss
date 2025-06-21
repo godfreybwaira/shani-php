@@ -1,3 +1,9 @@
+@use 'functions' as fn;
+
+@mixin addBackground($bg_color){
+    background: if(fn.isDarkColor($bg_color),var(--fg-color),none);
+}
+
 @mixin positionItem($length, $location){
     $value: calc((100% - $length)/2);
     @if($location == center){
@@ -37,7 +43,7 @@
     transform: rotate(45deg);
     width: $size;
     height: $size;
-    border: $border_width solid currentColor;
+    border: $border_width solid var(--font-color);
     border-bottom: transparent;
     border-left: transparent;
 }
@@ -47,7 +53,7 @@
     transform: rotate(45deg);
     width: $size;
     height: $size;
-    border: $border_width solid currentColor;
+    border: $border_width solid var(--font-color);
     border-top: transparent;
     border-right: transparent;
 }

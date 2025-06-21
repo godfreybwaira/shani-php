@@ -1,10 +1,12 @@
-@use '../utils/callables/extensions';
+@use '../utils/callables/extensions' as ext;
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/variables' as var;
 
 .step{
     $_line_width: fn.px2rem(2px);
+    border-radius: var(--radius-sm);
     --size: calc(var(--spacing) * 2.5);
+    @include ext.addBackground(var.$bg_color);
 
     text-align: center;
     counter-reset: num;
@@ -17,14 +19,14 @@
             flex: 1;
             flex-direction: column;
             align-items: center;
-            @extend %padding_y;
+            @extend %padding_xy;
         }
         &>:before {
             margin-bottom: var(--spacing);
         }
         &>:not(:last-child):after{
             height: $_line_width;
-            top: calc(var(--size)/2 - $_line_width/2);
+            top: calc(var(--size)/1.1 - $_line_width);
             left: calc(50% + var(--size)/2);
             width: calc(100% - var(--size));
         }
@@ -45,8 +47,7 @@
         @extend %position_absolute;
     }
     &-active:before{
-        color: fn.getTextColor(var.$accent_color);
-        background-color: var.$accent_color;
+        @extend %theme_color;
     }
     &-complete{
         &:before{

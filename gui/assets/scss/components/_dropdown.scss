@@ -1,4 +1,6 @@
 @use '../utils/callables/extensions' as ext;
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
 
 .dropdown{
     display: inline-block;
@@ -7,7 +9,13 @@
         z-index: 1;
         overflow: hidden;
         min-width: max-content;
-        @extend %position_absolute,%full_width,%box_shadow_sm;
+        @if(fn.isDarkColor(var.$bg_color)==false){
+            @extend %box_shadow_sm;
+        }
+        @else{
+            outline: var(--thin-border);
+        }
+        @extend %position_absolute,%full_width;
         border-radius: var(--radius-sm);
         background-color: var(--bg-color);
         &.pos{
@@ -25,7 +33,7 @@
             }
         }
     }
-    &:not(:hover)>&-body {
+    &:not(:focus-within,:hover)>&-body {
         display: none;
     }
 }

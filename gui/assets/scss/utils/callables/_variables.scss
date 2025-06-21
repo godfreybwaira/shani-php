@@ -4,11 +4,11 @@
 
 $font_size: 1rem;
 $spacing: 1rem;
+
 $accent_color: #007bff;
-$bg_color: white;
-$fg_color_1: color.scale($bg_color,$lightness:-10%);
-$fg_color_2: color.scale($bg_color,$lightness:-2%);
-$fg_border_color: color.scale($bg_color,$lightness:-20%);
+$bg_color: #000;
+$fg_color: fn.adjustContrast($bg_color);
+$border_color: fn.adjustContrast($fg_color,14%);
 
 $action_colors: (
 'success': #2eb85c,

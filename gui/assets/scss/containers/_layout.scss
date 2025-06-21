@@ -12,9 +12,11 @@
 
 .content{
     &-navbar{
+        $color: if(fn.isDarkColor(var.$bg_color),var(--fg-color),rgba(22, 22, 23, 0.25));
         display: flex;
         justify-content: space-between;
-        background: linear-gradient(rgba(22, 22, 23, 0.25), transparent);
+        background: linear-gradient($color, transparent);
+        border-bottom: if(fn.isDarkColor(var.$bg_color),var(--thin-border),none);
     }
     &-body{
         flex: 1;
@@ -33,10 +35,12 @@
     &-menu{
         order: 1;
         z-index: 1;
-        box-shadow: var(--shadow-md);
+        @if(fn.isDarkColor(var.$bg_color)==false){
+            box-shadow: var(--shadow-md);
+        }
         .menu-item.active{
-            color: fn.getTextColor(var.$bg_color);
-            background-color: var.$bg_color;
+            color: var(--font-color);
+            background: var.$bg_color;
             &:after{
                 left: 0;
                 bottom: 0;

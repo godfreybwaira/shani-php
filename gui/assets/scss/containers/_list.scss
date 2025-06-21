@@ -5,6 +5,7 @@
     $list: &;
     display: grid;
     overflow: hidden;
+    @include ext.addBackground(var.$bg_color);
     border-radius: var(--radius-sm);
     @extend %list_reset, %full_width;
 
@@ -17,7 +18,7 @@
     }
 
     &>:hover:not(.active) {
-        background-color: var(--hover-color-2);
+        background-color: var(--hover-color);
     }
     &>.active {
         @extend %theme_color;
@@ -27,7 +28,7 @@
         font-weight: bold;
     }
     &-body{
-        color: #333;
+        color: var(--font-grey);
         @extend %font_sm;
     }
     &-dir-h{

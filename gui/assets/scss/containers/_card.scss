@@ -1,10 +1,12 @@
 @use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
 
 .card {
     $card: &;
     display: flex;
     overflow: hidden;
     outline: var(--thin-border);
+    @include ext.addBackground(var.$bg_color);
     border-radius: calc(var(--spacing)/3);
     @extend %full_height;
     &:not(&-dir-h){
