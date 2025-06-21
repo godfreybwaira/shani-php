@@ -115,10 +115,8 @@ $_thin_line: fn.px2rem(1px);
                 content: '';
                 @extend %position_absolute;
             }
-            &.active,&:hover {
+            &.active {
                 color: var(--theme-color);
-            }
-            &.active{
                 &:before{
                     background-color: var(--accent-color);
                 }
