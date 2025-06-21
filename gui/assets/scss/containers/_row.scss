@@ -11,8 +11,9 @@
 
 .row {
     display: flex;
+    row-gap: var(--spacing);
     &:not(&-no-gap){
-        gap: var(--spacing);
+        column-gap: var(--spacing);
     }
     &:not(&-nowrap){
         flex-direction: column;
