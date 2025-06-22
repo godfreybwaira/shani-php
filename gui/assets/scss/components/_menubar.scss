@@ -18,9 +18,6 @@
     @extend %padding_md, %position_relative, %center_content;
     &:hover{
         text-decoration: none;
-        &:not(.active){
-            background-color: var(--hover-color);
-        }
     }
     &.active{
         cursor: default;
@@ -33,5 +30,5 @@
     }
 }
 a:not(.menu-item){
-    color: var(--theme-color);
+    color: var(--accent-color);
 }

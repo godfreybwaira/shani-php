@@ -14,7 +14,7 @@
         align-items: center;
         cursor: pointer;
         &:hover{
-            background-color: var(--hover-color);
+            @extend %hover_color;
         }
         &:not(:only-child):before{
             right: var(--spacing);

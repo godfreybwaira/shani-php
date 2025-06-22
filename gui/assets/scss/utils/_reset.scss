@@ -33,7 +33,7 @@ b,strong {
     font-weight: bolder;
 }
 small {
-    font-size: 80%;
+    @extend %font_sm;
 }
 sub,sup {
     @extend %position_relative;
@@ -170,10 +170,6 @@ button,
 select {
     accent-color: var(--accent-color);
 }
-
-select{
-    color: inherit;
-}
 ::selection,::-webkit-scrollbar-thumb{
-    @extend %theme_color;
+    @extend %accent_color;
 }

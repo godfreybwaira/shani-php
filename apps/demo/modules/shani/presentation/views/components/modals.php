@@ -7,7 +7,7 @@
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vl'): ?>
-        <div class="modal modal-type-v width-sm-3 pos-l">
+        <div class="modal modal-type-v width-md-3 width-sm-10 pos-l">
             <div class="card">
                 <div class="card-title justify-right">
                     <button shani-fn="close" class="button button-times color-danger" shani-target=".modal-background"></button>
@@ -18,7 +18,7 @@
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>
-        <div class="modal modal-type-v width-sm-3 pos-r">
+        <div class="modal modal-type-v width-md-3 width-sm-10 pos-r">
             <button shani-fn="close" class="button color-danger" shani-target=".modal-background">Close</button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'ht'): ?>

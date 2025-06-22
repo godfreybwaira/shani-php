@@ -39,7 +39,7 @@
         background: var(--fg-color);
         @extend %round_corner;
         &:hover{
-            background-color: var(--hover-color);
+            @extend %hover_color;
         }
     }
     &-next:after{

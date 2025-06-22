@@ -156,7 +156,11 @@
 %box_shadow_md{
     box-shadow: var(--shadow-md);
 }
-%theme_color{
+%accent_color{
+    color: var(--accent-text);
+    background-color: var(--accent-color);
+}
+%hover_color{
     color: var(--theme-text);
     background-color: var(--theme-color);
 }

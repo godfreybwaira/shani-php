@@ -1,5 +1,5 @@
 <div class="divider">Pills</div>
-<div class="grid" style="height: 50px;">
+<div class="grid">
     <a href="#" class="pill color-alert">My awesome pill</a>
     <a href="#" class="pill color-danger">another pill</a>
     <a href="#" class="pill color-info">My pill</a>

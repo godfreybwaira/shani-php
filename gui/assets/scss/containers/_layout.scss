@@ -16,7 +16,7 @@
         display: flex;
         justify-content: space-between;
         background: linear-gradient($color, transparent);
-        border-bottom: if(fn.isDarkColor(var.$bg_color),var(--thin-border),none);
+        //border-bottom: if(fn.isDarkColor(var.$bg_color),var(--thin-border),none);
     }
     &-body{
         flex: 1;
@@ -38,16 +38,21 @@
         @if(fn.isDarkColor(var.$bg_color)==false){
             box-shadow: var(--shadow-md);
         }
-        .menu-item.active{
-            color: var(--font-color);
-            background: var.$bg_color;
-            &:after{
-                left: 0;
-                bottom: 0;
-                content: '';
-                height: calc(var(--spacing)/5);
-                background-color: currentColor;
-                @extend %position_absolute, %full_width;
+        .menu-item{
+            &.active{
+                color: var(--font-color);
+                background: var.$bg_color;
+                &:after{
+                    left: 0;
+                    bottom: 0;
+                    content: '';
+                    height: calc(var(--spacing)/5);
+                    background-color: currentColor;
+                    @extend %position_absolute, %full_width;
+                }
+            }
+            &:not(.active):hover{
+                background: var(--hover-color);
             }
         }
         @include ext.media(map-get(var.$breakpoints, md)) {

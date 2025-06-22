@@ -7,12 +7,8 @@
 @mixin _createColors($action_colors, $accent_color){
     $median: 10;
     @for $i from 1 through 19 {
-        $color: color.scale($accent_color, $lightness: ($i - $median) * 10%);
-        @if($i == $median){
-            --theme-color:#{$color};
-            --theme-text: #{fn.getTextColor($color)};
-        }
-        @else{
+        @if($i != $median){
+            $color: color.scale($accent_color, $lightness: ($i - $median) * 10%);
             --color-#{$i}:#{$color};
         }
     }
@@ -29,8 +25,8 @@
     @for $i from 1 through 19 {
         $color: color.scale($accent_color, $lightness: ($i - $median) * 10%);
         @if($i == $median){
-            .color-theme,.color-theme-hover:hover{
-                @extend %theme_color;
+            .accent-color,.accent-color-hover:hover{
+                @extend %accent_color;
             }
         }
         @else{
@@ -92,10 +88,12 @@
     --spacing:#{var.$spacing};
     --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
+    --accent-text: #{fn.getTextColor(var.$accent_color)};
     --thin-border: #{fn.getBorder()};
     --fg-color: #{var.$fg_color};
-    //--fg-color: #{if(fn.isDarkColor(var.$bg_color),var(--color-1),var(--color-19))};
-    --hover-color: #{if(fn.isDarkColor(var.$bg_color),rgba(60,60,60,.2),rgba(50,50,50,.2))};
+    --hover-color:rgba(0,0,0,.25);
+    --theme-color:#{if(fn.isDarkColor(var.$bg_color),var.$bg_color,var.$fg_color)};
+    --theme-text:#{if(fn.isDarkColor(var.$bg_color),var(--font-color),fn.getTextColor(var.$fg_color))};
     --border-color: #{var.$border_color};
     --bg-color: #{var.$bg_color};
     --shadow-sm: #{map-get(var.$shadows,sm)};

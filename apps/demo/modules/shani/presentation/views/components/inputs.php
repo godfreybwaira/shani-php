@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button color-theme">
+        <button class="button accent-color">
             Simple Button
         </button>
     </div>
@@ -14,13 +14,13 @@
         </button>
     </div>
     <div class="col">
-        <button class="button color-theme container">
+        <button class="button accent-color container">
             Button with empty Badge
             <span class="badge color-danger pos-tr badge-empty">9+</span>
         </button>
     </div>
     <div class="col">
-        <button class="button color-theme container">
+        <button class="button accent-color container">
             Button with Badge
             <span class="badge color-danger pos-tr">9+</span>
         </button>

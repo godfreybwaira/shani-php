@@ -18,10 +18,10 @@
     }
 
     &>:hover:not(.active) {
-        background-color: var(--hover-color);
+        @extend %hover_color;
     }
     &>.active {
-        @extend %theme_color;
+        @extend %accent_color;
     }
     &-title{
         display: block;

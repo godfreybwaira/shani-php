@@ -116,7 +116,7 @@ $_thin_line: fn.px2rem(1px);
                 @extend %position_absolute;
             }
             &.active {
-                color: var(--theme-color);
+                color: var(--accent-color);
                 &:before{
                     background-color: var(--accent-color);
                 }
@@ -125,6 +125,9 @@ $_thin_line: fn.px2rem(1px);
                 background-color: var(--fg-color);
                 &:after{
                     background-color: var(--border-color);
+                }
+                &:hover{
+                    @extend %hover_color;
                 }
             }
         }

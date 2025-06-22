@@ -98,3 +98,6 @@ input::file-selector-button{
     border: none;
     background: none;
 }
+input:not(:invalid),select,textarea:not(:invalid),input::file-selector-button{
+    color: inherit;
+}

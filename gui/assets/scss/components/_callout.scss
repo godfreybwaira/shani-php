@@ -10,8 +10,8 @@
     border-left: fn.px2rem(5px) solid currentColor;
     @each $name,$color in var.$action_colors{
         &-#{$name}{
-            color: color.mix(#000,$color,65%);
-            background-color: #{color.scale($color,$lightness: 65%)}b5;
+            color: color.mix(#000,$color,75%);
+            background-color: #{color.scale($color,$lightness: 65%)}81;
         }
     }
 

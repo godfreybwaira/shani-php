@@ -47,14 +47,14 @@
         @extend %position_absolute;
     }
     &-active:before{
-        @extend %theme_color;
+        @extend %accent_color;
     }
     &-complete{
         &:before{
-            outline: $_line_width solid var(--theme-color);
+            outline: $_line_width solid var(--accent-color);
         }
         &:after{
-            background-color: var(--theme-color);
+            background-color: var(--accent-color);
         }
     }
     &>:not(&-complete):after{

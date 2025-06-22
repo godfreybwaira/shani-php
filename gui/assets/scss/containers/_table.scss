@@ -27,6 +27,6 @@
     }
 
     tr:hover {
-        background-color: var(--hover-color);
+        @extend %hover_color;
     }
 }

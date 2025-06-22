@@ -6,7 +6,7 @@ $font_size: 1rem;
 $spacing: 1rem;
 
 $accent_color: #007bff;
-$bg_color: #000;
+$bg_color: #111;
 $fg_color: fn.adjustContrast($bg_color);
 $border_color: fn.adjustContrast($fg_color,14%);
 
