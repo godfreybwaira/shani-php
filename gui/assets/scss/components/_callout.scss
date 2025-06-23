@@ -11,7 +11,7 @@
     @each $name,$color in var.$action_colors{
         &-#{$name}{
             color: color.mix(#000,$color,75%);
-            background-color: #{color.scale($color,$lightness: 65%)}81;
+            background-color: #{color.scale($color,$lightness: 65%)}b1;
         }
     }
 
