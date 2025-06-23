@@ -51,6 +51,11 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
             return $this->app->render();
         }
+
+        public function loader()
+        {
+            return $this->app->render();
+        }
     }
 
 }

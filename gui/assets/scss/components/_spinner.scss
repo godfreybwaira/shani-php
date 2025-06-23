@@ -2,10 +2,11 @@
 @use '../utils/callables/functions' as fn;
 
 .spinner{
-    @extend %full_size, %position_absolute, %center_grid;
     top: 0;
     left: 0;
     --size: 2.5rem;
+    background: var(--fg-color);
+    @extend %full_size, %position_absolute, %center_grid;
     &:before{
         content: '';
         width: var(--size);

@@ -1,6 +1,4 @@
 @use '../utils/callables/extensions' as ext;
-@use '../utils/callables/functions' as fn;
-@use '../utils/callables/variables' as var;
 
 .media{
     @extend %full_size;

@@ -3,48 +3,67 @@
 @use '../utils/callables/variables' as var;
 
 .progress{
+    $progress: &;
     display: flex;
     align-items: center;
-    --color: var(--accent-color);
     background: var(--fg-color);
     @extend %font_sm, %position_relative;
     border-radius: map-get(var.$border_radius,lg);
     &:before{
         content: '';
         width: var(--progress);
-        animation: pg_before .8s;
         background-color: var(--color);
-        height: calc(var(--spacing)/2);
         border-radius: inherit;
-    }
-    &:after{
-        display: flex;
-        overflow: hidden;
-        width: var(--size);
-        height: var(--size);
-        border-radius: 50%;
-        animation: pg_after .8s;
-        background: var(--bg-color);
-        content: attr(data-value,'0%');
-        border: fn.px2rem(2px) solid var(--color);
-        left: max(0%,calc(var(--progress) - var(--size)));
-        @extend %position_absolute, %center_content;
     }
     &-bar{
         --size:calc(var(--spacing)*2.5);
-        height: var(--size);
         display: flex;
         flex-direction: column;
         justify-content: center;
+        &:not(.loader){
+            #{$progress}{
+                --color: var(--accent-color);
+            }
+            height: var(--size);
+            &>:after{
+                display: flex;
+                overflow: hidden;
+                width: var(--size);
+                height: var(--size);
+                animation: pg_after .8s;
+                background: var(--bg-color);
+                content: attr(data-value,'0%');
+                border: fn.px2rem(2px) solid var(--color);
+                left: max(0%,calc(var(--progress) - var(--size)));
+                @extend %position_absolute, %center_content, %round_corner;
+            }
+            &>:before{
+                animation: pg_before .8s;
+                height: calc(var(--spacing)/2);
+            }
+        }
+        &.loader{
+            #{$progress}{
+                --color:red;
+                --progress: 20%;
+            }
+            top: 0;
+            @extend %position_absolute, %full_width;
+            &>:before{
+                height: calc(var(--spacing)/4);
+                margin-left: calc(var(--progress) * -1);
+                animation: pg_move .6s ease-in-out infinite;
+            }
+        }
     }
     &-circle{
         --size:#{fn.px2rem(40px)};
         --color: var(--accent-color);
-        border-radius: 50%;
         width: var(--size);
         height: var(--size);
         padding: calc(var(--spacing)/2);
         background: conic-gradient(var(--color) var(--progress,0),var(--fg-color) 0);
+        @extend %round_corner;
         &:before{
             display: flex;
             border-radius: inherit;
@@ -52,6 +71,11 @@
             background-color: var(--bg-color);
             @extend %full_size, %center_content;
         }
+    }
+}
+@keyframes pg_move{
+    100%{
+        margin-left:100%;
     }
 }
 @keyframes pg_before{

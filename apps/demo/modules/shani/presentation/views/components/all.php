@@ -281,5 +281,13 @@
         </a>
     </li>
 </ul>
+<div class="divider">Loaders</div>
+<ul>
+    <li>
+        <a href="/shani/0/components/0/loader?type=i" shani-insert="append" shani-header="x-request-mode:async" shani-fn="r" shani-target=".layout-content">
+            Infinite loader
+        </a>
+    </li>
+</ul>
 
 <div class="divider">divider</div>
