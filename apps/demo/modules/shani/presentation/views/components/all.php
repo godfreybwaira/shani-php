@@ -290,4 +290,7 @@
     </li>
 </ul>
 
-<div class="divider">divider</div>
+<div class="divider">Divider with some texts</div>
+<div class="divider">some texts</div>
+<div class="divider">Divider without texts</div>
+<div class="divider"></div>

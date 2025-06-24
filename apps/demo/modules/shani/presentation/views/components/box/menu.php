@@ -7,7 +7,7 @@
         <i class="mdi mdi-rectangle"></i>
         <span class="font-sm menu-label">Containers</span>
     </a>
-    <a href="/shani/0/components/0/inputs" shani-header="x-request-mode:async" shani-fn="r" shani-target="#content" class="menu-item menu-item-dir-v">
+    <a href="/shani/0/components/0/inputs" ui-comp="spinner" shani-header="x-request-mode:async" shani-fn="r" shani-target="#content" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-inbox-full"></i>
         <span class="font-sm menu-label">Inputs</span>
     </a>

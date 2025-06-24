@@ -33,7 +33,6 @@ namespace gui {
             $this->style('/css/icons/mdi.css');
             $this->script('/js/ui.js', ['defer']);
             $this->script('/js/shani-ob-2.0.js', ['defer']);
-            $this->script('/js/shani-plugins.js', ['defer']);
         }
 
         /**
