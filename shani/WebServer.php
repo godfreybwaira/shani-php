@@ -23,6 +23,7 @@ namespace shani {
     use shani\core\VirtualHost;
     use shani\http\App;
     use test\TestConfig;
+    use test\TestParameter;
 
     final class WebServer
     {
@@ -86,15 +87,15 @@ namespace shani {
                 }
             });
             $result = null;
-            if ($args !== null) {
-                $server->start(function () use (&$args, &$server, &$result) {
-                    self::log(LogLevel::INFO, 'Server started');
-                    $result = TestConfig::config($args);
+            $server->start(function () use (&$args, &$server, &$result) {
+                if ($args !== null) {
+                    self::log(LogLevel::INFO, 'Server started. Test mode initiated...');
+                    $result = TestConfig::config(new TestParameter($args));
                     if ($result !== null) {
                         $server->stop();
                     }
-                });
-            }
+                }
+            });
             if ($result !== null) {
                 exit($result ? 0 : 1);
             }
