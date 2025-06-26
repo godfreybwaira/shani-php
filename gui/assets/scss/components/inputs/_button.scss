@@ -1,8 +1,9 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
+@use '../../utils/callables/variables' as var;
 
 %_cross{
-    width: 55%;
+    width: 60%;
     content: '';
     height: fn.px2rem(1px);
     @extend %position_center;
@@ -30,18 +31,22 @@
     }
 
     &-times{
-        $_angle: 45deg;
+        $angle: 45deg;
+        $size: fn.px2rem(19.2px);
+
+        width: $size;
+        height: $size;
         display: flex;
-        width: fn.px2rem(25px);
-        height: fn.px2rem(25px);
-        @extend %position_relative, %round_corner, %center_content;
+        z-index: 100;
+        background: map-get(var.$action_colors,danger);
+        @extend %position_absolute, %round_corner, %center_content, %margin_xy;
         &:before {
-            transform: rotate($_angle);
+            transform: rotate($angle);
             @extend %_cross, %position_absolute;
         }
 
         &:after {
-            transform: rotate(-$_angle);
+            transform: rotate(-$angle);
             @extend %_cross, %position_absolute;
         }
     }
