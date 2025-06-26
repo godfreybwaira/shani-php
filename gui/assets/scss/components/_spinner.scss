@@ -1,12 +1,13 @@
 @use '../utils/callables/extensions';
 @use '../utils/callables/functions' as fn;
+@use '../utils/callables/variables' as var;
 
 .spinner{
     top: 0;
     left: 0;
     z-index: 1;
     --size: 2.5rem;
-    background: var(--fg-color);
+    background: rgba(var.$bg_color,.2);
     @extend %full_size, %position_absolute, %center_grid;
     &:before{
         content: '';

@@ -60,7 +60,7 @@
             </label>
         </div>
     </div>
-    <div class="col width-sm-max width-md-3">
+    <div class="col width-sm-max width-md-1q">
         <label>Single-select Input</label>
         <div class="choice-group">
             <label>
