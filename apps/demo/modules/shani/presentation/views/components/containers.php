@@ -194,8 +194,8 @@
 </div>
 <div class="divider">Rows</div>
 <div class="row">
-    <div class="col color-4 width-md-2q">Col1</div>
-    <div class="col color-8 width-md-2q">Col2</div>
+    <div class="col color-4 width-md-half">Col1</div>
+    <div class="col color-8 width-md-half">Col2</div>
 </div>
 <div class="row">
     <div class="col color-4 width-md-4">Col1</div>
@@ -209,20 +209,20 @@
     <div class="col color-12 width-md-1q">Col4</div>
 </div>
 <div class="row">
-    <div class="col color-4 width-md-1q">Col1</div>
-    <div class="col color-16 width-md-1q">Col2</div>
-    <div class="col color-12 width-md-2q">Col3</div>
+    <div class="col color-4 width-md-1q">A quarter sized column</div>
+    <div class="col color-16 width-md-1q">A quarter sized column</div>
+    <div class="col color-12 width-md-half">A half sized column</div>
 </div>
 <div class="row">
     <div class="col color-4 width-md-2">Col1</div>
     <div class="col color-16 width-md-2">Col2</div>
     <div class="col color-8 width-md-2">Col3</div>
-    <div class="col color-12 width-md-2q">Col4</div>
+    <div class="col color-12 width-md-half">Col4</div>
 </div>
 <div class="divider">Form Rows</div>
 <div class="row row-no-gap row-stretch">
-    <div class="col color-4 width-md-2q">Col1</div>
-    <div class="col color-8 width-md-2q">Col2</div>
+    <div class="col color-4 width-md-half">Col1</div>
+    <div class="col color-8 width-md-half">Col2</div>
 </div>
 <div class="row row-no-gap row-stretch">
     <div class="col color-4 width-md-4">Col1</div>
@@ -238,13 +238,13 @@
 <div class="row row-no-gap row-stretch">
     <div class="col color-4 width-md-1q">Col1</div>
     <div class="col color-16 width-md-1q">Col2</div>
-    <div class="col color-12 width-md-2q">Col3</div>
+    <div class="col color-12 width-md-half">Col3</div>
 </div>
 <div class="row row-no-gap row-stretch">
     <div class="col color-4 width-md-2">Col1</div>
     <div class="col color-16 width-md-2">Col2</div>
     <div class="col color-8 width-md-2">Col3</div>
-    <div class="col color-12 width-md-2q">Col4</div>
+    <div class="col color-12 width-md-half">Col4</div>
 </div>
 <div class="divider">Details</div>
 <div class="details">
@@ -263,7 +263,7 @@
 </div>
 <div class="divider">Horizontal Tabs</div>
 <div class="row">
-    <div class="col width-md-2q width-sm-max">
+    <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -284,7 +284,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-2q width-sm-max">
+    <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-b borders">
             <div class="tab-menu menubar">
                 <a href="#" class="active menu-item">
@@ -308,7 +308,7 @@
 </div>
 <div class="divider">Vertical Tabs</div>
 <div class="row">
-    <div class="col width-md-2q width-sm-max">
+    <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-l borders">
             <div class="tab-menu menubar">
                 <a href="#" class="active menu-item menu-item-dir-v">
@@ -329,7 +329,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-md-2q width-sm-max">
+    <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-r borders">
             <div class="tab-menu menubar">
                 <a href="#" class="active menu-item">
@@ -448,7 +448,7 @@
 </div>
 <div class="divider">Lists</div>
 <div class="row">
-    <div class="col width-sm-max width-md-2q">
+    <div class="col width-sm-max width-md-half">
         <div class="row">
             <div class="col">
                 <ul class="list list-dir-h borders">
@@ -468,7 +468,7 @@
             </div>
         </div>
     </div>
-    <div class="col width-sm-max width-md-2q">
+    <div class="col width-sm-max width-md-half">
         <ul class="list borders">
             <li>
                 <div class="row row-nowrap">

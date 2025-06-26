@@ -43,7 +43,7 @@
     @each $key, $size in $breakpoints {
         @include ext.media($size) {
             @for $col from 1 through $columns {
-                $name: if($col==12,max,if($col==9,3q,if($col==6,2q,if($col==3,1q,$col))));
+                $name: if($col==12,max,if($col==9,3q,if($col==6,half,if($col==3,1q,$col))));
                 .width-#{$key}-#{$name} {
                     width: $ratio * $col;
                 }

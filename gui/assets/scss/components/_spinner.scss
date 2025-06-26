@@ -7,7 +7,7 @@
     left: 0;
     z-index: 1;
     --size: 2.5rem;
-    background: rgba(var.$bg_color,.2);
+    background: rgba(var.$bg_color,.4);
     @extend %full_size, %position_absolute, %center_grid;
     &:before{
         content: '';
