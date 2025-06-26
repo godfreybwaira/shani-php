@@ -7,8 +7,8 @@
     border-radius: map-get(var.$border_radius,lg);
     @extend %font_sm;
     &-group{
-        overflow: hidden;
         display: inline-flex;
+        @extend %overflow_hide;
         border-radius: map-get(var.$border_radius,lg);
         &>*{
             border-radius: 0;

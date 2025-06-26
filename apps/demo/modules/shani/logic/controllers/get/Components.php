@@ -18,7 +18,6 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function __construct(App &$app)
         {
-            sleep(2);
             $this->app = $app;
         }
 

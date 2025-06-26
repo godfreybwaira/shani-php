@@ -11,8 +11,7 @@
     appearance: none;
     height: $height;
     width: $width;
-    overflow: hidden;
-    @extend %position_relative;
+    @extend %position_relative, %overflow_hide;
     border-radius: var(--spacing);
     outline: fn.px2rem(1px) solid;
     vertical-align: text-bottom;

@@ -29,9 +29,8 @@ $_thin_line: fn.px2rem(1px);
 .tab {
     $tab: &;
     display: grid;
-    overflow: hidden;
     border-radius: var(--radius-sm);
-    @extend %full_height;
+    @extend %full_height, %overflow_hide;
     &-pos{
         &-t{
             grid-template-areas: "tm""tb";

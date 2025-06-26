@@ -3,7 +3,7 @@
 @use '../utils/callables/functions' as fn;
 
 .carousel {
-    $square: fn.px2rem(40px);
+    $square: fn.px2rem(30px);
     display: grid;
     gap: calc(var(--spacing)/2);
     align-items: center;
@@ -11,9 +11,8 @@
     grid-template-columns: $square 1fr $square;
     @extend %full_size;
     &-body {
-        overflow: hidden;
         border-radius: var(--radius-sm);
-        @extend %full_height, %position_relative;
+        @extend %full_height, %position_relative, %overflow_hide;
         &>* {
             top: 0;
             left: 0;
@@ -31,6 +30,7 @@
     &-next,&-prev{
         display: grid;
         height: $square;
+        width: $square;
         cursor: pointer;
         align-items: center;
         justify-items: center;
@@ -43,11 +43,9 @@
         }
     }
     &-next:after{
-        @include ext.createRightAngle(var.$spacing,fn.px2rem(3px));
-        border-radius: fn.px2rem(2px);
+        @include ext.createRightAngle(.6rem,fn.px2rem(2px));
     }
     &-prev:before{
-        border-radius: fn.px2rem(2px);
-        @include ext.createLeftAngle(var.$spacing,fn.px2rem(3px));
+        @include ext.createLeftAngle(.6rem,fn.px2rem(2px));
     }
 }

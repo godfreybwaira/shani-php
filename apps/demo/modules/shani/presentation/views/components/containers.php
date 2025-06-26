@@ -1,7 +1,7 @@
 <div class="divider">Accordion</div>
 <div class="row">
     <div class="col">
-        <ul class="accordion borders border-h radius-sm" shani-fn="select" shani-class="active blur">
+        <ul class="accordion borders border-h radius-sm" ui-class="active" ui-attr="select">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
@@ -32,7 +32,7 @@
         </ul>
     </div>
     <div class="col">
-        <ul class="accordion borders radius-sm" shani-fn="select" shani-class="active blur">
+        <ul class="accordion borders radius-sm" ui-class="active" ui-attr="select">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
@@ -63,7 +63,7 @@
         </ul>
     </div>
     <div class="col">
-        <ul class="accordion border-h" shani-fn="select" shani-class="active blur">
+        <ul class="accordion border-h" ui-class="active" ui-attr="select">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
@@ -107,14 +107,19 @@
             </div>
             <div class="media active">
                 <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt="">
-                <div class="media-caption pos-l width-sm-4 height-sm-max">
+                <div class="media-caption pos-l">
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
             </div>
             <div class="media">
                 <img src="<?= $app->ui()->asset('/img/pic3.jpg'); ?>" alt="">
-                <div class="media-caption pos-r width-sm-4 height-sm-max">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                <div class="media-caption pos-r">
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <p>
+                        Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam consequat. Curabitur augue lorem, dapibus quis, laoreet et, pretium ac, nisi. Aenean magna nisl, mollis quis, molestie eu, feugiat in, orci. In hac habitasse platea dictumst.
+                    </p>
                 </div>
             </div>
         </div>
@@ -260,7 +265,7 @@
 <div class="row">
     <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-t borders">
-            <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
+            <div class="tab-menu menubar">
                 <a href="#" class="active menu-item menu-item-dir-v">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
@@ -281,7 +286,7 @@
     </div>
     <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-b borders">
-            <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
+            <div class="tab-menu menubar">
                 <a href="#" class="active menu-item">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
@@ -305,7 +310,7 @@
 <div class="row">
     <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-l borders">
-            <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
+            <div class="tab-menu menubar">
                 <a href="#" class="active menu-item menu-item-dir-v">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
@@ -326,7 +331,7 @@
     </div>
     <div class="col width-md-6 width-sm-max">
         <div class="tab tab-pos-r borders">
-            <div class="tab-menu menubar" shani-fn="select" shani-class="active blur" shani-on="click">
+            <div class="tab-menu menubar">
                 <a href="#" class="active menu-item">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
@@ -507,11 +512,17 @@
 </div>
 <div class="divider">Modals</div>
 <ul>
-    <li><a href="/shani/0/components/0/modals?type=c" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type C</a></li>
-    <li><a href="/shani/0/components/0/modals?type=cl" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type C With layout</a></li>
-    <li><a href="/shani/0/components/0/modals?type=vr" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type VR</a></li>
-    <li><a href="/shani/0/components/0/modals?type=vl" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type VL</a></li>
-    <li><a href="/shani/0/components/0/modals?type=ht" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type HT</a></li>
-    <li><a href="/shani/0/components/0/modals?type=hb" shani-header="x-request-mode:async" shani-fn="r" shani-target="#modals">Type HB</a></li>
+    <li><a href="/shani/0/components/0/modals?type=c" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type C</a></li>
+    <li><a href="/shani/0/components/0/modals?type=cl" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type C With layout</a></li>
+    <li><a href="/shani/0/components/0/modals?type=vr" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type VR</a></li>
+    <li><a href="/shani/0/components/0/modals?type=vl" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type VL</a></li>
+    <li><a href="/shani/0/components/0/modals?type=ht" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type HT</a></li>
+    <li><a href="/shani/0/components/0/modals?type=hb" shani-header="x-request-mode:async"
+           shani-fn="r" shani-target="body" shani-insert="append">Type HB</a></li>
 </ul>
 <div id="modals"></div>

@@ -27,7 +27,6 @@
             height: var(--size);
             &>:after{
                 display: flex;
-                overflow: hidden;
                 width: var(--size);
                 height: var(--size);
                 animation: pg_after .8s;
@@ -35,7 +34,7 @@
                 content: attr(data-value,'0%');
                 border: fn.px2rem(2px) solid var(--color);
                 left: max(0%,calc(var(--progress) - var(--size)));
-                @extend %position_absolute, %center_content, %round_corner;
+                @extend %position_absolute, %center_content, %round_corner, %overflow_hide;
             }
             &>:before{
                 animation: pg_before .8s;

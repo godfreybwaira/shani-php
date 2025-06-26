@@ -4,6 +4,7 @@
 .spinner{
     top: 0;
     left: 0;
+    z-index: 1;
     --size: 2.5rem;
     background: var(--fg-color);
     @extend %full_size, %position_absolute, %center_grid;

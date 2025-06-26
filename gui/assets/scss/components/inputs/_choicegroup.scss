@@ -4,11 +4,10 @@
     $gap: calc(var(--spacing)/4);
     border-radius: var(--radius-sm);
     outline: var(--thin-border);
-    overflow: hidden;
     display: grid;
     padding: $gap;
     gap: $gap;
-    @extend %position_relative;
+    @extend %position_relative, %overflow_hide;
     &:has(:focus){
         outline-color: var(--accent-color);
     }

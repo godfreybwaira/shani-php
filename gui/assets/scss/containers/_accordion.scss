@@ -33,6 +33,6 @@
         transform: rotate($_angle * 3);
     }
     &-body{
-        overflow: hidden;
+        @extend %overflow_hide;
     }
 }

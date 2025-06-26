@@ -3,13 +3,12 @@
 
 .avatar{
     cursor: pointer;
-    overflow: hidden;
     font-weight: bold;
     display: inline-flex;
     vertical-align: middle;
     outline: fn.px2rem(2px) solid var(--bg-color);
     font-size: calc(var(--font-size) * 1.6);
-    @extend %round_corner, %center_content;
+    @extend %round_corner, %center_content, %overflow_hide;
     --size:2.5rem;
     width: var(--size);
     height: var(--size);

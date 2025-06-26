@@ -1,5 +1,5 @@
 <div class="tab tab-pos-b">
-    <div class="tab-menu menubar" shani-fn="select" shani-class="active blur">
+    <div class="tab-menu menubar" ui-attr="select" ui-class="active">
         <a href="#" class="menu-item">
             <i class="mdi mdi-professional-hexagon"></i>
             <span class="font-sm">Professional</span>
@@ -17,7 +17,7 @@
             <span class="font-sm">Profile</span>
         </a>
     </div>
-    <div class="tab-body" id="content">
+    <div class="tab-body container" id="content">
         <?php $app->ui()->import($app->view('/all')); ?>
     </div>
 </div>

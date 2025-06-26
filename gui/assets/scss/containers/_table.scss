@@ -1,7 +1,7 @@
 @use '../utils/callables/extensions';
 
 .table {
-    overflow: hidden;
+    @extend %overflow_hide;
     border-collapse: collapse;
     &-container {
         overflow-x: auto;

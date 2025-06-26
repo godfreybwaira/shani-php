@@ -67,7 +67,7 @@ img {
     border-style: none;
 }
 svg:not(:root) {
-    overflow: hidden;
+    @extend %overflow_hide;
 }
 a,
 area,

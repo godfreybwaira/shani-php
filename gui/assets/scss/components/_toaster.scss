@@ -12,7 +12,6 @@
     height: max-content;
     overflow-y: auto;
     max-height: 30%;
-    min-width: max-content;
     &.pos-tc{
         border-radius: 0 0 $radius $radius;
         animation: slideDown var.$animation_duration var.$animation_timing;

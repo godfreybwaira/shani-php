@@ -1,4 +1,4 @@
-@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/extensions';
 
 .media{
     @extend %full_size;
@@ -8,9 +8,16 @@
         @extend %full_size;
     }
     &-caption{
+        color: #000;
         overflow-y: auto;
         @extend %padding_xy;
-        color: #000;
         background-color: rgba(0,0,0,.25);
+        &.pos-b,&.pos-t{
+            max-height: 40%;
+        }
+        &.pos-r,&.pos-l{
+            max-width: 40%;
+            @extend %full_height;
+        }
     }
 }

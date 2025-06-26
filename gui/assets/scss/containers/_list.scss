@@ -4,10 +4,9 @@
 .list {
     $list: &;
     display: grid;
-    overflow: hidden;
     @include ext.addBackground(var.$bg_color);
     border-radius: var(--radius-sm);
-    @extend %list_reset, %full_width;
+    @extend %list_reset, %full_width, %overflow_hide;
 
     &:not(&-sm)>*{
         @extend %padding_md;

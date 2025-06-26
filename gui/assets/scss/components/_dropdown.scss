@@ -7,7 +7,6 @@
     @extend %position_relative;
     &-body{
         z-index: 1;
-        overflow: hidden;
         min-width: max-content;
         @if(fn.isDarkColor(var.$bg_color)==false){
             @extend %box_shadow_sm;
@@ -15,7 +14,7 @@
         @else{
             outline: var(--thin-border);
         }
-        @extend %position_absolute,%full_width;
+        @extend %position_absolute,%full_width, %overflow_hide;
         border-radius: var(--radius-sm);
         background-color: var(--bg-color);
         &.pos{

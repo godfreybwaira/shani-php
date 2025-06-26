@@ -4,11 +4,10 @@
 .card {
     $card: &;
     display: flex;
-    overflow: hidden;
     outline: var(--thin-border);
     @include ext.addBackground(var.$bg_color);
     border-radius: calc(var(--spacing)/3);
-    @extend %full_height;
+    @extend %full_height, %overflow_hide;
     &:not(&-dir-h){
         flex-flow: column;
     }

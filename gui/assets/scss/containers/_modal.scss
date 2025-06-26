@@ -3,14 +3,14 @@
 @use '../utils/callables/variables' as var;
 
 .modal{
-    overflow: hidden;
+    @extend %overflow_hide;
     background: if(fn.isDarkColor(var.$bg_color),var(--fg-color),var(--bg-color));
     &-background{
         top: 0;
         left: 0;
         background: rgba(0,0,0,0.7);
         backdrop-filter:blur(fn.px2rem(4px));
-        @extend %full_size,%position_absolute;
+        @extend %full_size,%position_absolute, %overflow_hide;
         z-index: map-get(var.$z_index,md);
     }
     &-type{
