@@ -1,7 +1,7 @@
 <div class="divider">Accordion</div>
 <div class="row">
     <div class="col">
-        <ul class="accordion borders border-h radius-sm" ui-class="active" ui-attr="select">
+        <ul class="accordion borders border-h radius-sm">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
@@ -32,7 +32,7 @@
         </ul>
     </div>
     <div class="col">
-        <ul class="accordion borders radius-sm" ui-class="active" ui-attr="select">
+        <ul class="accordion borders radius-sm">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
@@ -63,7 +63,7 @@
         </ul>
     </div>
     <div class="col">
-        <ul class="accordion border-h" ui-class="active" ui-attr="select">
+        <ul class="accordion border-h">
             <li>
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">

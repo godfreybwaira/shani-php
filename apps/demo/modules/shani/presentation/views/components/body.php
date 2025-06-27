@@ -1,5 +1,5 @@
 <div class="tab tab-pos-b">
-    <div class="tab-menu menubar" ui-attr="select" ui-class="active">
+    <div class="tab-menu menubar">
         <a href="#" class="menu-item">
             <i class="mdi mdi-professional-hexagon"></i>
             <span class="font-sm">Professional</span>

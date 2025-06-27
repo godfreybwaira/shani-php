@@ -29,10 +29,9 @@ namespace gui {
             $this->title = null;
             $this->scripts = $this->styles = [];
             $this->icon = '<link rel="icon" href="data:,">';
-            $this->style('/css/main.css');
-            $this->style('/css/icons/mdi.css');
-            $this->script('/js/ui.js', ['defer']);
-            $this->script('/js/shani-ob-2.0.js', ['defer']);
+            $this->localStyle('/css/main.css');
+            $this->localStyle('/css/icons/mdi.css');
+            $this->localScript('/js/shani-ob-2.0.js', ['defer']);
         }
 
         /**
@@ -88,7 +87,7 @@ namespace gui {
          * attributes naming standard
          * @return self
          */
-        public function script(string $src, array $attributes = []): self
+        public function localScript(string $src, array $attributes = []): self
         {
             self::createHeader($this->scripts, $src, $attributes);
             return $this;
@@ -101,7 +100,7 @@ namespace gui {
          * attributes naming standard
          * @return self
          */
-        public function style(string $href, array $attributes = []): self
+        public function localStyle(string $href, array $attributes = []): self
         {
             self::createHeader($this->styles, $href, $attributes);
             return $this;
