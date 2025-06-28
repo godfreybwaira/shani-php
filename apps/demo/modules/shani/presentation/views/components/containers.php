@@ -96,7 +96,7 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="justify-center">
-    <div class="carousel width-md-7 width-sm-max">
+    <div class="carousel width-md-7 width-sm-max" ui-attr="auto">
         <button class="carousel-prev"></button>
         <div class="carousel-body">
             <div class="media">

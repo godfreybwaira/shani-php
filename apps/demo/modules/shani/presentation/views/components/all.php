@@ -79,10 +79,10 @@
             <div class="progress" style="--progress: 70%;" data-value="70%"></div>
         </div>
         <div class="progress-bar">
-            <div class="progress" style="--progress: 30%;--color:green" data-value="30%"></div>
+            <div class="progress" style="--progress: 30%;--color:var(--color-success)" data-value="30%"></div>
         </div>
         <div class="progress-bar" style="--size:8px" title="49%">
-            <div class="progress" style="--progress: 49%;--color:red"></div>
+            <div class="progress" style="--progress: 49%;--color:var(--color-danger)"></div>
         </div>
     </div>
 </div>
@@ -92,7 +92,7 @@
         <div class="progress-circle font-sm" data-value="10%" style="--progress: 10%;"></div>
     </div>
     <div class="col">
-        <div class="progress-circle" data-value="25%" style="--progress: 25%;--size:4rem;--color:red"></div>
+        <div class="progress-circle" data-value="25%" style="--progress: 25%;--size:4rem;--color:var(--color-danger)"></div>
     </div>
 </div>
 <div class="divider">Breadcrumb</div>

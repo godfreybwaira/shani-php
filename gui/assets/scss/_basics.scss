@@ -12,11 +12,10 @@
             --color-#{$i}:#{$color};
         }
     }
+    //--text-#{$name}: mix($color, #222, 5%);
     @each $name,$color in $action_colors{
-        .color-#{$name}{
-            color: mix($color, #222, 5%);
-            background-color: $color;
-        }
+        --text-#{$name}: #{fn.getTextColor($color)};
+        --color-#{$name}: #{$color};
     }
 }
 
@@ -83,27 +82,34 @@
 }
 :root{
     @include _createColors(var.$action_colors,var.$accent_color);
-    --font-grey: #{if(fn.isDarkColor(var.$bg_color),#555,#888)};
-    --font-color: #{fn.getTextColor(var.$bg_color)};
-    --spacing:#{var.$spacing};
+    --text-grey: #{if(fn.isDarkColor(var.$bg_color),#555,#888)};
     --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
     --accent-text: #{fn.getTextColor(var.$accent_color)};
     --thin-border: #{fn.getBorder()};
     --fg-color: #{var.$fg_color};
+    --fg-text: #{fn.getTextColor(var.$fg_color)};
     --hover-color:rgba(0,0,0,.25);
     --theme-color:#{if(fn.isDarkColor(var.$bg_color),var.$bg_color,var.$fg_color)};
-    --theme-text:#{if(fn.isDarkColor(var.$bg_color),var(--font-color),fn.getTextColor(var.$fg_color))};
+    --theme-text:#{if(fn.isDarkColor(var.$bg_color),var(--bg-text),fn.getTextColor(var.$fg_color))};
     --border-color: #{var.$border_color};
     --bg-color: #{var.$bg_color};
+    --bg-text: #{fn.getTextColor(var.$bg_color)};
     --shadow-sm: #{map-get(var.$shadows,sm)};
     --shadow-md: #{map-get(var.$shadows,md)};
-    --spacing-md: calc(var(--spacing)/2) var(--spacing);
-    --spacing-sm: calc(var(--spacing)/4) calc(var(--spacing)/2);
+    --spacing:#{var.$spacing};
+    --spacing-md: #{math.div(var.$spacing,2)} #{var.$spacing};
+    --spacing-sm: #{math.div(var.$spacing,4)} #{math.div(var.$spacing,2)};
     --radius-sm: #{map-get(var.$border_radius,sm)};
 }
 *,:before,:after{
     transition: all .3s;
+}
+@each $name,$color in var.$action_colors{
+    .color-#{$name}{
+        color: var(--text-#{$name});
+        background-color: var(--color-#{$name});
+    }
 }
 .shadow-sm{
     @if(fn.isDarkColor(var.$bg_color)==false){
@@ -163,7 +169,7 @@
 }
 
 input:invalid {
-    color: map-get(var.$action_colors,danger);
+    color: var(--color-danger);
 }
 select{
     appearance: none;

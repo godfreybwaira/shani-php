@@ -61,7 +61,7 @@
         background-color: var(--color-18);
     }
     &>:not(&-active, &-complete) {
-        color: var(--font-grey);
+        color: var(--text-grey);
         &:before {
             background-color: var(--color-18);
         }

@@ -40,7 +40,7 @@
         }
         .menu-item{
             &.active{
-                color: var(--font-color);
+                color: var(--bg-text);
                 background: var.$bg_color;
                 &:after{
                     left: 0;

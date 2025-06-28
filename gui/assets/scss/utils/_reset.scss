@@ -5,7 +5,7 @@ html {
     scroll-behavior: smooth;
 }
 body {
-    color: var(--font-color);
+    color: var(--bg-text);
     font-size: var(--font-size);
     font-weight: normal;
     line-height: 1.5;
@@ -16,7 +16,7 @@ body {
     box-sizing: border-box;
 }
 *::placeholder{
-    color: var(--font-grey);
+    color: var(--text-grey);
 }
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
@@ -50,6 +50,7 @@ sup {
 a {
     text-decoration: none;
     background-color: transparent;
+    color: var(--accent-color);
 }
 a:hover{
     text-decoration: underline;
@@ -58,7 +59,6 @@ pre,code,kbd,samp {
     font-family: monospace;
 }
 pre,textarea {
-
     overflow: auto;
 }
 img {
@@ -113,6 +113,7 @@ html [type="button"],
 [type="reset"],
 [type="submit"] {
     -webkit-appearance: button;
+    cursor: pointer;
 }
 button::-moz-focus-inner,
 [type="button"]::-moz-focus-inner,

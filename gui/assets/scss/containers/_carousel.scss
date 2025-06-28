@@ -3,16 +3,16 @@
 @use '../utils/callables/functions' as fn;
 
 .carousel {
-    $square: fn.px2rem(30px);
-    display: grid;
+    display: flex;
     gap: calc(var(--spacing)/2);
     align-items: center;
-    grid-auto-flow: column;
-    grid-template-columns: $square 1fr $square;
     @extend %full_size;
+    --speed: 5s;
     &-body {
+        flex: 1;
         border-radius: var(--radius-sm);
         @extend %full_height, %position_relative, %overflow_hide;
+
         &>* {
             top: 0;
             left: 0;
@@ -21,23 +21,32 @@
             @extend %full_size, %position_absolute;
             &.active{
                 z-index: 1;
+                &:after{
+                    animation: cl_timeout var(--speed) linear;
+                }
             }
             &:not(.active){
                 opacity: 0;
             }
+            &:after{
+                content: '';
+                width: 100%;
+                z-index: 1;
+                bottom: 0;
+                height:fn.px2rem(2px);
+                background: var(--color-danger);
+                @extend %position_absolute;
+            }
         }
     }
     &-next,&-prev{
+        $square: fn.px2rem(30px);
         display: grid;
         height: $square;
         width: $square;
-        cursor: pointer;
-        align-items: center;
-        justify-items: center;
         border: none;
-        outline: var(--thin-border);
         background: var(--fg-color);
-        @extend %round_corner;
+        @extend %round_corner,%center_content;
         &:hover{
             @extend %hover_color;
         }
@@ -47,5 +56,11 @@
     }
     &-prev:before{
         @include ext.createLeftAngle(.6rem,fn.px2rem(2px));
+    }
+}
+
+@keyframes cl_timeout{
+    to{
+        width:0;
     }
 }

@@ -43,7 +43,7 @@
         }
         &.loader{
             #{$progress}{
-                --color:red;
+                --color:var(--color-danger);
                 --progress: 20%;
             }
             top: 0;

@@ -1,6 +1,5 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
-@use '../../utils/callables/variables' as var;
 
 %_cross{
     width: 60%;
@@ -22,7 +21,6 @@
     }
 
     &:hover {
-        cursor: pointer;
         text-decoration: none;
     }
 
@@ -38,7 +36,8 @@
         height: $size;
         display: flex;
         z-index: 100;
-        background: map-get(var.$action_colors,danger);
+        color: var(--text-danger);
+        background: var(--color-danger);
         @extend %position_absolute, %round_corner, %center_content, %margin_xy;
         &:before {
             transform: rotate($angle);
