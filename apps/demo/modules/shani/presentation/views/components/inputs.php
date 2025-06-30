@@ -36,6 +36,12 @@
     </div>
     <div class="col">
         <label>
+            <input class="checkbox" type="checkbox">
+            Checkbox
+        </label>
+    </div>
+    <div class="col">
+        <label>
             <input class="toggle input-mask" type="checkbox">
             Toggle with mask
         </label>

@@ -1,0 +1,19 @@
+@use '../../utils/callables/functions' as fn;
+
+.checkbox{
+    $size: fn.px2rem(20px);
+    height: $size;
+    width: $size;
+    vertical-align: text-bottom;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.checkbox:not(:checked){
+    appearance: none;
+    outline: var(--thin-border);
+}
+
+.checkbox:checked{
+    clip-path: circle(50%);
+}

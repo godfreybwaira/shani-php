@@ -2,7 +2,7 @@
 @use '../../utils/callables/extensions';
 
 .toggle {
-    $height: fn.px2rem(18px);
+    $height: fn.px2rem(20px);
     $width: $height * 2.23;
     $pos: calc($height * .25 /2);
     $size: $height * .75;
