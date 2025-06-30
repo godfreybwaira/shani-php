@@ -12,11 +12,10 @@
 
 .content{
     &-navbar{
-        $color: if(fn.isDarkColor(var.$bg_color),var(--fg-color),rgba(22, 22, 23, 0.25));
         display: flex;
         justify-content: space-between;
-        background: linear-gradient($color, transparent);
-        //border-bottom: if(fn.isDarkColor(var.$bg_color),var(--thin-border),none);
+        border-bottom: var(--thin-border);
+        background: var(--theme-color);
     }
     &-body{
         flex: 1;

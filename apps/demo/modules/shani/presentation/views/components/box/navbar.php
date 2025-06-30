@@ -16,7 +16,7 @@
     </div>
     <div class="dropdown">
         <a href="#" class="menu-item">
-            <img src="/0/img/pic2.jpg" title="" class="avatar" style="--size:1.5rem"/>
+            <img src="/0/img/pic1.jpg" title="" class="avatar" style="--size:1.5rem"/>
         </a>
         <div class="dropdown-body pos-bl">
             <div class="list">
