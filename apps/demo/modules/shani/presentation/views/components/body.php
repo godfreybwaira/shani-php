@@ -1,4 +1,4 @@
-<div class="tab tab-pos-b">
+<div class="tab tab-pos-t">
     <div class="tab-menu menubar">
         <a href="#" class="menu-item">
             <i class="mdi mdi-professional-hexagon"></i>

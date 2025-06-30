@@ -12,9 +12,9 @@
 .menu-item {
     flex: 1;
     display: flex;
-    flex-wrap: wrap;
-    text-align: center;
     color: inherit;
+    text-wrap: nowrap;
+    text-align: center;
     @extend %padding_md, %position_relative, %center_content;
     &:hover{
         text-decoration: none;

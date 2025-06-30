@@ -141,30 +141,30 @@
 <div class="divider">Avatars</div>
 <div class="row">
     <div class="col">
-        <a href="#" title="" class="avatar avatar-sm color-danger" style="--size:2rem">L</a>
-        <a href="#" class="avatar avatar-sm">
+        <a href="#" title="" class="avatar color-danger" style="--size:2rem">L</a>
+        <a href="#" class="avatar">
             <img src="/0/img/pic1.jpg" alt=""/>
         </a>
-        <a href="#" title="" class="avatar avatar-sm color-success" style="--size:3rem">M</a>
-        <a href="#" title="" class="avatar avatar-sm" style="--size:3.5rem">
+        <a href="#" title="" class="avatar color-success" style="--size:3rem">M</a>
+        <a href="#" title="" class="avatar" style="--size:3.5rem">
             <img src="/0/img/pic2.jpg" alt=""/>
         </a>
-        <a href="#" title="" class="avatar avatar-sm color-alert" style="--size:4rem">G</a>
+        <a href="#" title="" class="avatar color-alert" style="--size:4rem">G</a>
     </div>
 </div>
 <div class="divider">Avatar Group</div>
 <div class="row">
     <div class="col">
         <div class="avatar-group">
-            <div class="avatar avatar-sm color-danger">L</div>
-            <div class="avatar avatar-sm">
+            <div class="avatar color-danger">L</div>
+            <div class="avatar">
                 <img src="/0/img/pic1.jpg" alt=""/>
             </div>
-            <div class="avatar avatar-sm color-success">M</div>
-            <div class="avatar avatar-sm">
+            <div class="avatar color-success">M</div>
+            <div class="avatar">
                 <img src="/0/img/pic2.jpg" alt=""/>
             </div>
-            <div class="avatar avatar-sm color-alert">G</div>
+            <div class="avatar color-alert">G</div>
         </div>
     </div>
 </div>

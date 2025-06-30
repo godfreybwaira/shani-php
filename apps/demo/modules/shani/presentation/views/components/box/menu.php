@@ -19,8 +19,7 @@
         <i class="mdi mdi-inbox-full"></i>
         <span class="font-sm menu-label">Modal</span>
     </a>
-    <a href="#" class="menu-item menu-item-dir-v" style="margin-top:auto">
+    <a href="#" class="menu-item menu-item-dir-v" title="Settings" style="margin-top:auto">
         <i class="mdi mdi-cog"></i>
-        <span class="font-sm menu-label">Settings</span>
     </a>
 </div>

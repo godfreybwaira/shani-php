@@ -38,17 +38,27 @@
         @if(fn.isDarkColor(var.$bg_color)==false){
             box-shadow: var(--shadow-md);
         }
+        &>*{
+            gap: calc(var(--spacing)/2);
+            @extend %padding_xy_sm;
+        }
         .menu-item{
+            justify-content: start;
+            border-radius: calc(var(--spacing)/2);
+            @extend %padding_xy_sm;
+            &-dir-v:after{
+                width: 0;
+                content: '';
+                height: fn.px2rem(2px);
+                bottom: calc(var(--spacing)/3);
+                background-color: currentColor;
+                @extend %position_absolute;
+            }
             &.active{
                 color: var(--bg-text);
-                background: var.$bg_color;
+                background: var(--bg-color);
                 &:after{
-                    left: 0;
-                    bottom: 0;
-                    content: '';
-                    height: calc(var(--spacing)/5);
-                    background-color: currentColor;
-                    @extend %position_absolute, %full_width;
+                    width: 50%;
                 }
             }
             &:not(.active):hover{
@@ -62,13 +72,8 @@
             &>*{
                 flex-direction: column;
             }
-
             .menu-item{
                 flex: none;
-                &.active:after{
-                    height: 100%;
-                    width: calc(var(--spacing)/5);
-                }
             }
         }
     }

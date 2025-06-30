@@ -16,10 +16,7 @@
     </div>
     <div class="dropdown">
         <a href="#" class="menu-item">
-            <i class="mdi mdi-account"></i>
-            <span>
-                User<i class="mdi mdi-chevron-down"></i>
-            </span>
+            <img src="/0/img/pic2.jpg" title="" class="avatar" style="--size:1.5rem"/>
         </a>
         <div class="dropdown-body pos-bl">
             <div class="list">
