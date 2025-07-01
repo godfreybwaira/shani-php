@@ -5,7 +5,7 @@
     cursor: default;
     align-items: center;
     text-align: center;
-    color: var(--text-grey);
+    color: var(--text-muted);
     @extend %margin_x,%full_width,%font_sm;
     &:not(:empty){
         gap: var(--spacing);

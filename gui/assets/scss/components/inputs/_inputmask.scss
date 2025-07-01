@@ -11,7 +11,7 @@
     }
     &[data-label]{
         &:after{
-            color: var(--text-grey);
+            color: var(--text-muted);
             @extend %padding_md;
         }
     }

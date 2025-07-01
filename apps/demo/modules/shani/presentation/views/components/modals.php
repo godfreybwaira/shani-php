@@ -7,7 +7,7 @@
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vl'): ?>
-        <div class="modal modal-type-v width-md-1q width-sm-10 pos-l">
+        <div class="modal modal-type-v width-md-1q width-sm-3q pos-l">
             <button shani-fn="close" class="button button-times" shani-target=".modal-background"></button>
             <div class="card">
                 <div class="card-body container">
@@ -16,7 +16,7 @@
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>
-        <div class="modal modal-type-v width-md-1q width-sm-10 pos-r">
+        <div class="modal modal-type-v width-md-1q width-sm-3q pos-r">
             <button shani-fn="close" class="button button-times" shani-target=".modal-background"></button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'ht'): ?>
@@ -28,7 +28,7 @@
             <button shani-fn="close" class="button button-times" shani-target=".modal-background"></button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'cl'): ?>
-        <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
+        <div class="modal modal-type-c width-sm-3q height-sm-10 pos-c">
             <?php $app->ui()->layout($app->view('/box/modal_nav'), $app->view('/body'), $app->view('/box/menu')); ?>
         </div>
     <?php else: ?>

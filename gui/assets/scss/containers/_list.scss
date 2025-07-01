@@ -27,7 +27,7 @@
         font-weight: bold;
     }
     &-body{
-        color: var(--text-grey);
+        color: var(--text-muted);
         @extend %font_sm;
     }
     &-dir-h{

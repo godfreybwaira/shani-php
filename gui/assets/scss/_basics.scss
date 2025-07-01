@@ -82,7 +82,7 @@
 }
 :root{
     @include _createColors(var.$action_colors,var.$accent_color);
-    --text-grey: #{if(fn.isDarkColor(var.$bg_color),#555,#888)};
+    --text-muted: #{if(fn.isDarkColor(var.$bg_color),#555,#888)};
     --font-size:#{var.$font_size};
     --accent-color:#{var.$accent_color};
     --accent-text: #{fn.getTextColor(var.$accent_color)};

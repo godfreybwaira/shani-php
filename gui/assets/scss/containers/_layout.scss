@@ -27,7 +27,7 @@
     &-content{
         flex: 1;
         display: flex;
-        overflow-y: auto;
+        overflow: hidden auto;
         flex-direction: column;
         background-color: var(--bg-color);
     }
@@ -54,8 +54,9 @@
                 @extend %position_absolute;
             }
             &.active{
-                color: var(--bg-text);
-                background: var(--bg-color);
+                $size: fn.px2rem(3px);
+                box-shadow: inset $size $size $size var(--color-6),
+                    inset -#{$size} -#{$size} $size var(--color-12);
                 &:after{
                     width: 50%;
                 }

@@ -1,0 +1,39 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+
+.input{
+    &-line{
+        display: flex;
+        margin-top: var(--spacing);
+        border-bottom: var(--thin-border);
+        @extend %position_relative;
+        &:not(&-sm)>*{
+            @extend %padding_md;
+        }
+        &-sm>*{
+            @extend %padding_sm;
+        }
+        select,input,textarea{
+            flex: 1;
+            border: none;
+            outline: none;
+            background-color: var(--bg-color);
+        }
+        &>label{
+            top: 0;
+            width: 100%;
+            pointer-events: none;
+            @extend %position_absolute;
+        }
+        :focus+label,[type=file]+label,:not(:placeholder-shown)+label{
+            top: -50%;
+            padding: 0;
+        }
+        :not(:focus)::placeholder{
+            opacity: 0;
+        }
+        &:has(:focus){
+            border-color: var(--accent-color);
+        }
+    }
+}

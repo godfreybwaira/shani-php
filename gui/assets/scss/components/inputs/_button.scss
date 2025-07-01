@@ -10,6 +10,7 @@
 }
 .button {
     border: none;
+    white-space: nowrap;
     &:not(&-times){
         border-radius: var(--radius-sm);
     }
