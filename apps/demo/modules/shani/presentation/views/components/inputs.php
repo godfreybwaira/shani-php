@@ -8,7 +8,10 @@
     <div class="col width-sm-1">
         <button class="button button-times"></button>
     </div>
-    <div class="col width-sm-max width-md-4">
+    <div class="col">
+        <button class="button button-type-outline">Outline Button</button>
+    </div>
+    <div class="col width-sm-max width-md-1q">
         <button class="button button-block color-success">
             Button Block
         </button>

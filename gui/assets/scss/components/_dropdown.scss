@@ -33,6 +33,7 @@
         }
     }
     &:not(:focus-within,:hover)>&-body {
-        display: none;
+        visibility: hidden;
+        opacity: 0;
     }
 }

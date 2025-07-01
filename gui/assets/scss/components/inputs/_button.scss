@@ -13,6 +13,12 @@
     &:not(&-times){
         border-radius: var(--radius-sm);
     }
+    &-type-outline{
+        color: var(--theme-text);
+        outline: fn.px2rem(1px) solid currentColor;
+        outline-offset: fn.px2rem(-1px);
+        background: none;
+    }
     &:not(&-sm,&-times){
         @extend %padding_md;
     }
