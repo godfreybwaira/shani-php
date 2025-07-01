@@ -2,27 +2,25 @@
 @use '../../utils/callables/extensions';
 
 .toggle {
-    $height: fn.px2rem(20px);
-    $width: $height * 2.23;
-    $pos: calc($height * .25 /2);
-    $size: $height * .75;
+    $width: fn.px2rem(40px);
+    $margin: fn.px2rem(2px);
+    $size: calc($width / 2) - ($margin * 2);
 
+    width: $width;
     cursor: pointer;
     appearance: none;
-    height: $height;
-    width: $width;
-    @extend %position_relative, %overflow_hide;
-    border-radius: var(--spacing);
+    border-radius: 10rem;
     outline: fn.px2rem(1px) solid;
     vertical-align: text-bottom;
+    @extend %position_relative, %overflow_hide;
 
     &:before {
         content: '';
         height: $size;
         width: $size;
-        left: $pos;
-        top: $pos;
-        @extend %position_absolute, %round_corner;
+        display: block;
+        margin: $margin;
+        @extend %round_corner;
     }
     &:not(:checked){
         outline-color: var(--border-color);
@@ -33,7 +31,7 @@
     &:checked{
         outline-color: var(--accent-color);
         &:before{
-            left: calc($width - ($size + $pos));
+            margin-left: $width - ($size + $margin);
             background-color: var(--accent-color);
         }
     }
