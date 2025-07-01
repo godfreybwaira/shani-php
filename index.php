@@ -16,12 +16,12 @@ spl_autoload_register(function (string $class) {
 $config = new FrameworkConfig();
 
 if (PHP_SAPI === 'cli') {
-    /*     * *****************************************************************
+    /**
+     * ***********************************************************************
      * Run the application using Swoole server. It requires swoole extension *
-     * to be installed                                                       *
+     * to be installed, and of course UNIX family operating systems          *
      * ***********************************************************************
      */
-
     /*
      * Testing env
      */
@@ -32,11 +32,11 @@ if (PHP_SAPI === 'cli') {
      */
     WebServer::start(new \shani\servers\swoole\SwooleServer($config));
 } else {
-    /*     * ********************************************************
+    /**
+     * **************************************************************
      * Run the application using any CGI server e.g apache or nginx *
      * **************************************************************
      */
-
     /**
      * Testing env
      */
