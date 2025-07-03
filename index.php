@@ -19,7 +19,7 @@ if (PHP_SAPI === 'cli') {
     /**
      * ***********************************************************************
      * Run the application using Swoole server. It requires swoole extension *
-     * to be installed, and of course UNIX family operating systems          *
+     * to be installed, and of course UNIX family operating system           *
      * ***********************************************************************
      */
     /*
