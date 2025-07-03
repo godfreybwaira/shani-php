@@ -11,7 +11,8 @@
 
 .checkbox:not(:checked){
     appearance: none;
-    outline: var(--thin-border);
+    outline-offset: fn.px2rem(-2px);
+    outline: fn.px2rem(2px) solid var(--border-color);
 }
 
 .checkbox:checked{

@@ -127,6 +127,16 @@
         outline: var(--thin-border);
     }
 }
+.text-muted{
+    color:var(--text-muted);
+}
+.mb-md{
+    margin-bottom: var(--spacing);
+}
+.text-title{
+    margin: 0 0 var(--spacing) 0;
+    font-weight: bold;
+}
 .font-sm{
     @extend %font_sm;
 }

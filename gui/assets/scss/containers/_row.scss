@@ -27,9 +27,6 @@
     &:not(:last-child){
         margin-bottom: var(--spacing);
     }
-    &:not(&-stretch)>.col:not([class*=width-]) {
-        max-width: max-content;
-    }
     &-stretch>.col:not([class*=width-]) {
         flex: 1;
     }

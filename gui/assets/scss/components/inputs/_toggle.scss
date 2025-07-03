@@ -2,15 +2,16 @@
 @use '../../utils/callables/extensions';
 
 .toggle {
+    $outline: fn.px2rem(2px);
     $width: fn.px2rem(40px);
     $margin: fn.px2rem(2px);
-    $size: calc($width / 2) - ($margin * 2);
+    $size: calc($width / 2) - ($margin * 2) - $outline;
 
     width: $width;
     cursor: pointer;
     appearance: none;
     border-radius: 10rem;
-    outline: fn.px2rem(1px) solid;
+    outline: $outline solid;
     vertical-align: text-bottom;
     @extend %position_relative, %overflow_hide;
 

@@ -1,0 +1,93 @@
+@use '../utils/callables/functions' as fn;
+@use '../utils/callables/extensions' as ext;
+@use '../utils/callables/variables' as var;
+@use 'sass:math';
+
+.timeline{
+    $angle_size: var.$spacing;
+    $left_pos: var.$spacing * 2;
+    $before_width:fn.px2rem(2px);
+    $after_left_pos: ($angle_size + math.div($before_width,2)) * -2.325;
+
+    counter-reset: num;
+    padding-left: var(--spacing);
+    @extend %position_relative;
+    &:before{
+        content: '';
+        height: 0;
+        width:$before_width;
+        background: var(--accent-color);
+        animation: tl_grow 2s linear forwards;
+        @extend %position_absolute;
+    }
+    @extend %list_reset;
+    &>*{
+        background: var(--bg-color);
+        box-shadow: var(--shadow-sm);
+        border-radius: var(--radius-sm);
+        @extend %padding_xy, %margin_x, %position_relative;
+        &:before{
+            content: '';
+            background: inherit;
+            border: var(--thin-border);
+            transform: rotate(45deg);
+        }
+        &:before, &:after{
+            width: $angle_size;
+            height: $angle_size;
+            @extend %position_absolute;
+        }
+        &:after{
+            display: flex;
+            background: inherit;
+            counter-increment: num;
+            content: counter(num, decimal);
+            outline: fn.px2rem(2px) solid var(--accent-color);
+            @extend %round_corner,%font_sm,%center_content;
+        }
+        &:nth-child(even),&:nth-child(odd){
+            margin-left: $left_pos;
+            &:before{
+                border-width: 0 0 fn.px2rem(1px) fn.px2rem(1px);
+                left: math.div($angle_size,-2);
+            }
+            &:after{
+                top: var(--spacing);
+                left: $after_left_pos;
+            }
+        }
+    }
+
+    @include ext.media(map-get(var.$breakpoints, md)) {
+        $width: calc(50% - $left_pos);
+        &{
+            padding-left: 0;
+        }
+        &:before{
+            left: calc($width + $left_pos - math.div($before_width,2));
+        }
+        &>*{
+            width: $width;
+            &:nth-child(even){
+                margin-left: calc($width + ($left_pos * 2));
+            }
+            &:nth-child(odd){
+                margin-left: 0;
+                &:before{
+                    border-width: fn.px2rem(1px) fn.px2rem(1px) 0 0;
+                    left: calc(100% + math.div($angle_size,-2));
+                }
+                &:after{
+                    left: auto;
+                    right: $after_left_pos;
+                }
+            }
+        }
+    }
+}
+
+@keyframes tl_grow{
+    to{
+        height: 100%
+    }
+}
