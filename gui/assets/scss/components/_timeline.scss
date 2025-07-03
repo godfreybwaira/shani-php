@@ -25,6 +25,7 @@
         background: var(--bg-color);
         box-shadow: var(--shadow-sm);
         border-radius: var(--radius-sm);
+        outline: var(--thin-border);
         @extend %padding_xy, %margin_x, %position_relative;
         &:before{
             content: '';
