@@ -1,27 +1,3 @@
-<div class="divider">Timeline</div>
-<div class="row">
-    <div class="col">
-        <ul class="timeline">
-            <li>
-                <h3>My Title</h3>
-                <div class="text-muted font-sm mb-md">2011-2012</div>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt, esse, a deleniti quos qui veniam impedit vitae laborum earum quas quibusdam provident et eos dolore dicta distinctio ea itaque placeat.
-            </li>
-            <li>
-                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
-            </li>
-            <li>
-                Fusce convallis, mauris imperdiet gravida bibendum, nisl turpis suscipit mauris, sed placerat ipsum urna sed risus. In convallis tellus a mauris. Curabitur non elit ut libero tristique sodales. Mauris a lacus.
-            </li>
-            <li>
-                Donec mattis semper leo. In hac habitasse platea dictumst. Vivamus facilisis diam at odio. Mauris dictum, nisi eget consequat elementum, lacus ligula molestie metus, non feugiat orci magna ac sem. Donec turpis.
-            </li>
-            <li>
-                Proin nonummy, lacus eget pulvinar lacinia, pede felis dignissim leo, vitae tristique magna lacus sit amet eros. Nullam ornare. Praesent odio ligula, dapibus sed, tincidunt eget, dictum ac, nibh. Nam quis lacus. Nunc eleifend molestie velit. Morbi lobortis quam eu velit
-            </li>
-        </ul>
-    </div>
-</div>
 <div class="divider">Pills</div>
 <div class="grid">
     <a href="#" class="pill color-alert">My awesome pill</a>
@@ -295,12 +271,12 @@
 <div class="divider">Toaster</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/toaster?type=t" shani-insert="append" shani-header="x-request-mode:async" shani-fn="r" shani-target="body">
+        <a href="/shani/0/components/0/toaster?type=t" shani-insert="append" shani-fn="r" shani-target="body">
             Toaster from Top
         </a>
     </li>
     <li>
-        <a href="/shani/0/components/0/toaster?type=b" shani-insert="append" shani-header="x-request-mode:async" shani-fn="r" shani-target="body">
+        <a href="/shani/0/components/0/toaster?type=b" shani-insert="append" shani-fn="r" shani-target="body">
             Toaster from Bottom
         </a>
     </li>
@@ -308,7 +284,7 @@
 <div class="divider">Loaders</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/loader?type=i" shani-insert="append" shani-header="x-request-mode:async" shani-fn="r" shani-target=".layout-content">
+        <a href="/shani/0/components/0/loader?type=i" shani-insert="append" shani-fn="r" shani-target=".layout-content">
             Infinite loader
         </a>
     </li>
@@ -318,3 +294,27 @@
 <div class="divider">some texts</div>
 <div class="divider">Divider without texts</div>
 <div class="divider"></div>
+<div class="divider">Timeline</div>
+<div class="row">
+    <div class="col">
+        <ul class="timeline" shani-target=".timeline" shani-fn="r" shani-on="demand" action="/shani/0/components/0/timeline" shani-insert="append">
+            <li>
+                <h3>My Title</h3>
+                <div class="text-muted font-sm mb-md">2011-2012</div>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt, esse, a deleniti quos qui veniam impedit vitae laborum earum quas quibusdam provident et eos dolore dicta distinctio ea itaque placeat.
+            </li>
+            <li>
+                Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula.
+            </li>
+            <li>
+                Fusce convallis, mauris imperdiet gravida bibendum, nisl turpis suscipit mauris, sed placerat ipsum urna sed risus. In convallis tellus a mauris. Curabitur non elit ut libero tristique sodales. Mauris a lacus.
+            </li>
+            <li>
+                Donec mattis semper leo. In hac habitasse platea dictumst. Vivamus facilisis diam at odio. Mauris dictum, nisi eget consequat elementum, lacus ligula molestie metus, non feugiat orci magna ac sem. Donec turpis.
+            </li>
+            <li>
+                Proin nonummy, lacus eget pulvinar lacinia, pede felis dignissim leo, vitae tristique magna lacus sit amet eros. Nullam ornare. Praesent odio ligula, dapibus sed, tincidunt eget, dictum ac, nibh. Nam quis lacus. Nunc eleifend molestie velit. Morbi lobortis quam eu velit
+            </li>
+        </ul>
+    </div>
+</div>

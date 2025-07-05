@@ -41,11 +41,10 @@
 
         width: $size;
         height: $size;
-        display: flex;
         z-index: 100;
         color: var(--text-danger);
         background: var(--color-danger);
-        @extend %position_absolute, %round_corner, %center_content, %margin_xy;
+        @extend %position_absolute, %round_corner;
         &:before {
             transform: rotate($angle);
             @extend %_cross, %position_absolute;

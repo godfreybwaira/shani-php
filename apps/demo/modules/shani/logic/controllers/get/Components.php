@@ -56,6 +56,11 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
             return $this->app->render();
         }
+
+        public function timeline()
+        {
+            return $this->app->render();
+        }
     }
 
 }

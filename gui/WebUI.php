@@ -32,6 +32,7 @@ namespace gui {
             $this->localStyle('/css/main.css');
             $this->localStyle('/css/icons/mdi.css');
             $this->localScript('/js/shani-ob-2.0.js', ['defer']);
+            $this->localScript('/js/app.js', ['defer']);
         }
 
         /**
