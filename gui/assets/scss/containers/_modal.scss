@@ -1,6 +1,7 @@
 @use '../utils/callables/extensions';
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/variables' as var;
+@use 'sass:map';
 
 .modal{
     @extend %overflow_hide;
@@ -11,7 +12,7 @@
         background: rgba(0,0,0,0.7);
         backdrop-filter:blur(fn.px2rem(4px));
         @extend %full_size,%position_absolute, %overflow_hide;
-        z-index: map-get(var.$z_index,md);
+        z-index: map.get(var.$z_index,md);
     }
     &-type{
         &-c{

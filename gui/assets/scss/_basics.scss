@@ -3,6 +3,7 @@
 @use 'utils/callables/variables' as var;
 @use 'sass:color';
 @use 'sass:math';
+@use 'sass:map';
 
 @mixin _createColors($action_colors, $accent_color){
     $median: 10;
@@ -95,12 +96,12 @@
     --border-color: #{var.$border_color};
     --bg-color: #{var.$bg_color};
     --bg-text: #{fn.getTextColor(var.$bg_color)};
-    --shadow-sm: #{map-get(var.$shadows,sm)};
-    --shadow-md: #{map-get(var.$shadows,md)};
+    --shadow-sm: #{map.get(var.$shadows,sm)};
+    --shadow-md: #{map.get(var.$shadows,md)};
     --spacing:#{var.$spacing};
     --spacing-md: #{math.div(var.$spacing,2)} #{var.$spacing};
     --spacing-sm: #{math.div(var.$spacing,4)} #{math.div(var.$spacing,2)};
-    --radius-sm: #{map-get(var.$border_radius,sm)};
+    --radius-sm: #{map.get(var.$border_radius,sm)};
 }
 *,:before,:after{
     transition: all .3s;

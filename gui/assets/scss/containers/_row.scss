@@ -1,5 +1,6 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
+@use 'sass:map';
 
 .grid{
     display: flex;
@@ -31,7 +32,7 @@
         flex: 1;
     }
 
-    @include ext.media(map-get(var.$breakpoints, md)) {
+    @include ext.media(map.get(var.$breakpoints, md)) {
         &:not(&-nowrap){
             flex-direction: row;
         }

@@ -44,7 +44,13 @@ namespace shani\persistence {
             $pos = strpos($root, '/', 1);
             $dirname = $pos === false ? $root : substr($root, 0, $pos);
             $path = Framework::DIR_STORAGE . $dirname;
-            if (is_link($path) || symlink($target, $path)) {
+            if (is_link($path)) {
+                return $path;
+            }
+            if (!is_dir($target)) {
+                mkdir($target, self::FILE_MODE, true);
+            }
+            if (symlink($target, $path)) {
                 return $path;
             }
             throw new ServerException('Failed to create directory ' . $path);

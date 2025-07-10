@@ -1,6 +1,7 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
 @use '../utils/callables/functions' as fn;
+@use 'sass:map';
 
 .grid-layout{
     display: grid;
@@ -65,7 +66,7 @@
                 background: var(--hover-color);
             }
         }
-        @include ext.media(map-get(var.$breakpoints, md)) {
+        @include ext.media(map.get(var.$breakpoints, md)) {
             & {
                 order: -1;
             }
@@ -81,7 +82,7 @@
         display: flex;
         @extend %full_size;
         flex-direction: column;
-        @include ext.media(map-get(var.$breakpoints, md)) {
+        @include ext.media(map.get(var.$breakpoints, md)) {
             & {
                 flex-direction: row;
             }

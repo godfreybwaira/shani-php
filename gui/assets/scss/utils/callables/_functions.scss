@@ -6,9 +6,9 @@
     @return if($value <= 0.03928, math.div($value, 12.92), math.pow(math.div($value + 0.055, 1.055), 2.4));
 }
 @function isDarkColor($color){
-    $red: gammaCorrection(red($color));
-    $green: gammaCorrection(green($color));
-    $blue: gammaCorrection(blue($color));
+    $red: gammaCorrection(color.channel($color, 'red', $space: rgb));
+    $green: gammaCorrection(color.channel($color, 'green', $space: rgb));
+    $blue: gammaCorrection(color.channel($color, 'blue', $space: rgb));
     $luminance: $red * 0.2126 + $green * 0.7152 + $blue * 0.0722;
     @return $luminance < 0.179;
 }
@@ -24,7 +24,7 @@
     $num: $px * 0+1;
     $base: 1rem;
 
-    @if(unit($num)=='px' or is-unitless($px)) {
+    @if(math.unit($num)=='px' or is-unitless($px)) {
         @if($return_unit) {
             @return math.div(math.div($px * $base, $num), 16);
         }

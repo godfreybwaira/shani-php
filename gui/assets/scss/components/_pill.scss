@@ -1,15 +1,16 @@
 @use '../utils/callables/extensions';
 @use '../utils/callables/variables' as var;
+@use 'sass:map';
 
 
 .pill{
     padding: calc(var(--spacing)/6) var(--spacing);
-    border-radius: map-get(var.$border_radius,lg);
+    border-radius: map.get(var.$border_radius,lg);
     @extend %font_sm;
     &-group{
         display: inline-flex;
         @extend %overflow_hide;
-        border-radius: map-get(var.$border_radius,lg);
+        border-radius: map.get(var.$border_radius,lg);
         &>*{
             border-radius: 0;
         }

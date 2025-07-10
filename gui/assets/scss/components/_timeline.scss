@@ -2,6 +2,7 @@
 @use '../utils/callables/extensions' as ext;
 @use '../utils/callables/variables' as var;
 @use 'sass:math';
+@use 'sass:map';
 
 .timeline{
     $angle_size: var.$spacing;
@@ -59,7 +60,7 @@
         }
     }
 
-    @include ext.media(map-get(var.$breakpoints, md)) {
+    @include ext.media(map.get(var.$breakpoints, md)) {
         $width: calc(50% - $left_pos);
         &{
             padding-left: 0;

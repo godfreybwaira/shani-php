@@ -4,8 +4,8 @@
 # Begin server block
 ## Redirect HTTP requests on port 80 to HTTPS on port 443
 server {
-    listen 80;
-    listen [::]:80;
+    listen 80 http2;
+    listen [::]:80 http2;
 
     server_name dev.shani.v2.local www.dev.shani.v2.local;
 
@@ -16,12 +16,12 @@ server {
 ```
 ## HTTPS server block on port 443
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
 
     server_name dev.shani.v2.local www.dev.shani.v2.local;
 
-    root /var/www/html/dev/shani/v2;
+    root /var/www/html/shani-php;
     index index.php;
 
     # Include the SSL certificate and key
@@ -50,8 +50,8 @@ server {
 
 ## Create a file named self-signed.conf in /nginx/snippets and add the following content
 ```
-ssl_certificate /var/www/html/dev/shani/v2/config/ssl/server.crt;
-ssl_certificate_key /var/www/html/dev/shani/v2/config/ssl/server.key;
+ssl_certificate /var/www/html/shani-php/config/ssl/server.crt;
+ssl_certificate_key /var/www/html/shani-php/config/ssl/server.key;
 
 ```
 ## Create a file named ssl-params.conf in /nginx/snippets and add the following content
