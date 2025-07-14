@@ -101,7 +101,7 @@
         <div class="carousel-body">
             <div class="media">
                 <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt="">
-                <div class="media-caption pos-b">
+                <div class="media-caption pos-b" style="--color:#fff">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
             </div>
@@ -113,7 +113,7 @@
             </div>
             <div class="media">
                 <img src="<?= $app->ui()->asset('/img/pic3.jpg'); ?>" alt="">
-                <div class="media-caption pos-r">
+                <div class="media-caption pos-r" style="--color:#fff">
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                     </p>
@@ -525,4 +525,3 @@
     <li><a href="/shani/0/components/0/modals?type=hb"
            shani-fn="r" shani-target="body" shani-insert="append">Type HB</a></li>
 </ul>
-<div id="modals"></div>

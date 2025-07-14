@@ -226,6 +226,34 @@ namespace lib\http {
             }
             return $this;
         }
+
+        /**
+         * Send HTTP response redirect using a given HTTP referrer, if no referrer given
+         * false is returned and redirection fails
+         * @param HttpStatus $status HTTP status code, default is 302
+         * @return bool
+         */
+        public function redirectBack(HttpStatus $status = HttpStatus::FOUND): bool
+        {
+            $url = $this->request->header()->getOne(HttpHeader::REFERER);
+            if ($url !== null) {
+                $this->redirect($url, $status);
+                return true;
+            }
+            return false;
+        }
+
+        /**
+         * Send HTTP response redirect
+         * @param string $url new destination
+         * @param HttpStatus $status HTTP status code, default is 302
+         * @return self
+         */
+        public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
+        {
+            $this->setStatus($status)->header()->addOne(HttpHeader::LOCATION, $url);
+            return $this;
+        }
     }
 
 }

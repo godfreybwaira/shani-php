@@ -6,13 +6,8 @@
 .pill{
     padding: calc(var(--spacing)/6) var(--spacing);
     border-radius: map.get(var.$border_radius,lg);
+    background: var(--fg-color);
+    color: var(--text-color);
+    display: inline-block;
     @extend %font_sm;
-    &-group{
-        display: inline-flex;
-        @extend %overflow_hide;
-        border-radius: map.get(var.$border_radius,lg);
-        &>*{
-            border-radius: 0;
-        }
-    }
 }

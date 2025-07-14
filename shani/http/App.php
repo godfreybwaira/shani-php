@@ -181,34 +181,6 @@ namespace shani\http {
         }
 
         /**
-         * Send HTTP response redirect using a given HTTP referrer, if no referrer given
-         * false is returned and redirection fails
-         * @param HttpStatus $status HTTP status code, default is 302
-         * @return bool
-         */
-        public function redirectBack(HttpStatus $status = HttpStatus::FOUND): bool
-        {
-            $url = $this->request->header()->getOne(HttpHeader::REFERER);
-            if ($url !== null) {
-                $this->redirect($url, $status);
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * Send HTTP response redirect
-         * @param string $url new destination
-         * @param HttpStatus $status HTTP status code, default is 302
-         * @return self
-         */
-        public function redirect(string $url, HttpStatus $status = HttpStatus::FOUND): self
-        {
-            $this->response->setStatus($status)->header()->addOne(HttpHeader::LOCATION, $url);
-            return $this;
-        }
-
-        /**
          * Execute a callback function only when a application is in a given context
          * execution environment. Currently, 'web' and 'api' context are supported by
          * the framework. Developer is advised to use 'web' for web application and 'api'
@@ -297,18 +269,19 @@ namespace shani\http {
         /**
          * Render HTML document to user agent and close the HTTP connection.
          * @param \JsonSerializable|array|null $data Data to send with the response or to pass to a view file
+         * @param string|null $viewPath View file path
          * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable|array|null $data = null, ?bool $useBuffer = null): void
+        public function render(\JsonSerializable|array|null $data = null, ?string $viewPath = null, ?bool $useBuffer = null): void
         {
             $content = ($data instanceof \JsonSerializable) ? $data->jsonSerialize() : $data;
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();
-                $this->ui()->render($content);
+                $this->ui()->render($content, $viewPath);
                 $this->sendHtml(ob_get_clean(), $subtype);
             } else if ($subtype === DataConvertor::TYPE_SSE) {
                 ob_start();

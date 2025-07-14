@@ -127,14 +127,15 @@ namespace gui {
 
         /**
          * Render HTML document to user agent
-         * @param array $data Data object to be passed to a view component.
+         * @param array|null $data Data object to be passed to a view component.
+         * @param string|null $viewPath View file path
          * @return void
          */
-        public function render(?array $data): void
+        public function render(?array $data, ?string $viewPath = null): void
         {
             $this->data = new ReadableMap($data ?? []);
             if ($this->app->config->isAsync()) {
-                self::load($this->app, $this->app->view());
+                self::load($this->app, $this->app->view($viewPath));
             } else {
                 self::load($this->app, Framework::DIR_GUI . '/html/main.php');
             }
@@ -174,14 +175,15 @@ namespace gui {
          * @param string $navbar Full path to HTML navbar file
          * @param string $body Full path to HTML body file
          * @param string|null $menu Full path to HTML menu file
+         * @param string|null $id HTML id attribute for reference via JavaScript
          * @return void
          */
-        public function layout(string $navbar, string $body, ?string $menu = null): void
+        public function layout(string $navbar, string $body, ?string $menu = null, ?string $id = null): void
         {
-            self::loadLayout($this->app, $menu, $navbar, $body);
+            self::loadLayout($this->app, $navbar, $body, $id, $menu);
         }
 
-        private static function loadLayout(App &$app, ?string $menu_, string $navbar_, string $body_): void
+        private static function loadLayout(App &$app, string $navbar_, string $body_, ?string $id_, ?string $menu_): void
         {
             require Framework::DIR_GUI . '/html/layout.php';
         }

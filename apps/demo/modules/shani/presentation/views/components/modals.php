@@ -1,7 +1,7 @@
 <div class="modal-background">
     <?php if ($app->request->query->getOne('type') === 'c'): ?>
         <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
-            <button shani-fn="close" class="button button-times pos-tr" shani-target=".modal-background"></button>
+            <button shani-fn="close" class="button button-times pos-tr" style="margin: var(--spacing)" shani-target=".modal-background"></button>
             <div class="container height-sm-max">
                 <div class="spinner" style="--size:2.5rem"></div>
             </div>
@@ -29,7 +29,7 @@
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'cl'): ?>
         <div class="modal modal-type-c width-sm-3q height-sm-10 pos-c">
-            <?php $app->ui()->layout($app->view('/box/modal_nav'), $app->view('/body'), $app->view('/box/menu')); ?>
+            <?php $app->ui()->import($app->view('/shani')); ?>
         </div>
     <?php else: ?>
         Not available!

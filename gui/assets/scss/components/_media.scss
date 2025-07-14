@@ -8,7 +8,7 @@
         @extend %full_size;
     }
     &-caption{
-        color: #000;
+        color: var(--color,#000);
         overflow-y: auto;
         @extend %padding_xy;
         background-color: rgba(0,0,0,.25);

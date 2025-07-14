@@ -24,7 +24,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         public function index()
         {
             $this->app->ui()->description('Shani web framework')->title('Home Page');
-            return $this->app->render();
+            return $this->app->render(viewPath: '/body');
         }
 
         public function all()
@@ -58,6 +58,16 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         }
 
         public function timeline()
+        {
+            return $this->app->render();
+        }
+
+        public function shani()
+        {
+            return $this->app->render();
+        }
+
+        public function redirect()
         {
             return $this->app->render();
         }

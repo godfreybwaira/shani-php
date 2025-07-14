@@ -1,21 +1,8 @@
 <div class="divider">Pills</div>
 <div class="grid">
-    <a href="#" class="pill color-alert">My awesome pill</a>
-    <a href="#" class="pill color-danger">another pill</a>
-    <a href="#" class="pill color-info">My pill</a>
-    <a href="#" class="pill color-success">pill line</a>
-    <a href="#" class="pill color-disable">Disabled</a>
-</div>
-<div class="divider">Pill Group</div>
-<div class="row row-stretch">
-    <div class="col">
-        <div class="pill-group">
-            <a href="#" class="pill color-alert">My awesome pill</a>
-            <a href="#" class="pill color-danger">awesome pill</a>
-            <a href="#" class="pill color-info">My pill</a>
-            <a href="#" class="pill color-disable">Disabled</a>
-        </div>
-    </div>
+    <a href="#" class="pill">My awesome pill</a>
+    <a href="#" class="pill">My pill</a>
+    <a href="#" class="pill" disabled>Disabled</a>
 </div>
 <div class="divider">Dropdown Menu</div>
 <div class="row row-stretch">
@@ -297,7 +284,7 @@
 <div class="divider">Timeline</div>
 <div class="row">
     <div class="col">
-        <ul class="timeline" shani-target=".timeline" shani-fn="r" shani-on="demand" action="/shani/0/components/0/timeline" shani-insert="append">
+        <ul class="timeline" shani-target=".timeline" shani-fn="r" shani-poll="0:3" shani-on="demand" action="/shani/0/components/0/timeline" shani-insert="append">
             <li>
                 <h3>My Title</h3>
                 <div class="text-muted font-sm mb-md">2011-2012</div>

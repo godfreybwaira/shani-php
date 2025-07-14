@@ -8,7 +8,7 @@
         <div class="content-navbar">
             <?php $app->ui()->import($navbar_); ?>
         </div>
-        <div class="content-body">
+        <div class="content-body"<?= !empty($id_) ? ' id="' . $id_ . '"' : null; ?>>
             <?php $app->ui()->import($body_); ?>
         </div>
     </div>

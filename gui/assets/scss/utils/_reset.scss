@@ -167,6 +167,10 @@ summary {
 [hidden],template {
     display: none !important;
 }
+[disabled]:hover{
+    cursor: not-allowed;
+    text-decoration: none;
+}
 
 input,
 textarea,
@@ -174,6 +178,6 @@ button,
 select {
     accent-color: var(--accent-color);
 }
-::selection,::-webkit-scrollbar-thumb{
+::-webkit-scrollbar-thumb{
     @extend %accent_color;
 }

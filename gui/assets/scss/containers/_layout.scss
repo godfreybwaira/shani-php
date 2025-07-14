@@ -55,9 +55,11 @@
                 @extend %position_absolute;
             }
             &.active{
-                $size: fn.px2rem(3px);
-                box-shadow: inset $size $size $size var(--color-6),
-                    inset -#{$size} -#{$size} $size var(--color-12);
+                // $size: fn.px2rem(3px);
+                // box-shadow: inset $size $size $size var(--color-6),
+                //   inset -#{$size} -#{$size} $size var(--color-12);
+                background: var(--fg-color);
+                color: var(--fg-text);
                 &:after{
                     width: 50%;
                 }
