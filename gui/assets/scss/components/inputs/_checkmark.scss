@@ -1,0 +1,35 @@
+@use '../../utils/callables/functions' as fn;
+
+.checkmark{
+    $size: fn.px2rem(20px);
+    height: $size;
+    width: $size;
+    vertical-align: text-bottom;
+    border-radius: 50%;
+    cursor: pointer;
+    appearance: none;
+
+    &:before{
+        content: "";
+        width: 60%;
+        height: 34%;
+        display: block;
+        border: ($size * .1) solid var(--fg-color);
+        border-top-width: 0;
+        border-right-width: 0;
+        margin: 25% auto auto auto;
+        transform: scale(0);
+    }
+
+    &:not(:checked){
+        outline-offset: fn.px2rem(-2px);
+        outline: fn.px2rem(2px) solid var(--border-color);
+    }
+
+    &:checked{
+        background: var(--accent-color);
+        &:before{
+            transform: scale(1) rotate(-45deg);
+        }
+    }
+}

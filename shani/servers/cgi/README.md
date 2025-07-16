@@ -14,6 +14,17 @@ server {
 ```
 
 ```
+# Begin server block
+## Redirect HTTP requests on port 80 to HTTPS on port 443
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name dev.shani.v2.local www.dev.shani.v2.local;
+
+    return 301 https://$host$request_uri;
+}
+
 ## HTTPS server block on port 443
 server {
     listen 443 ssl http2;
@@ -34,18 +45,26 @@ server {
     # Process PHP files using PHP-FPM
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        # Depending on your PHP-FPM version, adjust the socket path:
+
+        # Security: Close vulnerabilities
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        fastcgi_param DOCUMENT_ROOT $realpath_root;
+
+	# Depending on your PHP-FPM version, adjust the socket path:
         fastcgi_pass unix:/var/run/php/php-fpm.sock;
         # Alternatively:
         # fastcgi_pass 127.0.0.1:9000;
     }
 
-    # Deny access to .ht* files (if any exist)
-    location ~ /\.ht {
+    # Deny access to hidden files
+    location ~ /\.(?!well-known).* {
         deny all;
+        access_log off;
+        log_not_found off;
     }
 }
 # End server block
+
 ```
 
 ## Create a file named self-signed.conf in /nginx/snippets and add the following content

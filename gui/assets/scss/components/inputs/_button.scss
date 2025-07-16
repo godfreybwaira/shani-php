@@ -1,13 +1,6 @@
 @use '../../utils/callables/functions' as fn;
 @use '../../utils/callables/extensions' as ext;
 
-%_cross{
-    width: 60%;
-    content: '';
-    height: fn.px2rem(1px);
-    @extend %position_center;
-    background-color: currentColor;
-}
 .button {
     border: none;
     white-space: nowrap;
@@ -36,23 +29,12 @@
     }
 
     &-times{
-        $angle: 45deg;
-        $size: fn.px2rem(20px);
-
+        $size: fn.px2rem(22px);
         width: $size;
         height: $size;
         z-index: 100;
-        color: var(--text-danger);
-        background: var(--color-danger);
-        @extend %position_absolute, %round_corner;
-        &:before {
-            transform: rotate($angle);
-            @extend %_cross, %position_absolute;
-        }
-
-        &:after {
-            transform: rotate(-$angle);
-            @extend %_cross, %position_absolute;
-        }
+        display: flex;
+        font-size: calc(var(--font-size) * 1.5);
+        @extend %center_content, %round_corner;
     }
 }

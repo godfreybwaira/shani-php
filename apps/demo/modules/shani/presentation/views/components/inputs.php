@@ -6,7 +6,7 @@
         </button>
     </div>
     <div class="col width-sm-1">
-        <button class="button button-times"></button>
+        <button class="button button-times">&times;</button>
     </div>
     <div class="col">
         <button class="button button-type-outline">Outline Button</button>
@@ -39,8 +39,18 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkbox" type="checkbox">
+            <input class="checkmark" type="checkbox">
             Checkbox
+        </label>
+    </div>
+    <div class="col">
+        <label>
+            <input class="checkmark" name="chl" type="radio">
+            Choose A
+        </label>
+        <label>
+            <input class="checkmark" name="chl" type="radio">
+            Choose B
         </label>
     </div>
     <div class="col">

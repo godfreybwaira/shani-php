@@ -9,8 +9,6 @@
 
 namespace shani\core\log {
 
-    use lib\ds\map\ReadableMap;
-
     final class Logger
     {
 
