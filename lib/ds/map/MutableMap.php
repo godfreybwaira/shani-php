@@ -15,6 +15,18 @@ namespace lib\ds\map {
     {
 
         /**
+         * Increment an item by a given number. A number can be negative or positive.
+         * @param string|int $key An item to increment
+         * @param float $value A value to increment
+         * @return self
+         */
+        public function increment(string|int $key, float $value = 1): self
+        {
+            $this->data[$key] = ($this->data[$key] ?? 0) + $value;
+            return $this;
+        }
+
+        /**
          * Add an item to an iterable object
          * @param string|int $key Item name
          * @param mixed $value Item value

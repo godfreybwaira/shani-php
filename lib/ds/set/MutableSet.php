@@ -17,7 +17,6 @@ namespace lib\ds\set {
         /**
          * Add an item to an iterable object
          * @param string|int $value Item value to add to a list
-         * @param mixed $value Item value
          * @return self
          */
         public function addOne(string|int $value): self

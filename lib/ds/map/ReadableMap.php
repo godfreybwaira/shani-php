@@ -78,10 +78,10 @@ namespace lib\ds\map {
         /**
          * Get an item from an iterable object
          * @param string|int $key Item to get
-         * @param type $default Default value to return if no value found
+         * @param mixed $default Default value to return if no value found
          * @return mixed
          */
-        public function getOne(string|int $key, $default = null): mixed
+        public function getOne(string|int $key, mixed $default = null): mixed
         {
             return $this->data[$key] ?? $default;
         }
