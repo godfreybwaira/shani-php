@@ -25,7 +25,9 @@ if (PHP_SAPI === 'cli') {
     /*
      * Testing env
      */
-    //WebServer::start(new \shani\servers\swoole\SwooleServer($config), $argv);
+//    WebServer::start(new \shani\servers\swoole\SwooleServer($config), [
+//        'host' => 'localhost', 'env' => 'TEST'
+//    ]);
 
     /**
      * Production env
@@ -40,9 +42,9 @@ if (PHP_SAPI === 'cli') {
     /**
      * Testing env
      */
-    //WebServer::start(new shani\servers\cgi\CgiServer($config), [
-    //    'host' => 'localhost', 'env' => 'TEST'
-    //]);
+//    WebServer::start(new shani\servers\cgi\CgiServer($config), [
+//        'host' => 'localhost', 'env' => 'TEST'
+//    ]);
 
     /**
      * Production env

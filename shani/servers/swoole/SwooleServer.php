@@ -115,11 +115,6 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function stop(): void
-        {
-            $this->server->shutdown();
-        }
-
         private static function createRequest(string $scheme, Request &$req): RequestEntity
         {
             $query = !empty($req->server['query_string']) ? '?' . $req->server['query_string'] : null;

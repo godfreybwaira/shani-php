@@ -19,16 +19,6 @@ namespace test {
             if (isset($params['host'], $params['env'])) {
                 $this->host = $params['host'];
                 $this->env = $params['env'];
-            } else {
-                $size = count($params);
-                for ($i = 0; $i < $size; $i++) {
-                    if ($params[$i] === '--host') {
-                        $this->host = $params[++$i];
-                    } else if ($params[$i] === '--env') {
-                        $this->env = $params[++$i];
-                    }
-                }
-//        "--test" "localhost" "--env" "TEST"
             }
         }
     }

@@ -50,8 +50,7 @@ namespace lib\client {
         {
             $this->retries = $retries;
             $this->curlOptions = [
-                CURLOPT_SSL_VERIFYPEER => true, CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true, CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HEADER => false, CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_UPLOAD_BUFFERSIZE => Framework::BUFFER_SIZE,
                 CURLOPT_BUFFERSIZE => Framework::BUFFER_SIZE,
@@ -59,11 +58,26 @@ namespace lib\client {
                     return $this->collectResponseHeaders($headerLine);
                 }
             ];
+            $this->enableSSLVerification(true);
             $this->stream = 'php://temp';
             $this->streamMode = 'r+b';
             $this->requestHeader = new HttpHeader();
             $this->responseHeader = new HttpHeader();
             $this->host = $uri->host();
+        }
+
+        /**
+         * Enable SSL certificate verification (recommended in production). Default is true
+         * @param bool $flag Whether to enable or not.
+         * @return self
+         */
+        public function enableSSLVerification(bool $flag = true): self
+        {
+            $this->setOptions([
+                CURLOPT_SSL_VERIFYPEER => $flag,
+                CURLOPT_SSL_VERIFYHOST => $flag ? 2 : 0
+            ]);
+            return $this;
         }
 
         /**
@@ -199,7 +213,8 @@ namespace lib\client {
          * Send HTTP request using provided request method
          * @param string $method Request method e.g: GET, PUT, POST etc
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function send(string $method, string $endpoint, callable $callback): self
@@ -425,7 +440,8 @@ namespace lib\client {
         /**
          * Send HTTP GET request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function get(string $endpoint, callable $callback): self
@@ -440,7 +456,8 @@ namespace lib\client {
         /**
          * Send HTTP POST request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function post(string $endpoint, callable $callback): self
@@ -451,8 +468,8 @@ namespace lib\client {
         /**
          * Send HTTP PUT request to destination
          * @param string $endpoint Request destination endpoint
-         * @param type $body Request body
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function put(string $endpoint, callable $callback): self
@@ -463,7 +480,8 @@ namespace lib\client {
         /**
          * Send HTTP PATCH request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function patch(string $endpoint, callable $callback): self
@@ -474,7 +492,8 @@ namespace lib\client {
         /**
          * Send HTTP DELETE request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function delete(string $endpoint, callable $callback): self
@@ -485,7 +504,8 @@ namespace lib\client {
         /**
          * Send HTTP HEAD request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
         public function head(string $endpoint, callable $callback): self
@@ -498,7 +518,8 @@ namespace lib\client {
          * @param string $endpoint Request destination endpoint
          * @param string $destination Location on disk to save a file
          * @param string $filename file name
-         * @param callable $callback A callback that accept ResponseEntity object
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @param callable $progress A callback for showing progress during download
          * where the first argument is total bytes to load and the second is
          * total bytes loaded
@@ -526,8 +547,8 @@ namespace lib\client {
          * Upload a file to remote server
          * @param string $endpoint Request destination endpoint
          * @param string $source A path to a source file to upload
-         * @param callable $callback A callback that accept ResponseEntity object
-         * as a parameter
+         * @param callable $callback A callback with the following signature:
+         * <code>$callback(ResponseEntity $resp):void</code>
          * @param callable $progress A callback for showing progress during upload
          * where the first argument is total bytes to load and the second is
          * total bytes loaded

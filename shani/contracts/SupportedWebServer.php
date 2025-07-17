@@ -30,12 +30,6 @@ namespace shani\contracts {
         public function request(callable $callback): self;
 
         /**
-         * Stop (shutdown) a web server
-         * @return void
-         */
-        public function stop(): void;
-
-        /**
          * Return concurrency handler for a web server that supports concurrency
          * @return ConcurrencyInterface
          */

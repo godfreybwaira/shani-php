@@ -10,12 +10,14 @@
 namespace test {
 
     use shani\core\Framework;
+    use shani\core\log\LogLevel;
     use shani\core\VirtualHost;
+    use shani\WebServer;
 
     final class TestConfig
     {
 
-        public static function config(TestParameter $params): ?bool
+        private static function config(TestParameter $params): bool
         {
             $source = Framework::DIR_HOSTS . '/' . $params->host . '.yml';
             $destination = $source . '.bak';
@@ -49,6 +51,23 @@ namespace test {
         {
             if (is_file($source) && is_file($destination)) {
                 rename($destination, $source);
+            }
+        }
+
+        public static function start(array $args): void
+        {
+            $testFile = Framework::DIR_STORAGE . '/__TEST_IS_RUNNING__';
+            if (is_file($testFile)) {
+                return;
+            }
+            touch($testFile);
+            WebServer::log(LogLevel::INFO, 'Test is running...');
+            $result = self::config(new TestParameter($args));
+            unlink($testFile);
+            if ($result) {
+                WebServer::log(LogLevel::INFO, 'Test passed.');
+            } else {
+                WebServer::log(LogLevel::WARNING, 'Test failed.');
             }
         }
     }

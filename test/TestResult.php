@@ -25,9 +25,18 @@ namespace test {
         private ?string $description;
         private ?string $location = null;
 
-        public function __construct(string $description = null)
+        /**
+         * Create a test result for your application. Test result acts like an
+         * envelope for your test cases
+         * @param string $description Result description
+         * @param string $location Location where test report will be saved.
+         */
+        public function __construct(string $description = null, string $location = null)
         {
             $this->description = $description;
+            if ($location !== null) {
+                $this->saveTo($location);
+            }
         }
 
         /**

@@ -42,11 +42,6 @@ namespace shani\servers\cgi {
             $callback();
         }
 
-        public function stop(): void
-        {
-            //do nothing...cgi server cannot be stopped here
-        }
-
         private static function createRequest(): RequestEntity
         {
             $scheme = $_SERVER['REQUEST_SCHEME'] ?? (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');

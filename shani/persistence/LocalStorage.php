@@ -30,7 +30,7 @@ namespace shani\persistence {
         private readonly App $app;
         private readonly string $host, $storage;
 
-        private const FILE_MODE = 0700;
+        public const FILE_MODE = 0700;
 
         public function __construct(App &$app)
         {

@@ -83,7 +83,23 @@ namespace apps\demo\config {
 
         public static function runTest(): TestResult
         {
-
+//            $result = new TestResult(location: SERVER_ROOT);
+//            $case1 = new \test\TestCase('My first test');
+//            $case2 = new \test\TestCase('My second test');
+//            $case3 = new \test\TestCase('Real test...');
+//            $case1->test('Test if 2+2=4', fn() => 2 + 2 === 4);
+//            $case2->test('Test if A is same as a', fn() => 'A' === 'a');
+//            $case3->test('Testing if I can make a call on this server', function () {
+//                $client = new \lib\client\HttpClient(new \lib\URI('https://dev.shani.v2.local'));
+//                $client->enableAsync(false)->enableSSLVerification(false);
+//                $code = null;
+//                $client->get('/', function (\lib\http\ResponseEntity $res)use (&$code) {
+//                    $code = $res->status();
+//                });
+//                return $code === \lib\http\HttpStatus::OK;
+//            });
+//            $result->addCase($case1, $case2, $case3);
+//            return $result;
         }
 
         public function database(string $connName = null): Database

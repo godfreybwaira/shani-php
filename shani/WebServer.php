@@ -23,7 +23,6 @@ namespace shani {
     use shani\core\VirtualHost;
     use shani\http\App;
     use test\TestConfig;
-    use test\TestParameter;
 
     final class WebServer
     {
@@ -86,25 +85,16 @@ namespace shani {
                     self::log(LogLevel::EMERGENCY, $ex->getMessage());
                 }
             });
-            $result = null;
-            $server->start(function () use (&$args, &$server, &$result) {
-                if ($args !== null) {
-                    self::log(LogLevel::INFO, 'Server started. Test mode initiated...');
-                    $result = TestConfig::config(new TestParameter($args));
-                    if ($result !== null) {
-                        $server->stop();
-                    }
-                }
-            });
-            if ($result !== null) {
-                exit($result ? 0 : 1);
-            }
+            $server->start(fn() => empty($args) ? null : TestConfig::start($args));
         }
 
-        private static function log(LogLevel $level, string $message): void
+        public static function log(LogLevel $level, string $message): void
         {
             if (PHP_SAPI === 'cli') {
                 echo $message . PHP_EOL;
+            }
+            if (!is_dir(Framework::DIR_SERVER_STORAGE)) {
+                mkdir(Framework::DIR_SERVER_STORAGE, persistence\LocalStorage::FILE_MODE);
             }
             $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);
