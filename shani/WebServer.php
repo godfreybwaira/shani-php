@@ -94,7 +94,7 @@ namespace shani {
                 echo $message . PHP_EOL;
             }
             if (!is_dir(Framework::DIR_SERVER_STORAGE)) {
-                mkdir(Framework::DIR_SERVER_STORAGE, persistence\LocalStorage::FILE_MODE);
+                mkdir(Framework::DIR_SERVER_STORAGE, persistence\LocalStorage::FILE_MODE, true);
             }
             $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);
