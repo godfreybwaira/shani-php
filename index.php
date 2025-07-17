@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use shani\FrameworkConfig;
 use shani\WebServer;
+use test\TestParameters;
 
 /**
  * Server root directory
@@ -25,9 +26,7 @@ if (PHP_SAPI === 'cli') {
     /*
      * Testing env
      */
-//    WebServer::start(new \shani\servers\swoole\SwooleServer($config), [
-//        'host' => 'localhost', 'env' => 'TEST'
-//    ]);
+    WebServer::start(new \shani\servers\swoole\SwooleServer($config), new TestParameters(host: 'localhost', env: 'TEST'));
 
     /**
      * Production env
@@ -42,9 +41,7 @@ if (PHP_SAPI === 'cli') {
     /**
      * Testing env
      */
-//    WebServer::start(new shani\servers\cgi\CgiServer($config), [
-//        'host' => 'localhost', 'env' => 'TEST'
-//    ]);
+    WebServer::start(new shani\servers\cgi\CgiServer($config), new TestParameters(host: 'localhost', env: 'TEST'));
 
     /**
      * Production env

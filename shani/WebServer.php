@@ -22,7 +22,9 @@ namespace shani {
     use shani\core\log\LogLevel;
     use shani\core\VirtualHost;
     use shani\http\App;
+    use shani\persistence\LocalStorage;
     use test\TestConfig;
+    use test\TestParameters;
 
     final class WebServer
     {
@@ -65,10 +67,10 @@ namespace shani {
         /**
          * Starting the server. When started, server becomes ready to accept requests
          * @param SupportedWebServer $server Server application capable of handling HTTP requests
-         * @param array $args CLI arguments
+         * @param TestParameters $params Test parameters
          * @return void
          */
-        public static function start(SupportedWebServer $server, array $args = null): void
+        public static function start(SupportedWebServer $server, TestParameters $params = null): void
         {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
@@ -85,7 +87,7 @@ namespace shani {
                     self::log(LogLevel::EMERGENCY, $ex->getMessage());
                 }
             });
-            $server->start(fn() => empty($args) ? null : TestConfig::start($args));
+            $server->start(fn() => empty($params) ? null : TestConfig::start($params));
         }
 
         public static function log(LogLevel $level, string $message): void
@@ -94,7 +96,7 @@ namespace shani {
                 echo $message . PHP_EOL;
             }
             if (!is_dir(Framework::DIR_SERVER_STORAGE)) {
-                mkdir(Framework::DIR_SERVER_STORAGE, persistence\LocalStorage::FILE_MODE, true);
+                mkdir(Framework::DIR_SERVER_STORAGE, LocalStorage::FILE_MODE, true);
             }
             $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);

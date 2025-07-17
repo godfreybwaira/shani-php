@@ -17,7 +17,7 @@ namespace test {
     final class TestConfig
     {
 
-        private static function config(TestParameter $params): bool
+        private static function config(TestParameters $params): bool
         {
             $source = Framework::DIR_HOSTS . '/' . $params->host . '.yml';
             $destination = $source . '.bak';
@@ -54,7 +54,7 @@ namespace test {
             }
         }
 
-        public static function start(array $args): void
+        public static function start(TestParameters $params): void
         {
             $testFile = Framework::DIR_STORAGE . '/__TEST_IS_RUNNING__';
             if (is_file($testFile)) {
@@ -62,7 +62,7 @@ namespace test {
             }
             touch($testFile);
             WebServer::log(LogLevel::INFO, 'Test is running...');
-            $result = self::config(new TestParameter($args));
+            $result = self::config($params);
             unlink($testFile);
             if ($result) {
                 WebServer::log(LogLevel::INFO, 'Test passed.');
