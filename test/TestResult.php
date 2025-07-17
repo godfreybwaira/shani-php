@@ -106,6 +106,8 @@ namespace test {
             $percentPass = round($pass * 100 / $totalTests, 2);
             $content[] = PHP_EOL . str_repeat('-', $longestString + 1);
             $values[] = null;
+            $content[] = self::KEYWORD_TIMESTAMP;
+            $values[] = time();
             $content[] = self::KEYWORD_CASES;
             $values[] = $totalTests;
             $content[] = self::KEYWORD_PASS;
@@ -114,8 +116,6 @@ namespace test {
             $values[] = $fail . ' (' . (100 - $percentPass) . '%)';
             $content[] = self::KEYWORD_COMMENTS;
             $values[] = $pass === $totalTests ? $passLabel : $failLabel;
-            $content[] = self::KEYWORD_TIMESTAMP;
-            $values[] = time();
 
             $str = $result->description !== null ? strtoupper($result->description) . PHP_EOL : null;
             $str .= self::formatContent($content, $values, $longestString);
