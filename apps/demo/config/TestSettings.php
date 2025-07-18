@@ -83,23 +83,43 @@ namespace apps\demo\config {
 
         public static function runTest(): TestResult
         {
-//            $result = new TestResult(location: SERVER_ROOT);
-//            $case1 = new \test\TestCase('My first test');
-//            $case2 = new \test\TestCase('My second test');
-//            $case3 = new \test\TestCase('Real test...');
-//            $case1->test('Test if 2+2=4', fn() => 2 + 2 === 4);
-//            $case2->test('Test if A is same as a', fn() => 'A' === 'a');
-//            $case3->test('Testing if I can make a call on this server', function () {
-//                $client = new \lib\client\HttpClient(new \lib\URI('https://dev.shani.v2.local'));
-//                $client->enableAsync(false)->enableSSLVerification(false);
-//                $code = null;
-//                $client->get('/', function (\lib\http\ResponseEntity $res)use (&$code) {
-//                    $code = $res->status();
-//                });
-//                return $code === \lib\http\HttpStatus::OK;
-//            });
-//            $result->addCase($case1, $case2, $case3);
-//            return $result;
+            $result = new TestResult('UAT for my application', location: '/home/goddy/Desktop');
+            $g1 = new \test\TestGroup('MY FIRST MODULE');
+            $g2 = new \test\TestGroup('MY SECOND MODULE');
+            $g3 = new \test\TestGroup('MY THIRD MODULE');
+            $caseg11 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_001');
+            $caseg12 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_002');
+            $caseg13 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_003');
+            $caseg11->test('Running test 001', fn() => 1 == 1);
+            $caseg12->test('Running test 002', fn() => 1 == 1);
+            $caseg13->test('Running test 003', fn() => 1 == 2);
+            $g1->addCase($caseg11, $caseg12, $caseg13);
+            ///////////////////////////////////////////
+            $caseg21 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_004');
+            $caseg22 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_005');
+            $caseg23 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_006');
+            $caseg21->test('Running test 004', fn() => 1 == 2);
+            $caseg22->test('Running test 005', fn() => 1 == 1);
+            $caseg23->test('Running test 006', fn() => 1 == 2);
+            $g2->addCase($caseg21, $caseg22, $caseg23);
+            ///////////////////////////////////////////
+            $caseg31 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_007');
+            $caseg32 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_008');
+            $caseg33 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_009');
+            $caseg31->test('Test if 2+2=4', fn() => 2 + 2 === 4);
+            $caseg32->test('Test if A is same as a', fn() => 'A' === 'a');
+            $caseg33->test('Testing if I can make a call on this server', function () {
+                $client = new \lib\client\HttpClient(new \lib\URI('https://dev.shani.v2.local'));
+                $client->enableAsync(false)->enableSSLVerification(false);
+                $code = null;
+                $client->get('/', function (\lib\http\ResponseEntity $res)use (&$code) {
+                    $code = $res->status();
+                });
+                return $code === \lib\http\HttpStatus::OK;
+            });
+            $g3->addCase($caseg31, $caseg32, $caseg33);
+            $result->addGroup($g1, $g2, $g3);
+            return $result;
         }
 
         public function database(string $connName = null): Database

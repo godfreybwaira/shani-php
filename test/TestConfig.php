@@ -34,7 +34,7 @@ namespace test {
             $content['ACTIVE_ENVIRONMENT'] = $params->env;
             $vhost = new VirtualHost($content);
             self::removeBackupFile($source, $destination);
-            return TestResult::processResult($vhost->configFile::runTest());
+            return TestResult::processResult($vhost->configFile::runTest(), $params->env);
         }
 
         public static function createBackupFile(string $source, string $destination): void

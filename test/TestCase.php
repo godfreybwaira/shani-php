@@ -2,36 +2,36 @@
 
 /**
  * Description of TestCase
- * @author coder
+ * @author goddy
  *
- * Created on: May 3, 2025 at 2:40:16 PM
+ * Created on: Jul 18, 2025 at 1:33:08 PM
  */
 
 namespace test {
 
-    final class TestCase
+    final class TestCase implements \JsonSerializable
     {
 
-        private array $testResult;
-        public readonly string $description;
+        private readonly ?string $id;
+        private readonly string $description;
+        private readonly TestComment $result;
+        private readonly TestSeverity $severity;
 
         /**
-         * Create a test case (scenario) and give it a name
-         * @param string $description Test case description (name)
+         * Test Execution time in seconds
+         * @var float
          */
-        public function __construct(string $description)
-        {
-            $this->testResult = [];
-            $this->description = $description;
-        }
+        private float $executionTime = 0;
 
         /**
-         * Get collection of individual test result in this case
-         * @return array
+         * Create a test case
+         * @param TestSeverity $severity Test case severity
+         * @param string|null $id Test case unique id
          */
-        public function getResult(): array
+        public function __construct(TestSeverity $severity, ?string $id = null)
         {
-            return $this->testResult;
+            $this->severity = $severity;
+            $this->id = strtoupper($id);
         }
 
         /**
@@ -39,28 +39,44 @@ namespace test {
          * @param string $description Test description
          * @param callable $callback A callback with the following signature:
          * <code>$callback():bool</code>. True when test passes or false when a test fails
-         * @param string|null $id Unique test case ID
          * @return self
-         * @throws \Exception When Id is not null and exists
          */
-        public function test(string $description, callable $callback, ?string $id = null): self
+        public function test(string $description, callable $callback): self
         {
-            if ($id !== null) {
-                $id = strtoupper($id);
-                foreach ($this->testResult as $value) {
-                    if ($value['id'] === $id) {
-                        throw new \Exception('Test case Id exists: ', $id);
-                    }
-                }
-            }
+            $this->description = $description;
             $start = hrtime(true);
-            $this->testResult[] = [
-                'id' => $id,
-                'result' => $callback(),
-                'duration' => (hrtime(true) - $start) / 1E+9, //converting into seconds
-                'description' => $description
-            ];
+            $this->result = $callback() ? TestComment::PASS : TestComment::FAIL;
+            $this->executionTime = (hrtime(true) - $start) / 1E9; //converting into seconds
             return $this;
+        }
+
+        /**
+         * Get test case result.
+         * @return TestComment Test result
+         */
+        public function getResult(): TestComment
+        {
+            return $this->result;
+        }
+
+        /**
+         * Get test case execution time
+         * @return float Time in seconds
+         */
+        public function getExecutionTime(): float
+        {
+            return $this->executionTime;
+        }
+
+        public function jsonSerialize(): array
+        {
+            return [
+                'id' => $this->id,
+                'result' => $this->result->name,
+                'severity' => $this->severity->name,
+                'execution_time' => $this->executionTime,
+                'description' => $this->description
+            ];
         }
     }
 
