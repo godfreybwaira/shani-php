@@ -87,7 +87,7 @@ namespace shani {
                     self::log(LogLevel::EMERGENCY, $ex->getMessage());
                 }
             });
-            $server->start(fn() => empty($params) ? null : TestConfig::start($params));
+            $server->start(fn() => $params === null ? null : TestConfig::start($params));
         }
 
         public static function log(LogLevel $level, string $message): void
