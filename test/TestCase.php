@@ -54,7 +54,7 @@ namespace test {
 
         /**
          * Execute test case and return a test result
-         * @return bool True when test case passes, false otherwise
+         * @return bool True when a test case passes, false otherwise
          */
         public function getResult(): bool
         {
