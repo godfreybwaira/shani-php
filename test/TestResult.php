@@ -53,13 +53,12 @@ namespace test {
         #[\Override]
         public function jsonSerialize(): array
         {
-            $summary = new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime);
             return [
                 'metadata' => [
                     'version' => '1.0',
                     'timestamp' => date('Y-m-d\TH:i:s')
                 ],
-                'summary' => $summary,
+                'summary' => new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime),
                 'environment' => $this->env,
                 'groups' => $this->testGroups
             ];
