@@ -19,6 +19,7 @@ namespace test {
         private readonly string $description;
         private readonly TestComment $result;
         private readonly TestSeverity $severity;
+        private $callback;
 
         /**
          * Test Execution time in seconds
@@ -38,7 +39,7 @@ namespace test {
         }
 
         /**
-         * Perform a test case and return a result of a test case
+         * Register a test case
          * @param string $description Test description
          * @param callable $callback A callback with the following signature:
          * <code>$callback():bool</code>. True when test passes or false when a test fails
@@ -47,19 +48,21 @@ namespace test {
         public function test(string $description, callable $callback): self
         {
             $this->description = $description;
-            $start = hrtime(true);
-            $this->result = $callback() ? TestComment::PASS : TestComment::FAIL;
-            $this->executionTime = (hrtime(true) - $start) / 1E9; //converting into seconds
+            $this->callback = $callback;
             return $this;
         }
 
         /**
-         * Get test case comment.
-         * @return TestComment Test result
+         * Execute test case and return a test result
+         * @return bool True when test case passes, false otherwise
          */
-        public function getComment(): TestComment
+        public function getResult(): bool
         {
-            return $this->result;
+            $cb = $this->callback;
+            $start = hrtime(true);
+            $this->result = $cb() ? TestComment::PASS : TestComment::FAIL;
+            $this->executionTime = (hrtime(true) - $start) / 1E9; //converting into seconds
+            return $this->result === TestComment::PASS;
         }
 
         /**

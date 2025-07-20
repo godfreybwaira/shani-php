@@ -9,7 +9,6 @@
 
 namespace test {
 
-    use test\helpers\TestComment;
     use test\helpers\TestSummary;
 
     final class TestGroup implements \JsonSerializable
@@ -18,6 +17,7 @@ namespace test {
         private int $testPassed = 0, $totalTests = 0;
         private readonly string $description;
         private float $executionTime = 0;
+        private array $testCases;
 
         /**
          * Create a test case group so that all cases with similar nature or behavior
@@ -27,7 +27,7 @@ namespace test {
         public function __construct(string $description)
         {
             $this->description = $description;
-            $this->cases = [];
+            $this->testCases = [];
         }
 
         /**
@@ -39,22 +39,24 @@ namespace test {
         {
             foreach ($cases as $case) {
                 $this->testCases[] = $case;
-                $this->executionTime += $case->getExecutionTime();
-                if ($case->getComment() === TestComment::PASS) {
-                    ++$this->testPassed;
-                }
                 ++$this->totalTests;
             }
             return $this;
         }
 
         /**
-         * Get test group summary
-         * @return TestSummary Test group summary
+         * Execute all test cases and return a general result
+         * @return bool True if all tests pass, false otherwise
          */
-        public function getSummary(): TestSummary
+        public function getResult(): bool
         {
-            return new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime);
+            foreach ($this->testCases as $case) {
+                if ($case->getResult()) {
+                    ++$this->testPassed;
+                }
+                $this->executionTime += $case->getExecutionTime();
+            }
+            return $this->testPassed === $this->totalTests;
         }
 
         /**
@@ -88,7 +90,7 @@ namespace test {
         public function jsonSerialize(): array
         {
             return [
-                'summary' => $this->getSummary(),
+                'summary' => new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime),
                 'cases' => $this->testCases
             ];
         }

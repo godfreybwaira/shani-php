@@ -46,9 +46,6 @@ namespace test {
         {
             foreach ($groups as $group) {
                 $this->testGroups[] = $group;
-                $this->testPassed += $group->getTotalTestPassed();
-                $this->executionTime += $group->getTotalExecutionTime();
-                $this->totalTests += $group->getTotalTests();
             }
             return $this;
         }
@@ -68,8 +65,18 @@ namespace test {
             ];
         }
 
+        /**
+         * Execute all test groups and return a general test result
+         * @return bool True if a test passes, false otherwise
+         */
         public function getResult(): bool
         {
+            foreach ($this->testGroups as $group) {
+                $group->getResult();
+                $this->testPassed += $group->getTotalTestPassed();
+                $this->executionTime += $group->getTotalExecutionTime();
+                $this->totalTests += $group->getTotalTests();
+            }
             $report = json_encode($this->jsonSerialize(), JSON_PRETTY_PRINT);
             $this->save($report);
             return $this->totalTests === $this->testPassed;
