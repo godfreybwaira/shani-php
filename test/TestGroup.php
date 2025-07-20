@@ -9,13 +9,15 @@
 
 namespace test {
 
+    use test\helpers\TestComment;
+    use test\helpers\TestSummary;
+
     final class TestGroup implements \JsonSerializable
     {
 
         private int $testPassed = 0, $totalTests = 0;
         private readonly string $description;
         private float $executionTime = 0;
-        private array $testCases;
 
         /**
          * Create a test case group so that all cases with similar nature or behavior
@@ -38,7 +40,7 @@ namespace test {
             foreach ($cases as $case) {
                 $this->testCases[] = $case;
                 $this->executionTime += $case->getExecutionTime();
-                if ($case->getResult() === TestComment::PASS) {
+                if ($case->getComment() === TestComment::PASS) {
                     ++$this->testPassed;
                 }
                 ++$this->totalTests;

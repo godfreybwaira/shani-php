@@ -7,14 +7,14 @@
  * Created on: Jul 18, 2025 at 12:48:22 PM
  */
 
-namespace test {
+namespace test\helpers {
 
     final class TestSummary implements \JsonSerializable
     {
 
-        public readonly int $totalTests, $testPassed;
-        public readonly float $executionTime;
-        public readonly string $description;
+        private readonly int $totalTests, $testPassed;
+        private readonly float $executionTime;
+        private readonly string $description;
 
         /**
          * Create a summary of what happened on the test you have done. It can be on each module or entire test scenario

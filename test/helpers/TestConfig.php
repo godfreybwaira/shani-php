@@ -7,7 +7,7 @@
  * Created on: May 3, 2025 at 9:49:06 AM
  */
 
-namespace test {
+namespace test\helpers {
 
     use shani\core\Framework;
     use shani\core\log\LogLevel;
@@ -34,7 +34,8 @@ namespace test {
             $content['ACTIVE_ENVIRONMENT'] = $params->env;
             $vhost = new VirtualHost($content);
             self::removeBackupFile($source, $destination);
-            return TestResult::processResult($vhost->configFile::runTest(), $params->env);
+            $test = $vhost->configFile::runTest();
+            return $test->getResult();
         }
 
         public static function createBackupFile(string $source, string $destination): void

@@ -87,25 +87,25 @@ namespace apps\demo\config {
             $g1 = new \test\TestGroup('MY FIRST MODULE');
             $g2 = new \test\TestGroup('MY SECOND MODULE');
             $g3 = new \test\TestGroup('MY THIRD MODULE');
-            $caseg11 = new \test\TestCase(\test\TestSeverity::LOW, 'TEST_001');
-            $caseg12 = new \test\TestCase(\test\TestSeverity::LOW, 'TEST_002');
-            $caseg13 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_003');
+            $caseg11 = new \test\TestCase(\test\helpers\TestSeverity::LOW, 'TEST_001');
+            $caseg12 = new \test\TestCase(\test\helpers\TestSeverity::LOW, 'TEST_002');
+            $caseg13 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_003');
             $caseg11->test('Running test 001', fn() => 1 == 1);
             $caseg12->test('Running test 002', fn() => 1 == 1);
             $caseg13->test('Running test 003', fn() => 1 == 2);
             $g1->addCase($caseg11, $caseg12, $caseg13);
             ///////////////////////////////////////////
-            $caseg21 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_004');
-            $caseg22 = new \test\TestCase(\test\TestSeverity::MEDIUM, 'TEST_005');
-            $caseg23 = new \test\TestCase(\test\TestSeverity::LOW, 'TEST_006');
+            $caseg21 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_004');
+            $caseg22 = new \test\TestCase(\test\helpers\TestSeverity::MEDIUM, 'TEST_005');
+            $caseg23 = new \test\TestCase(\test\helpers\TestSeverity::LOW, 'TEST_006');
             $caseg21->test('Running test 004', fn() => 1 == 2);
             $caseg22->test('Running test 005', fn() => 1 == 1);
             $caseg23->test('Running test 006', fn() => 1 == 2);
             $g2->addCase($caseg21, $caseg22, $caseg23);
             ///////////////////////////////////////////
-            $caseg31 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_007');
-            $caseg32 = new \test\TestCase(\test\TestSeverity::MEDIUM, 'TEST_008');
-            $caseg33 = new \test\TestCase(\test\TestSeverity::HIGH, 'TEST_009');
+            $caseg31 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_007');
+            $caseg32 = new \test\TestCase(\test\helpers\TestSeverity::MEDIUM, 'TEST_008');
+            $caseg33 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_009');
             $caseg31->test('Test if 2+2=4', fn() => 2 + 2 === 4);
             $caseg32->test('Test if A is same as a', fn() => 'A' === 'a');
             $caseg33->test('Testing if I can make a call on this server', function () {

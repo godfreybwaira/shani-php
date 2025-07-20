@@ -7,7 +7,7 @@
  * Created on: Jul 18, 2025 at 12:09:47 PM
  */
 
-namespace test {
+namespace test\helpers {
 
     use shani\core\Framework;
 

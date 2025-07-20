@@ -9,6 +9,9 @@
 
 namespace test {
 
+    use test\helpers\TestComment;
+    use test\helpers\TestSeverity;
+
     final class TestCase implements \JsonSerializable
     {
 
@@ -51,10 +54,10 @@ namespace test {
         }
 
         /**
-         * Get test case result.
+         * Get test case comment.
          * @return TestComment Test result
          */
-        public function getResult(): TestComment
+        public function getComment(): TestComment
         {
             return $this->result;
         }
@@ -72,10 +75,10 @@ namespace test {
         {
             return [
                 'id' => $this->id,
+                'description' => $this->description,
                 'result' => $this->result->name,
                 'severity' => $this->severity->name,
-                'execution_time' => $this->executionTime,
-                'description' => $this->description
+                'execution_time' => $this->executionTime
             ];
         }
     }

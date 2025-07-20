@@ -23,8 +23,8 @@ namespace shani {
     use shani\core\VirtualHost;
     use shani\http\App;
     use shani\persistence\LocalStorage;
-    use test\TestConfig;
-    use test\TestParameters;
+    use test\helpers\TestConfig;
+    use test\helpers\TestParameters;
 
     final class WebServer
     {

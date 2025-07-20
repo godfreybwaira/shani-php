@@ -7,7 +7,7 @@
  * Created on: Jun 26, 2025 at 1:58:54 PM
  */
 
-namespace test {
+namespace test\helpers {
 
     final class TestParameters
     {

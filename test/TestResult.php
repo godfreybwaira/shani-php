@@ -9,17 +9,20 @@
 
 namespace test {
 
+    use test\helpers\TestEnvironment;
+    use test\helpers\TestSummary;
+
     final class TestResult implements \JsonSerializable
     {
 
-        private const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}_test-report\.json/';
+        private const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{3}_test-report\.json/';
 
         private int $testPassed = 0, $totalTests = 0;
         private readonly TestEnvironment $env;
         private readonly string $description;
         private readonly ?string $location;
-        private array $testGroups, $summary;
         private float $executionTime = 0;
+        private array $testGroups;
 
         /**
          * Create general test result for your application
@@ -32,7 +35,6 @@ namespace test {
             $this->description = $description;
             $this->location = $location;
             $this->testGroups = [];
-            $this->summary = [];
         }
 
         /**
@@ -51,38 +53,33 @@ namespace test {
             return $this;
         }
 
-        private function setStaging(string $staging): self
-        {
-            $this->summary['staging'] = $staging;
-            return $this;
-        }
-
         #[\Override]
         public function jsonSerialize(): array
         {
             $summary = new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime);
-            $testSummary = $summary->jsonSerialize();
-            $testSummary['timestamp'] = date('Y-m-d\TH:i:s');
-
             return [
-                'summary' => array_merge($this->summary, $testSummary),
+                'metadata' => [
+                    'version' => '1.0',
+                    'timestamp' => date('Y-m-d\TH:i:s')
+                ],
+                'summary' => $summary,
                 'environment' => $this->env,
                 'groups' => $this->testGroups
             ];
         }
 
-        public static function processResult(TestResult $result, string $staging): bool
+        public function getResult(): bool
         {
-            $result->setStaging($staging);
-            $report = json_encode($result->jsonSerialize(), JSON_PRETTY_PRINT);
-            $result->save($report);
-            return $result->totalTests === $result->testPassed;
+            $report = json_encode($this->jsonSerialize(), JSON_PRETTY_PRINT);
+            $this->save($report);
+            return $this->totalTests === $this->testPassed;
         }
 
         private function save(string $data): self
         {
             if ($this->location !== null) {
-                $filename = date('Y-m-d.Hi') . '_test-report.json';
+                $date = date('Y-m-d.Hi');
+                $filename = substr($date, 0, strlen($date) - 1) . '_test-report.json';
                 if (preg_match(self::FILENAME_PATTERN, $filename) !== 1) {
                     throw new \Exception('Invalid file name');
                 }

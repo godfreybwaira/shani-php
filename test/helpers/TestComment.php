@@ -7,7 +7,7 @@
  * Created on: Jul 18, 2025 at 1:17:25 PM
  */
 
-namespace test {
+namespace test\helpers {
 
     enum TestComment
     {
