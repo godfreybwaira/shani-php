@@ -19,16 +19,21 @@ namespace lib\client {
         private ?string $lastReply = null, $errorMsg;
 
         private const FLAGS = STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT;
-        private const STATUS_CODE_LENGTH = 4, EOL = "\r\n";
+        private const STATUS_CODE_LENGTH = 4;
+
+        /**
+         * End of line
+         */
+        public const EOL = "\r\n";
 
         /**
          * Creating SMTP connection to remote host
          * @param string $host Remote host address
-         * @param string|null $security SSL or TLS security
+         * @param SMTPSecurity|null $security SMTP security
          * @param int $retries Number of retries before failing
          * @param int $timeout Timeout before failing
          */
-        public function __construct(string $host, ?string $security, int $retries, int $timeout)
+        public function __construct(string $host, ?SMTPSecurity $security, int $retries, int $timeout)
         {
             $count = 0;
             $socket = $errorCode = $errorMsg = null;
@@ -111,13 +116,13 @@ namespace lib\client {
         }
 
         /**
-         * Set e-mail receipient(s)
-         * @param array $receipients Emails of receipient(s)
+         * Set e-mail recipient(s)
+         * @param array $recipients Emails of recipient(s)
          * @return self
          */
-        public function setReceipients(array $receipients): self
+        public function setRecipients(array $recipients): self
         {
-            foreach ($receipients as $email) {
+            foreach ($recipients as $email) {
                 $this->sendCommand('RCPT TO:<' . $email . '>', 250);
             }
             $this->sendCommand('DATA', 354);

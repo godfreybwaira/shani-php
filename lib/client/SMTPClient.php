@@ -20,9 +20,7 @@ namespace lib\client {
         private SMTPConnection $conn;
         private string $boundary, $host;
         private int $retries, $timeout;
-        private ?string $security = null;
-
-        private const EOL = "\r\n", SECURITY_TLS = 'tls', SECURITY_SSL = 'ssl';
+        private ?SMTPSecurity $security = null;
 
         public function __construct(string $host, int $retries = 3, int $timeout = 500)
         {
@@ -38,17 +36,13 @@ namespace lib\client {
 
         /**
          * Choose security mechanism to use when transporting e-mail
-         * @param string $security Security mechanism set using SMTPClient::SECURITY_*
+         * @param SMTPSecurity $security Security mechanism
          * @return self
-         * @throws \InvalidArgumentException
          */
-        public function security(string $security = self::SECURITY_TLS): self
+        public function security(SMTPSecurity $security): self
         {
-            if ($security === self::SECURITY_SSL || $security === self::SECURITY_TLS) {
-                $this->security = $security;
-                return $this;
-            }
-            throw new \InvalidArgumentException('Invalid security option');
+            $this->security = $security->value;
+            return $this;
         }
 
         /**
@@ -72,7 +66,7 @@ namespace lib\client {
         {
             if ($this->replyTo === null && self::validEmail($email)) {
                 $this->replyTo = $email;
-                $this->headerLine .= 'Reply-To: ' . $name . '<' . $email . '>' . self::EOL;
+                $this->headerLine .= 'Reply-To: ' . $name . '<' . $email . '>' . SMTPConnection::EOL;
             }
             return $this;
         }
@@ -106,15 +100,15 @@ namespace lib\client {
         {
             if ($this->from === null && self::validEmail($email)) {
                 $this->from = $email;
-                $this->headerLine .= 'From: ' . $name . '<' . $this->from . '>' . self::EOL;
+                $this->headerLine .= 'From: ' . $name . '<' . $this->from . '>' . SMTPConnection::EOL;
             }
             return $this;
         }
 
         /**
-         * Set e-mail receipient
-         * @param string $email Receipient e-mail
-         * @param string $name Receipient name
+         * Set e-mail recipient
+         * @param string $email Recipient e-mail
+         * @param string $name Recipient name
          * @return self
          */
         public function to(string $email, string $name = null): self
@@ -124,8 +118,8 @@ namespace lib\client {
 
         /**
          * Set CC (Carbon Copy) to e-mail
-         * @param string $email Receipient e-mail
-         * @param string $name Receipient name
+         * @param string $email Recipient e-mail
+         * @param string $name Recipient name
          * @return self
          */
         public function cc(string $email, string $name = null): self
@@ -135,13 +129,13 @@ namespace lib\client {
 
         /**
          * Set BCC (Blind Carbon Copy) to e-mail
-         * @param string $email Receipient e-mail
-         * @param string $name Receipient name
+         * @param string $email Recipient e-mail
+         * @param string $name Recipient name
          * @return self
          */
         public function bcc(string $email, string $name = null): self
         {
-            return $this->addRcpt($email, $name);
+            return $this->addRcpt($email, $name, 'Bcc');
         }
 
         private function addRcpt(string $email, string $name = null, string $type = null): self
@@ -149,7 +143,7 @@ namespace lib\client {
             if (!in_array($email, $this->rcpt) && self::validEmail($email)) {
                 $this->rcpt[] = $email;
                 if ($type !== null) {
-                    $this->headerLine .= $type . ': ' . $name . '<' . $email . '>' . self::EOL;
+                    $this->headerLine .= $type . ': ' . $name . '<' . $email . '>' . SMTPConnection::EOL;
                 }
             }
             return $this;
@@ -169,14 +163,14 @@ namespace lib\client {
         /**
          * Add path to file as attachment to e-mail
          * @param string $path Path to a valid file to be send as attachment
-         * @param string $filename Name of a file as it will appear to recepient.
+         * @param string $filename Name of a file as it will appear to recipient.
          * @param string $mime File mime type. If not provided file mime will be used instead
          * @return self
          */
         public function attachment(string $path, string $filename = null, string $mime = null): self
         {
             $mime ??= \lib\MediaType::fromFilename($path) ?? 'application/octet-stream';
-            $this->files[md5_file($path)] = ['path' => $path, 'mime' => $mime, 'name' => $filename];
+            $this->files[md5($path)] = ['path' => $path, 'mime' => $mime, 'name' => $filename];
             return $this;
         }
 
@@ -221,9 +215,8 @@ namespace lib\client {
 
         /**
          * Send e-mail to destination(s)
-         * @param callable $callback A callback for error handling. The first argument
-         * of this callback is error code and the second is the error message.
-         * i.e $callback(int $errorCode, string $errorMessage)
+         * @param callable $callback A callback for error handling with the following
+         * signature <code>$callback(int|null $errorCode, string|null $errorMessage):void</code>
          * @return void
          */
         public function send(callable $callback = null): void
@@ -233,9 +226,9 @@ namespace lib\client {
                 $success = $this->conn->initialize($this->from, $this->password, $this->token);
                 if ($success) {
                     $socket = $this->conn->getSocket();
-                    $this->conn->setReceipients($this->rcpt);
-                    $this->createHeader($socket)->createBody($socket)->createAttachments($socket);
-                    fwrite($socket, '--' . $this->boundary . '--' . self::EOL);
+                    $this->conn->setRecipients($this->rcpt);
+                    $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
+                    fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
                     $this->conn->quit();
                 }
                 if ($callback !== null) {
@@ -244,40 +237,40 @@ namespace lib\client {
             });
         }
 
-        private function createHeader(&$socket): self
+        private function sendHeader(&$socket): self
         {
             $content = $this->headerLine . $this->subject;
             foreach ($this->headers as $key => $value) {
-                $content .= ucwords($key, '-') . ': ' . $value . self::EOL;
+                $content .= ucwords($key, '-') . ': ' . $value . SMTPConnection::EOL;
             }
             $content .= 'Content-Type: multipart/mixed; boundary="' . $this->boundary . '"';
-            fwrite($socket, $content . self::EOL . self::EOL);
+            fwrite($socket, $content . SMTPConnection::EOL . SMTPConnection::EOL);
             return $this;
         }
 
-        private function createBody(&$socket): self
+        private function sendBody(&$socket): self
         {
             if ($this->body !== null) {
-                $content = '--' . $this->boundary . self::EOL;
-                $content .= 'Content-Type: text/html; charset=utf-8' . self::EOL;
-                $content .= 'Content-Transfer-Encoding: base64' . self::EOL . self::EOL;
+                $content = '--' . $this->boundary . SMTPConnection::EOL;
+                $content .= 'Content-Type: text/html; charset=utf-8' . SMTPConnection::EOL;
+                $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL . SMTPConnection::EOL;
                 $content .= chunk_split(base64_encode($this->body));
                 fwrite($socket, $content);
             }
             return $this;
         }
 
-        private function createAttachments(&$socket): self
+        private function sendAttachments(&$socket): self
         {
             foreach ($this->files as $file) {
                 $name = $file['name'] ?? basename($file['path']);
                 $src = fopen($file['path'], 'rb');
-                $content = '--' . $this->boundary . self::EOL;
+                $content = '--' . $this->boundary . SMTPConnection::EOL;
                 $content .= 'Content-Type: ' . $file['mime'] . '; ' . chunk_split('name="' . $name . '"');
-                $content .= 'Content-Transfer-Encoding: base64' . self::EOL;
-                $content .= 'Content-Length: ' . fstat($src)['size'] . self::EOL;
+                $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL;
+                $content .= 'Content-Length: ' . fstat($src)['size'] . SMTPConnection::EOL;
                 $content .= 'Content-Disposition: attachment; ' . chunk_split('filename="' . $name . '"');
-                fwrite($socket, $content . self::EOL);
+                fwrite($socket, $content . SMTPConnection::EOL);
                 self::copyFile($src, $socket);
                 fclose($src);
             }
