@@ -69,14 +69,18 @@ namespace lib\client {
         /**
          * Enable SSL certificate verification (recommended in production). Default is true
          * @param bool $flag Whether to enable or not.
+         * @param string|null $caPath Path to a certificate authority file
          * @return self
          */
-        public function enableSSLVerification(bool $flag = true): self
+        public function enableSSLVerification(bool $flag = true, string $caPath = null): self
         {
             $this->setOptions([
                 CURLOPT_SSL_VERIFYPEER => $flag,
                 CURLOPT_SSL_VERIFYHOST => $flag ? 2 : 0
             ]);
+            if ($flag && $caPath !== null) {
+                $this->setOptions([CURLOPT_CAINFO => $caPath]);
+            }
             return $this;
         }
 
@@ -422,7 +426,7 @@ namespace lib\client {
 
         /**
          * Encrypt HTTP payload using provided SSL credentials
-         * @param string $caPath Path to certificate authority file
+         * @param string $caPath Path to a certificate authority file
          * @param string $keyPath Path to SSL public key file
          * @param int $sslVersion One of the CURL_SSLVERSION_*
          * @return self
