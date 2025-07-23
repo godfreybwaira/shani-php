@@ -99,6 +99,11 @@ namespace lib {
             return $this;
         }
 
+        /**
+         * Set request IP
+         * @param string $ip Valid IP address
+         * @return self
+         */
         public function ip(string $ip): self
         {
             $this->ip = $ip;

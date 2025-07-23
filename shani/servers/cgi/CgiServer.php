@@ -52,7 +52,7 @@ namespace shani\servers\cgi {
                     ->files(self::getPostedFiles($_FILES))
                     ->method($_SERVER['REQUEST_METHOD'])
                     ->time($_SERVER['REQUEST_TIME'])
-                    ->ip($_SERVER['REMOTE_ADDR'])
+                    ->ip(self::getClientIP($_SERVER))
                     ->body(self::getPostedBody($raw))
                     ->headers(getallheaders())
                     ->cookies($_COOKIE)
@@ -61,6 +61,21 @@ namespace shani\servers\cgi {
                     ->uri($path)
                     ->build();
             return $request;
+        }
+
+        private static function getClientIP(array &$env): ?string
+        {
+            $keys = [
+                'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP',
+                'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'
+            ];
+            foreach ($keys as $key) {
+                if (!empty($env[$key])) {
+                    return $env[$key];
+                }
+            }
+            return null;
         }
 
         private static function getPostedBody(string $raw): ?array

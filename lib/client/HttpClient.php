@@ -248,12 +248,12 @@ namespace lib\client {
             if ($this->signature !== null) {
                 $response = $this->verifySignature($response);
             }
-            $this->decompress($response);
-            $callback($response);
             if (isset($this->curlOptions[CURLOPT_INFILE])) {
                 fclose($this->curlOptions[CURLOPT_INFILE]);
             }
             fclose($this->curlOptions[CURLOPT_FILE]);
+            $this->decompress($response);
+            $callback($response);
         }
 
         private function getResponse(string $method, URI $endpoint): ResponseEntity

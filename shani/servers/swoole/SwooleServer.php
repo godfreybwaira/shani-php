@@ -124,7 +124,7 @@ namespace shani\servers\swoole {
                     ->files(self::getPostedFiles($req->files))
                     ->method($req->server['request_method'])
                     ->time($req->server['request_time'])
-                    ->ip($req->server['remote_addr'])
+                    ->ip(self::getClientIP($req->server))
                     ->body(self::getPostedBody($req))
                     ->rawBody($req->rawcontent())
                     ->headers($req->header)
@@ -133,6 +133,21 @@ namespace shani\servers\swoole {
                     ->uri($path)
                     ->build();
             return $request;
+        }
+
+        private static function getClientIP(array &$env): ?string
+        {
+            $keys = [
+                'http_client_ip', 'http_x_forwarded_for',
+                'http_x_forwarded', 'http_x_cluster_client_ip',
+                'http_forwarded_for', 'http_forwarded', 'remote_addr'
+            ];
+            foreach ($keys as $key) {
+                if (!empty($env[$key])) {
+                    return $env[$key];
+                }
+            }
+            return null;
         }
 
         private static function getPostedBody(Request &$req): ?array
