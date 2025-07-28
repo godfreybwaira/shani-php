@@ -2,23 +2,23 @@
 @use '../../utils/callables/extensions';
 
 .toggle {
-    $outline: fn.px2rem(2px);
-    $width: fn.px2rem(40px);
     $margin: fn.px2rem(2px);
-    $size: calc($width / 2) - ($margin * 2) - $outline;
+    $gutter: $margin * 3;
+    --width: #{fn.px2rem(40px)};
+    --size: calc(var(--width) / 2 - #{$gutter});
 
-    width: $width;
+    width: var(--width);
     cursor: pointer;
     appearance: none;
-    border-radius: 10rem;
-    outline: $outline solid;
+    border-radius: 50rem;
+    outline: $margin solid;
     vertical-align: text-bottom;
     @extend %position_relative, %overflow_hide;
 
     &:before {
         content: '';
-        height: $size;
-        width: $size;
+        height: var(--size);
+        width: var(--size);
         display: block;
         margin: $margin;
         @extend %round_corner;
@@ -32,7 +32,7 @@
     &:checked{
         outline-color: var(--accent-color);
         &:before{
-            margin-left: $width - ($size + $margin);
+            margin-left: calc(var(--width) - var(--size) - $margin);
             background-color: var(--accent-color);
         }
     }

@@ -2,9 +2,9 @@
 @use 'sass:math';
 
 .checkmark{
-    $size: fn.px2rem(20px);
-    height: $size;
-    width: $size;
+    --size: #{fn.px2rem(20px)};
+    height: var(--size);
+    width: var(--size);
     vertical-align: text-bottom;
     border-radius: 50%;
     cursor: pointer;
@@ -15,7 +15,7 @@
         width: 60%;
         height: 34%;
         display: block;
-        border: math.div($size,6.57) solid var(--fg-color);
+        border: calc(var(--size)/6.57) solid var(--fg-color);
         border-top-width: 0;
         border-right-width: 0;
         margin: 25% auto auto auto;
