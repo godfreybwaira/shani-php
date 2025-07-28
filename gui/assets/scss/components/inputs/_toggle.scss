@@ -3,7 +3,6 @@
 
 .toggle {
     $margin: fn.px2rem(2px);
-    $gutter: $margin * 3;
     --width: #{fn.px2rem(40px)};
     --size: calc(var(--width) / 2.6);
 
