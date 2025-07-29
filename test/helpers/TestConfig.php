@@ -20,7 +20,7 @@ namespace test\helpers {
         private static function config(TestParameters $params): bool
         {
             $source = Framework::DIR_HOSTS . '/' . $params->host . '.yml';
-            $destination = $source . '.bak';
+            $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
             self::createBackupFile($source, $destination);
             $content = yaml_parse_file($source);
             if (!array_key_exists($params->env, $content['ENVIRONMENTS'])) {

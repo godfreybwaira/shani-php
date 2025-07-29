@@ -68,7 +68,13 @@ namespace shani\http {
          */
         public readonly Configuration $config;
 
-        public function __construct(VirtualHost $vhost, ResponseEntity &$res, ResponseWriter $writer)
+        /**
+         * Create an application instance
+         * @param VirtualHost $vhost Virtual host
+         * @param ResponseEntity $res Response endity object
+         * @param ResponseWriter $writer response writer object
+         */
+        public function __construct(VirtualHost $vhost, ResponseEntity $res, ResponseWriter $writer)
         {
             $this->vhost = $vhost;
             $this->response = $res;

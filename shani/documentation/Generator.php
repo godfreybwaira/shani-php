@@ -20,7 +20,7 @@ namespace shani\documentation {
 
         /**
          * Generate documentation for user application
-         * @param App $app
+         * @param App $app Application object
          */
         public function __construct(App &$app)
         {
