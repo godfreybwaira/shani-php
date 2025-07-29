@@ -35,6 +35,10 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             $this->app->render($dtos);
         }
 
+        /**
+         * My good function.
+         * Returns nothing
+         */
         public function one()
         {
             $id = (int) $this->app->request->params(3);
