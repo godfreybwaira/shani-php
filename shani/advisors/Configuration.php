@@ -20,6 +20,7 @@ namespace shani\advisors {
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\core\log\LogLevel;
+    use shani\documentation\scanners\Endpoints;
     use shani\http\App;
     use shani\http\Middleware;
     use shani\persistence\Database;
@@ -384,12 +385,12 @@ namespace shani\advisors {
          * Check whether a client is granted access to a resource. If authorization
          * is skipped this function will always return true.
          * @param string $method Request method e.g get, post etc
-         * @param string $module Requested module with trailing / e.g /users
-         * @param string $controller Requested controller with trailing / e.g /profile
-         * @param string $action A callback function with trailing / e.g /activate
+         * @param string $module Requested module
+         * @param string $controller Requested controller
+         * @param string $action A callback function
          * @return bool True if a client is granted access, false otherwise.
          */
-        public function accessGranted(string $method, string $module = null, string $controller = null, string $action = null): bool
+        public function accessGranted(string $method, string $module, string $controller, string $action): bool
         {
             if ($this->skipAuthorization()) {
                 return true;
@@ -397,11 +398,8 @@ namespace shani\advisors {
             if (empty($this->permissionList)) {
                 return false;
             }
-            $target = $method . $module . $controller . $action;
-            if ($target !== $method) {
-                $target = App::digest(strtolower($target));
-            }
-            return str_contains($this->permissionList, $target);
+            $endpoint = Endpoints::create($method, $module, $controller, $action);
+            return str_contains($this->permissionList, $endpoint[0]);
 //            return (preg_match('\b' . $target . '\b', $this->permissionList) === 1);
         }
 

@@ -29,11 +29,16 @@ namespace shani\documentation\scanners {
             $comment = $method->getDocComment();
             $this->name = $method->getShortName();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
-            $this->path = strtolower(
-                    $reqMethod . '/' . $moduleName . '/' .
-                    $method->getDeclaringClass()->getShortName() . '/' . $this->name
-            );
-            $this->hash = App::digest($this->path);
+            $endpoint = self::create($reqMethod, $moduleName, $method->getDeclaringClass()->getShortName(), $this->name);
+            $this->hash = $endpoint[0];
+            $this->path = $endpoint[1];
+        }
+
+        public static function create(string $method, string $module, string $controller, string $action): array
+        {
+            $target = $method . '.' . $module . '.' . $controller . '.' . $action;
+            $endpoint = strtolower($target);
+            return [App::digest($endpoint, length: 7), $endpoint];
         }
 
         #[\Override]

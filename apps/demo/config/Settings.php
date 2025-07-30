@@ -79,7 +79,7 @@ namespace apps\demo\config {
 
         public function accessibleByPublic(): bool
         {
-            return in_array($this->app->request->route()->module, ['/schools', '/shani']);
+            return in_array($this->app->request->route()->module, ['schools', 'shani']);
         }
 
         public static function runTest(): TestResult

@@ -332,7 +332,7 @@ namespace shani\http {
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
-                $file = $this->module($this->config->languageDir() . $route->controller . $route->action . '/' . $this->language() . '.php');
+                $file = $this->module($this->config->languageDir() . '/' . $route->controller . '/' . $route->action . '/' . $this->language() . '.php');
                 $this->dict = self::getFile($file, $this);
             }
             return $this->dict;
@@ -353,7 +353,7 @@ namespace shani\http {
          */
         public function view(?string $path = null): string
         {
-            return $this->module($this->config->viewDir() . $this->request->route()->controller . ($path ?? $this->request->route()->action) . '.php');
+            return $this->module($this->config->viewDir() . '/' . $this->request->route()->controller . ($path ?? '/' . $this->request->route()->action) . '.php');
         }
 
         /**
@@ -363,15 +363,15 @@ namespace shani\http {
          */
         public function module(?string $path = null): string
         {
-            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . $this->request->route()->module . $path;
+            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . '/' . $this->request->route()->module . $path;
         }
 
         private function getClassPath(): string
         {
             $class = Framework::DIRNAME_APPS . $this->config->root();
-            $class .= $this->config->moduleDir() . $this->request->route()->module;
+            $class .= $this->config->moduleDir() . '/' . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
-            return $class . '/' . str_replace('-', '', ucwords(substr($this->request->route()->controller, 1), '-'));
+            return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));
         }
 
         /**
@@ -395,7 +395,7 @@ namespace shani\http {
                 throw CustomException::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);
-            $callback = self::kebab2camelCase(substr($this->request->route()->action, 1));
+            $callback = self::kebab2camelCase($this->request->route()->action);
             $obj = new $className($this);
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);

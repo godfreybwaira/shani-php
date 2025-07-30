@@ -47,9 +47,9 @@ namespace shani\http {
             }
             $url = explode('.', $cleanPath);
             $this->params = explode('/', $url[0]);
-            $this->controller = '/' . ($this->params[2] ?? $this->params[0]);
-            $this->module = '/' . $this->params[0];
-            $this->action = '/' . ($this->params[4] ?? Framework::HOME_FUNCTION);
+            $this->controller = ($this->params[2] ?? $this->params[0]);
+            $this->module = $this->params[0];
+            $this->action = ($this->params[4] ?? Framework::HOME_FUNCTION);
         }
     }
 

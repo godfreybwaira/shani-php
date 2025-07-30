@@ -30,7 +30,7 @@ namespace shani\documentation\scanners {
             $reflection = new \ReflectionClass(substr($class, 0, strpos($class, '.')));
             $this->module = $moduleName;
             $this->name = $reflection->getShortName();
-            $this->path = $reflection->getNamespaceName();
+            $this->path = str_replace('\\', '.', $reflection->getNamespaceName());
 
             $this->method = $requestNethod;
             $comment = $reflection->getDocComment();
