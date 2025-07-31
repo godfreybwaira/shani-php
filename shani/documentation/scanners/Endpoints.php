@@ -15,7 +15,7 @@ namespace shani\documentation\scanners {
     final class Endpoints implements \JsonSerializable
     {
 
-        private readonly string $hash, $path, $name;
+        private readonly string $hash, $path, $name, $target;
         private readonly ?string $details;
 
         /**
@@ -28,8 +28,10 @@ namespace shani\documentation\scanners {
         {
             $comment = $method->getDocComment();
             $this->name = $method->getShortName();
+            $controller = $method->getDeclaringClass()->getShortName();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
-            $endpoint = self::create($reqMethod, $moduleName, $method->getDeclaringClass()->getShortName(), $this->name);
+            $endpoint = self::create($reqMethod, $moduleName, $controller, $this->name);
+            $this->target = strtolower('/' . $moduleName . '/{id0}/' . $controller . '/{id1}/' . $this->name);
             $this->hash = $endpoint[0];
             $this->path = $endpoint[1];
         }
@@ -47,6 +49,7 @@ namespace shani\documentation\scanners {
             return [
                 'details' => $this->details,
                 'name' => $this->name,
+                'target' => $this->target,
                 'path' => $this->path,
                 'hash' => $this->hash
             ];
