@@ -189,7 +189,7 @@
         };
     })();
     const HTML = (() => {
-        const setInputData = (target, data, modes, mode, mechanism) => {
+        const setInputData = (target, data, mode, mechanism) => {
             if (mode === 'prepend') {
                 target.value = data + target.value;
             } else if (mode === 'append') {
@@ -197,10 +197,10 @@
             } else if (mode === 'replace') {
                 target.value = data;
             } else {
-                target[mechanism](modes[mode], data);
+                target[mechanism](HTML.INSERT_MODES[mode], data);
             }
         };
-        const setNodeData = (target, data, modes, mode, mechanism, plainText) => {
+        const setNodeData = (target, data, mode, mechanism, plainText) => {
             if (mode === 'replace') {
                 if (plainText) {
                     target.textContent = data;
@@ -208,20 +208,7 @@
                     target.innerHTML = data;
                 }
             } else {
-                target[mechanism](modes[mode], data);
-            }
-        };
-        const insertData = (target, shani, modes, data, type) => {
-            const mode = shani.insert || 'replace';
-            const plainText = shani.xss === 'true' || type !== 'html';
-            const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
-            if (Utils.isInput(target)) {
-                setInputData(target, data, modes, mode, mechanism);
-            } else {
-                setNodeData(target, data, modes, mode, mechanism, plainText);
-            }
-            if (mode === 'swap') {
-                target.remove();
+                target[mechanism](HTML.INSERT_MODES[mode], data);
             }
         };
         const mutateCSS = (node, params) => {
@@ -235,13 +222,9 @@
         };
         return {
             processResponse(shani, response) {
-                const modes = Utils.object({
-                    prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
-                    swap: 'afterend', before: 'beforebegin', after: 'afterend'
-                });
                 Utils.emitEvent(shani, 'on:data', response);
                 const type = Utils.getSubtype(response?.headers.get('content-type'));
-                doc.querySelectorAll(shani.target).forEach(target => insertData(target, shani, modes, response.data || '', type));
+                doc.querySelectorAll(shani.target).forEach(target => HTML.insertData(target, shani, response.data || '', type));
             },
             handleCss(node, css, evt) {
                 const handlers = Utils.explode(css);
@@ -250,6 +233,23 @@
                         mutateCSS(node, handler[1]);
                     }
                 }
+            },
+            insertData(target, shani, data, type) {
+                const mode = shani.insert || 'replace';
+                const plainText = shani.xss === 'true' || type !== 'html';
+                const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
+                if (Utils.isInput(target)) {
+                    setInputData(target, data, mode, mechanism);
+                } else {
+                    setNodeData(target, data, mode, mechanism, plainText);
+                }
+                if (mode === 'swap') {
+                    target.remove();
+                }
+            },
+            INSERT_MODES: {
+                prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
+                swap: 'afterend', before: 'beforebegin', after: 'afterend'
             }
         };
     })();
@@ -271,7 +271,6 @@
         /**
          * Make HTTP request at a regular interval
          * @param {type} shani Shani object
-         * @returns {undefined}
          */
         const doPolling = shani => {
             const poll = shani.poll.split(':');
@@ -282,7 +281,6 @@
         /**
          * Resend a polling HTTP request
          * @param {type} shani
-         * @returns {undefined}
          */
         const resubmit = shani => {
             if (shani.emitter.isConnected && shani.timer.steps > -1 && (!shani.timer.limit || (--shani.timer.limit) > 0)) {
@@ -356,8 +354,17 @@
                 sendReq(this, 'POST');
             },
             /**
+             * Requires shani-watch and shani-fn=bind on `this.emitter` element
+             */
+            bind() {
+                if (this.event.detail) {
+                    const src = this.event.detail.shani.emitter;
+                    const data = Utils.isInput(src) ? src.value : src.innerHTML;
+                    HTML.insertData(this.emitter, this, data);
+                }
+            },
+            /**
              * Remove node from DOM
-             * @returns {undefined}
              */
             close() {
                 const node = !this.target ? this.emitter : Utils.getParentNode(this.emitter, this.target);
@@ -375,7 +382,6 @@
             },
             /**
              * Offline search
-             * @returns {undefined}
              */
             search() {
                 const text = this.emitter.value.trim().toLowerCase(), target = getTarget(this);
@@ -385,7 +391,6 @@
             },
             /**
              * Full screen
-             * @returns {undefined}
              */
             fs() {
                 if (doc.fullscreenEnabled) {

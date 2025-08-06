@@ -112,7 +112,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup change" shani-fn name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>
@@ -126,6 +126,8 @@
         </div>
     </div>
 </div>
+<p shani-watch="#url" shani-fn="bind" watch-on="keyup">Demonstrating shani-bind function</p>
+<input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" shani-fn="bind" watch-on="change" class="input-box">
 <div class="row row-no-gap row-stretch">
     <div class="col width-sm-max width-md-4">
         <label>Single Input Box</label>
