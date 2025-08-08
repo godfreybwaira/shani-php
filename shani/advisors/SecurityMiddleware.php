@@ -14,7 +14,7 @@ namespace shani\advisors {
     use lib\http\HttpStatus;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
-    use shani\advisors\web\RespourceAccessPolicy;
+    use shani\advisors\web\ResourceAccessPolicy;
     use shani\core\Framework;
     use shani\exceptions\CustomException;
     use shani\http\App;
@@ -27,9 +27,9 @@ namespace shani\advisors {
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $policy = $app->config->browsingPrivacy()->value;
+            $policy = $app->config->browsingPrivacy();
             if ($policy !== BrowsingPrivacy::DISABLED) {
-                $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy);
+                $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy->value);
             }
             $this->app->response->header()->addAll([
                 HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
@@ -63,8 +63,9 @@ namespace shani\advisors {
                 return $this;
             }
             if ($this->app->config->csrfProtected()) {
-                $token = $this->app->request->cookie->getOne($this->app->config->csrfTokenName());
-                if ($token === null || !$this->app->csrfToken()->exists($token)) {
+                $tokenName = $this->app->config->csrfTokenName();
+                $token = $this->app->request->cookie->getOne($tokenName);
+                if ($this->app->csrfToken()->getOne($tokenName) !== $token) {
                     throw CustomException::notAcceptable($this->app);
                 }
             }
@@ -102,7 +103,7 @@ namespace shani\advisors {
         public function resourceAccessPolicy(): self
         {
             $policy = $this->app->config->resourceAccessPolicy();
-            if ($policy !== RespourceAccessPolicy::DISABLED) {
+            if ($policy !== ResourceAccessPolicy::DISABLED) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()

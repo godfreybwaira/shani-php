@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RespourceAccessPolicy
+ * Description of ResourceAccessPolicy
  * @author coder
  *
  * Created on: Mar 25, 2025 at 10:09:50 AM
@@ -9,7 +9,7 @@
 
 namespace shani\advisors\web {
 
-    enum RespourceAccessPolicy: string
+    enum ResourceAccessPolicy: string
     {
 
         /**

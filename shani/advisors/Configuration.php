@@ -16,7 +16,7 @@ namespace shani\advisors {
     use lib\Duration;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
-    use shani\advisors\web\RespourceAccessPolicy;
+    use shani\advisors\web\ResourceAccessPolicy;
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\core\log\LogLevel;
@@ -317,9 +317,9 @@ namespace shani\advisors {
          * @return RespourceAccessPolicy
          * @see SecurityMiddleware::resourceAccessPolicy()
          */
-        public function resourceAccessPolicy(): RespourceAccessPolicy
+        public function resourceAccessPolicy(): ResourceAccessPolicy
         {
-            return RespourceAccessPolicy::THIS_DOMAIN_AND_SUBDOMAIN;
+            return ResourceAccessPolicy::THIS_DOMAIN_AND_SUBDOMAIN;
         }
 
         /**

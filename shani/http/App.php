@@ -39,6 +39,7 @@ namespace shani\http {
         private ?array $dict = null;
         private array $storage = [];
         private ?Logger $logger = null;
+        private ?Cart $csrfCart = null;
         private SessionManager $session;
         private readonly ResponseWriter $writer;
         private ?MutableMap $appData = null;
@@ -224,7 +225,10 @@ namespace shani\http {
 
         public function csrfToken(): Cart
         {
-            return $this->session()->storage->cart('_gGOd2y$oN');
+            if ($this->csrfCart === null) {
+                $this->csrfCart = $this->session()->storage->cart('_gGOd2y$oN');
+            }
+            return $this->csrfCart;
         }
 
         /**
@@ -419,21 +423,23 @@ namespace shani\http {
         }
 
         /**
-         * Set and/or get URL safe from CSRF attack. if CSRF is enabled, then the
+         * Set and get URL safe from CSRF attack. if CSRF is enabled, then the
          * application will be protected against CSRF attack and the URL will be
          * returned, otherwise the URL will be returned but CSRF will be turned off.
-         * @param string|null $urlPath
+         * @param string|null $urlPath URL to protect from CSRF. If not supplied
+         * then the request URI path will be used.
          * @return string URL safe from CSRF attack
          */
         public function csrf(?string $urlPath = null): string
         {
             $url = $urlPath ?? $this->request->uri->path();
             if (!$this->config->skipCsrfProtection()) {
-                $token = base64_encode(random_bytes(6));
-                $this->csrfToken()->addOne($token, null);
-                $cookie = (new HttpCookie())->setName($this->config->csrfTokenName())
+                $tokenName = $this->config->csrfTokenName();
+                $token = $this->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
+                $this->csrfToken()->addOne($tokenName, $token);
+                $cookie = (new HttpCookie())->setName($tokenName)
                         ->setSameSite(HttpCookie::SAME_SITE_LAX)
-                        ->setValue($token)->setPath($url)->setHttpOnly(true)
+                        ->setValue($token)->setHttpOnly(true)
                         ->setSecure($this->request->uri->secure());
                 $this->response->header()->setCookie($cookie);
             }
