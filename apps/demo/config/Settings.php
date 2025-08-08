@@ -14,7 +14,7 @@ namespace apps\demo\config {
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
-    use shani\persistence\Database;
+    use shani\persistence\DatabaseConnection;
     use shani\persistence\DatabaseDriver;
     use test\TestResult;
 
@@ -87,9 +87,9 @@ namespace apps\demo\config {
 
         }
 
-        public function database(string $connName = null): Database
+        public function database(string $connName = null): DatabaseConnection
         {
-            return new Database(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
+            return new DatabaseConnection(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }
     }
 

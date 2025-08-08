@@ -1,24 +1,22 @@
 (doc => {
     'use strict';
-    doc.addEventListener('DOMContentLoaded', function () {
-        Shanify(this.body);
-        Observers.mutate(this.body);
+    doc.addEventListener('DOMContentLoaded', e => {
+        Shanify(e.target.body);
+        Observers.mutate(e.target.body);
     });
     const Observers = (() => {
-        const runScript = (node) => {
+        const runScript = node => {
             if (node.hasAttribute('src')) {
                 const found = doc.head.querySelector('script[src="' + node.src + '"]') !== null;
                 if (!found) {
                     doc.head.appendChild(node);
-                    node.addEventListener('load', function () {
-                        Function(this.textContent)();
-                    });
+                    node.addEventListener('load', e => Function(node.textContent)());
                 }
             } else {
                 Function(node.textContent)();
             }
         };
-        const addNode = (node) => {
+        const addNode = node => {
             if (node instanceof Element) {
                 if (node.tagName === 'SCRIPT') {
                     return runScript(node);
@@ -26,7 +24,7 @@
                 Shanify(node);
             }
         };
-        const mo = (changes) => {
+        const mo = changes => {
             for (let change of changes) {
                 for (let node of change.addedNodes) {
                     addNode(node);
@@ -50,7 +48,7 @@
         };
     })();
     const Convertor = (() => {
-        const json = (data) => {
+        const json = data => {
             if (typeof data === 'string') {
                 return Utils.object(JSON.parse(data));
             }
@@ -129,7 +127,7 @@
                 return convert(json(data), 0).trim();
             },
             json2csv(obj) {
-                const enclose = (val) => {
+                const enclose = val => {
                     return '"' + (val !== null || val !== undefined ? (val instanceof Array ? val.join('|') : val) : '') + '"';
                 };
                 obj = json(obj);
@@ -318,7 +316,7 @@
                 resubmit(shani);
             });
         };
-        const getTarget = (shani) => {
+        const getTarget = shani => {
             if (!shani.target) {
                 return shani.emitter;
             }
@@ -429,7 +427,7 @@
         };
     })();
     const Shanify = (() => {
-        const listen = (e) => {
+        const listen = e => {
             const node = e.target.closest('[shani-on~=' + e.type + ']');
             if (node) {
                 if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
@@ -550,7 +548,7 @@
         };
     })();
     const HTTP = (() => {
-        const getHttpResponse = (xhr) => {
+        const getHttpResponse = xhr => {
             const resp = Utils.object({code: xhr.status, status: xhr.statusText});
             if (xhr.readyState >= 4) {
                 resp.data = xhr.response;
@@ -584,7 +582,7 @@
                 }
             });
         };
-        const redirect = (headers) => {
+        const redirect = headers => {
             const url = headers.get('location');
             if (url === '#') {
                 window.location.reload();
@@ -648,7 +646,7 @@
         };
     })();
     const WSocket = (() => {
-        const createPayload = (shani) => {
+        const createPayload = shani => {
             const payload = Utils.object({
                 url: shani.url, data: null, headers: Utils.getReqHeaders(shani)
             });
@@ -677,7 +675,7 @@
                 Utils.emitEvent(shani, 'on:end');
             });
         };
-        return (shani) => {
+        return shani => {
             const scheme = location.protocol === 'http:' ? 'ws' : 'wss';
             const host = shani.url.indexOf('://') === -1 ? scheme + '://' + location.host : '';
             httpHandler(shani, new WebSocket(host + shani.url));
@@ -688,7 +686,7 @@
             const on = (e, cb) => sse.addEventListener(e, cb);
             const evt = Utils.explode(shani.on || 'message');
             for (let e of evt) {
-                on(e[0], (e) => {
+                on(e[0], e => {
                     Utils.emitEvent(shani, 'on:start');
                     const resp = Utils.object({
                         data: e.data || null, headers: new Map().set('content-type', 'text/html')
@@ -697,13 +695,13 @@
                     HTML.processResponse(shani, resp);
                 });
             }
-            on('error', (e) => Utils.emitEvent(shani, 'on:' + e.type));
+            on('error', e => Utils.emitEvent(shani, 'on:' + e.type));
             on('beforeunload', () => {
                 sse.close();
                 Utils.emitEvent(shani, 'on:end');
             });
         };
-        return (shani) => httpHandler(shani, new EventSource(shani.url));
+        return shani => httpHandler(shani, new EventSource(shani.url));
 
     })();
 

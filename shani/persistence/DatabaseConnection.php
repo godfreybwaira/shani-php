@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Database
+ * Description of DatabaseConnection
  *
  * @author coder
  */
@@ -10,7 +10,7 @@ namespace shani\persistence {
 
     use lib\ds\map\ReadableMap;
 
-    final class Database
+    final class DatabaseConnection
     {
 
         public readonly \PDO $pdo;

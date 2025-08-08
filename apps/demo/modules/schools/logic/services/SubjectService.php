@@ -10,20 +10,20 @@
 namespace apps\demo\modules\schools\logic\services {
 
     use apps\demo\modules\schools\data\entities\SubjectEntity;
-    use shani\persistence\Database;
+    use shani\persistence\DatabaseConnection;
 
     final class SubjectService
     {
 
         private static SubjectService $object;
-        private readonly Database $conn;
+        private readonly DatabaseConnection $conn;
 
-        private function __construct(Database $connection)
+        private function __construct(DatabaseConnection $connection)
         {
             $this->conn = $connection;
         }
 
-        public static function getObject(Database $connection): SubjectService
+        public static function getObject(DatabaseConnection $connection): SubjectService
         {
             if (!isset(self::$object)) {
                 self::$object = new self($connection);

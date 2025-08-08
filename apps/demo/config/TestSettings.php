@@ -14,7 +14,7 @@ namespace apps\demo\config {
     use shani\core\Framework;
     use shani\http\App;
     use shani\http\Middleware;
-    use shani\persistence\Database;
+    use shani\persistence\DatabaseConnection;
     use test\TestResult;
 
     final class TestSettings extends Configuration
@@ -122,7 +122,7 @@ namespace apps\demo\config {
             return $result;
         }
 
-        public function database(string $connName = null): Database
+        public function database(string $connName = null): DatabaseConnection
         {
 
         }

@@ -23,7 +23,7 @@ namespace shani\advisors {
     use shani\documentation\scanners\Endpoints;
     use shani\http\App;
     use shani\http\Middleware;
-    use shani\persistence\Database;
+    use shani\persistence\DatabaseConnection;
     use shani\persistence\LocalStorage;
     use test\TestResult;
 
@@ -273,7 +273,7 @@ namespace shani\advisors {
 
         /**
          * Check whether a given resource is available to both authenticated and
-         * unauthenticated clients.
+         * unauthenticated clients (guests).
          * @return bool True on success, false otherwise.
          */
         public function accessibleByPublic(): bool
@@ -478,9 +478,9 @@ namespace shani\advisors {
          * Get database connection object specified by connection name. If no
          * connection name specified then default connection will be returned
          * @param string $connName Connection name
-         * @return Database Database connection
+         * @return DatabaseConnection Database connection
          */
-        public abstract function database(string $connName = null): Database;
+        public abstract function database(string $connName = null): DatabaseConnection;
     }
 
 }
