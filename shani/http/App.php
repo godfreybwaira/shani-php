@@ -336,7 +336,9 @@ namespace shani\http {
         {
             if ($this->dict === null) {
                 $route = $this->request->route();
-                $file = $this->module($this->config->languageDir() . '/' . $route->controller . '/' . $route->action . '/' . $this->language() . '.php');
+                $file = $this->module() . $this->config->languageDir() . '/' . $route->controller;
+                $file .= '/' . $route->action . '/' . $this->language() . '.php';
+
                 $this->dict = self::getFile($file, $this);
             }
             return $this->dict;
@@ -349,25 +351,31 @@ namespace shani\http {
 
         /**
          * Set and/or get current view file to be rendered as HTML to client.
-         * @param string|null $path Case sensitive Path to view file, if not provided then
+         * @param string $path Case sensitive Path to view file, if not provided then
          * the view file will be the same as current executing function name. All views
          * have access to application object as $app
-         * @return string Path to view file
+         * @param string $moduleName Module name
+         * @return string Path to a view file
          * @see App::render()
          */
-        public function view(?string $path = null): string
+        public function view(string $path = null, string $moduleName = null): string
         {
-            return $this->module($this->config->viewDir() . '/' . $this->request->route()->controller . ($path ?? '/' . $this->request->route()->action) . '.php');
+            $route = $this->request->route();
+            $file = ($path ?? '/' . $route->action) . '.php';
+            if ($moduleName === null) {
+                return $this->module() . $this->config->viewDir() . '/' . $route->controller . $file;
+            }
+            return $this->module($moduleName) . $this->config->viewDir() . $file;
         }
 
         /**
-         * Get path to current executing module directory
-         * @param string|null $path Path to other resource relative to current module directory
-         * @return string Path to module directory
+         * Get path to a module directory
+         * @param string $name Module name or default requesting module if null is provided.
+         * @return string Path to a module directory
          */
-        public function module(?string $path = null): string
+        public function module(string $name = null): string
         {
-            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . '/' . $this->request->route()->module . $path;
+            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . '/' . ($name ?? $this->request->route()->module);
         }
 
         private function getClassPath(): string

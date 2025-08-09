@@ -175,7 +175,7 @@ namespace gui {
          * @param string $navbar Full path to HTML navbar file
          * @param string $body Full path to HTML body file
          * @param string|null $menu Full path to HTML menu file
-         * @param string|null $id HTML id attribute for reference via JavaScript
+         * @param string|null $id HTML id attribute for reference in JavaScript
          * @return void
          */
         public function layout(string $navbar, string $body, ?string $menu = null, ?string $id = null): void
