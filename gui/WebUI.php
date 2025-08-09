@@ -158,14 +158,14 @@ namespace gui {
         public function head(): string
         {
             $head = $this->icon;
+            foreach ($this->details as $name => $value) {
+                $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
+            }
             foreach ($this->styles as $url => $attr) {
                 $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->asset($url) . '"/>';
             }
             foreach ($this->scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $this->asset($url) . '"></script>';
-            }
-            foreach ($this->details as $name => $value) {
-                $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
             }
             return $head . '<title>' . ($this->title ?? $this->app->config->appName()) . '</title>';
         }
