@@ -28,7 +28,7 @@ namespace apps\demo\config {
 
         public function root(): string
         {
-            return '/demo';
+            return Framework::DIR_APPS . '/demo';
         }
 
         public function home(): string

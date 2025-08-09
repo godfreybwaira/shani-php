@@ -41,8 +41,7 @@ namespace shani\persistence {
 
         private static function createPath(string $root, string $target): string
         {
-            $pos = strpos($root, '/', 1);
-            $dirname = $pos === false ? $root : substr($root, 0, $pos);
+            $dirname = substr($root, strlen(Framework::DIR_APPS));
             $path = Framework::DIR_STORAGE . $dirname;
             if (is_link($path)) {
                 return $path;

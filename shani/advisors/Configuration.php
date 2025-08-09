@@ -46,8 +46,8 @@ namespace shani\advisors {
         }
 
         /**
-         * Get the application root directory with a leading /.
-         * @return string Application root directory relative to Apps directory
+         * Get the path to application root directory.
+         * @return string Application root directory
          */
         public abstract function root(): string;
 

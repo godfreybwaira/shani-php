@@ -9,7 +9,6 @@
 
 namespace shani\documentation {
 
-    use shani\core\Framework;
     use shani\documentation\scanners\Modules;
     use shani\http\App;
 
@@ -24,7 +23,7 @@ namespace shani\documentation {
          */
         public function __construct(App &$app)
         {
-            $moduleDir = Framework::DIR_APPS . $app->config->root() . $app->config->moduleDir();
+            $moduleDir = $app->config->root() . $app->config->moduleDir();
             $moduleCollection = Modules::scan($moduleDir);
             $controllerPath = $app->config->controllers();
             foreach ($moduleCollection as $modulePath) {

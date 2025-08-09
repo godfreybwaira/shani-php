@@ -373,14 +373,14 @@ namespace shani\http {
          * @param string $name Module name or default requesting module if null is provided.
          * @return string Path to a module directory
          */
-        public function module(string $name = null): string
+        private function module(string $name = null): string
         {
-            return Framework::DIR_APPS . $this->config->root() . $this->config->moduleDir() . '/' . ($name ?? $this->request->route()->module);
+            return $this->config->root() . $this->config->moduleDir() . '/' . ($name ?? $this->request->route()->module);
         }
 
         private function getClassPath(): string
         {
-            $class = Framework::DIRNAME_APPS . $this->config->root();
+            $class = $this->config->root();
             $class .= $this->config->moduleDir() . '/' . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
             return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));
