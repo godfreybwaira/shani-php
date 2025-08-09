@@ -380,7 +380,7 @@ namespace shani\http {
 
         private function getClassPath(): string
         {
-            $class = $this->config->root();
+            $class = substr($this->config->root(), strrpos(Framework::DIR_APPS, '/'));
             $class .= $this->config->moduleDir() . '/' . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
             return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));

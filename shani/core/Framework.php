@@ -29,11 +29,6 @@ namespace shani\core {
         public const HOME_FUNCTION = 'index';
 
         /**
-         * Application directory name
-         */
-        public const DIRNAME_APPS = '/apps';
-
-        /**
          * Configuration directory path
          */
         public const DIR_CONFIG = SERVER_ROOT . '/config';
@@ -71,7 +66,7 @@ namespace shani\core {
         /**
          * Application directory path
          */
-        public const DIR_APPS = SERVER_ROOT . self::DIRNAME_APPS;
+        public const DIR_APPS = SERVER_ROOT . '/apps';
 
         /**
          * Minimum PHP version supported by Shani framework
