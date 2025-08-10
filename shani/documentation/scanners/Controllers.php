@@ -36,19 +36,16 @@ namespace shani\documentation\scanners {
             $comment = $reflection->getDocComment();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
 
-            $this->endpoints = self::getEndpoints($this, $reflection->getMethods(\ReflectionMethod::IS_PUBLIC));
+            $this->collectEndpoints($reflection->getMethods(\ReflectionMethod::IS_PUBLIC));
         }
 
-        private static function getEndpoints(Controllers $class, array $methods): array
+        private function collectEndpoints(array $methods): void
         {
-            $functions = [];
             foreach ($methods as $method) {
-                if (substr($method->getShortName(), 0, 2) === '__') {
-                    continue;
+                if (substr($method->getShortName(), 0, 2) !== '__') {
+                    $this->endpoints[] = new Endpoints($this->method, $this->module, $method);
                 }
-                $functions[] = new Endpoints($class->method, $class->module, $method);
             }
-            return $functions;
         }
 
         #[\Override]
