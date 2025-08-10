@@ -109,18 +109,21 @@ namespace shani\persistence {
             return true;
         }
 
+        #[\Override]
         public function save(File $file, string $bucket = '/'): ?string
         {
             $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
             return self::persist($file, $this->storage, $path);
         }
 
+        #[\Override]
         public function save2protect(File $file, string $bucket = '/'): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             return self::persist($file, $this->storage, $path);
         }
 
+        #[\Override]
         public function save2private(File $file, string $bucket = '/'): ?string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
@@ -162,22 +165,26 @@ namespace shani\persistence {
             throw new ServerException('Failed to create directory ' . $destination);
         }
 
+        #[\Override]
         public function url(string $filepath): string
         {
             return $this->host . $filepath;
         }
 
+        #[\Override]
         public function pathTo(?string $path = null): string
         {
             return $this->storage . $path;
         }
 
+        #[\Override]
         public function download(string $filepath, ?string $filename = null): self
         {
             $this->app->response->saveAs($filename ?? basename($filepath));
             return $this->app->stream($filepath);
         }
 
+        #[\Override]
         public function delete(string $filepath): self
         {
             $path = $this->pathTo($filepath);
@@ -187,12 +194,14 @@ namespace shani\persistence {
             return $this;
         }
 
+        #[\Override]
         public function move2protect(string $filepath): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
             return $this->moveFile($filepath, $bucket);
         }
 
+        #[\Override]
         public function move2private(string $filepath): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
@@ -203,6 +212,7 @@ namespace shani\persistence {
             return $this->moveFile($filepath, $bucket, $groupId . '-');
         }
 
+        #[\Override]
         public function move(string $filepath): ?string
         {
             $bucket = $this->app->config->appPublicStorage();
