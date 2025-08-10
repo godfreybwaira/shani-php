@@ -20,11 +20,12 @@ namespace shani\documentation {
         /**
          * Generate documentation for user application
          * @param App $app Application object
+         * @param array $exclusion List of modules to exclude
          */
-        public function __construct(App &$app)
+        public function __construct(App &$app, array $exclusion = [])
         {
             $moduleDir = $app->config->root() . $app->config->moduleDir();
-            $moduleCollection = Modules::scan($moduleDir);
+            $moduleCollection = Modules::scan($moduleDir, $exclusion);
             $controllerPath = $app->config->controllers();
             foreach ($moduleCollection as $modulePath) {
                 $this->modules[] = new Modules(basename($modulePath), $modulePath . $controllerPath);

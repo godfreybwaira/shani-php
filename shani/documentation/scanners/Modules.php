@@ -43,13 +43,13 @@ namespace shani\documentation\scanners {
             }
         }
 
-        public static function scan(string $modulesRootPath): array
+        public static function scan(string $modulesRootPath, array $exclusion = []): array
         {
             $folders = [];
             $modules = array_diff(scandir($modulesRootPath), ['.', '..']);
             foreach ($modules as $module) {
                 $path = $modulesRootPath . '/' . $module;
-                if (is_dir($path)) {
+                if (!in_array($module, $exclusion) && is_dir($path)) {
                     $folders[] = $path;
                 }
             }

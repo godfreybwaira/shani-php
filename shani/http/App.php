@@ -12,12 +12,12 @@ namespace shani\http {
 
     use gui\WebUI;
     use lib\DataConvertor;
+    use lib\ds\map\MutableMap;
     use lib\http\HttpCookie;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
-    use lib\ds\map\MutableMap;
     use lib\MediaType;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
@@ -26,7 +26,6 @@ namespace shani\http {
     use shani\core\Framework;
     use shani\core\log\Logger;
     use shani\core\VirtualHost;
-    use shani\documentation\Generator;
     use shani\exceptions\CustomException;
     use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
@@ -72,7 +71,7 @@ namespace shani\http {
         /**
          * Create an application instance
          * @param VirtualHost $vhost Virtual host
-         * @param ResponseEntity $res Response endity object
+         * @param ResponseEntity $res Response entity object
          * @param ResponseWriter $writer response writer object
          */
         public function __construct(VirtualHost $vhost, ResponseEntity $res, ResponseWriter $writer)
@@ -384,15 +383,6 @@ namespace shani\http {
             $class .= $this->config->moduleDir() . '/' . $this->request->route()->module;
             $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
             return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));
-        }
-
-        /**
-         * Generate current user application documentation
-         * @return array application documentation
-         */
-        public function documentation(): array
-        {
-            return (new Generator($this))->generate();
         }
 
         /**
