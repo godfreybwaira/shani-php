@@ -340,9 +340,12 @@
         };
         Obj.prototype = {
             /**
-             * Read content from server. history.pushState(null, doc.title, this.url) will be added in future
+             * Read content from server.
              */
             r() {
+                if (this.history === 'true') {
+                    history.pushState(null, '', this.url);
+                }
                 sendReq(this, 'GET');
             },
             /**
@@ -401,6 +404,23 @@
                         });
                     }).catch(() => Utils.removeNode(cover));
                 }
+            },
+            copy() {
+                const target = getTarget(this);
+                if (['INPUT', 'TEXTAREA'].indexOf(target.tagName) > -1) {
+                    target.select();
+                    doc.execCommand('copy');
+                } else {
+                    const box = doc.createElement('TEXTAREA');
+                    box.style.width = 0;
+                    box.style.height = 0;
+                    doc.body.appendChild(box);
+                    box.value = target.innerText;
+                    box.select();
+                    doc.execCommand('copy');
+                    box.remove();
+                }
+                Utils.emitEvent(this, 'on:copy');
             }
         };
         if (!window.Shani) {
@@ -408,7 +428,7 @@
         }
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'header', 'poll', 'insert', 'xss', 'css', 'on', 'fn', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'header', 'poll', 'insert', 'xss', 'history', 'css', 'on', 'fn', 'scheme', 'target'],
             create(node, event) {
                 const shani = new Obj(node, event);
                 Utils.emitEvent(shani, 'on:' + event.type);
@@ -859,7 +879,7 @@
                 if (specs?.split(' ').indexOf('toaster') > -1) {
                     toast(e.detail.data || '(No data returned)', e.detail.code);
                 }
-            });
+            })('copy', e => toast('Copied!', 200));
         })();
     })();
 })(document);
