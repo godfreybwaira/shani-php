@@ -7,6 +7,9 @@
     &-hide-labels .menu-label{
         display: none;
     }
+    &>*{
+        justify-content: center;
+    }
 }
 
 .menu-item {
@@ -14,8 +17,8 @@
     display: flex;
     color: inherit;
     text-wrap: nowrap;
-    text-align: center;
-    @extend %padding_md, %position_relative, %center_content;
+    align-items: center;
+    @extend %padding_md, %position_relative;
     &:hover{
         text-decoration: none;
     }
