@@ -430,6 +430,9 @@
             HTML_ATTR: ['enctype', 'method'],
             SHANI_ATTR: ['watch', 'header', 'poll', 'insert', 'xss', 'history', 'css', 'on', 'fn', 'scheme', 'target'],
             create(node, event) {
+                if (node.hasAttribute('disabled')) {
+                    return;
+                }
                 const shani = new Obj(node, event);
                 Utils.emitEvent(shani, 'on:' + event.type);
                 if (shani[shani.fn] instanceof Function) {
@@ -453,9 +456,7 @@
                 if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
                     e.preventDefault();
                 }
-                if (!node.hasAttribute('disabled')) {
-                    Shani.create(node, e);
-                }
+                Shani.create(node, e);
             }
         };
         const setDefaultEvents = node => {
@@ -564,6 +565,9 @@
                     return plusPos < 0 ? subtype : subtype.substring(plusPos + 1);
                 }
                 return null;
+            },
+            getId() {
+                return Date.now().toString(36);
             }
         };
     })();
@@ -742,6 +746,7 @@
                 });
                 setTimeout(rotate, 5000);
             };
+            window.addEventListener('popstate', e => history.go(0));
             doc.addEventListener('click', e => {
                 if (e.target.classList?.contains('carousel-next')) {
                     // Calculate next index: cycle to 0 if at end.
@@ -786,7 +791,7 @@
                 const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                 modal.className = specs;
                 mdbg.className = 'modal-background';
-                mdbg.id = Date.now().toString(36);
+                mdbg.id = Utils.getId();
                 modal.id = mdbg.id + 'mdl';
                 mdbg.appendChild(modal);
                 doc.body.appendChild(mdbg);
