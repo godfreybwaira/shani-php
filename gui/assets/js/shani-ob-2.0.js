@@ -582,8 +582,8 @@
         };
         const httpHandler = (shani, xhr, cb) => {
             const on = (e, cb) => xhr.addEventListener(e, cb);
-            on('readystatechange', function () {
-                if (this.readyState === 4) {
+            on('readystatechange', e => {
+                if (e.target.readyState === 4) {
                     HTTP.fire(shani, getHttpResponse(xhr), xhr.status);
                 }
             });
@@ -598,7 +598,7 @@
             on('loadstart', () => HTTP.fire(shani, getHttpResponse(xhr), 102));
             on('loadend', () => cb(getHttpResponse(xhr)));
 
-            xhr.upload.addEventListener('progress', (e) => {
+            xhr.upload.addEventListener('progress', e => {
                 if (e.lengthComputable) {
                     const response = getHttpResponse(xhr);
                     response.bytes = Utils.object({loaded: e.loaded, total: e.total});
@@ -689,12 +689,12 @@
                 socket.send(payload.data || '');
                 Utils.emitEvent(shani, 'on:start', {request: payload});
             });
-            on('message', (e) => {
+            on('message', e => {
                 const resp = Utils.object({data: e.data || null, headers: null});
                 Utils.emitEvent(shani, 'on:' + e.type, resp);
                 HTML.processResponse(shani, resp);
             });
-            on('error', (e) => Utils.emitEvent(shani, 'on:' + e.type));
+            on('error', e => Utils.emitEvent(shani, 'on:' + e.type));
             on('close', () => {
                 Utils.emitEvent(shani, 'on:end');
             });
