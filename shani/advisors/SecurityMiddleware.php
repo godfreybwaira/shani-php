@@ -108,7 +108,7 @@ namespace shani\advisors {
                     HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $policy->value,
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $this->app->config->allowedRequestMethods()
                 ]);
-                return $this->addAllowOrigin();
+                $this->addAllowOrigin();
             }
             return $this;
         }
@@ -139,6 +139,7 @@ namespace shani\advisors {
         public function validateSession(): self
         {
             if ($this->app->config->sessionEnabled() && $this->app->session()->expired()) {
+                $this->app->session()->stop();
                 throw CustomException::sessionExpired($this->app);
             }
             return $this;
@@ -146,7 +147,7 @@ namespace shani\advisors {
 
         /**
          * A request sent by the browser before sending the actual request to verify
-         * whether a server can process the coming request.
+         * whether a server can process the incoming request.
          * @param int $cacheTime Tells the browser to cache the preflight response
          * @return self
          * @see Configuration::preflightRequest()
@@ -159,18 +160,17 @@ namespace shani\advisors {
                     HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $this->app->config->allowedRequestHeaders(),
                     HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
                 ]);
-                return $this->addAllowOrigin();
+                $this->addAllowOrigin();
             }
             return $this;
         }
 
-        private function addAllowOrigin(): self
+        private function addAllowOrigin(): void
         {
             $origin = $this->app->request->header()->getOne(HttpHeader::ORIGIN);
             if (!empty($origin) && $this->app->config->whitelistedDomain($origin)) {
                 $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_ORIGIN, $origin);
             }
-            return $this;
         }
     }
 
