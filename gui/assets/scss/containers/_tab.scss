@@ -30,7 +30,7 @@ $_thin_line: fn.px2rem(1px);
     $tab: &;
     display: grid;
     border-radius: var(--radius-sm);
-    @extend %full_height, %overflow_hide;
+    @extend %full_height, %overflow_hide,%zoomOut;
     &-pos{
         &-t{
             grid-template-areas: "tm""tb";

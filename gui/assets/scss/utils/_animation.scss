@@ -3,9 +3,6 @@
 .animation-spin{
     animation: spin var.$animation_duration infinite var.$animation_timing;
 }
-.animation-zoom-in{
-    animation: zoomIn var.$animation_duration var.$animation_timing;
-}
 .animation-slide-left{
     animation: slideLeft var.$animation_duration var.$animation_timing;
 }
@@ -18,41 +15,25 @@
 .animation-slide-down{
     animation: slideDown var.$animation_duration var.$animation_timing;
 }
-.animation-fade-in{
-    animation: fadeIn var.$animation_duration var.$animation_timing;
+.animation-zoom-out{
+    animation: zoomOut var.$animation_duration var.$animation_timing;
 }
-@keyframes fadeIn{
-    from{
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to{
-        opacity: 1;
-        transform: none;
+@keyframes zoomOut{
+    0%{
+        opacity:0;
+        transform:scale(.95);
     }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(100%);
-    }
-
-    to {
-        opacity: 1;
-        transform: none;
+    0%{
+        transform:translateY(100%);
     }
 }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-100%);
-    }
-
-    to {
-        opacity: 1;
-        transform: none;
+    0%{
+        transform:translateY(-100%);
     }
 }
 
@@ -63,38 +44,13 @@
 }
 
 @keyframes slideLeft {
-    from{
-        opacity: 0;
-        transform: translateX(100%);
-    }
-
-    to {
-        opacity: 1;
-        transform: none;
+    0%{
+        transform:translateX(100%);
     }
 }
 
 @keyframes slideRight {
-    from {
-        opacity: 0;
-        transform: translateX(-100%);
-    }
-
-    to {
-        opacity: 1;
-        transform: none;
-    }
-}
-
-
-@keyframes zoomIn {
-    from{
-        opacity: 0;
-        transform: scale(1.2);
-    }
-
-    to{
-        opacity: 1;
-        transform: none;
+    0%{
+        transform:translateX(-100%);
     }
 }

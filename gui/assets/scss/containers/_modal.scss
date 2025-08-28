@@ -18,25 +18,25 @@
         &-c{
             border-radius: var(--radius-sm);
             &.pos-c{
-                animation: zoomIn var.$animation_duration var.$animation_timing;
+                @extend %zoomOut;
             }
         }
         &-v{
             @extend %full_height;
             &.pos-r{
-                animation: slideLeft var.$animation_duration var.$animation_timing;
+                animation: slideLeft var.$animation_duration;
             }
             &.pos-l{
-                animation: slideRight var.$animation_duration var.$animation_timing;
+                animation: slideRight var.$animation_duration;
             }
         }
         &-h{
             @extend %full_width;
             &.pos-t{
-                animation: slideDown var.$animation_duration var.$animation_timing;
+                animation: slideDown var.$animation_duration;
             }
             &.pos-b{
-                animation: slideUp var.$animation_duration var.$animation_timing;
+                animation: slideUp var.$animation_duration;
             }
         }
     }

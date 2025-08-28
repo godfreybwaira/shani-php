@@ -1,4 +1,5 @@
 @use 'functions' as fn;
+@use 'variables' as var;
 
 @mixin addBackground($bg_color){
     background: if(fn.isDarkColor($bg_color),var(--fg-color),none);
@@ -183,4 +184,7 @@
 }
 %overflow_hide{
     overflow: hidden;
+}
+%zoomOut{
+    animation: zoomOut var.$animation_duration;
 }

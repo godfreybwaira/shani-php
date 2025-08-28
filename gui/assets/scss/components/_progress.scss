@@ -63,7 +63,7 @@
         height: var(--size);
         padding: calc(var(--spacing)/2);
         background: conic-gradient(var(--color) var(--progress,0),var(--fg-color) 0);
-        @extend %round_corner;
+        @extend %round_corner, %zoomOut;
         &:before{
             display: flex;
             border-radius: inherit;
@@ -74,7 +74,7 @@
     }
 }
 @keyframes pg_move{
-    100%{
+    to{
         margin-left:100%;
     }
 }
@@ -82,15 +82,9 @@
     0%{
         width:0;
     }
-    100%{
-        width:var(--progress);
-    }
 }
 @keyframes pg_after{
     0%{
         left: 0;
-    }
-    100%{
-        left: max(0%,calc(var(--progress) - var(--size)));
     }
 }

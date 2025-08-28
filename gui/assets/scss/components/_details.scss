@@ -1,10 +1,9 @@
 @use '../utils/callables/extensions' as ext;
 
 .details{
-    @extend %overflow_hide;
+    @extend %overflow_hide,%zoomOut;
     outline: var(--thin-border);
     border-radius: var(--radius-sm);
-
     &-row{
         display: flex;
         flex-wrap: wrap;

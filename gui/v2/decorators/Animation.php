@@ -12,12 +12,11 @@ namespace gui\v2\decorators {
     enum Animation: string
     {
 
-        case ZOOM_IN = 'animation-zoom-in';
         case SLIDE_LEFT = 'animation-slide-left';
         case SLIDE_RIGHT = 'animation-slide-right';
         case SLIDE_UP = 'animation-slide-up';
         case SLIDE_DOWN = 'animation-slide-down';
-        case FADE_IN = 'animation-fade-in';
+        case ZOOM_OUT = 'animation-zoom-out';
         case SPIN = 'animation-spin';
     }
 

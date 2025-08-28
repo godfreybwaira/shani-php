@@ -7,10 +7,9 @@
     border-radius: var(--radius-sm);
     --size: calc(var(--spacing) * 2.5);
     @include ext.addBackground(var.$bg_color);
-
     text-align: center;
     counter-reset: num;
-    @extend %list_reset;
+    @extend %list_reset,%zoomOut;
 
     &:not(&-dir-v) {
         display: flex;

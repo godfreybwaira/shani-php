@@ -6,7 +6,7 @@
     display: grid;
     @include ext.addBackground(var.$bg_color);
     border-radius: var(--radius-sm);
-    @extend %list_reset, %full_width, %overflow_hide;
+    @extend %list_reset, %full_width, %overflow_hide,%zoomOut;
 
     &:not(&-sm)>*{
         @extend %padding_md;

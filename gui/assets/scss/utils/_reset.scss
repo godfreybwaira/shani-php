@@ -9,7 +9,7 @@ body {
     font-size: var(--font-size);
     font-weight: normal;
     line-height: 1.5;
-    @extend %full_size, %spacing_0;
+    @extend %full_size, %spacing_0, %overflow_hide;
     background-color: var(--bg-color);
 }
 *, *::before, *::after {

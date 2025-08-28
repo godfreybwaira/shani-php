@@ -4,7 +4,7 @@
 
 .accordion {
     $_angle: 45deg;
-    @extend %list_reset;
+    @extend %list_reset,%zoomOut;
     @include ext.addBackground(var.$bg_color);
 
     &-title{

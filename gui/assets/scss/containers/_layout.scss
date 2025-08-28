@@ -17,6 +17,7 @@
         justify-content: space-between;
         border-bottom: var(--thin-border);
         background: var(--theme-color);
+        animation: slideDown var.$animation_duration;
     }
     &-body{
         flex: 1;
@@ -35,6 +36,7 @@
     &-menu{
         order: 1;
         z-index: 1;
+        animation: slideUp var.$animation_duration;
         @if(fn.isDarkColor(var.$bg_color)==false){
             box-shadow: var(--shadow-md);
         }
@@ -69,6 +71,7 @@
             }
         }
         @include ext.media(map.get(var.$breakpoints, md)) {
+            animation: slideRight var.$animation_duration;
             & {
                 order: -1;
             }
