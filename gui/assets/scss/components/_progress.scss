@@ -63,7 +63,7 @@
         height: var(--size);
         padding: calc(var(--spacing)/2);
         background: conic-gradient(var(--color) var(--progress,0),var(--fg-color) 0);
-        @extend %round_corner, %zoomOut;
+        @extend %round_corner;
         &:before{
             display: flex;
             border-radius: inherit;
