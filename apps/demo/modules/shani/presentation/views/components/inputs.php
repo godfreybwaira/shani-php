@@ -39,6 +39,12 @@
     </div>
     <div class="col">
         <label>
+            <input type="color" class="checkmark">
+            Color
+        </label>
+    </div>
+    <div class="col">
+        <label>
             <input class="checkmark" type="checkbox">
             Checkbox
         </label>
@@ -126,8 +132,12 @@
         </div>
     </div>
 </div>
-<p shani-watch="#url" shani-fn="bind" watch-on="keyup">Demonstrating shani-bind function</p>
-<input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" shani-fn="bind" watch-on="change" class="input-box">
+<div class="row row-stretch">
+    <div class="col">
+        <label shani-watch="#url" shani-fn="bind" watch-on="keyup">Demonstrating shani-bind function</label>
+        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" shani-fn="bind" watch-on="change" class="input-box">
+    </div>
+</div>
 <div class="row row-no-gap row-stretch">
     <div class="col width-sm-max width-md-4">
         <label>Single Input Box</label>

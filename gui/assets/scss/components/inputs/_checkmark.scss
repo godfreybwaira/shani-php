@@ -1,4 +1,5 @@
 @use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions';
 @use 'sass:math';
 
 .checkmark{
@@ -6,9 +7,12 @@
     height: var(--size);
     width: var(--size);
     vertical-align: text-bottom;
-    border-radius: 50%;
     cursor: pointer;
     appearance: none;
+    @extend %round_corner;
+    &[type=color]{
+        padding: 0;
+    }
 
     &:before{
         content: "";

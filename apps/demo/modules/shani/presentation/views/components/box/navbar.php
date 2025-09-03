@@ -1,4 +1,4 @@
-<div class="padding-y width-sm-max" style="display: flex;justify-content: space-between">
+<div class="space-btn">
     <div class="dropdown">
         <a href="#" class="menu-item">
             <i class="mdi mdi-menu"></i>

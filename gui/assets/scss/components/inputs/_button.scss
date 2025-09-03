@@ -4,7 +4,7 @@
 .button {
     border: none;
     white-space: nowrap;
-    &:not(&-times){
+    &:not(&-times,.round-corner){
         border-radius: var(--radius-sm);
     }
     &-type-outline{

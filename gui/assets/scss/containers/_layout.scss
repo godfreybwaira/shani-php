@@ -13,8 +13,6 @@
 
 .content{
     &-navbar{
-        display: flex;
-        justify-content: space-between;
         border-bottom: var(--thin-border);
         background: var(--theme-color);
         animation: slideDown var.$animation_duration;

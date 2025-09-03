@@ -1,0 +1,24 @@
+@use '../../utils/callables/functions' as fn;
+@use '../../utils/callables/extensions' as ext;
+
+.input-box{
+    border: none;
+    outline: var(--thin-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-color);
+    @extend %full_width;
+    &:not(&-sm){
+        @extend %padding_md;
+    }
+    &-sm{
+        @extend %padding_sm;
+    }
+    &:focus{
+        outline-color: var(--accent-color);
+    }
+}
+
+textarea.input-box{
+    height: fn.px2rem(40px);
+    min-height: fn.px2rem(40px);
+}

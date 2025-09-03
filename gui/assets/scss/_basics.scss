@@ -147,6 +147,9 @@
 .full-size{
     @extend %full_size;
 }
+.round-corner{
+    @extend %round_corner;
+}
 .radius-sm{
     border-radius: var(--radius-sm);
 }
@@ -157,14 +160,21 @@
     border-top: var(--thin-border);
 }
 .hide{
-    display: none;
+    display:none;
 }
-.justify-right{
-    display: grid;
-    justify-content: right;
-}
-.justify-center>*{
-    margin: 0 auto;
+.space{
+    &-btn,&-start,&-around,&-end{
+        display:flex;
+    }
+    &-btn{
+        justify-content:space-between;
+    }
+    &-start{
+        justify-content:end;
+    }
+    &-around{
+        justify-content:center;
+    }
 }
 .stripes{
     &-even {
