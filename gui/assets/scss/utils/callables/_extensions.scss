@@ -39,9 +39,9 @@
     margin: $size;
 }
 
-@mixin createRightAngle($size,$border_width){
+@mixin createRightAngle($size,$border_width,$angle:45deg){
     content: '';
-    transform: rotate(45deg);
+    transform: rotate($angle);
     width: $size;
     height: $size;
     border: $border_width solid var(--bg-text);
@@ -49,9 +49,9 @@
     border-left: transparent;
 }
 
-@mixin createLeftAngle($size,$border_width){
+@mixin createLeftAngle($size,$border_width,$angle:45deg){
     content: '';
-    transform: rotate(45deg);
+    transform: rotate($angle);
     width: $size;
     height: $size;
     border: $border_width solid var(--bg-text);

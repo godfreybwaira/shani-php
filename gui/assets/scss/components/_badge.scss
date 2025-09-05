@@ -7,7 +7,7 @@
     height: var(--size);
     display: inline-flex;
     outline: fn.px2rem(1px) solid var(--bg-color);
-    @extend %round_corner, %center_content;
+    @extend %round_corner, %center_content,%zoomOut;
     &.pos-tl{
         top: calc(var(--size)/-2);
         left: calc(var(--size)/-2);
