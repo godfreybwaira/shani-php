@@ -57,4 +57,20 @@
             @extend %round_corner, %position_absolute, %position_center;
         }
     }
+    &-load{
+        cursor: wait;
+        @extend %position_relative, %overflow_hide;
+        &:before{
+            $width:30%;
+            left: 0;
+            bottom: 0;
+            content: '';
+            width: $width;
+            margin-left: $width * -1;
+            animation: pg_move .6s linear infinite;
+            height: fn.px2rem(2px);
+            background: currentColor;
+            @extend %position_absolute;
+        }
+    }
 }

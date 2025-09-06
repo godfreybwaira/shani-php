@@ -50,9 +50,9 @@
             top: 0;
             @extend %position_absolute, %full_width;
             &>:before{
-                height: calc(var(--spacing)/4);
+                height: .25rem;
                 margin-left: calc(var(--progress) * -1);
-                animation: pg_move .6s ease-in-out infinite;
+                animation: pg_move .5s linear infinite;
             }
         }
     }

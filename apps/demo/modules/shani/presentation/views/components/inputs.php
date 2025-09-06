@@ -28,8 +28,16 @@
             <span class="badge color-danger pos-tr">9+</span>
         </button>
     </div>
+</div>
+<div class="divider">Loading Buttons</div>
+<div class="row">
     <div class="col">
         <button class="button color-alert button-spin">
+            Loading...
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert button-load">
             Loading...
         </button>
     </div>
