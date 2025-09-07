@@ -1,0 +1,44 @@
+@use '../utils/callables/extensions';
+@use '../utils/callables/functions' as fn;
+
+.load{
+    $speed: .5s;
+    &-spin{
+        --size: #{fn.px2rem(22px)};
+        cursor: wait;
+        @extend %position_relative, %overflow_hide;
+        &:before{
+            inset: 0;
+            content: '';
+            background: inherit;
+            @extend %position_absolute;
+        }
+        &:after{
+            content: '';
+            width: var(--size);
+            height: var(--size);
+            border: fn.px2rem(2px) solid currentColor;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            animation: spin $speed linear infinite;
+            @extend %round_corner, %position_absolute, %position_center;
+        }
+    }
+    &-line{
+        --size: #{fn.px2rem(2px)};
+        cursor: wait;
+        @extend %position_relative, %overflow_hide;
+        &:before{
+            $width:30%;
+            left: 0;
+            bottom: 0;
+            content: '';
+            width: $width;
+            margin-left: $width * -1;
+            animation: pg_move $speed linear infinite;
+            height: var(--size);
+            background: currentColor;
+            @extend %position_absolute;
+        }
+    }
+}

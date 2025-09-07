@@ -2,7 +2,6 @@
 @use '../../utils/callables/extensions' as ext;
 
 .button {
-    $size: fn.px2rem(22px);
     border: none;
     white-space: nowrap;
     &:not(&-times,.round-corner){
@@ -30,47 +29,12 @@
     }
 
     &-times{
+        $size: fn.px2rem(22px);
         width: $size;
         height: $size;
         z-index: 100;
         display: flex;
         font-size: calc(var(--font-size) * 1.5);
         @extend %center_content, %round_corner;
-    }
-    &-spin{
-        cursor: wait;
-        @extend %position_relative, %overflow_hide;
-        &:before{
-            inset: 0;
-            content: '';
-            background: inherit;
-            @extend %position_absolute;
-        }
-        &:after{
-            content: '';
-            width: $size;
-            height: $size;
-            border: fn.px2rem(2px) solid currentColor;
-            border-top-color: transparent;
-            border-left-color: transparent;
-            animation: spin .4s linear infinite;
-            @extend %round_corner, %position_absolute, %position_center;
-        }
-    }
-    &-load{
-        cursor: wait;
-        @extend %position_relative, %overflow_hide;
-        &:before{
-            $width:30%;
-            left: 0;
-            bottom: 0;
-            content: '';
-            width: $width;
-            margin-left: $width * -1;
-            animation: pg_move .6s linear infinite;
-            height: fn.px2rem(2px);
-            background: currentColor;
-            @extend %position_absolute;
-        }
     }
 }

@@ -1,18 +1,17 @@
 <div class="modal-background">
     <?php if ($app->request->query->getOne('type') === 'c'): ?>
         <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
-            <button shani-fn="close" class="button button-times pos-tr" style="margin: var(--spacing)" shani-target=".modal-background">&times;</button>
-            <div class="container height-sm-max">
-                <div class="spinner" style="--size:2.5rem"></div>
-            </div>
+            <button shani-fn="close" class="button button-times pos-tr" style="margin: var(--spacing)"
+                    shani-target=".modal-background">&times;</button>
+            <div class="height-sm-max load-spin" style="--size:2.5rem"></div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vl'): ?>
-        <div class="modal modal-type-v width-md-1q width-sm-3q pos-l">
-            <button shani-fn="close" class="button button-times" shani-target=".modal-background">&times;</button>
-            <div class="card">
-                <div class="card-body container">
-                    <div class="spinner" style="--size:2.5rem"></div>
-                </div>
+        <div class="modal modal-type-v width-md-1q width-sm-3q pos-l" action="/shani/0/components/0/generator"
+             shani-fn="r" shani-on="load" id="modal1" shani-target="#card1">
+            <button shani-fn="close" class="button button-times pos-tr"
+                    shani-target=".modal-background" style="margin: var(--spacing)">&times;</button>
+            <div class="card load-spin" style="--size:2.5rem" watch-on="end"
+                 id="card1" shani-watch="#modal1" shani-css="end:remove load-spin">
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>
