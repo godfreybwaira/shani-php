@@ -10,8 +10,8 @@
              shani-fn="r" shani-on="load" id="modal1" shani-target="#card1">
             <button shani-fn="close" class="button button-times pos-tr"
                     shani-target=".modal-background" style="margin: var(--spacing)">&times;</button>
-            <div class="card load-spin" style="--size:2.5rem" watch-on="end"
-                 id="card1" shani-watch="#modal1" shani-css="end:remove load-spin">
+            <div class="card" style="--size:2.5rem" watch-on="end,start"
+                 id="card1" shani-watch="#modal1" shani-css="start:add load-spin,end:remove load-spin">
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>

@@ -462,7 +462,7 @@
             }
             const watchEvents = node.getAttribute('watch-on');
             if (watchEvents !== null) {
-                const eventList = Utils.explode(watchEvents, ' ');
+                const eventList = Utils.explode(watchEvents, ',');
                 for (let e of eventList) {
                     Shani.on(e[0], watch); //watch for event
                 }
@@ -470,7 +470,7 @@
             return events;
         };
         const addListener = node => {
-            const evtList = Utils.explode(setDefaultEvents(node), ' ');
+            const evtList = Utils.explode(setDefaultEvents(node), ',');
             for (let evt of evtList) {
                 if (evt[0] === 'load') {
                     node.addEventListener(evt[0], listen);
