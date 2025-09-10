@@ -220,14 +220,14 @@
         };
         return {
             processResponse(shani, response) {
-                Utils.emitEvent(shani, 'data', response);
+                Utils.trigger(shani, 'data', response);
                 const type = Utils.getSubtype(response?.headers.get('content-type'));
                 doc.querySelectorAll(shani.target).forEach(target => HTML.insertData(target, shani, response.data || '', type));
             },
             handleCss(node, css, evt) {
                 const handlers = Utils.explode(css);
                 for (let handler of handlers) {
-                    if (handler[0] === evt || handler[0] === '*') {
+                    if (handler[0] === evt) {
                         mutateCSS(node, handler[1]);
                     }
                 }
@@ -303,11 +303,11 @@
                 em = em.querySelector('fieldset') || em;
             }
             HTTP.send(shani, shani.method || method, request => {
-                Utils.emitEvent(shani, 'start', {request});
+                Utils.trigger(shani, 'start', {request});
                 em.setAttribute('disabled', 'disabled');
             }, response => {
                 em.removeAttribute('disabled');
-                Utils.emitEvent(shani, 'end', response);
+                Utils.trigger(shani, 'end', response);
                 resubmit(shani);
             });
         };
@@ -415,7 +415,7 @@
                     doc.execCommand('copy');
                     box.remove();
                 }
-                Utils.emitEvent(this, 'copy');
+                Utils.trigger(this, 'copy');
             }
         };
         if (!window.Shani) {
@@ -429,7 +429,7 @@
                     return;
                 }
                 const shani = new Obj(node, event);
-                Utils.emitEvent(shani, event.type);
+                Utils.trigger(shani, event.type);
                 if (shani[shani.fn] instanceof Function) {
                     if (!shani.poll || shani.scheme === 'ws') {
                         shani[shani.fn]();
@@ -467,10 +467,9 @@
                     Shani.on(e[0], watch); //watch for event
                 }
             }
-            return events;
         };
         const addListener = node => {
-            const evtList = Utils.explode(setDefaultEvents(node), ',');
+            const evtList = Utils.explode(node.getAttribute('shani-on'), ',');
             for (let evt of evtList) {
                 if (evt[0] === 'load') {
                     node.addEventListener(evt[0], listen);
@@ -487,7 +486,7 @@
             const evt = e.type.substring(e.type.lastIndexOf(':') + 1);
             doc.querySelectorAll('[shani-watch]').forEach(watcher => {
                 const events = watcher.getAttribute('watch-on');
-                if (events !== null && (events.split(',').indexOf(evt) > -1 || events === '*')) {
+                if (events !== null && events.split(',').indexOf(evt) > -1) {
                     if (e.detail.shani.emitter.matches(watcher.getAttribute('shani-watch'))) {
                         Shani.create(watcher, e);
                     }
@@ -497,9 +496,12 @@
 
         return root => {
             if (root.hasAttribute('shani-fn') || root.hasAttribute('shani-watch')) {
+                setDefaultEvents(root);
                 addListener(root);
             }
-            root.querySelectorAll('[shani-fn],[shani-watch]').forEach(node => addListener(node));
+            const nodes = root.querySelectorAll('[shani-fn],[shani-watch]');
+            nodes.forEach(node => setDefaultEvents(node));
+            nodes.forEach(node => addListener(node));
         };
     })();
     const Utils = (() => {
@@ -538,10 +540,10 @@
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
             },
-            emitEvent(shani, evt, data = {}) {
-                const event = evt.substring(evt.lastIndexOf(':') + 1);
+            trigger(shani, event, data = {}) {
+                const evt = event.substring(event.lastIndexOf(':') + 1);
                 if (shani.css !== null) {
-                    HTML.handleCss(shani.emitter, shani.css, event);
+                    HTML.handleCss(shani.emitter, shani.css, evt);
                 }
                 data.shani = shani;
                 doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
@@ -655,8 +657,8 @@
                 if (!(response.code > 0)) {
                     response.code = code;
                 }
-                Utils.emitEvent(shani, '' + code, response);
-                Utils.emitEvent(shani, status, response);
+                Utils.trigger(shani, '' + code, response);
+                Utils.trigger(shani, status, response);
                 HTML.processResponse(shani, response);
                 if (status === 'redirect') {
                     redirect(response.headers);
@@ -682,16 +684,16 @@
             on('open', () => {
                 const payload = createPayload(shani);
                 socket.send(payload.data || '');
-                Utils.emitEvent(shani, 'start', {request: payload});
+                Utils.trigger(shani, 'start', {request: payload});
             });
             on('message', e => {
                 const resp = Utils.object({data: e.data || null, headers: null});
-                Utils.emitEvent(shani, e.type, resp);
+                Utils.trigger(shani, e.type, resp);
                 HTML.processResponse(shani, resp);
             });
-            on('error', e => Utils.emitEvent(shani, e.type));
+            on('error', e => Utils.trigger(shani, e.type));
             on('close', () => {
-                Utils.emitEvent(shani, 'end');
+                Utils.trigger(shani, 'end');
             });
         };
         return shani => {
@@ -706,18 +708,18 @@
             const evt = Utils.explode(shani.on || 'message');
             for (let e of evt) {
                 on(e[0], e => {
-                    Utils.emitEvent(shani, 'start');
+                    Utils.trigger(shani, 'start');
                     const resp = Utils.object({
                         data: e.data || null, headers: new Map().set('content-type', 'text/html')
                     });
-                    Utils.emitEvent(shani, e.type, resp);
+                    Utils.trigger(shani, e.type, resp);
                     HTML.processResponse(shani, resp);
                 });
             }
-            on('error', e => Utils.emitEvent(shani, e.type));
+            on('error', e => Utils.trigger(shani, e.type));
             on('beforeunload', () => {
                 sse.close();
-                Utils.emitEvent(shani, 'end');
+                Utils.trigger(shani, 'end');
             });
         };
         return shani => httpHandler(shani, new EventSource(shani.url));
@@ -809,7 +811,7 @@
                     const modal = createModal(specs, attr);
                     shani.target ||= '#' + modal.id;
                     shani.insert ||= 'append';
-                    Shani.on('data', () => modal.classList.remove('load-line', 'load-spin'));
+                    Shani.on('data', () => modal.classList.remove('loader-line', 'loader-spin'));
                 }
                 Shani.on('data', e => closeOtherModals(e.detail.shani));
             });

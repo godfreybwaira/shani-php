@@ -32,12 +32,12 @@
 <div class="divider">Loading Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button color-alert load-spin">
+        <button class="button color-alert loader-spin">
             Loading...
         </button>
     </div>
     <div class="col">
-        <button class="button color-alert load-line">
+        <button class="button color-alert loader-line">
             Loading...
         </button>
     </div>
