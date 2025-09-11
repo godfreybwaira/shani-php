@@ -17,11 +17,11 @@ namespace test {
 
         private const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{3}_test-report\.json/';
 
+        private float $executionTime = 0, $performanceScore = 0;
         private int $testPassed = 0, $totalTests = 0;
         private readonly TestEnvironment $env;
         private readonly string $description;
         private readonly ?string $location;
-        private float $executionTime = 0;
         private array $testGroups;
 
         /**
@@ -58,7 +58,10 @@ namespace test {
                     'version' => '1.0',
                     'timestamp' => date('Y-m-d\TH:i:s')
                 ],
-                'summary' => new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime),
+                'summary' => new TestSummary(
+                        $this->description, $this->totalTests, $this->testPassed,
+                        $this->executionTime, $this->performanceScore
+                ),
                 'environment' => $this->env,
                 'groups' => $this->testGroups
             ];
@@ -74,6 +77,7 @@ namespace test {
                 $group->getResult();
                 $this->testPassed += $group->getTotalTestPassed();
                 $this->executionTime += $group->getTotalExecutionTime();
+                $this->performanceScore += $group->getTotalPerformanceScore();
                 $this->totalTests += $group->getTotalTests();
             }
             $report = json_encode($this->jsonSerialize(), JSON_PRETTY_PRINT);

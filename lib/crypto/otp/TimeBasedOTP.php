@@ -9,6 +9,8 @@
 
 namespace lib\crypto\otp {
 
+    use lib\DataConvertor;
+
     final class TimeBasedOTP implements \Stringable
     {
 
@@ -51,18 +53,19 @@ namespace lib\crypto\otp {
 
         /**
          * Generates a Time-based one time password (TOTP)
-         * @param string $password A shared secret key in base 32 format.
-         * @param int $length The number of OTP digits (default 6).
+         * @param string $password A shared secret key.
+         * @param int $length The number of OTP digits (default 6 digits).
+         * @param int $period The time step in seconds (default 30 seconds)
          * @param string $issuer The issuer or organization name.
          * @param string $accountName The user's account name or email.
          */
-        public function __construct(string $password, int $length = 6, string $issuer = null, string $accountName = null)
+        public function __construct(string $password, int $length = 6, int $period = 30, string $issuer = null, string $accountName = null)
         {
 
-            $this->password = $password;
+            $this->password = DataConvertor::base32Encode($password);
             $this->length = $length;
             $this->algorithm = 'SHA1';
-            $this->period = 30;
+            $this->period = $period;
             $this->accountName = $accountName;
             $this->issuer = $issuer;
         }
@@ -94,7 +97,7 @@ namespace lib\crypto\otp {
          */
         public function verify(string $otp): bool
         {
-            $newOtp = new self($this->password, strlen($otp));
+            $newOtp = new self($this->password, strlen($otp), $this->period);
             return $newOtp->generate() === $otp;
         }
 

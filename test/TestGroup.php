@@ -14,9 +14,9 @@ namespace test {
     final class TestGroup implements \JsonSerializable
     {
 
+        private float $executionTime = 0, $performanceScore = 0;
         private int $testPassed = 0, $totalTests = 0;
         private readonly string $description;
-        private float $executionTime = 0;
         private array $testCases;
 
         /**
@@ -54,13 +54,23 @@ namespace test {
                 if ($case->getResult()) {
                     ++$this->testPassed;
                 }
+                $this->performanceScore += $case->getPerformanceScore();
                 $this->executionTime += $case->getExecutionTime();
             }
             return $this->testPassed === $this->totalTests;
         }
 
         /**
-         * Get total execution time in this group
+         * Get total test performance score (in percent) in this group
+         * @return float Performance score in percent
+         */
+        public function getTotalPerformanceScore(): float
+        {
+            return $this->performanceScore;
+        }
+
+        /**
+         * Get total execution time (in milliseconds) in this group
          * @return float
          */
         public function getTotalExecutionTime(): float
@@ -90,7 +100,10 @@ namespace test {
         public function jsonSerialize(): array
         {
             return [
-                'summary' => new TestSummary($this->description, $this->totalTests, $this->testPassed, $this->executionTime),
+                'summary' => new TestSummary(
+                        $this->description, $this->totalTests, $this->testPassed,
+                        $this->executionTime, $this->performanceScore
+                ),
                 'cases' => $this->testCases
             ];
         }

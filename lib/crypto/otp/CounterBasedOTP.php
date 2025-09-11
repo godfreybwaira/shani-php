@@ -9,6 +9,8 @@
 
 namespace lib\crypto\otp {
 
+    use lib\DataConvertor;
+
     final class CounterBasedOTP implements \Stringable
     {
 
@@ -51,7 +53,7 @@ namespace lib\crypto\otp {
 
         /**
          * Generates a Count-based one time password (HOTP)
-         * @param string $password A shared secret key in base 32 format.
+         * @param string $password A shared secret key.
          * @param int $counter The starting counter for HOTP.
          * @param int $length The number of OTP digits (default 6).
          * @param string $issuer The issuer or organization name.
@@ -59,7 +61,7 @@ namespace lib\crypto\otp {
          */
         public function __construct(string $password, int $counter, int $length = 6, string $issuer = null, string $accountName = null)
         {
-            $this->password = $password;
+            $this->password = DataConvertor::base32Encode($password);
             $this->length = $length;
             $this->algorithm = 'SHA1';
             $this->counter = $counter;

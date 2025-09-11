@@ -421,6 +421,7 @@
         if (!window.Shani) {
             window.Shani = obj => GLOBAL_ATTR = Utils.object(obj);
         }
+        window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
             SHANI_ATTR: ['watch', 'header', 'poll', 'insert', 'xss', 'history', 'css', 'on', 'fn', 'scheme', 'target'],
@@ -743,7 +744,6 @@
                 });
                 setTimeout(rotate, 5000);
             };
-            window.addEventListener('popstate', e => history.go(0));
             doc.addEventListener('click', e => {
                 if (e.target.classList?.contains('carousel-next')) {
                     // Calculate next index: cycle to 0 if at end.

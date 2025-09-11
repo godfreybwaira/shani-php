@@ -116,7 +116,7 @@ namespace apps\demo\config {
                     $code = $res->status();
                 });
                 return $code === \lib\http\HttpStatus::OK;
-            });
+            }, 7);
             $g3->addCase($caseg31, $caseg32, $caseg33);
             $result->addGroup($g1, $g2, $g3);
             return $result;

@@ -66,9 +66,9 @@ namespace test\helpers {
             $result = self::config($params);
             unlink($testFile);
             if ($result) {
-                WebServer::log(LogLevel::INFO, 'Test passed.');
+                WebServer::log(LogLevel::INFO, 'Test finished and passed.');
             } else {
-                WebServer::log(LogLevel::WARNING, 'Test failed.');
+                WebServer::log(LogLevel::WARNING, 'Test finished and failed.');
             }
         }
     }
