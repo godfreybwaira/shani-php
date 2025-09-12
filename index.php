@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 use shani\FrameworkConfig;
 use shani\WebServer;
-use test\helpers\TestParameters;
+
+//use test\helpers\TestParameters;
 
 /**
  * Server root directory

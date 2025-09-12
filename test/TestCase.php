@@ -9,6 +9,7 @@
 
 namespace test {
 
+    use test\helpers\TestCategory;
     use test\helpers\TestComment;
     use test\helpers\TestPerformanceScore;
     use test\helpers\TestSeverity;
@@ -20,7 +21,8 @@ namespace test {
         private readonly string $description;
         private readonly TestComment $result;
         private readonly TestSeverity $severity;
-        private int $repetition = 1;
+        private readonly TestCategory $category;
+        private int $iterations = 1;
         private $callback;
 
         /**
@@ -46,9 +48,10 @@ namespace test {
          * @param TestSeverity $severity Test case severity
          * @param string|null $id Test case unique id
          */
-        public function __construct(TestSeverity $severity, ?string $id = null)
+        public function __construct(TestSeverity $severity, ?string $id = null, TestCategory $category = TestCategory::OTHER)
         {
             $this->severity = $severity;
+            $this->category = $category;
             $this->id = strtoupper($id);
         }
 
@@ -60,15 +63,15 @@ namespace test {
          * @param int $maxExecutionTime Maximum execution time (in milliseconds)
          * a single test case should take. When a test takes longer than this time
          * the performance drops.
-         * @param int $repetition A number of times a test should be repeated. By
-         * default a test case is run only once
+         * @param int $iterations A number of times a test should be repeated.
+         * By default a test case is run only once.
          * @return self
          */
-        public function test(string $description, callable $callback, int $maxExecutionTime = 0, int $repetition = 1): self
+        public function test(string $description, callable $callback, int $maxExecutionTime = 0, int $iterations = 1): self
         {
-            $this->maxExecutionTime = $maxExecutionTime * $repetition;
+            $this->maxExecutionTime = $maxExecutionTime * $iterations;
             $this->description = $description;
-            $this->repetition = $repetition;
+            $this->iterations = $iterations;
             $this->callback = $callback;
             return $this;
         }
@@ -81,14 +84,14 @@ namespace test {
         {
             $cb = $this->callback;
             $passCount = 0;
-            for ($i = 0; $i < $this->repetition; $i++) {
+            for ($i = 0; $i < $this->iterations; $i++) {
                 $start = hrtime(true);
                 if ($cb()) {
                     ++$passCount;
                 }
                 $this->executionTime += (hrtime(true) - $start);
             }
-            $this->result = $passCount === $this->repetition ? TestComment::PASS : TestComment::FAIL;
+            $this->result = $passCount === $this->iterations ? TestComment::PASS : TestComment::FAIL;
             $this->executionTime /= 1E6; //converting into milliseconds
             $this->performanceScore = TestPerformanceScore::calculate($this->maxExecutionTime, $this->executionTime);
             return $this->result === TestComment::PASS;
@@ -119,6 +122,7 @@ namespace test {
                 'description' => $this->description,
                 'result' => $this->result->name,
                 'severity' => $this->severity->name,
+                'category' => $this->category->name,
                 'execution_time_ms' => $this->executionTime,
                 'performance' => TestPerformanceScore::check($this->performanceScore)->name,
                 'performance_score' => $this->performanceScore,

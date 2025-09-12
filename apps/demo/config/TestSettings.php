@@ -105,7 +105,7 @@ namespace apps\demo\config {
             ///////////////////////////////////////////
             $caseg31 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_007');
             $caseg32 = new \test\TestCase(\test\helpers\TestSeverity::MEDIUM, 'TEST_008');
-            $caseg33 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_009');
+            $caseg33 = new \test\TestCase(\test\helpers\TestSeverity::HIGH, 'TEST_009', \test\helpers\TestCategory::PERFORMANCE);
             $caseg31->test('Test if 2+2=4', fn() => 2 + 2 === 4);
             $caseg32->test('Test if A is same as a', fn() => 'A' === 'a');
             $caseg33->test('Testing if I can make a call on this server', function () {

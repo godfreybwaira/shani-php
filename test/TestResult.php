@@ -9,13 +9,14 @@
 
 namespace test {
 
+    use test\helpers\TestConfig;
     use test\helpers\TestEnvironment;
     use test\helpers\TestSummary;
 
     final class TestResult implements \JsonSerializable
     {
 
-        private const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{3}_test-report\.json/';
+        private const FILENAME_PATTERN = '/^\d{4}(-\d{2}){2}\.\d{4}_test-report\.json/';
 
         private float $executionTime = 0, $performanceScore = 0;
         private int $testPassed = 0, $totalTests = 0;
@@ -56,7 +57,7 @@ namespace test {
             return [
                 'metadata' => [
                     'version' => '1.0',
-                    'timestamp' => date('Y-m-d\TH:i:s')
+                    'report_datetime' => date('Y-m-d\TH:i:s')
                 ],
                 'summary' => new TestSummary(
                         $this->description, $this->totalTests, $this->testPassed,
@@ -88,9 +89,9 @@ namespace test {
         private function save(string $data): self
         {
             if ($this->location !== null) {
-                $date = date('Y-m-d.Hi');
-                $filename = substr($date, 0, strlen($date) - 1) . '_test-report.json';
+                $filename = date('Y-m-d.Hi') . '_test-report.json';
                 if (preg_match(self::FILENAME_PATTERN, $filename) !== 1) {
+                    TestConfig::stop();
                     throw new \Exception('Invalid file name');
                 }
                 file_put_contents($this->location . '/' . $filename, $data);
