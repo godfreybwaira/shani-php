@@ -4,13 +4,16 @@
 .button {
     border: none;
     white-space: nowrap;
+    &:active{
+        opacity:.8;
+    }
     &:not(&-times,.round-corner){
         border-radius: var(--radius-sm);
     }
     &-type-outline{
         color: var(--theme-text);
-        outline: fn.px2rem(2px) solid currentColor;
-        outline-offset: fn.px2rem(-2px);
+        outline: fn.px2rem(1px) solid currentColor;
+        outline-offset: fn.px2rem(-1px);
         background: none;
     }
     &:not(&-sm,&-times){
