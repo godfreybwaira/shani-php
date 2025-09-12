@@ -22,15 +22,9 @@
     &-sm{
         @extend %padding_sm;
     }
-
-    &:hover {
-        text-decoration: none;
-    }
-
     &-block {
         @extend %full_width;
     }
-
     &-times{
         $size: fn.px2rem(22px);
         width: $size;
