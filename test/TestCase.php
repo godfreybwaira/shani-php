@@ -123,6 +123,7 @@ namespace test {
                 'result' => $this->result->name,
                 'severity' => $this->severity->name,
                 'category' => $this->category->name,
+                'iterations' => $this->iterations,
                 'execution_time_ms' => $this->executionTime,
                 'performance' => TestPerformanceScore::check($this->performanceScore)->name,
                 'performance_score' => $this->performanceScore,
