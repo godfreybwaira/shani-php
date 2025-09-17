@@ -513,15 +513,15 @@
 <div class="divider">Modals</div>
 <ul>
     <li><a href="/shani/0/components/0/modals?type=c"
-           shani-fn="r" shani-target="body" shani-insert="append">Type C</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type C</a></li>
     <li><a href="/shani/0/components/0/modals?type=cl"
-           shani-fn="r" shani-target="body" shani-insert="append">Type C With layout</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type C With layout</a></li>
     <li><a href="/shani/0/components/0/modals?type=vr"
-           shani-fn="r" shani-target="body" shani-insert="append">Type VR</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type VR</a></li>
     <li><a href="/shani/0/components/0/modals?type=vl"
-           shani-fn="r" shani-target="body" shani-insert="append">Type VL</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type VL</a></li>
     <li><a href="/shani/0/components/0/modals?type=ht"
-           shani-fn="r" shani-target="body" shani-insert="append">Type HT</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
-           shani-fn="r" shani-target="body" shani-insert="append">Type HB</a></li>
+           shani-on="click:r" shani-target="body" shani-insert="append">Type HB</a></li>
 </ul>

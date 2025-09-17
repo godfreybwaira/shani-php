@@ -29,8 +29,8 @@
         </button>
     </div>
 </div>
-<div class="divider">Loading Buttons</div>
-<div class="row">
+<div class="divider">Loading Inputs</div>
+<div class="row row-stretch">
     <div class="col">
         <button class="button color-alert loader-spin">
             Loading...
@@ -40,6 +40,67 @@
         <button class="button color-alert loader-line">
             Loading...
         </button>
+    </div>
+    <div class="col">
+        <div class="choice-group loader-spin">
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Jan</span>
+            </label>
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Feb</span>
+            </label>
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Mar</span>
+            </label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-group loader-spin">
+            <label>www.</label>
+            <input type="url" name="website" placeholder="My website...">
+            <label>.com</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-group loader-spin">
+            <input placeholder="Please enter your name..." type="text" name="name">
+        </div>
+    </div>
+</div>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-line loader-spin">
+            <!--order matters-->
+            <input type="text" name="name" placeholder="E.g: Misas Miubka">
+            <label class="font-sm">Your name</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-line loader-line">
+            <!--order matters-->
+            <input type="text" name="name" placeholder="E.g: Misas Miubka">
+            <label class="font-sm">Your name</label>
+        </div>
+    </div>
+    <div class="col">
+        <label>Multi-select Input</label>
+        <div class="choice-group loader-line">
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Jan</span>
+            </label>
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Feb</span>
+            </label>
+            <label>
+                <input class="choice" type="checkbox" name="choice">
+                <span>Mar</span>
+            </label>
+        </div>
     </div>
 </div>
 <div class="divider">Toggle Buttons</div>
@@ -131,7 +192,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup change" shani-fn name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup:,change:" name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>
@@ -147,8 +208,8 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label shani-watch="#url" shani-fn="bind" watch-on="keyup">Demonstrating shani-bind function</label>
-        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" shani-fn="bind" watch-on="change" class="input-box">
+        <label shani-watch="#url" watch-on="keyup:bind">Demonstrating shani-bind function</label>
+        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" watch-on="change:bind" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">

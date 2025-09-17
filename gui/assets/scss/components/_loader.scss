@@ -5,12 +5,12 @@
     $speed: .5s;
     &-spin{
         --size: #{fn.px2rem(22px)};
-        cursor: wait;
+        pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
             inset: 0;
             content: '';
-            background: inherit;
+            backdrop-filter:blur(fn.px2rem(4px));
             @extend %position_absolute;
         }
         &:after{
@@ -26,7 +26,7 @@
     }
     &-line{
         --size: #{fn.px2rem(2px)};
-        cursor: wait;
+        pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
             $width:30%;

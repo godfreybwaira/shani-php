@@ -258,12 +258,12 @@
 <div class="divider">Toaster</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/toaster?type=t" shani-insert="append" shani-fn="r" shani-target="body">
+        <a href="/shani/0/components/0/toaster?type=t" shani-insert="append" shani-on="click:r" shani-target="body">
             Toaster from Top
         </a>
     </li>
     <li>
-        <a href="/shani/0/components/0/toaster?type=b" shani-insert="append" shani-fn="r" shani-target="body">
+        <a href="/shani/0/components/0/toaster?type=b" shani-insert="append" shani-on="click:r" shani-target="body">
             Toaster from Bottom
         </a>
     </li>
@@ -271,7 +271,7 @@
 <div class="divider">Loaders</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/loader?type=i" shani-insert="append" shani-fn="r" shani-target=".layout-content">
+        <a href="/shani/0/components/0/loader?type=i" shani-insert="append" shani-on="click:r" shani-target=".layout-content">
             Infinite loader
         </a>
     </li>
@@ -284,7 +284,7 @@
 <div class="divider">Timeline</div>
 <div class="row">
     <div class="col">
-        <ul class="timeline" shani-target=".timeline" shani-fn="r" shani-poll="0:3" shani-on="demand" action="/shani/0/components/0/timeline" shani-insert="append">
+        <ul class="timeline" shani-target=".timeline" shani-on="demand:r" shani-poll="0:3" action="/shani/0/components/0/timeline" shani-insert="append">
             <li>
                 <h3>My Title</h3>
                 <div class="text-muted font-sm mb-md">2011-2012</div>

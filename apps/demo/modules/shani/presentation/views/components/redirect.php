@@ -1,2 +1,2 @@
 <!--Redirection demo-->
-<a href="/shani/0/components/0/all" shani-on="load" shani-target="#mainbody" shani-fn="r"></a>
+<a href="/shani/0/components/0/all" shani-target="#mainbody" shani-on="load:r"></a>
