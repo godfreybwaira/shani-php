@@ -228,13 +228,10 @@
                 } else {
                     setNodeData(target, data, mode, mechanism, plainText);
                 }
-                if (mode === 'swap') {
-                    target.remove();
-                }
             },
             INSERT_MODES: {
                 prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
-                swap: 'afterend', before: 'beforebegin', after: 'afterend'
+                before: 'beforebegin', after: 'afterend'
             }
         };
     })();
@@ -266,15 +263,6 @@
             setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
         /**
-         * Resend a polling HTTP request
-         * @param {object} shani
-         */
-        const resubmit = shani => {
-            if (shani.emitter.isConnected && shani.timer.steps > -1 && (!shani.timer.limit || (--shani.timer.limit) > 0)) {
-                setTimeout(Utils.trigger, shani.timer.steps, shani, shani.event.type);
-            }
-        };
-        /**
          * Send HTTP request
          * @param {object} shani
          * @param {string} method HTTP request type
@@ -296,7 +284,6 @@
             }, response => {
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end', response);
-                resubmit(shani);
             });
         };
         const getTarget = shani => {
@@ -414,16 +401,22 @@
              * Add CSS class(es) to extisting node
              * @param {array} params
              */
-            add(params) {
+            addcss(params) {
                 for (let i = 1; i < params.length; i++) {
                     this.emitter.classList.add(params[i]);
                 }
             },
             /**
+             * Remove a node from DOM tree
+             */
+            rm() {
+                Utils.removeNode(this.emitter);
+            },
+            /**
              * Remove CSS class(es) to extisting node
              * @param {array} params
              */
-            remove(params) {
+            rmcss(params) {
                 for (let i = 1; i < params.length; i++) {
                     this.emitter.classList.remove(params[i]);
                 }
@@ -432,14 +425,14 @@
              * Replace CSS class(es) to extisting node
              * @param {array} params
              */
-            replace(params) {
+            replacecss(params) {
                 this.emitter.classList.replace(params[1], params[2]);
             },
             /**
              * Toggle CSS class(es) to extisting node
              * @param {array} params
              */
-            toggle(params) {
+            togglecss(params) {
                 for (let i = 1; i < params.length; i++) {
                     this.emitter.classList.toggle(params[i]);
                 }
@@ -464,15 +457,6 @@
             on(e, cb) {
                 doc.addEventListener('shani:on:' + e, cb);
                 return Shani.on;
-            },
-            callNext(shani, event) {
-                const str = shani.params.get(event);
-                if (str) {
-                    const params = str.split(' ');
-                    if (shani[params[0]] instanceof Function) {
-                        shani[params[0]](params);
-                    }
-                }
             }
         };
     })();
@@ -537,6 +521,17 @@
         };
     })();
     const Utils = (() => {
+        const callNext = (shani, event) => {
+            const params = shani.params.get(event)?.split(' ');
+            if (params && shani[params[0]] instanceof Function) {
+                shani[params[0]](params);
+            }
+        };
+        const resubmit = shani => {
+            if (shani.emitter.isConnected && shani.timer.steps > -1 && (!shani.timer.limit || (--shani.timer.limit) > 0)) {
+                setTimeout(Utils.trigger, shani.timer.steps, shani, shani.event.type);
+            }
+        };
         return {
             removeNode(node) {
                 node.style.opacity = 0;
@@ -577,11 +572,11 @@
             },
             trigger(shani, event, data = {}) {
                 const evt = Utils.getEventName(event);
-                Shani.callNext(shani, evt);
+                callNext(shani, evt);
                 data.shani = shani;
-                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {
-                    detail: Utils.object(data)
-                }));
+                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+                if (evt === 'end')
+                    resubmit(shani);
             },
             getReqHeaders(shani) {
                 const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.headers, '|');

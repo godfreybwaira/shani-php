@@ -4,19 +4,19 @@
 .loader{
     $speed: .5s;
     &-spin{
-        --size: #{fn.px2rem(22px)};
+        --loader-size: #{fn.px2rem(22px)};
         pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
             inset: 0;
             content: '';
-            backdrop-filter:blur(fn.px2rem(4px));
+            backdrop-filter:blur(fn.px2rem(5px));
             @extend %position_absolute;
         }
         &:after{
             content: '';
-            width: var(--size);
-            height: var(--size);
+            width: var(--loader-size);
+            height: var(--loader-size);
             border: fn.px2rem(2px) solid currentColor;
             border-top-color: transparent;
             border-left-color: transparent;
@@ -25,7 +25,7 @@
         }
     }
     &-line{
-        --size: #{fn.px2rem(2px)};
+        --loader-size: #{fn.px2rem(2px)};
         pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
@@ -36,7 +36,7 @@
             width: $width;
             margin-left: $width * -1;
             animation: pg_move $speed linear infinite;
-            height: var(--size);
+            height: var(--loader-size);
             background: currentColor;
             @extend %position_absolute;
         }
