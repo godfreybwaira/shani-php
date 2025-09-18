@@ -213,7 +213,11 @@
             processResponse(shani, response) {
                 Utils.trigger(shani, 'data', response);
                 const type = Utils.getSubtype(response?.headers.get('content-type'));
-                doc.querySelectorAll(shani.target).forEach(target => HTML.insertData(target, shani, response.data || '', type));
+                if (shani.target) {
+                    doc.querySelectorAll(shani.target).forEach(target => HTML.insertData(target, shani, response.data || '', type));
+                } else {
+                    HTML.insertData(shani.emitter, shani, response.data || '', type);
+                }
             },
             insertData(target, shani, data, type) {
                 const mode = shani.insert || 'replace';
@@ -314,9 +318,10 @@
             return wrapper;
         };
         const getCover = (shani, size) => {
+            let style = 'position:fixed;top:0;left:0;width:100%;height:100%;padding:1rem;';
+            style += 'overflow-y:auto;font-size:' + (size || 100) + '%;background:#fff;z-index:998';
             const cover = doc.createElement('div');
-            cover.style = 'position:fixed;top:0;left:0;width:100%;height:100%;padding:1rem;';
-            cover.style += 'overflow-y:auto;font-size:' + (size || 100) + '%;background:#fff;z-index:998';
+            cover.style = style;
             cover.innerHTML = getTarget(shani).outerHTML;
             doc.body.insertBefore(cover, doc.body.firstChild);
             return cover;
@@ -353,11 +358,11 @@
              */
             close() {
                 const node = !this.target ? this.emitter : Utils.getParentNode(this.emitter, this.target);
+                Utils.trigger(this, 'close');
                 if (node) {
                     return Utils.removeNode(node);
                 }
                 doc.querySelectorAll(this.target).forEach(node => Utils.removeNode(node));
-                Utils.trigger(this, 'close');
             },
             print() {
                 if (window.print instanceof Function) {
@@ -830,7 +835,7 @@
                 return modal;
             };
             const closeOtherModals = shani => {
-                if (!shani.poll) {
+                if (!shani.poll && shani.target) {
                     doc.querySelectorAll('.modal-background').forEach(mc => {
                         if (mc.querySelector(shani.target) === null) {
                             Utils.removeNode(mc);

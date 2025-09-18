@@ -354,7 +354,7 @@
 <div class="divider">Tables</div>
 <div class="row row-stretch">
     <div class="col">
-        <div class="table-container">
+        <div class="table-container" id="tc1">
             <table class="table border-v">
                 <caption>Users</caption>
                 <thead class="color-12">
@@ -400,7 +400,7 @@
         </div>
     </div>
     <div class="col">
-        <div class="table-container">
+        <div class="table-container" id="tc2">
             <table class="table border-h">
                 <caption>Users</caption>
                 <thead>
@@ -524,4 +524,9 @@
            shani-on="click:r" shani-target="body" shani-insert="append">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
            shani-on="click:r" shani-target="body" shani-insert="append">Type HB</a></li>
+</ul>
+<div class="divider">Misc</div>
+<ul>
+    <li><a href="#" shani-on="click:fs" shani-target="#tc2">Full screen</a></li>
+    <li><a href="#" shani-on="click:print" shani-target="#tc2">Print</a></li>
 </ul>
