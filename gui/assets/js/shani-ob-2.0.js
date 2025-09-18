@@ -255,32 +255,28 @@
         };
         let GLOBAL_ATTR = {};
         /**
-         * Make HTTP request at a regular interval
-         * @param {type} shani Shani object
-         * @param {type} fn Callback function
+         * Make HTTP request at a given interval
+         * @param {object} shani
          */
-        const doPolling = (shani, fn) => {
+        const doPolling = shani => {
             const poll = shani.poll.split(':');
-            shani.timer.limit = parseInt(poll[2]) || null;
+            const start = Number(poll[0] || 0) * 1000;
             shani.timer.steps = Number(poll[1] || -1) * 1000;
-            setTimeout(shani[fn].bind(shani), Number(poll[0] || 0) * 1000);
+            shani.timer.limit = parseInt(poll[2]) || null;
+            setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
         /**
          * Resend a polling HTTP request
-         * @param {type} shani
+         * @param {object} shani
          */
         const resubmit = shani => {
             if (shani.emitter.isConnected && shani.timer.steps > -1 && (!shani.timer.limit || (--shani.timer.limit) > 0)) {
-                const evt = Utils.getEventName(shani.event.type);
-                const fn = shani.params.get(evt).split(' ')[0];
-                if (shani[fn] instanceof Function) {
-                    setTimeout(shani[fn].bind(shani), shani.timer.steps);
-                }
+                setTimeout(Utils.trigger, shani.timer.steps, shani, shani.event.type);
             }
         };
         /**
          * Send HTTP request
-         * @param {type} shani Shani object
+         * @param {object} shani
          * @param {string} method HTTP request type
          */
         const sendReq = (shani, method) => {
@@ -296,7 +292,7 @@
             }
             HTTP.send(shani, shani.method || method, request => {
                 Utils.trigger(shani, 'start', {request});
-                em.setAttribute('disabled', 'disabled');
+                em.setAttribute('disabled', '');
             }, response => {
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end', response);
@@ -455,13 +451,15 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'header', 'poll', 'insert', 'xss', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'poll', 'insert', 'xss', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
-                if (node.hasAttribute('disabled')) {
-                    return;
+                if (!node.hasAttribute('disabled')) {
+                    const shani = new Obj(node, event, attrib);
+                    if (shani.poll) {
+                        return doPolling(shani);
+                    }
+                    Utils.trigger(shani, event.type);
                 }
-                const shani = new Obj(node, event, attrib);
-                Utils.trigger(shani, event.type);
             },
             on(e, cb) {
                 doc.addEventListener('shani:on:' + e, cb);
@@ -469,15 +467,10 @@
             },
             callNext(shani, event) {
                 const str = shani.params.get(event);
-                if (!str) {
-                    return;
-                }
-                const params = str.split(' ');
-                if (shani[params[0]] instanceof Function) {
-                    if (!shani.poll || shani.scheme === 'ws') {
+                if (str) {
+                    const params = str.split(' ');
+                    if (shani[params[0]] instanceof Function) {
                         shani[params[0]](params);
-                    } else if (shani.poll) {
-                        doPolling(shani, params[0]);
                     }
                 }
             }
@@ -591,7 +584,7 @@
                 }));
             },
             getReqHeaders(shani) {
-                const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.header, '|');
+                const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.headers, '|');
                 if (type && type !== 'form-data') {
                     headers.set('content-type', shani.enctype.trim());
                 }

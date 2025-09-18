@@ -10,7 +10,7 @@
             <button shani-on="click:close" class="button button-times pos-tr"
                     shani-target=".modal-background" style="margin: var(--spacing)">&times;</button>
             <div class="card" style="--size:2.5rem" id="card1" action="/shani/0/components/0/generator"
-                 shani-on="load:r,start:add loader-spin,end:remove loader-spin">
+                 shani-on="load:r,start:add loader-spin,end:remove loader-spin" shani-poll="2:3:5">
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>

@@ -1,3 +1,3 @@
 window.Shani({
-    'header': 'x-request-mode:async'
+    'headers': 'x-request-mode:async'
 });
