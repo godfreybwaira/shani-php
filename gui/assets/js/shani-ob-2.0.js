@@ -1,8 +1,9 @@
 (doc => {
     'use strict';
-    doc.addEventListener('DOMContentLoaded', e => {
-        Shanify(e.target.body);
-        Observers.mutate(e.target.body);
+    // Initialize DOM listeners
+    doc.addEventListener('DOMContentLoaded', () => {
+        Shanify(doc.body);
+        Observers.mutate(doc.body);
     });
     const Observers = (() => {
         const runScript = node => {
@@ -48,12 +49,8 @@
         };
     })();
     const Convertor = (() => {
-        const json = data => {
-            if (typeof data === 'string') {
-                return Utils.object(JSON.parse(data));
-            }
-            return data;
-        };
+        const json = (data) => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
+
         return {
             map2json(map) {
                 const obj = Utils.object();
@@ -155,7 +152,7 @@
                     }
                     keys.push(input[0]);
                 }
-                return output.substring(1);
+                return output.slice(1);
             },
 //            file2json(file) {
 //                const fr = new FileReader();
@@ -164,7 +161,7 @@
 //                    fr.addEventListener('load', e => {
 //                        ok(Utils.object({
 //                            name: file.name, size: file.size, type: file.type,
-//                            base64: e.target.result.substring(e.target.result.indexOf(',') + 1)
+//                            base64: e.target.result.slice(e.target.result.indexOf(',') + 1)
 //                        }));
 //                    });
 //                });
@@ -361,7 +358,7 @@
             search() {
                 const text = this.emitter.value.trim().toLowerCase(), target = getTarget(this);
                 for (const row of target.children) {
-                    row.style.display = row.textContent.toLowerCase().indexOf(text) < 0 ? 'none' : null;
+                    row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
                 }
             },
             /**
@@ -473,7 +470,7 @@
         const getTargetNode = (node, evt) => {
             if (node) {
                 const values = node.getAttribute('shani-on');
-                if (values !== null && values.indexOf(evt + ':') > -1) {
+                if (values?.includes(evt + ':')) {
                     return node;
                 }
                 return getTargetNode(Utils.getParentNode(node, '[shani-on]'), evt);
@@ -504,7 +501,7 @@
             const evt = Utils.getEventName(e.type);
             doc.querySelectorAll('[watch-on]').forEach(watcher => {
                 const events = watcher.getAttribute('watch-on');
-                if (events !== null && events.indexOf(evt + ':') > -1) {
+                if (events?.includes(evt + ':')) {
                     if (e.detail.shani.emitter.matches(watcher.getAttribute('shani-watch'))) {
                         Shani.create(watcher, e, 'watch-on');
                     }
@@ -535,7 +532,7 @@
         return {
             removeNode(node) {
                 node.style.opacity = 0;
-                node.addEventListener('transitionend', () => node.remove());
+                node.addEventListener('transitionend', () => node.remove(), {once: true});
             },
             selectNode(children, activeChild, cssClass) {
                 for (const row of children) {
@@ -544,10 +541,10 @@
                 activeChild.classList.add(cssClass);
             },
             getEventName(evt) {
-                return evt.substring(evt.lastIndexOf(':') + 1);
+                return evt.slice(evt.lastIndexOf(':') + 1);
             },
             isInput(node) {
-                return ['INPUT', 'TEXTAREA'].indexOf(node.tagName) > -1;
+                return ['INPUT', 'TEXTAREA'].includes(node.tagName);
             },
             getParentNode(childNode, parentSelector) {
                 const parent = childNode.parentElement;
@@ -562,7 +559,7 @@
                     const raw = str.trim().split(sep);
                     for (let val of raw) {
                         const pos = val.indexOf(':'), key = pos > 0 ? val.substring(0, pos) : val;
-                        map.set(key.toLowerCase().trim(), pos > 0 ? val.substring(pos + 1).trim() : null);
+                        map.set(key.toLowerCase().trim(), pos > 0 ? val.slice(pos + 1).trim() : null);
                     }
                 }
                 return map;
@@ -587,9 +584,9 @@
             },
             getSubtype(header) {
                 if (header) {
-                    const subtype = header.substring(header.indexOf('/') + 1).split(';')[0];
+                    const subtype = header.slice(header.indexOf('/') + 1).split(';')[0];
                     const plusPos = subtype.indexOf('+');
-                    return plusPos < 0 ? subtype : subtype.substring(plusPos + 1);
+                    return plusPos < 0 ? subtype : subtype.slice(plusPos + 1);
                 }
                 return null;
             },
@@ -635,13 +632,8 @@
         };
         const redirect = headers => {
             const url = headers.get('location');
-            if (url === '#') {
-                window.location.reload();
-            } else {
-                window.location = url;
-            }
+            url === '#' ? location.reload() : location = url;
         };
-
         const createPayload = (shani, method) => {
             const fd = Convertor.input2form(shani.emitter);
             const payload = Utils.object({
@@ -801,7 +793,7 @@
         const Modal = (() => {
             const addCloseBtn = (modal, attr) => {
                 if (attr !== null) {
-                    const position = attr.substring(attr.indexOf(':') + 1), target = '#' + modal.parentElement.id;
+                    const position = attr.slice(attr.indexOf(':') + 1), target = '#' + modal.parentElement.id;
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + position;
                     btn.setAttribute('type', 'button');
