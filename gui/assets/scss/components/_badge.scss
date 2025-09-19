@@ -1,7 +1,7 @@
 @use '../utils/callables/functions' as fn;
 @use '../utils/callables/extensions' as ext;
 
-//badge container MUST have .container class
+//badge container MUST have .container class or any class that has absolute or relative position
 .badge{
     width: var(--size);
     height: var(--size);
