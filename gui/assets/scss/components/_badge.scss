@@ -6,6 +6,7 @@
     width: var(--size);
     height: var(--size);
     display: inline-flex;
+    animation: glow 9s linear infinite;
     outline: fn.px2rem(1px) solid var(--bg-color);
     @extend %round_corner, %center_content,%zoomOut;
     &.pos-tl{

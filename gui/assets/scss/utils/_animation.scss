@@ -24,6 +24,11 @@
         transform:scale(.95);
     }
 }
+@keyframes glow{
+    to{
+        transform:scale(0);
+    }
+}
 
 @keyframes slideUp {
     0%{
