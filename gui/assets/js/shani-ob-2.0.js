@@ -1,6 +1,5 @@
 (doc => {
     'use strict';
-    // Initialize DOM listeners
     doc.addEventListener('DOMContentLoaded', () => {
         Shanify(doc.body);
         Observers.mutate(doc.body);
@@ -50,7 +49,6 @@
     })();
     const Convertor = (() => {
         const json = (data) => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
-
         return {
             map2json(map) {
                 const obj = Utils.object();
@@ -508,7 +506,6 @@
                 }
             });
         };
-
         return root => {
             setWatchEvents(root);
             addListener(root);
@@ -650,7 +647,6 @@
             }
             return payload;
         };
-
         return {
             send(shani, method, startCb, endCb) {
                 const payload = createPayload(shani, method), xhr = new XMLHttpRequest();
@@ -743,9 +739,7 @@
             });
         };
         return shani => httpHandler(shani, new EventSource(shani.url));
-
     })();
-
     const UI = (() => {
         const Carousel = (() => {
             const rotateItems = (carousel, cb) => {
@@ -818,7 +812,7 @@
             const closeOtherModals = shani => {
                 if (!shani.poll && shani.target) {
                     doc.querySelectorAll('.modal-background').forEach(mc => {
-                        if (mc.querySelector(shani.target) === null) {
+                        if (!mc.querySelector(shani.target)) {
                             Utils.removeNode(mc);
                         }
                     });
