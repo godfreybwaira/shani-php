@@ -785,29 +785,33 @@
             doc.addEventListener('click', e => select(e.target));
         })();
         const Modal = (() => {
-            const addCloseBtn = (modal, attr) => {
+            const getCloseBtn = (attr, selector) => {
                 if (attr !== null) {
-                    const position = attr.slice(attr.indexOf(':') + 1), target = '#' + modal.parentElement.id;
+                    const position = attr.slice(attr.indexOf(':') + 1);
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + position;
                     btn.setAttribute('type', 'button');
                     btn.setAttribute('shani-on', 'click:close');
-                    btn.setAttribute('shani-target', target);
+                    btn.setAttribute('shani-target', selector);
                     btn.innerHTML = '&times;';
-                    modal.appendChild(btn);
+                    return btn;
                 }
             };
             const createModal = (specs, data) => {
                 const mdbg = doc.createElement('div'), modal = doc.createElement('div');
+                const wrapper = doc.createElement('div'), btn = getCloseBtn(data, '.modal-background');
+                btn.style.margin = 'var(--spacing)';
+                wrapper.className = 'loader-spin full-size';
+                wrapper.id = Utils.getId();
+                wrapper.style.setProperty('--loader-size', '2.5rem');
                 modal.className = specs;
-                modal.classList.add('loader-spin');
+                modal.appendChild(btn);
+                modal.appendChild(wrapper);
                 mdbg.className = 'modal-background';
-                mdbg.id = Utils.getId();
-                modal.id = mdbg.id + 'mdl';
                 mdbg.appendChild(modal);
                 doc.body.appendChild(mdbg);
-                addCloseBtn(modal, data);
-                return modal;
+                Shani.on('end', () => wrapper.classList.remove('loader-spin'));
+                return wrapper.id;
             };
             const closeOtherModals = shani => {
                 if (!shani.poll && shani.target) {
@@ -822,10 +826,7 @@
                 const shani = e1.detail.shani, specs = shani.emitter.getAttribute('ui-class');
                 if (specs?.split(' ').indexOf('modal') > -1) {
                     const attr = shani.emitter.getAttribute('ui-data');
-                    const modal = createModal(specs, attr);
-                    shani.target ||= '#' + modal.id;
-                    shani.insert ||= 'append';
-                    Shani.on('end', () => modal.classList.remove('loader-spin'));
+                    shani.target = '#' + createModal(specs, attr);
                 }
                 Shani.on('data', e => closeOtherModals(e.detail.shani));
             });
