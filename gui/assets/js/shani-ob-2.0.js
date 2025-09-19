@@ -806,6 +806,7 @@
             const createModal = (specs, data) => {
                 const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                 modal.className = specs;
+                modal.classList.add('loader-spin');
                 mdbg.className = 'modal-background';
                 mdbg.id = Utils.getId();
                 modal.id = mdbg.id + 'mdl';
@@ -830,7 +831,7 @@
                     const modal = createModal(specs, attr);
                     shani.target ||= '#' + modal.id;
                     shani.insert ||= 'append';
-                    Shani.on('data', () => modal.classList.remove('loader-line', 'loader-spin'));
+                    Shani.on('end', () => modal.classList.remove('loader-spin'));
                 }
                 Shani.on('data', e => closeOtherModals(e.detail.shani));
             });

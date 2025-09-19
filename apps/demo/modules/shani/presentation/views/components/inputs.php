@@ -37,8 +37,13 @@
         </button>
     </div>
     <div class="col">
-        <button class="button color-alert loader-line">
-            Loading...
+        <button class="button color-alert loader-bottom">
+            Bottom loading...
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert loader-top">
+            Top loading...
         </button>
     </div>
     <div class="col">
@@ -79,7 +84,7 @@
         </div>
     </div>
     <div class="col">
-        <div class="input-line loader-line">
+        <div class="input-line loader-bottom">
             <!--order matters-->
             <input type="text" name="name" placeholder="E.g: Misas Miubka">
             <label class="font-sm">Your name</label>
@@ -87,7 +92,7 @@
     </div>
     <div class="col">
         <label>Multi-select Input</label>
-        <div class="choice-group loader-line">
+        <div class="choice-group loader-bottom">
             <label>
                 <input class="choice" type="checkbox" name="choice">
                 <span>Jan</span>
