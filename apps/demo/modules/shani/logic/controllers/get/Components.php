@@ -77,6 +77,12 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             sleep(2);
             return $this->app->render();
         }
+
+        public function card()
+        {
+            sleep(1);
+            return $this->app->render();
+        }
     }
 
 }
