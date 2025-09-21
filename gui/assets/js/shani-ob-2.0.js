@@ -328,7 +328,6 @@
                     const src = this.event.detail.shani.emitter;
                     const data = Utils.isInput(src) ? src.value : src.innerHTML;
                     HTML.insertData(this.emitter, this, data);
-                    Utils.trigger(this, 'bind');
                 }
             },
             /**
@@ -336,7 +335,6 @@
              */
             close() {
                 const node = !this.target ? this.emitter : Utils.getParentNode(this.emitter, this.target);
-                Utils.trigger(this, 'close');
                 if (node) {
                     return Utils.removeNode(node);
                 }
@@ -347,7 +345,6 @@
                     const cover = getCover(this);
                     window.print();
                     Utils.removeNode(cover);
-                    Utils.trigger(this, 'print');
                 }
             },
             /**
@@ -371,7 +368,6 @@
                                 Utils.removeNode(cover);
                             }
                         });
-                        Utils.trigger(this, 'fs');
                     }).catch(() => Utils.removeNode(cover));
                 }
             },
@@ -390,7 +386,6 @@
                     doc.execCommand('copy');
                     box.remove();
                 }
-                Utils.trigger(this, 'copy');
             },
             /**
              * Add CSS class(es) to extisting node
@@ -519,6 +514,7 @@
             const params = shani.params.get(event)?.split(' ');
             if (params && shani[params[0]] instanceof Function) {
                 shani[params[0]](params);
+                Utils.trigger(shani, params[0]);
             }
         };
         const resubmit = shani => {
