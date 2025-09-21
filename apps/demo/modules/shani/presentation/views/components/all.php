@@ -284,7 +284,7 @@
 <div class="divider">Timeline</div>
 <div class="row">
     <div class="col">
-        <ul class="timeline" shani-target=".timeline" shani-on="demand:r" shani-poll="0:3" action="/shani/0/components/0/timeline" shani-insert="append">
+        <ul class="timeline" shani-target=".timeline" shani-on="demand:r" shani-timer="0:3" action="/shani/0/components/0/timeline" shani-insert="append">
             <li>
                 <h3>My Title</h3>
                 <div class="text-muted font-sm mb-md">2011-2012</div>

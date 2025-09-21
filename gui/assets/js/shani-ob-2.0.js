@@ -234,7 +234,7 @@
         const Obj = function (node, e, attrib) {
             this.event = e;
             this.emitter = node;
-            this.timer = Utils.object();
+            this.poll = Utils.object();
             this.params = Utils.explode(node.getAttribute(attrib));
             this.url = node.getAttribute('href') || node.getAttribute('action') || node.value;
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
@@ -250,11 +250,11 @@
          * Make HTTP request at a given interval
          * @param {object} shani
          */
-        const doPolling = shani => {
-            const poll = shani.poll.split(':');
-            const start = Number(poll[0] || 0) * 1000;
-            shani.timer.steps = Number(poll[1] || -1) * 1000;
-            shani.timer.limit = parseInt(poll[2]) || null;
+        const countdown = shani => {
+            const t = shani.timer.split(':');
+            const start = Number(t[0] || 0) * 1000;
+            shani.poll.steps = Number(t[1] || -1) * 1000;
+            shani.poll.limit = parseInt(t[2]) || null;
             setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
         /**
@@ -439,12 +439,12 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'poll', 'insert', 'xss', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
-                    if (shani.poll) {
-                        return doPolling(shani);
+                    if (shani.timer) {
+                        return countdown(shani);
                     }
                     Utils.trigger(shani, event.type);
                 }
@@ -522,8 +522,8 @@
             }
         };
         const resubmit = shani => {
-            if (shani.emitter.isConnected && shani.timer.steps > -1 && (!shani.timer.limit || (--shani.timer.limit) > 0)) {
-                setTimeout(Utils.trigger, shani.timer.steps, shani, shani.event.type);
+            if (shani.emitter.isConnected && shani.poll.steps > -1 && (!shani.poll.limit || (--shani.poll.limit) > 0)) {
+                setTimeout(Utils.trigger, shani.poll.steps, shani, shani.event.type);
             }
         };
         return {
@@ -609,8 +609,8 @@
                 }
             });
             on('error', e => {
-                if (shani.timer.limit > 0) {
-                    shani.timer.limit++;
+                if (shani.poll.limit > 0) {
+                    shani.poll.limit++;
                 }
                 HTTP.fire(shani, getHttpResponse(xhr), 400);
             });
@@ -814,7 +814,7 @@
                 return wrapper.id;
             };
             const closeOtherModals = shani => {
-                if (!shani.poll && shani.target) {
+                if (!shani.timer && shani.target) {
                     doc.querySelectorAll('.modal-background').forEach(mc => {
                         if (!mc.querySelector(shani.target)) {
                             Utils.removeNode(mc);
