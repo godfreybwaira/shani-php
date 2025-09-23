@@ -216,6 +216,9 @@
             },
             insertData(target, shani, data, type) {
                 const mode = shani.insert || 'replace';
+                if (mode === 'ignore') {
+                    return;
+                }
                 const plainText = shani.xss === 'true' || type !== 'html';
                 const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
                 if (Utils.isInput(target)) {
@@ -226,7 +229,7 @@
             },
             INSERT_MODES: {
                 prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
-                before: 'beforebegin', after: 'afterend'
+                before: 'beforebegin', after: 'afterend', ignore: 'ignore'
             }
         };
     })();
