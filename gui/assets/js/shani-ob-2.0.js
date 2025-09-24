@@ -238,7 +238,7 @@
             this.event = e;
             this.emitter = node;
             this.poll = Utils.object();
-            this.params = Utils.explode(node.getAttribute(attrib));
+            this.params = Utils.explode(node.getAttribute(attrib), ';');
             this.url = node.getAttribute('href') || node.getAttribute('action') || node.value;
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
@@ -395,9 +395,7 @@
              * @param {array} params
              */
             addcss(params) {
-                for (let i = 1; i < params.length; i++) {
-                    this.emitter.classList.add(params[i]);
-                }
+                params.forEach(val => this.emitter.classList.add(val.trim()));
             },
             /**
              * Remove a node from DOM tree
@@ -406,28 +404,44 @@
                 Utils.removeNode(this.emitter);
             },
             /**
-             * Remove CSS class(es) to extisting node
+             * Remove CSS class(es) from extisting node
              * @param {array} params
              */
             rmcss(params) {
-                for (let i = 1; i < params.length; i++) {
-                    this.emitter.classList.remove(params[i]);
-                }
+                params.forEach(val => this.emitter.classList.remove(val.trim()));
             },
             /**
              * Replace CSS class(es) to extisting node
              * @param {array} params
              */
             replacecss(params) {
-                this.emitter.classList.replace(params[1], params[2]);
+                for (const val of params) {
+                    const kv = val.trim().split(' ');
+                    this.emitter.classList.replace(kv[0], kv[1]);
+                }
             },
             /**
              * Toggle CSS class(es) to extisting node
              * @param {array} params
              */
             togglecss(params) {
-                for (let i = 1; i < params.length; i++) {
-                    this.emitter.classList.toggle(params[i]);
+                params.forEach(val => this.emitter.classList.toggle(val.trim()));
+            },
+            /**
+             * Remove html attribute(s) from extisting node
+             * @param {array} params
+             */
+            rmattr(params) {
+                params.forEach(val => this.emitter.removeAttribute(val.trim()));
+            },
+            /**
+             * Add html attribute(s) from extisting node
+             * @param {array} params
+             */
+            addattr(params) {
+                for (const val of params) {
+                    const kv = val.trim().split(' ');
+                    this.emitter.setAttribute(kv[0], kv[1]);
                 }
             }
         };
@@ -514,10 +528,14 @@
     })();
     const Utils = (() => {
         const callNext = (shani, event) => {
-            const params = shani.params.get(event)?.split(' ');
-            if (params && shani[params[0]] instanceof Function) {
-                shani[params[0]](params);
-                Utils.trigger(shani, params[0]);
+            const str = shani.params.get(event)?.trim();
+            if (str) {
+                const pos = str.indexOf(' '), fn = pos > -1 ? str.slice(0, pos) : str;
+                if (shani[fn] instanceof Function) {
+                    const params = str.slice(pos + 1).split(',');
+                    shani[fn](params);
+                    Utils.trigger(shani, fn);
+                }
             }
         };
         const resubmit = shani => {

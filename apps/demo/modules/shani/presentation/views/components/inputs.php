@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" shani-on="inactive:r" shani-insert="ignore" shani-timer="5:5">
+        <button class="button accent-color" shani-on="click:rmattr class, value" value="test">
             Simple Button
         </button>
     </div>
