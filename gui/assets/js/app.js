@@ -1,3 +1,3 @@
-window.Shani({
-    'headers': 'x-request-mode:async'
+window.Shani('*', {
+    'shani-headers': 'x-request-mode:async'
 });

@@ -245,16 +245,24 @@
         };
         const setAttribs = (shani, node, attrs, prefix) => {
             for (const a of attrs) {
-                shani[a] = node.getAttribute(prefix + a) || GLOBAL_ATTR[a] || null;
+                shani[a] = node.getAttribute(prefix + a) || getGlobalAttr(prefix + a, node);
             }
         };
-        let GLOBAL_ATTR = {};
+        const GLOBAL_ATTR = new Map();
+        const getGlobalAttr = (attr, node) => {
+            for (let a of GLOBAL_ATTR) {
+                if (node.matches(a[0])) {
+                    return a[1][attr] || null;
+                }
+            }
+            return null;
+        };
         /**
          * Make HTTP request at a given interval
          * @param {object} shani
          */
         const countdown = shani => {
-            const t = shani.timer.split(':');
+            const t = shani.timer.split(',');
             const start = Number(t[0] || 0) * 1000;
             shani.poll.steps = Number(t[1] || -1) * 1000;
             shani.poll.limit = parseInt(t[2]) || null;
@@ -416,8 +424,8 @@
              */
             replacecss(params) {
                 for (const val of params) {
-                    const kv = val.trim().split(' ');
-                    this.emitter.classList.replace(kv[0], kv[1]);
+                    const pos = val.indexOf(':'), key = val.slice(0, pos);
+                    this.emitter.classList.replace(key.trim(), val.slice(pos + 1));
                 }
             },
             /**
@@ -440,13 +448,13 @@
              */
             addattr(params) {
                 for (const val of params) {
-                    const kv = val.trim().split(' ');
-                    this.emitter.setAttribute(kv[0], kv[1]);
+                    const pos = val.indexOf(':'), key = val.slice(0, pos);
+                    this.emitter.setAttribute(key.trim(), val.slice(pos + 1));
                 }
             }
         };
         if (!window.Shani) {
-            window.Shani = obj => GLOBAL_ATTR = Utils.object(obj);
+            window.Shani = (selector, obj) => GLOBAL_ATTR.set(selector, Utils.object(obj));
         }
         window.addEventListener('popstate', e => history.go(0));
         return {
@@ -572,7 +580,7 @@
                 if (str) {
                     const raw = str.trim().split(sep);
                     for (let val of raw) {
-                        const pos = val.indexOf(':'), key = pos > 0 ? val.substring(0, pos) : val;
+                        const pos = val.indexOf(':'), key = pos > 0 ? val.slice(0, pos) : val;
                         map.set(key.toLowerCase().trim(), pos > 0 ? val.slice(pos + 1).trim() : null);
                     }
                 }
@@ -590,7 +598,7 @@
                     resubmit(shani);
             },
             getReqHeaders(shani) {
-                const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.headers, '|');
+                const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.headers);
                 if (type && type !== 'form-data') {
                     headers.set('content-type', shani.enctype.trim());
                 }
