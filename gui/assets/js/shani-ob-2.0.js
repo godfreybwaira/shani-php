@@ -399,17 +399,17 @@
                 }
             },
             /**
+             * Remove a node from DOM tree
+             */
+            rm() {
+                Utils.removeNode(this.emitter);
+            },
+            /**
              * Add CSS class(es) to extisting node
              * @param {array} params
              */
             addcss(params) {
                 params.forEach(val => this.emitter.classList.add(val.trim()));
-            },
-            /**
-             * Remove a node from DOM tree
-             */
-            rm() {
-                Utils.removeNode(this.emitter);
             },
             /**
              * Remove CSS class(es) from extisting node
@@ -446,10 +446,24 @@
              * Add html attribute(s) from extisting node
              * @param {array} params
              */
-            addattr(params) {
+            attr(params) {
                 for (const val of params) {
                     const pos = val.indexOf(':'), key = val.slice(0, pos);
                     this.emitter.setAttribute(key.trim(), val.slice(pos + 1));
+                }
+            },
+            /**
+             * Toggle html attribute(s) from extisting node
+             * @param {array} params
+             */
+            toggleattr(params) {
+                for (const val of params) {
+                    const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
+                    if (this.emitter.hasAttribute(key)) {
+                        this.emitter.removeAttribute(key);
+                    } else {
+                        this.emitter.setAttribute(key, val.slice(pos + 1));
+                    }
                 }
             }
         };
