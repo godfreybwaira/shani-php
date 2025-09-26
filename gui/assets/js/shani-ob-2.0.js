@@ -262,7 +262,7 @@
          * @param {object} shani
          */
         const countdown = shani => {
-            const t = shani.timer.split(',');
+            const t = shani.timer.split(':');
             const start = Number(t[0] || 0) * 1000;
             shani.poll.steps = Number(t[1] || -1) * 1000;
             shani.poll.limit = parseInt(t[2]) || null;
