@@ -405,6 +405,22 @@
                 Utils.removeNode(this.emitter);
             },
             /**
+             * Move this element to a specified position, to another destination.
+             * If a position is not given then the element is placed to the end.
+             * @param {type} params
+             */
+            moveto(params) {
+                params = params.join(',').split(' ');
+                const parent = doc.querySelector(params[0]);
+                if (parent) {
+                    const idx = parseInt(params[params.length - 1]) || -1, len = parent.children.length + 1;
+                    if (Math.abs(idx) <= len && idx !== 0) {
+                        const pos = idx > 0 ? idx - 1 : idx + len;
+                        parent.insertBefore(this.emitter, parent.children[pos]);
+                    }
+                }
+            },
+            /**
              * Add CSS class(es) to extisting node
              * @param {array} params
              */

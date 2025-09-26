@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color">
+        <button class="button accent-color" shani-on="click:moveto #r22 -6">
             Simple Button
         </button>
     </div>
@@ -30,7 +30,7 @@
     </div>
 </div>
 <div class="divider">Loading Inputs</div>
-<div class="row row-stretch">
+<div class="row row-stretch" id="r22">
     <div class="col">
         <button class="button color-alert loader-spin">
             Loading...
