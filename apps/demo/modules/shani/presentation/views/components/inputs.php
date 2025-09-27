@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" shani-on="click:moveto #r22 -2">
+        <button class="button accent-color" shani-on="click:moveto #r22 2" watch-on="change:trigger click" shani-watch="#chkbx">
             Simple Button
         </button>
     </div>
@@ -112,7 +112,7 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox">
+            <input class="toggle" type="checkbox" id="chkbx" shani-on="change:">
             Toggle
         </label>
     </div>
@@ -124,7 +124,7 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkmark" type="checkbox">
+            <input class="checkmark" type="checkbox" watch-on="change:bindprop checked:" shani-watch="#chkbx">
             Checkbox
         </label>
     </div>
@@ -213,8 +213,8 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label shani-watch="#url" watch-on="keyup:bind">Demonstrating shani-bind function</label>
-        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bind function" shani-watch="#url" watch-on="change:bind" class="input-box">
+        <label shani-watch="#url" watch-on="keyup:bindprop innerHTML:value">Demonstrating shani-bindprop function</label>
+        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bindprop function" shani-watch="#url" watch-on="change:bindprop value:" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
@@ -250,7 +250,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2">Two</option>
+                <option value="2" watch-on="change:bindprop selected:checked" shani-watch="#chkbx">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>

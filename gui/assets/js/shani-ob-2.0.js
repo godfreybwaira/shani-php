@@ -34,7 +34,7 @@
         const demand = function (changes) {
             for (let change of changes) {
                 if (change.isIntersecting) {
-                    change.target.dispatchEvent(new Event('demand'));
+                    change.target.dispatchEvent(new Event('demand', {bubbles: true}));
                     this.disconnect();
                 }
             }
@@ -331,14 +331,9 @@
             w() {
                 sendReq(this, 'POST');
             },
-            /**
-             * Change this.emitter values or content
-             */
-            bind() {
-                if (this.event.detail) {
-                    const src = this.event.detail.shani.emitter;
-                    const data = Utils.isInput(src) ? src.value : src.innerHTML;
-                    HTML.insertData(this.emitter, this, data);
+            trigger(params) {
+                for (const val of params) {
+                    this.emitter.dispatchEvent(new Event(val.trim(), {bubbles: true}));
                 }
             },
             /**
@@ -455,34 +450,51 @@
                 params.forEach(val => this.emitter.classList.toggle(val.trim()));
             },
             /**
-             * Remove html attribute(s) from extisting node
+             * Remove properties from extisting node
              * @param {array} params
              */
-            rmattr(params) {
-                params.forEach(val => this.emitter.removeAttribute(val.trim()));
-            },
-            /**
-             * Add html attribute(s) from extisting node
-             * @param {array} params
-             */
-            attr(params) {
-                for (const val of params) {
-                    const pos = val.indexOf(':'), key = val.slice(0, pos);
-                    this.emitter.setAttribute(key.trim(), val.slice(pos + 1));
+            rmprop(params) {
+                for (const p of params) {
+                    const key = p.trim();
+                    if (key in this.emitter) {
+                        const type = typeof this.emitter[key];
+                        this.emitter[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
+                    }
                 }
             },
             /**
-             * Toggle html attribute(s) from extisting node
+             * Add properties from extisting node
              * @param {array} params
              */
-            toggleattr(params) {
+            prop(params) {
                 for (const val of params) {
                     const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
-                    if (this.emitter.hasAttribute(key)) {
-                        this.emitter.removeAttribute(key);
-                    } else {
-                        this.emitter.setAttribute(key, val.slice(pos + 1));
+                    const value = val.slice(pos + 1).trim();
+                    this.emitter[key] = key === value || value.length === 0 || value;
+                }
+            },
+            /**
+             * Map this.emitter properties to that of src element
+             * @param {array} params
+             */
+            bindprop(params) {
+                if (this.event.detail) {
+                    const src = this.event.detail.shani.emitter;
+                    for (const val of params) {
+                        const pos = val.indexOf(':'), thiskey = val.slice(0, pos).trim();
+                        const thatkey = val.slice(pos + 1).trim() || thiskey;
+                        this.emitter[thiskey] = src[thatkey];
                     }
+                }
+            },
+            /**
+             * Toggle properties from extisting node
+             * @param {array} params
+             */
+            toggleprop(params) {
+                for (const val of params) {
+                    const key = val.trim(), value = this.emitter[key];
+                    this.emitter[key] = typeof value === 'boolean' ? !value : '' || value;
                 }
             }
         };
@@ -537,14 +549,11 @@
         const addListener = node => {
             const events = Utils.explode(node.getAttribute('shani-on'), ',');
             for (let e of events) {
+                doc.addEventListener(e[0], listen);
                 if (e[0] === 'load') {
-                    node.addEventListener(e[0], listen);
-                    node.dispatchEvent(new Event(e[0]));
+                    node.dispatchEvent(new Event(e[0], {bubbles: true}));
                 } else if (e[0] === 'demand') {
-                    node.addEventListener(e[0], listen);
                     Observers.intersect(node);
-                } else {
-                    doc.addEventListener(e[0], listen);
                 }
             }
         };
