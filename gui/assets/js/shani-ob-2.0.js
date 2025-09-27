@@ -410,13 +410,14 @@
              * @param {type} params
              */
             moveto(params) {
-                params = params.join(',').split(' ');
-                const parent = doc.querySelector(params[0]);
+                const str = params.join(',');
+                const pos = str.lastIndexOf(' '), selector = pos > -1 ? str.slice(0, pos) : str;
+                const parent = doc.querySelector(selector);
                 if (parent) {
-                    const idx = parseInt(params[params.length - 1]) || -1, len = parent.children.length + 1;
+                    const idx = pos > -1 ? parseInt(str.slice(pos + 1)) : -1, len = parent.children.length + 1;
                     if (Math.abs(idx) <= len && idx !== 0) {
-                        const pos = idx > 0 ? idx - 1 : idx + len;
-                        parent.insertBefore(this.emitter, parent.children[pos]);
+                        const index = idx > 0 ? idx - 1 : idx + len;
+                        parent.insertBefore(this.emitter, parent.children[index]);
                     }
                 }
             },
