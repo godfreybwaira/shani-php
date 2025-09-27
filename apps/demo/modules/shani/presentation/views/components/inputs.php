@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" shani-on="click:moveto #r22 2">
+        <button class="button accent-color" shani-on="click:moveto #r22 -2">
             Simple Button
         </button>
     </div>

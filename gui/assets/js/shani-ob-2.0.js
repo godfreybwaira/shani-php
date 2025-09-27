@@ -410,11 +410,13 @@
              * @param {type} params
              */
             moveto(params) {
-                const str = params.join(',');
-                const pos = str.lastIndexOf(' '), selector = pos > -1 ? str.slice(0, pos) : str;
+                const str = params.join(','), pos = str.lastIndexOf(' ');
+                let idx = parseInt(str.slice(pos + 1));
+                const selector = isNaN(idx) ? str : str.slice(0, pos);
+                idx = isNaN(idx) ? -1 : idx;
                 const parent = doc.querySelector(selector);
                 if (parent) {
-                    const idx = pos > -1 ? parseInt(str.slice(pos + 1)) : -1, len = parent.children.length + 1;
+                    const len = parent.children.length + 1;
                     if (Math.abs(idx) <= len && idx !== 0) {
                         const index = idx > 0 ? idx - 1 : idx + len;
                         parent.insertBefore(this.emitter, parent.children[index]);
