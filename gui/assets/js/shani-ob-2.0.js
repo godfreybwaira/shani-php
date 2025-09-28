@@ -405,9 +405,9 @@
              * @param {type} params
              */
             moveto(params) {
-                const str = params.join(','), pos = str.lastIndexOf(' ');
-                let idx = parseInt(str.slice(pos + 1));
-                const selector = isNaN(idx) ? str : str.slice(0, pos);
+                const pos = params[0].lastIndexOf(' ');
+                let idx = parseInt(params[0].slice(pos + 1));
+                const selector = isNaN(idx) ? params[0] : params[0].slice(0, pos);
                 idx = isNaN(idx) ? -1 : idx;
                 const parent = doc.querySelector(selector);
                 if (parent) {
@@ -485,6 +485,23 @@
                         const thatkey = val.slice(pos + 1).trim() || thiskey;
                         this.emitter[thiskey] = src[thatkey];
                     }
+                }
+            },
+            /**
+             * Call user defined function using this.emitter as parameter
+             * @param {array} params
+             */
+            udf(params) {
+                Utils.recursiveCall(params[0], [this.emitter]);
+            },
+            /**
+             * Map this.emitter properties to a function call
+             * @param {array} params
+             */
+            bindudf(params) {
+                if (this.event.detail) {
+                    const src = this.event.detail.shani.emitter;
+                    Utils.recursiveCall(params[0], [this.emitter, src]);
                 }
             },
             /**
@@ -656,6 +673,16 @@
             },
             getId() {
                 return Date.now().toString(36);
+            },
+            recursiveCall(path, args, thisArg = null) {
+                const keys = path.split('.');
+                const traverse = (obj, index) => {
+                    if (index === keys.length - 1) {
+                        return obj[keys[index]].apply(thisArg, args);
+                    }
+                    return traverse(obj[keys[index]], index + 1);
+                };
+                return traverse(window, 0);
             }
         };
     })();
