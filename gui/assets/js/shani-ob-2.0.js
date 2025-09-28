@@ -3,7 +3,15 @@
     doc.addEventListener('DOMContentLoaded', () => {
         Shanify(doc.body);
         Observers.mutate(doc.body);
+        if (!window.Shani) {
+            window.Shani = Utils.object({
+                attr: (selector, obj) => GLOBAL_ATTR.set(selector, Utils.object(obj)),
+                fn: Utils.object() //udf and bindudf will pick functions from here...
+            });
+            doc.dispatchEvent(new Event('shani:init'));
+        }
     });
+    const GLOBAL_ATTR = new Map();
     const Observers = (() => {
         const runScript = node => {
             if (node.hasAttribute('src')) {
@@ -248,7 +256,6 @@
                 shani[a] = node.getAttribute(prefix + a) || getGlobalAttr(prefix + a, node);
             }
         };
-        const GLOBAL_ATTR = new Map();
         const getGlobalAttr = (attr, node) => {
             for (let a of GLOBAL_ATTR) {
                 if (node.matches(a[0])) {
@@ -515,9 +522,6 @@
                 }
             }
         };
-        if (!window.Shani) {
-            window.Shani = (selector, obj) => GLOBAL_ATTR.set(selector, Utils.object(obj));
-        }
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
@@ -652,7 +656,9 @@
                 const evt = Utils.getEventName(event);
                 callNext(shani, evt);
                 data.shani = shani;
-                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+                if (shani.event.detail?.shani?.event?.type !== evt) {
+                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+                }
                 if (evt === 'end')
                     resubmit(shani);
             },
@@ -682,7 +688,7 @@
                     }
                     return traverse(obj[keys[index]], index + 1);
                 };
-                return traverse(window, 0);
+                return traverse(window.Shani.fn, 0);
             }
         };
     })();

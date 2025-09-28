@@ -197,7 +197,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup:,change:" name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup:udf ucase,change:" name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>
