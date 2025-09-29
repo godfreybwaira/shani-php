@@ -1,7 +1,7 @@
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar">
-        <a href="/shani/0/components/0/generator" shani-on="click:r"
-           shani-target="#content" class="active menu-item">
+        <a href="https://jsonplaceholder.typicode.com/comments?postId=1" shani-on="click:r;start:addcss loader-spin;end:rmcss loader-spin"
+           shani-target="#content" shani-formatter="formatter" class="active menu-item">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>
         </a>
@@ -21,7 +21,7 @@
             <span class="font-sm menu-label">Inputs</span>
         </a>
     </div>
-    <div class="tab-body container" id="content">
+    <div class="tab-body container" id="content" style="--loader-size:2.5rem">
         <?php $app->ui()->import($app->view('/all')); ?>
     </div>
 </div>

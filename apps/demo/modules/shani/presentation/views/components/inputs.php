@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" shani-on="click:moveto #r22 2" watch-on="change:trigger click" shani-watch="#chkbx">
+        <button class="button accent-color" shani-on="click:moveto #r22 2" watch-on="change:trigger click" shani-watch="#chb">
             Simple Button
         </button>
     </div>
@@ -112,7 +112,7 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox" id="chkbx" shani-on="change:">
+            <input class="toggle" type="checkbox" id="chb" shani-on="change:" watch-on="input:bindprop checked:" shani-watch="#chb2">
             Toggle
         </label>
     </div>
@@ -124,7 +124,7 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkmark" type="checkbox" watch-on="change:bindprop checked:" shani-watch="#chkbx">
+            <input class="checkmark" type="checkbox" shani-on="input:" id="chb2" watch-on="change:bindprop checked:" shani-watch="#chb">
             Checkbox
         </label>
     </div>
@@ -250,7 +250,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" watch-on="change:bindprop selected:checked" shani-watch="#chkbx">Two</option>
+                <option value="2" watch-on="change:bindprop selected:checked" shani-watch="#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>

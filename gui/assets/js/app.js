@@ -4,5 +4,6 @@ document.addEventListener('shani:init', () => {
     Shani.attr('*', {
         'shani-headers': 'x-request-mode:async'
     });
-    Shani.fn.ucase = ($this) => $this.value = $this.value.toUpperCase();
+    Shani.define('ucase', ($this) => $this.value = $this.value.toUpperCase());
+    Shani.define('formatter', (src, target, resp) => target.textContent = resp.data);
 });

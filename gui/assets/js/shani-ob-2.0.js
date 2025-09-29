@@ -4,14 +4,24 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
         if (!window.Shani) {
+            USER_DATA.attr = Utils.object();
+            USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
-                attr: (selector, obj) => GLOBAL_ATTR.set(selector, Utils.object(obj)),
-                fn: Utils.object() //udf and bindudf will pick functions from here...
+                attr: (selector, obj) => USER_DATA.attr[selector] = Utils.object(obj),
+                define: (fnName, fn) => {
+                    if (!(fnName in USER_DATA.fn)) {
+                        USER_DATA.fn[fnName] = fn;
+                    } else {
+                        console.warn(fnName + ' already exists.');
+                    }
+                }
             });
+            Object.freeze(window.Shani);
+            Object.freeze(USER_DATA);
             doc.dispatchEvent(new Event('shani:init'));
         }
     });
-    const GLOBAL_ATTR = new Map();
+    const USER_DATA = Object.setPrototypeOf({}, null);
     const Observers = (() => {
         const runScript = node => {
             if (node.hasAttribute('src')) {
@@ -190,6 +200,10 @@
         };
     })();
     const HTML = (() => {
+        const INSERT_MODES = {
+            prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
+            before: 'beforebegin', after: 'afterend', ignore: 'ignore'
+        };
         const setInputData = (target, data, mode, mechanism) => {
             if (mode === 'prepend') {
                 target.value = data + target.value;
@@ -198,7 +212,7 @@
             } else if (mode === 'replace') {
                 target.value = data;
             } else {
-                target[mechanism](HTML.INSERT_MODES[mode], data);
+                target[mechanism](INSERT_MODES[mode], data);
             }
         };
         const setNodeData = (target, data, mode, mechanism, plainText) => {
@@ -209,35 +223,38 @@
                     target.innerHTML = data;
                 }
             } else {
-                target[mechanism](HTML.INSERT_MODES[mode], data);
+                target[mechanism](INSERT_MODES[mode], data);
             }
+        };
+        const insertData = (target, shani, data, mode, headers) => {
+            const type = Utils.getSubtype(headers?.get('content-type'));
+            const plainText = (target.getAttribute('shani-xss') || shani.xss) === 'true' || type !== 'html';
+            const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
+            if (Utils.isInput(target)) {
+                setInputData(target, data, mode, mechanism);
+            } else {
+                setNodeData(target, data, mode, mechanism, plainText);
+            }
+        };
+        const handleDataInsertion = (srcNode, target, shani, resp) => {
+            const formatter = target.getAttribute('shani-formatter') || shani.formatter;
+            if (formatter) {
+                return Utils.recursiveCall(formatter, [srcNode, target, resp]);
+            }
+            const mode = target.getAttribute('shani-insert') || shani.insert || 'replace';
+            if (mode === 'ignore') {
+                return;
+            }
+            insertData(target, shani, resp.data || '', mode, resp.headers);
         };
         return {
             processResponse(shani, response) {
                 Utils.trigger(shani, 'data', response);
-                const type = Utils.getSubtype(response?.headers.get('content-type'));
                 if (shani.target) {
-                    doc.querySelectorAll(shani.target).forEach(target => HTML.insertData(target, shani, response.data || '', type));
+                    doc.querySelectorAll(shani.target).forEach(target => handleDataInsertion(shani.emitter, target, shani, response));
                 } else {
-                    HTML.insertData(shani.emitter, shani, response.data || '', type);
+                    handleDataInsertion(shani.emitter, shani.emitter, shani, response);
                 }
-            },
-            insertData(target, shani, data, type) {
-                const mode = shani.insert || 'replace';
-                if (mode === 'ignore') {
-                    return;
-                }
-                const plainText = shani.xss === 'true' || type !== 'html';
-                const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
-                if (Utils.isInput(target)) {
-                    setInputData(target, data, mode, mechanism);
-                } else {
-                    setNodeData(target, data, mode, mechanism, plainText);
-                }
-            },
-            INSERT_MODES: {
-                prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
-                before: 'beforebegin', after: 'afterend', ignore: 'ignore'
             }
         };
     })();
@@ -257,9 +274,9 @@
             }
         };
         const getGlobalAttr = (attr, node) => {
-            for (let a of GLOBAL_ATTR) {
-                if (node.matches(a[0])) {
-                    return a[1][attr] || null;
+            for (let a in USER_DATA.attr) {
+                if (node.matches(a)) {
+                    return USER_DATA.attr[a][attr] || null;
                 }
             }
             return null;
@@ -401,7 +418,7 @@
                 }
             },
             /**
-             * Remove a node from DOM tree
+             * Remove a target node from DOM tree
              */
             rm() {
                 Utils.removeNode(this.emitter);
@@ -430,23 +447,26 @@
              * @param {array} params
              */
             addcss(params) {
-                params.forEach(val => this.emitter.classList.add(val.trim()));
+                const target = getTarget(this);
+                params.forEach(val => target.classList.add(val.trim()));
             },
             /**
              * Remove CSS class(es) from extisting node
              * @param {array} params
              */
             rmcss(params) {
-                params.forEach(val => this.emitter.classList.remove(val.trim()));
+                const target = getTarget(this);
+                params.forEach(val => target.classList.remove(val.trim()));
             },
             /**
              * Replace CSS class(es) to extisting node
              * @param {array} params
              */
             replacecss(params) {
+                const target = getTarget(this);
                 for (const val of params) {
                     const pos = val.indexOf(':'), key = val.slice(0, pos);
-                    this.emitter.classList.replace(key.trim(), val.slice(pos + 1));
+                    target.classList.replace(key.trim(), val.slice(pos + 1));
                 }
             },
             /**
@@ -454,7 +474,8 @@
              * @param {array} params
              */
             togglecss(params) {
-                params.forEach(val => this.emitter.classList.toggle(val.trim()));
+                const target = getTarget(this);
+                params.forEach(val => target.classList.toggle(val.trim()));
             },
             /**
              * Remove properties from extisting node
@@ -495,20 +516,22 @@
                 }
             },
             /**
-             * Call user defined function using this.emitter as parameter
+             * Call user defined function using this node and target node as parameter
              * @param {array} params
+             * @param {object} data
              */
-            udf(params) {
-                Utils.recursiveCall(params[0], [this.emitter]);
+            udf(params, data) {
+                Utils.recursiveCall(params[0], [this.emitter, getTarget(this), data]);
             },
             /**
-             * Map this.emitter properties to a function call
+             * Map target node properties to a function call
              * @param {array} params
+             * @param {array} data
              */
-            bindudf(params) {
+            bindudf(params, data) {
                 if (this.event.detail) {
                     const src = this.event.detail.shani.emitter;
-                    Utils.recursiveCall(params[0], [this.emitter, src]);
+                    Utils.recursiveCall(params[0], [this.emitter, src, data]);
                 }
             },
             /**
@@ -525,7 +548,7 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'formatter', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
@@ -598,13 +621,13 @@
         };
     })();
     const Utils = (() => {
-        const callNext = (shani, event) => {
+        const callNext = (shani, event, data) => {
             const str = shani.params.get(event)?.trim();
             if (str) {
                 const pos = str.indexOf(' '), fn = pos > -1 ? str.slice(0, pos) : str;
                 if (shani[fn] instanceof Function) {
                     const params = str.slice(pos + 1).split(',');
-                    shani[fn](params);
+                    shani[fn](params, data);
                     Utils.trigger(shani, fn);
                 }
             }
@@ -617,7 +640,7 @@
         return {
             removeNode(node) {
                 node.style.opacity = 0;
-                node.addEventListener('transitionend', () => node.remove(), {once: true});
+                node.addEventListener('transitionend', () => node.remove());
             },
             selectNode(children, activeChild, cssClass) {
                 for (const row of children) {
@@ -654,7 +677,7 @@
             },
             trigger(shani, event, data = {}) {
                 const evt = Utils.getEventName(event);
-                callNext(shani, evt);
+                callNext(shani, evt, data);
                 data.shani = shani;
                 if (shani.event.detail?.shani?.event?.type !== evt) {
                     doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
@@ -688,7 +711,7 @@
                     }
                     return traverse(obj[keys[index]], index + 1);
                 };
-                return traverse(window.Shani.fn, 0);
+                return traverse(USER_DATA.fn, 0);
             }
         };
     })();
@@ -801,12 +824,11 @@
             const on = (e, cb) => socket.addEventListener(e, cb);
             on('open', () => {
                 const payload = createPayload(shani);
-                socket.send(payload.data || '');
                 Utils.trigger(shani, 'start', {request: payload});
+                socket.send(payload.data || '');
             });
             on('message', e => {
                 const resp = Utils.object({data: e.data || null, headers: null});
-                Utils.trigger(shani, e.type, resp);
                 HTML.processResponse(shani, resp);
             });
             on('error', e => Utils.trigger(shani, e.type));
@@ -821,14 +843,14 @@
     const ServerEvent = (() => {
         const httpHandler = (shani, sse) => {
             const on = (e, cb) => sse.addEventListener(e, cb);
-            const evt = Utils.explode(shani.on || 'message');
-            for (let e of evt) {
-                on(e[0], e => {
-                    Utils.trigger(shani, 'start');
+            const events = Utils.explode(shani.on || 'message');
+            Utils.trigger(shani, 'start');
+            for (let evt of events) {
+                const name = Utils.getEventName(evt[0]);
+                on(name, e => {
                     const resp = Utils.object({
                         data: e.data || null, headers: new Map().set('content-type', 'text/html')
                     });
-                    Utils.trigger(shani, e.type, resp);
                     HTML.processResponse(shani, resp);
                 });
             }
