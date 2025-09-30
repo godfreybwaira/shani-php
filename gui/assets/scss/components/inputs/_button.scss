@@ -29,7 +29,7 @@
         $size: fn.px2rem(22px);
         width: $size;
         height: $size;
-        z-index: 100;
+        z-index: 900;
         display: flex;
         font-size: calc(var(--font-size) * 1.5);
         @extend %center_content, %round_corner;

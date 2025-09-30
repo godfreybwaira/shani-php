@@ -317,11 +317,10 @@
             });
         };
         const getTarget = shani => {
-            const sh = shani.event.detail.shani || shani;
-            if (!sh.target) {
-                return sh.emitter;
+            if (!shani.target) {
+                return shani.emitter;
             }
-            const targets = getAllTargets(sh);
+            const targets = doc.querySelectorAll(shani.target);
             if (targets.length === 1) {
                 return targets[0];
             }
@@ -418,71 +417,49 @@
                     box.remove();
                 }
             },
-            /**
-             * Remove a target node from DOM tree
-             */
-            rm() {
-                Utils.removeNode(this.emitter);
+            rmv(params) {
+                if (params) {
+                    doc.querySelectorAll(params[0]).forEach(target => Utils.removeNode(target));
+                } else {
+                    Utils.removeNode(this.emitter);
+                }
             },
-            /**
-             * Move this element to a specified position, to another destination.
-             * If a position is not given then the element is placed to the end.
-             * @param {type} params
-             */
             moveto(params) {
                 const pos = params[0].lastIndexOf(' ');
-                let idx = parseInt(params[0].slice(pos + 1));
+                const idx = parseInt(params[0].slice(pos + 1));
                 const selector = isNaN(idx) ? params[0] : params[0].slice(0, pos);
-                idx = isNaN(idx) ? -1 : idx;
                 const parent = doc.querySelector(selector);
-                if (parent) {
-                    const len = parent.children.length + 1;
-                    if (Math.abs(idx) <= len && idx !== 0) {
-                        const index = idx > 0 ? idx - 1 : idx + len;
-                        parent.insertBefore(this.emitter, parent.children[index]);
-                    }
-                }
+                Actions.moveto(this.emitter, parent, idx);
             },
-            /**
-             * Add CSS class(es) to extisting node
-             * @param {array} params
-             */
-            addcss(params) {
-                const target = getTarget(this);
-                params.forEach(val => target.classList.add(val.trim()));
+            cssadd(params) {
+                Actions.addcss(this.emitter, params);
             },
-            /**
-             * Remove CSS class(es) from extisting node
-             * @param {array} params
-             */
-            rmcss(params) {
-                const target = getTarget(this);
-                params.forEach(val => target.classList.remove(val.trim()));
+            cssrmv(params) {
+                Actions.rmcss(this.emitter, params);
             },
-            /**
-             * Replace CSS class(es) to extisting node
-             * @param {array} params
-             */
-            replacecss(params) {
-                const target = getTarget(this);
-                for (const val of params) {
-                    const pos = val.indexOf(':'), key = val.slice(0, pos);
-                    target.classList.replace(key.trim(), val.slice(pos + 1));
-                }
+            cssreplace(params) {
+                Actions.replacecss(this.emitter, params);
             },
-            /**
-             * Toggle CSS class(es) to extisting node
-             * @param {array} params
-             */
-            togglecss(params) {
-                const target = getTarget(this);
-                params.forEach(val => target.classList.toggle(val.trim()));
+            csstoggle(params) {
+                Actions.togglecss(this.emitter, params);
+            },
+            cssaddt(params) {
+                doc.querySelectorAll(this.target).forEach(target => Actions.addcss(target, params));
+            },
+            cssrmvt(params) {
+                doc.querySelectorAll(this.target).forEach(target => Actions.rmcss(target, params));
+            },
+            cssreplacet(params) {
+                doc.querySelectorAll(this.target).forEach(target => Actions.replacecss(target, params));
+            },
+            csstogglet(params) {
+                doc.querySelectorAll(this.target).forEach(target => Actions.togglecss(target, params));
             },
             /**
              * Remove properties from extisting node
              * @param {array} params
              */
-            rmprop(params) {
+            proprm(params) {
                 for (const p of params) {
                     const key = p.trim();
                     if (key in this.emitter) {
@@ -506,7 +483,7 @@
              * Map this.emitter properties to that of src element
              * @param {array} params
              */
-            bindprop(params) {
+            propbind(params) {
                 if (this.event.detail) {
                     const src = this.event.detail.shani.emitter;
                     for (const val of params) {
@@ -514,6 +491,16 @@
                         const thatkey = val.slice(pos + 1).trim() || thiskey;
                         this.emitter[thiskey] = src[thatkey];
                     }
+                }
+            },
+            /**
+             * Toggle properties from extisting node
+             * @param {array} params
+             */
+            proptoggle(params) {
+                for (const val of params) {
+                    const key = val.trim(), value = this.emitter[key];
+                    this.emitter[key] = typeof value === 'boolean' ? !value : '' || value;
                 }
             },
             /**
@@ -529,20 +516,10 @@
              * @param {array} params
              * @param {array} data
              */
-            bindudf(params, data) {
+            udfbind(params, data) {
                 if (this.event.detail) {
                     const src = this.event.detail.shani.emitter;
                     Utils.recursiveCall(params[0], [this.emitter, src, data]);
-                }
-            },
-            /**
-             * Toggle properties from extisting node
-             * @param {array} params
-             */
-            toggleprop(params) {
-                for (const val of params) {
-                    const key = val.trim(), value = this.emitter[key];
-                    this.emitter[key] = typeof value === 'boolean' ? !value : '' || value;
                 }
             }
         };
@@ -562,6 +539,51 @@
             on(e, cb) {
                 doc.addEventListener('shani:on:' + e, cb);
                 return Shani.on;
+            }
+        };
+    })();
+    const Actions = (() => {
+
+        return {
+            /**
+             * Move this element to a specified position, to another destination.
+             * If a position is not given then the element is placed to the end.
+             */
+            moveto(target, parent, index) {
+                if (parent) {
+                    const idx = isNaN(index) ? -1 : index, len = parent.children.length + 1;
+                    if (Math.abs(idx) <= len && idx !== 0) {
+                        const pos = idx > 0 ? idx - 1 : idx + len;
+                        parent.insertBefore(target, parent.children[pos]);
+                    }
+                }
+            },
+            /**8
+             * Add CSS class(es) to extisting node
+             */
+            addcss(target, params) {
+                params.forEach(val => target.classList.add(val.trim()));
+            },
+            /**
+             * Remove CSS class(es) from extisting node
+             */
+            rmcss(target, params) {
+                params.forEach(val => target.classList.remove(val.trim()));
+            },
+            /**
+             * Replace CSS class(es) to extisting node
+             */
+            replacecss(target, params) {
+                for (const val of params) {
+                    const pos = val.indexOf(':'), key = val.slice(0, pos);
+                    target.classList.replace(key.trim(), val.slice(pos + 1));
+                }
+            },
+            /**
+             * Toggle CSS class(es) to extisting node
+             */
+            togglecss(target, params) {
+                params.forEach(val => target.classList.toggle(val.trim()));
             }
         };
     })();
@@ -627,7 +649,7 @@
             if (str) {
                 const pos = str.indexOf(' '), fn = pos > -1 ? str.slice(0, pos) : str;
                 if (shani[fn] instanceof Function) {
-                    const params = str.slice(pos + 1).split(',');
+                    const params = pos > -1 ? str.slice(pos + 1).split(',') : null;
                     shani[fn](params, data);
                     Utils.trigger(shani, fn);
                 }

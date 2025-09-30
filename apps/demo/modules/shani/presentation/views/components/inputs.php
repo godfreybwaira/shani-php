@@ -112,7 +112,7 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox" id="chb" shani-on="change:" watch-on="input:bindprop checked:" shani-watch="#chb2">
+            <input class="toggle" type="checkbox" id="chb" shani-on="change:" watch-on="input:rmv" shani-watch="#chb2">
             Toggle
         </label>
     </div>
@@ -124,7 +124,7 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkmark" type="checkbox" shani-on="input:" id="chb2" watch-on="change:bindprop checked:" shani-watch="#chb">
+            <input class="checkmark" type="checkbox" shani-on="input:" id="chb2" watch-on="change:propbind checked:" shani-watch="#chb">
             Checkbox
         </label>
     </div>
@@ -213,8 +213,8 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label shani-watch="#url" watch-on="keyup:bindprop innerHTML:value">Demonstrating shani-bindprop function</label>
-        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-bindprop function" shani-watch="#url" watch-on="change:bindprop value:" class="input-box">
+        <label shani-watch="#url" watch-on="keyup:propbind innerHTML:value">Demonstrating shani-propbind function</label>
+        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function" shani-watch="#url" watch-on="change:propbind value:" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
@@ -250,7 +250,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" watch-on="change:bindprop selected:checked" shani-watch="#chb">Two</option>
+                <option value="2" watch-on="change:propbind selected:checked" shani-watch="#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>

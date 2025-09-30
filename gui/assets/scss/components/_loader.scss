@@ -11,13 +11,13 @@
         &:before{
             inset: 0;
             content: '';
-            z-index: 1;
+            z-index: 89;
             backdrop-filter:blur(fn.px2rem(5px));
             @extend %position_absolute;
         }
         &:after{
             content: '';
-            z-index: 2;
+            z-index: 99;
             width: var(--loader-size);
             height: var(--loader-size);
             border: fn.px2rem(2px) solid var(--loader-color);
