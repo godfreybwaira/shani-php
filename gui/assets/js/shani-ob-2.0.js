@@ -321,7 +321,7 @@
             if (!sh.target) {
                 return sh.emitter;
             }
-            const targets = doc.querySelectorAll(sh.target);
+            const targets = getAllTargets(sh);
             if (targets.length === 1) {
                 return targets[0];
             }
