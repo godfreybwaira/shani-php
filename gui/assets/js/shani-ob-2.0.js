@@ -459,7 +459,7 @@
              * Remove properties from extisting node
              * @param {array} params
              */
-            proprm(params) {
+            proprmv(params) {
                 for (const p of params) {
                     const key = p.trim();
                     if (key in this.emitter) {
@@ -509,7 +509,10 @@
              * @param {object} data
              */
             udf(params, data) {
-                Utils.recursiveCall(params[0], [this.emitter, getTarget(this), data]);
+                const pos = params[0].indexOf(' '), fn = pos > -1 ? params[0].slice(0, pos) : params[0];
+                const selector = pos > -1 ? params[0].slice(pos + 1).trim() : null;
+                const targets = selector ? doc.querySelectorAll(selector) : [null];
+                targets.forEach(target => Utils.recursiveCall(fn, [this.emitter, target, data]));
             },
             /**
              * Map target node properties to a function call
