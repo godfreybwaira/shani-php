@@ -239,7 +239,7 @@
         const handleDataInsertion = (target, shani, resp) => {
             const formatter = target.getAttribute('shani-formatter') || shani.formatter;
             if (formatter) {
-                return Utils.recursiveCall(formatter, [shani.emitter, target, resp]);
+                return Utils.recursiveCall(formatter, [target, shani.emitter, resp]);
             }
             const mode = target.getAttribute('shani-insert') || shani.insert || 'replace';
             if (mode === 'ignore') {
@@ -317,10 +317,11 @@
             });
         };
         const getTarget = shani => {
-            if (!shani.target) {
-                return shani.emitter;
+            const sh = shani.event.detail.shani || shani;
+            if (!sh.target) {
+                return sh.emitter;
             }
-            const targets = doc.querySelectorAll(shani.target);
+            const targets = doc.querySelectorAll(sh.target);
             if (targets.length === 1) {
                 return targets[0];
             }
