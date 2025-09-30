@@ -236,10 +236,10 @@
                 setNodeData(target, data, mode, mechanism, plainText);
             }
         };
-        const handleDataInsertion = (srcNode, target, shani, resp) => {
+        const handleDataInsertion = (target, shani, resp) => {
             const formatter = target.getAttribute('shani-formatter') || shani.formatter;
             if (formatter) {
-                return Utils.recursiveCall(formatter, [srcNode, target, resp]);
+                return Utils.recursiveCall(formatter, [shani.emitter, target, resp]);
             }
             const mode = target.getAttribute('shani-insert') || shani.insert || 'replace';
             if (mode === 'ignore') {
@@ -251,9 +251,9 @@
             processResponse(shani, response) {
                 Utils.trigger(shani, 'data', response);
                 if (shani.target) {
-                    doc.querySelectorAll(shani.target).forEach(target => handleDataInsertion(shani.emitter, target, shani, response));
+                    doc.querySelectorAll(shani.target).forEach(target => handleDataInsertion(target, shani, response));
                 } else {
-                    handleDataInsertion(shani.emitter, shani.emitter, shani, response);
+                    handleDataInsertion(shani.emitter, shani, response);
                 }
             }
         };
@@ -320,13 +320,13 @@
             if (!shani.target) {
                 return shani.emitter;
             }
-            const watchers = doc.querySelectorAll(shani.target);
-            if (watchers.length === 1) {
-                return watchers[0];
+            const targets = doc.querySelectorAll(shani.target);
+            if (targets.length === 1) {
+                return targets[0];
             }
             const wrapper = doc.createElement('div');
-            for (const w of watchers) {
-                wrapper.appendChild(w.cloneNode(true));
+            for (const t of targets) {
+                wrapper.appendChild(t.cloneNode(true));
             }
             return wrapper;
         };
