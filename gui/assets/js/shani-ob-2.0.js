@@ -237,9 +237,9 @@
             }
         };
         const handleDataInsertion = (target, shani, resp) => {
-            const formatter = target.getAttribute('shani-formatter') || shani.formatter;
-            if (formatter) {
-                return Utils.recursiveCall(formatter, [target, shani.emitter, resp]);
+            const outf = target.getAttribute('shani-outf') || shani.outf;
+            if (outf) {
+                return Utils.recursiveCall(outf, [target, shani.emitter, resp]);
             }
             const mode = target.getAttribute('shani-insert') || shani.insert || 'replace';
             if (mode === 'ignore') {
@@ -529,7 +529,7 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'formatter', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'outf', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
