@@ -75,14 +75,18 @@
                 }
                 return obj;
             },
-            input2form(node) {
+            input2form(shani) {
+                if (shani.inf) {
+                    return Utils.recursiveCall(shani.inf, [shani.emitter]);
+                }
+                const node = shani.emitter;
                 if (['SELECT', 'INPUT', 'TEXTAREA'].indexOf(node.tagName) > -1) {
-                    const name = node.getAttribute('name'), fd = new FormData();
+                    const fd = new FormData();
                     if (!node.files) {
-                        fd.append(name || 'value', node.value);
+                        fd.append(node.name || 'value', node.value);
                     } else {
                         for (let f = 0; f < node.files.length; f++) {
-                            fd.append(name || 'file[]', node.files[f]);
+                            fd.append(node.name || 'file[]', node.files[f]);
                         }
                     }
                     return fd;
@@ -529,7 +533,7 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'outf', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'inf', 'outf', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
@@ -781,7 +785,7 @@
             url === '#' ? location.reload() : location = url;
         };
         const createPayload = (shani, method) => {
-            const fd = Convertor.input2form(shani.emitter);
+            const fd = Convertor.input2form(shani);
             const payload = Utils.object({
                 url: shani.url, data: null, headers: Utils.getReqHeaders(shani)
             });
@@ -838,11 +842,13 @@
             const payload = Utils.object({
                 url: shani.url, data: null, headers: Utils.getReqHeaders(shani)
             });
-            const formdata = Convertor.input2form(shani.emitter);
+            const formdata = Convertor.input2form(shani);
             if (formdata) {
                 const type = Utils.getSubtype(payload.headers.get('content-type'));
-                payload.data = '{"data":' + Convertor.form2(formdata, type) + ',"headers":';
-                payload.data += JSON.stringify(Convertor.map2json(payload.headers)) + '}';
+                payload.data = JSON.stringify({
+                    headers: Convertor.map2json(payload.headers),
+                    body: Convertor.form2(formdata, type)
+                });
             }
             return payload;
         };
