@@ -801,15 +801,15 @@
             return payload;
         };
         return {
-            send(shani, method, startCb, endCb) {
+            send(shani, method, onStart, onEnd) {
                 const payload = createPayload(shani, method), xhr = new XMLHttpRequest();
-                startCb(payload);
+                onStart(payload);
                 xhr.open(method, payload.url, true);
                 for (let h of payload.headers) {
                     xhr.setRequestHeader(h[0], h[1]);
                 }
                 xhr.send(payload.data);
-                httpHandler(shani, xhr, endCb);
+                httpHandler(shani, xhr, onEnd);
             },
             statusText(code) {
                 if (code > 199 && code < 300) {

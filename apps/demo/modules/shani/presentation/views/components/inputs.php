@@ -112,7 +112,7 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox" id="chb" shani-on="change:r" method="post" shani-inf="inf" watch-on="input:propbind checked:" shani-watch="#chb2">
+            <input class="toggle" type="checkbox" id="chb" shani-on="change:" watch-on="input:propbind checked:" shani-watch="#chb2">
             Toggle
         </label>
     </div>
