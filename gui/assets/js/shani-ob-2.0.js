@@ -70,9 +70,7 @@
         return {
             map2json(map) {
                 const obj = Utils.object();
-                for (let m of map) {
-                    obj[m[0]] = m[1];
-                }
+                map.forEach((v, k) => obj[k] = v);
                 return obj;
             },
             input2form(shani) {
@@ -231,7 +229,7 @@
             }
         };
         const insertData = (target, shani, data, mode, headers) => {
-            const type = Utils.getSubtype(headers?.get('content-type'));
+            const type = Utils.getSubtype(headers.get('content-type'));
             const plainText = (target.getAttribute('shani-xss') || shani.xss) === 'true' || type !== 'html';
             const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
             if (Utils.isInput(target)) {
@@ -249,7 +247,7 @@
             if (mode === 'ignore') {
                 return;
             }
-            insertData(target, shani, resp.data || '', mode, resp.headers);
+            insertData(target, shani, resp.body || '', mode, resp.headers);
         };
         return {
             processResponse(shani, response) {
@@ -268,7 +266,7 @@
             this.emitter = node;
             this.poll = Utils.object();
             this.params = Utils.explode(node.getAttribute(attrib), ';');
-            this.url = node.getAttribute('href') || node.getAttribute('action') || node.value;
+            this.url = node.getAttribute('href') || node.getAttribute('action');
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
         };
@@ -315,9 +313,9 @@
             HTTP.send(shani, shani.method || method, request => {
                 Utils.trigger(shani, 'start', {request});
                 em.setAttribute('disabled', '');
-            }, response => {
+            }, () => {
                 em.removeAttribute('disabled');
-                Utils.trigger(shani, 'end', response);
+                Utils.trigger(shani, 'end');
             });
         };
         const getTarget = shani => {
@@ -428,12 +426,19 @@
                     Utils.removeNode(this.emitter);
                 }
             },
+            copyto(params) {
+                const node = Actions.moveNode(this.emitter, params, true);
+                if (node) {
+                    node.removeAttribute('shani-watch');
+                    node.querySelectorAll('[id]').forEach(el => {
+                        const id = Utils.getId();
+                        node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
+                        el.id = id;
+                    });
+                }
+            },
             moveto(params) {
-                const pos = params[0].lastIndexOf(' ');
-                const idx = parseInt(params[0].slice(pos + 1));
-                const selector = isNaN(idx) ? params[0] : params[0].slice(0, pos);
-                const parent = doc.querySelector(selector);
-                Actions.moveto(this.emitter, parent, idx);
+                Actions.moveNode(this.emitter, params);
             },
             cssadd(params) {
                 Actions.addcss(this.emitter, params);
@@ -533,7 +538,7 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'inf', 'outf', 'history', 'on', 'scheme', 'target'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
@@ -556,12 +561,18 @@
              * Move this element to a specified position, to another destination.
              * If a position is not given then the element is placed to the end.
              */
-            moveto(target, parent, index) {
+            moveNode(target, params, clone) {
+                const pos = params[0].lastIndexOf(' ');
+                const index = parseInt(params[0].slice(pos + 1));
+                const selector = isNaN(index) ? params[0] : params[0].slice(0, pos);
+                const parent = doc.querySelector(selector);
                 if (parent) {
                     const idx = isNaN(index) ? -1 : index, len = parent.children.length + 1;
                     if (Math.abs(idx) <= len && idx !== 0) {
                         const pos = idx > 0 ? idx - 1 : idx + len;
-                        parent.insertBefore(target, parent.children[pos]);
+                        const node = clone ? target.cloneNode(true) : target;
+                        parent.insertBefore(node, parent.children[pos]);
+                        return node;
                     }
                 }
             },
@@ -616,20 +627,18 @@
         };
         const setWatchEvents = node => {
             const events = Utils.explode(node.getAttribute('watch-on'), ',');
-            for (let e of events) {
-                Shani.on(e[0], watch);
-            }
+            events.forEach((v, k) => Shani.on(k, watch));
         };
         const addListener = node => {
             const events = Utils.explode(node.getAttribute('shani-on'), ',');
-            for (let e of events) {
-                doc.addEventListener(e[0], listen);
-                if (e[0] === 'load') {
-                    node.dispatchEvent(new Event(e[0], {bubbles: true}));
-                } else if (e[0] === 'demand') {
+            events.forEach((v, k) => {
+                doc.addEventListener(k, listen);
+                if (k === 'load') {
+                    node.dispatchEvent(new Event(k, {bubbles: true}));
+                } else if (k === 'demand') {
                     Observers.intersect(node);
                 }
-            }
+            });
         };
         const watch = e => {
             const evt = Utils.getEventName(e.type);
@@ -720,7 +729,7 @@
                 if (type && type !== 'form-data') {
                     headers.set('content-type', shani.enctype.trim());
                 }
-                return headers;
+                return new Headers(headers);
             },
             getSubtype(header) {
                 if (header) {
@@ -746,43 +755,39 @@
         };
     })();
     const HTTP = (() => {
-        const getHttpResponse = xhr => {
-            const resp = Utils.object({code: xhr.status, status: xhr.statusText});
-            if (xhr.readyState >= 4) {
-                resp.data = xhr.response;
-                resp.headers = Utils.explode(xhr.getAllResponseHeaders(), '\r\n');
-            }
-            return resp;
-        };
-        const httpHandler = (shani, xhr, cb) => {
-            const on = (e, cb) => xhr.addEventListener(e, cb);
-            on('readystatechange', e => {
-                if (e.target.readyState === 4) {
-                    HTTP.fire(shani, getHttpResponse(xhr), xhr.status);
-                }
-            });
-            on('error', e => {
+        const httpHandler = (shani, req, payload, onEnd) => {
+            const onSuccess = resp => fire(shani, resp, resp.status);
+            const onError = e => {
                 if (shani.poll.limit > 0) {
                     shani.poll.limit++;
                 }
-                HTTP.fire(shani, getHttpResponse(xhr), 400);
-            });
-            on('abort', e => HTTP.fire(shani, getHttpResponse(xhr), 410));
-            on('timeout', e => HTTP.fire(shani, getHttpResponse(xhr), 408));
-            on('loadstart', e => HTTP.fire(shani, getHttpResponse(xhr), 102));
-            on('loadend', e => cb(getHttpResponse(xhr)));
-
-            xhr.upload.addEventListener('progress', e => {
-                if (e.lengthComputable) {
-                    const response = getHttpResponse(xhr);
-                    response.bytes = Utils.object({loaded: e.loaded, total: e.total});
-                    HTTP.fire(shani, response, 102);
-                }
-            });
+                const resp = Utils.object({headers: new Headers(), status: 400, body: ''});
+                fire(shani, resp, resp.status);
+            };
+            Fetcher.send(payload.url, req, onSuccess, onError, onEnd);
         };
-        const redirect = headers => {
-            const url = headers.get('location');
-            url === '#' ? location.reload() : location = url;
+
+        const statusText = (code) => {
+            if (code > 199 && code < 300) {
+                return 'success';
+            }
+            if (code > 299 && code < 400) {
+                return 'redirect';
+            }
+            if (code > 399 && code < 500) {
+                return 'error';
+            }
+            return code < 200 ? 'info' : 'offline';
+        };
+        const fire = (shani, resp, code) => {
+            const text = statusText(code);
+            Utils.trigger(shani, '' + code, resp);
+            Utils.trigger(shani, text, resp);
+            HTML.processResponse(shani, resp);
+            if (text === 'redirect') {
+                const url = resp.headers.get('location');
+                url === '#' ? location.reload() : location = url;
+            }
         };
         const createPayload = (shani, method) => {
             const fd = Convertor.input2form(shani);
@@ -802,38 +807,19 @@
         };
         return {
             send(shani, method, onStart, onEnd) {
-                const payload = createPayload(shani, method), xhr = new XMLHttpRequest();
-                onStart(payload);
-                xhr.open(method, payload.url, true);
-                for (let h of payload.headers) {
-                    xhr.setRequestHeader(h[0], h[1]);
+                const payload = createPayload(shani, method), req = Utils.object();
+                if (shani.cache) {
+                    const pos = shani.cache.indexOf(' ');
+                    req.cacheDuration = parseInt(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
+                    req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
-                xhr.send(payload.data);
-                httpHandler(shani, xhr, onEnd);
-            },
-            statusText(code) {
-                if (code > 199 && code < 300) {
-                    return 'success';
-                }
-                if (code > 299 && code < 400) {
-                    return 'redirect';
-                }
-                if (code > 399 && code < 500) {
-                    return 'error';
-                }
-                return code < 200 ? 'info' : 'offline';
-            },
-            fire(shani, response, code) {
-                const status = HTTP.statusText(code);
-                if (!(response.code > 0)) {
-                    response.code = code;
-                }
-                Utils.trigger(shani, '' + code, response);
-                Utils.trigger(shani, status, response);
-                HTML.processResponse(shani, response);
-                if (status === 'redirect') {
-                    redirect(response.headers);
-                }
+                req.options = Utils.object({
+                    headers: payload.headers,
+                    body: payload.data,
+                    method: method
+                });
+                onStart(req);
+                httpHandler(shani, req, payload, onEnd);
             }
         };
     })();
@@ -860,15 +846,15 @@
                 socket.send(payload.data || '');
             });
             on('message', e => {
-                const resp = Utils.object({data: e.data || null, headers: null});
+                const resp = Utils.object({body: e.data || '', headers: new Headers()});
                 HTML.processResponse(shani, resp);
             });
             on('error', e => Utils.trigger(shani, e.type));
             on('close', e => Utils.trigger(shani, 'end'));
         };
         return shani => {
-            const scheme = location.protocol === 'http:' ? 'ws' : 'wss';
-            const host = shani.url.indexOf('://') === -1 ? scheme + '://' + location.host : '';
+            const scheme = location.protocol === 'http:' ? 'ws://' : 'wss://';
+            const host = shani.url.indexOf('://') === -1 ? scheme + location.host : '';
             httpHandler(shani, new WebSocket(host + shani.url));
         };
     })();
@@ -877,15 +863,15 @@
             const on = (e, cb) => sse.addEventListener(e, cb);
             const events = Utils.explode(shani.on || 'message');
             Utils.trigger(shani, 'start');
-            for (let evt of events) {
-                const name = Utils.getEventName(evt[0]);
+            events.forEach((v, k) => {
+                const name = Utils.getEventName(k);
                 on(name, e => {
                     const resp = Utils.object({
-                        data: e.data || null, headers: new Map().set('content-type', 'text/html')
+                        body: e.data || '', headers: new Headers({'content-type': 'text/html'})
                     });
                     HTML.processResponse(shani, resp);
                 });
-            }
+            });
             on('error', e => Utils.trigger(shani, e.type));
             on('beforeunload', () => {
                 sse.close();
@@ -893,6 +879,69 @@
             });
         };
         return shani => httpHandler(shani, new EventSource(shani.url));
+    })();
+    const Fetcher = (() => {
+        const cacheResponse = (cache, req, res, url) => {
+            const headers = new Headers(res.headers);
+            headers.set('x-expires', Date.now() + (req.cacheDuration * 1000));
+            const cached = new Response(res.body, {
+                statusText: res.statusText,
+                status: res.status,
+                headers
+            });
+            cache.put(url, cached);
+        };
+        const parseResponse = (res, onSuccess, accept) => {
+            const type = accept || Utils.getSubtype(res.headers.get('content-type'));
+            let promise;
+            if (type === 'json') {
+                promise = res.json();
+            } else if (['html', 'plain', 'xml'].includes(type)) {
+                promise = res.text();
+            } else if (type === 'form') {
+                promise = res.formData();
+            } else {
+                promise = res.blob().then(URL.createObjectURL);
+            }
+            promise.then(body => {
+                onSuccess(Utils.object({
+                    headers: res.headers,
+                    status: res.status,
+                    body
+                }));
+            });
+        };
+        const fetchAndCache = (cache, cacheKey, url, req, type, onSuccess, onError) => {
+            fetch(url, req.options).then(res => {
+                cacheResponse(cache, req, res.clone(), cacheKey);
+                parseResponse(res, onSuccess, type);
+            }).catch(onError);
+        };
+        const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
+            const cacheKey = url + '::' + req.options.method;  // Differentiate by method
+            caches.open(req.cacheName || 'pubcache').then(cache => {
+                cache.match(cacheKey).then(res => {
+                    const expires = res && res.headers.get('x-expires');
+                    if (res && Date.now() < Number(expires)) {
+                        parseResponse(res, onSuccess, type);
+                    } else {
+                        fetchAndCache(cache, cacheKey, url, req, type, onSuccess, onError);
+                    }
+                }).catch(() => fetchAndCache(cache, cacheKey, url, req, type, onSuccess, onError));
+            }).catch(onError).finally(onEnd);
+        };
+        return {
+            send(url, req, onSuccess, onError, onEnd) {
+                const type = Utils.getSubtype(req.options.headers.get('accept')) || null;
+                if (req.cacheDuration && 'caches' in window) {
+                    handleCacheResponse(url, req, type, onSuccess, onError, onEnd);
+                } else {
+                    fetch(url, req.options).then(res =>
+                        parseResponse(res, onSuccess, type)
+                    ).catch(onError).finally(onEnd);
+                }
+            }
+        };
     })();
     const UI = (() => {
         const Carousel = (() => {
@@ -1003,18 +1052,14 @@
                     toaster.addEventListener('transitionend', e => e.target.remove());
                 }, 3000 + toaster.innerText.length * 64);
             };
-            Shani.on('abort', e => {
-                toast(e.detail.status || 'Request cancelled.', e.detail.code);
-            })('error', e => {
-                toast(e.detail.status || 'Failed to connect to server. Try again.', e.detail.code);
-            })('timeout', e => {
-                toast(e.detail.status || 'Response takes too long.', e.detail.code);
+            Shani.on('error', e => {
+                toast(e.detail.statusText || 'Failed to connect to server. Try again.', e.detail.status);
             })('redirect', e => {
-                toast(e.detail.status || 'Redirecting...', e.detail.code);
+                toast(e.detail.statusText || 'Redirecting...', e.detail.status);
             })('data', e => {
                 const specs = e.detail.shani.emitter.getAttribute('ui-class');
                 if (specs?.split(' ').indexOf('toaster') > -1) {
-                    toast(e.detail.data || '(No data returned)', e.detail.code);
+                    toast(e.detail.body || '(No data returned)', e.detail.status);
                 }
             })('copy', e => toast('Copied!', 200));
         })();
