@@ -1,7 +1,7 @@
 /* global Shani */
 
 document.addEventListener('shani:init', () => {
-    Shani.attr('*', {
+    Shani.select('*', {
         'shani-headers': 'x-request-mode:async'
     });
     Shani.define('ucase', ($this) => $this.value = $this.value.toUpperCase());

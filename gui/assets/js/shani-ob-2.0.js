@@ -7,12 +7,12 @@
             USER_DATA.attr = Utils.object();
             USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
-                attr: (selector, obj) => USER_DATA.attr[selector] = Utils.object(obj),
+                select: (selector, obj) => USER_DATA.attr[selector] = Utils.object(obj),
                 define: (fnName, fn) => {
-                    if (!(fnName in USER_DATA.fn)) {
-                        USER_DATA.fn[fnName] = fn;
-                    } else {
+                    if (fnName in USER_DATA.fn) {
                         console.warn(fnName + ' already exists.');
+                    } else {
+                        USER_DATA.fn[fnName] = fn;
                     }
                 }
             });
@@ -746,7 +746,7 @@
                 const keys = path.split('.');
                 const traverse = (obj, index) => {
                     if (index === keys.length - 1) {
-                        return obj[keys[index]].apply(thisArg, args);
+                        return obj[keys[index]].apply(thisArg || USER_DATA.fn, args);
                     }
                     return traverse(obj[keys[index]], index + 1);
                 };
@@ -881,7 +881,7 @@
         return shani => httpHandler(shani, new EventSource(shani.url));
     })();
     const Fetcher = (() => {
-        const cacheResponse = (cache, req, res, url) => {
+        const cacheResponse = (cache, req, res, cacheKey) => {
             const headers = new Headers(res.headers);
             headers.set('x-expires', Date.now() + (req.cacheDuration * 1000));
             const cached = new Response(res.body, {
@@ -889,7 +889,7 @@
                 status: res.status,
                 headers
             });
-            cache.put(url, cached);
+            cache.put(cacheKey, cached);
         };
         const parseResponse = (res, onSuccess, accept) => {
             const type = accept || Utils.getSubtype(res.headers.get('content-type'));
@@ -918,7 +918,7 @@
             }).catch(onError);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
-            const cacheKey = url + '::' + req.options.method;  // Differentiate by method
+            const cacheKey = req.options.method + '::' + url;  // Differentiate by method
             caches.open(req.cacheName || 'pubcache').then(cache => {
                 cache.match(cacheKey).then(res => {
                     const expires = res && res.headers.get('x-expires');
