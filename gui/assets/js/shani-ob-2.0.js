@@ -78,7 +78,7 @@
                     return Utils.recursiveCall(shani.inf, [shani.emitter]);
                 }
                 const node = shani.emitter;
-                if (['SELECT', 'INPUT', 'TEXTAREA'].indexOf(node.tagName) > -1) {
+                if (['SELECT', 'INPUT', 'TEXTAREA'].includes(node.tagName)) {
                     const fd = new FormData();
                     if (!node.files) {
                         fd.append(node.name || 'value', node.value);
@@ -232,7 +232,7 @@
             const type = Utils.getSubtype(headers.get('content-type'));
             const plainText = (target.getAttribute('shani-xss') || shani.xss) === 'true' || type !== 'html';
             const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
-            if (Utils.isInput(target)) {
+            if (['INPUT', 'TEXTAREA'].includes(target.tagName)) {
                 setInputData(target, data, mode, mechanism);
             } else {
                 setNodeData(target, data, mode, mechanism, plainText);
@@ -401,22 +401,6 @@
                             }
                         });
                     }).catch(() => Utils.removeNode(cover));
-                }
-            },
-            copy() {
-                const target = getTarget(this);
-                if (['INPUT', 'TEXTAREA'].indexOf(target.tagName) > -1) {
-                    target.select();
-                    doc.execCommand('copy');
-                } else {
-                    const box = doc.createElement('TEXTAREA');
-                    box.style.width = 0;
-                    box.style.height = 0;
-                    doc.body.appendChild(box);
-                    box.value = target.innerText;
-                    box.select();
-                    doc.execCommand('copy');
-                    box.remove();
                 }
             },
             rmv(params) {
@@ -690,9 +674,6 @@
             getEventName(evt) {
                 return evt.slice(evt.lastIndexOf(':') + 1);
             },
-            isInput(node) {
-                return ['INPUT', 'TEXTAREA'].includes(node.tagName);
-            },
             getParentNode(childNode, parentSelector) {
                 const parent = childNode.parentElement;
                 if (!parent || parent.matches(parentSelector)) {
@@ -742,13 +723,13 @@
             getId() {
                 return Date.now().toString(36);
             },
-            recursiveCall(path, args, thisArg = null) {
+            recursiveCall(path, args, thisArg) {
                 const keys = path.split('.');
-                const traverse = (obj, index) => {
-                    if (index === keys.length - 1) {
-                        return obj[keys[index]].apply(thisArg || USER_DATA.fn, args);
+                const traverse = (obj, idx) => {
+                    if (idx === keys.length - 1) {
+                        return obj[keys[idx]].apply(thisArg || USER_DATA.fn, args);
                     }
-                    return traverse(obj[keys[index]], index + 1);
+                    return traverse(obj[keys[idx]], idx + 1);
                 };
                 return traverse(USER_DATA.fn, 0);
             }
@@ -904,11 +885,7 @@
                 promise = res.blob().then(URL.createObjectURL);
             }
             promise.then(body => {
-                onSuccess(Utils.object({
-                    headers: res.headers,
-                    status: res.status,
-                    body
-                }));
+                onSuccess(Utils.object({headers: res.headers, status: res.status, body}));
             });
         };
         const fetchAndCache = (cache, cacheKey, url, req, type, onSuccess, onError) => {
@@ -1061,7 +1038,7 @@
                 if (specs?.split(' ').indexOf('toaster') > -1) {
                     toast(e.detail.body || '(No data returned)', e.detail.status);
                 }
-            })('copy', e => toast('Copied!', 200));
+            });
         })();
     })();
 })(document);

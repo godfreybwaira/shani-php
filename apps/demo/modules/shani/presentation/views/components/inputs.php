@@ -87,7 +87,7 @@
         <div class="input-line loader-bottom">
             <!--order matters-->
             <input type="text" name="name" placeholder="E.g: Misas Miubka">
-            <label class="font-sm">Your name</label>
+            <label>Your name</label>
         </div>
     </div>
     <div class="col">
@@ -241,7 +241,7 @@
         <div class="input-line">
             <!--order matters-->
             <input type="text" name="name" placeholder="E.g: Misas Miubka">
-            <label class="font-sm">Your name</label>
+            <label>Your name</label>
         </div>
     </div>
     <div class="col width-sm-max width-md-4">
@@ -254,14 +254,14 @@
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>
-            <label class="font-sm">Choose a number</label>
+            <label>Choose a number</label>
         </div>
     </div>
     <div class="col width-sm-max width-md-4">
         <div class="input-line">
             <!--order matters-->
             <input type="file" name="file">
-            <label class="font-sm">Upload your photo</label>
+            <label>Upload your photo</label>
         </div>
     </div>
 </div>
