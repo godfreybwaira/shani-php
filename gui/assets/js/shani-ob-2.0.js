@@ -4,10 +4,9 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
         if (!window.Shani) {
-            USER_DATA.attr = Utils.object();
             USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
-                select: (selector, obj) => USER_DATA.attr[selector] = Utils.object(obj),
+                select: (selector, obj) => USER_DATA.attr.set(selector, Utils.object(obj)),
                 define: (fnName, fn) => {
                     if (fnName in USER_DATA.fn) {
                         console.warn(fnName + ' already exists.');
@@ -21,7 +20,7 @@
             doc.dispatchEvent(new Event('shani:init'));
         }
     });
-    const USER_DATA = Object.setPrototypeOf({}, null);
+    const USER_DATA = Object.setPrototypeOf({attr: new Map()}, null);
     const Observers = (() => {
         const runScript = node => {
             if (node.hasAttribute('src')) {
@@ -272,16 +271,22 @@
         };
         const setAttribs = (shani, node, attrs, prefix) => {
             for (const a of attrs) {
-                shani[a] = node.getAttribute(prefix + a) || getGlobalAttr(prefix + a, node);
+                shani[a] = selectAttribute(node, prefix + a);
             }
         };
-        const getGlobalAttr = (attr, node) => {
-            for (let a in USER_DATA.attr) {
-                if (node.matches(a)) {
-                    return USER_DATA.attr[a][attr] || null;
+        const selectAttribute = (node, attr) => {
+            const value = node.getAttribute(attr);
+            for (let val of USER_DATA.attr) {
+                if (attr in val[1] && node.matches(val[0])) {
+                    if (attr === 'shani-headers') {
+                        return (value ? value + ',' : '') + val[1][attr];
+                    }
+                    if (['shani-on', 'watch-on'].includes(attr)) {
+                        return (value ? value + ';' : '') + val[1][attr];
+                    }
                 }
             }
-            return null;
+            return value;
         };
         /**
          * Make HTTP request at a given interval
@@ -521,7 +526,7 @@
         };
         window.addEventListener('popstate', e => history.go(0));
         return {
-            HTML_ATTR: ['enctype', 'method'],
+            HTML_ATTR: ['enctype', 'method', 'watch-on'],
             SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
@@ -862,7 +867,7 @@
         return shani => httpHandler(shani, new EventSource(shani.url));
     })();
     const Fetcher = (() => {
-        const cacheResponse = (cache, req, res, cacheKey) => {
+        const cacheResponse = (cache, req, res, url) => {
             const headers = new Headers(res.headers);
             headers.set('x-expires', Date.now() + (req.cacheDuration * 1000));
             const cached = new Response(res.body, {
@@ -870,7 +875,7 @@
                 status: res.status,
                 headers
             });
-            cache.put(cacheKey, cached);
+            cache.put(url, cached);
         };
         const parseResponse = (res, onSuccess, accept) => {
             const type = accept || Utils.getSubtype(res.headers.get('content-type'));
@@ -888,23 +893,22 @@
                 onSuccess(Utils.object({headers: res.headers, status: res.status, body}));
             });
         };
-        const fetchAndCache = (cache, cacheKey, url, req, type, onSuccess, onError) => {
+        const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
             fetch(url, req.options).then(res => {
-                cacheResponse(cache, req, res.clone(), cacheKey);
+                cacheResponse(cache, req, res.clone(), url);
                 parseResponse(res, onSuccess, type);
             }).catch(onError);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
-            const cacheKey = req.options.method + '::' + url;  // Differentiate by method
             caches.open(req.cacheName || 'pubcache').then(cache => {
-                cache.match(cacheKey).then(res => {
+                cache.match(url).then(res => {
                     const expires = res && res.headers.get('x-expires');
                     if (res && Date.now() < Number(expires)) {
                         parseResponse(res, onSuccess, type);
                     } else {
-                        fetchAndCache(cache, cacheKey, url, req, type, onSuccess, onError);
+                        fetchAndCache(cache, url, req, type, onSuccess, onError);
                     }
-                }).catch(() => fetchAndCache(cache, cacheKey, url, req, type, onSuccess, onError));
+                }).catch(() => fetchAndCache(cache, url, req, type, onSuccess, onError));
             }).catch(onError).finally(onEnd);
         };
         return {
