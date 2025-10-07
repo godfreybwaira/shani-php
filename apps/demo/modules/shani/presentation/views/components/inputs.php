@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" shani-on="click:moveto #r22 2" watch-on="change:trigger click" shani-watch="#chb">
+        <button class="button" shani-on="click:udf ucase>>input" shani-watch="#chb">
             Simple Button
         </button>
     </div>
@@ -197,7 +197,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup:udf ucase,change:" name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup:udf ucase;change:" name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>

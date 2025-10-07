@@ -1,29 +1,29 @@
 <div class="modal-background">
     <?php if ($app->request->query->getOne('type') === 'c'): ?>
         <div class="modal modal-type-c width-sm-10 height-sm-10 pos-c">
-            <button shani-on="click:close" class="button button-times pos-tr" style="margin: var(--spacing)"
-                    shani-target=".modal-background">&times;</button>
+            <button shani-on="click:close>>.modal-background"
+                    class="button button-times pos-tr" style="margin: var(--spacing)">&times;</button>
             <div class="height-sm-max loader-spin" style="--loader-size:2.5rem"></div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vl'): ?>
         <div class="modal modal-type-v width-md-1q width-sm-3q pos-l">
-            <button shani-on="click:close" class="button button-times pos-tr"
-                    shani-target=".modal-background" style="margin: var(--spacing)">&times;</button>
+            <button shani-on="click:close>>.modal-background" class="button button-times pos-tr"
+                    style="margin: var(--spacing)">&times;</button>
             <div class="card" style="--loader-size:2.5rem" action="/shani/0/components/0/generator"
                  shani-on="load:r;start:cssadd loader-spin;end:cssrmv loader-spin" shani-timer="2:3:4">
             </div>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'vr'): ?>
         <div class="modal modal-type-v width-md-1q width-sm-3q pos-r">
-            <button shani-on="click:close" class="button button-times" shani-target=".modal-background">&times;</button>
+            <button shani-on="click:close>>.modal-background" class="button button-times">&times;</button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'ht'): ?>
         <div class="modal modal-type-h height-sm-4 pos-t">
-            <button shani-on="click:close" class="button button-times" shani-target=".modal-background">&times;</button>
+            <button shani-on="click:close>>.modal-background" class="button button-times">&times;</button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'hb'): ?>
         <div class="modal modal-type-h height-sm-4 pos-b">
-            <button shani-on="click:close" class="button button-times" shani-target=".modal-background">&times;</button>
+            <button shani-on="click:close>>.modal-background" class="button button-times">&times;</button>
         </div>
     <?php elseif ($app->request->query->getOne('type') === 'cl'): ?>
         <div class="modal modal-type-c width-sm-3q height-sm-10 pos-c">

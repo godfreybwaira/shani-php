@@ -20,4 +20,4 @@
         Shani
     </div>
 </div>
-<button shani-on="click:close" class="button button-times pos-tr" style="margin: var(--spacing)" shani-target=".modal-background">&times;</button>
+<button shani-on="click:close>>.modal-background" class="button button-times pos-tr" style="margin: var(--spacing)">&times;</button>

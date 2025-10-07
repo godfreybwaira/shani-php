@@ -281,7 +281,7 @@
                     if (attr === 'shani-headers') {
                         return (value ? value + ',' : '') + val[1][attr];
                     }
-                    if (['shani-on', 'watch-on'].includes(attr)) {
+                    if (attr === 'shani-on') {
                         return (value ? value + ';' : '') + val[1][attr];
                     }
                 }
@@ -323,26 +323,14 @@
                 Utils.trigger(shani, 'end');
             });
         };
-        const getTarget = shani => {
-            if (!shani.target) {
-                return shani.emitter;
-            }
-            const targets = doc.querySelectorAll(shani.target);
-            if (targets.length === 1) {
-                return targets[0];
-            }
-            const wrapper = doc.createElement('div');
-            for (const t of targets) {
-                wrapper.appendChild(t.cloneNode(true));
-            }
-            return wrapper;
-        };
-        const getCover = (shani, size) => {
+        const getCover = (target, size) => {
             let style = 'position:fixed;top:0;left:0;width:100%;height:100%;padding:1rem;';
             style += 'overflow-y:auto;font-size:' + (size || 100) + '%;background:#fff;z-index:998';
             const cover = doc.createElement('div');
             cover.style = style;
-            cover.innerHTML = getTarget(shani).outerHTML;
+            for (const t of target) {
+                cover.appendChild(t.cloneNode(true));
+            }
             doc.body.insertBefore(cover, doc.body.firstChild);
             return cover;
         };
@@ -362,24 +350,28 @@
             w() {
                 sendReq(this, 'POST');
             },
-            trigger(params) {
-                for (const val of params) {
-                    this.emitter.dispatchEvent(new Event(val.trim(), {bubbles: true}));
-                }
+            trigger(target, params) {
+                target.forEach(node => {
+                    for (const val of params) {
+                        node.dispatchEvent(new Event(val.trim(), {bubbles: true}));
+                    }
+                });
             },
             /**
              * Remove node from DOM
              */
-            close() {
-                const node = !this.target ? this.emitter : Utils.getParentNode(this.emitter, this.target);
-                if (node) {
-                    return Utils.removeNode(node);
+            close(target, params) {
+                if (!params) {
+                    return target.forEach(node => Utils.removeNode(node));
                 }
-                doc.querySelectorAll(this.target).forEach(node => Utils.removeNode(node));
+                const parent = Utils.getParentNode(this.emitter, params);
+                if (parent) {
+                    Utils.removeNode(parent);
+                }
             },
-            print() {
+            print(target, params) {
                 if (window.print instanceof Function) {
-                    const cover = getCover(this);
+                    const cover = getCover(params ? target : this);
                     window.print();
                     Utils.removeNode(cover);
                 }
@@ -387,18 +379,20 @@
             /**
              * Offline search
              */
-            search() {
-                const text = this.emitter.value.trim().toLowerCase(), target = getTarget(this);
-                for (const row of target.children) {
-                    row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
-                }
+            search(target) {
+                const text = this.emitter.value.trim().toLowerCase();
+                target.forEach(node => {
+                    for (const row of node.children) {
+                        row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
+                    }
+                });
             },
             /**
              * Full screen
              */
-            fs() {
+            fs(target, params) {
                 if (doc.fullscreenEnabled) {
-                    const cover = getCover(this, 135);
+                    const cover = getCover(params ? target : this, 135);
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
                             if (!doc.fullscreenElement) {
@@ -408,125 +402,95 @@
                     }).catch(() => Utils.removeNode(cover));
                 }
             },
-            rmv(params) {
-                if (params) {
-                    doc.querySelectorAll(params[0]).forEach(target => Utils.removeNode(target));
-                } else {
-                    Utils.removeNode(this.emitter);
-                }
+            rmv(target) {
+                target.forEach(node => Utils.removeNode(node));
             },
-            copyto(params) {
-                const node = Actions.moveNode(this.emitter, params, true);
-                if (node) {
-                    node.removeAttribute('shani-watch');
-                    node.querySelectorAll('[id]').forEach(el => {
-                        const id = Utils.getId();
-                        node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
-                        el.id = id;
+            copyto(targets, params) {
+                targets.forEach(target => {
+                    Actions.moveNode(target, this.emitter, params, (node) => {
+                        node.removeAttribute('shani-watch');
+                        node.querySelectorAll('[id]').forEach(el => {
+                            const id = Utils.getId();
+                            node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
+                            el.id = id;
+                        });
                     });
-                }
+                });
             },
-            moveto(params) {
-                Actions.moveNode(this.emitter, params);
+            moveto(target, params) {
+                target.forEach(node => Actions.moveNode(node, this.emitter, params));
             },
-            cssadd(params) {
-                Actions.addcss(this.emitter, params);
+            cssadd(target, params) {
+                target.forEach(node => Actions.addcss(node, params));
             },
-            cssrmv(params) {
-                Actions.rmcss(this.emitter, params);
+            cssrmv(target, params) {
+                target.forEach(node => Actions.rmcss(node, params));
             },
-            cssreplace(params) {
-                Actions.replacecss(this.emitter, params);
+            cssreplace(target, params) {
+                target.forEach(node => Actions.replacecss(node, params));
             },
-            csstoggle(params) {
-                Actions.togglecss(this.emitter, params);
-            },
-            cssaddt(params) {
-                doc.querySelectorAll(this.target).forEach(target => Actions.addcss(target, params));
-            },
-            cssrmvt(params) {
-                doc.querySelectorAll(this.target).forEach(target => Actions.rmcss(target, params));
-            },
-            cssreplacet(params) {
-                doc.querySelectorAll(this.target).forEach(target => Actions.replacecss(target, params));
-            },
-            csstogglet(params) {
-                doc.querySelectorAll(this.target).forEach(target => Actions.togglecss(target, params));
+            csstoggle(target, params) {
+                target.forEach(node => Actions.togglecss(node, params));
             },
             /**
              * Remove properties from extisting node
-             * @param {array} params
              */
-            proprmv(params) {
-                for (const p of params) {
-                    const key = p.trim();
-                    if (key in this.emitter) {
-                        const type = typeof this.emitter[key];
-                        this.emitter[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
+            proprmv(target, params) {
+                target.forEach(node => {
+                    for (const p of params) {
+                        const key = p.trim();
+                        if (key in node) {
+                            const type = typeof node[key];
+                            node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
+                        }
                     }
-                }
+                });
             },
             /**
              * Add properties from extisting node
-             * @param {array} params
              */
-            prop(params) {
-                for (const val of params) {
-                    const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
-                    const value = val.slice(pos + 1).trim();
-                    this.emitter[key] = key === value || value.length === 0 || value;
-                }
+            prop(target, params) {
+                target.forEach(node => {
+                    for (const val of params) {
+                        const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
+                        const value = val.slice(pos + 1).trim();
+                        node[key] = key === value || value.length === 0 || value;
+                    }
+                });
             },
             /**
              * Map this.emitter properties to that of src element
-             * @param {array} params
              */
-            propbind(params) {
-                if (this.event.detail) {
-                    const src = this.event.detail.shani.emitter;
+            propbind(target, params) {
+                target.forEach(node => {
                     for (const val of params) {
                         const pos = val.indexOf(':'), thiskey = val.slice(0, pos).trim();
                         const thatkey = val.slice(pos + 1).trim() || thiskey;
-                        this.emitter[thiskey] = src[thatkey];
+                        this.emitter[thiskey] = node[thatkey];
                     }
-                }
+                });
             },
             /**
              * Toggle properties from extisting node
-             * @param {array} params
              */
-            proptoggle(params) {
-                for (const val of params) {
-                    const key = val.trim(), value = this.emitter[key];
-                    this.emitter[key] = typeof value === 'boolean' ? !value : '' || value;
-                }
+            proptoggle(target, params) {
+                target.forEach(node => {
+                    for (const val of params) {
+                        const key = val.trim(), value = node[key];
+                        node[key] = typeof value === 'boolean' ? !value : '' || value;
+                    }
+                });
             },
             /**
              * Call user defined function using this node and target node as parameter
-             * @param {array} params
-             * @param {object} data
              */
-            udf(params, data) {
-                const pos = params[0].indexOf(' '), fn = pos > -1 ? params[0].slice(0, pos) : params[0];
-                const selector = pos > -1 ? params[0].slice(pos + 1).trim() : null;
-                const targets = selector ? doc.querySelectorAll(selector) : [null];
-                targets.forEach(target => Utils.recursiveCall(fn, [this.emitter, target, data]));
-            },
-            /**
-             * Map target node properties to a function call
-             * @param {array} params
-             * @param {array} data
-             */
-            udfbind(params, data) {
-                if (this.event.detail) {
-                    const src = this.event.detail.shani.emitter;
-                    Utils.recursiveCall(params[0], [this.emitter, src, data]);
-                }
+            udf(target, params, data) {
+                target.forEach(node => Utils.recursiveCall(params[0], [this.emitter, node, data]));
             }
         };
         window.addEventListener('popstate', e => history.go(0));
         return {
-            HTML_ATTR: ['enctype', 'method', 'watch-on'],
+            HTML_ATTR: ['enctype', 'method'],
             SHANI_ATTR: ['watch', 'headers', 'timer', 'insert', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'scheme', 'target'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
@@ -550,20 +514,19 @@
              * Move this element to a specified position, to another destination.
              * If a position is not given then the element is placed to the end.
              */
-            moveNode(target, params, clone) {
-                const pos = params[0].lastIndexOf(' ');
-                const index = parseInt(params[0].slice(pos + 1));
-                const selector = isNaN(index) ? params[0] : params[0].slice(0, pos);
-                const parent = doc.querySelector(selector);
-                if (parent) {
-                    const idx = isNaN(index) ? -1 : index, len = parent.children.length + 1;
-                    if (Math.abs(idx) <= len && idx !== 0) {
-                        const pos = idx > 0 ? idx - 1 : idx + len;
-                        const node = clone ? target.cloneNode(true) : target;
-                        parent.insertBefore(node, parent.children[pos]);
-                        return node;
+            moveNode(parent, emitter, params, clone) {
+                const index = parseInt(params[0]), len = parent.children.length + 1;
+                const pos = index > 0 ? index - 1 : index + len;
+                const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
+                kids.forEach(node => {
+                    if (Math.abs(index) <= len && index !== 0) {
+                        const n = clone ? node.cloneNode(true) : node;
+                        parent.insertBefore(n, parent.children[pos]);
+                        if (clone) {
+                            clone(n);
+                        }
                     }
-                }
+                });
             },
             /**8
              * Add CSS class(es) to extisting node
@@ -583,7 +546,7 @@
             replacecss(target, params) {
                 for (const val of params) {
                     const pos = val.indexOf(':'), key = val.slice(0, pos);
-                    target.classList.replace(key.trim(), val.slice(pos + 1));
+                    target.classList.replace(key.trim(), val.slice(pos + 1).trim());
                 }
             },
             /**
@@ -651,13 +614,20 @@
     const Utils = (() => {
         const callNext = (shani, event, data) => {
             const str = shani.params.get(event)?.trim();
-            if (str) {
-                const pos = str.indexOf(' '), fn = pos > -1 ? str.slice(0, pos) : str;
-                if (shani[fn] instanceof Function) {
-                    const params = pos > -1 ? str.slice(pos + 1).split(',') : null;
-                    shani[fn](params, data);
-                    Utils.trigger(shani, fn);
+            if (!str) {
+                return;
+            }
+            const parts = str.split('>>');
+            const pos = parts[0].indexOf(' '), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
+            if (shani[fn] instanceof Function) {
+                const targets = parts[1] ? doc.querySelectorAll(parts[1]) : [shani.emitter];
+                if (fn === parts[0]) {
+                    shani[fn](targets, parts[1]);
+                } else {
+                    const params = parts[0].slice(pos + 1).split(',');
+                    shani[fn](targets, params, data);
                 }
+                Utils.trigger(shani, fn);
             }
         };
         const resubmit = shani => {
@@ -975,8 +945,7 @@
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + position;
                     btn.setAttribute('type', 'button');
-                    btn.setAttribute('shani-on', 'click:close');
-                    btn.setAttribute('shani-target', selector);
+                    btn.setAttribute('shani-on', 'click:close>>' + selector);
                     btn.innerHTML = '&times;';
                     return btn;
                 }

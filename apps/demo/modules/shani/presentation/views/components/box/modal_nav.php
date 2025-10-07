@@ -13,4 +13,4 @@
         </ul>
     </div>
 </div>
-<button shani-on="click:close" class="button button-times pos-tr" style="margin: .625rem 1rem" shani-target=".modal-background"></button>
+<button shani-on="click:close>>.modal-background" class="button button-times pos-tr" style="margin: .625rem 1rem"></button>
