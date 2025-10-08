@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button" shani-on="click:udf ucase>>input" shani-watch="#chb">
+        <button class="button accent-color" watch-on="change:moveto -1>>#r22" shani-watch="#chb">
             Simple Button
         </button>
     </div>
@@ -213,8 +213,9 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label shani-watch="#url" watch-on="keyup:propbind innerHTML:value">Demonstrating shani-propbind function</label>
-        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function" shani-watch="#url" watch-on="change:propbind value:" class="input-box">
+        <label shani-watch="#url" watch-on="keyup:propbind innerHTML:value>>#url">Demonstrating shani-propbind function</label>
+        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function"
+               shani-watch="#url" watch-on="change:propbind value>>#url" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
@@ -250,7 +251,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" watch-on="change:propbind selected:checked" shani-watch="#chb">Two</option>
+                <option value="2" watch-on="change:propbind selected:checked>>#chb" shani-watch="#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>
