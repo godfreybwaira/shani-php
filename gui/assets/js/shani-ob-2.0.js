@@ -334,6 +334,24 @@
             doc.body.insertBefore(cover, doc.body.firstChild);
             return cover;
         };
+        /**
+         * Move this element to a specified position, to another destination.
+         * If a position is not given then the element is placed to the end.
+         */
+        const moveNode = (parent, emitter, params, clone) => {
+            const index = parseInt(params[0]), len = parent.children.length + 1;
+            const pos = index > 0 ? index - 1 : index + len;
+            const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
+            kids.forEach(node => {
+                if (Math.abs(index) <= len && index !== 0) {
+                    const n = clone ? node.cloneNode(true) : node;
+                    parent.insertBefore(n, parent.children[pos]);
+                    if (clone) {
+                        clone(n);
+                    }
+                }
+            });
+        };
         Obj.prototype = {
             /**
              * Read content from server.
@@ -407,7 +425,7 @@
             },
             copyto(targets, params) {
                 targets.forEach(target => {
-                    Actions.moveNode(target, this.emitter, params, (node) => {
+                    moveNode(target, this.emitter, params, (node) => {
                         node.removeAttribute('shani-watch');
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
@@ -418,19 +436,29 @@
                 });
             },
             moveto(target, params) {
-                target.forEach(node => Actions.moveNode(node, this.emitter, params));
+                target.forEach(node => moveNode(node, this.emitter, params));
             },
             cssadd(target, params) {
-                target.forEach(node => Actions.addcss(node, params));
+                target.forEach(node => {
+                    params.forEach(val => node.classList.remove(val.trim()));
+                });
             },
             cssrmv(target, params) {
-                target.forEach(node => Actions.rmcss(node, params));
+                target.forEach(node => {
+                    params.forEach(val => node.classList.add(val.trim()));
+                });
             },
             cssreplace(target, params) {
-                target.forEach(node => Actions.replacecss(node, params));
+                params.forEach(val => {
+                    const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
+                    const value = val.slice(pos + 1).trim();
+                    target.forEach(node => node.classList.replace(key, value));
+                });
             },
             csstoggle(target, params) {
-                target.forEach(node => Actions.togglecss(node, params));
+                target.forEach(node => {
+                    params.forEach(val => node.classList.toggle(val.trim()));
+                });
             },
             /**
              * Remove properties from extisting node
@@ -504,56 +532,6 @@
             on(e, cb) {
                 doc.addEventListener('shani:on:' + e, cb);
                 return Shani.on;
-            }
-        };
-    })();
-    const Actions = (() => {
-
-        return {
-            /**
-             * Move this element to a specified position, to another destination.
-             * If a position is not given then the element is placed to the end.
-             */
-            moveNode(parent, emitter, params, clone) {
-                const index = parseInt(params[0]), len = parent.children.length + 1;
-                const pos = index > 0 ? index - 1 : index + len;
-                const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
-                kids.forEach(node => {
-                    if (Math.abs(index) <= len && index !== 0) {
-                        const n = clone ? node.cloneNode(true) : node;
-                        parent.insertBefore(n, parent.children[pos]);
-                        if (clone) {
-                            clone(n);
-                        }
-                    }
-                });
-            },
-            /**8
-             * Add CSS class(es) to extisting node
-             */
-            addcss(target, params) {
-                params.forEach(val => target.classList.add(val.trim()));
-            },
-            /**
-             * Remove CSS class(es) from extisting node
-             */
-            rmcss(target, params) {
-                params.forEach(val => target.classList.remove(val.trim()));
-            },
-            /**
-             * Replace CSS class(es) to extisting node
-             */
-            replacecss(target, params) {
-                for (const val of params) {
-                    const pos = val.indexOf(':'), key = val.slice(0, pos);
-                    target.classList.replace(key.trim(), val.slice(pos + 1).trim());
-                }
-            },
-            /**
-             * Toggle CSS class(es) to extisting node
-             */
-            togglecss(target, params) {
-                params.forEach(val => target.classList.toggle(val.trim()));
             }
         };
     })();
