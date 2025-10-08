@@ -614,9 +614,10 @@
             const parts = str.split('>>');
             const pos = parts[0].indexOf(' '), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
             if (shani[fn] instanceof Function) {
-                const targets = parts[1] ? doc.querySelectorAll(parts[1]) : [shani.emitter];
+                const selector = parts[1] || shani.watch;
+                const targets = selector ? doc.querySelectorAll(selector) : [shani.emitter];
                 if (fn === parts[0]) {
-                    shani[fn](targets, parts[1]);
+                    shani[fn](targets, selector);
                 } else {
                     const params = parts[0].slice(pos + 1).split(',');
                     shani[fn](targets, params, data);
