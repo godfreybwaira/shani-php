@@ -351,7 +351,7 @@
         const moveNode = (parent, emitter, params, clone) => {
             const index = parseInt(params[0]), len = parent.children.length + 1;
             const pos = index > 0 ? index - 1 : index + len;
-            const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
+            const kids = params[1] ? doc.querySelectorAll(params[1].trim()) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
