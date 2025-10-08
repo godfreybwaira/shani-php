@@ -240,7 +240,7 @@
         const handleDataInsertion = (target, shani, resp) => {
             const outf = target.getAttribute('shani-outf') || shani.outf;
             if (outf) {
-                return Utils.recursiveCall(outf, [target, shani.emitter, resp]);
+                return Utils.recursiveCall(outf, [shani.emitter, target, resp]);
             }
             const mode = target.getAttribute('shani-insert') || shani.insert || 'replace';
             if (mode === 'ignore') {
@@ -452,9 +452,9 @@
             prop(target, params) {
                 target.forEach(node => {
                     for (const val of params) {
-                        const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
-                        const value = val.slice(pos + 1).trim();
-                        node[key] = key === value || value.length === 0 || value;
+                        const pos = val.indexOf(':'), key = (pos > -1 ? val.slice(0, pos) : val).trim();
+                        const value = pos > -1 ? val.slice(pos + 1).trim() : key;
+                        node[key] = key === value || value;
                     }
                 });
             },
@@ -464,9 +464,9 @@
             propbind(target, params) {
                 target.forEach(node => {
                     for (const val of params) {
-                        const pos = val.indexOf(':'), thiskey = val.slice(0, pos).trim();
-                        const thatkey = val.slice(pos + 1).trim() || thiskey;
-                        this.emitter[thiskey] = node[thatkey];
+                        const pos = val.indexOf(':'), thiskey = pos > -1 ? val.slice(0, pos) : val;
+                        const thatkey = pos > -1 ? val.slice(pos + 1) : thiskey;
+                        this.emitter[thiskey.trim()] = node[thatkey.trim()];
                     }
                 });
             },
