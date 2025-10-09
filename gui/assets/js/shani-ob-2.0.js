@@ -449,13 +449,13 @@
                 target.forEach(node => moveNode(node, this.emitter, params));
             },
             cssadd(target, params) {
-                target.forEach(node => {
-                    params.forEach(val => node.classList.add(val.trim()));
+                params.forEach(val => {
+                    target.forEach(node => node.classList.add(val.trim()));
                 });
             },
             cssrmv(target, params) {
-                target.forEach(node => {
-                    params.forEach(val => node.classList.remove(val.trim()));
+                params.forEach(val => {
+                    target.forEach(node => node.classList.remove(val.trim()));
                 });
             },
             cssreplace(target, params) {
@@ -466,58 +466,55 @@
                 });
             },
             csstoggle(target, params) {
-                target.forEach(node => {
-                    params.forEach(val => node.classList.toggle(val.trim()));
+                params.forEach(val => {
+                    target.forEach(node => node.classList.toggle(val.trim()));
                 });
             },
             /**
              * Remove properties from extisting node
              */
             proprmv(target, params) {
-                target.forEach(node => {
-                    for (const p of params) {
-                        const key = p.trim();
+                for (const p of params) {
+                    const key = p.trim();
+                    target.forEach(node => {
                         if (key in node) {
                             const type = typeof node[key];
                             node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
                         }
-                    }
-                });
+                    });
+                }
             },
             /**
              * Add properties from extisting node
              */
             prop(target, params) {
-                target.forEach(node => {
-                    for (const val of params) {
-                        const pos = val.indexOf(':'), key = (pos > -1 ? val.slice(0, pos) : val).trim();
-                        const value = pos > -1 ? val.slice(pos + 1).trim() : key;
-                        node[key] = key === value || value;
-                    }
-                });
+                for (const val of params) {
+                    const pos = val.indexOf(':'), key = (pos > -1 ? val.slice(0, pos) : val).trim();
+                    const value = pos > -1 ? val.slice(pos + 1).trim() : key;
+                    target.forEach(node => node[key] = key === value || value);
+                }
             },
             /**
              * Map this.emitter properties to that of src element
              */
             propbind(target, params) {
-                target.forEach(node => {
-                    for (const val of params) {
-                        const pos = val.indexOf(':'), thiskey = pos > -1 ? val.slice(0, pos) : val;
-                        const thatkey = pos > -1 ? val.slice(pos + 1) : thiskey;
-                        this.emitter[thiskey.trim()] = node[thatkey.trim()];
-                    }
-                });
+                for (const val of params) {
+                    const pos = val.indexOf(':'), thiskey = (pos > -1 ? val.slice(0, pos) : val).trim();
+                    const thatkey = pos > -1 ? val.slice(pos + 1).trim() : thiskey;
+                    target.forEach(node => this.emitter[thiskey] = node[thatkey]);
+                }
             },
             /**
              * Toggle properties from extisting node
              */
             proptoggle(target, params) {
-                target.forEach(node => {
-                    for (const val of params) {
-                        const key = val.trim(), value = node[key];
+                for (const val of params) {
+                    const key = val.trim();
+                    target.forEach(node => {
+                        const value = node[key];
                         node[key] = typeof value === 'boolean' ? !value : '' || value;
-                    }
-                });
+                    });
+                }
             },
             /**
              * Call user defined function using this node and target node as parameter
