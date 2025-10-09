@@ -379,11 +379,11 @@
                 sendReq(this, 'POST', target, params);
             },
             trigger(target, params) {
-                target.forEach(node => {
-                    for (const val of params) {
+                for (const val of params) {
+                    target.forEach(node => {
                         node.dispatchEvent(new Event(val.trim(), {bubbles: true}));
-                    }
-                });
+                    });
+                }
             },
             /**
              * Remove node from DOM
