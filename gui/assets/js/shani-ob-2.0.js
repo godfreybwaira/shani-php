@@ -607,12 +607,12 @@
     })();
     const Utils = (() => {
         const callNext = (shani, event, data) => {
-            const str = shani.params.get(event)?.trim();
+            const str = shani.params.get(event);
             if (!str) {
                 return;
             }
-            const parts = str.split('>>');
-            const pos = parts[0].indexOf(' '), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
+            const parts = str.split('>>').map(s => s.trim());
+            const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
             if (shani[fn] instanceof Function) {
                 const targets = parts[1] ? doc.querySelectorAll(parts[1]) : [shani.emitter];
                 if (fn === parts[0]) {
@@ -737,7 +737,7 @@
             createReq(shani, method, onStart, onEnd, onSuccess, onError) {
                 const payload = createPayload(shani, method), req = Utils.object();
                 if (shani.cache) {
-                    const pos = shani.cache.indexOf(' ');
+                    const pos = shani.cache.search(/\s/);
                     req.cacheDuration = parseInt(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
@@ -923,7 +923,7 @@
                 }
             };
             const createModal = specs => {
-                const [id, classList] = specs[0].split(':');
+                const [id, classList] = specs[0].split(':').map(s => s.trim());
                 const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                 const wrapper = doc.createElement('div');
                 wrapper.id = id;
@@ -968,7 +968,7 @@
         })();
         const Loader = (() => {
             const createLoader = loader => {
-                const [id, color] = loader.specs[0].split(':');
+                const [id, color] = loader.specs[0].split(':').map(s => s.trim());
                 loader.wrapper.forEach(node => {
                     const bar = doc.createElement('div'), wrapper = doc.createElement('div');
                     bar.className = 'progress';
