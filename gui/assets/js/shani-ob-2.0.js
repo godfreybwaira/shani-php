@@ -397,9 +397,9 @@
                     Utils.removeNode(parent);
                 }
             },
-            print(target, params) {
+            print(target) {
                 if (window.print instanceof Function) {
-                    const cover = getCover(params ? target : this);
+                    const cover = getCover(target);
                     window.print();
                     Utils.removeNode(cover);
                 }
@@ -418,9 +418,9 @@
             /**
              * Full screen
              */
-            fs(target, params) {
+            fs(target) {
                 if (doc.fullscreenEnabled) {
-                    const cover = getCover(params ? target : this, 135);
+                    const cover = getCover(target, 135);
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
                             if (!doc.fullscreenElement) {
