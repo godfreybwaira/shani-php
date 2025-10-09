@@ -523,9 +523,9 @@
                 target.forEach(node => Utils.recursiveCall(params[0], [this.emitter, node, data]));
             },
             /**
-             * Create HTML element
+             * Create HTML modal element
              */
-            create(_, params) {
+            makemodal(_, params) {
                 Utils.trigger(this, 'ui-modal', {specs: params});
             }
         };
