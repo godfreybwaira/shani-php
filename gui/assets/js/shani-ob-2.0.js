@@ -527,6 +527,9 @@
              */
             makemodal(_, params) {
                 Utils.trigger(this, 'ui-modal', {specs: params});
+            },
+            makeloader(wrapper, params) {
+                Utils.trigger(this, 'ui-loader', {specs: params, wrapper});
             }
         };
         window.addEventListener('popstate', e => history.go(0));
@@ -962,6 +965,23 @@
             })('redirect', e => {
                 toast(e.detail.statusText || 'Redirecting...', e.detail.status);
             });
+        })();
+        const Loader = (() => {
+            const createLoader = loader => {
+                const [id, color] = loader.specs[0].split(':');
+                loader.wrapper.forEach(node => {
+                    const bar = doc.createElement('div'), wrapper = doc.createElement('div');
+                    bar.className = 'progress';
+                    if (color) {
+                        bar.style.setProperty('--color', color);
+                    }
+                    wrapper.id = id;
+                    wrapper.className = 'progress-bar loader';
+                    wrapper.appendChild(bar);
+                    node.appendChild(wrapper);
+                });
+            };
+            Shani.on('ui-loader', e => createLoader(e.detail));
         })();
     })();
 })(document);
