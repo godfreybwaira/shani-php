@@ -25,20 +25,15 @@ namespace test\helpers {
             $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
             self::createBackupFile($source, $destination);
             $content = yaml_parse_file($source);
-            if (!array_key_exists($params->env, $content['ENVIRONMENTS'])) {
-                self::stop();
-                throw new \Exception('Could not start a test because the environment "' . $params->env . '" is not found.');
-            }
             if (file_put_contents($source, yaml_emit($content)) === false) {
                 self::removeBackupFile($source, $destination);
                 self::stop();
                 throw new \Exception('Could not start a test.');
             }
-            $content['CACHE_CONFIG'] = false;
-            $content['ACTIVE_ENVIRONMENT'] = $params->env;
+            $content['CONFIGURATION']['PROFILE'] = $params->profile;
             $vhost = new VirtualHost($content);
             self::removeBackupFile($source, $destination);
-            $test = $vhost->configFile::runTest();
+            $test = $vhost->classFile::runTest();
             return $test->getResult();
         }
 

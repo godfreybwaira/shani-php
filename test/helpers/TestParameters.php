@@ -12,17 +12,17 @@ namespace test\helpers {
     final class TestParameters
     {
 
-        public readonly string $host, $env;
+        public readonly string $host, $profile;
 
         /**
          * Create test parameters
          * @param string $host HTTP host name
-         * @param string $env Test enviroment in which this test is done under. See host yaml file
+         * @param string $profile Test profile in which this test is done under. See host yaml file
          */
-        public function __construct(string $host, string $env)
+        public function __construct(string $host, string $profile)
         {
             $this->host = $host;
-            $this->env = $env;
+            $this->profile = $profile;
         }
     }
 

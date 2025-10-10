@@ -36,11 +36,13 @@ namespace shani\advisors {
          */
         public readonly bool $authenticated;
         private readonly ?string $permissionList;
+        protected readonly string $profile;
         protected readonly App $app;
 
-        public function __construct(App &$app)
+        public function __construct(App &$app, string $profile)
         {
             $this->app = $app;
+            $this->profile = $profile;
             $this->permissionList = $this->clientPermissions();
             $this->authenticated = $this->permissionList !== null;
         }

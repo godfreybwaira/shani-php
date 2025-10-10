@@ -1,12 +1,6 @@
-# Environment variables are customs. Create enviroment variables and give them
-# names of your choice, e.g DEV, TEST, PROD
-ENVIRONMENTS:
+CONFIGURATION:
   # Must extends shani\advisors\Configuration
-  DEV: \apps\demo\config\Settings
-  TEST: \apps\demo\config\TestSettings
-  # Active environment can be any one of the provided above.
-ACTIVE_ENVIRONMENT: DEV
-# Whether an application is able to run or not
+  CLASSFILE: \apps\demo\config\Settings
+  # Active configuration profile
+  PROFILE: dev
 RUNNING: true
-# Whether to cache these configurations in memory or not
-CACHE_CONFIG: true

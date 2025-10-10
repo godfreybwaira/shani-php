@@ -29,7 +29,7 @@ namespace shani {
     final class WebServer
     {
 
-        private static array $mime = [], $hosts = [];
+        private static array $mime = [];
 
         public static function mime(string $extension): ?string
         {
@@ -45,16 +45,9 @@ namespace shani {
 
         private static function host(string $name): VirtualHost
         {
-            if (!empty(self::$hosts[$name])) {
-                return self::$hosts[$name];
-            }
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                $config = new VirtualHost(yaml_parse_file($yaml));
-                if ($config->cache) {
-                    self::$hosts[$name] = $config;
-                }
-                return $config;
+                return new VirtualHost(yaml_parse_file($yaml));
             }
             $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {

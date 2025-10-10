@@ -80,7 +80,7 @@ namespace shani\http {
             $this->response = $res;
             $this->writer = $writer;
             $this->request = $res->request;
-            $this->config = new $vhost->configFile($this);
+            $this->config = new $vhost->classFile($this, $vhost->profile);
         }
 
         /**
