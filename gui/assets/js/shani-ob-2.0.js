@@ -259,29 +259,40 @@
             this.event = e;
             this.emitter = node;
             this.poll = Utils.object();
-            this.params = Utils.explode(node.getAttribute(attrib), ';');
             this.url = node.getAttribute('href') || node.getAttribute('action');
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
+            /**/
+            this.actions = collectActions(Utils.explode(selectAttribute(node, attrib), ';'));
+            const nodeActions = collectActions(Utils.explode(node.getAttribute(attrib), ';'));
+            nodeActions.forEach((v, k) => this.actions.set(k, v));
+            const headerline = this.headers;
+            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers')));
+            new Headers(Utils.explode(headerline)).forEach((v, k) => this.headers.set(k, v));
         };
         const setAttribs = (shani, node, attrs, prefix) => {
-            for (const a of attrs) {
-                shani[a] = selectAttribute(node, prefix + a);
-            }
+            attrs.forEach(a => {
+                const attr = node.getAttribute(prefix + a);
+                shani[a] = attr !== null ? attr : selectAttribute(node, prefix + a);
+            });
         };
-        const selectAttribute = (node, attr) => {
-            const value = node.getAttribute(attr);
+        const collectActions = actions => {
+            const map = new Map();
+            actions.forEach((str, evt) => {
+                const parts = str.split('>>').map(s => s.trim());
+                const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
+                const params = pos > -1 ? parts[0].slice(pos + 1).split(',') : null;
+                map.set(evt, Utils.object({fn, params, selector: parts[1]}));
+            });
+            return map;
+        };
+        const selectAttribute = (node, name) => {
             for (let val of USER_DATA.attr) {
-                if (attr in val[1] && node.matches(val[0])) {
-                    if (attr === 'shani-headers') {
-                        return (value ? value + ',' : '') + val[1][attr];
-                    }
-                    if (attr === 'shani-on') {
-                        return (value ? value + ';' : '') + val[1][attr];
-                    }
+                if (name in val[1] && node.matches(val[0])) {
+                    return val[1][name];
                 }
             }
-            return value;
+            return null;
         };
         /**
          * Make HTTP request at a given interval
@@ -298,7 +309,11 @@
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
-            const mode = params instanceof Array ? params[0].trim() : 'replace';
+            const mode = params ? params[0].trim() : 'replace';
+            const type = Utils.getSubtype(shani.enctype);
+            if (type && type !== 'form-data') {
+                shani.headers.set('content-type', shani.enctype.trim());
+            }
             if (shani.scheme === 'ws') {
                 return WSocket(shani, target, mode);
             }
@@ -607,21 +622,11 @@
     })();
     const Utils = (() => {
         const callNext = (shani, event, data) => {
-            const str = shani.params.get(event);
-            if (!str) {
-                return;
-            }
-            const parts = str.split('>>').map(s => s.trim());
-            const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-            if (shani[fn] instanceof Function) {
-                const targets = parts[1] ? doc.querySelectorAll(parts[1]) : [shani.emitter];
-                if (fn === parts[0]) {
-                    shani[fn](targets, parts[1]);
-                } else {
-                    const params = parts[0].slice(pos + 1).split(',');
-                    shani[fn](targets, params, data);
-                }
-                Utils.trigger(shani, fn);
+            const action = shani.actions.get(event);
+            if (action && shani[action.fn] instanceof Function) {
+                const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
+                shani[action.fn](targets, action.params, data);
+                Utils.trigger(shani, action.fn);
             }
         };
         const resubmit = shani => {
@@ -653,10 +658,13 @@
             explode(str, sep = ',') {
                 const map = new Map();
                 if (str) {
-                    const raw = str.trim().split(sep);
+                    const raw = str.split(sep).map(s => s.trim());
                     for (let val of raw) {
                         const pos = val.indexOf(':'), key = pos > 0 ? val.slice(0, pos) : val;
-                        map.set(key.toLowerCase().trim(), pos > 0 ? val.slice(pos + 1).trim() : null);
+                        const name = key.toLowerCase();
+                        if (name.length > 0) {
+                            map.set(name, pos > 0 ? val.slice(pos + 1) : null);
+                        }
                     }
                 }
                 return map;
@@ -673,13 +681,6 @@
                 }
                 if (evt === 'end')
                     resubmit(shani);
-            },
-            getReqHeaders(shani) {
-                const type = Utils.getSubtype(shani.enctype), headers = Utils.explode(shani.headers);
-                if (type && type !== 'form-data') {
-                    headers.set('content-type', shani.enctype.trim());
-                }
-                return new Headers(headers);
             },
             getSubtype(header) {
                 if (header) {
@@ -720,7 +721,7 @@
         const createPayload = (shani, method) => {
             const fd = Convertor.input2form(shani);
             const payload = Utils.object({
-                url: shani.url, data: null, headers: Utils.getReqHeaders(shani)
+                url: shani.url, data: null, headers: shani.headers
             });
             if (fd) {
                 if (method.toUpperCase() === 'GET') {
@@ -753,14 +754,12 @@
     })();
     const WSocket = (() => {
         const createPayload = shani => {
-            const payload = Utils.object({
-                url: shani.url, data: null, headers: Utils.getReqHeaders(shani)
-            });
+            const payload = Utils.object({url: shani.url, data: null, headers: shani.headers});
             const formdata = Convertor.input2form(shani);
             if (formdata) {
-                const type = Utils.getSubtype(payload.headers.get('content-type'));
+                const type = Utils.getSubtype(shani.headers.get('content-type'));
                 payload.data = JSON.stringify({
-                    headers: Convertor.map2json(payload.headers),
+                    headers: Convertor.map2json(shani.headers),
                     body: Convertor.form2(formdata, type)
                 });
             }
@@ -789,16 +788,12 @@
     const ServerEvent = (() => {
         const httpHandler = (shani, sse, target, mode) => {
             const on = (e, cb) => sse.addEventListener(e, cb);
-            const events = Utils.explode(shani.on || 'message');
-            Utils.trigger(shani, 'start');
-            events.forEach((v, k) => {
-                const name = Utils.getEventName(k);
-                on(name, e => {
-                    const resp = Utils.object({
-                        body: e.data || '', headers: new Headers({'content-type': 'text/html'})
-                    });
-                    HTML.processResponse(shani, target, resp, mode);
+            on('message', e => {
+                Utils.trigger(shani, 'start');
+                const resp = Utils.object({
+                    body: e.data || '', headers: new Headers({'content-type': 'text/html'})
                 });
+                HTML.processResponse(shani, target, resp, mode);
             });
             on('error', e => Utils.trigger(shani, e.type));
             on('beforeunload', () => {
