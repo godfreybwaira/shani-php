@@ -140,6 +140,15 @@ namespace shani\advisors {
         public abstract function isAsync(): bool;
 
         /**
+         * Application running state. Returns true if the application is running,
+         * false otherwise.
+         */
+        public function isRunning(): bool
+        {
+            return true;
+        }
+
+        /**
          * Handle all application errors. You can use this function to log
          * application errors to your logger.
          * @param \Throwable $t Error Object

@@ -91,7 +91,7 @@ namespace shani\http {
         {
             try {
                 $this->config->requestMutator();
-                if (!$this->vhost->running) {
+                if (!$this->config->isRunning()) {
                     throw CustomException::offline($this);
                 }
                 if (LocalStorage::tryServe($this)) {
