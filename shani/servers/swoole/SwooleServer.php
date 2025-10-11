@@ -77,7 +77,7 @@ namespace shani\servers\swoole {
 
         public function start(callable $callback): void
         {
-            $this->server->on('start', fn() => $callback());
+            $this->server->on('start', $callback);
             $this->server->on('open', function (Server $server, Request $req) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
                 $this->clients[$req->fd] = self::createRequest($scheme, $req);
