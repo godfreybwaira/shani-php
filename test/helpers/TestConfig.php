@@ -56,10 +56,10 @@ namespace test\helpers {
             }
         }
 
-        public static function start(TestParameters $params): void
+        public static function start(TestParameters $params): ?bool
         {
             if (is_file(self::TEST_FILE)) {
-                return;
+                return null;
             }
             touch(self::TEST_FILE);
             WebServer::log(LogLevel::INFO, 'Test is running...');
@@ -70,6 +70,7 @@ namespace test\helpers {
             } else {
                 WebServer::log(LogLevel::WARNING, 'Test finished and failed.');
             }
+            return $result;
         }
 
         public static function stop(): void
