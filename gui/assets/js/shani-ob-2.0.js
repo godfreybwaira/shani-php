@@ -653,7 +653,7 @@
                 if (!parent || parent.matches(parentSelector)) {
                     return parent;
                 }
-                return Utils.getParentNode(parent, parentSelector);
+                return this.getParentNode(parent, parentSelector);
             },
             explode(str, sep = ',') {
                 const map = new Map();
@@ -673,11 +673,11 @@
                 return Object.setPrototypeOf(o || {}, null);
             },
             trigger(shani, event, data = {}) {
-                const evt = Utils.getEventName(event);
+                const evt = this.getEventName(event);
                 callNext(shani, evt, data);
                 data.shani = shani;
                 if (shani.event.detail?.shani?.event?.type !== evt) {
-                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: this.object(data)}));
                 }
                 if (evt === 'end')
                     resubmit(shani);
