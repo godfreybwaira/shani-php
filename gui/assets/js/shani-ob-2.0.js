@@ -203,7 +203,7 @@
     const HTML = (() => {
         const INSERT_MODES = {
             prepend: 'afterbegin', append: 'beforeend', replace: 'replace',
-            before: 'beforebegin', after: 'afterend', ignore: 'ignore'
+            before: 'beforebegin', after: 'afterend', discard: 'discard'
         };
         const setInputData = (target, data, mode, mechanism) => {
             if (mode === 'prepend') {
@@ -242,7 +242,7 @@
             if (outf) {
                 return Utils.recursiveCall(outf, [shani.emitter, target, resp]);
             }
-            if (mode === 'ignore') {
+            if (mode === 'discard') {
                 return;
             }
             insertData(target, shani, resp.body || '', mode, resp.headers);
