@@ -65,7 +65,7 @@
         };
     })();
     const Convertor = (() => {
-        const json = (data) => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
+        const json = data => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
         return {
             map2json(map) {
                 const obj = Utils.object();
@@ -115,7 +115,7 @@
                     if (typeof obj === 'object') {
                         const isArray = obj instanceof Array;
                         for (let key in obj) {
-                            node += convert(obj[key], isArray ? 'item' : key.replace(/[ ]+/, '-'));
+                            node += convert(obj[key], isArray ? 'item' : key.replace(/\s+/, '-'));
                         }
                     } else {
                         node += obj;
