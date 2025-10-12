@@ -416,7 +416,7 @@
                 if (window.print instanceof Function) {
                     const cover = getCover(target);
                     window.print();
-                    Utils.removeNode(cover);
+                    cover.remove();
                 }
             },
             /**
@@ -439,10 +439,10 @@
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
                             if (!doc.fullscreenElement) {
-                                Utils.removeNode(cover);
+                                cover.remove();
                             }
                         });
-                    }).catch(() => Utils.removeNode(cover));
+                    }).catch(() => cover.remove());
                 }
             },
             rmv(target) {
