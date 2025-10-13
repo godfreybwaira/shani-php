@@ -10,5 +10,5 @@ document.addEventListener('shani:init', () => {
     Shani.action('test', (obj) => {
         return false; //try to return true...
     });
-    Shani.action('hello', (target) => console.log('hello'));
+    Shani.action('hello', (a) => console.log(a.data));
 });

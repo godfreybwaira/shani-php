@@ -20,7 +20,7 @@
     </a>
     <a href="/shani/0/components/0/card" class="menu-item menu-item-dir-v"
        shani-on="click:makemodal mdl123:modal modal-type-c width-sm-10 height-sm-10 pos-c&close-btn:pos-tr;
-       makemodal:r replace>>#mdl123;
+       makemodal:r replace>>#mdl123; data: hello;
        start:cssadd loader-spin>>#mdl123;
        end:cssrmv loader-spin>>#mdl123">
         <i class="mdi mdi-inbox-full"></i>

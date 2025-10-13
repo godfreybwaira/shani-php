@@ -372,9 +372,7 @@
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
                     parent.insertBefore(n, parent.children[pos]);
-                    if (clone) {
-                        clone(n);
-                    }
+                    !clone || clone(n);
                 }
             });
         };
@@ -409,9 +407,7 @@
                     return obj.targets.forEach(node => Utils.removeNode(node));
                 }
                 const parent = Utils.getParentNode(this.emitter, obj.params);
-                if (parent) {
-                    Utils.removeNode(parent);
-                }
+                !parent || Utils.removeNode(parent);
             },
             print(obj) {
                 if (window.print instanceof Function) {
@@ -439,9 +435,7 @@
                     const cover = getCover(obj.targets, 135);
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
-                            if (!doc.fullscreenElement) {
-                                cover.remove();
-                            }
+                            doc.fullscreenElement || cover.remove();
                         });
                     }).catch(() => cover.remove());
                 }
@@ -644,9 +638,7 @@
                 const result = cb.call(shani, Utils.object({
                     emitter: shani.emitter, params: action.params, targets, data
                 }));
-                if (result !== false) {
-                    Utils.trigger(shani, action.fn);
-                }
+                result === false || Utils.trigger(shani, action.fn);
             }
         };
         const resubmit = shani => {
@@ -699,8 +691,7 @@
                 if (shani.event.detail?.shani?.event?.type !== evt) {
                     doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
                 }
-                if (evt === 'end')
-                    resubmit(shani);
+                evt !== 'end' || resubmit(shani);
             },
             getSubtype(header) {
                 if (header) {
@@ -910,20 +901,20 @@
             setTimeout(rotate, 5000);
         })();
         const Selection = (() => {
-            const select = target => {
-                const parent = Utils.getParentNode(target, '.accordion,.menubar');
+            const select = e => {
+                const parent = Utils.getParentNode(e.target, '.accordion,.menubar');
                 if (parent) {
-                    const child = getEmittingChild(target, parent);
+                    const child = getEmittingChild(e.target, parent);
                     Utils.selectNode(parent.children, child, 'active');
                 }
             };
-            const getEmittingChild = (target, parent) => {
-                while (target !== parent && target.parentElement !== parent) {
+            const getEmittingChild = (target, root) => {
+                while (target !== root && target.parentElement !== root) {
                     target = target.parentElement;
                 }
                 return target;
             };
-            doc.addEventListener('click', e => select(e.target));
+            doc.addEventListener('click', select);
         })();
         const Modal = (() => {
             const COVER = 'modal-background';
@@ -962,9 +953,7 @@
                 const content = code + ' &CenterDot; ' + message;
                 let toaster = doc.getElementById('oer89trJ');
                 const color = code === 200 ? 'success' : (code > 399 ? 'danger' : 'info');
-                if (toaster) {
-                    toaster.remove();
-                }
+                !toaster || toaster.remove();
                 toaster = doc.createElement('div');
                 toaster.id = 'oer89trJ';
                 toaster.innerHTML = content;
@@ -972,11 +961,11 @@
                 doc.body.appendChild(toaster);
                 setTimeout(() => {
                     toaster.style.transform = 'translateY(-100%)';
-                    toaster.addEventListener('transitionend', e => e.target.remove());
+                    toaster.addEventListener('transitionend', e => toaster.remove());
                 }, 3000 + toaster.innerText.length * 64);
             };
             Shani.on('error', e => {
-                toast(e.detail.statusText || 'Failed to connect to server. Try again.', e.detail.status);
+                toast(e.detail.statusText || 'No connection to server. Try again.', e.detail.status);
             })('redirect', e => {
                 toast(e.detail.statusText || 'Redirecting...', e.detail.status);
             });
@@ -987,9 +976,7 @@
                 loader.wrapper.forEach(node => {
                     const bar = doc.createElement('div'), wrapper = doc.createElement('div');
                     bar.className = 'progress';
-                    if (color) {
-                        bar.style.setProperty('--color', color);
-                    }
+                    !color || bar.style.setProperty('--color', color);
                     wrapper.id = id;
                     wrapper.className = 'progress-bar loader';
                     wrapper.appendChild(bar);
