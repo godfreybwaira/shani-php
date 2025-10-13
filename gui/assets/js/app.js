@@ -4,7 +4,11 @@ document.addEventListener('shani:init', () => {
     Shani.select('*', {
         'shani-headers': 'x-request-mode:async'
     });
-    Shani.define('ucase', (a, b, c) => a.value = a.value.toUpperCase());
-    Shani.define('formatter', (target, src, resp) => target.innerHTML = resp.body);
-    Shani.define('inf', (target) => new FormData());
+    Shani.action('ucase', (a) => a.emitter.value = a.emitter.value.toUpperCase());
+    Shani.action('formatter', (obj) => obj.emitter.innerHTML = obj.body);
+    Shani.action('inf', (obj) => new FormData());
+    Shani.action('test', (obj) => {
+        return false; //try to return true...
+    });
+    Shani.action('hello', (target) => console.log('hello'));
 });

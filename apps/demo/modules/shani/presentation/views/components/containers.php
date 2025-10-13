@@ -400,6 +400,7 @@
         </div>
     </div>
     <div class="col">
+        <input type="text" class="input-box" placeholder="Search table" shani-on="keyup:search>>#tc2 tbody;search:TEST p1&p2>>#tc2 tbody;test:hello">
         <div class="table-container" id="tc2">
             <table class="table border-h">
                 <caption>Users</caption>

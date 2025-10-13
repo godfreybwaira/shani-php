@@ -7,11 +7,12 @@
             USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
                 select: (selector, obj) => USER_DATA.attr.set(selector, Utils.object(obj)),
-                define: (fnName, fn) => {
-                    if (fnName in USER_DATA.fn) {
-                        console.warn(fnName + ' already exists.');
+                action: (name, fn) => {
+                    const n = name.toLowerCase();
+                    if (n in USER_DATA.fn) {
+                        console.warn(n + ' already exists.');
                     } else {
-                        USER_DATA.fn[fnName] = fn;
+                        USER_DATA.fn[n] = fn;
                     }
                 }
             });
@@ -267,8 +268,8 @@
             const nodeActions = collectActions(Utils.explode(node.getAttribute(attrib), ';'));
             nodeActions.forEach((v, k) => this.actions.set(k, v));
             const headerline = this.headers;
-            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers')));
-            new Headers(Utils.explode(headerline)).forEach((v, k) => this.headers.set(k, v));
+            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers'), '&'));
+            new Headers(Utils.explode(headerline, '&')).forEach((v, k) => this.headers.set(k, v));
         };
         const setAttribs = (shani, node, attrs, prefix) => {
             attrs.forEach(a => {
@@ -281,8 +282,8 @@
             actions.forEach((str, evt) => {
                 const parts = str.split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? parts[0].slice(pos + 1).split(',') : null;
-                map.set(evt, Utils.object({fn, params, selector: parts[1]}));
+                const params = pos > -1 ? parts[0].slice(pos + 1).split('&') : null;
+                map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
             });
             return map;
         };
@@ -381,21 +382,21 @@
             /**
              * Read content from server.
              */
-            r(target, params) {
+            r(obj) {
                 if (this.history === 'true') {
                     history.pushState(null, '', this.url);
                 }
-                sendReq(this, 'GET', target, params);
+                sendReq(this, 'GET', obj.targets, obj.params);
             },
             /**
              * Write content to server
              */
-            w(target, params) {
-                sendReq(this, 'POST', target, params);
+            w(obj) {
+                sendReq(this, 'POST', obj.targets, obj.params);
             },
-            trigger(target, params) {
-                for (const val of params) {
-                    target.forEach(node => {
+            trigger(obj) {
+                for (const val of obj.params) {
+                    obj.targets.forEach(node => {
                         node.dispatchEvent(new Event(val.trim(), {bubbles: true}));
                     });
                 }
@@ -403,18 +404,18 @@
             /**
              * Remove node from DOM
              */
-            close(target, params) {
-                if (!params) {
-                    return target.forEach(node => Utils.removeNode(node));
+            close(obj) {
+                if (!obj.params) {
+                    return obj.targets.forEach(node => Utils.removeNode(node));
                 }
-                const parent = Utils.getParentNode(this.emitter, params);
+                const parent = Utils.getParentNode(this.emitter, obj.params);
                 if (parent) {
                     Utils.removeNode(parent);
                 }
             },
-            print(target) {
+            print(obj) {
                 if (window.print instanceof Function) {
-                    const cover = getCover(target);
+                    const cover = getCover(obj.targets);
                     window.print();
                     cover.remove();
                 }
@@ -422,9 +423,9 @@
             /**
              * Offline search
              */
-            search(target) {
+            search(obj) {
                 const text = this.emitter.value.trim().toLowerCase();
-                target.forEach(node => {
+                obj.targets.forEach(node => {
                     for (const row of node.children) {
                         row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
                     }
@@ -433,9 +434,9 @@
             /**
              * Full screen
              */
-            fs(target) {
+            fs(obj) {
                 if (doc.fullscreenEnabled) {
-                    const cover = getCover(target, 135);
+                    const cover = getCover(obj.targets, 135);
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
                             if (!doc.fullscreenElement) {
@@ -445,12 +446,12 @@
                     }).catch(() => cover.remove());
                 }
             },
-            rmv(target) {
-                target.forEach(node => Utils.removeNode(node));
+            rmv(obj) {
+                obj.targets.forEach(node => Utils.removeNode(node));
             },
-            copyto(targets, params) {
-                targets.forEach(target => {
-                    moveNode(target, this.emitter, params, (node) => {
+            copyto(obj) {
+                obj.targets.forEach(target => {
+                    moveNode(target, this.emitter, obj.params, (node) => {
                         node.removeAttribute('shani-watch');
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
@@ -460,38 +461,38 @@
                     });
                 });
             },
-            moveto(target, params) {
-                target.forEach(node => moveNode(node, this.emitter, params));
+            moveto(obj) {
+                obj.targets.forEach(node => moveNode(node, this.emitter, obj.params));
             },
-            cssadd(target, params) {
-                params.forEach(val => {
-                    target.forEach(node => node.classList.add(val.trim()));
+            cssadd(obj) {
+                obj.params.forEach(val => {
+                    obj.targets.forEach(node => node.classList.add(val.trim()));
                 });
             },
-            cssrmv(target, params) {
-                params.forEach(val => {
-                    target.forEach(node => node.classList.remove(val.trim()));
+            cssrmv(obj) {
+                obj.params.forEach(val => {
+                    obj.targets.forEach(node => node.classList.remove(val.trim()));
                 });
             },
-            cssreplace(target, params) {
-                params.forEach(val => {
+            cssreplace(obj) {
+                obj.params.forEach(val => {
                     const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
                     const value = val.slice(pos + 1).trim();
-                    target.forEach(node => node.classList.replace(key, value));
+                    obj.targets.forEach(node => node.classList.replace(key, value));
                 });
             },
-            csstoggle(target, params) {
-                params.forEach(val => {
-                    target.forEach(node => node.classList.toggle(val.trim()));
+            csstoggle(obj) {
+                obj.params.forEach(val => {
+                    obj.targets.forEach(node => node.classList.toggle(val.trim()));
                 });
             },
             /**
              * Remove properties from extisting node
              */
-            proprmv(target, params) {
-                for (const p of params) {
+            proprmv(obj) {
+                for (const p of obj.params) {
                     const key = p.trim();
-                    target.forEach(node => {
+                    obj.targets.forEach(node => {
                         if (key in node) {
                             const type = typeof node[key];
                             node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
@@ -502,49 +503,43 @@
             /**
              * Add properties from extisting node
              */
-            prop(target, params) {
-                for (const val of params) {
+            prop(obj) {
+                for (const val of obj.params) {
                     const pos = val.indexOf(':'), key = (pos > -1 ? val.slice(0, pos) : val).trim();
                     const value = pos > -1 ? val.slice(pos + 1).trim() : key;
-                    target.forEach(node => node[key] = key === value || value);
+                    obj.targets.forEach(node => node[key] = key === value || value);
                 }
             },
             /**
              * Map this.emitter properties to that of src element
              */
-            propbind(target, params) {
-                for (const val of params) {
+            propbind(obj) {
+                for (const val of obj.params) {
                     const pos = val.indexOf(':'), thiskey = (pos > -1 ? val.slice(0, pos) : val).trim();
                     const thatkey = pos > -1 ? val.slice(pos + 1).trim() : thiskey;
-                    target.forEach(node => this.emitter[thiskey] = node[thatkey]);
+                    obj.targets.forEach(node => this.emitter[thiskey] = node[thatkey]);
                 }
             },
             /**
              * Toggle properties from extisting node
              */
-            proptoggle(target, params) {
-                for (const val of params) {
+            proptoggle(obj) {
+                for (const val of obj.params) {
                     const key = val.trim();
-                    target.forEach(node => {
+                    obj.targets.forEach(node => {
                         const value = node[key];
                         node[key] = typeof value === 'boolean' ? !value : '' || value;
                     });
                 }
             },
             /**
-             * Call user defined function using this node and target node as parameter
-             */
-            udf(target, params, data) {
-                target.forEach(node => Utils.recursiveCall(params[0], [this.emitter, node, data]));
-            },
-            /**
              * Create HTML modal element
              */
-            makemodal(_, params) {
-                Utils.trigger(this, 'ui-modal', {specs: params});
+            makemodal(obj) {
+                Utils.trigger(this, 'ui-modal', {specs: obj.params});
             },
-            makeloader(wrapper, params) {
-                Utils.trigger(this, 'ui-loader', {specs: params, wrapper});
+            makeloader(obj) {
+                Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
             }
         };
         window.addEventListener('popstate', e => history.go(0));
@@ -587,11 +582,11 @@
             return null;
         };
         const setWatchEvents = node => {
-            const events = Utils.explode(node.getAttribute('watch-on'), ',');
+            const events = Utils.explode(node.getAttribute('watch-on'));
             events.forEach((v, k) => Shani.on(k, watch));
         };
         const addListener = node => {
-            const events = Utils.explode(node.getAttribute('shani-on'), ',');
+            const events = Utils.explode(node.getAttribute('shani-on'));
             events.forEach((v, k) => {
                 doc.addEventListener(k, listen);
                 if (k === 'load') {
@@ -623,10 +618,15 @@
     const Utils = (() => {
         const callNext = (shani, event, data) => {
             const action = shani.actions.get(event);
-            if (action && shani[action.fn] instanceof Function) {
+            const cb = action ? USER_DATA.fn[action.fn] || shani[action.fn] : null;
+            if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
-                shani[action.fn](targets, action.params, data);
-                Utils.trigger(shani, action.fn);
+                const result = cb.call(shani, Utils.object({
+                    emitter: shani.emitter, params: action.params, targets, data
+                }));
+                if (result !== false) {
+                    Utils.trigger(shani, action.fn);
+                }
             }
         };
         const resubmit = shani => {
@@ -653,9 +653,9 @@
                 if (!parent || parent.matches(parentSelector)) {
                     return parent;
                 }
-                return this.getParentNode(parent, parentSelector);
+                return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, sep = ',') {
+            explode(str, sep = '&') {
                 const map = new Map();
                 if (str) {
                     const raw = str.split(sep).map(s => s.trim());
@@ -673,11 +673,11 @@
                 return Object.setPrototypeOf(o || {}, null);
             },
             trigger(shani, event, data = {}) {
-                const evt = this.getEventName(event);
+                const evt = Utils.getEventName(event);
                 callNext(shani, evt, data);
                 data.shani = shani;
                 if (shani.event.detail?.shani?.event?.type !== evt) {
-                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: this.object(data)}));
+                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
                 }
                 if (evt === 'end')
                     resubmit(shani);
