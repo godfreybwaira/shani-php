@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" watch-on="change:copyto 1>>#r22" shani-watch="#chb">
+        <button class="button accent-color" watch-on="change:cssexists row" shani-watch="#chb">
             Simple Button
         </button>
     </div>

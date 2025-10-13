@@ -486,6 +486,16 @@
                     obj.targets.forEach(node => node.classList.toggle(val.trim()));
                 });
             },
+            cssexists(obj) {
+                for (const node of obj.targets) {
+                    for (const val of obj.params) {
+                        if (!node.classList.contains(val.trim())) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
             /**
              * Remove properties from extisting node
              */
@@ -531,6 +541,16 @@
                         node[key] = typeof value === 'boolean' ? !value : '' || value;
                     });
                 }
+            },
+            propexists(obj) {
+                for (const p of obj.params) {
+                    for (const node of obj.targets) {
+                        if (!(p.trim() in node)) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
             },
             /**
              * Create HTML modal element
