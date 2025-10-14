@@ -350,10 +350,14 @@
             }
         };
         const getCover = (target, size) => {
-            let style = 'position:fixed;top:0;left:0;width:100%;height:100%;padding:1rem;';
-            style += 'overflow-y:auto;font-size:' + (size || 100) + '%;background:#fff;z-index:998';
+            const id = Utils.getId(), style = doc.createElement('style');
+            let s = '#' + id + '{width:100%;height:100%;padding:1rem;overflow-y:auto;font-size:';
+            s += (size || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
+            style.type = 'text/css';
+            style.textContent = s;
             const cover = doc.createElement('div');
-            cover.style = style;
+            cover.appendChild(style);
+            cover.id = id;
             for (const t of target) {
                 cover.appendChild(t.cloneNode(true));
             }
