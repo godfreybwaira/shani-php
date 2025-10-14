@@ -409,11 +409,13 @@
              * Remove node from DOM
              */
             close(obj) {
-                if (!obj.params) {
-                    return obj.targets.forEach(node => Utils.removeNode(node));
+                if (obj.selector) {
+                    const parent = Utils.getParentNode(this.emitter, obj.selector);
+                    if (parent) {
+                        return Utils.removeNode(parent);
+                    }
+                    obj.targets.forEach(node => Utils.removeNode(node));
                 }
-                const parent = Utils.getParentNode(this.emitter, obj.params);
-                !parent || Utils.removeNode(parent);
             },
             print(obj) {
                 if (window.print instanceof Function) {
@@ -642,7 +644,8 @@
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
                 const result = cb.call(shani, Utils.object({
-                    emitter: shani.emitter, params: action.params, targets, data
+                    emitter: shani.emitter, params: action.params,
+                    selector: action.selector, targets, data
                 }));
                 result === false || Utils.trigger(shani, action.fn);
             }
