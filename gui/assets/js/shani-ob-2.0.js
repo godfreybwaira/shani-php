@@ -353,7 +353,8 @@
             const id = Utils.getId(), style = doc.createElement('style');
             let s = '#' + id + '{width:100%;height:100%;padding:1rem;overflow-y:auto;font-size:';
             s += (size || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
-            s += '@media print{#' + id + '{padding:12mm}}@page{size:A4;margin:0;page-break-after:always}';
+            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact}}';
+            s += '@page{size:A4;margin:0;page-break-after:always;break-after:page}';
             style.type = 'text/css';
             style.textContent = s;
             const cover = doc.createElement('div');

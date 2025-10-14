@@ -178,6 +178,13 @@ button,
 select {
     accent-color: var(--accent-color);
 }
+::-webkit-scrollbar{
+    width: 3px;
+    height: 3px;
+}
+::-webkit-scrollbar-track{
+    background: #f1f1f1;
+}
 ::-webkit-scrollbar-thumb{
-    @extend %accent_color;
+    background: #c1c1c1;
 }
