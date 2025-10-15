@@ -268,8 +268,11 @@
             const nodeActions = collectActions(Utils.explode(node.getAttribute(attrib), ';'));
             nodeActions.forEach((v, k) => this.actions.set(k, v));
             const headerline = this.headers;
-            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers'), '&'));
-            new Headers(Utils.explode(headerline, '&')).forEach((v, k) => this.headers.set(k, v));
+            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers')));
+            new Headers(Utils.explode(headerline)).forEach((v, k) => this.headers.set(k, v));
+            const httpline = this.http;
+            this.http = Utils.explode(selectAttribute(node, 'shani-http'));
+            Utils.explode(httpline).forEach((v, k) => this.http.set(k, v));
         };
         const setAttribs = (shani, node, attrs, prefix) => {
             attrs.forEach(a => {
@@ -311,14 +314,14 @@
          */
         const sendReq = (shani, method, target, params) => {
             const mode = params ? params[0].trim() : 'replace';
-            const type = Utils.getSubtype(shani.enctype);
+            const type = Utils.getSubtype(shani.enctype), scheme = shani.http.get('scheme');
             if (type && type !== 'form-data') {
                 shani.headers.set('content-type', shani.enctype.trim());
             }
-            if (shani.scheme === 'ws') {
+            if (scheme === 'ws') {
                 return WSocket(shani, target, mode);
             }
-            if (shani.scheme === 'sse') {
+            if (scheme === 'sse') {
                 return ServerEvent(shani, target, mode);
             }
             let em = shani.emitter;
@@ -331,11 +334,12 @@
             }, () => {
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end');
-            }, resp => onSuccessReq(shani, target, resp, mode), () => {
+            }, resp => onSuccessReq(shani, target, resp, mode), err => {
+                const status = err.name === 'AbortError' ? 408 : 400;
                 if (shani.poll.limit > 0) {
                     shani.poll.limit++;
                 }
-                const resp = Utils.object({headers: new Headers(), status: 400, body: ''});
+                const resp = Utils.object({headers: new Headers(), status, body: ''});
                 onSuccessReq(shani, target, resp, mode);
             });
         };
@@ -349,12 +353,12 @@
                 url === '#' ? location.reload() : location = url;
             }
         };
-        const getCover = (target, size) => {
+        const getCover = (target, page, size) => {
             const id = Utils.getId(), style = doc.createElement('style');
-            let s = '#' + id + '{width:100%;height:100%;padding:1rem;overflow-y:auto;font-size:';
+            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;font-size:';
             s += (size || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
-            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact}}';
-            s += '@page{size:A4;margin:0;page-break-after:always;break-after:page}';
+            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + page + '}}';
+            s += '@page{margin:0;page-break-after:always;break-after:page}';
             style.type = 'text/css';
             style.textContent = s;
             const cover = doc.createElement('div');
@@ -419,7 +423,8 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    const cover = getCover(obj.targets);
+                    const size = obj.params ? obj.params[0] : 'size:auto';
+                    const cover = getCover(obj.targets, null, size);
                     window.print();
                     cover.remove();
                 }
@@ -567,7 +572,7 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'scheme'],
+            SHANI_ATTR: ['watch', 'headers', 'timer', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
@@ -762,10 +767,13 @@
                     req.cacheDuration = parseInt(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
+                req.timeout = parseInt(shani.http.get('timeout') || 0) * 1000;
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
-                    method: method
+                    method: method,
+                    credentials: shani.http.get('credentials'),
+                    mode: shani.http.get('mode')
                 });
                 onStart(req);
                 Fetcher.send(payload.url, req, onSuccess, onError, onEnd);
@@ -851,10 +859,17 @@
             });
         };
         const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
-            fetch(url, req.options).then(res => {
+            fetchWithRetry(onError, url, req, res => {
                 cacheResponse(cache, req, res.clone(), url);
                 parseResponse(res, onSuccess, type);
-            }).catch(onError);
+            });
+        };
+        const fetchWithRetry = (onError, url, req, responseHandler) => {
+            const controller = new AbortController();
+            const timerId = req.timeout === 0 ? null : setTimeout(() => controller.abort(), req.timeout);
+            req.options.signal = controller.signal;
+            return fetch(url, req.options).then(responseHandler).catch(onError)
+                    .finally(() => !timerId || clearTimeout(timerId));
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
             caches.open(req.cacheName || 'pubcache').then(cache => {
@@ -874,9 +889,9 @@
                 if (req.cacheDuration && 'caches' in window) {
                     handleCacheResponse(url, req, type, onSuccess, onError, onEnd);
                 } else {
-                    fetch(url, req.options).then(res =>
-                        parseResponse(res, onSuccess, type)
-                    ).catch(onError).finally(onEnd);
+                    fetchWithRetry(onError, url, req, res => {
+                        parseResponse(res, onSuccess, type);
+                    }).finally(onEnd);
                 }
             }
         };

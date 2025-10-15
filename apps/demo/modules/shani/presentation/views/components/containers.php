@@ -529,5 +529,5 @@
 <div class="divider">Misc</div>
 <ul>
     <li><a href="#" shani-on="click:fs>>#tc2">Full screen</a></li>
-    <li><a href="#" shani-on="click:print>>#tc2">Print</a></li>
+    <li><a href="#" shani-on="click:print size:A4 landscape>>#tc2">Print</a></li>
 </ul>
