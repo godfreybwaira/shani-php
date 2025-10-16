@@ -988,10 +988,10 @@
             Shani.on('ui-modal', e => createModal(e.detail.specs));
         })();
         const Toaster = (() => {
-            const toast = (message, code) => {
-                const content = code + ' &CenterDot; ' + message;
+            const toast = (resp, message) => {
+                const content = resp.status + ' &CenterDot; ' + (resp.statusText || message);
                 let toaster = doc.getElementById('oer89trJ');
-                const color = code === 200 ? 'success' : (code > 399 ? 'danger' : 'info');
+                const color = resp.status === 200 ? 'success' : (resp.status > 399 ? 'danger' : 'info');
                 !toaster || toaster.remove();
                 toaster = doc.createElement('div');
                 toaster.id = 'oer89trJ';
@@ -1003,11 +1003,8 @@
                     toaster.addEventListener('transitionend', e => toaster.remove());
                 }, 3000 + toaster.innerText.length * 64);
             };
-            Shani.on('error', e => {
-                toast(e.detail.statusText || 'No connection to server. Try again.', e.detail.status);
-            })('redirect', e => {
-                toast(e.detail.statusText || 'Redirecting...', e.detail.status);
-            });
+            Shani.on('error', e => toast(e.detail, 'No connection to server. Try again.'));
+            Shani.on('redirect', e => toast(e.detail, 'Redirecting...'));
         })();
         const Loader = (() => {
             const createLoader = loader => {
