@@ -782,7 +782,7 @@
                     req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
-                req.timeout = Utils.time2ms(shani.http.get('timeout')) || 0;
+                req.timeout = Utils.time2ms(shani.http.get('timeout'));
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
@@ -881,7 +881,7 @@
         };
         const fetchWithRetry = (onError, url, req, responseHandler) => {
             const controller = new AbortController();
-            const timerId = req.timeout === 0 ? null : setTimeout(() => controller.abort(), req.timeout);
+            const timerId = req.timeout ? setTimeout(() => controller.abort(), req.timeout) : null;
             req.options.signal = controller.signal;
             return fetch(url, req.options).then(responseHandler).catch(onError)
                     .finally(() => !timerId || clearTimeout(timerId));
