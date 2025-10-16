@@ -304,8 +304,8 @@
          */
         const countdown = shani => {
             const t = shani.timer.split(':');
-            const start = Number(t[0] || 0) * 1000;
-            shani.poll.steps = Number(t[1] || -1) * 1000;
+            const start = Utils.time2ms(t[0]) || 0;
+            shani.poll.steps = Utils.time2ms(t[1]) || -1;
             shani.poll.limit = parseInt(t[2]) || null;
             setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
@@ -390,7 +390,7 @@
             /**
              * Read content from server.
              */
-            r(obj) {
+            read(obj) {
                 if (this.history === 'true') {
                     history.pushState(null, '', this.url);
                 }
@@ -399,7 +399,7 @@
             /**
              * Write content to server
              */
-            w(obj) {
+            write(obj) {
                 sendReq(this, 'POST', obj.targets, obj.params);
             },
             trigger(obj) {
@@ -739,6 +739,21 @@
                     return 'error';
                 }
                 return code < 200 ? 'info' : 'offline';
+            },
+            time2ms(time) {
+                if (time) {
+                    time = time.trim();
+                    if (/^\d+(\.\d+)?[smhdy]$/.test(time)) {
+                        const TIME_UNITS = {
+                            s: 1, m: 60, h: 3600, d: 24 * 3600, y: 24 * 3600 * 365
+                        };
+                        const unit = time.slice(-1).toLowerCase();
+                        const val = parseFloat(time.slice(0, -1));
+                        return Math.round(TIME_UNITS[unit] * val * 1000);
+                    }
+                    throw new Error('Invalid time interval ' + time);
+                }
+                return time;
             }
         };
     })();
@@ -764,10 +779,10 @@
                 const payload = createPayload(shani, method), req = Utils.object();
                 if (shani.cache) {
                     const pos = shani.cache.search(/\s/);
-                    req.cacheDuration = parseInt(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
+                    req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
-                req.timeout = parseInt(shani.http.get('timeout') || 0) * 1000;
+                req.timeout = Utils.time2ms(shani.http.get('timeout')) || 0;
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
@@ -834,7 +849,7 @@
     const Fetcher = (() => {
         const cacheResponse = (cache, req, res, url) => {
             const headers = new Headers(res.headers);
-            headers.set('x-expires', Date.now() + (req.cacheDuration * 1000));
+            headers.set('x-expires', Date.now() + req.cacheDuration);
             const cached = new Response(res.body, {
                 statusText: res.statusText,
                 status: res.status,
