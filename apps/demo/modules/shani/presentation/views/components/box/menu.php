@@ -4,7 +4,7 @@
         <span class="font-sm menu-label">Home</span>
     </a>
     <a href="/shani/0/components/0/shani"
-       shani-on="click:read>>#mainbody" class="menu-item menu-item-dir-v">
+       shani-on="click:nodeappend input&type:text&readonly&class:cls1 cls2 cls3&id:input23>>#mainbody" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
@@ -14,7 +14,7 @@
         <span class="font-sm menu-label">Loader 1</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
-       shani-on="click:makeloader ldr123:red>>.layout-content;makeloader:read>>#content;end:rmv>>#ldr123">
+       shani-on="click:makeloader ldr123:red>>.layout-content;makeloader:read>>#content;end:nodermv>>#ldr123">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 2</span>
     </a>

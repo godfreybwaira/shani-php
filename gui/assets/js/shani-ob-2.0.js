@@ -285,7 +285,7 @@
             actions.forEach((str, evt) => {
                 const parts = str.split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? parts[0].slice(pos + 1).split('&') : null;
+                const params = pos > -1 ? parts[0].slice(pos + 1).split('&').map(s => s.trim()) : null;
                 map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
             });
             return map;
@@ -377,7 +377,7 @@
         const moveNode = (parent, emitter, params, clone) => {
             const index = parseInt(params[0]), len = parent.children.length + 1;
             const pos = index > 0 ? index - 1 : index + len;
-            const kids = params[1] ? doc.querySelectorAll(params[1].trim()) : [emitter];
+            const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
@@ -385,6 +385,20 @@
                     !clone || clone(n);
                 }
             });
+        };
+        const addNode = (targets, params, handler) => {
+            if (params) {
+                targets.forEach(target => {
+                    const node = doc.createElement(params[0]);
+                    params.forEach((value, key) => {
+                        if (key !== 0) {
+                            const val = value.split(':').map(s => s.trim());
+                            node.setAttribute(val[0], val[1] || '');
+                        }
+                    });
+                    handler(target, node);
+                });
+            }
         };
         Obj.prototype = {
             /**
@@ -405,7 +419,7 @@
             trigger(obj) {
                 for (const val of obj.params) {
                     obj.targets.forEach(node => {
-                        node.dispatchEvent(new Event(val.trim(), {bubbles: true}));
+                        node.dispatchEvent(new Event(val, {bubbles: true}));
                     });
                 }
             },
@@ -453,10 +467,25 @@
                     }).catch(() => cover.remove());
                 }
             },
-            rmv(obj) {
+            nodermv(obj) {
                 obj.targets.forEach(node => Utils.removeNode(node));
             },
-            copyto(obj) {
+            nodeappend(obj) {
+                addNode(obj.targets, obj.params, (target, node) => target.appendChild(node));
+            },
+            nodeprepend(obj) {
+                addNode(obj.targets, obj.params, (target, node) => target.insertBefore(node, target.firstChild));
+            },
+            nodereplace(obj) {
+                addNode(obj.targets, obj.params, (target, node) => target.innerHTML = node.outerHTML);
+            },
+            nodeaddprev(obj) {
+                addNode(obj.targets, obj.params, (target, node) => target.parentElement.insertBefore(node, target));
+            },
+            nodeaddnext(obj) {
+                addNode(obj.targets, obj.params, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
+            },
+            nodecopyto(obj) {
                 obj.targets.forEach(target => {
                     moveNode(target, this.emitter, obj.params, (node) => {
                         node.removeAttribute('shani-watch');
@@ -468,17 +497,17 @@
                     });
                 });
             },
-            moveto(obj) {
+            nodemoveto(obj) {
                 obj.targets.forEach(node => moveNode(node, this.emitter, obj.params));
             },
             cssadd(obj) {
                 obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.add(val.trim()));
+                    obj.targets.forEach(node => node.classList.add(val));
                 });
             },
             cssrmv(obj) {
                 obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.remove(val.trim()));
+                    obj.targets.forEach(node => node.classList.remove(val));
                 });
             },
             cssreplace(obj) {
@@ -490,13 +519,13 @@
             },
             csstoggle(obj) {
                 obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.toggle(val.trim()));
+                    obj.targets.forEach(node => node.classList.toggle(val));
                 });
             },
             cssexists(obj) {
                 for (const node of obj.targets) {
                     for (const val of obj.params) {
-                        if (!node.classList.contains(val.trim())) {
+                        if (!node.classList.contains(val)) {
                             return false;
                         }
                     }
@@ -507,8 +536,7 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                for (const p of obj.params) {
-                    const key = p.trim();
+                for (const key of obj.params) {
                     obj.targets.forEach(node => {
                         if (key in node) {
                             const type = typeof node[key];
@@ -542,17 +570,15 @@
              */
             proptoggle(obj) {
                 for (const val of obj.params) {
-                    const key = val.trim();
                     obj.targets.forEach(node => {
-                        const value = node[key];
-                        node[key] = typeof value === 'boolean' ? !value : '' || value;
+                        node[val] = typeof node[val] === 'boolean' ? !node[val] : '' || node[val];
                     });
                 }
             },
             propexists(obj) {
                 for (const p of obj.params) {
                     for (const node of obj.targets) {
-                        if (!(p.trim() in node)) {
+                        if (!(p in node)) {
                             return false;
                         }
                     }
