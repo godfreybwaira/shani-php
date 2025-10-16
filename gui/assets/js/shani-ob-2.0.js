@@ -1,8 +1,6 @@
 (doc => {
     'use strict';
     doc.addEventListener('DOMContentLoaded', () => {
-        Shanify(doc.body);
-        Observers.mutate(doc.body);
         if (!window.Shani) {
             USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
@@ -20,6 +18,8 @@
             Object.freeze(USER_DATA);
             doc.dispatchEvent(new Event('shani:init'));
         }
+        Shanify(doc.body);
+        Observers.mutate(doc.body);
     });
     const USER_DATA = Object.setPrototypeOf({attr: new Map()}, null);
     const Observers = (() => {
@@ -264,24 +264,15 @@
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
             /**/
-            this.actions = collectActions(Utils.explode(selectAttribute(node, attrib), ';'));
-            const nodeActions = collectActions(Utils.explode(node.getAttribute(attrib), ';'));
-            nodeActions.forEach((v, k) => this.actions.set(k, v));
-            const headerline = this.headers;
-            this.headers = new Headers(Utils.explode(selectAttribute(node, 'shani-headers')));
-            new Headers(Utils.explode(headerline)).forEach((v, k) => this.headers.set(k, v));
-            const httpline = this.http;
-            this.http = Utils.explode(selectAttribute(node, 'shani-http'));
-            Utils.explode(httpline).forEach((v, k) => this.http.set(k, v));
+            this.actions = collectActions(node.getAttribute(attrib));
+            this.headers = new Headers(Utils.explode(this.headers));
+            this.http = Utils.explode(this.http);
         };
         const setAttribs = (shani, node, attrs, prefix) => {
-            attrs.forEach(a => {
-                const attr = node.getAttribute(prefix + a);
-                shani[a] = attr !== null ? attr : selectAttribute(node, prefix + a);
-            });
+            attrs.forEach(a => shani[a] = node.getAttribute(prefix + a));
         };
-        const collectActions = actions => {
-            const map = new Map();
+        const collectActions = actionStr => {
+            const actions = Utils.explode(actionStr, ';'), map = new Map();
             actions.forEach((str, evt) => {
                 const parts = str.split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
@@ -289,14 +280,6 @@
                 map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
             });
             return map;
-        };
-        const selectAttribute = (node, name) => {
-            for (let val of USER_DATA.attr) {
-                if (name in val[1] && node.matches(val[0])) {
-                    return val[1][name];
-                }
-            }
-            return null;
         };
         /**
          * Make HTTP request at a given interval
@@ -660,12 +643,49 @@
                 }
             });
         };
+        const setUserAttributes = node => {
+            for (let val of USER_DATA.attr) {
+                if (node.matches(val[0])) {
+                    for (const key in val[1]) {
+                        const value = node.getAttribute(key);
+                        const newValue = mergeAttributeValues(key, value, val[1][key]);
+                        node.setAttribute(key, newValue);
+                    }
+                }
+            }
+        };
+        const mergeAttributeValues = (attr, oldValue, newValue) => {
+            if (oldValue === null) {
+                return newValue;
+            }
+            switch (attr) {
+                case 'shani-http':
+                case 'shani-headers':
+                    return mergeString(newValue, oldValue, '&');
+                case 'shani-on':
+                case 'watch-on':
+                    return mergeString(newValue, oldValue, ';');
+                default:
+                    return oldValue;
+            }
+        };
+        const mergeString = (oldValue, newValue, sep) => {
+            const map = Utils.explode(oldValue, sep), nv = Utils.explode(newValue, sep);
+            nv.forEach((v, k) => map.set(k, v));
+            let str = '';
+            map.forEach((v, k) => str += sep + k + ':' + v);
+            return str.slice(sep.length);
+        };
         return root => {
+            setUserAttributes(root);
             setWatchEvents(root);
             addListener(root);
             const nodes = root.querySelectorAll('[shani-on],[watch-on]');
-            nodes.forEach(node => setWatchEvents(node));
-            nodes.forEach(node => addListener(node));
+            nodes.forEach(node => {
+                setUserAttributes(node);
+                setWatchEvents(node);
+                addListener(node);
+            });
         };
     })();
     const Utils = (() => {

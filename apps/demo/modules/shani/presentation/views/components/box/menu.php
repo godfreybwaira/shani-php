@@ -4,7 +4,7 @@
         <span class="font-sm menu-label">Home</span>
     </a>
     <a href="/shani/0/components/0/shani"
-       shani-on="click:nodeappend input&type:text&readonly&class:cls1 cls2 cls3&id:input23>>#mainbody" class="menu-item menu-item-dir-v">
+       shani-on="click:read>>#mainbody" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
@@ -23,7 +23,8 @@
        makemodal:read replace>>#mdl123; 408: timeout;
        start:cssadd loader-spin>>#mdl123;
        end:cssrmv loader-spin>>#mdl123"
-       shani-http="credentials:same-origin&mode:cors&timeout:2s">
+       shani-http="credentials:same-origin&mode:cors&timeout:2s"
+       shani-headers="content-type:application/json">
         <i class="mdi mdi-inbox-full"></i>
         <span class="font-sm menu-label">Modal</span>
     </a>

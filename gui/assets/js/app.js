@@ -1,8 +1,9 @@
 /* global Shani */
 
 document.addEventListener('shani:init', () => {
-    Shani.select('*', {
-        'shani-headers': 'x-request-mode:async'
+    Shani.select('[shani-on],[watch-on]', {
+        'shani-headers': 'x-request-mode:async',
+        'shani-http': 'timeout:5s'
     });
     Shani.action('ucase', (a) => a.emitter.value = a.emitter.value.toUpperCase());
     Shani.action('formatter', (obj) => obj.emitter.innerHTML = obj.data.body);
