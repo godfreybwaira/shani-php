@@ -319,7 +319,7 @@
                 Utils.trigger(shani, 'end');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
                 const status = err.name === 'AbortError' ? 408 : 400;
-                if (shani.poll.limit > 0) {
+                if (shani.poll.limit !== null) {
                     shani.poll.limit++;
                 }
                 const resp = Utils.object({headers: new Headers(), status, body: ''});
