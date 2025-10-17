@@ -273,12 +273,12 @@
         };
         const collectActions = actionStr => {
             const actions = Utils.explode(actionStr, ';'), map = new Map();
-            actions.forEach((str, evt) => {
-                const parts = str.split('>>').map(s => s.trim());
+            for (const key in actions) {
+                const parts = actions[key].split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? parts[0].slice(pos + 1).split('&').map(s => s.trim()) : null;
-                map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
-            });
+                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
+                map.set(key, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
+            }
             return map;
         };
         /**
@@ -296,8 +296,8 @@
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
-            const mode = params ? params[0].trim() : 'replace';
-            const type = Utils.getSubtype(shani.enctype), scheme = shani.http.get('scheme');
+            const mode = params?.mode || 'replace';
+            const type = Utils.getSubtype(shani.enctype), scheme = shani.http.scheme;
             if (type && type !== 'form-data') {
                 shani.headers.set('content-type', shani.enctype.trim());
             }
@@ -336,11 +336,11 @@
                 url === '#' ? location.reload() : location = url;
             }
         };
-        const getCover = (target, page, size) => {
+        const getCover = (target, pageSize, fontSize) => {
             const id = Utils.getId(), style = doc.createElement('style');
             let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;font-size:';
-            s += (size || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
-            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + page + '}}';
+            s += (fontSize || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
+            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
             s += '@page{margin:0;page-break-after:always;break-after:page}';
             style.type = 'text/css';
             style.textContent = s;
@@ -358,9 +358,9 @@
          * If a position is not given then the element is placed to the end.
          */
         const moveNode = (parent, emitter, params, clone) => {
-            const index = parseInt(params[0]), len = parent.children.length + 1;
+            const index = parseInt(params.pos), len = parent.children.length + 1;
             const pos = index > 0 ? index - 1 : index + len;
-            const kids = params[1] ? doc.querySelectorAll(params[1]) : [emitter];
+            const kids = params.target ? doc.querySelectorAll(params.target) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
@@ -369,19 +369,15 @@
                 }
             });
         };
-        const addNode = (targets, params, handler) => {
-            if (params) {
-                targets.forEach(target => {
-                    const node = doc.createElement(params[0]);
-                    params.forEach((value, key) => {
-                        if (key !== 0) {
-                            const val = value.split(':').map(s => s.trim());
-                            node.setAttribute(val[0], val[1] || '');
-                        }
-                    });
-                    handler(target, node);
-                });
-            }
+        const addNode = (obj, handler) => {
+            obj.targets.forEach(target => {
+                const node = doc.createElement(obj.params['-tag']);
+                delete obj.params['-tag'];
+                for (const key in obj.params) {
+                    node.setAttribute(key, obj.params[key] || '');
+                }
+                handler(target, node);
+            });
         };
         Obj.prototype = {
             /**
@@ -400,7 +396,7 @@
                 sendReq(this, 'POST', obj.targets, obj.params);
             },
             trigger(obj) {
-                for (const val of obj.params) {
+                for (const val in obj.params) {
                     obj.targets.forEach(node => {
                         node.dispatchEvent(new Event(val, {bubbles: true}));
                     });
@@ -420,8 +416,8 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    const size = obj.params ? obj.params[0] : 'size:auto';
-                    const cover = getCover(obj.targets, null, size);
+                    const size = obj.params.size || 'auto';
+                    const cover = getCover(obj.targets, 'size:' + size);
                     window.print();
                     cover.remove();
                 }
@@ -442,7 +438,7 @@
              */
             fs(obj) {
                 if (doc.fullscreenEnabled) {
-                    const cover = getCover(obj.targets, 135);
+                    const cover = getCover(obj.targets, '', 135);
                     doc.documentElement.requestFullscreen().then(() => {
                         doc.addEventListener('fullscreenchange', () => {
                             doc.fullscreenElement || cover.remove();
@@ -454,19 +450,19 @@
                 obj.targets.forEach(node => Utils.removeNode(node));
             },
             nodeappend(obj) {
-                addNode(obj.targets, obj.params, (target, node) => target.appendChild(node));
+                addNode(obj, (target, node) => target.appendChild(node));
             },
             nodeprepend(obj) {
-                addNode(obj.targets, obj.params, (target, node) => target.insertBefore(node, target.firstChild));
+                addNode(obj, (target, node) => target.insertBefore(node, target.firstChild));
             },
             nodereplace(obj) {
-                addNode(obj.targets, obj.params, (target, node) => target.innerHTML = node.outerHTML);
+                addNode(obj, (target, node) => target.innerHTML = node.outerHTML);
             },
             nodeaddprev(obj) {
-                addNode(obj.targets, obj.params, (target, node) => target.parentElement.insertBefore(node, target));
+                addNode(obj, (target, node) => target.parentElement.insertBefore(node, target));
             },
             nodeaddnext(obj) {
-                addNode(obj.targets, obj.params, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
+                addNode(obj, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
             },
             nodecopyto(obj) {
                 obj.targets.forEach(target => {
@@ -484,31 +480,29 @@
                 obj.targets.forEach(node => moveNode(node, this.emitter, obj.params));
             },
             cssadd(obj) {
-                obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.add(val));
-                });
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => node.classList.add(key));
+                }
             },
             cssrmv(obj) {
-                obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.remove(val));
-                });
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => node.classList.remove(key));
+                }
             },
             cssreplace(obj) {
-                obj.params.forEach(val => {
-                    const pos = val.indexOf(':'), key = val.slice(0, pos).trim();
-                    const value = val.slice(pos + 1).trim();
-                    obj.targets.forEach(node => node.classList.replace(key, value));
-                });
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => node.classList.replace(key, obj.params[key]));
+                }
             },
             csstoggle(obj) {
-                obj.params.forEach(val => {
-                    obj.targets.forEach(node => node.classList.toggle(val));
-                });
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => node.classList.toggle(key));
+                }
             },
             cssexists(obj) {
                 for (const node of obj.targets) {
-                    for (const val of obj.params) {
-                        if (!node.classList.contains(val)) {
+                    for (const key in obj.params) {
+                        if (!node.classList.contains(key)) {
                             return false;
                         }
                     }
@@ -519,47 +513,46 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                for (const key of obj.params) {
-                    obj.targets.forEach(node => {
+                obj.targets.forEach(node => {
+                    for (const key in obj.params) {
                         if (key in node) {
                             const type = typeof node[key];
                             node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
                         }
-                    });
-                }
+                    }
+                });
             },
             /**
              * Add properties from extisting node
              */
             prop(obj) {
-                for (const val of obj.params) {
-                    const pos = val.indexOf(':'), key = (pos > -1 ? val.slice(0, pos) : val).trim();
-                    const value = pos > -1 ? val.slice(pos + 1).trim() : key;
-                    obj.targets.forEach(node => node[key] = key === value || value);
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => node[key] = key === obj.params[key] || obj.params[key]);
                 }
             },
             /**
              * Map this.emitter properties to that of src element
              */
             propbind(obj) {
-                for (const val of obj.params) {
-                    const pos = val.indexOf(':'), thiskey = (pos > -1 ? val.slice(0, pos) : val).trim();
-                    const thatkey = pos > -1 ? val.slice(pos + 1).trim() : thiskey;
-                    obj.targets.forEach(node => this.emitter[thiskey] = node[thatkey]);
-                }
+                obj.targets.forEach(node => {
+                    for (const key in obj.params) {
+                        const thatkey = obj.params[key] === null ? key : obj.params[key];
+                        this.emitter[key] = node[thatkey];
+                    }
+                });
             },
             /**
              * Toggle properties from extisting node
              */
             proptoggle(obj) {
-                for (const val of obj.params) {
+                for (const val in obj.params) {
                     obj.targets.forEach(node => {
                         node[val] = typeof node[val] === 'boolean' ? !node[val] : '' || node[val];
                     });
                 }
             },
             propexists(obj) {
-                for (const p of obj.params) {
+                for (const p in obj.params) {
                     for (const node of obj.targets) {
                         if (!(p in node)) {
                             return false;
@@ -567,6 +560,14 @@
                     }
                 }
                 return true;
+            },
+            saveas(obj) {
+                const type = obj.params.type || obj.data.headers.get('content-type');
+                const a = doc.createElement('a');
+                a.download = obj.params.name;
+                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+                a.click();
+                URL.revokeObjectURL(a.href);
             },
             /**
              * Create HTML modal element
@@ -619,18 +620,20 @@
         };
         const setWatchEvents = node => {
             const events = Utils.explode(node.getAttribute('watch-on'));
-            events.forEach((v, k) => Shani.on(k, watch));
+            for (const e in events) {
+                Shani.on(e, watch);
+            }
         };
         const addListener = node => {
             const events = Utils.explode(node.getAttribute('shani-on'));
-            events.forEach((v, k) => {
-                doc.addEventListener(k, listen);
-                if (k === 'load') {
-                    node.dispatchEvent(new Event(k, {bubbles: true}));
-                } else if (k === 'demand') {
+            for (const e in events) {
+                doc.addEventListener(e, listen);
+                if (e === 'load') {
+                    node.dispatchEvent(new Event(e, {bubbles: true}));
+                } else if (e === 'demand') {
                     Observers.intersect(node);
                 }
-            });
+            }
         };
         const watch = e => {
             const evt = Utils.getEventName(e.type);
@@ -643,18 +646,23 @@
                 }
             });
         };
-        const setUserAttributes = node => {
-            for (let val of USER_DATA.attr) {
-                if (node.matches(val[0])) {
-                    for (const key in val[1]) {
-                        const value = node.getAttribute(key);
-                        const newValue = mergeAttributeValues(key, value, val[1][key]);
-                        node.setAttribute(key, newValue);
-                    }
+        const setUserAttributes = root => {
+            for (let sel of USER_DATA.attr) {
+                if (root.matches(sel[0])) {
+                    addAttributes(root, sel[1]);
                 }
+                const nodes = root.querySelectorAll(sel[0]);
+                nodes.forEach(node => addAttributes(node, sel[1]));
             }
         };
-        const mergeAttributeValues = (attr, oldValue, newValue) => {
+        const addAttributes = (node, obj) => {
+            for (const key in obj) {
+                const value = node.getAttribute(key);
+                const newValue = mergeAttributes(key, value, obj[key]);
+                node.setAttribute(key, newValue);
+            }
+        };
+        const mergeAttributes = (attr, oldValue, newValue) => {
             if (oldValue === null) {
                 return newValue;
             }
@@ -670,10 +678,14 @@
             }
         };
         const mergeString = (oldValue, newValue, sep) => {
-            const map = Utils.explode(oldValue, sep), nv = Utils.explode(newValue, sep);
-            nv.forEach((v, k) => map.set(k, v));
+            const ov = Utils.explode(oldValue, sep), nv = Utils.explode(newValue, sep);
+            for (const k in nv) {
+                ov[k] = nv[k];
+            }
             let str = '';
-            map.forEach((v, k) => str += sep + k + ':' + v);
+            for (const k in ov) {
+                str += sep + k + ':' + ov[k];
+            }
             return str.slice(sep.length);
         };
         return root => {
@@ -681,11 +693,8 @@
             setWatchEvents(root);
             addListener(root);
             const nodes = root.querySelectorAll('[shani-on],[watch-on]');
-            nodes.forEach(node => {
-                setUserAttributes(node);
-                setWatchEvents(node);
-                addListener(node);
-            });
+            nodes.forEach(node => setWatchEvents(node));
+            nodes.forEach(node => addListener(node));
         };
     })();
     const Utils = (() => {
@@ -728,14 +737,14 @@
                 return Utils.getParentNode(parent, parentSelector);
             },
             explode(str, sep = '&') {
-                const map = new Map();
+                const map = Utils.object();
                 if (str) {
                     const raw = str.split(sep).map(s => s.trim());
                     for (let val of raw) {
                         const pos = val.indexOf(':'), key = pos > 0 ? val.slice(0, pos) : val;
                         const name = key.toLowerCase();
                         if (name.length > 0) {
-                            map.set(name, pos > 0 ? val.slice(pos + 1) : null);
+                            map[name] = pos > 0 ? val.slice(pos + 1).trim() : null;
                         }
                     }
                 }
@@ -828,13 +837,13 @@
                     req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
-                req.timeout = Utils.time2ms(shani.http.get('timeout'));
+                req.timeout = Utils.time2ms(shani.http.timeout);
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
                     method: method,
-                    credentials: shani.http.get('credentials'),
-                    mode: shani.http.get('mode')
+                    credentials: shani.http.credentials,
+                    mode: shani.http.mode
                 });
                 onStart(req);
                 Fetcher.send(payload.url, req, onSuccess, onError, onEnd);
@@ -1014,18 +1023,17 @@
                 }
             };
             const createModal = specs => {
-                const [id, classList] = specs[0].split(':').map(s => s.trim());
                 const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                 const wrapper = doc.createElement('div');
-                wrapper.id = id;
+                wrapper.id = specs.id;
                 wrapper.className = 'full-size';
                 wrapper.style.setProperty('--loader-size', '2.5rem');
-                if (specs.length > 1) {
-                    const btn = getCloseBtn(specs[1].split(':')[1]);
+                if ('close-btn' in specs) {
+                    const btn = getCloseBtn(specs['close-btn']);
                     btn.style.margin = 'var(--spacing)';
                     modal.appendChild(btn);
                 }
-                modal.className = classList;
+                modal.className = specs.classes;
                 modal.appendChild(wrapper);
                 mdbg.className = COVER;
                 mdbg.appendChild(modal);
@@ -1054,12 +1062,11 @@
         })();
         const Loader = (() => {
             const createLoader = loader => {
-                const [id, color] = loader.specs[0].split(':').map(s => s.trim());
                 loader.wrapper.forEach(node => {
                     const bar = doc.createElement('div'), wrapper = doc.createElement('div');
                     bar.className = 'progress';
-                    !color || bar.style.setProperty('--color', color);
-                    wrapper.id = id;
+                    !loader.specs.color || bar.style.setProperty('--color', loader.specs.color);
+                    wrapper.id = loader.specs.id;
                     wrapper.className = 'progress-bar loader';
                     wrapper.appendChild(bar);
                     node.appendChild(wrapper);
