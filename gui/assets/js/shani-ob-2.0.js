@@ -657,34 +657,25 @@
         };
         const addAttributes = (node, obj) => {
             for (const key in obj) {
-                const value = node.getAttribute(key);
-                const newValue = mergeAttributes(key, value, obj[key]);
-                node.setAttribute(key, newValue);
+                let value = node.getAttribute(key);
+                if (value === null) {
+                    value = obj[key];
+                } else if (['shani-http', 'shani-headers'].includes(key)) {
+                    value = mergeString(obj[key], value, '&');
+                } else if (['shani-on', 'watch-on'].includes(key)) {
+                    value = mergeString(obj[key], value, ';');
+                }
+                node.setAttribute(key, value);
             }
         };
-        const mergeAttributes = (attr, oldValue, newValue) => {
-            if (oldValue === null) {
-                return newValue;
-            }
-            switch (attr) {
-                case 'shani-http':
-                case 'shani-headers':
-                    return mergeString(newValue, oldValue, '&');
-                case 'shani-on':
-                case 'watch-on':
-                    return mergeString(newValue, oldValue, ';');
-                default:
-                    return oldValue;
-            }
-        };
-        const mergeString = (oldValue, newValue, sep) => {
-            const ov = Utils.explode(oldValue, sep), nv = Utils.explode(newValue, sep);
-            for (const k in nv) {
-                ov[k] = nv[k];
+        const mergeString = (val1, val2, sep) => {
+            const v1 = Utils.explode(val1, sep), v2 = Utils.explode(val2, sep);
+            for (const k in v2) {
+                v1[k] = v2[k];
             }
             let str = '';
-            for (const k in ov) {
-                str += sep + k + ':' + ov[k];
+            for (const k in v1) {
+                str += sep + k + ':' + v1[k];
             }
             return str.slice(sep.length);
         };
