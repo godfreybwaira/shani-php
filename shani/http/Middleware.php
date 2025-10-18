@@ -14,6 +14,7 @@ namespace shani\http {
     use lib\http\HttpHeader;
     use lib\MediaType;
     use shani\advisors\SecurityMiddleware;
+    use shani\WebServer;
 
     final class Middleware
     {
@@ -45,13 +46,23 @@ namespace shani\http {
             return $this;
         }
 
+        /**
+         * Set client content type priority.
+         * @return void
+         */
         private function setProperContentType(): void
         {
-            $type = $this->app->request->header()->getOne(HttpHeader::ACCEPT);
-            if ($type === '*/*' || $type === null) {
-                $type = $this->app->platform() === 'web' ? MediaType::TEXT_HTML : MediaType::JSON;
-                $this->app->request->header()->addOne(HttpHeader::ACCEPT, $type);
+            //1. extension 2. accept 3. content_type 4. default
+            $ext = $this->app->request->route()->extension;
+            if ($ext !== null) {
+                $this->app->request->header()->addOne(HttpHeader::ACCEPT, WebServer::mime($ext));
+                return;
             }
+            $accepted = $this->app->request->header()->getOne(HttpHeader::ACCEPT, HttpHeader::CONTENT_TYPE);
+            if ($accepted === '*/*' || $accepted === null) {
+                $accepted = $this->app->platform() === 'web' ? MediaType::TEXT_HTML : MediaType::JSON;
+            }
+            $this->app->request->header()->addOne(HttpHeader::ACCEPT, $accepted);
         }
 
         /**

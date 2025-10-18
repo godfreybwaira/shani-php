@@ -33,6 +33,7 @@ namespace shani\http {
          * @var string
          */
         public readonly string $action;
+        public readonly ?string $extension;
 
         /**
          * Create a new Request Rout object
@@ -50,6 +51,7 @@ namespace shani\http {
             $this->controller = ($this->params[2] ?? $this->params[0]);
             $this->module = $this->params[0];
             $this->action = ($this->params[4] ?? Framework::HOME_FUNCTION);
+            $this->extension = $url[1] ?? null;
         }
     }
 

@@ -33,14 +33,15 @@ namespace shani {
 
         public static function mime(string $extension): ?string
         {
-            if (!isset(self::$mime[$extension])) {
-                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$extension] ?? null;
+            $ext = strtolower($extension);
+            if (!isset(self::$mime[$ext])) {
+                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
                 if ($mime === null) {
                     return null;
                 }
-                self::$mime[$extension] = $mime;
+                self::$mime[$ext] = $mime;
             }
-            return self::$mime[$extension];
+            return self::$mime[$ext];
         }
 
         private static function host(string $name): VirtualHost

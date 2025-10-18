@@ -277,16 +277,16 @@ namespace shani\http {
 
         /**
          * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable|array|null $data Data to send with the response or to pass to a view file
+         * @param \JsonSerializable|null $data Data to send with the response or to pass to a view file
          * @param string|null $viewPath View file path
          * @param bool|null $useBuffer Set output buffer on so that output can be sent
          * in chunks without closing connection. If false, then connection will
          * be closed and no output can be sent.
          * @return void
          */
-        public function render(\JsonSerializable|array|null $data = null, ?string $viewPath = null, ?bool $useBuffer = null): void
+        public function render(?\JsonSerializable $data = null, ?string $viewPath = null, ?bool $useBuffer = null): void
         {
-            $content = ($data instanceof \JsonSerializable) ? $data->jsonSerialize() : $data;
+            $content = $data?->jsonSerialize();
             $subtype = $this->response->subtype();
             if ($subtype === DataConvertor::TYPE_HTML) {
                 ob_start();

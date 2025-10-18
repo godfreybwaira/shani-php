@@ -1252,7 +1252,7 @@ namespace lib {
         public static function fromFilename(string $filename): ?string
         {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            return !empty($ext) ? WebServer::mime(strtolower($ext)) : null;
+            return !empty($ext) ? WebServer::mime($ext) : null;
         }
 
         /**

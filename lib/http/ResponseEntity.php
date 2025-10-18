@@ -43,11 +43,6 @@ namespace lib\http {
             if (!empty($contentType)) {
                 return MediaType::subtype($contentType);
             }
-            $parts = explode('.', $this->request->uri->path());
-            $size = count($parts);
-            if ($size > 1) {
-                return strtolower($parts[$size - 1]);
-            }
             return MediaType::subtype($this->request->header()->getOne(HttpHeader::ACCEPT)) ?? '';
         }
 
