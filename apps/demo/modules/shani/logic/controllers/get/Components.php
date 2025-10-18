@@ -76,7 +76,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
 //            sleep(2);
             $data = new \shani\documentation\Generator($this->app);
-            return $this->app->render($data);
+            return $data;
         }
 
         public function card()

@@ -402,7 +402,7 @@ namespace shani\http {
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);
             }
-            $obj->$callback();
+            new ResponseRoute($this, $obj->$callback());
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string
