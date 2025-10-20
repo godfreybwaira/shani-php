@@ -16,7 +16,6 @@ namespace shani\advisors {
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
     use shani\core\Framework;
-    use shani\exceptions\CustomException;
     use shani\http\App;
 
     final class SecurityMiddleware
@@ -27,14 +26,23 @@ namespace shani\advisors {
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $policy = $app->config->browsingPrivacy();
-            if ($policy !== BrowsingPrivacy::DISABLED) {
-                $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy->value);
-            }
             $this->app->response->header()->addAll([
                 HttpHeader::X_CONTENT_TYPE_OPTIONS => 'nosniff',
                 HttpHeader::SERVER => Framework::NAME
             ]);
+        }
+
+        /**
+         * Set browsing policy
+         * @return bool True on success, false otherwise
+         */
+        public function setBrowsingPolicy(): bool
+        {
+            $policy = $this->app->config->browsingPrivacy();
+            if ($policy !== BrowsingPrivacy::DISABLED) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy->value);
+            }
+            return true;
         }
 
         /**

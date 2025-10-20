@@ -73,7 +73,9 @@ namespace shani\http {
         public function runWith(SecurityMiddleware $security): void
         {
             $this->setProperContentType();
-            $security->validateSession()->preflightRequest();
+            $security->setBrowsingPolicy();
+            $security->preflightRequest();
+            $security->validateSession();
             $this->app->on('web', function () use (&$security) {
                 $security->cspHeaders()->resourceAccessPolicy()->csrfTest();
             });
