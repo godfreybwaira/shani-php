@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UIBuilder
+ * Description of WebUIBuilder
  * @author goddy
  *
  * Created on: Oct 18, 2025 at 2:11:32 PM
@@ -10,9 +10,8 @@
 namespace gui {
 
     use lib\ds\map\MutableMap;
-    use lib\ds\map\ReadableMap;
 
-    final class UIBuilder
+    final class WebUIBuilder
     {
 
         private readonly MutableMap $attributes;

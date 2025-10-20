@@ -9,7 +9,7 @@
 
 namespace apps\demo\modules\shani\logic\controllers\get {
 
-    use gui\UIBuilder;
+    use gui\WebUIBuilder;
     use shani\documentation\Generator as Documentation;
     use shani\http\App;
 
@@ -23,75 +23,75 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): UIBuilder
+        public function index(): WebUIBuilder
         {
-            $builder = new UIBuilder();
+            $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
                     ->view('/body');
             return $builder;
         }
 
-        public function all(): UIBuilder
+        public function all(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function inputs(): UIBuilder
+        public function inputs(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function containers(): UIBuilder
+        public function containers(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function modals(): UIBuilder
+        public function modals(): WebUIBuilder
         {
-            $builder = new UIBuilder();
+            $builder = new WebUIBuilder();
             $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
             return $builder;
         }
 
-        public function toaster(): UIBuilder
+        public function toaster(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function loader(): UIBuilder
+        public function loader(): WebUIBuilder
         {
-            $builder = new UIBuilder();
+            $builder = new WebUIBuilder();
             $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
             return $builder;
         }
 
-        public function timeline(): UIBuilder
+        public function timeline(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function shani(): UIBuilder
+        public function shani(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function redirect(): UIBuilder
+        public function redirect(): WebUIBuilder
         {
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
 
-        public function generator(): UIBuilder
+        public function generator(): WebUIBuilder
         {
             sleep(2);
             $doc = new Documentation($this->app);
-            return new UIBuilder($doc);
+            return new WebUIBuilder($doc);
         }
 
-        public function card(): UIBuilder
+        public function card(): WebUIBuilder
         {
             sleep(1);
-            return new UIBuilder();
+            return new WebUIBuilder();
         }
     }
 

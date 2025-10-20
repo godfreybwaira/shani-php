@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use gui\UIBuilder;
+    use gui\WebUIBuilder;
     use gui\WebUI;
     use lib\DataConvertor;
     use lib\http\FileOutput;
@@ -32,15 +32,15 @@ namespace shani\http {
 
         /**
          * Send content to a client application
-         * @param \JsonSerializable|UIBuilder|FileOutput|null $output Output object to send
+         * @param \JsonSerializable|WebUIBuilder|FileOutput|null $output Output object to send
          * @return void
          */
-        public function send(\JsonSerializable|UIBuilder|FileOutput|null $output): void
+        public function send(\JsonSerializable|WebUIBuilder|FileOutput|null $output): void
         {
             $subtype = $this->app->response->subtype();
             if ($output instanceof \JsonSerializable) {
                 $this->handleSerializableOutput($output, $subtype);
-            } elseif ($output instanceof UIBuilder) {
+            } elseif ($output instanceof WebUIBuilder) {
                 $this->handleUIBuilderOutput($output, $subtype);
             } elseif ($output instanceof FileOutput) {
                 $this->handleFileOutput($output);
@@ -59,7 +59,7 @@ namespace shani\http {
             }
         }
 
-        private function handleUIBuilderOutput(UIBuilder $builder, string $subtype): void
+        private function handleUIBuilderOutput(WebUIBuilder $builder, string $subtype): void
         {
             if ($subtype === DataConvertor::TYPE_HTML) {
                 $content = WebUI::render($this->app, $builder);

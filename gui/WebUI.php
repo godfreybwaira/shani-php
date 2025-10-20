@@ -20,9 +20,9 @@ namespace gui {
     {
 
         private readonly App $app;
-        private readonly UIBuilder $builder;
+        private readonly WebUIBuilder $builder;
 
-        private function __construct(App &$app, UIBuilder &$builder)
+        private function __construct(App &$app, WebUIBuilder &$builder)
         {
             $this->app = $app;
             $this->builder = $builder;
@@ -69,10 +69,10 @@ namespace gui {
         /**
          * Render HTML document to user agent
          * @param App $app Application object
-         * @param UIBuilder $builder UI builder object
+         * @param WebUIBuilder $builder UI builder object
          * @return string The HTML string
          */
-        public static function render(App &$app, UIBuilder &$builder): string
+        public static function render(App &$app, WebUIBuilder &$builder): string
         {
             $web = new WebUI($app, $builder);
             ob_start();
