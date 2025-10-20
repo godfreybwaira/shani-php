@@ -26,7 +26,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
             $this->service = StudentService::getObject();
         }
 
-        public function index()
+        public function index(): StudentDto
         {
             $data = $this->app->request->body()->getAll(['firstName', 'id', 'lastName', 'age', 'subjects']);
             $dto = StudentDto::fromArray($data);
@@ -34,7 +34,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
             if ($student === null) {
                 throw CustomException::serverError($this->app, 'Could not save student');
             }
-            $this->app->render(StudentDto::toDto($student));
+            return StudentDto::toDto($student);
         }
     }
 

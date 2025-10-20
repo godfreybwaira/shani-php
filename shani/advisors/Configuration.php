@@ -35,17 +35,26 @@ namespace shani\advisors {
          * @var bool
          */
         public readonly bool $authenticated;
+
+        /**
+         * List of user permissions separated by any character out of a-z0-9
+         * @var string|null
+         */
         private readonly ?string $permissionList;
-        protected readonly string $profile;
         protected readonly App $app;
 
-        public function __construct(App &$app, string $profile)
+        public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->profile = $profile;
             $this->permissionList = $this->clientPermissions();
             $this->authenticated = $this->permissionList !== null;
         }
+
+        /**
+         * Create current profile configuration from a given profile name.
+         * @param string $name Profile name
+         */
+        public abstract function createProfile(string $name): void;
 
         /**
          * Get the path to application root directory.
@@ -488,10 +497,9 @@ namespace shani\advisors {
         /**
          * Get database connection object specified by connection name. If no
          * connection name specified then default connection will be returned
-         * @param string $connName Connection name
          * @return DatabaseConnection Database connection
          */
-        public abstract function database(string $connName = null): DatabaseConnection;
+        public abstract function database(): DatabaseConnection;
     }
 
 }

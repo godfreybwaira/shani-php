@@ -10,6 +10,7 @@
 namespace apps\demo\modules\schools\logic\controllers\get {
 
     use apps\demo\modules\schools\data\dto\StudentDto;
+    use apps\demo\modules\schools\data\dto\StudentListDto;
     use apps\demo\modules\schools\logic\services\StudentService;
     use shani\http\App;
 
@@ -25,26 +26,26 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->database());
         }
 
-        public function index()
+        public function index(): StudentListDto
         {
             $students = $this->service->getAll();
-            $dtos = [];
+            $dtos = new StudentListDto();
             foreach ($students as $student) {
-                $dtos[] = StudentDto::toDto($student);
+                $dtos->put(StudentDto::toDto($student));
             }
-            $this->app->render($dtos);
+            return $dtos;
         }
 
         /**
          * My good function.
          * Returns nothing
          */
-        public function one()
+        public function one(): ?StudentDto
         {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
             $dto = $student !== null ? StudentDto::toDto($student) : null;
-            $this->app->render($dto);
+            return $dto;
         }
     }
 
