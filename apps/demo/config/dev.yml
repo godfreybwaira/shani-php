@@ -1,0 +1,6 @@
+DATABASE:
+  USER: testuser
+  PASSWORD: test123
+  HOST: localhost
+  NAME: test
+  PORT: 3306
