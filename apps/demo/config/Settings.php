@@ -136,7 +136,7 @@ namespace apps\demo\config {
             return $result;
         }
 
-        public function database(string $connName = null): DatabaseConnection
+        public function database(): DatabaseConnection
         {
             return new DatabaseConnection(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }
