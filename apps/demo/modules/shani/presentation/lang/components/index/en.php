@@ -1,5 +1,5 @@
 <?php
 
 return[
-    'hello' => 'Hello ' . $data['name'] . '!'
+    'hello' => 'Hello ' . $data->getOne('name') . '!'
 ];

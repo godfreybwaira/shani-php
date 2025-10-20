@@ -50,14 +50,6 @@ namespace shani\contracts {
         public function url(string $filepath): string;
 
         /**
-         * Download a file
-         * @param string $filepath File path
-         * @param string|null $filename Optional new file name
-         * @return self
-         */
-        public function download(string $filepath, ?string $filename = null): self;
-
-        /**
          * Delete a file
          * @param string $filepath File path
          * @return self

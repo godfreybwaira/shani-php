@@ -10,15 +10,11 @@
 
 namespace shani\http {
 
-    use gui\WebUI;
-    use lib\DataConvertor;
-    use lib\ds\map\MutableMap;
-    use lib\http\HttpCookie;
+    use lib\ds\map\ReadableMap;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
     use lib\http\RequestEntity;
     use lib\http\ResponseEntity;
-    use lib\MediaType;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
@@ -34,15 +30,13 @@ namespace shani\http {
     final class App
     {
 
-        private ?WebUI $ui = null;
-        private ?array $dict = null;
         private array $storage = [];
         private ?Logger $logger = null;
         private ?Cart $csrfCart = null;
         private SessionManager $session;
-        private readonly ResponseWriter $writer;
-        private ?MutableMap $appData = null;
+        private readonly HttpWriter $httpWriter;
         private ?string $lang = null, $platform = null;
+        private ?bool $keepConn = null;
 
         /**
          * Application virtual host configuration
@@ -78,9 +72,33 @@ namespace shani\http {
         {
             $this->vhost = $vhost;
             $this->response = $res;
-            $this->writer = $writer;
             $this->request = $res->request;
+            $this->httpWriter = new HttpWriter($this, $writer);
             $this->config = new $vhost->classFile($this, $vhost->profile);
+        }
+
+        /**
+         * Set whether to close the connection after sending a response or to keep
+         * it open. By default, if the application is running as a web socket, the
+         * connection will not be closed unless you say so, otherwise the connection
+         * will be closed as soon as the first response is sent.
+         * @param bool $value The value indicate whether to keep or to close the connection.
+         * @return self
+         */
+        public function keepConnection(bool $value): self
+        {
+            $this->keepConn = $value;
+            return $this;
+        }
+
+        /**
+         * Get the connection status
+         * @return bool True if if the connection will be kept, null means the
+         * server will decide whether to keep or to close, false otherwise.
+         */
+        public function connectionStatus(): ?bool
+        {
+            return $this->keepConn;
         }
 
         /**
@@ -106,84 +124,6 @@ namespace shani\http {
             } catch (\Throwable $ex) {
                 $this->handleException($ex);
             }
-        }
-
-        /**
-         * Send content to a client application
-         * @param bool|null $useBuffer Set output buffer on so that output can be sent
-         * in chunks without closing connection. If false, then connection will
-         * be closed and no output will be sent afterward.
-         * @return void
-         */
-        public function send(?bool $useBuffer = null): void
-        {
-            $scheme = $this->request->uri->scheme();
-            $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
-            $this->config->responseMutator();
-            $this->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->response->bodySize());
-            if ($this->request->method === 'head') {
-                $this->response->setStatus(HttpStatus::NO_CONTENT);
-                $this->writer->sendHeaders($this->response);
-            } else if ($buffer) {
-                $this->writer->send($this->response);
-            } else {
-                $this->writer->close($this->response);
-            }
-        }
-
-        /**
-         * Stream  a file as HTTP response
-         * @param string $filepath Path to a file to stream
-         * @param int $chunkSize Number of bytes to stream every turn, default is 1MB
-         * @return self
-         */
-        public function stream(string $filepath, int $chunkSize = Framework::BUFFER_SIZE): self
-        {
-            if (!is_readable($filepath)) {
-                throw CustomException::notFound($this);
-            }
-            $file = stat($filepath);
-            $range = $this->request->header()->getOne(HttpHeader::RANGE) ?? '=0-';
-            if ($range === '=0-' && $file['size'] <= $chunkSize) {
-                $this->response->setStatus(HttpStatus::OK);
-                return $this->doStream($filepath, $file['size'], 0, $file['size'] - 1);
-            }
-            $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-            $end = min($start + $chunkSize, $file['size']) - 1;
-            $this->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->addAll([
-                HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
-                HttpHeader::ACCEPT_RANGES => 'bytes'
-            ]);
-            $this->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
-            return $this->doStream($filepath, $file['size'], $start, $end);
-        }
-
-        /**
-         * Stream a file to a client
-         * @param string $path Path to a file to stream
-         * @param int $filesize Actual file size
-         * @param int $start Start bytes to stream
-         * @param int $end End bytes to stream
-         * @return self
-         */
-        private function doStream(string $path, int $filesize, int $start, int $end): self
-        {
-            $length = $end - $start + 1;
-            if ($length > 0 && $length <= $filesize) {
-                $this->response->header()->addAll([
-                    HttpHeader::CONTENT_LENGTH => $length,
-                    HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
-                ]);
-                if ($this->request->method === 'head') {
-                    $this->response->setStatus(HttpStatus::NO_CONTENT);
-                    $this->writer->close($this->response);
-                } else {
-                    $this->writer->stream($this->response, $path, $start, $length);
-                }
-            } else {
-                throw CustomException::badRequest($this);
-            }
-            return $this;
         }
 
         /**
@@ -267,114 +207,35 @@ namespace shani\http {
         }
 
         /**
-         * Manage Graphical User interface with this function
-         * @return WebUI
-         */
-        public function ui(): WebUI
-        {
-            return $this->ui ??= new WebUI($this);
-        }
-
-        /**
-         * Render HTML document to user agent and close the HTTP connection.
-         * @param \JsonSerializable|null $data Data to send with the response or to pass to a view file
-         * @param string|null $viewPath View file path
-         * @param bool|null $useBuffer Set output buffer on so that output can be sent
-         * in chunks without closing connection. If false, then connection will
-         * be closed and no output can be sent.
-         * @return void
-         */
-        public function render(?\JsonSerializable $data = null, ?string $viewPath = null, ?bool $useBuffer = null): void
-        {
-            $content = $data?->jsonSerialize();
-            $subtype = $this->response->subtype();
-            if ($subtype === DataConvertor::TYPE_HTML) {
-                ob_start();
-                $this->ui()->render($content, $viewPath);
-                $this->sendHtml(ob_get_clean(), $subtype);
-            } else if ($subtype === DataConvertor::TYPE_SSE) {
-                ob_start();
-                $this->ui()->render($content);
-                $this->sendSse(ob_get_clean(), $subtype);
-            } else if ($subtype === DataConvertor::TYPE_JS) {
-                $this->sendJsonp($content, $subtype);
-            } else {
-                $this->response->setBody(DataConvertor::convertTo($content, $subtype), $subtype);
-            }
-            $this->send($useBuffer);
-        }
-
-        private function sendHtml(string $content, string $type): void
-        {
-            $this->response->setBody($content, $type)->header()
-                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::TEXT_HTML);
-        }
-
-        private function sendJsonp(?array $content, string $type): void
-        {
-            $callback = $this->request->query->getOne('callback', 'callback');
-            $data = $callback . '(' . json_encode($content) . ');';
-            $this->response->setBody($data, $type)->header()
-                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::JS);
-        }
-
-        private function sendSse(string $content, string $type): void
-        {
-            $this->response->setBody(DataConvertor::toEventStream($content), $type)
-                    ->header()->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
-                    ->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::EVENT_STREAM);
-        }
-
-        /**
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @return array A key-value pair of a keyword and a sentence/word.
+         * @param array $data Optional data to that will be available in the dictionary
+         * file using $data object
+         * @param string $name Dictionary directory name
+         * @return ReadableMap An object of words in the dictionary file.
          */
-        public function dictionary(): array
-        {
-            if ($this->dict === null) {
-                $route = $this->request->route();
-                $file = $this->module() . $this->config->languageDir() . '/' . $route->controller;
-                $file .= '/' . $route->action . '/' . $this->language() . '.php';
-
-                $this->dict = self::getFile($file, $this);
-            }
-            return $this->dict;
-        }
-
-        private static function getFile(string $loadedFile, App &$app): array
-        {
-            return require $loadedFile;
-        }
-
-        /**
-         * Set and/or get current view file to be rendered as HTML to client.
-         * @param string $path Case sensitive Path to view file, if not provided then
-         * the view file will be the same as current executing function name. All views
-         * have access to application object as $app
-         * @param string $moduleName Module name
-         * @return string Path to a view file
-         * @see App::render()
-         */
-        public function view(string $path = null, string $moduleName = null): string
+        public function dictionary(array $data = null, string $name = null): ReadableMap
         {
             $route = $this->request->route();
-            $file = ($path ?? '/' . $route->action) . '.php';
-            if ($moduleName === null) {
-                return $this->module() . $this->config->viewDir() . '/' . $route->controller . $file;
-            }
-            return $this->module($moduleName) . $this->config->viewDir() . $file;
+            $file = $this->module() . $this->config->languageDir() . '/' . $route->controller;
+            $file .= ($name ?? '/' . $route->action) . '/' . $this->language() . '.php';
+            return self::getFile($file, new ReadableMap($data));
+        }
+
+        private static function getFile(string $loadedFile, ReadableMap $data): ReadableMap
+        {
+            return new ReadableMap(require $loadedFile);
         }
 
         /**
          * Get path to a module directory
-         * @param string $name Module name or default requesting module if null is provided.
+         * @param string $name Module name or default current module if null is provided.
          * @return string Path to a module directory
          */
-        private function module(string $name = null): string
+        public function module(string $name = null): string
         {
-            return $this->config->root() . $this->config->moduleDir() . '/' . ($name ?? $this->request->route()->module);
+            return $this->config->root() . $this->config->moduleDir() . ($name ?? '/' . $this->request->route()->module);
         }
 
         private function getClassPath(): string
@@ -402,7 +263,8 @@ namespace shani\http {
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);
             }
-            new ResponseRoute($this, $obj->$callback());
+            $output = $obj->$callback();
+            $this->httpWriter->send($output);
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string
@@ -418,30 +280,6 @@ namespace shani\http {
         public static function digest(string $str, string $algorithm = 'sha1', int $length = 7): string
         {
             return substr(hash($algorithm, $str), 0, $length);
-        }
-
-        /**
-         * Set and get URL safe from CSRF attack. if CSRF is enabled, then the
-         * application will be protected against CSRF attack and the URL will be
-         * returned, otherwise the URL will be returned but CSRF will be turned off.
-         * @param string|null $urlPath URL to protect from CSRF. If not supplied
-         * then the request URI path will be used.
-         * @return string URL safe from CSRF attack
-         */
-        public function csrf(?string $urlPath = null): string
-        {
-            $url = $urlPath ?? $this->request->uri->path();
-            if (!$this->config->skipCsrfProtection()) {
-                $tokenName = $this->config->csrfTokenName();
-                $token = $this->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
-                $this->csrfToken()->addOne($tokenName, $token);
-                $cookie = (new HttpCookie())->setName($tokenName)
-                        ->setSameSite(HttpCookie::SAME_SITE_LAX)
-                        ->setValue($token)->setHttpOnly(true)
-                        ->setSecure($this->request->uri->secure());
-                $this->response->header()->setCookie($cookie);
-            }
-            return $this->request->uri->host() . $url;
         }
 
         /**
@@ -478,17 +316,18 @@ namespace shani\http {
                 $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                 //log error
             }
-            $this->send();
+            $this->httpWriter->send(null);
         }
 
         /**
-         * Create application temporary data storage. This function is ideal for
-         * data exchange within application (e.g among views)
-         * @return MutableMap Iterable object
+         * Get writer object. This object is responsible for writing the output
+         * to client application. Most of the time you will not be calling this
+         * function as it is called internally.
+         * @return HttpWriter Writer object
          */
-        public function attr(): MutableMap
+        public function writer(): HttpWriter
         {
-            return $this->appData ??= new MutableMap();
+            return $this->httpWriter;
         }
     }
 

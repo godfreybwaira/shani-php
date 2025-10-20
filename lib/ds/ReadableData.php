@@ -84,9 +84,10 @@ namespace lib\ds {
 
         /**
          * Convert iterable data to JSON
+         * @param bool $pretty Whether to prettify JSON content or not
          * @return string
          */
-        public abstract function toJson(): string;
+        public abstract function toJson(bool $pretty = false): string;
 
         /**
          * Convert iterable data to datagrid, A json with first row as headers,

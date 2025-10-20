@@ -21,6 +21,6 @@
         </a>
     </div>
     <div class="tab-body container" id="content" style="--loader-size:2.5rem">
-        <?php $app->ui()->import($app->view('/all')); ?>
+        <?php $web->import($web->view('/all')); ?>
     </div>
 </div>

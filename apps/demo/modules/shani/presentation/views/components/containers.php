@@ -100,19 +100,19 @@
         <button class="carousel-prev"></button>
         <div class="carousel-body">
             <div class="media">
-                <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt="">
+                <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt="">
                 <div class="media-caption pos-b" style="--color:#fff">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
             </div>
             <div class="media active">
-                <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt="">
+                <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt="">
                 <div class="media-caption pos-l">
                     Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                 </div>
             </div>
             <div class="media">
-                <img src="<?= $app->ui()->asset('/img/pic3.jpg'); ?>" alt="">
+                <img src="<?= $web->asset('/img/pic3.jpg'); ?>" alt="">
                 <div class="media-caption pos-r" style="--color:#fff">
                     <p>
                         Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -131,7 +131,7 @@
     <div class="col width-md-1q width-sm-max">
         <div class="card">
             <div class="card-title">About Card</div>
-            <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt=""/>
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>
@@ -142,13 +142,13 @@
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>
-            <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt=""/>
             <div class="card-title">About Card</div>
         </div>
     </div>
     <div class="col width-md-1q width-sm-max">
         <div class="card">
-            <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt=""/>
             <div class="card-title">About Card</div>
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
@@ -160,7 +160,7 @@
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>
-            <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt=""/>
         </div>
     </div>
 </div>
@@ -172,14 +172,14 @@
                 <div class="card-title">About Card</div>
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>
-            <img src="<?= $app->ui()->asset('/img/pic2.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt=""/>
         </div>
     </div>
 </div>
 <div class="row" style="height: 250px">
     <div class="col">
         <div class="card card-dir-h">
-            <img src="<?= $app->ui()->asset('/img/pic1.jpg'); ?>" alt=""/>
+            <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt=""/>
             <div class="card-body">
                 <div class="card-title">About Card</div>
                 <p>

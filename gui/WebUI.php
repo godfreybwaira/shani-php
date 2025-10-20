@@ -9,7 +9,9 @@
 
 namespace gui {
 
+    use lib\ds\map\MutableMap;
     use lib\ds\map\ReadableMap;
+    use lib\http\HttpCookie;
     use shani\core\Framework;
     use shani\http\App;
     use shani\persistence\LocalStorage;
@@ -18,93 +20,12 @@ namespace gui {
     {
 
         private readonly App $app;
-        private array $details = [];
-        private ?string $title, $icon;
-        private array $scripts, $styles;
-        private ?ReadableMap $data = null;
+        private readonly UIBuilder $builder;
 
-        public function __construct(App &$app)
+        private function __construct(App &$app, UIBuilder &$builder)
         {
             $this->app = $app;
-            $this->title = null;
-            $this->scripts = $this->styles = [];
-            $this->icon = '<link rel="icon" href="data:,">';
-            $this->localStyle('/css/main.css');
-            $this->localStyle('/css/icons/mdi.css');
-            $this->localScript('/js/shani-ob-2.0.js', ['defer']);
-            $this->localScript('/js/app.js', ['defer']);
-        }
-
-        /**
-         * Set HTML document icon (favicon)
-         * @param string $path Path to icon file
-         * @param string $mediaType media type of a file
-         * @return self
-         */
-        public function icon(string $path, string $mediaType): self
-        {
-            $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mediaType . '"/>';
-            return $this;
-        }
-
-        /**
-         * Set meta description on a HTML document.
-         * @param string $content Descriptive content about your application
-         * @return self
-         */
-        public function description(string $content): self
-        {
-            return $this->meta('description', $content);
-        }
-
-        /**
-         * Create an HTML meta tag
-         * @param string $name meta name
-         * @param string $value meta value
-         * @return self
-         */
-        public function meta(string $name, string $value): self
-        {
-            $this->details[$name] = $value;
-            return $this;
-        }
-
-        /**
-         * Set title to HTML document. If not set, then the default title will be
-         * application name, or empty string.
-         * @param string $content HTML title
-         * @return self
-         */
-        public function title(string $content): self
-        {
-            $this->title = $content;
-            return $this;
-        }
-
-        /**
-         * Set link to external script file for HTML document relative to asset directory.
-         * @param string $src Path to Javascript file(s) relative to asset directory.
-         * @param array $attributes Script attributes, must conform to HTML
-         * attributes naming standard
-         * @return self
-         */
-        public function localScript(string $src, array $attributes = []): self
-        {
-            self::createHeader($this->scripts, $src, $attributes);
-            return $this;
-        }
-
-        /**
-         * Set link to external CSS file for HTML document relative to asset directory.
-         * @param string $href Path to CSS file relative to asset directory.
-         * @param array $attributes Style attributes, must conform to HTML
-         * attributes naming standard
-         * @return self
-         */
-        public function localStyle(string $href, array $attributes = []): self
-        {
-            self::createHeader($this->styles, $href, $attributes);
-            return $this;
+            $this->builder = $builder;
         }
 
         /**
@@ -117,37 +38,59 @@ namespace gui {
             return $this->app->storage()->url(LocalStorage::ACCESS_ASSET . $path);
         }
 
-        private static function createHeader(array &$head, string $url, array &$attributes): void
+        /**
+         * Set and/or get current view file to be rendered as HTML to client.
+         * @param string $path Case sensitive Path to view file, if not provided then
+         * the view file will be the same as current executing function name. All views
+         * have access to application object as $app
+         * @param string $moduleName Module name
+         * @return string Path to a view file
+         * @see App::render()
+         */
+        public function view(string $path = null, string $moduleName = null): string
         {
-            $head[$url] = null;
-            foreach ($attributes as $key => $val) {
-                $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
+            $route = $this->app->request->route();
+            $file = ($path ?? '/' . $route->action) . '.php';
+            if ($moduleName === null) {
+                return $this->app->module() . $this->app->config->viewDir() . '/' . $route->controller . $file;
             }
+            return $this->app->module($moduleName) . $this->app->config->viewDir() . $file;
+        }
+
+        /**
+         * Get dictionary object of the current web view
+         * @return ReadableMap Dictionary object
+         */
+        public function dictionary(): ReadableMap
+        {
+            return $this->app->dictionary($this->builder->getDictionaryData(), $this->builder->getView());
         }
 
         /**
          * Render HTML document to user agent
-         * @param array|null $data Data object to be passed to a view component.
-         * @param string|null $viewPath View file path
-         * @return void
+         * @param App $app Application object
+         * @param UIBuilder $builder UI builder object
+         * @return string The HTML string
          */
-        public function render(?array $data, ?string $viewPath = null): void
+        public static function render(App &$app, UIBuilder &$builder): string
         {
-            $this->data = new ReadableMap($data ?? []);
-            if ($this->app->config->isAsync()) {
-                self::load($this->app, $this->app->view($viewPath));
+            $web = new WebUI($app, $builder);
+            ob_start();
+            if ($app->config->isAsync()) {
+                self::load($web, $web->view($builder->getView()));
             } else {
-                self::load($this->app, Framework::DIR_GUI . '/html/main.php');
+                self::load($web, Framework::DIR_GUI . '/html/main.php');
             }
+            return ob_get_clean();
         }
 
         /**
-         * Get immutable data object.
-         * @return ReadableMap ReadableMap object
+         * Get the application language
+         * @return string The application language
          */
-        public function data(): ReadableMap
+        public function language(): string
         {
-            return $this->data;
+            return $this->app->language();
         }
 
         /**
@@ -157,17 +100,20 @@ namespace gui {
          */
         public function head(): string
         {
-            $head = $this->icon;
-            foreach ($this->details as $name => $value) {
+            $head = $this->builder->getIcon();
+            $meta = $this->builder->getMeta();
+            foreach ($meta as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
             }
-            foreach ($this->styles as $url => $attr) {
+            $styles = $this->builder->getStyles();
+            foreach ($styles as $url => $attr) {
                 $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->asset($url) . '"/>';
             }
-            foreach ($this->scripts as $url => $attr) {
+            $scripts = $this->builder->getScripts();
+            foreach ($scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $this->asset($url) . '"></script>';
             }
-            return $head . '<title>' . ($this->title ?? $this->app->config->appName()) . '</title>';
+            return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appName()) . '</title>';
         }
 
         /**
@@ -180,16 +126,16 @@ namespace gui {
          */
         public function layout(string $navbar, string $body, ?string $menu = null, ?string $id = null): void
         {
-            self::loadLayout($this->app, $navbar, $body, $id, $menu);
+            self::loadLayout($this, $navbar, $body, $id, $menu);
         }
 
-        private static function loadLayout(App &$app, string $navbar_, string $body_, ?string $id_, ?string $menu_): void
+        private static function loadLayout(WebUI &$web, string $navbar_, string $body_, ?string $id_, ?string $menu_): void
         {
             require Framework::DIR_GUI . '/html/layout.php';
         }
 
         /**
-         * Import a template file. The template imported also has access to $app object
+         * Import a template file. The template imported also has access to $web object
          * @param string $template Path to template file
          * @param bool $success If true then import will be done, false otherwise.
          * @return void
@@ -197,24 +143,56 @@ namespace gui {
         public function import(string $template, bool $success = true): self
         {
             if ($success) {
-                self::load($this->app, $template);
+                self::load($this, $template);
             }
             return $this;
         }
 
-        private static function load(App &$app, string $loadedFile): void
+        private static function load(WebUI &$web, string $loadedFile): void
         {
             require $loadedFile;
         }
 
-        private static function loadFile(string $file): ?string
+        /**
+         * Get an iterable MutableMap representing UIBilder attributes object
+         * @return MutableMap Iterable object
+         */
+        public function attr(): MutableMap
         {
-            if (is_file($file . '.php')) {
-                ob_start();
-                require $file . '.php';
-                return '<li>' . ob_get_clean() . '</li>';
+            return $this->builder->attr();
+        }
+
+        /**
+         * Get data passed via UIBuilder constructor
+         * @return \JsonSerializable|null
+         */
+        public function data(): ?\JsonSerializable
+        {
+            return $this->builder->getData();
+        }
+
+        /**
+         * Set and get URL safe from CSRF attack. if CSRF is enabled, then the
+         * application will be protected against CSRF attack and the URL will be
+         * returned, otherwise the URL will be returned but CSRF will be turned off.
+         * @param string|null $urlPath URL to protect from CSRF. If not supplied
+         * then the request URI path will be used.
+         * @return string URL safe from CSRF attack
+         */
+        public function csrf(?string $urlPath = null): string
+        {
+            $url = $urlPath ?? $this->app->request->uri->path();
+            if (!$this->app->config->skipCsrfProtection()) {
+                $tokenName = $this->app->config->csrfTokenName();
+                $token = $this->app->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
+                $this->app->csrfToken()->addOne($tokenName, $token);
+                $cookie = (new HttpCookie())->setName($tokenName)
+                        ->setSameSite(HttpCookie::SAME_SITE_LAX)
+                        ->setValue($token)->setHttpOnly(true)
+                        ->setSecure($this->app->request->uri->secure());
+                $this->app->response->header()->setCookie($cookie);
             }
-            return null;
+            return $this->app->request->uri->host() . $url;
         }
     }
 

@@ -142,12 +142,11 @@ namespace lib\ds\map {
             return DataConvertor::array2xml($this->data);
         }
 
-        /**
-         * Convert iterable data to JSON
-         * @return string
-         */
-        public function toJson(): string
+        public function toJson(bool $pretty = false): string
         {
+            if ($pretty) {
+                return json_encode($this->data, JSON_PRETTY_PRINT);
+            }
             return json_encode($this->data);
         }
 

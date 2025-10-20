@@ -9,6 +9,8 @@
 
 namespace apps\demo\modules\shani\logic\controllers\get {
 
+    use gui\UIBuilder;
+    use shani\documentation\Generator as Documentation;
     use shani\http\App;
 
     final class Components
@@ -21,68 +23,75 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index()
+        public function index(): UIBuilder
         {
-            $this->app->ui()->description('Shani web framework')->title('Home Page');
-            return $this->app->render(viewPath: '/body');
+            $builder = new UIBuilder();
+            $builder->description('Shani web framework')
+                    ->title('Home Page II')
+                    ->view('/body');
+            return $builder;
         }
 
-        public function all()
+        public function all(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function inputs()
+        public function inputs(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function containers()
+        public function containers(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function modals()
+        public function modals(): UIBuilder
         {
-            return $this->app->render();
+            $builder = new UIBuilder();
+            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
+            return $builder;
         }
 
-        public function toaster()
+        public function toaster(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function loader()
+        public function loader(): UIBuilder
         {
-            return $this->app->render();
+            $builder = new UIBuilder();
+            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
+            return $builder;
         }
 
-        public function timeline()
+        public function timeline(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function shani()
+        public function shani(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function redirect()
+        public function redirect(): UIBuilder
         {
-            return $this->app->render();
+            return new UIBuilder();
         }
 
-        public function generator()
+        public function generator(): UIBuilder
         {
-//            sleep(2);
-            $data = new \shani\documentation\Generator($this->app);
-            return $data;
+            sleep(2);
+            $doc = new Documentation($this->app);
+            return new UIBuilder($doc);
         }
 
-        public function card()
+        public function card(): UIBuilder
         {
             sleep(1);
-            return $this->app->render();
+            return new UIBuilder();
         }
     }
 

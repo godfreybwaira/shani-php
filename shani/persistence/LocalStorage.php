@@ -9,7 +9,9 @@
 
 namespace shani\persistence {
 
+    use lib\Concurrency;
     use lib\File;
+    use lib\http\FileOutput;
     use lib\http\HttpCache;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
@@ -97,15 +99,16 @@ namespace shani\persistence {
 
         private static function sendFile(App &$app, string $filepath): bool
         {
+            $output = null;
             $etag = md5($app->request->uri->path());
             if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
-                $app->send();
             } else {
                 $cache = (new HttpCache())->setEtag($etag);
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-                $app->stream($filepath);
+                $output = new FileOutput($filepath);
             }
+            $app->writer()->send($output);
             return true;
         }
 
@@ -139,7 +142,7 @@ namespace shani\persistence {
             $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
             $directory = self::createDirectory($savePath . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
-            \lib\Concurrency::parallel(function ()use ($filepath, &$file) {
+            Concurrency::parallel(function ()use ($filepath, &$file) {
                 $handle = fopen($filepath, 'a+b');
                 $size = fstat($handle)['size'];
                 if ($size < $file->size) {
@@ -175,13 +178,6 @@ namespace shani\persistence {
         public function pathTo(?string $path = null): string
         {
             return $this->storage . $path;
-        }
-
-        #[\Override]
-        public function download(string $filepath, ?string $filename = null): self
-        {
-            $this->app->response->saveAs($filename ?? basename($filepath));
-            return $this->app->stream($filepath);
         }
 
         #[\Override]
@@ -229,7 +225,7 @@ namespace shani\persistence {
                 $folder = $bucket . dirname($shortPath);
                 $filename = $groupId . self::getFilename(basename($shortPath));
                 $destination = self::createDirectory($this->pathTo($folder));
-                \lib\Concurrency::parallel(fn() => rename($filepath, $destination . '/' . $filename));
+                Concurrency::parallel(fn() => rename($filepath, $destination . '/' . $filename));
                 return $folder . '/' . $filename;
             }
             return null;

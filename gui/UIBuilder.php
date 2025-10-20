@@ -9,9 +9,14 @@
 
 namespace gui {
 
+    use lib\ds\map\MutableMap;
+    use lib\ds\map\ReadableMap;
+
     final class UIBuilder
     {
 
+        private readonly MutableMap $attributes;
+        private ?array $dictionary = null;
         private ?string $viewPath, $title;
         private ?\JsonSerializable $data;
         private array $scripts, $styles;
@@ -23,6 +28,7 @@ namespace gui {
             $this->data = $data;
             $this->title = null;
             $this->viewPath = null;
+            $this->attributes = new MutableMap();
             $this->scripts = $this->styles = [];
             $this->icon = '<link rel="icon" href="data:,">';
             $this->style('/css/main.css');
@@ -35,15 +41,49 @@ namespace gui {
          * Get immutable data object.
          * @return \JsonSerializable|null
          */
-        public function data(): ?\JsonSerializable
+        public function getData(): ?\JsonSerializable
         {
             return $this->data;
         }
 
+        /**
+         * Set data to pass into dictionary
+         * @param array $data Data to pass into dictionary
+         * @return self
+         */
+        public function dictionaryData(array $data): self
+        {
+            $this->dictionary = $data;
+            return $this;
+        }
+
+        /**
+         * Get dictionary object
+         * @return array|null Dictionary object
+         */
+        public function getDictionaryData(): ?array
+        {
+            return $this->dictionary;
+        }
+
+        /**
+         * Override default web view
+         * @param string $path Relative path to the view file (without extension)
+         * @return self
+         */
         public function view(string $path): self
         {
             $this->viewPath = $path;
             return $this;
+        }
+
+        /**
+         * Get application web view (not default one)
+         * @return string|null
+         */
+        public function getView(): ?string
+        {
+            return $this->viewPath;
         }
 
         /**
@@ -56,6 +96,15 @@ namespace gui {
         {
             $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mediaType . '"/>';
             return $this;
+        }
+
+        /**
+         * Get HTML document icon (favicon)
+         * @return string
+         */
+        public function getIcon(): string
+        {
+            return $this->icon;
         }
 
         /**
@@ -81,15 +130,32 @@ namespace gui {
         }
 
         /**
-         * Set title to HTML document. If not set, then the default title will be
-         * application name, or empty string.
-         * @param string $content HTML title
+         * Get existing HTML meta values
+         * @return array
+         */
+        public function getMeta(): array
+        {
+            return $this->details;
+        }
+
+        /**
+         * Set HTML document title.
+         * @param string $content HTML document title
          * @return self
          */
         public function title(string $content): self
         {
             $this->title = $content;
             return $this;
+        }
+
+        /**
+         * Get HTML document title
+         * @return string|null
+         */
+        public function getTitle(): ?string
+        {
+            return $this->title;
         }
 
         /**
@@ -101,12 +167,21 @@ namespace gui {
          */
         public function script(string $src, array $attributes = []): self
         {
-            $this->scripts[$src] = $attributes;
+            self::createHeader($this->scripts, $src, $attributes);
             return $this;
         }
 
         /**
-         * Set link to external CSS file for HTML document relative to asset directory.
+         * Get links to external script file relative to asset directory.
+         * @return array
+         */
+        public function getScripts(): array
+        {
+            return $this->scripts;
+        }
+
+        /**
+         * Set link to external CSS file relative to asset directory.
          * @param string $href Path to CSS file relative to asset directory.
          * @param array $attributes Style attributes, must conform to HTML
          * attributes naming standard
@@ -114,8 +189,35 @@ namespace gui {
          */
         public function style(string $href, array $attributes = []): self
         {
-            $this->styles[$href] = $attributes;
+            self::createHeader($this->styles, $href, $attributes);
             return $this;
+        }
+
+        /**
+         * Get links to external CSS file relative to asset directory.
+         * @return array
+         */
+        public function getStyles(): array
+        {
+            return $this->styles;
+        }
+
+        /**
+         * Create application temporary data storage. This function is ideal for
+         * data exchange within application web views
+         * @return MutableMap Iterable object
+         */
+        public function attr(): MutableMap
+        {
+            return $this->attributes;
+        }
+
+        private static function createHeader(array &$head, string $url, array &$attributes): void
+        {
+            $head[$url] = null;
+            foreach ($attributes as $key => $val) {
+                $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
+            }
         }
     }
 

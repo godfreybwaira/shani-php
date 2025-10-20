@@ -55,14 +55,14 @@ namespace shani\http {
             //1. extension 2. accept 3. content_type 4. default
             $ext = $this->app->request->route()->extension;
             if ($ext !== null) {
-                $this->app->request->header()->addOne(HttpHeader::ACCEPT, WebServer::mime($ext));
+                $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, WebServer::mime($ext));
                 return;
             }
             $accepted = $this->app->request->header()->getOne(HttpHeader::ACCEPT, HttpHeader::CONTENT_TYPE);
             if ($accepted === '*/*' || $accepted === null) {
                 $accepted = $this->app->platform() === 'web' ? MediaType::TEXT_HTML : MediaType::JSON;
             }
-            $this->app->request->header()->addOne(HttpHeader::ACCEPT, $accepted);
+            $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::parse($accepted)[0]);
         }
 
         /**

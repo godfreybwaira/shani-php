@@ -3,6 +3,6 @@
         Title here
     </div>
     <div class="card-body">
-        <?php $app->ui()->import($app->view('/containers')); ?>
+        <?php $web->import($web->view('/containers')); ?>
     </div>
 </div>

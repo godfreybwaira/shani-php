@@ -82,8 +82,11 @@ namespace lib\ds\set {
             return DataConvertor::array2xml($this->toArray());
         }
 
-        public function toJson(): string
+        public function toJson(bool $pretty = false): string
         {
+            if ($pretty) {
+                return json_encode($this->toArray(), JSON_PRETTY_PRINT);
+            }
             return json_encode($this->toArray());
         }
 

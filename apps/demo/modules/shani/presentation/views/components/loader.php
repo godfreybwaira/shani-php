@@ -1,4 +1,4 @@
-<?php if ($app->request->query->getOne('type') === 'i'): ?>
+<?php if ($web->attr()->getOne('type') === 'i'): ?>
     <div class="progress-bar loader">
         <div class="progress"></div>
     </div>
