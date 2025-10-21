@@ -9,7 +9,7 @@
 
 namespace lib {
 
-    final class File
+    final class File implements \JsonSerializable
     {
 
         public readonly int $size;
@@ -52,6 +52,19 @@ namespace lib {
         {
             $dotPos = strrpos($file, '.');
             return $dotPos !== false ? substr($file, $dotPos) : null;
+        }
+
+        #[\Override]
+        public function jsonSerialize(): array
+        {
+            return[
+                'name' => $this->name,
+                'type' => $this->type,
+                'size' => $this->size,
+                'extension' => $this->extension,
+                'path' => $this->path,
+                'error' => $this->error
+            ];
         }
     }
 

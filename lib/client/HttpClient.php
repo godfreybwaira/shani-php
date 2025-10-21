@@ -260,7 +260,8 @@ namespace lib\client {
         {
             $retry = 0;
             while (($curl = curl_init($endpoint)) === false && $retry < $this->retries) {
-                Concurrency::sleep(++$retry);
+                $retry++;
+                usleep($retry * 100000);
             }
             if ($curl === false) {
                 throw new \Exception('Connection to a host machine failed.');
@@ -278,7 +279,7 @@ namespace lib\client {
             return $response;
         }
 
-        public function prepareResponse(\CurlHandle &$curl, string $method, URI &$endpoint): ResponseEntity
+        private function prepareResponse(\CurlHandle &$curl, string $method, URI &$endpoint): ResponseEntity
         {
             $builder = (new RequestEntityBuilder())
                     ->headers($this->requestHeader)->files($this->files)
@@ -524,9 +525,8 @@ namespace lib\client {
          * @param string $filename file name
          * @param callable $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
-         * @param callable $progress A callback for showing progress during download
-         * where the first argument is total bytes to load and the second is
-         * total bytes loaded
+         * @param callable $progress A callback for showing progress during download.
+         * It has the following syntax <code>$callback(int $totalSize, int $loaded):void</code>
          * @return self
          */
         public function download(string $endpoint, string $destination, string $filename, callable $callback, callable $progress = null): self
@@ -553,9 +553,8 @@ namespace lib\client {
          * @param string $source A path to a source file to upload
          * @param callable $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
-         * @param callable $progress A callback for showing progress during upload
-         * where the first argument is total bytes to load and the second is
-         * total bytes loaded
+         * @param callable $progress A callback for showing progress during upload.
+         * It has the following syntax <code>$callback(int $totalSize, int $loaded):void</code>
          * @return self
          */
         public function upload(string $endpoint, string $source, callable $callback, callable $progress = null): self

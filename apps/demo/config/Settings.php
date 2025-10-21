@@ -92,12 +92,12 @@ namespace apps\demo\config {
 
         public function accessibleByPublic(): bool
         {
-            return in_array($this->app->request->route()->module, ['schools', 'shani']);
+            return in_array($this->app->request->route()->module, ['schools', 'shani', 'files']);
         }
 
         public static function runTest(): TestResult
         {
-            $result = new TestResult('UAT for my application', location: '/home/goddy/Desktop');
+            $result = new TestResult('UAT for my application', location: '~/Desktop');
             $g1 = new TestGroup('MY FIRST MODULE');
             $g2 = new TestGroup('MY SECOND MODULE');
             $g3 = new TestGroup('MY THIRD MODULE');

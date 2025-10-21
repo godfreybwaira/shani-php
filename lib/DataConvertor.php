@@ -15,7 +15,7 @@ namespace lib {
         private const SEARCH_STR = ['\\', "\"", "\n", "\r", "\t"];
         private const REPLACE_STR = ['\\\\', '\\"', "\\n", "\\r", "\\t"];
         public const TYPE_JSON = 'json';
-        public const TYPE_JS = 'js';
+        public const TYPE_JS = 'javascript';
         public const TYPE_XML = 'xml';
         public const TYPE_YAML = 'yaml';
         public const TYPE_HTML = 'html';

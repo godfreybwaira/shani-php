@@ -30,7 +30,7 @@ namespace shani\http {
     final class App
     {
 
-        private array $storage = [];
+        private StorageMedia $storage;
         private ?Logger $logger = null;
         private ?Cart $csrfCart = null;
         private SessionManager $session;
@@ -198,12 +198,11 @@ namespace shani\http {
 
         /**
          * Get storage object representing application storage directory
-         * @param string $name Storage name. The default storage is 'local'
          * @return StorageMedia
          */
-        public function storage(string $name = 'local'): StorageMedia
+        public function storage(): StorageMedia
         {
-            return ($this->storage[$name] ??= $this->config->getStorageMedia($name));
+            return $this->storage ??= $this->config->getStorageMedia();
         }
 
         /**

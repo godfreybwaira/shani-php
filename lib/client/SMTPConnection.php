@@ -47,7 +47,8 @@ namespace lib\client {
                     $this->secure = $security !== null;
                     break;
                 }
-                \lib\Concurrency::sleep(++$count);
+                $count++;
+                usleep($count * 100000);
             }
         }
 

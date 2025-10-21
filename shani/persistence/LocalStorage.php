@@ -28,11 +28,11 @@ namespace shani\persistence {
          * Access to public assets in an asset directory. Everyone has an access.
          */
         public const ACCESS_ASSET = '/0';
+        public const FILE_MODE = 0700;
+        private const ID_SEPARATOR = '_', GID_INITIAL = 'g', PID_INITIAL = 'u';
 
         private readonly App $app;
         private readonly string $host, $storage;
-
-        public const FILE_MODE = 0700;
 
         public function __construct(App &$app)
         {
@@ -63,7 +63,7 @@ namespace shani\persistence {
         }
 
         /**
-         * Serve static content e.g CSS, images and other static files.
+         * Serve a static file e.g CSS, images and other static files.
          * @param App $app Application object
          * @return bool True on success, false otherwise.
          */
@@ -89,12 +89,27 @@ namespace shani\persistence {
             if (!$app->config->authenticated) {
                 throw CustomException::forbidden($app);
             }
-            $filename = basename($filepath);
-            $groupId = substr($filename, 0, strrpos($filename, '-'));
-            if (!empty($groupId) && $groupId !== $app->config->clientGroupId()) {
-                throw CustomException::forbidden($app);
+            $owners = self::getFileOwnership($filepath);
+            if ($owners !== null) {
+                if ($owners['oid'] !== $app->config->clientPrivateId() && !$app->config->clientGroupIdExists($owners['gid'])) {
+                    throw CustomException::forbidden($app);
+                }
             }
             return self::sendFile($app, $app->storage()->pathTo($filepath));
+        }
+
+        private static function getFileOwnership(string $filepath): ?array
+        {
+            $filename = basename($filepath);
+            $ownership = substr($filename, 0, strrpos($filename, self::ID_SEPARATOR));
+            if (empty($ownership)) {
+                return null; //file has no owner
+            }
+            $owners = explode(self::ID_SEPARATOR, $ownership);
+            return[
+                'oid' => substr($owners[0], strlen(self::PID_INITIAL)),
+                'gid' => !empty($owners[1]) ? substr($owners[1], strlen(self::GID_INITIAL)) : null,
+            ];
         }
 
         private static function sendFile(App &$app, string $filepath): bool
@@ -113,34 +128,16 @@ namespace shani\persistence {
         }
 
         #[\Override]
-        public function save(File $file, string $bucket = '/'): ?string
-        {
-            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
-            return self::persist($file, $this->storage, $path);
-        }
-
-        #[\Override]
-        public function save2protect(File $file, string $bucket = '/'): ?string
+        public function save(File $file, string $bucket = '/'): string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
-            return self::persist($file, $this->storage, $path);
-        }
-
-        #[\Override]
-        public function save2private(File $file, string $bucket = '/'): ?string
-        {
-            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
-            $groupId = $this->app->config->clientGroupId();
-            if (empty($groupId)) {
-                throw new ServerException('Client group Id cannot be empty');
+            $privateId = $this->app->config->clientPrivateId();
+            if (empty($privateId)) {
+                throw new ServerException('Client private Id cannot be empty');
             }
-            return self::persist($file, $this->storage, $path, $groupId . '-');
-        }
-
-        private static function persist(File &$file, string $root, string $savePath, string $prefix = null): ?string
-        {
-            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 20);
-            $directory = self::createDirectory($savePath . $file->type);
+            $prefix = self::PID_INITIAL . $privateId . self::ID_SEPARATOR;
+            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 15);
+            $directory = self::createDirectory($path . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
             Concurrency::parallel(function ()use ($filepath, &$file) {
                 $handle = fopen($filepath, 'a+b');
@@ -157,7 +154,7 @@ namespace shani\persistence {
                 }
                 fclose($handle);
             });
-            return substr($filepath, strlen($root));
+            return substr($filepath, strlen($this->storage));
         }
 
         private static function createDirectory(string $destination): string
@@ -181,66 +178,63 @@ namespace shani\persistence {
         }
 
         #[\Override]
-        public function delete(string $filepath): self
+        public function delete(string $filepath): bool
         {
-            $path = $this->pathTo($filepath);
-            if (is_readable($path)) {
-                unlink($path);
+            $owners = self::getFileOwnership($filepath);
+            if ($owners['oid'] === $this->app->config->clientPrivateId()) {
+                return file_exists($filepath) && unlink($filepath);
             }
-            return $this;
+            return false;
         }
 
         #[\Override]
-        public function move2protect(string $filepath): ?string
+        public function copy2protected(string $filepath): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
-            return $this->moveFile($filepath, $bucket);
+            return $this->copyFile($filepath, $bucket, self::GID_INITIAL . self::ID_SEPARATOR);
         }
 
         #[\Override]
-        public function move2private(string $filepath): ?string
+        public function copy2group(string $filepath, string $groupId): ?string
         {
             $bucket = $this->app->config->appProtectedStorage();
-            $groupId = $this->app->config->clientGroupId();
-            if (empty($groupId)) {
-                throw new ServerException('Client group Id cannot be empty');
-            }
-            return $this->moveFile($filepath, $bucket, $groupId . '-');
+            return $this->copyFile($filepath, $bucket, self::GID_INITIAL . $groupId . self::ID_SEPARATOR);
         }
 
         #[\Override]
-        public function move(string $filepath): ?string
+        public function copy2public(string $filepath): ?string
         {
             $bucket = $this->app->config->appPublicStorage();
-            return $this->moveFile($filepath, $bucket);
+            return $this->copyFile($filepath, $bucket);
         }
 
-        private function moveFile(string $filepath, string $bucket, string $groupId = null): ?string
+        private function copyFile(string $filepath, string $bucket, string $prefix = null): ?string
         {
-            $prefix = self::getPrefix($filepath);
-            if ($prefix !== $bucket && is_file($filepath)) {
-                //= /prefix/path/to/file.txt
-                $shortPath = substr($filepath, strlen($prefix));
-                //= /path/to/file.txt
-                $folder = $bucket . dirname($shortPath);
-                $filename = $groupId . self::getFilename(basename($shortPath));
-                $destination = self::createDirectory($this->pathTo($folder));
-                Concurrency::parallel(fn() => rename($filepath, $destination . '/' . $filename));
-                return $folder . '/' . $filename;
+            $owners = self::getFileOwnership($filepath);
+            $srcFile = $this->pathTo($filepath);
+            if (is_readable($srcFile) && $owners['oid'] === $this->app->config->clientPrivateId()) {
+                $name = self::getFilename($filepath);
+                $newName = self::PID_INITIAL . $owners['oid'] . self::ID_SEPARATOR . $prefix . $name;
+                $srcBucket = self::getPrefix($filepath);
+                $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
+                $destination = self::createDirectory($this->pathTo($savepath));
+                if (!is_link($destination . '/' . $newName) && symlink($srcFile, $destination . '/' . $newName)) {
+                    return $savepath . '/' . $newName;
+                }
             }
             return null;
         }
 
         /**
-         * Get a file name without client group Id
+         * Get a file name without client Id
          * @param string $file
          * @return string
          */
         private static function getFilename(string $file): string
         {
-            $pos = strrpos($file, '-');
+            $pos = strrpos($file, self::ID_SEPARATOR);
             if ($pos !== false) {
-                return substr($file, $pos + 1);
+                return substr($file, $pos + strlen(self::ID_SEPARATOR));
             }
             return $file;
         }

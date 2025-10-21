@@ -228,12 +228,37 @@ namespace shani\advisors {
 
         /**
          * Returns client group Id shared by one or more clients e.g company unique Id.
-         * This Id helps protecting shared resources (e.g uploaded files) against outsiders.
+         * This Id helps accessing and protecting shared resources (e.g uploaded files)
+         * against outsiders. This ID should not be changed anyhow, otherwise client will
+         * loose access to their shared uploaded files.
          * @return string|null Shared unique id
          */
         public function clientGroupId(): ?string
         {
-            return null;
+            return '334';
+        }
+
+        /**
+         * Check whether a client possess a given group id. Client can have multiple
+         * group ids
+         * @param string $groupId The group Id to check
+         * @return bool True if client has the given group id, false otherwise
+         */
+        public function clientGroupIdExists(string $groupId): bool
+        {
+            return false;
+        }
+
+        /**
+         * Returns client private unique Id. This Id helps accessing and protecting
+         * private resources (e.g uploaded files) against outsiders. This ID should not
+         * be changed anyhow, otherwise client will loose access to their private
+         * uploaded files.
+         * @return string|null Private unique id
+         */
+        public function clientPrivateId(): ?string
+        {
+            return '123';
         }
 
         /**
@@ -393,10 +418,9 @@ namespace shani\advisors {
         /**
          * Get file storage media where uploaded files will be saved and retrieved.
          * To be able to use remote storage.
-         * @param string $media Storage name
          * @return StorageMedia
          */
-        public function getStorageMedia(string $media): StorageMedia
+        public function getStorageMedia(): StorageMedia
         {
             return new LocalStorage($this->app);
         }

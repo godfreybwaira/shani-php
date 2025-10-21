@@ -445,6 +445,7 @@ jph: image/jph
 jpm: video/jpm
 jpx: image/jpx
 js: application/javascript
+jsonp: application/javascript
 json: application/json
 json5: application/json5
 jsonld: application/ld+json

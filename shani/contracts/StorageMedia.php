@@ -15,32 +15,13 @@ namespace shani\contracts {
     {
 
         /**
-         * Save a file to a public directory. A public directory is accessible
-         * by everyone
+         * Save a file with a private access. A private file is accessible
+         * only by a file owner
          * @param File $file A file object to save
          * @param string $bucket A destination directory
-         * @return string|null Path to a File, null otherwise
+         * @return string|null Path to a saved file.
          */
-        public function save(File $file, string $bucket = '/'): ?string;
-
-        /**
-         * Save a file to a protected directory. A protected directory is accessible
-         * by authenticated clients only
-         * @param File $file A file object to save
-         * @param string $bucket A destination directory
-         * @return string|null Path to a File, null otherwise
-         */
-        public function save2protect(File $file, string $bucket = '/'): ?string;
-
-        /**
-         * Save a file to a protected directory. This resource is only accessible
-         * to authenticated clients with the same group Id
-         * @param File $file A file object to save
-         * @param string|null $bucket A destination directory
-         * @return string Path to a File, null otherwise
-         * @see \shani\advisors\Configuration::clientGroupId()
-         */
-        public function save2private(File $file, string $bucket = '/'): ?string;
+        public function save(File $file, string $bucket = '/'): string;
 
         /**
          * Get file URL
@@ -52,33 +33,34 @@ namespace shani\contracts {
         /**
          * Delete a file
          * @param string $filepath File path
-         * @return self
+         * @return bool True on success, false otherwise.
          */
-        public function delete(string $filepath): self;
+        public function delete(string $filepath): bool;
 
         /**
-         * Move a file to a public directory. If the file is already in public
-         * directory nothing happens
-         * @param string $filepath Source file to move
+         * Copy a file to a public directory. If the file is already in public
+         * directory nothing will happens
+         * @param string $filepath Source file to copy
          * @return string|null A path to a new location, or null otherwise
          */
-        public function move(string $filepath): ?string;
+        public function copy2public(string $filepath): ?string;
 
         /**
-         * Move a file to a protected directory. If the file is already in protected
-         * directory nothing happens
-         * @param string $filepath Source file to move
+         * Copy a file to a protected directory. If the file is already in protected
+         * directory nothing will happen
+         * @param string $filepath Source file to copy
          * @return string|null A path to a new location, or null otherwise
          */
-        public function move2protect(string $filepath): ?string;
+        public function copy2protected(string $filepath): ?string;
 
         /**
-         * Move a file to a private directory. If the file is already in private
-         * directory nothing happens
-         * @param string $filepath Source file to move
+         * Copy a file to a shared directory. If the file is already in private
+         * directory nothing will happen
+         * @param string $filepath Source file to copy
+         * @param string $groupId Client group Id to save in
          * @return string|null A path to a new location, or null otherwise
          */
-        public function move2private(string $filepath): ?string;
+        public function copy2group(string $filepath, string $groupId): ?string;
 
         /**
          * Get a full path to a storage destination

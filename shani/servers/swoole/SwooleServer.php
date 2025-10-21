@@ -94,10 +94,10 @@ namespace shani\servers\swoole {
             $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';
                 $request = self::createRequest($scheme, $req);
-                if ($scheme === 'https') {
+                if ($scheme === 'https' || !$this->forceRedirection) {
                     $writer = new SwooleHttpResponseWriter($res);
                     $callback($request, $writer);
-                } elseif ($this->forceRedirection) {
+                } else {
                     $uri = $request->uri->withPort($this->httpsPort)->withScheme('https');
                     $res->status(HttpStatus::MOVED_PERMANENTLY->value);
                     $res->header('location', $uri);
