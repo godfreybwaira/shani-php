@@ -43,7 +43,7 @@ namespace shani\contracts {
          * @param string $filepath Source file to copy
          * @return string|null A path to a new location, or null otherwise
          */
-        public function copy2public(string $filepath): ?string;
+        public function share2public(string $filepath): ?string;
 
         /**
          * Copy a file to a protected directory. If the file is already in protected
@@ -51,7 +51,7 @@ namespace shani\contracts {
          * @param string $filepath Source file to copy
          * @return string|null A path to a new location, or null otherwise
          */
-        public function copy2protected(string $filepath): ?string;
+        public function share2protected(string $filepath): ?string;
 
         /**
          * Copy a file to a shared directory. If the file is already in private
@@ -60,7 +60,16 @@ namespace shani\contracts {
          * @param string $groupId Client group Id to save in
          * @return string|null A path to a new location, or null otherwise
          */
-        public function copy2group(string $filepath, string $groupId): ?string;
+        public function share2group(string $filepath, string $groupId): ?string;
+
+        /**
+         * Copy a file to a shared directory. If the file is already in private
+         * directory nothing will happen
+         * @param string $filepath Source file to copy
+         * @param string $otherId Client group Id to save in
+         * @return string|null A path to a new location, or null otherwise
+         */
+        public function share2other(string $filepath, string $otherId): ?string;
 
         /**
          * Get a full path to a storage destination

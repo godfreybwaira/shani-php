@@ -181,40 +181,51 @@ namespace shani\persistence {
         public function delete(string $filepath): bool
         {
             $owners = self::getFileOwnership($filepath);
-            if ($owners['oid'] === $this->app->config->clientPrivateId()) {
+            if ($owners == null || $owners['oid'] === $this->app->config->clientPrivateId()) {
                 return file_exists($filepath) && unlink($filepath);
             }
             return false;
         }
 
         #[\Override]
-        public function copy2protected(string $filepath): ?string
+        public function share2protected(string $filepath): ?string
         {
+            $prefix = self::PID_INITIAL . $this->app->config->clientPrivateId();
+            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL;
             $bucket = $this->app->config->appProtectedStorage();
-            return $this->copyFile($filepath, $bucket, self::GID_INITIAL . self::ID_SEPARATOR);
+            return $this->shareFile($filepath, $bucket, $prefix);
         }
 
         #[\Override]
-        public function copy2group(string $filepath, string $groupId): ?string
+        public function share2group(string $filepath, string $groupId): ?string
         {
+            $prefix = self::PID_INITIAL . $this->app->config->clientPrivateId();
+            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $groupId;
             $bucket = $this->app->config->appProtectedStorage();
-            return $this->copyFile($filepath, $bucket, self::GID_INITIAL . $groupId . self::ID_SEPARATOR);
+            return $this->shareFile($filepath, $bucket, $prefix);
         }
 
         #[\Override]
-        public function copy2public(string $filepath): ?string
+        public function share2other(string $filepath, string $otherId): ?string
         {
+            $prefix = self::PID_INITIAL . $otherId;
+            $bucket = $this->app->config->appProtectedStorage();
+            return $this->shareFile($filepath, $bucket, $prefix);
+        }
+
+        #[\Override]
+        public function share2public(string $filepath): ?string
+        {
+            $prefix = self::PID_INITIAL . $this->app->config->clientPrivateId();
             $bucket = $this->app->config->appPublicStorage();
-            return $this->copyFile($filepath, $bucket);
+            return $this->shareFile($filepath, $bucket, $prefix);
         }
 
-        private function copyFile(string $filepath, string $bucket, string $prefix = null): ?string
+        private function shareFile(string $filepath, string $bucket, string $prefix): ?string
         {
-            $owners = self::getFileOwnership($filepath);
             $srcFile = $this->pathTo($filepath);
-            if (is_readable($srcFile) && $owners['oid'] === $this->app->config->clientPrivateId()) {
-                $name = self::getFilename($filepath);
-                $newName = self::PID_INITIAL . $owners['oid'] . self::ID_SEPARATOR . $prefix . $name;
+            if (is_readable($srcFile)) {
+                $newName = $prefix . self::ID_SEPARATOR . self::getFilename($filepath);
                 $srcBucket = self::getPrefix($filepath);
                 $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
                 $destination = self::createDirectory($this->pathTo($savepath));
