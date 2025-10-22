@@ -65,10 +65,9 @@ namespace shani\http {
         {
             $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
             $subtype = $this->app->response->subtype();
-            $this->app->response->header()->addAll([
-                HttpHeader::CACHE_CONTROL => 'no-cache',
-                'X-Accel-Buffering' => 'no', //disable buffering on nginx
-            ]);
+            $this->app->response->header()
+                    ->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
+                    ->addOne('X-Accel-Buffering', 'no'); //disable buffering on nginx
             $this->writer->sendHeaders($this->app->response);
             while (($output = $callback()) !== null) {
                 if ($output instanceof \JsonSerializable) {
@@ -122,37 +121,37 @@ namespace shani\http {
                 $this->app->response->saveAs($output->filename);
             }
             $file = stat($output->filepath);
-            $start = 0;
-            $end = $file['size'] - 1;
+            $startPos = 0;
+            $endPos = $file['size'] - 1;
             $range = $this->app->request->header()->getOne(HttpHeader::RANGE) ?? '=0-';
             if ($range === '=0-' && $file['size'] <= $output->chunkSize) {
                 $this->app->response->setStatus(HttpStatus::OK);
             } else {
-                $start = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-                $end = min($start + $output->chunkSize, $file['size']) - 1;
+                $startPos = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
+                $endPos = min($startPos + $output->chunkSize, $file['size']) - 1;
                 $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->addAll([
-                    HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
+                    HttpHeader::CONTENT_RANGE => "bytes $startPos-$endPos/" . $file['size'],
                     HttpHeader::ACCEPT_RANGES => 'bytes',
                     'X-Accel-Buffering' => 'no', //disable buffering on nginx
                 ]);
                 $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             }
-            $this->streamFile($output->filepath, $file['size'], $start, $end);
+            $this->streamFile($output->filepath, $file['size'], $startPos, $endPos);
         }
 
-        private function streamFile(string $path, int $filesize, int $start, int $end): void
+        private function streamFile(string $filepath, int $filesize, int $startPos, int $endPos): void
         {
-            $length = $end - $start + 1;
+            $length = $endPos - $startPos + 1;
             if ($length > 0 && $length <= $filesize) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CONTENT_LENGTH => $length,
-                    HttpHeader::CONTENT_TYPE => MediaType::fromFilename($path)
+                    HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
                 ]);
                 if ($this->app->request->method === 'head') {
                     $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->app->response);
                 } else {
-                    $this->writer->streamFile($this->app->response, $path, $start, $length);
+                    $this->writer->streamFile($this->app->response, $filepath, $startPos, $length);
                 }
             } else {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);

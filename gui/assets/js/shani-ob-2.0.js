@@ -904,9 +904,7 @@
             cache.put(url, cached);
         };
         const parseResponse = (res, onSuccess, accept) => {
-            // Better streaming detection
-            const isStreaming = res.status === 206 || res.headers.get('transfer-encoding') === 'chunked';
-            if (isStreaming) {
+            if (res.status === 206) {
                 handleStream(res, onSuccess);
             } else {
                 handleNonStream(res, onSuccess, accept);
