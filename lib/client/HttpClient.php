@@ -60,7 +60,7 @@ namespace lib\client {
             ];
             $this->enableSSLVerification(true);
             $this->stream = 'php://temp';
-            $this->streamMode = 'r+b';
+            $this->streamMode = 'rb';
             $this->requestHeader = new HttpHeader();
             $this->responseHeader = new HttpHeader();
             $this->host = $uri->host();

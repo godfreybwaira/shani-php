@@ -51,7 +51,7 @@ namespace shani\contracts {
          * @param int $chunkSize Size of a chunk to send
          * @return self
          */
-        public function stream(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self;
+        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self;
     }
 
 }

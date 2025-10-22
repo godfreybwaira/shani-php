@@ -46,23 +46,29 @@ namespace shani\servers\cgi {
         public function sendBody(ResponseEntity &$res): self
         {
             echo $res->body();
+            self::flush();
+            return $this;
+        }
+
+        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
+        {
+            $this->sendHeaders($res);
+            $stream = fopen($filepath, 'rb');
+            fseek($stream, $startByte);
+            while (!feof($stream)) {
+                echo fread($stream, $chunkSize);
+                self::flush();
+            }
+            fclose($stream);
+            return $this;
+        }
+
+        private static function flush(): void
+        {
             flush();
             if (ob_get_level() > 0) {
                 ob_flush();
             }
-            return $this;
-        }
-
-        public function stream(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
-        {
-            $this->sendHeaders($res);
-            $stream = fopen($filepath, 'r+b');
-            fseek($stream, $startByte);
-            while (!feof($stream)) {
-                echo fread($stream, $chunkSize);
-            }
-            fclose($stream);
-            return $this;
         }
     }
 

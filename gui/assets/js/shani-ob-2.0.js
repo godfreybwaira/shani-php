@@ -904,6 +904,30 @@
             cache.put(url, cached);
         };
         const parseResponse = (res, onSuccess, accept) => {
+            // Better streaming detection
+            const isStreaming = res.status === 206 || res.headers.get('transfer-encoding') === 'chunked';
+            if (isStreaming) {
+                handleStream(res, onSuccess);
+            } else {
+                handleNonStream(res, onSuccess, accept);
+            }
+        };
+        const handleStream = (res, onSuccess) => {
+            const reader = res.body.getReader(), decoder = new TextDecoder();
+            const readChunk = () => {
+                reader.read().then(data => {
+                    if (data.done) {
+                        return;
+                    }
+                    onSuccess(Utils.object({
+                        headers: res.headers, status: res.status, body: decoder.decode(data.value)
+                    }));
+                    readChunk();
+                }).finally(() => reader.releaseLock());
+            };
+            readChunk();
+        };
+        const handleNonStream = (res, onSuccess, accept) => {
             const type = accept || Utils.getSubtype(res.headers.get('content-type'));
             let promise;
             if (type === 'json') {

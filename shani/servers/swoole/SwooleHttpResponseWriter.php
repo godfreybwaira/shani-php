@@ -53,7 +53,7 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function stream(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
+        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res)->writer->sendfile($filepath, $startByte, $chunkSize);
             return $this;

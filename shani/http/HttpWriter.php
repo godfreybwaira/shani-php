@@ -132,7 +132,9 @@ namespace shani\http {
                 $end = min($start + $output->chunkSize, $file['size']) - 1;
                 $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->addAll([
                     HttpHeader::CONTENT_RANGE => "bytes $start-$end/" . $file['size'],
-                    HttpHeader::ACCEPT_RANGES => 'bytes'
+                    HttpHeader::ACCEPT_RANGES => 'bytes',
+                    HttpHeader::CACHE_CONTROL => 'no-cache',
+                    'X-Accel-Buffering' => 'no', //disable buffering on nginx
                 ]);
                 $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             }
@@ -151,7 +153,7 @@ namespace shani\http {
                     $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->app->response);
                 } else {
-                    $this->writer->stream($this->app->response, $path, $start, $length);
+                    $this->writer->streamFile($this->app->response, $path, $start, $length);
                 }
             } else {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
