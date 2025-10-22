@@ -35,14 +35,22 @@ namespace shani\servers\cgi {
 
         public function send(ResponseEntity &$res): self
         {
-            $this->sendHeaders($res);
-            echo $res->body();
-            return $this;
+            return $this->sendHeaders($res)->sendBody($res);
         }
 
         public function close(ResponseEntity &$res): self
         {
             return $this->send($res);
+        }
+
+        public function sendBody(ResponseEntity &$res): self
+        {
+            echo $res->body();
+            flush();
+            if (ob_get_level() > 0) {
+                ob_flush();
+            }
+            return $this;
         }
 
         public function stream(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self

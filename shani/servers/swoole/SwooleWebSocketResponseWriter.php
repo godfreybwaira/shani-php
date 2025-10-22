@@ -37,7 +37,11 @@ namespace shani\servers\swoole {
 
         public function send(ResponseEntity &$res): self
         {
-            $this->sendHeaders($res);
+            return $this->sendHeaders($res)->sendBody($res);
+        }
+
+        public function sendBody(ResponseEntity &$res): self
+        {
             $this->writer->push($this->connectionId, $res->body());
             return $this;
         }

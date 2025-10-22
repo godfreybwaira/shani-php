@@ -15,7 +15,7 @@ namespace shani\contracts {
     {
 
         /**
-         * Send output to a client application
+         * Send the HTTP output (headers and body) to a client application
          * @param ResponseEntity $res Response object
          * @return self
          */
@@ -29,7 +29,14 @@ namespace shani\contracts {
         public function sendHeaders(ResponseEntity &$res): self;
 
         /**
-         * Send output to a client application and close connection
+         * Send HTTP response body to client application
+         * @param ResponseEntity $res Response object
+         * @return self
+         */
+        public function sendBody(ResponseEntity &$res): self;
+
+        /**
+         * Send the HTTP output (headers and body) to a client application and close connection
          * @param ResponseEntity $res Response object
          * @return self
          */

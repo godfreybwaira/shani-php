@@ -34,9 +34,13 @@ namespace shani\http {
         private ?Logger $logger = null;
         private ?Cart $csrfCart = null;
         private SessionManager $session;
-        private readonly HttpWriter $httpWriter;
         private ?string $lang = null, $platform = null;
-        private ?bool $keepConn = null;
+
+        /**
+         * HTTP response writer
+         * @var HttpWriter
+         */
+        public readonly HttpWriter $writer;
 
         /**
          * Application virtual host configuration
@@ -73,32 +77,8 @@ namespace shani\http {
             $this->vhost = $vhost;
             $this->response = $res;
             $this->request = $res->request;
-            $this->httpWriter = new HttpWriter($this, $writer);
+            $this->writer = new HttpWriter($this, $writer);
             $this->config = new $vhost->classFile($this, $vhost->profile);
-        }
-
-        /**
-         * Set whether to close the connection after sending a response or to keep
-         * it open. By default, if the application is running as a web socket, the
-         * connection will not be closed unless you say so, otherwise the connection
-         * will be closed as soon as the first response is sent.
-         * @param bool $value The value indicate whether to keep or to close the connection.
-         * @return self
-         */
-        public function keepConnection(bool $value): self
-        {
-            $this->keepConn = $value;
-            return $this;
-        }
-
-        /**
-         * Get the connection status
-         * @return bool True if if the connection will be kept, null means the
-         * server will decide whether to keep or to close, false otherwise.
-         */
-        public function connectionStatus(): ?bool
-        {
-            return $this->keepConn;
         }
 
         /**
@@ -262,8 +242,7 @@ namespace shani\http {
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);
             }
-            $output = $obj->$callback();
-            $this->httpWriter->send($output);
+            $obj->$callback();
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string
@@ -315,18 +294,7 @@ namespace shani\http {
                 $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
                 //log error
             }
-            $this->httpWriter->send(null);
-        }
-
-        /**
-         * Get writer object. This object is responsible for writing the output
-         * to client application. Most of the time you will not be calling this
-         * function as it is called internally.
-         * @return HttpWriter Writer object
-         */
-        public function writer(): HttpWriter
-        {
-            return $this->httpWriter;
+            $this->writer->send(null);
         }
     }
 

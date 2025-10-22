@@ -10,6 +10,8 @@
 namespace apps\demo\modules\shani\logic\controllers\get {
 
     use gui\WebUIBuilder;
+    use lib\http\HttpHeader;
+    use lib\MediaType;
     use shani\documentation\Generator as Documentation;
     use shani\http\App;
 
@@ -23,75 +25,75 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): WebUIBuilder
+        public function index(): void
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
                     ->view('/body');
-            return $builder;
+            $this->app->writer->send($builder);
         }
 
-        public function all(): WebUIBuilder
+        public function all(): void
         {
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function inputs(): WebUIBuilder
+        public function inputs(): void
         {
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function containers(): WebUIBuilder
+        public function containers(): void
         {
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function modals(): WebUIBuilder
-        {
-            $builder = new WebUIBuilder();
-            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            return $builder;
-        }
-
-        public function toaster(): WebUIBuilder
-        {
-            return new WebUIBuilder();
-        }
-
-        public function loader(): WebUIBuilder
+        public function modals(): void
         {
             $builder = new WebUIBuilder();
             $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            return $builder;
+            $this->app->writer->send($builder);
         }
 
-        public function timeline(): WebUIBuilder
+        public function toaster(): void
         {
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function shani(): WebUIBuilder
+        public function loader(): void
         {
-            return new WebUIBuilder();
+            $builder = new WebUIBuilder();
+            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
+            $this->app->writer->send($builder);
         }
 
-        public function redirect(): WebUIBuilder
+        public function timeline(): void
         {
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function generator(): WebUIBuilder
+        public function shani(): void
+        {
+            $this->app->writer->send(new WebUIBuilder());
+        }
+
+        public function redirect(): void
+        {
+            $this->app->writer->send(new WebUIBuilder());
+        }
+
+        public function generator(): void
         {
             sleep(2);
             $doc = new Documentation($this->app);
-            return new WebUIBuilder($doc);
+            $this->app->writer->send($doc);
         }
 
-        public function card(): WebUIBuilder
+        public function card(): void
         {
             sleep(1);
-            return new WebUIBuilder();
+            $this->app->writer->send(new WebUIBuilder());
         }
     }
 

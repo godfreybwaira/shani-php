@@ -26,26 +26,26 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->database());
         }
 
-        public function index(): StudentListDto
+        public function index(): void
         {
             $students = $this->service->getAll();
             $dtos = new StudentListDto();
             foreach ($students as $student) {
                 $dtos->put(StudentDto::toDto($student));
             }
-            return $dtos;
+            $this->app->writer->send($dtos);
         }
 
         /**
          * My good function.
          * Returns nothing
          */
-        public function one(): ?StudentDto
+        public function one(): void
         {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
             $dto = $student !== null ? StudentDto::toDto($student) : null;
-            return $dto;
+            $this->app->writer->send($dto);
         }
     }
 

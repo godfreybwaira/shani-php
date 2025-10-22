@@ -90,8 +90,8 @@ namespace shani\persistence {
                 throw CustomException::forbidden($app);
             }
             $owners = self::getFileOwnership($filepath);
-            if ($owners !== null) {
-                if ($owners['oid'] !== $app->config->clientPrivateId() && !$app->config->clientGroupIdExists($owners['gid'])) {
+            if ($owners !== null && $owners['oid'] !== $app->config->clientPrivateId()) {
+                if (!$app->config->clientGroupIdExists($owners['gid'])) {
                     throw CustomException::forbidden($app);
                 }
             }
@@ -123,7 +123,7 @@ namespace shani\persistence {
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
                 $output = new FileOutput($filepath);
             }
-            $app->writer()->send($output);
+            $app->writer->send($output);
             return true;
         }
 

@@ -32,10 +32,16 @@ namespace shani\http {
 
         /**
          * Send content to a client application
-         * @param \JsonSerializable|WebUIBuilder|FileOutput|null $output Output object to send
+         * @param \JsonSerializable|WebUIBuilder|FileOutput|null $output Output
+         * object to send
+         * @param bool|null $keepConnection Set whether to close the connection
+         * after sending a response or to keep it open. By default, if the application
+         * is running as a web socket, the connection will not be closed unless
+         * you say so, otherwise the connection will be closed as soon as the
+         * first response is sent.
          * @return void
          */
-        public function send(\JsonSerializable|WebUIBuilder|FileOutput|null $output): void
+        public function send(\JsonSerializable|WebUIBuilder|FileOutput|null $output = null, ?bool $keepConnection = null): void
         {
             $subtype = $this->app->response->subtype();
             if ($output instanceof \JsonSerializable) {
@@ -43,10 +49,38 @@ namespace shani\http {
             } elseif ($output instanceof WebUIBuilder) {
                 $this->handleUIBuilderOutput($output, $subtype);
             } elseif ($output instanceof FileOutput) {
-                $this->handleFileOutput($output);
+                $this->prepareFileStreaming($output);
                 return;
             }
-            $this->write();
+            $this->write($keepConnection);
+        }
+
+        /**
+         * Stream data to client application. To stop streaming return null on $callback
+         * @param callable $callback A callback to handle streaming. This callback
+         * has the following signature <code>$callback():?\JsonSerializable|WebUIBuilder|string</code>
+         * @return void
+         */
+        public function stream(callable $callback): void
+        {
+            $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
+            $subtype = $this->app->response->subtype();
+            $this->app->response->header()->addAll([
+                HttpHeader::CACHE_CONTROL => 'no-cache',
+                'X-Accel-Buffering' => 'no', //disable buffering on nginx
+            ]);
+            $this->writer->sendHeaders($this->app->response);
+            while (($output = $callback()) !== null) {
+                if ($output instanceof \JsonSerializable) {
+                    $this->handleSerializableOutput($output, $subtype);
+                } elseif ($output instanceof WebUIBuilder) {
+                    $this->handleUIBuilderOutput($output, $subtype);
+                } else {
+                    $this->app->response->setBody($output);
+                }
+                $this->writer->sendBody($this->app->response);
+            }
+            $this->writer->close($this->app->response);
         }
 
         private function handleSerializableOutput(?\JsonSerializable $data, string $subtype): void
@@ -77,7 +111,7 @@ namespace shani\http {
          * @param FileOutput $output
          * @return void
          */
-        private function handleFileOutput(FileOutput $output): void
+        private function prepareFileStreaming(FileOutput $output): void
         {
             if (!is_readable($output->filepath)) {
                 $this->app->response->setStatus(HttpStatus::NOT_FOUND);
@@ -102,10 +136,10 @@ namespace shani\http {
                 ]);
                 $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             }
-            $this->doStream($output->filepath, $file['size'], $start, $end);
+            $this->streamFile($output->filepath, $file['size'], $start, $end);
         }
 
-        private function doStream(string $path, int $filesize, int $start, int $end): void
+        private function streamFile(string $path, int $filesize, int $start, int $end): void
         {
             $length = $end - $start + 1;
             if ($length > 0 && $length <= $filesize) {
@@ -138,11 +172,10 @@ namespace shani\http {
                     ->header()->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache');
         }
 
-        private function write(): void
+        private function write(?bool $keepConnection = false): void
         {
-            $useBuffer = $this->app->connectionStatus();
             $scheme = $this->app->request->uri->scheme();
-            $buffer = $useBuffer === null ? $scheme === 'ws' || $scheme === 'wss' : $useBuffer;
+            $buffer = $keepConnection === null ? $scheme === 'ws' || $scheme === 'wss' : $keepConnection;
             $this->app->config->responseMutator();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->app->response->bodySize());
             if ($this->app->request->method === 'head') {
