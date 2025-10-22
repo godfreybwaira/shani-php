@@ -10,8 +10,6 @@
 namespace apps\demo\modules\shani\logic\controllers\get {
 
     use gui\WebUIBuilder;
-    use lib\http\HttpHeader;
-    use lib\MediaType;
     use shani\documentation\Generator as Documentation;
     use shani\http\App;
 
