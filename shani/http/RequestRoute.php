@@ -35,11 +35,21 @@ namespace shani\http {
         public readonly string $action;
         public readonly ?string $extension;
 
+        private function __construct(string $module, string $controller, string $action, array $params, ?string $extension)
+        {
+            $this->params = $params;
+            $this->module = $module;
+            $this->action = $action;
+            $this->extension = $extension;
+            $this->controller = $controller;
+        }
+
         /**
-         * Create a new Request Rout object
+         * Create a new Request Rout object from path while the query string is ignored.
+         * Normally the path can be request uri or any other similar structure.
          * @param string $path Request uri path e.g /users/0/profile
          */
-        public function __construct(string $path)
+        public static function fromPath(string $path): self
         {
             $cleanPath = strtolower(trim($path, '/'));
             $idx = strpos($cleanPath, '?');
@@ -47,11 +57,12 @@ namespace shani\http {
                 $cleanPath = substr($cleanPath, 0, $idx);
             }
             $url = explode('.', $cleanPath);
-            $this->params = explode('/', $url[0]);
-            $this->controller = ($this->params[2] ?? $this->params[0]);
-            $this->module = $this->params[0];
-            $this->action = ($this->params[4] ?? Framework::HOME_FUNCTION);
-            $this->extension = $url[1] ?? null;
+            $params = explode('/', $url[0]);
+            $module = $params[0];
+            $controller = $params[2] ?? $module;
+            $action = $params[4] ?? Framework::HOME_FUNCTION;
+            $extension = $url[1] ?? null;
+            return new self($module, $controller, $action, $params, $extension);
         }
     }
 

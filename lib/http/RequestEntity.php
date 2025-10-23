@@ -114,7 +114,7 @@ namespace lib\http {
          */
         public function changeRoute(string $path): self
         {
-            $this->route = new RequestRoute($path);
+            $this->route = RequestRoute::fromPath($path);
             return $this;
         }
 
