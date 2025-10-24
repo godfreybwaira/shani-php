@@ -6,7 +6,7 @@
     display: inline-block;
     @extend %position_relative;
     &-body{
-        z-index: 1;
+        z-index: 900;
         min-width: max-content;
         @if(fn.isDarkColor(var.$bg_color)==false){
             @extend %box_shadow_sm;

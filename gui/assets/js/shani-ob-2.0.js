@@ -921,7 +921,7 @@
                         headers: res.headers, status: res.status, body: decoder.decode(data.value)
                     }));
                     readChunk();
-                }).finally(() => reader.releaseLock());
+                });
             };
             readChunk();
         };

@@ -136,7 +136,7 @@ namespace shani\persistence {
                 throw new ServerException('Client private Id cannot be empty');
             }
             $prefix = self::PID_INITIAL . $privateId . self::ID_SEPARATOR;
-            $filename = $prefix . substr(md5(random_bytes(random_int(10, 70))), 0, 15);
+            $filename = $prefix . substr(sha1(random_bytes(random_int(10, 70))), 0, rand(10, 15));
             $directory = self::createDirectory($path . $file->type);
             $filepath = $directory . '/' . $filename . $file->extension;
             Concurrency::parallel(function ()use ($filepath, &$file) {

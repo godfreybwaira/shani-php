@@ -37,6 +37,19 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app->writer->send(new WebUIBuilder());
         }
 
+        public function stream(): void
+        {
+            $counter = 0;
+            $this->app->writer->stream(function ()use (&$counter) {
+                sleep(1);
+                $counter++;
+                if ($counter > 10000) {
+                    return null; //terminate streaming
+                }
+                return 'counter ' . $counter;
+            });
+        }
+
         public function inputs(): void
         {
             $this->app->writer->send(new WebUIBuilder());

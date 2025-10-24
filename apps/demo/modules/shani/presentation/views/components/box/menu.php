@@ -8,6 +8,13 @@
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
+    <a href="/shani/0/components/0/stream"
+       shani-on="click:makeloader id:ldr1&color:red>>.layout-content;
+       makeloader:read mode:replace>>#mainbody;
+       end:nodermv>>#ldr1" class="menu-item menu-item-dir-v">
+        <i class="mdi mdi-water"></i>
+        <span class="font-sm menu-label">Streaming</span>
+    </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
        shani-on="click:cssadd loader-top>>.layout-content;cssadd:read>>#content;end:cssrmv loader-top>>.layout-content">
         <i class="mdi mdi-loading"></i>
