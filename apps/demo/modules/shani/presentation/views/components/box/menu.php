@@ -10,7 +10,7 @@
     </a>
     <a href="/shani/0/components/0/stream"
        shani-on="click:makeloader id:ldr1&color:red>>.layout-content;
-       makeloader:read mode:replace>>#mainbody;
+       makeloader:abort;abort:read mode:replace>>#content;
        end:nodermv>>#ldr1" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-water"></i>
         <span class="font-sm menu-label">Streaming</span>
@@ -21,7 +21,10 @@
         <span class="font-sm menu-label">Loader 1</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
-       shani-on="click:makeloader id:ldr123&color:red>>.layout-content;makeloader:read>>#content;end:nodermv>>#ldr123">
+       shani-on="click:makeloader id:ldr123&color:red>>.layout-content;
+       makeloader:abort;
+       abort:read>>#content;
+       end:nodermv>>#ldr123">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 2</span>
     </a>

@@ -296,10 +296,13 @@
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
-            const mode = params?.mode || 'replace';
+            const mode = params?.mode || 'replace', timeout = shani.http.timeout;
             const type = Utils.getSubtype(shani.enctype), scheme = shani.http.scheme;
             if (type && type !== 'form-data') {
                 shani.headers.set('content-type', shani.enctype.trim());
+            }
+            if (timeout) {
+                shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
             if (scheme === 'ws') {
                 return WSocket(shani, target, mode);
@@ -577,6 +580,14 @@
             },
             makeloader(obj) {
                 Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
+            },
+            /**
+             * Abort any previous HTTP request before making a new one
+             */
+            abort(obj) {
+                if (Utils.controller) {
+                    Utils.controller.abort();
+                }
             }
         };
         window.addEventListener('popstate', e => history.go(0));
@@ -751,7 +762,12 @@
                 if (shani.event.detail?.shani?.event?.type !== evt) {
                     doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
                 }
-                evt !== 'end' || resubmit(shani);
+                if (evt === 'end') {
+                    if (shani.http.timerId) {
+                        clearTimeout(shani.http.timerId);
+                    }
+                    resubmit(shani);
+            }
             },
             getSubtype(header) {
                 if (header) {
@@ -800,7 +816,8 @@
                     throw new Error('Invalid time interval ' + time);
                 }
                 return time;
-            }
+            },
+            controller: null
         };
     })();
     const HTTP = (() => {
@@ -828,7 +845,6 @@
                     req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
-                req.timeout = Utils.time2ms(shani.http.timeout);
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
@@ -903,11 +919,11 @@
             });
             cache.put(url, cached);
         };
-        const parseResponse = (res, onSuccess, accept) => {
+        const parseResponse = (res, accept, onSuccess, onError) => {
             if (res.status === 206) {
                 handleStream(res, onSuccess);
             } else {
-                handleNonStream(res, onSuccess, accept);
+                handleNonStream(res, accept, onSuccess, onError);
             }
         };
         const handleStream = (res, onSuccess) => {
@@ -921,11 +937,11 @@
                         headers: res.headers, status: res.status, body: decoder.decode(data.value)
                     }));
                     readChunk();
-                });
+                }).catch(e => null);
             };
             readChunk();
         };
-        const handleNonStream = (res, onSuccess, accept) => {
+        const handleNonStream = (res, accept, onSuccess, onError) => {
             const type = accept || Utils.getSubtype(res.headers.get('content-type'));
             let promise;
             if (type === 'json') {
@@ -939,27 +955,27 @@
             }
             promise.then(body => {
                 onSuccess(Utils.object({headers: res.headers, status: res.status, body}));
-            });
+            }).catch(onError);
         };
         const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
-            fetchWithRetry(onError, url, req, res => {
+            fetchWithRetry(url, req, res => {
                 cacheResponse(cache, req, res.clone(), url);
-                parseResponse(res, onSuccess, type);
+                parseResponse(res, type, onSuccess, onError);
             });
         };
-        const fetchWithRetry = (onError, url, req, responseHandler) => {
-            const controller = new AbortController();
-            const timerId = req.timeout ? setTimeout(() => controller.abort(), req.timeout) : null;
-            req.options.signal = controller.signal;
-            return fetch(url, req.options).then(responseHandler).catch(onError)
-                    .finally(() => !timerId || clearTimeout(timerId));
+        const fetchWithRetry = (url, req, responseHandler) => {
+            if (!Utils.controller || Utils.controller.signal.aborted) {
+                Utils.controller = new AbortController();
+            }
+            req.options.signal = Utils.controller.signal;
+            return fetch(url, req.options).then(responseHandler);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
             caches.open(req.cacheName || 'pubcache').then(cache => {
                 cache.match(url).then(res => {
                     const expires = res && res.headers.get('x-expires');
                     if (res && Date.now() < Number(expires)) {
-                        parseResponse(res, onSuccess, type);
+                        parseResponse(res, type, onSuccess, onError);
                     } else {
                         fetchAndCache(cache, url, req, type, onSuccess, onError);
                     }
@@ -972,9 +988,9 @@
                 if (req.cacheDuration && 'caches' in window) {
                     handleCacheResponse(url, req, type, onSuccess, onError, onEnd);
                 } else {
-                    fetchWithRetry(onError, url, req, res => {
-                        parseResponse(res, onSuccess, type);
-                    }).finally(onEnd);
+                    fetchWithRetry(url, req, res => {
+                        parseResponse(res, type, onSuccess, onError);
+                    }).catch(onError).finally(onEnd);
                 }
             }
         };
