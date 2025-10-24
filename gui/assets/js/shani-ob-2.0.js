@@ -582,9 +582,9 @@
                 Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
             },
             /**
-             * Abort any previous HTTP request before making a new one
+             * Cancel ongoing HTTP request
              */
-            abort(obj) {
+            abortreq(obj) {
                 if (Utils.controller) {
                     Utils.controller.abort();
                 }
