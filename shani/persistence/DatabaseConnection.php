@@ -65,21 +65,37 @@ namespace shani\persistence {
         }
 
         /**
+         * Execute SQL query and all rows (if available) found
+         * @param string $query A query to execute
+         * @param array|null $data
+         * @return ReadableMap Iterable object contains rows returned as the result of SQL query.
+         */
+        public function get(string $query, ?array $data = null): ReadableMap
+        {
+            $result = $this->processQuery($query, $data);
+            $rows = $result->fetchAll(\PDO::FETCH_ASSOC);
+            $result->closeCursor();
+            if (!empty($rows) && $this->escape) {
+                self::escapeHtmlChars($rows);
+            }
+            return new ReadableMap($rows);
+        }
+
+        /**
          * Execute SQL query and fetch all rows (if available). This method is memory
          * efficient as it fetches rows on demand
          * @param string $query A query to execute
          * @param array|null $data
          * @return \Generator Iterable object of ReadableMap contains rows returned as the result of SQL query.
          */
-        public function get(string $query, ?array $data = null): \Generator
+        public function collect(string $query, ?array $data = null): \Generator
         {
             $result = $this->processQuery($query, $data);
             while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
                 if ($this->escape) {
-                    yield new ReadableMap(self::escapeHtmlChars($row));
-                } else {
-                    yield new ReadableMap($row);
+                    self::escapeHtmlChars($row);
                 }
+                yield new ReadableMap($row);
             }
             $result->closeCursor();
         }
