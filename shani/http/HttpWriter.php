@@ -69,7 +69,10 @@ namespace shani\http {
                     ->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
                     ->addOne('X-Accel-Buffering', 'no'); //disable buffering on nginx
             $this->writer->sendHeaders($this->app->response);
-            while (($output = $callback()) !== null) {
+            foreach ($callback() as $output) {
+                if ($output === null) {
+                    break;
+                }
                 if ($output instanceof \JsonSerializable) {
                     $this->handleSerializableOutput($output, $subtype);
                 } elseif ($output instanceof WebUIBuilder) {
@@ -79,7 +82,6 @@ namespace shani\http {
                 }
                 $this->writer->sendBody($this->app->response);
             }
-            $this->writer->close($this->app->response);
         }
 
         private function handleSerializableOutput(?\JsonSerializable $data, string $subtype): void
