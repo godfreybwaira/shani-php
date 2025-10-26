@@ -299,7 +299,7 @@
             const mode = params?.mode || 'replace', timeout = shani.http.timeout;
             const type = Utils.getSubtype(shani.enctype), scheme = shani.http.scheme;
             if (type && type !== 'form-data') {
-                shani.headers.set('content-type', shani.enctype.trim());
+                shani.headers.set('content-type', shani.enctype);
             }
             if (timeout) {
                 shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
@@ -341,8 +341,8 @@
         };
         const getCover = (target, pageSize, fontSize) => {
             const id = Utils.getId(), style = doc.createElement('style');
-            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;font-size:';
-            s += (fontSize || 100) + '%;background:#fff}body>:not(#' + id + '){display:none}';
+            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;';
+            s += 'font-size:' + (fontSize || 100) + '%}body>:not(#' + id + '){display:none}';
             s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
             s += '@page{margin:0;page-break-after:always;break-after:page}';
             style.type = 'text/css';
@@ -582,11 +582,15 @@
                 Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
             },
             /**
-             * Cancel ongoing HTTP request
+             * Cancel ongoing HTTP connection
              */
-            abortreq(obj) {
-                if (Utils.controller) {
-                    Utils.controller.abort();
+            abortconn(obj) {
+                if (!obj.params) {
+                    for (const key in Utils.controller) {
+                        Utils.controller[key].abort();
+                    }
+                } else {
+                    Utils.controller[obj.params.name]?.abort();
                 }
             }
         };
@@ -744,9 +748,8 @@
                     const raw = str.split(sep).map(s => s.trim());
                     for (let val of raw) {
                         const pos = val.indexOf(':'), key = pos > 0 ? val.slice(0, pos) : val;
-                        const name = key.toLowerCase();
-                        if (name.length > 0) {
-                            map[name] = pos > 0 ? val.slice(pos + 1).trim() : null;
+                        if (key.length > 0) {
+                            map[key] = pos > 0 ? val.slice(pos + 1).trim() : null;
                         }
                     }
                 }
@@ -817,7 +820,7 @@
                 }
                 return time;
             },
-            controller: null
+            controller: Object.setPrototypeOf({}, null)
         };
     })();
     const HTTP = (() => {
@@ -845,6 +848,7 @@
                     req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
                     req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
                 }
+                req.conn = shani.http.conn || 'conn';
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
@@ -964,10 +968,10 @@
             });
         };
         const fetchWithRetry = (url, req, responseHandler) => {
-            if (!Utils.controller || Utils.controller.signal.aborted) {
-                Utils.controller = new AbortController();
+            if (!Utils.controller[req.conn] || Utils.controller[req.conn].signal.aborted) {
+                Utils.controller[req.conn] = new AbortController();
             }
-            req.options.signal = Utils.controller.signal;
+            req.options.signal = Utils.controller[req.conn].signal;
             return fetch(url, req.options).then(responseHandler);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {

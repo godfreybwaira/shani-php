@@ -8,9 +8,9 @@
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
-    <a href="/shani/0/components/0/stream"
+    <a href="/shani/0/components/0/stream" shani-http="conn:aaa"
        shani-on="click:makeloader id:ldr1&color:red>>.layout-content;
-       makeloader:abortreq;abortreq:read mode:replace>>#content;
+       makeloader:abortconn name:aaa;abortconn:read mode:replace>>#content;
        end:nodermv>>#ldr1" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-water"></i>
         <span class="font-sm menu-label">Streaming</span>
@@ -22,8 +22,8 @@
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
        shani-on="click:makeloader id:ldr123&color:red>>.layout-content;
-       makeloader:abortreq;
-       abortreq:read>>#content;
+       makeloader:abortconn name:aaa;
+       abortconn:read>>#content;
        end:nodermv>>#ldr123">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 2</span>

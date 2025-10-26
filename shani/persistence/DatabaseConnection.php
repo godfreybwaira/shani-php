@@ -65,7 +65,8 @@ namespace shani\persistence {
         }
 
         /**
-         * Execute SQL query and all rows (if available) found
+         * Execute SQL query and all rows (if available) found. For a large data set
+         * (more than 1 row) use <code>loop</code> for efficiency.
          * @param string $query A query to execute
          * @param array|null $data
          * @return ReadableMap Iterable object contains rows returned as the result of SQL query.
