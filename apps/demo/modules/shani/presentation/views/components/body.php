@@ -1,6 +1,6 @@
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar">
-        <a href="/shani/0/components/0/generator" shani-cache="5m" class="active menu-item"
+        <a href="/shani/0/components/0/generator" shani-cache="age:30s" class="active menu-item"
            shani-on="click:read>>#content;start:cssadd loader-spin>>#content;end:cssrmv loader-spin>>#content">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>

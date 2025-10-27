@@ -286,10 +286,10 @@
          * @param {object} shani
          */
         const countdown = shani => {
-            const t = shani.timer.split(':');
-            const start = Utils.time2ms(t[0]) || 0;
-            shani.poll.steps = Utils.time2ms(t[1]) || -1;
-            shani.poll.limit = parseInt(t[2]) || null;
+            const t = Utils.explode(shani.timer);
+            const start = Utils.time2ms(t.start) || 0;
+            shani.poll.steps = Utils.time2ms(t.steps) || -1;
+            shani.poll.limit = parseInt(t.limit) || null;
             setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
         /**
@@ -844,9 +844,9 @@
             createReq(shani, method, onStart, onEnd, onSuccess, onError) {
                 const payload = createPayload(shani, method), req = Utils.object();
                 if (shani.cache) {
-                    const pos = shani.cache.search(/\s/);
-                    req.cacheDuration = Utils.time2ms(pos > -1 ? shani.cache.slice(0, pos) : shani.cache);
-                    req.cacheName = pos > -1 ? shani.cache.slice(pos + 1) : null;
+                    const params = Utils.explode(shani.cache);
+                    req.cacheAge = Utils.time2ms(params.age);
+                    req.cacheName = params.name || null;
                 }
                 req.conn = shani.http.conn || 'conn';
                 req.options = Utils.object({
@@ -915,7 +915,7 @@
     const Fetcher = (() => {
         const cacheResponse = (cache, req, res, url) => {
             const headers = new Headers(res.headers);
-            headers.set('x-expires', Date.now() + req.cacheDuration);
+            headers.set('x-expires', Date.now() + req.cacheAge);
             const cached = new Response(res.body, {
                 statusText: res.statusText,
                 status: res.status,
@@ -961,18 +961,18 @@
                 onSuccess(Utils.object({headers: res.headers, status: res.status, body}));
             }).catch(onError);
         };
-        const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
-            fetchWithRetry(url, req, res => {
-                cacheResponse(cache, req, res.clone(), url);
-                parseResponse(res, type, onSuccess, onError);
-            });
-        };
         const fetchWithRetry = (url, req, responseHandler) => {
             if (!Utils.controller[req.conn] || Utils.controller[req.conn].signal.aborted) {
                 Utils.controller[req.conn] = new AbortController();
             }
             req.options.signal = Utils.controller[req.conn].signal;
             return fetch(url, req.options).then(responseHandler);
+        };
+        const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
+            fetchWithRetry(url, req, res => {
+                cacheResponse(cache, req, res.clone(), url);
+                parseResponse(res, type, onSuccess, onError);
+            }).catch(onError);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
             caches.open(req.cacheName || 'pubcache').then(cache => {
@@ -989,7 +989,7 @@
         return {
             send(url, req, onSuccess, onError, onEnd) {
                 const type = Utils.getSubtype(req.options.headers.get('accept')) || null;
-                if (req.cacheDuration && 'caches' in window) {
+                if (req.cacheAge && 'caches' in window) {
                     handleCacheResponse(url, req, type, onSuccess, onError, onEnd);
                 } else {
                     fetchWithRetry(url, req, res => {
