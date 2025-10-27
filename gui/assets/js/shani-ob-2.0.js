@@ -846,7 +846,7 @@
                 if (shani.cache) {
                     const params = Utils.explode(shani.cache);
                     req.cacheAge = Utils.time2ms(params.age);
-                    req.cacheName = params.name || null;
+                    req.cacheName = params.name || 'pubcache';
                 }
                 req.conn = shani.http.conn || 'conn';
                 req.options = Utils.object({
@@ -975,7 +975,7 @@
             }).catch(onError);
         };
         const handleCacheResponse = (url, req, type, onSuccess, onError, onEnd) => {
-            caches.open(req.cacheName || 'pubcache').then(cache => {
+            caches.open(req.cacheName).then(cache => {
                 cache.match(url).then(res => {
                     const expires = res && res.headers.get('x-expires');
                     if (res && Date.now() < Number(expires)) {
