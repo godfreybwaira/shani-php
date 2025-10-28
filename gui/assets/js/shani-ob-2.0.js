@@ -172,18 +172,18 @@
                 }
                 return output.slice(1);
             },
-//            file2json(file) {
-//                const fr = new FileReader();
-//                fr.readAsDataURL(file);
-//                return new Promise(function (ok) {
-//                    fr.addEventListener('load', e => {
-//                        ok(Utils.object({
-//                            name: file.name, size: file.size, type: file.type,
-//                            base64: e.target.result.slice(e.target.result.indexOf(',') + 1)
-//                        }));
-//                    });
-//                });
-//            },
+            //            file2json(file) {
+            //                const fr = new FileReader();
+            //                fr.readAsDataURL(file);
+            //                return new Promise(function (ok) {
+            //                    fr.addEventListener('load', e => {
+            //                        ok(Utils.object({
+            //                            name: file.name, size: file.size, type: file.type,
+            //                            base64: e.target.result.slice(e.target.result.indexOf(',') + 1)
+            //                        }));
+            //                    });
+            //                });
+            //            },
             form2(fd, type) {
                 switch (type) {
                     case 'json':
@@ -296,34 +296,33 @@
             if (shani.http.timerId) {
                 clearTimeout(shani.http.timerId);
             }
+            Utils.trigger(shani, 'start');
         };
         /**
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
             const mode = params?.mode || 'replace', timeout = shani.http.timeout;
-            const type = Utils.getSubtype(shani.enctype), scheme = shani.http.scheme;
+            const type = Utils.getSubtype(shani.enctype);
             if (type && type !== 'form-data') {
                 shani.headers.set('content-type', shani.enctype);
             }
             if (timeout) {
                 shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
-            if (scheme === 'ws') {
-                return WSocket(shani, target, mode, () => onConnect(shani));
-            }
-            if (scheme === 'sse') {
-                return ServerEvent(shani, target, mode, () => onConnect(shani));
+            if (shani.http.scheme === 'sse') {
+                return HttpRequest.sse(shani, target, mode, onConnect);
+            } else if ('scheme' in shani.http) {
+                return HttpRequest.wsocket(shani, target, mode, onConnect);
             }
             let em = shani.emitter;
             if (em.tagName === 'FORM') {
                 em = em.querySelector('fieldset') || em;
             }
-            HTTP.createReq(shani, shani.method || method, request => {
-                Utils.trigger(shani, 'start', {request});
+            HttpRequest.http(shani, shani.method || method, request => {
                 em.setAttribute('disabled', '');
+                Utils.trigger(shani, 'start', {request});
             }, () => {
-                onConnect(shani);
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
@@ -824,8 +823,8 @@
             controller: Object.setPrototypeOf({}, null)
         };
     })();
-    const HTTP = (() => {
-        const createPayload = (shani, method) => {
+    const HttpRequest = (() => {
+        const createHttpPayload = (shani, method) => {
             const fd = Convertor.input2form(shani);
             const payload = Utils.object({
                 url: shani.url, data: null, headers: shani.headers
@@ -841,9 +840,21 @@
             }
             return payload;
         };
+        const createWSocketPayload = shani => {
+            const payload = Utils.object({url: shani.url, data: null, headers: shani.headers});
+            const formdata = Convertor.input2form(shani);
+            if (formdata) {
+                const type = Utils.getSubtype(shani.headers.get('content-type'));
+                payload.data = JSON.stringify({
+                    headers: Convertor.map2json(shani.headers),
+                    body: Convertor.form2(formdata, type)
+                });
+            }
+            return payload;
+        };
         return {
-            createReq(shani, method, onStart, onEnd, onSuccess, onError) {
-                const payload = createPayload(shani, method), req = Utils.object();
+            http(shani, method, onStart, onEnd, onSuccess, onError) {
+                const payload = createHttpPayload(shani, method), req = Utils.object();
                 if (shani.cache) {
                     const params = Utils.explode(shani.cache);
                     req.cacheAge = Utils.time2ms(params.age);
@@ -859,64 +870,42 @@
                 });
                 onStart(req);
                 Fetcher.send(payload.url, req, onSuccess, onError, onEnd);
+            },
+            sse(shani, target, mode, onConnect) {
+                const sse = new EventSource(shani.url, {
+                    withCredentials: shani.http.credentials === 'include'
+                });
+                const on = (e, cb) => sse.addEventListener(e, cb);
+                on('message', e => {
+                    const resp = Utils.object({
+                        body: e.data || '', headers: new Headers({'content-type': 'text/html'})
+                    });
+                    HTML.processResponse(shani, target, resp, mode);
+                });
+                on('open', e => onConnect(shani));
+                on('error', e => Utils.trigger(shani, e.type));
+                on('beforeunload', () => {
+                    sse.close();
+                    Utils.trigger(shani, 'end');
+                });
+            },
+            wsocket(shani, target, mode, onConnect) {
+                const host = shani.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
+                const socket = new WebSocket(host + shani.url);
+                const on = (e, cb) => socket.addEventListener(e, cb);
+                on('open', e => {
+                    onConnect(shani);
+                    const payload = createWSocketPayload(shani);
+                    socket.send(payload.data || '');
+                });
+                on('message', e => {
+                    const resp = Utils.object({body: e.data || '', headers: new Headers()});
+                    HTML.processResponse(shani, target, resp, mode);
+                });
+                on('error', e => Utils.trigger(shani, e.type));
+                on('close', e => Utils.trigger(shani, 'end'));
             }
         };
-    })();
-    const WSocket = (() => {
-        const createPayload = shani => {
-            const payload = Utils.object({url: shani.url, data: null, headers: shani.headers});
-            const formdata = Convertor.input2form(shani);
-            if (formdata) {
-                const type = Utils.getSubtype(shani.headers.get('content-type'));
-                payload.data = JSON.stringify({
-                    headers: Convertor.map2json(shani.headers),
-                    body: Convertor.form2(formdata, type)
-                });
-            }
-            return payload;
-        };
-        const httpHandler = (shani, socket, target, mode, onConnect) => {
-            const on = (e, cb) => socket.addEventListener(e, cb);
-            on('open', (e) => {
-                onConnect(e);
-                const payload = createPayload(shani);
-                Utils.trigger(shani, 'start', {request: payload});
-                socket.send(payload.data || '');
-            });
-            on('message', e => {
-                const resp = Utils.object({body: e.data || '', headers: new Headers()});
-                HTML.processResponse(shani, target, resp, mode);
-            });
-            on('error', e => Utils.trigger(shani, e.type));
-            on('close', e => Utils.trigger(shani, 'end'));
-        };
-        return (shani, target, mode, onConnect) => {
-            const scheme = location.protocol === 'http:' ? 'ws://' : 'wss://';
-            const host = shani.url.indexOf('://') === -1 ? scheme + location.host : '';
-            httpHandler(shani, new WebSocket(host + shani.url), target, mode, onConnect);
-        };
-    })();
-    const ServerEvent = (() => {
-        const httpHandler = (shani, target, mode, onConnect) => {
-            const sse = new EventSource(shani.url, {
-                withCredentials: shani.http.credentials === 'include'
-            });
-            const on = (e, cb) => sse.addEventListener(e, cb);
-            on('message', e => {
-                Utils.trigger(shani, 'start');
-                const resp = Utils.object({
-                    body: e.data || '', headers: new Headers({'content-type': 'text/html'})
-                });
-                HTML.processResponse(shani, target, resp, mode);
-            });
-            on('open', onConnect);
-            on('error', e => Utils.trigger(shani, e.type));
-            on('beforeunload', () => {
-                sse.close();
-                Utils.trigger(shani, 'end');
-            });
-        };
-        return (shani, target, mode, onConnect) => httpHandler(shani, target, mode, onConnect);
     })();
     const Fetcher = (() => {
         const cacheResponse = (cache, req, res, url) => {
