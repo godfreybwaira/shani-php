@@ -292,6 +292,11 @@
             shani.poll.limit = parseInt(t.limit) || null;
             setTimeout(Utils.trigger, start, shani, shani.event.type);
         };
+        const onConnect = shani => {
+            if (shani.http.timerId) {
+                clearTimeout(shani.http.timerId);
+            }
+        };
         /**
          * Send HTTP request
          */
@@ -305,10 +310,10 @@
                 shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
             if (scheme === 'ws') {
-                return WSocket(shani, target, mode);
+                return WSocket(shani, target, mode, () => onConnect(shani));
             }
             if (scheme === 'sse') {
-                return ServerEvent(shani, target, mode);
+                return ServerEvent(shani, target, mode, () => onConnect(shani));
             }
             let em = shani.emitter;
             if (em.tagName === 'FORM') {
@@ -318,6 +323,7 @@
                 Utils.trigger(shani, 'start', {request});
                 em.setAttribute('disabled', '');
             }, () => {
+                onConnect(shani);
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
@@ -765,12 +771,7 @@
                 if (shani.event.detail?.shani?.event?.type !== evt) {
                     doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
                 }
-                if (evt === 'end') {
-                    if (shani.http.timerId) {
-                        clearTimeout(shani.http.timerId);
-                    }
-                    resubmit(shani);
-            }
+                evt !== 'end' || resubmit(shani);
             },
             getSubtype(header) {
                 if (header) {
@@ -874,9 +875,10 @@
             }
             return payload;
         };
-        const httpHandler = (shani, socket, target, mode) => {
+        const httpHandler = (shani, socket, target, mode, onConnect) => {
             const on = (e, cb) => socket.addEventListener(e, cb);
-            on('open', () => {
+            on('open', (e) => {
+                onConnect(e);
                 const payload = createPayload(shani);
                 Utils.trigger(shani, 'start', {request: payload});
                 socket.send(payload.data || '');
@@ -888,14 +890,17 @@
             on('error', e => Utils.trigger(shani, e.type));
             on('close', e => Utils.trigger(shani, 'end'));
         };
-        return (shani, target, mode) => {
+        return (shani, target, mode, onConnect) => {
             const scheme = location.protocol === 'http:' ? 'ws://' : 'wss://';
             const host = shani.url.indexOf('://') === -1 ? scheme + location.host : '';
-            httpHandler(shani, new WebSocket(host + shani.url), target, mode);
+            httpHandler(shani, new WebSocket(host + shani.url), target, mode, onConnect);
         };
     })();
     const ServerEvent = (() => {
-        const httpHandler = (shani, sse, target, mode) => {
+        const httpHandler = (shani, target, mode, onConnect) => {
+            const sse = new EventSource(shani.url, {
+                withCredentials: shani.http.credentials === 'include'
+            });
             const on = (e, cb) => sse.addEventListener(e, cb);
             on('message', e => {
                 Utils.trigger(shani, 'start');
@@ -904,13 +909,14 @@
                 });
                 HTML.processResponse(shani, target, resp, mode);
             });
+            on('open', onConnect);
             on('error', e => Utils.trigger(shani, e.type));
             on('beforeunload', () => {
                 sse.close();
                 Utils.trigger(shani, 'end');
             });
         };
-        return (shani, target, mode) => httpHandler(shani, new EventSource(shani.url), target, mode);
+        return (shani, target, mode, onConnect) => httpHandler(shani, target, mode, onConnect);
     })();
     const Fetcher = (() => {
         const cacheResponse = (cache, req, res, url) => {
