@@ -296,7 +296,6 @@
             if (shani.http.timerId) {
                 clearTimeout(shani.http.timerId);
             }
-            Utils.trigger(shani, 'start');
         };
         /**
          * Send HTTP request
@@ -323,6 +322,7 @@
                 em.setAttribute('disabled', '');
                 Utils.trigger(shani, 'start', {request});
             }, () => {
+                onConnect(shani);
                 em.removeAttribute('disabled');
                 Utils.trigger(shani, 'end');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
@@ -882,7 +882,10 @@
                     });
                     HTML.processResponse(shani, target, resp, mode);
                 });
-                on('open', e => onConnect(shani));
+                on('open', e => {
+                    onConnect(shani);
+                    Utils.trigger(shani, 'start');
+                });
                 on('error', e => Utils.trigger(shani, e.type));
                 on('beforeunload', () => {
                     sse.close();
@@ -896,6 +899,7 @@
                 on('open', e => {
                     onConnect(shani);
                     const payload = createWSocketPayload(shani);
+                    Utils.trigger(shani, 'start', {request: payload});
                     socket.send(payload.data || '');
                 });
                 on('message', e => {
