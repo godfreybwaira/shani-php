@@ -310,15 +310,15 @@
                 shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
             if (shani.http.scheme === 'sse') {
-                return HttpRequest.sse(shani, target, mode, onConnect);
+                return HttpClient.sse(shani, target, mode, onConnect);
             } else if ('scheme' in shani.http) {
-                return HttpRequest.wsocket(shani, target, mode, onConnect);
+                return HttpClient.wsocket(shani, target, mode, onConnect);
             }
             let em = shani.emitter;
             if (em.tagName === 'FORM') {
                 em = em.querySelector('fieldset') || em;
             }
-            HttpRequest.http(shani, shani.method || method, request => {
+            HttpClient.http(shani, shani.method || method, request => {
                 em.setAttribute('disabled', '');
                 Utils.trigger(shani, 'start', {request});
             }, () => {
@@ -591,11 +591,11 @@
              */
             abortconn(obj) {
                 if (!obj.params) {
-                    for (const key in Utils.controller) {
-                        Utils.controller[key].abort();
+                    for (const key in Utils.connection) {
+                        Utils.closeConn(key);
                     }
                 } else {
-                    Utils.controller[obj.params.name]?.abort();
+                    Utils.closeConn(obj.params.name);
                 }
             }
         };
@@ -820,10 +820,20 @@
                 }
                 return time;
             },
-            controller: Object.setPrototypeOf({}, null)
+            connection: Object.setPrototypeOf({}, null),
+            closeConn(name) {
+                const cn = Utils.connection[name];
+                if (cn) {
+                    if (cn instanceof AbortController) {
+                        cn.abort();
+                    } else {
+                        cn.close();
+                    }
+                }
+            }
         };
     })();
-    const HttpRequest = (() => {
+    const HttpClient = (() => {
         const createHttpPayload = (shani, method) => {
             const fd = Convertor.input2form(shani);
             const payload = Utils.object({
@@ -860,7 +870,7 @@
                     req.cacheAge = Utils.time2ms(params.age);
                     req.cacheName = params.name || 'pubcache';
                 }
-                req.conn = shani.http.conn || 'conn';
+                req.conn = shani.http.conn || 'http';
                 req.options = Utils.object({
                     headers: payload.headers,
                     body: payload.data,
@@ -869,13 +879,14 @@
                     mode: shani.http.mode
                 });
                 onStart(req);
-                Fetcher.send(payload.url, req, onSuccess, onError, onEnd);
+                FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
             },
             sse(shani, target, mode, onConnect) {
-                const sse = new EventSource(shani.url, {
+                const name = shani.http.conn || 'sse';
+                Utils.connection[name] = new EventSource(shani.url, {
                     withCredentials: shani.http.credentials === 'include'
                 });
-                const on = (e, cb) => sse.addEventListener(e, cb);
+                const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
                 on('message', e => {
                     const resp = Utils.object({
                         body: e.data || '', headers: new Headers({'content-type': 'text/html'})
@@ -886,32 +897,36 @@
                     onConnect(shani);
                     Utils.trigger(shani, 'start');
                 });
-                on('error', e => Utils.trigger(shani, e.type));
-                on('beforeunload', () => {
-                    sse.close();
-                    Utils.trigger(shani, 'end');
+                on('error', e => {
+                    onConnect(shani);
+                    Utils.trigger(shani, 'error');
                 });
+                on('close', e => Utils.trigger(shani, 'end'));
             },
             wsocket(shani, target, mode, onConnect) {
                 const host = shani.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
-                const socket = new WebSocket(host + shani.url);
-                const on = (e, cb) => socket.addEventListener(e, cb);
+                const name = shani.http.conn || 'ws';
+                Utils.connection[name] = new WebSocket(host + shani.url);
+                const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
                 on('open', e => {
                     onConnect(shani);
                     const payload = createWSocketPayload(shani);
                     Utils.trigger(shani, 'start', {request: payload});
-                    socket.send(payload.data || '');
+                    Utils.connection[name].send(payload.data || '');
+                });
+                on('error', e => {
+                    onConnect(shani);
+                    Utils.trigger(shani, 'error');
                 });
                 on('message', e => {
                     const resp = Utils.object({body: e.data || '', headers: new Headers()});
                     HTML.processResponse(shani, target, resp, mode);
                 });
-                on('error', e => Utils.trigger(shani, e.type));
                 on('close', e => Utils.trigger(shani, 'end'));
             }
         };
     })();
-    const Fetcher = (() => {
+    const FetchClient = (() => {
         const cacheResponse = (cache, req, res, url) => {
             const headers = new Headers(res.headers);
             headers.set('x-expires', Date.now() + req.cacheAge);
@@ -961,10 +976,10 @@
             }).catch(onError);
         };
         const fetchWithRetry = (url, req, responseHandler) => {
-            if (!Utils.controller[req.conn] || Utils.controller[req.conn].signal.aborted) {
-                Utils.controller[req.conn] = new AbortController();
+            if (!Utils.connection[req.conn] || Utils.connection[req.conn].signal.aborted) {
+                Utils.connection[req.conn] = new AbortController();
             }
-            req.options.signal = Utils.controller[req.conn].signal;
+            req.options.signal = Utils.connection[req.conn].signal;
             return fetch(url, req.options).then(responseHandler);
         };
         const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
