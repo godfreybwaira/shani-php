@@ -10,6 +10,11 @@
 namespace apps\demo\modules\shani\logic\controllers\get {
 
     use gui\WebUIBuilder;
+    use lib\client\HttpClient;
+    use lib\http\HttpHeader;
+    use lib\http\ResponseEntity;
+    use lib\MediaType;
+    use lib\URI;
     use shani\documentation\Generator as Documentation;
     use shani\http\App;
 
@@ -39,7 +44,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function stream(): void
         {
-            $this->app->response->header()->addOne(\lib\http\HttpHeader::CONTENT_TYPE, \lib\MediaType::JSON);
+            $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $this->app->writer->stream(function () {
                 $db = $this->app->config->database();
                 $rows = $db->collect('SELECT * FROM users');
@@ -53,6 +58,14 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     }
                 }
             });
+        }
+
+        public function users(): void
+        {
+            $db = $this->app->config->database();
+            $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
+            $rows = $db->get('SELECT * FROM users');
+            $this->app->writer->send($rows);
         }
 
         public function inputs(): void
@@ -110,6 +123,17 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
             sleep(1);
             $this->app->writer->send(new WebUIBuilder());
+        }
+
+        public function client(): void
+        {
+            $client = new HttpClient(new URI('https://dev.shani.v2.local'));
+            $client->enableAsync(false)->enableSSLVerification(false);
+            $client->get('/shani/0/components/0/stream', function (ResponseEntity $res) {
+                print_r($res->body());
+                echo PHP_EOL;
+            });
+            $this->app->writer->send();
         }
     }
 

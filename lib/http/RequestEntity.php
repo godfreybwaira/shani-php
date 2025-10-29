@@ -55,7 +55,7 @@ namespace lib\http {
         public readonly string $localhost;
         private ?array $acceptedType = null;
         private ReadableMap $body;
-        public readonly ReadableMap $cookie, $query;
+        public readonly ReadableMap $query;
 
         public function __construct(
                 URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
@@ -63,10 +63,9 @@ namespace lib\http {
                 string $protocol, ?string $rawBody = null
         )
         {
-            parent::__construct($headers, $protocol);
+            parent::__construct($headers, $cookies, $protocol);
             $this->localhost = $ip === '127.0.0.1';
             $this->changeRoute($uri->path());
-            $this->cookie = $cookies;
             $this->query = $queries;
             $this->method = $method;
             $this->raw = $rawBody;

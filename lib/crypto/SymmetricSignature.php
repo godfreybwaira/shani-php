@@ -48,10 +48,7 @@ namespace lib\crypto {
             if (empty($signature)) {
                 throw new \Exception('Signature is missing or empty.');
             }
-            if (!hash_equals($this->sign($payload), $signature)) {
-                throw new \Exception('Invalid signature.');
-            }
-            return true;
+            return hash_equals($this->sign($payload), $signature);
         }
     }
 

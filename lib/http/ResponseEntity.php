@@ -13,6 +13,7 @@ namespace lib\http {
     use lib\crypto\Encryption;
     use lib\DataCompression;
     use lib\DataConvertor;
+    use lib\ds\map\ReadableMap;
     use lib\MediaType;
 
     final class ResponseEntity extends HttpEntity
@@ -26,9 +27,9 @@ namespace lib\http {
         public readonly RequestEntity $request;
         private ?string $statusMessage = null, $rawBody = null;
 
-        public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers)
+        public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers, ReadableMap $cookies)
         {
-            parent::__construct($headers, $request->protocol);
+            parent::__construct($headers, $cookies, $request->protocol);
             $this->status = $status;
             $this->request = $request;
         }

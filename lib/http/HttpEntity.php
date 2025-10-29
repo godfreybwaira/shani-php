@@ -9,16 +9,25 @@
 
 namespace lib\http {
 
+    use lib\ds\map\ReadableMap;
+
     abstract class HttpEntity
     {
 
         public readonly string $protocol;
         protected readonly HttpHeader $headers;
 
-        protected function __construct(HttpHeader $headers, string $protocol)
+        /**
+         * HTTP cookies
+         * @var ReadableMap
+         */
+        public readonly ReadableMap $cookie;
+
+        protected function __construct(HttpHeader $headers, ReadableMap $cookies, string $protocol)
         {
             $this->headers = $headers;
             $this->protocol = $protocol;
+            $this->cookie = $cookies;
         }
 
         /**

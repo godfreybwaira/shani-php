@@ -10,6 +10,7 @@
 namespace shani {
 
     use lib\Concurrency;
+    use lib\ds\map\ReadableMap;
     use lib\Event;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
@@ -69,7 +70,7 @@ namespace shani {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer) {
-                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader());
+                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 try {
                     $vhost = self::host($request->uri->hostname());
                     $app = new App($vhost, $response, $writer);

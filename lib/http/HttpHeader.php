@@ -3,6 +3,7 @@
 namespace lib\http {
 
     use lib\ds\map\MutableMap;
+    use lib\ds\map\ReadableMap;
 
     final class HttpHeader extends MutableMap
     {
@@ -159,12 +160,17 @@ namespace lib\http {
         }
 
         /**
-         * Get HTTP cookie header object(s) as array
-         * @return array|null
+         * Get HTTP cookie values
+         * @return array
          */
-        public function getCookies(): ?array
+        public function getCookieValues(): array
         {
-            return $this->getOne(self::SET_COOKIE);
+            $data = [];
+            $cookies = $this->getOne(self::SET_COOKIE, $data);
+            foreach ($cookies as $cookie) {
+                $data[$cookie->name()] = $cookie->value();
+            }
+            return $data;
         }
 
         /**

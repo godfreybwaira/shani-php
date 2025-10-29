@@ -48,10 +48,7 @@ namespace lib\crypto {
             }
             $publicKey = openssl_pkey_get_public($this->publicKey);
             $verified = openssl_verify($payload, base64_decode($signature), $publicKey, $this->algorithm);
-            if ($verified === 1) {
-                return true;
-            }
-            throw new \Exception('Invalid signature.');
+            return $verified === 1;
         }
     }
 
