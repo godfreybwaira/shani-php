@@ -11,7 +11,7 @@
             <button shani-on="click:close>>.modal-background" class="button button-times pos-tr"
                     style="margin: var(--spacing)">&times;</button>
             <div class="card" style="--loader-size:2.5rem" action="/shani/0/components/0/generator"
-                 shani-on="load:read;start:cssadd loader-spin;end:cssrmv loader-spin" shani-timer="start:2s&steps:3s&limit:4">
+                 shani-on="load:read delay:2s;start:cssadd loader-spin;end:cssrmv loader-spin" shani-timer="steps:3s&limit:4">
             </div>
         </div>
     <?php elseif ($type === 'vr'): ?>

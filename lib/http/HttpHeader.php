@@ -160,10 +160,10 @@ namespace lib\http {
         }
 
         /**
-         * Get HTTP cookie values
+         * Get HTTP cookie names and values
          * @return array
          */
-        public function getCookieValues(): array
+        public function cookies(): array
         {
             $data = [];
             $cookies = $this->getOne(self::SET_COOKIE, $data);

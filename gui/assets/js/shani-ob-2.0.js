@@ -281,17 +281,6 @@
             }
             return map;
         };
-        /**
-         * Make HTTP request at a given interval
-         * @param {object} shani
-         */
-        const countdown = shani => {
-            const t = Utils.explode(shani.timer);
-            const start = Utils.time2ms(t.start) || 0;
-            shani.poll.steps = Utils.time2ms(t.steps) || -1;
-            shani.poll.limit = parseInt(t.limit) || null;
-            setTimeout(Utils.trigger, start, shani, shani.event.type);
-        };
         const onConnect = shani => {
             if (shani.http.timerId) {
                 clearTimeout(shani.http.timerId);
@@ -607,7 +596,9 @@
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
                     if (shani.timer) {
-                        return countdown(shani);
+                        const t = Utils.explode(shani.timer);
+                        shani.poll.steps = Utils.time2ms(t.steps) || -1;
+                        shani.poll.limit = parseInt(t.limit) || null;
                     }
                     Utils.trigger(shani, event.type);
                 }
@@ -709,8 +700,7 @@
         };
     })();
     const Utils = (() => {
-        const callNext = (shani, event, data) => {
-            const action = shani.actions.get(event);
+        const callNext = (shani, action, data) => {
             const cb = action ? USER_DATA.fn[action.fn] || shani[action.fn] : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
@@ -721,10 +711,19 @@
                 result === false || Utils.trigger(shani, action.fn);
             }
         };
-        const resubmit = shani => {
+        const recall = (shani, data) => {
             if (shani.emitter.isConnected && shani.poll.steps > -1 && (!shani.poll.limit || (--shani.poll.limit) > 0)) {
-                setTimeout(Utils.trigger, shani.poll.steps, shani, shani.event.type);
+                const evt = Utils.getEventName(shani.event.type), action = shani.actions.get(evt);
+                setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
             }
+        };
+        const prepareCall = (shani, action, data, evt) => {
+            callNext(shani, action, data);
+            data.shani = shani;
+            if (shani.event.detail?.shani?.event?.type !== evt) {
+                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+            }
+            evt !== 'end' || recall(shani, data);
         };
         return {
             removeNode(node) {
@@ -764,13 +763,12 @@
                 return Object.setPrototypeOf(o || {}, null);
             },
             trigger(shani, event, data = {}) {
-                const evt = Utils.getEventName(event);
-                callNext(shani, evt, data);
-                data.shani = shani;
-                if (shani.event.detail?.shani?.event?.type !== evt) {
-                    doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
-                }
-                evt !== 'end' || resubmit(shani);
+                const evt = Utils.getEventName(event), action = shani.actions.get(evt);
+                const delay = action?.params?.delay;
+                if (delay)
+                    setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);
+                else
+                    prepareCall(shani, action, data, evt);
             },
             getSubtype(header) {
                 if (header) {

@@ -50,7 +50,7 @@ namespace lib\client {
         {
             $this->retries = $retries;
             $this->curlOptions = [
-                CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_RETURNTRANSFER => false, CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HEADER => false, CURLOPT_CONNECTTIMEOUT => $timeout,
                 CURLOPT_UPLOAD_BUFFERSIZE => Framework::BUFFER_SIZE,
                 CURLOPT_BUFFERSIZE => Framework::BUFFER_SIZE,
@@ -248,7 +248,7 @@ namespace lib\client {
                     ->headers($this->requestHeader)->files($this->files)->uri($uri)
                     ->method($method)->ip(curl_getinfo($curl, CURLINFO_LOCAL_IP))
                     ->protocol(curl_getinfo($curl, CURLINFO_PROTOCOL))
-                    ->cookies($this->requestHeader->getCookieValues());
+                    ->cookies($this->requestHeader->cookies());
             $this->sendRequest($curl, $builder->build(), $method, $callback);
             if (isset($this->curlOptions[CURLOPT_INFILE])) {
                 fclose($this->curlOptions[CURLOPT_INFILE]);
@@ -266,7 +266,7 @@ namespace lib\client {
                 CURLOPT_HTTPHEADER => $this->requestHeader->map(fn($name, $value) => $name . ':' . implode(',', $value))->toArray(),
                 CURLOPT_WRITEFUNCTION => function (\CurlHandle $curl, string $content) use (&$request, &$callback) {
                     $status = HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
-                    $cookies = new ReadableMap($this->responseHeader->getCookieValues());
+                    $cookies = new ReadableMap($this->responseHeader->cookies());
                     $response = new ResponseEntity($request, $status, $this->responseHeader, $cookies);
                     $response->setBody($content);
                     $callback($response);

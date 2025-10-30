@@ -130,8 +130,9 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $client = new HttpClient(new URI('https://dev.shani.v2.local'));
             $client->enableAsync(false)->enableSSLVerification(false);
             $client->get('/shani/0/components/0/stream', function (ResponseEntity $res) {
-                print_r($res->body());
-                echo PHP_EOL;
+                $this->app->writer->stream(function ()use (&$res) {
+                    yield $res->body();
+                });
             });
             $this->app->writer->send();
         }
