@@ -400,7 +400,8 @@
         </div>
     </div>
     <div class="col">
-        <input type="text" class="input-box" placeholder="Search table" shani-on="keyup delay:0.3s=search>>#tc2 tbody;search:TEST p1&p2>>#tc2 tbody;test:hello">
+        <input type="text" class="input-box" placeholder="Search table"
+               shani-on="keyup delay:0.3s::search>>#tc2 tbody;search::TEST p1&p2>>#tc2 tbody;test::hello">
         <div class="table-container" id="tc2">
             <table class="table border-h">
                 <caption>Users</caption>
@@ -514,20 +515,20 @@
 <div class="divider">Modals</div>
 <ul>
     <li><a href="/shani/0/components/0/modals?type=c"
-           shani-on="click=read mode:append>>body">Type C</a></li>
+           shani-on="click::read mode:append>>body">Type C</a></li>
     <li><a href="/shani/0/components/0/modals?type=cl"
-           shani-on="click=read mode:append>>body">Type C With layout</a></li>
+           shani-on="click::read mode:append>>body">Type C With layout</a></li>
     <li><a href="/shani/0/components/0/modals?type=vr"
-           shani-on="click=read mode:append>>body">Type VR</a></li>
+           shani-on="click::read mode:append>>body">Type VR</a></li>
     <li><a href="/shani/0/components/0/modals?type=vl"
-           shani-on="click=read mode:append>>body">Type VL</a></li>
+           shani-on="click::read mode:append>>body">Type VL</a></li>
     <li><a href="/shani/0/components/0/modals?type=ht"
-           shani-on="click=read mode:append>>body">Type HT</a></li>
+           shani-on="click::read mode:append>>body">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
-           shani-on="click=read mode:append>>body">Type HB</a></li>
+           shani-on="click::read mode:append>>body">Type HB</a></li>
 </ul>
 <div class="divider">Misc</div>
 <ul>
-    <li><a href="#" shani-on="click=fs>>#tc2">Full screen</a></li>
-    <li><a href="#" shani-on="click=print size: A4 landscape>>#tc2">Print</a></li>
+    <li><a href="#" shani-on="click::fs>>#tc2">Full screen</a></li>
+    <li><a href="#" shani-on="click::print size: A4 landscape>>#tc2">Print</a></li>
 </ul>

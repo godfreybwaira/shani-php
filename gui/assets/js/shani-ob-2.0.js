@@ -274,6 +274,9 @@
         const collectActions = evtStr => {
             const events = Utils.splitEvents(evtStr), map = new Map();
             for (const evt in events) {
+                if (events[evt] === null) {
+                    throw new Error('Syntax error on ' + evt);
+                }
                 const parts = events[evt].split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
                 const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
@@ -675,23 +678,23 @@
                 if (value === null) {
                     value = obj[key];
                 } else if (['shani-http', 'shani-headers'].includes(key)) {
-                    value = mergeString(obj[key], value, '&');
+                    value = mergeParams(value, obj[key], '&', ':');
                 } else if (['shani-on', 'watch-on'].includes(key)) {
-                    value = mergeString(obj[key], value, ';');
+                    value = mergeParams(value, obj[key], ';', '::');
                 }
                 node.setAttribute(key, value);
             }
         };
-        const mergeString = (val1, val2, sep) => {
-            const v1 = Utils.explode(val1, sep), v2 = Utils.explode(val2, sep);
-            for (const k in v2) {
-                v1[k] = v2[k];
+        const mergeParams = (oldVal, newVal, sep1, sep2) => {
+            const ov = Utils.explode(oldVal, sep1, sep2), nv = Utils.explode(newVal, sep1, sep2);
+            for (const k in ov) {
+                nv[k] = ov[k];
             }
             let str = '';
-            for (const k in v1) {
-                str += sep + k + ':' + v1[k];
+            for (const k in nv) {
+                str += sep1 + k + sep2 + nv[k];
             }
-            return str.slice(sep.length);
+            return str.slice(sep1.length);
         };
         return root => {
             setUserAttributes(root);
@@ -767,21 +770,21 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, sep1 = '&', keySep = ':') {
+            explode(str, sep = '&', keySep = ':') {
                 const map = Utils.object();
                 if (str) {
-                    const pair = str.split(sep1).map(s => s.trim());
+                    const pair = str.split(sep).map(s => s.trim());
                     for (let val of pair) {
-                        const pos = val.indexOf(keySep);
-                        if (pos > 0) {
-                            map[val.slice(0, pos)] = val.slice(pos + 1);
+                        const pos = val.indexOf(keySep), key = pos > 0 ? val.slice(0, pos) : val;
+                        if (key.length > 0) {
+                            map[key] = pos > 0 ? val.slice(pos + keySep.length).trim() : null;
                         }
                     }
                 }
                 return map;
             },
             splitEvents(str) {
-                return Utils.explode(str, ';', '=');
+                return Utils.explode(str, ';', '::');
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
@@ -1088,7 +1091,7 @@
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + classList;
                     btn.setAttribute('type', 'button');
-                    btn.setAttribute('shani-on', 'click:close>>.' + COVER);
+                    btn.setAttribute('shani-on', 'click::close>>.' + COVER);
                     btn.innerHTML = '&times;';
                     return btn;
                 }

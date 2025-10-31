@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" watch-on="change:nodecopyto pos:1>>#r22" shani-watch="#chb">
+        <button class="button accent-color" watch-on="change::nodecopyto pos:1>>#r22" shani-watch="#chb">
             Simple Button
         </button>
     </div>
@@ -112,7 +112,8 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox" id="chb" shani-on="change:" watch-on="input:propbind checked>>#chb2" shani-watch="#chb2">
+            <input class="toggle" type="checkbox" id="chb" shani-on="change::"
+                   watch-on="input::propbind checked>>#chb2" shani-watch="#chb2">
             Toggle
         </label>
     </div>
@@ -124,7 +125,8 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkmark" type="checkbox" shani-on="input:" id="chb2" watch-on="change:propbind checked>>#chb" shani-watch="#chb">
+            <input class="checkmark" type="checkbox" shani-on="input::" id="chb2"
+                   watch-on="change::propbind checked>>#chb" shani-watch="#chb">
             Checkbox
         </label>
     </div>
@@ -197,7 +199,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup:ucase;change:" name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup::ucase;change::" name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>
@@ -213,9 +215,9 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label shani-watch="#url" watch-on="keyup:propbind innerHTML:value>>#url">Demonstrating shani-propbind function</label>
+        <label shani-watch="#url" watch-on="keyup::propbind innerHTML:value>>#url">Demonstrating shani-propbind function</label>
         <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function"
-               shani-watch="#url" watch-on="change:propbind value>>#url" class="input-box">
+               shani-watch="#url" watch-on="change::propbind value>>#url" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
@@ -251,7 +253,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" watch-on="change:propbind selected:checked>>#chb" shani-watch="#chb">Two</option>
+                <option value="2" watch-on="change::propbind selected:checked>>#chb" shani-watch="#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>
