@@ -273,11 +273,11 @@
         };
         const collectActions = actionStr => {
             const actions = Utils.explode(actionStr, ';'), map = new Map();
-            for (const key in actions) {
-                const parts = actions[key].split('>>').map(s => s.trim());
+            for (const evt in actions) {
+                const parts = actions[evt].split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
                 const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
-                map.set(key, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
+                map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
             }
             return map;
         };
@@ -718,6 +718,7 @@
             }
         };
         const prepareCall = (shani, action, data, evt) => {
+            timer.delete(shani.emitter);
             callNext(shani, action, data);
             data.shani = shani;
             if (shani.event.detail?.shani?.event?.type !== evt) {
@@ -725,6 +726,11 @@
             }
             evt !== 'end' || recall(shani, data);
         };
+        /**
+         * Timer for a delayed actions
+         * @type Map
+         */
+        const timer = new Map();
         return {
             removeNode(node) {
                 node.style.opacity = 0;
@@ -765,9 +771,11 @@
             trigger(shani, event, data = {}) {
                 const evt = Utils.getEventName(event), action = shani.actions.get(evt);
                 const delay = action?.params?.delay;
-                if (delay)
-                    setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);
-                else
+                if (delay) {
+                    clearTimeout(timer.get(shani.emitter));
+                    const id = setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);
+                    timer.set(shani.emitter, id);
+                } else
                     prepareCall(shani, action, data, evt);
             },
             getSubtype(header) {
