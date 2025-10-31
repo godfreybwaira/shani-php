@@ -596,16 +596,17 @@
         window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'timer', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
+            SHANI_ATTR: ['watch', 'headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
             create(node, event, attrib) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event, attrib);
-                    if (shani.timer) {
-                        const t = Utils.explode(shani.timer);
-                        shani.poll.steps = Utils.time2ms(t.steps) || -1;
-                        shani.poll.limit = parseInt(t.limit) || null;
+                    const evt = Utils.getEventName(event.type);
+                    const p = shani.actions.get(evt).evtParams;
+                    if (p.steps) {
+                        shani.poll.steps = Utils.time2ms(p.steps) || -1;
+                        shani.poll.limit = parseInt(p.limit) || null;
                     }
-                    Utils.trigger(shani, event.type);
+                    Utils.trigger(shani, evt);
                 }
             },
             on(e, cb) {
@@ -678,9 +679,9 @@
                 if (value === null) {
                     value = obj[key];
                 } else if (['shani-http', 'shani-headers'].includes(key)) {
-                    value = mergeParams(value, obj[key], '&', ':');
+                    value = mergeParams(value, obj[key], SEP_PARAM, SEP_VAL);
                 } else if (['shani-on', 'watch-on'].includes(key)) {
-                    value = mergeParams(value, obj[key], ';', '::');
+                    value = mergeParams(value, obj[key], SEP_EVT, SEP_ACTION);
                 }
                 node.setAttribute(key, value);
             }
@@ -705,6 +706,7 @@
             nodes.forEach(node => addListener(node));
         };
     })();
+    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':';
     const Utils = (() => {
         const callNext = (shani, action, data) => {
             const cb = action ? USER_DATA.fn[action.fn] || shani[action.fn] : null;
@@ -770,28 +772,27 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, sep = '&', keySep = ':') {
-                const map = Utils.object();
+            explode(str, sep, keySep) {
+                const map = Utils.object(), ksep = keySep || SEP_VAL;
                 if (str) {
-                    const pair = str.split(sep).map(s => s.trim());
+                    const pair = str.split(sep || SEP_PARAM).map(s => s.trim());
                     for (let val of pair) {
-                        const pos = val.indexOf(keySep), key = pos > 0 ? val.slice(0, pos) : val;
+                        const pos = val.indexOf(ksep), key = pos > 0 ? val.slice(0, pos) : val;
                         if (key.length > 0) {
-                            map[key] = pos > 0 ? val.slice(pos + keySep.length).trim() : null;
+                            map[key] = pos > 0 ? val.slice(pos + ksep.length).trim() : null;
                         }
                     }
                 }
                 return map;
             },
             splitEvents(str) {
-                return Utils.explode(str, ';', '::');
+                return Utils.explode(str, SEP_EVT, SEP_ACTION);
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
             },
-            trigger(shani, event, data = {}) {
-                const evt = Utils.getEventName(event), action = shani.actions.get(evt);
-                const delay = action?.evtParams?.delay;
+            trigger(shani, evt, data = {}) {
+                const action = shani.actions.get(evt), delay = action?.evtParams?.delay;
                 if (delay) {
                     clearTimeout(timer.get(shani.emitter));
                     const id = setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);
@@ -1091,7 +1092,7 @@
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + classList;
                     btn.setAttribute('type', 'button');
-                    btn.setAttribute('shani-on', 'click::close>>.' + COVER);
+                    btn.setAttribute('shani-on', 'click' + SEP_ACTION + 'close>>.' + COVER);
                     btn.innerHTML = '&times;';
                     return btn;
                 }
