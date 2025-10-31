@@ -258,12 +258,12 @@
 <div class="divider">Toaster</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/toaster?type=t" shani-on="click:read mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=t" shani-on="click=read mode:append>>body">
             Toaster from Top
         </a>
     </li>
     <li>
-        <a href="/shani/0/components/0/toaster?type=b" shani-on="click:read mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=b" shani-on="click=read mode:append>>body">
             Toaster from Bottom
         </a>
     </li>
@@ -271,7 +271,7 @@
 <div class="divider">Loaders</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/loader?type=i" shani-on="click:read mode:append>>.layout-content">
+        <a href="/shani/0/components/0/loader?type=i" shani-on="click=read mode:append>>.layout-content">
             Infinite loader
         </a>
     </li>

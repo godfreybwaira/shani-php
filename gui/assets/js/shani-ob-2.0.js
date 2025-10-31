@@ -271,13 +271,15 @@
         const setAttribs = (shani, node, attrs, prefix) => {
             attrs.forEach(a => shani[a] = node.getAttribute(prefix + a));
         };
-        const collectActions = actionStr => {
-            const actions = Utils.explode(actionStr, ';'), map = new Map();
-            for (const evt in actions) {
-                const parts = actions[evt].split('>>').map(s => s.trim());
+        const collectActions = evtStr => {
+            const events = Utils.splitEvents(evtStr), map = new Map();
+            for (const evt in events) {
+                const parts = events[evt].split('>>').map(s => s.trim());
                 const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
                 const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
-                map.set(evt, Utils.object({fn: fn.toLowerCase(), params, selector: parts[1]}));
+                const e = Utils.getEventFromString(evt);
+                const evtParams = Utils.explode(evt.slice(e.length));
+                map.set(e, Utils.object({fn: fn.toLowerCase(), params, evtParams, selector: parts[1]}));
             }
             return map;
         };
@@ -621,8 +623,8 @@
         };
         const getTargetNode = (node, evt) => {
             if (node) {
-                const values = node.getAttribute('shani-on');
-                if (values?.includes(evt + ':')) {
+                const evtStr = node.getAttribute('shani-on');
+                if (Utils.eventExists(evt, evtStr)) {
                     return node;
                 }
                 return getTargetNode(Utils.getParentNode(node, '[shani-on]'), evt);
@@ -630,14 +632,15 @@
             return null;
         };
         const setWatchEvents = node => {
-            const events = Utils.explode(node.getAttribute('watch-on'));
-            for (const e in events) {
-                Shani.on(e, watch);
+            const events = Utils.splitEvents(node.getAttribute('watch-on'));
+            for (const evt in events) {
+                Shani.on(Utils.getEventFromString(evt), watch);
             }
         };
         const addListener = node => {
-            const events = Utils.explode(node.getAttribute('shani-on'));
-            for (const e in events) {
+            const events = Utils.splitEvents(node.getAttribute('shani-on'));
+            for (const evt in events) {
+                const e = Utils.getEventFromString(evt);
                 doc.addEventListener(e, listen);
                 if (e === 'load') {
                     node.dispatchEvent(new Event(e, {bubbles: true}));
@@ -649,8 +652,8 @@
         const watch = e => {
             const evt = Utils.getEventName(e.type);
             doc.querySelectorAll('[watch-on]').forEach(watcher => {
-                const events = watcher.getAttribute('watch-on');
-                if (events?.includes(evt + ':')) {
+                const evtStr = watcher.getAttribute('watch-on');
+                if (Utils.eventExists(evt, evtStr)) {
                     if (e.detail.shani.emitter.matches(watcher.getAttribute('shani-watch'))) {
                         Shani.create(watcher, e, 'watch-on');
                     }
@@ -745,6 +748,18 @@
             getEventName(evt) {
                 return evt.slice(evt.lastIndexOf(':') + 1);
             },
+            getEventFromString(str) {
+                return str.split(/\s/)[0];
+            },
+            eventExists(evt, evtStr) {
+                const events = Utils.splitEvents(evtStr);
+                for (const e in events) {
+                    if (Utils.getEventFromString(e) === evt) {
+                        return true;
+                    }
+                }
+                return false;
+            },
             getParentNode(childNode, parentSelector) {
                 const parent = childNode.parentElement;
                 if (!parent || parent.matches(parentSelector)) {
@@ -752,25 +767,28 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, sep = '&') {
+            explode(str, sep1 = '&', keySep = ':') {
                 const map = Utils.object();
                 if (str) {
-                    const raw = str.split(sep).map(s => s.trim());
-                    for (let val of raw) {
-                        const pos = val.indexOf(':'), key = pos > 0 ? val.slice(0, pos) : val;
-                        if (key.length > 0) {
-                            map[key] = pos > 0 ? val.slice(pos + 1).trim() : null;
+                    const pair = str.split(sep1).map(s => s.trim());
+                    for (let val of pair) {
+                        const pos = val.indexOf(keySep);
+                        if (pos > 0) {
+                            map[val.slice(0, pos)] = val.slice(pos + 1);
                         }
                     }
                 }
                 return map;
+            },
+            splitEvents(str) {
+                return Utils.explode(str, ';', '=');
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
             },
             trigger(shani, event, data = {}) {
                 const evt = Utils.getEventName(event), action = shani.actions.get(evt);
-                const delay = action?.params?.delay;
+                const delay = action?.evtParams?.delay;
                 if (delay) {
                     clearTimeout(timer.get(shani.emitter));
                     const id = setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);
