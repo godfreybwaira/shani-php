@@ -11,12 +11,12 @@
     <a href="/shani/0/components/0/stream" shani-http="conn:aaa"
        shani-on="click::makeloader id:ldr1&color:red>>.layout-content;
        makeloader::abortconn name:aaa;abortconn::read mode:replace>>#content;
-       end::nodermv>>#ldr1" class="menu-item menu-item-dir-v">
+       httpend::nodermv>>#ldr1" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-water"></i>
         <span class="font-sm menu-label">Streaming</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
-       shani-on="click::cssadd loader-top>>.layout-content;cssadd::read>>#content;end::cssrmv loader-top>>.layout-content">
+       shani-on="click::cssadd loader-top>>.layout-content;cssadd::read>>#content;httpend::cssrmv loader-top>>.layout-content">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 1</span>
     </a>
@@ -24,14 +24,14 @@
        shani-on="click::makeloader id:ldr123&color:red>>.layout-content;
        makeloader::abortconn name:aaa;
        abortconn::read>>#content;
-       end::nodermv>>#ldr123">
+       httpend::nodermv>>#ldr123">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 2</span>
     </a>
     <a href="/shani/0/components/0/card" class="menu-item menu-item-dir-v"
        shani-on="click::makemodal id:mdl123&classes:modal modal-type-c width-sm-10 height-sm-10 pos-c&close-btn:pos-tr;
-       makemodal::read mode:replace>>#mdl123; 408::timeout; end::cssrmv loader-spin>>#mdl123;
-       start::cssadd loader-spin>>#mdl123; data::saveas name:file22.txt&type:text/plain;"
+       makemodal::read mode:replace>>#mdl123; 408::timeout; httpend::cssrmv loader-spin>>#mdl123;
+       httpstart::cssadd loader-spin>>#mdl123; data::saveas name:file22.txt&type:text/plain;"
        shani-http="credentials:same-origin&mode:cors&timeout:2s"
        shani-headers="content-type:application/json">
         <i class="mdi mdi-inbox-full"></i>

@@ -314,11 +314,11 @@
             }
             HttpClient.http(shani, shani.method || method, request => {
                 em.setAttribute('disabled', '');
-                Utils.trigger(shani, 'start', {request});
+                Utils.trigger(shani, 'httpstart', {request});
             }, () => {
                 onConnect(shani);
                 em.removeAttribute('disabled');
-                Utils.trigger(shani, 'end');
+                Utils.trigger(shani, 'httpend');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
                 const status = err.name === 'AbortError' ? 408 : 400;
                 if (shani.poll.limit !== null) {
@@ -732,7 +732,7 @@
             if (shani.event.detail?.shani?.event?.type !== evt) {
                 doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
             }
-            evt !== 'end' || recall(shani, data);
+            evt !== 'httpend' || recall(shani, data);
         };
         /**
          * Timer for a delayed actions
@@ -844,7 +844,7 @@
                         const val = parseFloat(time.slice(0, -1));
                         return Math.round(TIME_UNITS[unit] * val * 1000);
                     }
-                    throw new Error('Invalid time interval ' + time);
+                    throw new Error('Invalid duration ' + time);
                 }
                 return time;
             },
@@ -923,13 +923,13 @@
                 });
                 on('open', e => {
                     onConnect(shani);
-                    Utils.trigger(shani, 'start');
+                    Utils.trigger(shani, 'httpstart');
                 });
                 on('error', e => {
                     onConnect(shani);
                     Utils.trigger(shani, 'error');
                 });
-                on('close', e => Utils.trigger(shani, 'end'));
+                on('close', e => Utils.trigger(shani, 'httpend'));
             },
             wsocket(shani, target, mode, onConnect) {
                 const host = shani.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
@@ -939,7 +939,7 @@
                 on('open', e => {
                     onConnect(shani);
                     const payload = createWSocketPayload(shani);
-                    Utils.trigger(shani, 'start', {request: payload});
+                    Utils.trigger(shani, 'httpstart', {request: payload});
                     Utils.connection[name].send(payload.data || '');
                 });
                 on('error', e => {
@@ -950,7 +950,7 @@
                     const resp = Utils.object({body: e.data || '', headers: new Headers()});
                     HTML.processResponse(shani, target, resp, mode);
                 });
-                on('close', e => Utils.trigger(shani, 'end'));
+                on('close', e => Utils.trigger(shani, 'httpend'));
             }
         };
     })();
