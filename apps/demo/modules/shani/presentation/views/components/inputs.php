@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col">
-        <button class="button accent-color" watch-on="change::nodecopyto pos:1>>#r22" shani-watch="#chb">
+        <button class="button accent-color" watch-on="proptoggle::nodecopyto pos:1>>#r22" shani-watch="#chb">
             Simple Button
         </button>
     </div>
@@ -112,8 +112,8 @@
 <div class="row row-no-gap row-stretch">
     <div class="col">
         <label>
-            <input class="toggle" type="checkbox" id="chb" shani-on="change::"
-                   watch-on="input::propbind checked>>#chb2" shani-watch="#chb2">
+            <input class="toggle" type="checkbox" id="chb" shani-on="proptoggle::propbind checked>>#chb2;
+                   change::proptoggle checked>>#chb2">
             Toggle
         </label>
     </div>
@@ -125,8 +125,7 @@
     </div>
     <div class="col">
         <label>
-            <input class="checkmark" type="checkbox" shani-on="input::" id="chb2"
-                   watch-on="change::propbind checked>>#chb" shani-watch="#chb">
+            <input class="checkmark" type="checkbox" shani-on="change::trigger proptoggle>>#chb;" id="chb2">
             Checkbox
         </label>
     </div>

@@ -538,8 +538,8 @@
             propbind(obj) {
                 obj.targets.forEach(node => {
                     for (const key in obj.params) {
-                        const thatkey = obj.params[key] === null ? key : obj.params[key];
-                        this.emitter[key] = node[thatkey];
+                        const thatKey = obj.params[key] === null ? key : obj.params[key];
+                        this.emitter[key] = node[thatKey];
                     }
                 });
             },
@@ -547,11 +547,11 @@
              * Toggle properties from extisting node
              */
             proptoggle(obj) {
-                for (const val in obj.params) {
-                    obj.targets.forEach(node => {
+                obj.targets.forEach(node => {
+                    for (const val in obj.params) {
                         node[val] = typeof node[val] === 'boolean' ? !node[val] : '' || node[val];
-                    });
-                }
+                    }
+                });
             },
             propexists(obj) {
                 for (const p in obj.params) {
