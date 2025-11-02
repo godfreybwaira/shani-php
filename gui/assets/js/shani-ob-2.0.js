@@ -548,8 +548,8 @@
              */
             proptoggle(obj) {
                 obj.targets.forEach(node => {
-                    for (const val in obj.params) {
-                        node[val] = typeof node[val] === 'boolean' ? !node[val] : '' || node[val];
+                    for (const key in obj.params) {
+                        node[key] = typeof node[key] === 'boolean' ? !node[key] : '' || node[key];
                     }
                 });
             },
