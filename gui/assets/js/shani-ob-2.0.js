@@ -736,7 +736,7 @@
                     emitter: shani.emitter, params: action.params,
                     selector: action.selector, targets, data
                 }));
-                result === false || Utils.trigger(shani, action.fn);
+                result === false || Utils.trigger(shani, action.fn, data);
             }
         };
         const recall = (shani, data) => {
@@ -746,11 +746,12 @@
             }
         };
         const prepareCall = (shani, action, data, evt) => {
+            data = Utils.object(data);
             timer.delete(shani.emitter);
             callNext(shani, action, data);
-            data.shani = shani;
             if (shani.event.detail?.shani?.event?.type !== evt) {
-                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object(data)}));
+                data.shani = shani;
+                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
             }
             evt !== 'httpend' || recall(shani, data);
         };
