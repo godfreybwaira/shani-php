@@ -525,6 +525,20 @@
                 });
             },
             /**
+             * Check if property value is exactly equal to the given value
+             */
+            propis(obj) {
+                for (const node of obj.targets) {
+                    for (const key in obj.params) {
+                        const val = obj.params[key] || typeof node[key] === 'boolean' || '';
+                        if (node[key] !== val) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            },
+            /**
              * Add properties from extisting node
              */
             prop(obj) {
@@ -538,8 +552,14 @@
             propbind(obj) {
                 obj.targets.forEach(node => {
                     for (const key in obj.params) {
-                        const thatKey = obj.params[key] === null ? key : obj.params[key];
-                        this.emitter[key] = node[thatKey];
+                        this.emitter[key] = node[obj.params[key] || key];
+                    }
+                });
+            },
+            propbindtoggle(obj) {
+                obj.targets.forEach(node => {
+                    for (const key in obj.params) {
+                        this.emitter[key] = Utils.toggleProp(node[obj.params[key] || key]);
                     }
                 });
             },
@@ -549,13 +569,13 @@
             proptoggle(obj) {
                 obj.targets.forEach(node => {
                     for (const key in obj.params) {
-                        node[key] = typeof node[key] === 'boolean' ? !node[key] : '' || node[key];
+                        node[key] = Utils.toggleProp(node[key]);
                     }
                 });
             },
             propexists(obj) {
-                for (const p in obj.params) {
-                    for (const node of obj.targets) {
+                for (const node of obj.targets) {
+                    for (const p in obj.params) {
                         if (!(p in node)) {
                             return false;
                         }
@@ -858,6 +878,9 @@
                         cn.close();
                     }
                 }
+            },
+            toggleProp(val) {
+                return typeof val === 'boolean' ? !val : val || '';
             }
         };
     })();
