@@ -77,7 +77,7 @@ namespace shani\http {
             $security->preflightRequest();
             $security->validateSession();
             $this->app->on('web', function () use (&$security) {
-                $security->cspHeaders()->resourceAccessPolicy()->csrfTest();
+                $security->addCspHeaders()->addResourceAccessPolicy()->csrfTest();
             });
             $security->authorized()->passedRequestMethodCheck();
             if ($this->listener->listening('before')) {

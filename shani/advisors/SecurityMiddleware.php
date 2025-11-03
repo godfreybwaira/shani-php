@@ -35,15 +35,15 @@ namespace shani\advisors {
 
         /**
          * Set browsing policy
-         * @return bool True on success, false otherwise
+         * @return self
          */
-        public function setBrowsingPolicy(): bool
+        public function setBrowsingPolicy(): self
         {
             $policy = $this->app->config->browsingPrivacy();
             if ($policy !== BrowsingPrivacy::DISABLED) {
                 $this->app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $policy->value);
             }
-            return true;
+            return $this;
         }
 
         /**
@@ -109,7 +109,7 @@ namespace shani\advisors {
          * @return void
          * @see Configuration::resourceAccessPolicy()
          */
-        public function resourceAccessPolicy(): self
+        public function addResourceAccessPolicy(): self
         {
             $policy = $this->app->config->resourceAccessPolicy();
             if ($policy !== ResourceAccessPolicy::DISABLED) {
@@ -126,7 +126,7 @@ namespace shani\advisors {
          * Adding basic Content-Security-Policy (CSP) header values
          * @return self
          */
-        public function cspHeaders(): self
+        public function addCspHeaders(): self
         {
             $policy = $this->app->config->csp();
             if ($policy !== ContentSecurityPolicy::DISABLE) {

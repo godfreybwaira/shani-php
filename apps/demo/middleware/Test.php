@@ -9,15 +9,17 @@
 
 namespace apps\demo\middleware {
 
+    use shani\http\App;
+
     final class Test
     {
 
-        public static function m1(\shani\http\App $app)
+        public static function m1(App $app)
         {
             //LOGIC HERE...
         }
 
-        public static function m2(\shani\http\App $app)
+        public static function m2(App $app)
         {
             //LOGIC HERE...
         }

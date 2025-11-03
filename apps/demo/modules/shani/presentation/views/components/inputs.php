@@ -252,7 +252,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" watch-on="change::propbind selected:checked>>#chb" shani-watch="#chb">Two</option>
+                <option value="2" watch-on="proptoggle::propbind selected:checked>>#chb" shani-watch="#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>
