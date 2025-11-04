@@ -527,7 +527,7 @@
             /**
              * Check if property value is exactly equal to the given value
              */
-            propis(obj) {
+            propequal(obj) {
                 for (const node of obj.targets) {
                     for (const key in obj.params) {
                         const val = obj.params[key] || typeof node[key] === 'boolean' || '';
