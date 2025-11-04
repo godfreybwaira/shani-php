@@ -66,7 +66,7 @@
         };
     })();
     const Convertor = (() => {
-        const json = data => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
+        const toJson = data => typeof data === 'string' ? Utils.object(JSON.parse(data)) : data;
         return {
             map2json(map) {
                 const obj = Utils.object();
@@ -123,7 +123,7 @@
                     }
                     return node + '</' + tag + '>';
                 };
-                return '<?xml version="1.0"?>' + convert(json(data), 'data');
+                return '<?xml version="1.0"?>' + convert(toJson(data), 'data');
             },
             json2yaml(data) {
                 const convert = (obj, indent) => {
@@ -139,13 +139,13 @@
                     }
                     return str;
                 };
-                return convert(json(data), 0).trim();
+                return convert(toJson(data), 0).trim();
             },
             json2csv(obj) {
                 const enclose = val => {
                     return '"' + (val !== null || val !== undefined ? (val instanceof Array ? val.join('|') : val) : '') + '"';
                 };
-                obj = json(obj);
+                obj = toJson(obj);
                 const data = obj instanceof Array ? obj : [obj];
                 let str = Object.keys(data[0]).map(enclose).join(',');
                 for (let row of data) {
