@@ -258,12 +258,12 @@
 <div class="divider">Toaster</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/toaster?type=t" shani-on="click::read mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=t" shani-on="click::read<<mode:append>>body">
             Toaster from Top
         </a>
     </li>
     <li>
-        <a href="/shani/0/components/0/toaster?type=b" shani-on="click::read mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=b" shani-on="click::read<<mode:append>>body">
             Toaster from Bottom
         </a>
     </li>
@@ -271,7 +271,7 @@
 <div class="divider">Loaders</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/loader?type=i" shani-on="click::read mode:append>>.layout-content">
+        <a href="/shani/0/components/0/loader?type=i" shani-on="click::read<<mode:append>>.layout-content">
             Infinite loader
         </a>
     </li>
@@ -284,7 +284,7 @@
 <div class="divider">Timeline</div>
 <div class="row">
     <div class="col">
-        <ul class="timeline" shani-on="demand steps:3s::read mode:append>>.timeline" action="/shani/0/components/0/timeline">
+        <ul class="timeline" shani-on="demand<<steps:3s::read<<mode:append>>.timeline" action="/shani/0/components/0/timeline">
             <li>
                 <h3>My Title</h3>
                 <div class="text-muted font-sm mb-md">2011-2012</div>

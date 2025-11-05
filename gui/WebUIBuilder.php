@@ -14,7 +14,12 @@ namespace gui {
     final class WebUIBuilder
     {
 
-        private readonly MutableMap $attributes;
+        /**
+         * Application temporary data storage. This object is ideal for data
+         * exchange within application web views
+         * @var MutableMap
+         */
+        public readonly MutableMap $attr;
         private ?array $dictionary = null;
         private ?string $viewPath, $title;
         private ?\JsonSerializable $data;
@@ -27,7 +32,7 @@ namespace gui {
             $this->data = $data;
             $this->title = null;
             $this->viewPath = null;
-            $this->attributes = new MutableMap();
+            $this->attr = new MutableMap();
             $this->scripts = $this->styles = [];
             $this->icon = '<link rel="icon" href="data:,">';
             $this->style('/css/main.css');
@@ -199,16 +204,6 @@ namespace gui {
         public function getStyles(): array
         {
             return $this->styles;
-        }
-
-        /**
-         * Create application temporary data storage. This function is ideal for
-         * data exchange within application web views
-         * @return MutableMap Iterable object
-         */
-        public function attr(): MutableMap
-        {
-            return $this->attributes;
         }
 
         private static function createHeader(array &$head, string $url, array &$attributes): void

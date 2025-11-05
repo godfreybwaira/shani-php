@@ -19,13 +19,19 @@ namespace gui {
     final class WebUI
     {
 
-        private readonly App $app;
+        /**
+         * Iterable MutableMap representing UIBilder attributes object
+         * @var MutableMap
+         */
+        public readonly MutableMap $attr;
         private readonly WebUIBuilder $builder;
+        private readonly App $app;
 
         private function __construct(App &$app, WebUIBuilder &$builder)
         {
             $this->app = $app;
             $this->builder = $builder;
+            $this->attr = $builder->attr;
         }
 
         /**
@@ -151,15 +157,6 @@ namespace gui {
         private static function load(WebUI &$web, string $loadedFile): void
         {
             require $loadedFile;
-        }
-
-        /**
-         * Get an iterable MutableMap representing UIBilder attributes object
-         * @return MutableMap Iterable object
-         */
-        public function attr(): MutableMap
-        {
-            return $this->builder->attr();
         }
 
         /**

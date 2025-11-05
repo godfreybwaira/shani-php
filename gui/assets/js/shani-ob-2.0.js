@@ -277,12 +277,11 @@
                 if (events[evt] === null) {
                     throw new Error('Syntax error on ' + evt);
                 }
-                const parts = events[evt].split('>>').map(s => s.trim());
-                const pos = parts[0].search(/\s/), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
-                const e = Utils.getEventFromString(evt);
-                const evtParams = Utils.explode(evt.slice(e.length));
-                map.set(e, Utils.object({fn: fn.toLowerCase(), params, evtParams, selector: parts[1]}));
+                const parts = events[evt].split(SEP_SELECTOR).map(s => s.trim());
+                const pos = parts[0].search(SEP_FN), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
+                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + SEP_FN.length)) : null;
+                const ep = evt.split(SEP_FN).map(s => s.trim()), evtParams = Utils.explode(ep[1]);
+                map.set(ep[0], Utils.object({fn: fn.trim().toLowerCase(), params, evtParams, selector: parts[1]}));
             }
             return map;
         };
@@ -305,7 +304,8 @@
             }
             if (shani.http.scheme === 'sse') {
                 return HttpClient.sse(shani, target, mode, onConnect);
-            } else if ('scheme' in shani.http) {
+            }
+            if ('scheme' in shani.http) {
                 return HttpClient.wsocket(shani, target, mode, onConnect);
             }
             let em = shani.emitter;
@@ -373,8 +373,8 @@
         };
         const addNode = (obj, handler) => {
             obj.targets.forEach(target => {
-                const node = doc.createElement(obj.params['-tag']);
-                delete obj.params['-tag'];
+                const node = doc.createElement(obj.params['_tag']);
+                delete obj.params['_tag'];
                 for (const key in obj.params) {
                     node.setAttribute(key, obj.params[key] || '');
                 }
@@ -613,7 +613,6 @@
                 }
             }
         };
-        window.addEventListener('popstate', e => history.go(0));
         return {
             HTML_ATTR: ['enctype', 'method'],
             SHANI_ATTR: ['watch', 'headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
@@ -726,7 +725,7 @@
             nodes.forEach(node => addListener(node));
         };
     })();
-    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':';
+    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = '<<';
     const Utils = (() => {
         const callNext = (shani, action, data) => {
             const cb = action ? USER_DATA.fn[action.fn] || shani[action.fn] : null;
@@ -775,7 +774,7 @@
                 return evt.slice(evt.lastIndexOf(':') + 1);
             },
             getEventFromString(str) {
-                return str.split(/\s/)[0];
+                return str.split(SEP_FN)[0].trim();
             },
             eventExists(evt, evtStr) {
                 const events = Utils.splitEvents(evtStr);
@@ -1116,7 +1115,7 @@
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + classList;
                     btn.setAttribute('type', 'button');
-                    btn.setAttribute('shani-on', 'click' + SEP_ACTION + 'close>>.' + COVER);
+                    btn.setAttribute('shani-on', 'click' + SEP_ACTION + 'close' + SEP_SELECTOR + '.' + COVER);
                     btn.innerHTML = '&times;';
                     return btn;
                 }

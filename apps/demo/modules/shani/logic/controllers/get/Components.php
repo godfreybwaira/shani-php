@@ -81,7 +81,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         public function modals(): void
         {
             $builder = new WebUIBuilder();
-            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
+            $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
             $this->app->writer->send($builder);
         }
 
@@ -93,7 +93,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         public function loader(): void
         {
             $builder = new WebUIBuilder();
-            $builder->attr()->addIfAbsent('type', $this->app->request->query->getOne('type'));
+            $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
             $this->app->writer->send($builder);
         }
 
