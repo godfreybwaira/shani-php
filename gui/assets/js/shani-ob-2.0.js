@@ -2,17 +2,17 @@
     'use strict';
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
-            USER_DATA.fn = Utils.object();
             window.Shani = Utils.object({
                 select: (selector, obj) => USER_DATA.attr.set(selector, Utils.object(obj)),
                 action: (name, fn) => {
                     const n = name.toLowerCase();
-                    if (n in USER_DATA.fn) {
+                    if (USER_DATA.fn.has(n)) {
                         console.warn(n + ' already exists.');
                     } else {
-                        USER_DATA.fn[n] = fn;
+                        USER_DATA.fn.set(n, fn);
                     }
-                }
+                },
+                on: Shani.on
             });
             Object.freeze(window.Shani);
             Object.freeze(USER_DATA);
@@ -21,7 +21,7 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const USER_DATA = Object.setPrototypeOf({attr: new Map()}, null);
+    const USER_DATA = Object.setPrototypeOf({attr: new Map(), fn: new Map()}, null);
     const Observers = (() => {
         const runScript = node => {
             if (node.hasAttribute('src')) {
@@ -731,7 +731,7 @@
     const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = '<<';
     const Utils = (() => {
         const callNext = (shani, action, data) => {
-            const cb = action ? USER_DATA.fn[action.fn] || shani[action.fn] : null;
+            const cb = action ? USER_DATA.fn.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
                 const result = cb.call(shani, Utils.object({
@@ -838,9 +838,9 @@
                 const keys = path.split('.');
                 const traverse = (obj, idx) => {
                     if (idx === keys.length - 1) {
-                        return obj[keys[idx]].apply(thisArg || USER_DATA.fn, args);
+                        return obj.get(keys[idx]).apply(thisArg, args);
                     }
-                    return traverse(obj[keys[idx]], idx + 1);
+                    return traverse(obj.get(keys[idx]), idx + 1);
                 };
                 return traverse(USER_DATA.fn, 0);
             },
@@ -1140,25 +1140,6 @@
                 doc.body.appendChild(mdbg);
             };
             Shani.on('ui-modal', e => createModal(e.detail.specs));
-        })();
-        const Toaster = (() => {
-            const toast = (resp, message) => {
-                const content = resp.status + ' &CenterDot; ' + (resp.statusText || message);
-                let toaster = doc.getElementById('oer89trJ');
-                const color = resp.status === 200 ? 'success' : (resp.status > 399 ? 'danger' : 'info');
-                !toaster || toaster.remove();
-                toaster = doc.createElement('div');
-                toaster.id = 'oer89trJ';
-                toaster.innerHTML = content;
-                toaster.className = 'toaster pos-tc width-md-5 width-sm-10 color-' + color;
-                doc.body.appendChild(toaster);
-                setTimeout(() => {
-                    toaster.style.transform = 'translateY(-100%)';
-                    toaster.addEventListener('transitionend', e => toaster.remove());
-                }, 3000 + toaster.innerText.length * 64);
-            };
-            Shani.on('error', e => toast(e.detail, 'No connection to server. Try again.'));
-            Shani.on('redirect', e => toast(e.detail, 'Redirecting...'));
         })();
         const Loader = (() => {
             const createLoader = loader => {
