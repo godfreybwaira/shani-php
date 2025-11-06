@@ -12,7 +12,7 @@
             inset: 0;
             content: '';
             z-index: 89;
-            backdrop-filter:blur(fn.px2rem(5px));
+            backdrop-filter:blur(fn.px2rem(4px));
             @extend %position_absolute;
         }
         &:after{
@@ -30,7 +30,6 @@
     &-bottom,&-top{
         --loader-size: #{fn.px2rem(2px)};
         --loader-color: currentColor;
-        pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
             $width:30%;
@@ -49,5 +48,10 @@
     }
     &-top:before{
         top: 0;
+    }
+}
+@keyframes pg_move{
+    to{
+        margin-left:100%;
     }
 }

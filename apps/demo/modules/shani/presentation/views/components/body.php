@@ -1,7 +1,8 @@
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar">
         <a href="/shani/0/components/0/generator" shani-cache="age:30s" class="active menu-item"
-           shani-on="click::read>>#content;httpstart::cssadd<<loader-spin>>#content;httpend::cssrmv<<loader-spin>>#content">
+           shani-on="click::read>>#content;httpend::loaderrmv>>#content;
+           httpstart::loaderadd<<name:loader-spin>>#content;">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>
         </a>
@@ -20,7 +21,7 @@
             <span class="font-sm menu-label">Inputs</span>
         </a>
     </div>
-    <div class="tab-body container" id="content" style="--loader-size:2.5rem">
+    <div class="tab-body container" id="content">
         <?php $web->import($web->view('/all')); ?>
     </div>
 </div>

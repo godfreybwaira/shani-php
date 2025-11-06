@@ -597,8 +597,11 @@
             makemodal(obj) {
                 Utils.trigger(this, 'ui-modal', {specs: obj.params});
             },
-            makeloader(obj) {
+            loaderadd(obj) {
                 Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
+            },
+            loaderrmv(obj) {
+                Utils.trigger(this, 'ui-loader-rmv', {specs: obj.params, wrapper: obj.targets});
             },
             /**
              * Cancel ongoing HTTP connection
@@ -1125,7 +1128,6 @@
                 const wrapper = doc.createElement('div');
                 wrapper.id = specs.id;
                 wrapper.className = 'full-size';
-                wrapper.style.setProperty('--loader-size', '2.5rem');
                 if ('close-btn' in specs) {
                     const btn = getCloseBtn(specs['close-btn']);
                     btn.style.margin = 'var(--spacing)';
@@ -1160,17 +1162,21 @@
         })();
         const Loader = (() => {
             const createLoader = loader => {
+                const {name, color, size} = loader.specs;
                 loader.wrapper.forEach(node => {
-                    const bar = doc.createElement('div'), wrapper = doc.createElement('div');
-                    bar.className = 'progress';
-                    !loader.specs.color || bar.style.setProperty('--color', loader.specs.color);
-                    wrapper.id = loader.specs.id;
-                    wrapper.className = 'progress-bar loader';
-                    wrapper.appendChild(bar);
-                    node.appendChild(wrapper);
+                    !color || node.style.setProperty('--loader-color', color);
+                    !size || node.style.setProperty('--loader-size', size);
+                    node.classList.add(name);
+                });
+            };
+            const rmvLoader = loader => {
+                loader.wrapper.forEach(node => {
+                    ['--loader-color', '--loader-size'].forEach(p => node.style.removeProperty(p));
+                    node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };
             Shani.on('ui-loader', e => createLoader(e.detail));
+            Shani.on('ui-loader-rmv', e => rmvLoader(e.detail));
         })();
     })();
 })(document);

@@ -90,13 +90,6 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function loader(): void
-        {
-            $builder = new WebUIBuilder();
-            $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            $this->app->writer->send($builder);
-        }
-
         public function timeline(): void
         {
             $this->app->writer->send(new WebUIBuilder());

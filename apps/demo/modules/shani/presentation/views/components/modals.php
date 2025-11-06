@@ -10,8 +10,9 @@
         <div class="modal modal-type-v width-md-1q width-sm-3q pos-l">
             <button shani-on="click::close>>.modal-background" class="button button-times pos-tr"
                     style="margin: var(--spacing)">&times;</button>
-            <div class="card" style="--loader-size:2.5rem" action="/shani/0/components/0/generator"
-                 shani-on="load<<delay:2s&steps:3s&limit:4::read;httpstart::cssadd<<loader-spin;httpend::cssrmv<<loader-spin">
+            <div class="card" action="/shani/0/components/0/generator"
+                 shani-on="load<<delay:2s&steps:3s&limit:4::read;httpend::loaderrmv;
+                 httpstart::loaderadd<<name:loader-spin&size:2.5rem;">
             </div>
         </div>
     <?php elseif ($type === 'vr'): ?>

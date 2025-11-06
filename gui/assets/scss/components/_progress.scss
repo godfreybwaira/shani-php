@@ -42,19 +42,6 @@
                 height: calc(var(--spacing)/2);
             }
         }
-        &.loader{
-            #{$progress}{
-                --color:var(--color-danger);
-                --progress: 20%;
-            }
-            top: 0;
-            @extend %position_absolute, %full_width;
-            &>:before{
-                height: .25rem;
-                margin-left: calc(var(--progress) * -1);
-                animation: pg_move .5s linear infinite;
-            }
-        }
     }
     &-circle{
         --size:#{fn.px2rem(40px)};
@@ -71,11 +58,6 @@
             background-color: var(--bg-color);
             @extend %full_size, %center_content;
         }
-    }
-}
-@keyframes pg_move{
-    to{
-        margin-left:100%;
     }
 }
 @keyframes pg_before{

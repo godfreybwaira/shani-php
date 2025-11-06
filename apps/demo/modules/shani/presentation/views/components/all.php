@@ -268,15 +268,6 @@
         </a>
     </li>
 </ul>
-<div class="divider">Loaders</div>
-<ul>
-    <li>
-        <a href="/shani/0/components/0/loader?type=i" shani-on="click::read<<mode:append>>.layout-content">
-            Infinite loader
-        </a>
-    </li>
-</ul>
-
 <div class="divider">Divider with some texts</div>
 <div class="divider">some texts</div>
 <div class="divider">Divider without texts</div>
