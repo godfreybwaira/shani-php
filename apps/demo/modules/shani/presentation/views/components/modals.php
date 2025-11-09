@@ -12,7 +12,7 @@
                     style="margin: var(--spacing)">&times;</button>
             <div class="card" action="/shani/0/components/0/generator"
                  shani-on="load<<delay:2s&steps:3s&limit:4::read;httpend::loaderrmv;
-                 httpstart::loaderadd<<name:loader-spin&size:2.5rem;">
+                 httpstart::loadercreate<<name:loader-spin&size:2.5rem;">
             </div>
         </div>
     <?php elseif ($type === 'vr'): ?>

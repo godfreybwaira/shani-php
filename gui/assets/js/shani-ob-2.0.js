@@ -381,6 +381,47 @@
                 handler(target, node);
             });
         };
+        const setNodeValue = (node, key, val) => {
+            key in node ? node[key] = val : node.setAttribute(key, val);
+        };
+        const bindTargetNodeValue = (obj, shani, flip) => {
+            for (const key in obj.params) {
+                let val = obj.params[key];
+                val = flip === null ? key === val || val : getNodeValue(shani.emitter, val || key, flip);
+                obj.targets.forEach(node => setNodeValue(node, key, val));
+            }
+        };
+        const bindSourceNodeValue = (obj, shani, flip) => {
+            obj.targets.forEach(node => {
+                for (const key in obj.params) {
+                    const val = getNodeValue(node, obj.params[key] || key, flip);
+                    setNodeValue(shani.emitter, key, val);
+                }
+            });
+        };
+        const getNodeValue = (node, key, flip) => {
+            const val = key in node ? node[key] : node.getAttribute(key);
+            return !flip ? val : typeof val === 'boolean' ? !val : val || '';
+        };
+        const compute = (ov, nv, sign) => {
+            const value = nv.search('%') === nv.length - 1 ? ov * parseFloat(nv) * 0.01 : parseFloat(nv);
+            switch (sign) {
+                case '+':
+                    return ov + value;
+                case '-':
+                    return ov - value;
+                case '*':
+                    return ov * value;
+                case '/':
+                    return ov / value;
+                case '%':
+                    return ov % value;
+                case '^':
+                    return Math.pow(ov, value);
+                default:
+                    throw new Error('valid math signs are: +-*/%^');
+            }
+        };
         Obj.prototype = {
             /**
              * Read content from server.
@@ -520,6 +561,8 @@
                         if (key in node) {
                             const type = typeof node[key];
                             node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
+                        } else {
+                            node.removeAttribute(key);
                         }
                     }
                 });
@@ -530,8 +573,9 @@
             propequal(obj) {
                 for (const node of obj.targets) {
                     for (const key in obj.params) {
-                        const val = obj.params[key] || typeof node[key] === 'boolean' || '';
-                        if (node[key] !== val) {
+                        const val = getNodeValue(node, key);
+                        const newVal = obj.params[key] || typeof val === 'boolean' || '';
+                        if (val !== newVal) {
                             return false;
                         }
                     }
@@ -539,49 +583,57 @@
                 return true;
             },
             /**
-             * Add properties from extisting node
+             * this.emitter value = that.node value
              */
-            prop(obj) {
-                for (const key in obj.params) {
-                    obj.targets.forEach(node => node[key] = key === obj.params[key] || obj.params[key]);
-                }
+            propbindthis(obj) {
+                bindSourceNodeValue(obj, this);
             },
             /**
-             * Map this.emitter properties to that of src element
+             * this.emitter value = !that.node value
+             */
+            proptogglethis(obj) {
+                bindSourceNodeValue(obj, this, true);
+            },
+            /**
+             * Add properties to extisting node
+             */
+            propset(obj) {
+                bindTargetNodeValue(obj, null, null);
+            },
+            /**
+             * that.node value = this.emitter value
              */
             propbind(obj) {
-                obj.targets.forEach(node => {
-                    for (const key in obj.params) {
-                        this.emitter[key] = node[obj.params[key] || key];
-                    }
-                });
-            },
-            propbindtoggle(obj) {
-                obj.targets.forEach(node => {
-                    for (const key in obj.params) {
-                        this.emitter[key] = Utils.toggleProp(node[obj.params[key] || key]);
-                    }
-                });
+                bindTargetNodeValue(obj, this, false);
             },
             /**
-             * Toggle properties from extisting node
+             * that.node value = !this.emitter value
              */
             proptoggle(obj) {
-                obj.targets.forEach(node => {
-                    for (const key in obj.params) {
-                        node[key] = Utils.toggleProp(node[key]);
-                    }
-                });
+                bindTargetNodeValue(obj, this, true);
             },
             propexists(obj) {
                 for (const node of obj.targets) {
                     for (const p in obj.params) {
-                        if (!(p in node)) {
+                        if (!(p in node || node.hasAttribute(p))) {
                             return false;
                         }
                     }
                 }
                 return true;
+            },
+            propcomputeby(obj) {
+                const tkey = obj.params.thatprop || obj.params.thisprop;
+                const p = obj.params.precision || 4, f = obj.params.format || true;
+                const val = getNodeValue(this.emitter, obj.params.thisprop).trim().replace(/,/, '');
+                if (!(/^-?\d+(\.\d+)?%?$/.test(val))) {
+                    throw new Error('Invalid number format: ' + val);
+                }
+                obj.targets.forEach(node => {
+                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/,/, ''));
+                    const newVal = compute(oldVal, val, obj.params.sign), nv = newVal.toFixed(p);
+                    setNodeValue(node, tkey, f ? parseFloat(nv).toLocaleString() : nv);
+                });
             },
             saveas(obj) {
                 const type = obj.params.type || obj.data.headers.get('content-type');
@@ -594,10 +646,10 @@
             /**
              * Create HTML modal element
              */
-            makemodal(obj) {
+            modalcreate(obj) {
                 Utils.trigger(this, 'ui-modal', {specs: obj.params});
             },
-            loaderadd(obj) {
+            loadercreate(obj) {
                 Utils.trigger(this, 'ui-loader', {specs: obj.params, wrapper: obj.targets});
             },
             loaderrmv(obj) {
@@ -881,9 +933,6 @@
                         cn.close();
                     }
                 }
-            },
-            toggleProp(val) {
-                return typeof val === 'boolean' ? !val : val || '';
             }
         };
     })();
