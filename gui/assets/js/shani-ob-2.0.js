@@ -1122,20 +1122,19 @@
             setTimeout(rotate, 5000);
         })();
         const Selection = (() => {
-            const select = e => {
-                const parent = Utils.getParentNode(e.target, '.accordion,.menubar');
-                if (parent) {
-                    const child = getEmittingChild(e.target, parent);
-                    Utils.selectNode(parent.children, child, 'active');
-                }
-            };
             const getEmittingChild = (target, root) => {
                 while (target !== root && target.parentElement !== root) {
                     target = target.parentElement;
                 }
                 return target;
             };
-            doc.addEventListener('click', select);
+            doc.addEventListener('click', e => {
+                const parent = Utils.getParentNode(e.target, '.accordion,.menubar');
+                if (parent) {
+                    const child = getEmittingChild(e.target, parent);
+                    Utils.selectNode(parent.children, child, 'active');
+                }
+            });
         })();
         const Modal = (() => {
             const COVER = 'modal-background';
@@ -1178,7 +1177,7 @@
             };
             const rmvLoader = loader => {
                 loader.wrapper.forEach(node => {
-                    ['--loader-color', '--loader-size'].forEach(p => node.style.removeProperty(p));
+                    ['--loader-color', '--loader-size'].forEach(node.style.removeProperty);
                     node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };
