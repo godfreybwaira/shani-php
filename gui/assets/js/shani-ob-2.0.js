@@ -622,9 +622,9 @@
                 return true;
             },
             propcomputeby(obj) {
-                const tkey = obj.params.thatprop || obj.params.thisprop;
-                const p = obj.params.precision || 4, f = obj.params.format || true;
-                const val = getNodeValue(this.emitter, obj.params.thisprop).trim().replace(/,/, '');
+                const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
+                const p = obj.params.precision || 4, f = obj.params.format === 'true';
+                const val = getNodeValue(this.emitter, skey).trim().replace(/,/, '');
                 if (!(/^-?\d+(\.\d+)?%?$/.test(val))) {
                     throw new Error('Invalid number format: ' + val);
                 }
