@@ -1177,7 +1177,7 @@
             };
             const rmvLoader = loader => {
                 loader.wrapper.forEach(node => {
-                    ['--loader-color', '--loader-size'].forEach(node.style.removeProperty);
+                    ['--loader-color', '--loader-size'].forEach(p => node.style.removeProperty(p));
                     node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };
