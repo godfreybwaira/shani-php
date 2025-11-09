@@ -256,7 +256,7 @@
         };
     })();
     const Shani = (() => {
-        const Obj = function (node, e, attrib) {
+        const Obj = function (node, e) {
             this.event = e;
             this.emitter = node;
             this.poll = Utils.object();
@@ -264,7 +264,7 @@
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
             /**/
-            this.actions = collectActions(node.getAttribute(attrib));
+            this.actions = collectActions(node.getAttribute('shani-on'));
             this.headers = new Headers(Utils.explode(this.headers));
             this.http = Utils.explode(this.http);
         };
@@ -454,7 +454,7 @@
                     if (parent) {
                         return Utils.removeNode(parent);
                     }
-                    obj.targets.forEach(node => Utils.removeNode(node));
+                    obj.targets.forEach(Utils.removeNode);
                 }
             },
             print(obj) {
@@ -490,7 +490,7 @@
                 }
             },
             nodermv(obj) {
-                obj.targets.forEach(node => Utils.removeNode(node));
+                obj.targets.forEach(Utils.removeNode);
             },
             nodeappend(obj) {
                 addNode(obj, (target, node) => target.appendChild(node));
@@ -510,7 +510,6 @@
             nodecopyto(obj) {
                 obj.targets.forEach(target => {
                     moveNode(target, this.emitter, obj.params, (node) => {
-                        node.removeAttribute('shani-watch');
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
                             node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
@@ -670,10 +669,10 @@
         };
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['watch', 'headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
-            create(node, event, attrib) {
+            SHANI_ATTR: ['headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
+            create(node, event) {
                 if (!node.hasAttribute('disabled')) {
-                    const shani = new Obj(node, event, attrib);
+                    const shani = new Obj(node, event);
                     const evt = Utils.getEventName(event.type);
                     const p = shani.actions.get(evt).evtParams;
                     if (p.steps) {
@@ -696,7 +695,7 @@
                 if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
                     e.preventDefault();
                 }
-                Shani.create(node, e, 'shani-on');
+                Shani.create(node, e);
             }
         };
         const getTargetNode = (node, evt) => {
@@ -709,12 +708,6 @@
             }
             return null;
         };
-        const setWatchEvents = node => {
-            const events = Utils.splitEvents(node.getAttribute('watch-on'));
-            for (const evt in events) {
-                Shani.on(Utils.getEventFromString(evt), watch);
-            }
-        };
         const addListener = node => {
             const events = Utils.splitEvents(node.getAttribute('shani-on'));
             for (const evt in events) {
@@ -726,17 +719,6 @@
                     Observers.intersect(node);
                 }
             }
-        };
-        const watch = e => {
-            const evt = Utils.getEventName(e.type);
-            doc.querySelectorAll('[watch-on]').forEach(watcher => {
-                const evtStr = watcher.getAttribute('watch-on');
-                if (Utils.eventExists(evt, evtStr)) {
-                    if (e.detail.shani.emitter.matches(watcher.getAttribute('shani-watch'))) {
-                        Shani.create(watcher, e, 'watch-on');
-                    }
-                }
-            });
         };
         const setUserAttributes = root => {
             for (let sel of USER_DATA.attr) {
@@ -754,7 +736,7 @@
                     value = obj[key];
                 } else if (['shani-http', 'shani-headers'].includes(key)) {
                     value = mergeParams(value, obj[key], SEP_PARAM, SEP_VAL);
-                } else if (['shani-on', 'watch-on'].includes(key)) {
+                } else if (key === 'shani-on') {
                     value = mergeParams(value, obj[key], SEP_EVT, SEP_ACTION);
                 }
                 node.setAttribute(key, value);
@@ -773,11 +755,8 @@
         };
         return root => {
             setUserAttributes(root);
-            setWatchEvents(root);
             addListener(root);
-            const nodes = root.querySelectorAll('[shani-on],[watch-on]');
-            nodes.forEach(node => setWatchEvents(node));
-            nodes.forEach(node => addListener(node));
+            root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
     const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = '<<';
@@ -800,13 +779,9 @@
             }
         };
         const prepareCall = (shani, action, data, evt) => {
-            data = Utils.object(data);
             timer.delete(shani.emitter);
             callNext(shani, action, data);
-            if (shani.event.detail?.shani?.event?.type !== evt) {
-                data.shani = shani;
-                doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
-            }
+            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
             evt !== 'httpend' || recall(shani, data);
         };
         /**
@@ -868,6 +843,8 @@
             },
             trigger(shani, evt, data = {}) {
                 const action = shani.actions.get(evt), delay = action?.evtParams?.delay;
+                data = Utils.object(data);
+                data.shani = shani;
                 if (delay) {
                     clearTimeout(timer.get(shani.emitter));
                     const id = setTimeout(prepareCall, Utils.time2ms(delay), shani, action, data, evt);

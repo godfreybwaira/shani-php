@@ -1,7 +1,7 @@
 /* global Shani */
 
 document.addEventListener('shani:init', () => {
-    Shani.select('[shani-on],[watch-on]', {
+    Shani.select('[shani-on]', {
         'shani-headers': 'x-request-mode:async',
         'shani-http': 'timeout:5s'
     });
