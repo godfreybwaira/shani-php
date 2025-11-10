@@ -288,11 +288,7 @@
             }
             return map;
         };
-        const onConnect = shani => {
-            if (shani.http.timerId) {
-                clearTimeout(shani.http.timerId);
-            }
-        };
+        const onConnect = shani => clearTimeout(shani.http.timerId);
         /**
          * Send HTTP request
          */
