@@ -404,7 +404,7 @@
             return !flip ? val : typeof val === 'boolean' ? !val : val || '';
         };
         const compute = (ov, nv, sign) => {
-            const value = nv.search('%') === nv.length - 1 ? ov * parseFloat(nv) * 0.01 : parseFloat(nv);
+            const value = nv.endsWith('%') ? ov * parseFloat(nv.slice(0, -1)) * 0.01 : parseFloat(nv);
             switch (sign) {
                 case '+':
                     return ov + value;
