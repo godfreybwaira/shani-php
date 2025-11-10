@@ -282,7 +282,7 @@
                 }
                 const parts = events[evt].split(SEP_SELECTOR).map(s => s.trim());
                 const pos = parts[0].search(SEP_FN), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + SEP_FN.length)) : null;
+                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
                 const ep = evt.split(SEP_FN).map(s => s.trim()), evtParams = Utils.explode(ep[1]);
                 map.set(ep[0], Utils.object({fn: fn.trim().toLowerCase(), params, evtParams, selector: parts[1]}));
             }
@@ -404,7 +404,7 @@
             return !flip ? val : typeof val === 'boolean' ? !val : val || '';
         };
         const compute = (ov, nv, sign) => {
-            const value = nv.endsWith('%') ? ov * parseFloat(nv.slice(0, -1)) * 0.01 : parseFloat(nv);
+            const value = nv.endsWith('%') ? ov * parseFloat(nv) * 0.01 : parseFloat(nv);
             switch (sign) {
                 case '+':
                     return ov + value;
@@ -627,7 +627,7 @@
                     throw new Error('Invalid number format: ' + val);
                 }
                 obj.targets.forEach(node => {
-                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/,/g, ''));
+                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/[^\d.-]/g, ''));
                     const newVal = compute(oldVal, val, obj.params.sign);
                     const result = newVal.toLocaleString(undefined, {maximumFractionDigits: p});
                     setNodeValue(node, tkey, f ? result : result.replace(/,/g, ''));
@@ -768,7 +768,7 @@
             root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
-    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = '<<';
+    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
     const Utils = (() => {
         const callNext = (shani, action, data) => {
             const cb = action ? USER_DATA.fn.get(action.fn) || shani[action.fn] : null;

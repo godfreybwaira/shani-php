@@ -1,7 +1,7 @@
 <div class="divider">Buttons</div>
 <div class="row">
     <div class="col" id="row1">
-        <button class="button accent-color" shani-on="change::nodecopyto<<pos:1>>#r22" id="btn1">
+        <button class="button accent-color" shani-on="change::nodecopyto pos:1>>#r22" id="btn1">
             Simple Button
         </button>
     </div>
@@ -113,8 +113,8 @@
     <div class="col">
         <label>
             <input class="toggle" type="checkbox" id="chb"
-                   shani-on="change::propbind<<checked>>#chb2;
-                   propbind::trigger<<change>>#two,#row1 #btn1">
+                   shani-on="change::propbind checked>>#chb2;
+                   propbind::trigger change>>#two,#row1 #btn1">
             Toggle
         </label>
     </div>
@@ -127,8 +127,8 @@
     <div class="col">
         <label>
             <input class="checkmark" type="checkbox" id="chb2"
-                   shani-on="change::propbind<<checked>>#chb;
-                   propbind::trigger<<propbind>>#chb">
+                   shani-on="change::propbind checked>>#chb;
+                   propbind::trigger propbind>>#chb">
             Checkbox
         </label>
     </div>
@@ -201,7 +201,7 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup::propbind<<value>>#bas;propbind::trigger<<yes>>#lbl1" name="website" placeholder="My website...">
+            <input type="url" id="url" shani-on="keyup::propbind value>>#bas;propbind::trigger yes>>#lbl1" name="website" placeholder="My website...">
             <label>.com</label>
         </div>
     </div>
@@ -217,9 +217,9 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label id="lbl1" shani-on="yes::propbindthis<<innerHTML:value>>#url">Demonstrating shani-propbind function</label>
+        <label id="lbl1" shani-on="yes::propbindthis innerHTML:value>>#url">Demonstrating shani-propbind function</label>
         <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function"
-               shani-on="keyup::propbind<<value>>#url;propbind::trigger<<propbind>>#url" class="input-box">
+               shani-on="keyup::propbind value>>#url;propbind::trigger propbind>>#url" class="input-box">
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
@@ -255,7 +255,7 @@
             <select name="number" id="num" required>
                 <option value="">Select a number</option>
                 <option value="1">One</option>
-                <option value="2" id="two" shani-on="change::propbindthis<<selected:checked>>#chb">Two</option>
+                <option value="2" id="two" shani-on="change::propbindthis selected:checked>>#chb">Two</option>
                 <option value="3">Three</option>
                 <option value="4">Four</option>
             </select>
