@@ -629,8 +629,8 @@
                 obj.targets.forEach(node => {
                     const oldVal = parseFloat(getNodeValue(node, tkey).replace(/,/g, ''));
                     const newVal = compute(oldVal, val, obj.params.sign);
-                    const result = f ? parseFloat(newVal).toLocaleString(undefined, {maximumFractionDigits: p}) : newVal.toFixed(p);
-                    setNodeValue(node, tkey, result);
+                    const result = newVal.toLocaleString(undefined, {maximumFractionDigits: p});
+                    setNodeValue(node, tkey, f ? result : result.replace(/,/g, ''));
                 });
             },
             propsum(obj) {
@@ -641,8 +641,8 @@
                     const val = getNodeValue(node, tkey).replace(/[^\d.-]/g, '');
                     sum += parseFloat(val);
                 });
-                const total = f ? parseFloat(sum).toLocaleString(undefined, {maximumFractionDigits: p}) : sum.toFixed(p);
-                setNodeValue(this.emitter, skey, total);
+                const total = sum.toLocaleString(undefined, {maximumFractionDigits: p});
+                setNodeValue(this.emitter, skey, f ? total : total.replace(/,/g, ''));
             },
             saveas(obj) {
                 const type = obj.params.type || obj.data.headers.get('content-type');
