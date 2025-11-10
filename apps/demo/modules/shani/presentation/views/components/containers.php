@@ -535,12 +535,13 @@
 <div class="divider">Computation</div>
 <div class="row">
     <div class="col">
-        <button class="button color-alert" shani-on="click<<steps:1s&limit:5::propcomputeby<<thatprop:value&value&sign:+>>#plus10" value="10">
+        <button class="button color-alert"
+                shani-on="click::propcomputeby<<thatprop:value&value&precision:2&format:true&sign:+>>#plus10" value="10000">
             Add By 10
         </button>
     </div>
     <div class="col">
-        <input type="text" class="input-box" id="plus10" value="990.984392">
+        <input type="text" class="input-box" id="plus10" value="990.948392">
     </div>
     <div class="col">
         <button class="button color-alert" shani-on="click::propcomputeby<<thatprop:value&format:true&value&sign:->>#plus10" value="10">
@@ -571,7 +572,7 @@
         <input type="text" class="input-box" placeholder="Reminder By 10" id="remby10" value="25">
     </div>
     <div class="col">
-        <button class="button color-alert" value="2" shani-on="click::propcomputeby<<value&precision:5&sign:^>>#powby2">
+        <button class="button color-alert" value="2" shani-on="click::propcomputeby<<value&precision:5&format:true&sign:^>>#powby2">
             Power 2
         </button>
     </div>

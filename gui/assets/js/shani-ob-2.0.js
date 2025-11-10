@@ -622,15 +622,27 @@
             propcomputeby(obj) {
                 const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
                 const p = obj.params.precision || 4, f = obj.params.format === 'true';
-                const val = getNodeValue(this.emitter, skey).trim().replace(/,/, '');
+                const val = getNodeValue(this.emitter, skey).trim().replace(/,/g, '');
                 if (!(/^-?\d+(\.\d+)?%?$/.test(val))) {
                     throw new Error('Invalid number format: ' + val);
                 }
                 obj.targets.forEach(node => {
-                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/,/, ''));
-                    const newVal = compute(oldVal, val, obj.params.sign), nv = newVal.toFixed(p);
-                    setNodeValue(node, tkey, f ? parseFloat(nv).toLocaleString() : nv);
+                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/,/g, ''));
+                    const newVal = compute(oldVal, val, obj.params.sign);
+                    const result = f ? parseFloat(newVal).toLocaleString(undefined, {maximumFractionDigits: p}) : newVal.toFixed(p);
+                    setNodeValue(node, tkey, result);
                 });
+            },
+            propsum(obj) {
+                const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
+                const p = obj.params.precision || 4, f = obj.params.format === 'true';
+                let sum = 0;
+                obj.targets.forEach(node => {
+                    const val = getNodeValue(node, tkey).replace(/[^\d.-]/g, '');
+                    sum += parseFloat(val);
+                });
+                const total = f ? parseFloat(sum).toLocaleString(undefined, {maximumFractionDigits: p}) : sum.toFixed(p);
+                setNodeValue(this.emitter, skey, total);
             },
             saveas(obj) {
                 const type = obj.params.type || obj.data.headers.get('content-type');
