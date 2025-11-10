@@ -535,7 +535,7 @@
 <div class="divider">Computation</div>
 <div class="row">
     <div class="col">
-        <button class="button color-alert" shani-on="click<<steps:2s&limit:5::propcomputeby<<thatprop:value&value&sign:+>>#plus10" value="10">
+        <button class="button color-alert" shani-on="click<<steps:1s&limit:5::propcomputeby<<thatprop:value&value&sign:+>>#plus10" value="10">
             Add By 10
         </button>
     </div>

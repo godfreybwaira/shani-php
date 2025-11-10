@@ -260,6 +260,7 @@
             this.event = e;
             this.emitter = node;
             this.poll = Utils.object();
+            this.eventName = e.type.slice(e.type.lastIndexOf(':') + 1);
             this.url = node.getAttribute('href') || node.getAttribute('action');
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
@@ -267,6 +268,8 @@
             this.actions = collectActions(node.getAttribute('shani-on'));
             this.headers = new Headers(Utils.explode(this.headers));
             this.http = Utils.explode(this.http);
+            /**for HTTP read() and write() sync become false**/
+            this.sync = true;
         };
         const setAttribs = (shani, node, attrs, prefix) => {
             attrs.forEach(a => shani[a] = node.getAttribute(prefix + a));
@@ -295,6 +298,7 @@
          */
         const sendReq = (shani, method, target, params) => {
             const mode = params?.mode || 'replace', timeout = shani.http.timeout;
+            shani.sync = false;
             const type = Utils.getSubtype(shani.enctype);
             if (type && type !== 'form-data') {
                 shani.headers.set('content-type', shani.enctype);
@@ -440,9 +444,7 @@
             },
             trigger(obj) {
                 for (const val in obj.params) {
-                    obj.targets.forEach(node => {
-                        node.dispatchEvent(new Event(val, {bubbles: true}));
-                    });
+                    obj.targets.forEach(node => node.dispatchEvent(new Event(val, {bubbles: true})));
                 }
             },
             /**
@@ -673,13 +675,12 @@
             create(node, event) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event);
-                    const evt = Utils.getEventName(event.type);
-                    const p = shani.actions.get(evt).evtParams;
+                    const p = shani.actions.get(shani.eventName).evtParams;
                     if (p.steps) {
                         shani.poll.steps = Utils.time2ms(p.steps) || -1;
                         shani.poll.limit = parseInt(p.limit) || null;
                     }
-                    Utils.trigger(shani, evt);
+                    Utils.trigger(shani, shani.eventName);
                 }
             },
             on(e, cb) {
@@ -772,17 +773,26 @@
                 result === false || Utils.trigger(shani, action.fn, data);
             }
         };
-        const recall = (shani, data) => {
-            if (shani.emitter.isConnected && shani.poll.steps > -1 && (!shani.poll.limit || (--shani.poll.limit) > 0)) {
-                const evt = Utils.getEventName(shani.event.type), action = shani.actions.get(evt);
-                setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
+        const shouldSchedule = shani => {
+            const connected = shani.emitter.isConnected;
+            const underLimit = !shani.poll.limit || (--shani.poll.limit) > 0;
+            return connected && shani.poll.steps > -1 && underLimit;
+        };
+        const recall = (shani, data, evt) => {
+            if (shouldSchedule(shani)) {
+                const action = shani.actions.get(evt);
+                return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
             }
         };
+        const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.eventName);
         const prepareCall = (shani, action, data, evt) => {
+            !isSyncEvent(shani, evt) || clearTimeout(timer.get(shani.emitter));
             timer.delete(shani.emitter);
             callNext(shani, action, data);
             doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
-            evt !== 'httpend' || recall(shani, data);
+            if (isSyncEvent(shani, evt)) {
+                timer.set(shani.emitter, recall(shani, data, shani.eventName));
+            }
         };
         /**
          * Timer for a delayed actions
@@ -799,9 +809,6 @@
                     row.classList.remove(cssClass);
                 }
                 activeChild.classList.add(cssClass);
-            },
-            getEventName(evt) {
-                return evt.slice(evt.lastIndexOf(':') + 1);
             },
             getEventFromString(str) {
                 return str.split(SEP_FN)[0].trim();

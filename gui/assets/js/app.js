@@ -12,5 +12,5 @@ document.addEventListener('shani:init', () => {
         return false; //try to return true...
     });
     Shani.action('timeout', (a) => console.log('request timed out (408)'));
-    Shani.on('200', e => console.log(e.type));
+//    Shani.on('200', e => console.log(e.type));
 });
