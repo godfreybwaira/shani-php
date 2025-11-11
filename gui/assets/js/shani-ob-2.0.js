@@ -384,24 +384,23 @@
         const setNodeValue = (node, key, val) => {
             key in node ? node[key] = val : node.setAttribute(key, val);
         };
-        const bindTargetNodeValue = (obj, shani, flip) => {
+        const bindTargetNodeValue = (obj, emitter, flip) => {
             for (const key in obj.params) {
-                let val = obj.params[key];
-                val = flip === null ? key === val || val : getNodeValue(shani.emitter, val || key, flip);
+                const val = getNodeValue(emitter, obj.params[key] || key, flip);
                 obj.targets.forEach(node => setNodeValue(node, key, val));
             }
         };
-        const bindSourceNodeValue = (obj, shani, flip) => {
+        const bindSourceNodeValue = (obj, emitter, flip) => {
             obj.targets.forEach(node => {
                 for (const key in obj.params) {
                     const val = getNodeValue(node, obj.params[key] || key, flip);
-                    setNodeValue(shani.emitter, key, val);
+                    setNodeValue(emitter, key, val);
                 }
             });
         };
         const getNodeValue = (node, key, flip) => {
             const val = key in node ? node[key] : node.getAttribute(key);
-            return !flip ? val : typeof val === 'boolean' ? !val : val || '';
+            return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
         };
         const compute = (ov, nv, sign) => {
             const value = nv.endsWith('%') ? ov * parseFloat(nv) * 0.01 : parseFloat(nv);
@@ -565,49 +564,28 @@
                 });
             },
             /**
-             * Check if property value is exactly equal to the given value
-             */
-            propequal(obj) {
-                for (const node of obj.targets) {
-                    for (const key in obj.params) {
-                        const val = getNodeValue(node, key);
-                        const newVal = obj.params[key] || typeof val === 'boolean' || '';
-                        if (val !== newVal) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            },
-            /**
              * this.emitter value = that.node value
              */
             propbindthis(obj) {
-                bindSourceNodeValue(obj, this);
+                bindSourceNodeValue(obj, this.emitter);
             },
             /**
              * this.emitter value = !that.node value
              */
             proptogglethis(obj) {
-                bindSourceNodeValue(obj, this, true);
-            },
-            /**
-             * Add properties to extisting node
-             */
-            propset(obj) {
-                bindTargetNodeValue(obj, null, null);
+                bindSourceNodeValue(obj, this.emitter, true);
             },
             /**
              * that.node value = this.emitter value
              */
             propbind(obj) {
-                bindTargetNodeValue(obj, this, false);
+                bindTargetNodeValue(obj, this.emitter);
             },
             /**
              * that.node value = !this.emitter value
              */
             proptoggle(obj) {
-                bindTargetNodeValue(obj, this, true);
+                bindTargetNodeValue(obj, this.emitter, true);
             },
             propexists(obj) {
                 for (const node of obj.targets) {
