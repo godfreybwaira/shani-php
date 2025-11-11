@@ -622,12 +622,12 @@
             propcomputeby(obj) {
                 const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
                 const p = obj.params.precision || 4, f = obj.params.format === 'true';
-                const val = getNodeValue(this.emitter, skey).trim().replace(/,/g, '');
+                const pattern = /[^\d.-]/g, val = getNodeValue(this.emitter, skey).replace(pattern, '');
                 if (!(/^-?\d+(\.\d+)?%?$/.test(val))) {
                     throw new Error('Invalid number format: ' + val);
                 }
                 obj.targets.forEach(node => {
-                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(/[^\d.-]/g, ''));
+                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(pattern, ''));
                     const newVal = compute(oldVal, val, obj.params.sign);
                     const result = newVal.toLocaleString(undefined, {maximumFractionDigits: p});
                     setNodeValue(node, tkey, f ? result : result.replace(/,/g, ''));
