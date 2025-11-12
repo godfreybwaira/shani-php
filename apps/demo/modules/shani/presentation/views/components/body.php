@@ -20,6 +20,11 @@
             <i class="mdi mdi-inbox-full"></i>
             <span class="font-sm menu-label">Inputs</span>
         </a>
+        <a href="/shani/0/components/0/bindings"
+           shani-on="click::read mode:replace>>#content" class="menu-item">
+            <i class="mdi mdi-anchor"></i>
+            <span class="font-sm menu-label">Bindings</span>
+        </a>
     </div>
     <div class="tab-body container" id="content">
         <?php $web->import($web->view('/all')); ?>

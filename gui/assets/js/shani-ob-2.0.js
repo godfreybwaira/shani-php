@@ -600,9 +600,9 @@
             numberbind(obj) {
                 const lkey = obj.params.invalue, rkey = obj.params.basevalue || lkey;
                 const outkey = obj.params.outvalue || lkey, sign = getNodeValue(this.emitter, obj.params.operator);
-                const pattern = /[^\d%.-]/g, rval = getNodeValue(this.emitter, rkey).replace(pattern, '');
-                if (!(/^-?\d+(\.\d+)?%?$/.test(rval))) {
-                    throw new Error('Invalid number format: ' + rval);
+                const pattern = /[^\d%.-]/g, rval = getNodeValue(this.emitter, rkey)?.replace(pattern, '');
+                if (rval === null || !(/^-?\d+(\.\d+)?%?$/.test(rval))) {
+                    throw new Error('Invalid number format ' + rval + ' on: ' + rkey);
                 }
                 obj.targets.forEach(node => {
                     const lval = parseFloat(getNodeValue(node, lkey).replace(pattern, ''));
@@ -613,7 +613,10 @@
                 const outkey = obj.params.outvalue || 'value', inkey = obj.params.invalue || outkey;
                 let sum = 0;
                 obj.targets.forEach(node => {
-                    const val = getNodeValue(node, inkey).replace(/[^\d.-]/g, '');
+                    const val = getNodeValue(node, inkey)?.replace(/[^\d.-]/g);
+                    if (val === null) {
+                        throw new Error(inkey + ' cannot become a number.');
+                    }
                     sum += parseFloat(val);
                 });
                 setNodeValue(this.emitter, outkey, sum);
@@ -621,7 +624,7 @@
             numberformat(obj) {
                 const key = obj.params.invalue || 'value';
                 obj.targets.forEach(node => {
-                    const val = parseFloat(getNodeValue(node, key).replace(/[^\d.-]/g, ''));
+                    const val = parseFloat(getNodeValue(node, key)?.replace(/[^\d.-]/g, '') || 0);
                     const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: obj.params.maxdecimals || 2,
                         minimumFractionDigits: obj.params.mindecimals || 0
@@ -664,7 +667,7 @@
         };
         return {
             HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'http'],
+            SHANI_ATTR: ['headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'log', 'http'],
             create(node, event) {
                 if (!node.hasAttribute('disabled')) {
                     const shani = new Obj(node, event);
@@ -759,11 +762,12 @@
             const cb = action ? USER_DATA.fn.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
-                const result = cb.call(shani, Utils.object({
+                const params = Utils.object({
                     emitter: shani.emitter, params: action.params,
                     selector: action.selector, targets, data
-                }));
-                result === false || Utils.trigger(shani, action.fn, data);
+                });
+                shani.log !== 'true' || console.log(params);
+                cb.call(shani, params) === false || Utils.trigger(shani, action.fn, data);
             }
         };
         const shouldSchedule = shani => {
