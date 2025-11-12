@@ -536,7 +536,7 @@
 <div class="row">
     <div class="col">
         <button class="button color-alert"
-                shani-on="click::propcomputeby thatprop:value&value&precision:2&format:true&sign:+>>#plus10" value="10000">
+                shani-on="click::numberbind thatprop:value&value&precision:2&format:true&operator:+>>#plus10" value="10000">
             Add By 10
         </button>
     </div>
@@ -544,12 +544,12 @@
         <input type="text" class="input-box" id="plus10" value="990.948392">
     </div>
     <div class="col">
-        <button class="button color-alert" shani-on="click::propcomputeby thatprop:value&format:true&value&sign:->>#plus10" value="10">
+        <button class="button color-alert" shani-on="click::numberbind thatprop:value&format:true&value&operator:->>#plus10" value="10">
             Minus 10
         </button>
     </div>
     <div class="col">
-        <button class="button color-alert" value="10" shani-on="click::propcomputeby thatprop:value&value&sign:*>>#mulby10">
+        <button class="button color-alert" value="10" shani-on="click::numberbind thatprop:value&value&operator:*>>#mulby10">
             Multiply by 10
         </button>
     </div>
@@ -557,14 +557,14 @@
         <input type="text" class="input-box" placeholder="Multiply 10" id="mulby10" value="1">
     </div>
     <div class="col">
-        <button class="button color-alert" value="10" shani-on="click::propcomputeby value&precision:5&sign:/>>#mulby10">
+        <button class="button color-alert" value="10" shani-on="click::numberbind value&precision:5&operator:/>>#mulby10">
             Divide by 10
         </button>
     </div>
 </div>
 <div class="row">
     <div class="col">
-        <button class="button color-alert" value="10" shani-on="click::propcomputeby value&precision:5&sign:%>>#remby10">
+        <button class="button color-alert" value="10" shani-on="click::numberbind value&precision:5&operator:%>>#remby10">
             Reminder By 10
         </button>
     </div>
@@ -572,7 +572,7 @@
         <input type="text" class="input-box" placeholder="Reminder By 10" id="remby10" value="25">
     </div>
     <div class="col">
-        <button class="button color-alert" value="2" shani-on="click::propcomputeby value&precision:5&format:true&sign:^>>#powby2">
+        <button class="button color-alert" value="2" shani-on="click::numberbind value&precision:5&format:true&operator:^>>#powby2">
             Power 2
         </button>
     </div>
@@ -580,7 +580,7 @@
         <input type="text" class="input-box" placeholder="Power 2" id="powby2" value="2">
     </div>
     <div class="col">
-        <button class="button color-alert" value="10%" shani-on="click::propcomputeby value&precision:5&sign:+>>#addpct10">
+        <button class="button color-alert" value="10%" shani-on="click::numberbind value&precision:5&operator:+>>#addpct10">
             Add 10%
         </button>
     </div>
@@ -588,7 +588,7 @@
         <input type="text" class="input-box" placeholder="Add 10%" id="addpct10" value="100">
     </div>
     <div class="col">
-        <button class="button color-alert" value="10%" shani-on="click::propcomputeby value&precision:5&sign:->>#addpct10">
+        <button class="button color-alert" value="10%" shani-on="click::numberbind value&precision:5&operator:->>#addpct10">
             Minus 10%
         </button>
     </div>

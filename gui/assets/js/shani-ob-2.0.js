@@ -402,23 +402,23 @@
             const val = key in node ? node[key] : node.getAttribute(key);
             return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
         };
-        const compute = (ov, nv, sign) => {
-            const value = nv.endsWith('%') ? ov * parseFloat(nv) * 0.01 : parseFloat(nv);
+        const compute = (lval, nv, sign) => {
+            const rval = nv.endsWith('%') ? lval * parseFloat(nv) * 0.01 : parseFloat(nv);
             switch (sign) {
                 case '+':
-                    return ov + value;
+                    return lval + rval;
                 case '-':
-                    return ov - value;
+                    return lval - rval;
                 case '*':
-                    return ov * value;
+                    return lval * rval;
                 case '/':
-                    return ov / value;
+                    return lval / rval;
                 case '%':
-                    return ov % value;
+                    return lval % rval;
                 case '^':
-                    return Math.pow(ov, value);
+                    return Math.pow(lval, rval);
                 default:
-                    throw new Error('valid math signs are: +-*/%^');
+                    throw new Error('valid math operators are: +-*/%^');
             }
         };
         Obj.prototype = {
@@ -597,30 +597,38 @@
                 }
                 return true;
             },
-            propcomputeby(obj) {
-                const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
-                const p = obj.params.precision || 4, f = obj.params.format === 'true';
-                const pattern = /[^\d.-]/g, val = getNodeValue(this.emitter, skey).replace(pattern, '');
-                if (!(/^-?\d+(\.\d+)?%?$/.test(val))) {
-                    throw new Error('Invalid number format: ' + val);
+            numberbind(obj) {
+                const lkey = obj.params.invalue, rkey = obj.params.basevalue || lkey;
+                const outkey = obj.params.outvalue || lkey, sign = getNodeValue(this.emitter, obj.params.operator);
+                const pattern = /[^\d%.-]/g, rval = getNodeValue(this.emitter, rkey).replace(pattern, '');
+                if (!(/^-?\d+(\.\d+)?%?$/.test(rval))) {
+                    throw new Error('Invalid number format: ' + rval);
                 }
                 obj.targets.forEach(node => {
-                    const oldVal = parseFloat(getNodeValue(node, tkey).replace(pattern, ''));
-                    const newVal = compute(oldVal, val, obj.params.sign);
-                    const result = newVal.toLocaleString(undefined, {maximumFractionDigits: p});
-                    setNodeValue(node, tkey, f ? result : result.replace(/,/g, ''));
+                    const lval = parseFloat(getNodeValue(node, lkey).replace(pattern, ''));
+                    setNodeValue(this.emitter, outkey, compute(lval, rval, sign) || '');
                 });
             },
-            propsum(obj) {
-                const skey = obj.params.value || 'value', tkey = obj.params.thatprop || skey;
-                const p = obj.params.precision || 4, f = obj.params.format === 'true';
+            numbersum(obj) {
+                const outkey = obj.params.outvalue || 'value', inkey = obj.params.invalue || outkey;
                 let sum = 0;
                 obj.targets.forEach(node => {
-                    const val = getNodeValue(node, tkey).replace(/[^\d.-]/g, '');
+                    const val = getNodeValue(node, inkey).replace(/[^\d.-]/g, '');
                     sum += parseFloat(val);
                 });
-                const total = sum.toLocaleString(undefined, {maximumFractionDigits: p});
-                setNodeValue(this.emitter, skey, f ? total : total.replace(/,/g, ''));
+                setNodeValue(this.emitter, outkey, sum);
+            },
+            numberformat(obj) {
+                const {mindecimals, maxdecimals, invalue} = obj.params;
+                const key = invalue || 'value';
+                obj.targets.forEach(node => {
+                    const val = parseFloat(getNodeValue(node, key).replace(/[^\d.-]/g, ''));
+                    const result = val.toLocaleString(undefined, {
+                        maximumFractionDigits: maxdecimals || 2,
+                        minimumFractionDigits: mindecimals || 0
+                    });
+                    setNodeValue(node, key, result);
+                });
             },
             saveas(obj) {
                 const type = obj.params.type || obj.data.headers.get('content-type');

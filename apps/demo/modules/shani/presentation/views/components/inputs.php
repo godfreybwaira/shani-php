@@ -201,7 +201,11 @@
         <label class="font-sm">Your Website</label>
         <div class="input-group">
             <label>www.</label>
-            <input type="url" id="url" shani-on="keyup::propbind value>>#bas;propbind::trigger yes>>#lbl1" name="website" placeholder="My website...">
+            <input type="url" id="url" data-percent="-18%" shani-on="keyup::trigger yes>>#bas;
+                   reverse::numberbind
+                   thatvalue:value&thisvalue:data-percent&result:value&precision:5&format:true&operator:->>#bas"
+                   name="website" placeholder="My website...">
+           <!--<input type="url" id="url" shani-on="keyup::propbind value>>#bas;propbind::trigger yes>>#lbl1" name="website" placeholder="My website...">-->
             <label>.com</label>
         </div>
     </div>
@@ -217,9 +221,14 @@
 </div>
 <div class="row row-stretch">
     <div class="col">
-        <label id="lbl1" shani-on="yes::propbindthis innerHTML:value>>#url">Demonstrating shani-propbind function</label>
-        <input type="text" name="a" id="bas" placeholder="Demonstrating shani-propbind function"
-               shani-on="keyup::propbind value>>#url;propbind::trigger propbind>>#url" class="input-box">
+        <!--<label id="lbl1" shani-on="yes::propcomputethisby innerHTML:value>>#url">Demonstrating shani-propbind function</label>-->
+        <input type="text" name="a" data-percent="18%" id="bas" placeholder="Demonstrating shani-propbind function"
+               shani-on="yes::numberbind
+               thatvalue:value&thisvalue:data-percent&result:value&precision:5&format:true&operator:+>>#url;
+               keyup::trigger reverse>>#url"
+               class="input-box">
+<!--        <input type="text" name="a" value="1" id="bas" placeholder="Demonstrating shani-propbind function"
+               shani-on="keyup::propbind value>>#url;propbind::trigger propbind>>#url" class="input-box">-->
     </div>
 </div>
 <div class="row row-no-gap row-stretch">
