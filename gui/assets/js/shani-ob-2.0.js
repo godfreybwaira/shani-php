@@ -619,13 +619,12 @@
                 setNodeValue(this.emitter, outkey, sum);
             },
             numberformat(obj) {
-                const {mindecimals, maxdecimals, invalue} = obj.params;
-                const key = invalue || 'value';
+                const key = obj.params.invalue || 'value';
                 obj.targets.forEach(node => {
                     const val = parseFloat(getNodeValue(node, key).replace(/[^\d.-]/g, ''));
                     const result = val.toLocaleString(undefined, {
-                        maximumFractionDigits: maxdecimals || 2,
-                        minimumFractionDigits: mindecimals || 0
+                        maximumFractionDigits: obj.params.maxdecimals || 2,
+                        minimumFractionDigits: obj.params.mindecimals || 0
                     });
                     setNodeValue(node, key, result);
                 });
@@ -1169,11 +1168,11 @@
         })();
         const Loader = (() => {
             const createLoader = loader => {
-                const {name, color, size} = loader.specs;
+                const color = loader.specs.color, size = loader.specs.size;
                 loader.wrapper.forEach(node => {
                     !color || node.style.setProperty('--loader-color', color);
                     !size || node.style.setProperty('--loader-size', size);
-                    node.classList.add(name);
+                    node.classList.add(loader.specs.name);
                 });
             };
             const rmvLoader = loader => {
