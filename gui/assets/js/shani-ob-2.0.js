@@ -613,7 +613,7 @@
                 const outkey = obj.params.outvalue || 'value', inkey = obj.params.invalue || outkey;
                 let sum = 0;
                 obj.targets.forEach(node => {
-                    const val = getNodeValue(node, inkey)?.replace(/[^\d.-]/g);
+                    const val = getNodeValue(node, inkey)?.replace(/[^\d.-]/g, '');
                     if (val === null) {
                         throw new Error(inkey + ' cannot become a number.');
                     }
@@ -762,12 +762,12 @@
             const cb = action ? USER_DATA.fn.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
-                const params = Utils.object({
+                const p = Utils.object({
                     emitter: shani.emitter, params: action.params,
                     selector: action.selector, targets, data
                 });
-                shani.log !== 'true' || console.log(params);
-                cb.call(shani, params) === false || Utils.trigger(shani, action.fn, data);
+                shani.log !== 'true' || console.log(p);
+                cb.call(shani, p) === false || Utils.trigger(shani, action.fn, data);
             }
         };
         const shouldSchedule = shani => {

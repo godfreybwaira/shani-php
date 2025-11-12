@@ -3,30 +3,29 @@
 <div class="row">
     <div class="col">
         <div class="input-group">
-            <label>Unit Price:</label>
-            <input type="text" id="unitprice" value="$100" readonly>
+            <label>Price:</label>
+            <input type="text" id="unitprice" value="$100.00" readonly>
             <label>Qty:</label>
-            <input type="text" id="plus10" value="1" class="width-md-2"
-                   shani-on="numberformat::trigger update>>#totalprice;
+            <input type="text" id="plus10" value="0" class="width-md-2" readonly
+                   shani-on="compute::numberbind
+                   invalue:value&outvalue:value&basevalue:data-base&operator:data-sign;
                    numberbind::numberformat invalue:value&mindecimals:2;
-                   compute::numberbind
-                   invalue:value&outvalue:value&basevalue:data-base&operator:data-sign;">
+                   numberformat::trigger update>>#totalprice;">
             <label>Total Price:</label>
             <input type="text" id="totalprice" readonly data-sign="*" class="width-md-2"
-                   shani-log="true"
                    shani-on="load::propbindthis data-base:value>>#unitprice;
-                   numberbind::numberformat invalue:value&mindecimals:2;
-                   numberformat::trigger update>>#vat;
-                   propbindthis::trigger update;
+                   propbindthis delay:0.01s::trigger update;
                    update::numberbind
-                   invalue:value&outvalue:value&basevalue:data-base&operator:data-sign>>#plus10;">
+                   invalue:value&outvalue:value&basevalue:data-base&operator:data-sign>>#plus10;
+                   numberbind::numberformat invalue:value&mindecimals:2;
+                   numberformat::trigger update>>#vat;">
             <label>VAT (18%):</label>
             <input type="text" id="vat" readonly data-sign="*" data-vat="0.18" class="width-md-2"
-                   shani-on="numberbind::numberformat invalue:value&mindecimals:2;
-                   numberformat::trigger update>>#total;
-                   update::numberbind
-                   invalue:value&basevalue:data-vat&operator:data-sign>>#totalprice;">
-            <label>GRAND TOTAL:</label>
+                   shani-on="update::numberbind
+                   invalue:value&basevalue:data-vat&operator:data-sign>>#totalprice;
+                   numberbind::numberformat invalue:value&mindecimals:2;
+                   numberformat::trigger update>>#total;">
+            <label>TOTAL:</label>
             <input type="text" id="total" readonly data-sign="*" data-vat="0.18" class="width-md-2"
                    shani-on="update::numbersum invalue:value&outvalue>>#vat,#totalprice;
                    numbersum::numberformat invalue:value&mindecimals:2;">
