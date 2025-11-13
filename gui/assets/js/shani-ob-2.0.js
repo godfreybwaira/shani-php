@@ -427,10 +427,10 @@
         const parseNodeNumber = (node, key, allowPercent) => {
             const val = getNodeValue(node, key) || '0';
             const num = val.replace(/[^\d%.-]/g, '');
-            if (!/^-?\d+(\.\d+)?%?$/.test(num)) {
-                throw new Error('Invalid number format: ' + val);
+            if (/^-?\d+(\.\d+)?%?$/.test(num)) {
+                return allowPercent ? num : parseFloat(num);
             }
-            return allowPercent ? num : parseFloat(num);
+            throw new Error('Invalid number "' + val + '" on ' + key);
         };
         Obj.prototype = {
             /**
