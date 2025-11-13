@@ -293,7 +293,7 @@
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
-            const mode = params?.mode || 'replace', timeout = shani.http.timeout;
+            const mode = params && params.mode ? params.mode : 'replace', timeout = shani.http.timeout;
             shani.sync = false;
             const type = Utils.getSubtype(shani.enctype);
             if (type && type !== 'form-data') {
@@ -423,6 +423,14 @@
                 default:
                     throw new Error('valid math operators are: +-*/%^');
             }
+        };
+        const parseNodeNumber = (node, key, allowPercent) => {
+            const val = getNodeValue(node, key) || '0';
+            const num = val.replace(/[^\d%.-]/g, '');
+            if (!/^-?\d+(\.\d+)?%?$/.test(num)) {
+                throw new Error('Invalid number format: ' + val);
+            }
+            return allowPercent ? num : parseFloat(num);
         };
         Obj.prototype = {
             /**
@@ -603,34 +611,24 @@
             numberbind(obj) {
                 const input = obj.params.input, rkey = obj.params.basevalue || input;
                 const output = obj.params.output || input, sign = getNodeValue(this.emitter, obj.params.operator);
-                const pattern = /[^\d%.-]/g, rval = getNodeValue(this.emitter, rkey)?.replace(pattern, '');
-                if (rval === null || !(/^-?\d+(\.\d+)?%?$/.test(rval))) {
-                    throw new Error('Invalid number format ' + rval + ' on: ' + rkey);
-                }
+                const rval = parseNodeNumber(this.emitter, rkey, true);
                 obj.targets.forEach(node => {
-                    const lval = parseFloat(getNodeValue(node, input).replace(pattern, ''));
+                    const lval = parseNodeNumber(node, input);
                     setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
             },
             numbersum(obj) {
                 const output = obj.params.output || 'value', input = obj.params.input || output;
                 let sum = 0;
-                obj.targets.forEach(node => {
-                    const val = getNodeValue(node, input)?.replace(/[^\d.-]/g, '');
-                    if (val === null) {
-                        throw new Error(input + ' cannot become a number.');
-                    }
-                    sum += parseFloat(val);
-                });
+                obj.targets.forEach(node => sum += parseNodeNumber(node, input));
                 setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
                 const input = obj.params.input || 'value', output = obj.params.output || input;
                 obj.targets.forEach(node => {
-                    const val = parseFloat(getNodeValue(node, input)?.replace(/[^\d.-]/g, '') || 0);
                     const prefix = getNodeValue(node, obj.params.prefix) || '';
                     const suffix = getNodeValue(node, obj.params.suffix) || '';
-                    const result = val.toLocaleString(undefined, {
+                    const result = parseNodeNumber(node, input).toLocaleString(undefined, {
                         maximumFractionDigits: obj.params.maxdecimals || 2,
                         minimumFractionDigits: obj.params.mindecimals || 0
                     });
@@ -851,7 +849,7 @@
                 return Object.setPrototypeOf(o || {}, null);
             },
             trigger(shani, evt, data = {}) {
-                const action = shani.actions.get(evt), delay = action?.evtParams?.delay;
+                const action = shani.actions.get(evt), delay = action ? action.evtParams.delay : null;
                 data = Utils.object(data);
                 data.shani = shani;
                 if (delay) {
@@ -1120,10 +1118,11 @@
                 setTimeout(rotate, 5000);
             };
             doc.addEventListener('click', e => {
-                if (e.target.classList?.contains('carousel-next')) {
+                const cls = e.target.classList;
+                if (cls && cls.contains('carousel-next')) {
                     // Calculate next index: cycle to 0 if at end.
                     rotateItems(e.target.parentElement, (total, idx) => (idx + 1) % total);
-                } else if (e.target.classList?.contains('carousel-prev')) {
+                } else if (cls && cls.contains('carousel-prev')) {
                     // Calculate previous index: add total length to avoid negative modulus.
                     rotateItems(e.target.parentElement, (total, idx) => (idx - 1 + total) % total);
                 }
