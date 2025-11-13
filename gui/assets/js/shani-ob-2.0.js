@@ -399,6 +399,9 @@
             });
         };
         const getNodeValue = (node, key, flip) => {
+            if (!key) {
+                return key;
+            }
             const val = key in node ? node[key] : node.getAttribute(key);
             return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
         };
@@ -598,38 +601,40 @@
                 return true;
             },
             numberbind(obj) {
-                const lkey = obj.params.invalue, rkey = obj.params.basevalue || lkey;
-                const outkey = obj.params.outvalue || lkey, sign = getNodeValue(this.emitter, obj.params.operator);
+                const input = obj.params.input, rkey = obj.params.basevalue || input;
+                const output = obj.params.output || input, sign = getNodeValue(this.emitter, obj.params.operator);
                 const pattern = /[^\d%.-]/g, rval = getNodeValue(this.emitter, rkey)?.replace(pattern, '');
                 if (rval === null || !(/^-?\d+(\.\d+)?%?$/.test(rval))) {
                     throw new Error('Invalid number format ' + rval + ' on: ' + rkey);
                 }
                 obj.targets.forEach(node => {
-                    const lval = parseFloat(getNodeValue(node, lkey).replace(pattern, ''));
-                    setNodeValue(this.emitter, outkey, compute(lval, rval, sign) || '');
+                    const lval = parseFloat(getNodeValue(node, input).replace(pattern, ''));
+                    setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
             },
             numbersum(obj) {
-                const outkey = obj.params.outvalue || 'value', inkey = obj.params.invalue || outkey;
+                const output = obj.params.output || 'value', input = obj.params.input || output;
                 let sum = 0;
                 obj.targets.forEach(node => {
-                    const val = getNodeValue(node, inkey)?.replace(/[^\d.-]/g, '');
+                    const val = getNodeValue(node, input)?.replace(/[^\d.-]/g, '');
                     if (val === null) {
-                        throw new Error(inkey + ' cannot become a number.');
+                        throw new Error(input + ' cannot become a number.');
                     }
                     sum += parseFloat(val);
                 });
-                setNodeValue(this.emitter, outkey, sum);
+                setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
-                const key = obj.params.invalue || 'value';
+                const input = obj.params.input || 'value', output = obj.params.output || input;
                 obj.targets.forEach(node => {
-                    const val = parseFloat(getNodeValue(node, key)?.replace(/[^\d.-]/g, '') || 0);
+                    const val = parseFloat(getNodeValue(node, input)?.replace(/[^\d.-]/g, '') || 0);
+                    const prefix = getNodeValue(node, obj.params.prefix) || '';
+                    const suffix = getNodeValue(node, obj.params.suffix) || '';
                     const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: obj.params.maxdecimals || 2,
                         minimumFractionDigits: obj.params.mindecimals || 0
                     });
-                    setNodeValue(node, key, result);
+                    setNodeValue(node, output, prefix + result + suffix);
                 });
             },
             saveas(obj) {
