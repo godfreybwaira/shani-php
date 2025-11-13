@@ -626,9 +626,10 @@
             numberformat(obj) {
                 const input = obj.params.input || 'value', output = obj.params.output || input;
                 obj.targets.forEach(node => {
+                    const val = parseNodeNumber(node, input);
                     const prefix = getNodeValue(node, obj.params.prefix) || '';
                     const suffix = getNodeValue(node, obj.params.suffix) || '';
-                    const result = parseNodeNumber(node, input).toLocaleString(undefined, {
+                    const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: obj.params.maxdecimals || 2,
                         minimumFractionDigits: obj.params.mindecimals || 0
                     });
