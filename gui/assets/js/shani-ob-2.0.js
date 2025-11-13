@@ -406,7 +406,7 @@
             return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
         };
         const compute = (lval, nv, sign) => {
-            const rval = nv.endsWith('%') ? lval * parseFloat(nv) * 0.01 : parseFloat(nv);
+            const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
             switch (sign) {
                 case '+':
                     return lval + rval;
