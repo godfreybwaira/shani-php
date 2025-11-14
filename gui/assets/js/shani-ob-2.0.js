@@ -3,25 +3,25 @@
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
             window.Shani = Utils.object({
-                select: (selector, obj) => USER_DATA.attr.set(selector, Utils.object(obj)),
-                action: (name, fn) => {
+                select: (selector, obj) => UDF.attr.set(selector, Utils.object(obj)),
+                define: (name, val, replace) => {
                     const n = name.toLowerCase();
-                    if (USER_DATA.fn.has(n)) {
-                        console.warn(n + ' already exists.');
+                    if (!replace && UDF.map.has(n)) {
+                        console.warn(name + ' already exists.');
                     } else {
-                        USER_DATA.fn.set(n, fn);
+                        UDF.map.set(n, val);
                     }
                 },
                 on: Shani.on
             });
             Object.freeze(window.Shani);
-            Object.freeze(USER_DATA);
+            Object.freeze(UDF);
             doc.dispatchEvent(new Event('shani:init'));
         }
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const USER_DATA = Object.setPrototypeOf({attr: new Map(), fn: new Map()}, null);
+    const UDF = Object.setPrototypeOf({attr: new Map(), map: new Map()}, null);
     const Observers = (() => {
         const runScript = node => {
             if (node.hasAttribute('src')) {
@@ -75,7 +75,7 @@
             },
             input2form(shani) {
                 if (shani.inf) {
-                    return Utils.recursiveCall(shani.inf, [shani.emitter]);
+                    return Utils.calludf(shani.inf, [shani.emitter]);
                 }
                 const node = shani.emitter;
                 if (['SELECT', 'INPUT', 'TEXTAREA'].includes(node.tagName)) {
@@ -241,7 +241,7 @@
         const handleDataInsertion = (target, shani, resp, mode) => {
             const outf = target.getAttribute('shani-outf') || shani.outf;
             if (outf) {
-                return Utils.recursiveCall(outf, [shani.emitter, target, resp]);
+                return Utils.calludf(outf, [shani.emitter, target, resp]);
             }
             if (mode === 'discard') {
                 return;
@@ -399,11 +399,11 @@
             });
         };
         const getNodeValue = (node, key, flip) => {
-            if (!key) {
-                return key;
+            if (key) {
+                const val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key);
+                return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
             }
-            const val = key in node ? node[key] : node.getAttribute(key);
-            return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
+            return key;
         };
         const compute = (lval, nv, sign) => {
             const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
@@ -624,14 +624,13 @@
                 setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
-                const input = obj.params.input || 'value', output = obj.params.output || input;
+                const p = obj.params, input = p.input || 'value', output = p.output || input;
                 obj.targets.forEach(node => {
                     const val = parseNodeNumber(node, input);
-                    const prefix = getNodeValue(node, obj.params.prefix) || '';
-                    const suffix = getNodeValue(node, obj.params.suffix) || '';
+                    const prefix = getNodeValue(node, p.prefix) || '', suffix = getNodeValue(node, p.suffix) || '';
                     const result = val.toLocaleString(undefined, {
-                        maximumFractionDigits: obj.params.maxdecimals || 2,
-                        minimumFractionDigits: obj.params.mindecimals || 0
+                        maximumFractionDigits: getNodeValue(node, p.maxdecimals) || 2,
+                        minimumFractionDigits: getNodeValue(node, p.mindecimals) || 0
                     });
                     setNodeValue(node, output, prefix + result + suffix);
                 });
@@ -722,7 +721,7 @@
             }
         };
         const setUserAttributes = root => {
-            for (let sel of USER_DATA.attr) {
+            for (let sel of UDF.attr) {
                 if (root.matches(sel[0])) {
                     addAttributes(root, sel[1]);
                 }
@@ -763,7 +762,7 @@
     const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
     const Utils = (() => {
         const callNext = (shani, action, data) => {
-            const cb = action ? USER_DATA.fn.get(action.fn) || shani[action.fn] : null;
+            const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
                 const p = Utils.object({
@@ -871,15 +870,9 @@
             getId() {
                 return Date.now().toString(36);
             },
-            recursiveCall(path, args, thisArg) {
-                const keys = path.split('.');
-                const traverse = (obj, idx) => {
-                    if (idx === keys.length - 1) {
-                        return obj.get(keys[idx]).apply(thisArg, args);
-                    }
-                    return traverse(obj.get(keys[idx]), idx + 1);
-                };
-                return traverse(USER_DATA.fn, 0);
+            calludf(path, args, thisArg) {
+                const v = UDF.map.get(path);
+                return v instanceof Function ? v.apply(thisArg, args) : v;
             },
             code2text(code) {
                 if (code > 199 && code < 300) {
