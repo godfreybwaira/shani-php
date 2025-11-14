@@ -24,7 +24,7 @@
     const UDF = Object.setPrototypeOf({attr: new Map(), map: new Map()}, null);
     const Observers = (() => {
         const runScript = node => {
-            if (node.hasAttribute('src')) {
+            if (Utils.nodeKeyExists(node, 'src')) {
                 const found = doc.head.querySelector('script[src="' + node.src + '"]') !== null;
                 if (!found) {
                     doc.head.appendChild(node);
@@ -230,7 +230,7 @@
         };
         const insertData = (target, shani, data, mode, headers) => {
             const type = Utils.getSubtype(headers.get('content-type'));
-            const plainText = (target.getAttribute('shani-xss') || shani.xss) === 'true' || type !== 'html';
+            const plainText = (Utils.getNodeValue(target, 'shani-xss') || shani.xss) === 'true' || type !== 'html';
             const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
             if (['INPUT', 'TEXTAREA'].includes(target.tagName)) {
                 setInputData(target, data, mode, mechanism);
@@ -239,7 +239,7 @@
             }
         };
         const handleDataInsertion = (target, shani, resp, mode) => {
-            const outf = target.getAttribute('shani-outf') || shani.outf;
+            const outf = Utils.getNodeValue(target, 'shani-outf') || shani.outf;
             if (outf) {
                 return Utils.calludf(outf, [shani.emitter, target, resp]);
             }
@@ -261,18 +261,18 @@
             this.emitter = node;
             this.poll = Utils.object();
             this.eventName = e.type.slice(e.type.lastIndexOf(':') + 1);
-            this.url = node.getAttribute('href') || node.getAttribute('action');
+            this.url = Utils.getNodeValue(node, 'href') || Utils.getNodeValue(node, 'action');
             setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
             setAttribs(this, node, Shani.HTML_ATTR, '');
             /**/
-            this.actions = collectActions(node.getAttribute('shani-on'));
+            this.actions = collectActions(Utils.getNodeValue(node, 'shani-on'));
             this.headers = new Headers(Utils.explode(this.headers));
             this.http = Utils.explode(this.http);
             /**for HTTP read() and write() sync become false**/
             this.sync = true;
         };
         const setAttribs = (shani, node, attrs, prefix) => {
-            attrs.forEach(a => shani[a] = node.getAttribute(prefix + a));
+            attrs.forEach(a => shani[a] = Utils.getNodeValue(node, prefix + a));
         };
         const collectActions = evtStr => {
             const events = Utils.splitEvents(evtStr), map = new Map();
@@ -313,11 +313,11 @@
                 em = em.querySelector('fieldset') || em;
             }
             HttpClient.http(shani, shani.method || method, request => {
-                em.setAttribute('disabled', '');
+                Utils.setNodeValue(em, 'disabled', true);
                 Utils.trigger(shani, 'httpstart', {request});
             }, () => {
                 onConnect(shani);
-                em.removeAttribute('disabled');
+                Utils.setNodeValue(em, 'disabled', false);
                 Utils.trigger(shani, 'httpend');
             }, resp => onSuccessReq(shani, target, resp, mode), err => {
                 const status = err.name === 'AbortError' ? 408 : 400;
@@ -376,34 +376,24 @@
                 const node = doc.createElement(obj.params['_tag']);
                 delete obj.params['_tag'];
                 for (const key in obj.params) {
-                    node.setAttribute(key, obj.params[key] || '');
+                    Utils.setNodeValue(node, key, obj.params[key] || key);
                 }
                 handler(target, node);
             });
         };
-        const setNodeValue = (node, key, val) => {
-            key in node ? node[key] = val : node.setAttribute(key, val);
-        };
         const bindTargetNodeValue = (obj, emitter, flip) => {
             for (const key in obj.params) {
-                const val = getNodeValue(emitter, obj.params[key] || key, flip);
-                obj.targets.forEach(node => setNodeValue(node, key, val));
+                const val = Utils.getNodeValue(emitter, obj.params[key] || key, flip);
+                obj.targets.forEach(node => Utils.setNodeValue(node, key, val));
             }
         };
         const bindSourceNodeValue = (obj, emitter, flip) => {
             obj.targets.forEach(node => {
                 for (const key in obj.params) {
-                    const val = getNodeValue(node, obj.params[key] || key, flip);
-                    setNodeValue(emitter, key, val);
+                    const val = Utils.getNodeValue(node, obj.params[key] || key, flip);
+                    Utils.setNodeValue(emitter, key, val);
                 }
             });
-        };
-        const getNodeValue = (node, key, flip) => {
-            if (key) {
-                const val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key);
-                return flip ? (typeof val === 'boolean' ? !val : val || '') : val;
-            }
-            return key;
         };
         const compute = (lval, nv, sign) => {
             const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
@@ -425,7 +415,7 @@
             }
         };
         const parseNodeNumber = (node, key, allowPercent) => {
-            const val = getNodeValue(node, key) || '0';
+            const val = Utils.getNodeValue(node, key) || '0';
             const num = val.replace(/[^\d%.-]/g, '');
             if (/^-?\d+(\.\d+)?%?$/.test(num)) {
                 return allowPercent ? num : parseFloat(num);
@@ -563,16 +553,9 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                obj.targets.forEach(node => {
-                    for (const key in obj.params) {
-                        if (key in node) {
-                            const type = typeof node[key];
-                            node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
-                        } else {
-                            node.removeAttribute(key);
-                        }
-                    }
-                });
+                for (const key in obj.params) {
+                    obj.targets.forEach(node => Utils.removeNodeKey(node, key));
+                }
             },
             /**
              * this.emitter value = that.node value
@@ -601,7 +584,7 @@
             propexists(obj) {
                 for (const node of obj.targets) {
                     for (const p in obj.params) {
-                        if (!(p in node || node.hasAttribute(p))) {
+                        if (!Utils.nodeKeyExists(node, p)) {
                             return false;
                         }
                     }
@@ -609,30 +592,30 @@
                 return true;
             },
             numberbind(obj) {
-                const input = obj.params.input, rkey = obj.params.basevalue || input;
-                const output = obj.params.output || input, sign = getNodeValue(this.emitter, obj.params.operator);
-                const rval = parseNodeNumber(this.emitter, rkey, true);
+                const p = obj.params, input = p.input, output = p.output || input;
+                const sign = Utils.getNodeValue(this.emitter, p.operator);
+                const rval = parseNodeNumber(this.emitter, p.basevalue || input, true);
                 obj.targets.forEach(node => {
                     const lval = parseNodeNumber(node, input);
-                    setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
+                    Utils.setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
             },
             numbersum(obj) {
                 const output = obj.params.output || 'value', input = obj.params.input || output;
                 let sum = 0;
                 obj.targets.forEach(node => sum += parseNodeNumber(node, input));
-                setNodeValue(this.emitter, output, sum);
+                Utils.setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
                 const p = obj.params, input = p.input || 'value', output = p.output || input;
                 obj.targets.forEach(node => {
                     const val = parseNodeNumber(node, input);
-                    const prefix = getNodeValue(node, p.prefix) || '', suffix = getNodeValue(node, p.suffix) || '';
+                    const prefix = Utils.getNodeValue(node, p.prefix) || '', suffix = Utils.getNodeValue(node, p.suffix) || '';
                     const result = val.toLocaleString(undefined, {
-                        maximumFractionDigits: getNodeValue(node, p.maxdecimals) || 2,
-                        minimumFractionDigits: getNodeValue(node, p.mindecimals) || 0
+                        maximumFractionDigits: Utils.getNodeValue(node, p.maxdecimals) || 2,
+                        minimumFractionDigits: Utils.getNodeValue(node, p.mindecimals) || 0
                     });
-                    setNodeValue(node, output, prefix + result + suffix);
+                    Utils.setNodeValue(node, output, prefix + result + suffix);
                 });
             },
             saveas(obj) {
@@ -672,7 +655,7 @@
             HTML_ATTR: ['enctype', 'method'],
             SHANI_ATTR: ['headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'log', 'http'],
             create(node, event) {
-                if (!node.hasAttribute('disabled')) {
+                if (!Utils.getNodeValue(node, 'disabled')) {
                     const shani = new Obj(node, event);
                     const p = shani.actions.get(shani.eventName).evtParams;
                     if (p.steps) {
@@ -700,7 +683,7 @@
         };
         const getTargetNode = (node, evt) => {
             if (node) {
-                const evtStr = node.getAttribute('shani-on');
+                const evtStr = Utils.getNodeValue(node, 'shani-on');
                 if (Utils.eventExists(evt, evtStr)) {
                     return node;
                 }
@@ -709,7 +692,7 @@
             return null;
         };
         const addListener = node => {
-            const events = Utils.splitEvents(node.getAttribute('shani-on'));
+            const events = Utils.splitEvents(Utils.getNodeValue(node, 'shani-on'));
             for (const evt in events) {
                 const e = Utils.getEventFromString(evt);
                 doc.addEventListener(e, listen);
@@ -731,7 +714,7 @@
         };
         const addAttributes = (node, obj) => {
             for (const key in obj) {
-                let value = node.getAttribute(key);
+                let value = Utils.getNodeValue(node, key);
                 if (value === null) {
                     value = obj[key];
                 } else if (['shani-http', 'shani-headers'].includes(key)) {
@@ -739,7 +722,7 @@
                 } else if (key === 'shani-on') {
                     value = mergeParams(value, obj[key], SEP_EVT, SEP_ACTION);
                 }
-                node.setAttribute(key, value);
+                Utils.setNodeValue(node, key, value);
             }
         };
         const mergeParams = (oldVal, newVal, sep1, sep2) => {
@@ -910,6 +893,33 @@
                     } else {
                         cn.close();
                     }
+                }
+            },
+            setNodeValue(node, key, val) {
+                if (key in node) {
+                    node[key] = val;
+                } else if (val === false) {
+                    node.removeAttribute(key);
+                } else {
+                    node.setAttribute(key, val === true ? key : val);
+                }
+            },
+            getNodeValue(node, key, flip) {
+                if (key) {
+                    const val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key);
+                    return flip ? (typeof val === 'boolean' ? !val : '') : key === val || val;
+                }
+                return key;
+            },
+            nodeKeyExists(node, key) {
+                return key in node || node.hasAttribute(key);
+            },
+            removeNodeKey(node, key) {
+                if (key in node) {
+                    const type = typeof node[key];
+                    node[key] = type === 'boolean' ? false : type === 'number' ? 0 : '';
+                } else {
+                    node.removeAttribute(key);
                 }
             }
         };
@@ -1105,7 +1115,7 @@
             };
             const rotate = () => {
                 doc.querySelectorAll('.carousel').forEach(node => {
-                    if (node.getAttribute('ui-attr') === 'auto') {
+                    if (Utils.getNodeValue(node, 'ui-attr') === 'auto') {
                         rotateItems(node, (total, idx) => (idx + 1) % total);
                     }
                 });
@@ -1144,8 +1154,8 @@
                 if (classList) {
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + classList;
-                    btn.setAttribute('type', 'button');
-                    btn.setAttribute('shani-on', 'click' + SEP_ACTION + 'close' + SEP_SELECTOR + '.' + COVER);
+                    Utils.setNodeValue(btn, 'type', 'button');
+                    Utils.setNodeValue(btn, 'shani-on', 'click' + SEP_ACTION + 'close' + SEP_SELECTOR + '.' + COVER);
                     btn.innerHTML = '&times;';
                     return btn;
                 }
