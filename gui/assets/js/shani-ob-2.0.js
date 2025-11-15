@@ -386,18 +386,20 @@
         };
         const bindTargetNodeValue = (obj, emitter, flip) => {
             for (const key in obj.params) {
-                const val = Utils.getNodeValue(emitter, obj.params[key] || key, flip);
+                const v = Utils.getNodeValue(emitter, obj.params[key] || key);
+                const val = flip ? flipValue(v) : v;
                 obj.targets.forEach(node => Utils.setNodeValue(node, key, val));
             }
         };
         const bindSourceNodeValue = (obj, emitter, flip) => {
             obj.targets.forEach(node => {
                 for (const key in obj.params) {
-                    const val = Utils.getNodeValue(node, obj.params[key] || key, flip);
-                    Utils.setNodeValue(emitter, key, val);
+                    const val = Utils.getNodeValue(node, obj.params[key] || key);
+                    Utils.setNodeValue(emitter, key, flip ? flipValue(val) : val);
                 }
             });
         };
+        const flipValue = val => typeof val === 'boolean' ? !val : '';
         const compute = (lval, nv, sign) => {
             const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
             switch (sign) {
@@ -906,11 +908,10 @@
                     node.setAttribute(key, val === true ? key : val);
                 }
             },
-            getNodeValue(node, key, flip) {
+            getNodeValue(node, key) {
                 if (key) {
                     let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
-                    val = val === 'true' ? true : val === 'false' ? false : val;
-                    return flip ? (typeof val === 'boolean' ? !val : '') : key === val || val;
+                    return key === val || (val === 'true' || val === 'false' ? false : val);
                 }
                 return key;
             },
