@@ -114,7 +114,7 @@
                 const convert = (obj, tag) => {
                     let node = '<' + tag + '>';
                     if (typeof obj === 'object') {
-                        const isArray = obj instanceof Array;
+                        const isArray = Array.isArray(obj);
                         for (let key in obj) {
                             node += convert(obj[key], isArray ? 'item' : key.replace(/\s+/, '-'));
                         }
@@ -128,7 +128,7 @@
             json2yaml(data) {
                 const convert = (obj, indent) => {
                     let str = '';
-                    const isArray = obj instanceof Array;
+                    const isArray = Array.isArray(obj);
                     for (let p in obj) {
                         const key = '  '.repeat(indent) + (isArray ? '-' : p + ':');
                         if (typeof obj[p] !== 'object') {
@@ -143,10 +143,10 @@
             },
             json2csv(obj) {
                 const enclose = val => {
-                    return '"' + (val !== null || val !== undefined ? (val instanceof Array ? val.join('|') : val) : '') + '"';
+                    return '"' + (val !== null || val !== undefined ? (Array.isArray(val) ? val.join('|') : val) : '') + '"';
                 };
                 obj = toJson(obj);
-                const data = obj instanceof Array ? obj : [obj];
+                const data = Array.isArray(obj) ? obj : [obj];
                 let str = Object.keys(data[0]).map(enclose).join(',');
                 for (let row of data) {
                     const rows = [];
@@ -230,7 +230,7 @@
         };
         const insertData = (target, shani, data, mode, headers) => {
             const type = Utils.getSubtype(headers.get('content-type'));
-            const plainText = (Utils.getNodeValue(target, 'shani-xss') || shani.xss) === 'true' || type !== 'html';
+            const plainText = (Utils.getNodeValue(target, 'shani-xss') || shani.xss) === true || type !== 'html';
             const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
             if (['INPUT', 'TEXTAREA'].includes(target.tagName)) {
                 setInputData(target, data, mode, mechanism);
@@ -239,7 +239,7 @@
             }
         };
         const handleDataInsertion = (target, shani, resp, mode) => {
-            const outf = Utils.getNodeValue(target, 'shani-outf') || shani.outf;
+            const outf = target.getAttribute('shani-outf') || shani.outf;
             if (outf) {
                 return Utils.calludf(outf, [shani.emitter, target, resp]);
             }
@@ -262,17 +262,24 @@
             this.poll = Utils.object();
             this.eventName = e.type.slice(e.type.lastIndexOf(':') + 1);
             this.url = Utils.getNodeValue(node, 'href') || Utils.getNodeValue(node, 'action');
-            setAttribs(this, node, Shani.SHANI_ATTR, 'shani-');
-            setAttribs(this, node, Shani.HTML_ATTR, '');
-            /**/
-            this.actions = collectActions(Utils.getNodeValue(node, 'shani-on'));
-            this.headers = new Headers(Utils.explode(this.headers));
-            this.http = Utils.explode(this.http);
+            setShaniAttrs(this, node);
+            this.actions = collectActions(node.getAttribute('shani-on'));
+            this.headers = new Headers(this.headers);
             /**for HTTP read() and write() sync become false**/
             this.sync = true;
         };
-        const setAttribs = (shani, node, attrs, prefix) => {
-            attrs.forEach(a => shani[a] = Utils.getNodeValue(node, prefix + a));
+        const setShaniAttrs = (shani, node) => {
+            ['xss', 'history', 'log'].forEach(a => {
+                const key = node.getAttribute('shani-' + a);
+                shani[a] = ['inf', 'outf'].includes(a) ? key : Utils.getNodeValue(node, key);
+            });
+            ['headers', 'cache', 'http'].forEach(a => {
+                shani[a] = Utils.object();
+                const values = Utils.explode(node.getAttribute('shani-' + a));
+                for (const key in values) {
+                    shani[a][key] = Utils.getNodeValue(node, values[key] || key);
+                }
+            });
         };
         const collectActions = evtStr => {
             const events = Utils.splitEvents(evtStr), map = new Map();
@@ -288,19 +295,15 @@
             }
             return map;
         };
-        const onConnect = shani => clearTimeout(shani.http.timerId);
+        const onConnect = shani => clearTimeout(shani.timeoutId);
         /**
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
             const mode = params && params.mode ? params.mode : 'replace', timeout = shani.http.timeout;
             shani.sync = false;
-            const type = Utils.getSubtype(shani.enctype);
-            if (type && type !== 'form-data') {
-                shani.headers.set('content-type', shani.enctype);
-            }
             if (timeout) {
-                shani.http.timerId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
+                shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
             if (shani.http.scheme === 'sse') {
                 return HttpClient.sse(shani, target, mode, onConnect);
@@ -312,7 +315,7 @@
             if (em.tagName === 'FORM') {
                 em = em.querySelector('fieldset') || em;
             }
-            HttpClient.http(shani, shani.method || method, request => {
+            HttpClient.http(shani, shani.http.method || method, request => {
                 Utils.setNodeValue(em, 'disabled', true);
                 Utils.trigger(shani, 'httpstart', {request});
             }, () => {
@@ -427,7 +430,7 @@
              * Read content from server.
              */
             read(obj) {
-                if (this.history === 'true') {
+                if (this.history === true) {
                     history.pushState(null, '', this.url);
                 }
                 sendReq(this, 'GET', obj.targets, obj.params);
@@ -610,7 +613,8 @@
                 const p = obj.params, input = p.input || 'value', output = p.output || input;
                 obj.targets.forEach(node => {
                     const val = parseNodeNumber(node, input);
-                    const prefix = Utils.getNodeValue(node, p.prefix) || '', suffix = Utils.getNodeValue(node, p.suffix) || '';
+                    const prefix = Utils.getNodeValue(node, p.prefix) || '';
+                    const suffix = Utils.getNodeValue(node, p.suffix) || '';
                     const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: Utils.getNodeValue(node, p.maxdecimals) || 2,
                         minimumFractionDigits: Utils.getNodeValue(node, p.mindecimals) || 0
@@ -652,8 +656,6 @@
             }
         };
         return {
-            HTML_ATTR: ['enctype', 'method'],
-            SHANI_ATTR: ['headers', 'xss', 'inf', 'outf', 'cache', 'history', 'on', 'log', 'http'],
             create(node, event) {
                 if (!Utils.getNodeValue(node, 'disabled')) {
                     const shani = new Obj(node, event);
@@ -683,7 +685,7 @@
         };
         const getTargetNode = (node, evt) => {
             if (node) {
-                const evtStr = Utils.getNodeValue(node, 'shani-on');
+                const evtStr = node.getAttribute('shani-on');
                 if (Utils.eventExists(evt, evtStr)) {
                     return node;
                 }
@@ -692,7 +694,7 @@
             return null;
         };
         const addListener = node => {
-            const events = Utils.splitEvents(Utils.getNodeValue(node, 'shani-on'));
+            const events = Utils.splitEvents(node.getAttribute('shani-on'));
             for (const evt in events) {
                 const e = Utils.getEventFromString(evt);
                 doc.addEventListener(e, listen);
@@ -712,17 +714,17 @@
                 nodes.forEach(node => addAttributes(node, sel[1]));
             }
         };
-        const addAttributes = (node, obj) => {
-            for (const key in obj) {
-                let value = Utils.getNodeValue(node, key);
-                if (value === null) {
-                    value = obj[key];
-                } else if (['shani-http', 'shani-headers'].includes(key)) {
-                    value = mergeParams(value, obj[key], SEP_PARAM, SEP_VAL);
+        const addAttributes = (node, values) => {
+            for (const key in values) {
+                let val = Utils.getNodeValue(node, key);
+                if (val === null) {
+                    val = values[key];
+                } else if (['shani-http', 'shani-cache', 'shani-headers'].includes(key)) {
+                    val = mergeParams(val, values[key], SEP_PARAM, SEP_VAL);
                 } else if (key === 'shani-on') {
-                    value = mergeParams(value, obj[key], SEP_EVT, SEP_ACTION);
+                    val = mergeParams(val, values[key], SEP_EVT, SEP_ACTION);
                 }
-                Utils.setNodeValue(node, key, value);
+                Utils.setNodeValue(node, key, val);
             }
         };
         const mergeParams = (oldVal, newVal, sep1, sep2) => {
@@ -752,7 +754,7 @@
                     emitter: shani.emitter, params: action.params,
                     selector: action.selector, targets, data
                 });
-                shani.log !== 'true' || console.log(p);
+                shani.log !== true || console.log(p);
                 cb.call(shani, p) === false || Utils.trigger(shani, action.fn, data);
             }
         };
@@ -906,7 +908,8 @@
             },
             getNodeValue(node, key, flip) {
                 if (key) {
-                    const val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key);
+                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
+                    val = val === 'true' ? true : val === 'false' ? false : val;
                     return flip ? (typeof val === 'boolean' ? !val : '') : key === val || val;
                 }
                 return key;
@@ -956,10 +959,10 @@
         return {
             http(shani, method, onStart, onEnd, onSuccess, onError) {
                 const payload = createHttpPayload(shani, method), req = Utils.object();
-                if (shani.cache) {
-                    const params = Utils.explode(shani.cache);
-                    req.cacheAge = Utils.time2ms(params.age);
-                    req.cacheName = params.name || 'pubcache';
+                const p = shani.cache;
+                if (p) {
+                    req.cacheAge = Utils.time2ms(p.age);
+                    req.cacheName = p.name || 'pubcache';
                 }
                 req.conn = shani.http.conn || 'http';
                 req.options = Utils.object({
@@ -1115,7 +1118,7 @@
             };
             const rotate = () => {
                 doc.querySelectorAll('.carousel').forEach(node => {
-                    if (Utils.getNodeValue(node, 'ui-attr') === 'auto') {
+                    if (node.getAttribute('ui-attr') === 'auto') {
                         rotateItems(node, (total, idx) => (idx + 1) % total);
                     }
                 });
