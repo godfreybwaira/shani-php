@@ -722,9 +722,9 @@
                 if (val === null) {
                     val = values[key];
                 } else if (['shani-http', 'shani-cache', 'shani-headers'].includes(key)) {
-                    val = mergeParams(val, values[key], SEP_PARAM, SEP_VAL);
+                    val = mergeParams(val, values[key], SEP_PARAM, SEP_VALUE);
                 } else if (key === 'shani-on') {
-                    val = mergeParams(val, values[key], SEP_EVT, SEP_ACTION);
+                    val = mergeParams(val, values[key], SEP_EVENT, SEP_ACTION);
                 }
                 Utils.setNodeValue(node, key, val);
             }
@@ -746,7 +746,7 @@
             root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
-    const SEP_ACTION = '::', SEP_EVT = ';', SEP_PARAM = '&', SEP_VAL = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
+    const SEP_ACTION = '::', SEP_EVENT = ';', SEP_PARAM = '&', SEP_VALUE = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
     const Utils = (() => {
         const callNext = (shani, action, data) => {
             const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
@@ -817,7 +817,7 @@
                 return Utils.getParentNode(parent, parentSelector);
             },
             explode(str, sep, keySep) {
-                const map = Utils.object(), ksep = keySep || SEP_VAL;
+                const map = Utils.object(), ksep = keySep || SEP_VALUE;
                 if (str) {
                     const pair = str.split(sep || SEP_PARAM).map(s => s.trim());
                     for (let val of pair) {
@@ -830,7 +830,7 @@
                 return map;
             },
             splitEvents(str) {
-                return Utils.explode(str, SEP_EVT, SEP_ACTION);
+                return Utils.explode(str, SEP_EVENT, SEP_ACTION);
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
