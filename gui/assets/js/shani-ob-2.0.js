@@ -419,13 +419,13 @@
                     throw new Error('valid math operators are: +-*/%^');
             }
         };
-        const parseNodeNumber = (node, key, allowPercent) => {
-            const val = Utils.resolveVars(node, key) || '0';
+        const parseNumber = (val, allowPercent) => {
+            val ||=  '0';
             const num = val.replace(/[^\d%.-]/g, '');
             if (/^-?\d+(\.\d+)?%?$/.test(num)) {
                 return allowPercent ? num : parseFloat(num);
             }
-            throw new Error('Invalid number "' + val + '" on ' + key);
+            throw new Error('Invalid number "' + val + '"');
         };
         Obj.prototype = {
             /**
@@ -599,9 +599,10 @@
             numberbind(obj) {
                 const p = obj.params;
                 const sign = Utils.resolveVars(this.emitter, p.operator);
-                const rval = parseNodeNumber(this.emitter, p.basevalue || p.input, true);
+                const val = Utils.resolveVars(this.emitter, p.basevalue || p.input);
+                const rval = parseNumber(val, true);
                 obj.targets.forEach(node => {
-                    const lval = parseNodeNumber(node, p.input);
+                    const lval = parseNumber(Utils.resolveVars(node, p.input));
                     const output = Utils.resolveVars(node, p.output || 'value');
                     Utils.setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
@@ -609,13 +610,13 @@
             numbersum(obj) {
                 const p = obj.params, output = Utils.resolveVars(this.emitter, p.output || 'value');
                 let sum = 0;
-                obj.targets.forEach(node => sum += parseNodeNumber(node, p.input || SEP_VAR + 'value'));
+                obj.targets.forEach(node => sum += parseNumber(Utils.resolveVars(node, p.input || SEP_VAR + 'value')));
                 Utils.setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
                 obj.targets.forEach(node => {
                     const p = Utils.resolveParams(node, obj.params);
-                    const val = parseNodeNumber(node, p.input || SEP_VAR + 'value');
+                    const val = parseNumber(Utils.resolveVars(node, p.input || SEP_VAR + 'value'));
                     const prefix = p.prefix || '', suffix = p.suffix || '';
                     const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: p.maxdecimals || 2,
