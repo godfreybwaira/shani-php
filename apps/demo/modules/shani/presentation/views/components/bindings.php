@@ -5,37 +5,37 @@
         <div class="input-group">
             <label>Price:</label>
             <input type="text" id="unitprice" value="100.00" readonly
-                   shani-on="load::numberformat input:value&prefix:currency">
+                   shani-on="load::numberformat input:@value&prefix:@currency">
             <label>Qty:</label>
             <input type="text" id="plus10" value="0" class="width-md-2" readonly
                    data-suffix="kg" shani-on="compute::numberbind
-                   input:value&output:value&basevalue:data-base&operator:data-sign;
-                   numberbind::numberformat input:value&mindecimals:data.mindec&suffix:data-suffix;
+                   input:@value&output:value&basevalue:@data-base&operator:@data-sign;
+                   numberbind::numberformat input:@value&mindecimals:@data.mindec&suffix:@data-suffix;
                    numberformat::trigger update>>#totalprice;">
             <label>Total Price:</label>
             <input type="text" id="totalprice" readonly data-sign="*"
                    class="width-md-2" data-suffix="/="
-                   shani-on="load::propbindthis data-base:value>>#unitprice;
-                   propbindthis delay:0.01s::trigger update;
+                   shani-on="load::propbindthis data-base:@value>>#unitprice;
+                   propbindthis delay:@delay-onload::trigger update;
                    update::numberbind
-                   input:value&output:value&basevalue:data-base&operator:data-sign>>#plus10;
-                   numberbind::numberformat input:value&mindecimals:data.mindec
-                   &prefix:currency&suffix:data-suffix;
+                   input:@value&output:value&basevalue:@data-base&operator:@data-sign>>#plus10;
+                   numberbind::numberformat input:@value&mindecimals:@data.mindec
+                   &prefix:@currency&suffix:@data-suffix;
                    numberformat::trigger update>>#vat;">
             <label>VAT (18%):</label>
             <input type="text" id="vat" readonly data-sign="*" data-vat="0.18"
                    class="width-md-2" data-suffix="/="
                    shani-on="update::numberbind
-                   input:value&basevalue:data-vat&operator:data-sign>>#totalprice;
-                   numberbind::numberformat input:value&mindecimals:data.mindec
-                   &prefix:currency&suffix:data-suffix;
+                   input:@value&basevalue:@data-vat&operator:@data-sign>>#totalprice;
+                   numberbind::numberformat input:@value&mindecimals:@data.mindec
+                   &prefix:@currency&suffix:@data-suffix;
                    numberformat::trigger update>>#total;">
             <label>TOTAL:</label>
             <input type="text" id="total" readonly data-sign="*" data-vat="0.18"
                    class="width-md-2" data-suffix="/="
-                   shani-on="update::numbersum input:value&output>>#vat,#totalprice;
-                   numbersum::numberformat input:value&mindecimals:data.mindec
-                   &prefix:currency&suffix:data-suffix;">
+                   shani-on="update::numbersum input:@value>>#vat,#totalprice;
+                   numbersum::numberformat input:@value&mindecimals:@data.mindec
+                   &prefix:@currency&suffix:@data-suffix;">
         </div>
     </div>
 </div>

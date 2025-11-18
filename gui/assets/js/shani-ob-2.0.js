@@ -230,7 +230,7 @@
         };
         const insertData = (target, shani, data, mode, headers) => {
             const type = Utils.getSubtype(headers.get('content-type'));
-            const plainText = (Utils.getNodeValue(target, 'shani-xss') || shani.xss) === true || type !== 'html';
+            const plainText = (Utils.resolveVars(target, 'shani-xss') || shani.xss) === true || type !== 'html';
             const mechanism = 'insertAdjacent' + (plainText ? 'Text' : 'HTML');
             if (['INPUT', 'TEXTAREA'].includes(target.tagName)) {
                 setInputData(target, data, mode, mechanism);
@@ -263,7 +263,7 @@
             this.eventName = e.type.slice(e.type.lastIndexOf(':') + 1);
             this.url = Utils.getNodeValue(node, 'href') || Utils.getNodeValue(node, 'action');
             setShaniAttrs(this, node);
-            this.actions = collectActions(node.getAttribute('shani-on'));
+            this.actions = collectActions(node);
             this.headers = new Headers(this.headers);
             /**for HTTP read() and write() sync become false**/
             this.sync = true;
@@ -271,18 +271,18 @@
         const setShaniAttrs = (shani, node) => {
             ['xss', 'history', 'log'].forEach(a => {
                 const key = node.getAttribute('shani-' + a);
-                shani[a] = ['inf', 'outf'].includes(a) ? key : Utils.getNodeValue(node, key);
+                shani[a] = ['inf', 'outf'].includes(a) ? key : Utils.resolveVars(node, key);
             });
             ['headers', 'cache', 'http'].forEach(a => {
                 shani[a] = Utils.object();
                 const values = Utils.explode(node.getAttribute('shani-' + a));
                 for (const key in values) {
-                    shani[a][key] = Utils.getNodeValue(node, values[key] || key);
+                    shani[a][key] = Utils.resolveVars(node, values[key] || SEP_VAR + key);
                 }
             });
         };
-        const collectActions = evtStr => {
-            const events = Utils.splitEvents(evtStr), map = new Map();
+        const collectActions = node => {
+            const events = Utils.splitEvents(node), map = new Map();
             for (const evt in events) {
                 if (events[evt] === null) {
                     throw new Error('Syntax error on ' + evt);
@@ -290,7 +290,7 @@
                 const parts = events[evt].split(SEP_SELECTOR).map(s => s.trim());
                 const pos = parts[0].search(SEP_FN), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
                 const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
-                const ep = evt.split(SEP_FN).map(s => s.trim()), evtParams = Utils.explode(ep[1]);
+                const ep = evt.split(SEP_FN).map(s => s.trim()), evtParams = Utils.explode(ep[1], node);
                 map.set(ep[0], Utils.object({fn: fn.trim().toLowerCase(), params, evtParams, selector: parts[1]}));
             }
             return map;
@@ -379,14 +379,14 @@
                 const node = doc.createElement(obj.params['_tag']);
                 delete obj.params['_tag'];
                 for (const key in obj.params) {
-                    Utils.setNodeValue(node, key, obj.params[key] || key);
+                    Utils.setNodeValue(node, key, obj.params[key] || SEP_VAR + key);
                 }
                 handler(target, node);
             });
         };
         const bindTargetNodeValue = (obj, emitter, flip) => {
             for (const key in obj.params) {
-                const v = Utils.getNodeValue(emitter, obj.params[key] || key);
+                const v = Utils.resolveVars(emitter, obj.params[key] || SEP_VAR + key);
                 const val = flip ? flipValue(v) : v;
                 obj.targets.forEach(node => Utils.setNodeValue(node, key, val));
             }
@@ -394,7 +394,7 @@
         const bindSourceNodeValue = (obj, emitter, flip) => {
             obj.targets.forEach(node => {
                 for (const key in obj.params) {
-                    const val = Utils.getNodeValue(node, obj.params[key] || key);
+                    const val = Utils.resolveVars(node, obj.params[key] || SEP_VAR + key);
                     Utils.setNodeValue(emitter, key, flip ? flipValue(val) : val);
                 }
             });
@@ -420,7 +420,7 @@
             }
         };
         const parseNodeNumber = (node, key, allowPercent) => {
-            const val = Utils.getNodeValue(node, key) || '0';
+            const val = Utils.resolveVars(node, key) || '0';
             const num = val.replace(/[^\d%.-]/g, '');
             if (/^-?\d+(\.\d+)?%?$/.test(num)) {
                 return allowPercent ? num : parseFloat(num);
@@ -597,30 +597,32 @@
                 return true;
             },
             numberbind(obj) {
-                const p = obj.params, input = p.input, output = p.output || input;
-                const sign = Utils.getNodeValue(this.emitter, p.operator);
-                const rval = parseNodeNumber(this.emitter, p.basevalue || input, true);
+                const p = obj.params;
+                const sign = Utils.resolveVars(this.emitter, p.operator);
+                const rval = parseNodeNumber(this.emitter, p.basevalue || p.input, true);
                 obj.targets.forEach(node => {
-                    const lval = parseNodeNumber(node, input);
+                    const lval = parseNodeNumber(node, p.input);
+                    const output = Utils.resolveVars(node, p.output || 'value');
                     Utils.setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
             },
             numbersum(obj) {
-                const output = obj.params.output || 'value', input = obj.params.input || output;
+                const p = obj.params, output = Utils.resolveVars(this.emitter, p.output || 'value');
                 let sum = 0;
-                obj.targets.forEach(node => sum += parseNodeNumber(node, input));
+                obj.targets.forEach(node => sum += parseNodeNumber(node, p.input || SEP_VAR + 'value'));
                 Utils.setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
-                const p = obj.params, input = p.input || 'value', output = p.output || input;
+                const p = obj.params;
                 obj.targets.forEach(node => {
-                    const val = parseNodeNumber(node, input);
-                    const prefix = Utils.getNodeValue(node, p.prefix) || '';
-                    const suffix = Utils.getNodeValue(node, p.suffix) || '';
+                    const val = parseNodeNumber(node, p.input || SEP_VAR + 'value');
+                    const prefix = Utils.resolveVars(node, p.prefix) || '';
+                    const suffix = Utils.resolveVars(node, p.suffix) || '';
                     const result = val.toLocaleString(undefined, {
-                        maximumFractionDigits: Utils.getNodeValue(node, p.maxdecimals) || 2,
-                        minimumFractionDigits: Utils.getNodeValue(node, p.mindecimals) || 0
+                        maximumFractionDigits: Utils.resolveVars(node, p.maxdecimals) || 2,
+                        minimumFractionDigits: Utils.resolveVars(node, p.mindecimals) || 0
                     });
+                    const output = Utils.resolveVars(node, p.output || 'value');
                     Utils.setNodeValue(node, output, prefix + result + suffix);
                 });
             },
@@ -687,8 +689,7 @@
         };
         const getTargetNode = (node, evt) => {
             if (node) {
-                const evtStr = node.getAttribute('shani-on');
-                if (Utils.eventExists(evt, evtStr)) {
+                if (Utils.eventExists(node, evt)) {
                     return node;
                 }
                 return getTargetNode(Utils.getParentNode(node, '[shani-on]'), evt);
@@ -696,7 +697,7 @@
             return null;
         };
         const addListener = node => {
-            const events = Utils.splitEvents(node.getAttribute('shani-on'));
+            const events = Utils.splitEvents(node);
             for (const evt in events) {
                 const e = Utils.getEventFromString(evt);
                 doc.addEventListener(e, listen);
@@ -719,7 +720,7 @@
         const addAttributes = (node, values) => {
             for (const key in values) {
                 let val = Utils.getNodeValue(node, key);
-                if (val === null) {
+                if (val === undefined) {
                     val = values[key];
                 } else if (['shani-http', 'shani-cache', 'shani-headers'].includes(key)) {
                     val = mergeParams(val, values[key], SEP_PARAM, SEP_VALUE);
@@ -730,7 +731,7 @@
             }
         };
         const mergeParams = (oldVal, newVal, sep1, sep2) => {
-            const ov = Utils.explode(oldVal, sep1, sep2), nv = Utils.explode(newVal, sep1, sep2);
+            const ov = Utils.explode(oldVal, null, sep1, sep2), nv = Utils.explode(newVal, null, sep1, sep2);
             for (const k in ov) {
                 nv[k] = ov[k];
             }
@@ -746,7 +747,7 @@
             root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
-    const SEP_ACTION = '::', SEP_EVENT = ';', SEP_PARAM = '&', SEP_VALUE = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
+    const SEP_ACTION = '::', SEP_EVENT = ';', SEP_VAR = '@', SEP_PARAM = '&', SEP_VALUE = ':', SEP_SELECTOR = '>>', SEP_FN = /\s/;
     const Utils = (() => {
         const callNext = (shani, action, data) => {
             const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
@@ -800,8 +801,8 @@
             getEventFromString(str) {
                 return str.split(SEP_FN)[0].trim();
             },
-            eventExists(evt, evtStr) {
-                const events = Utils.splitEvents(evtStr);
+            eventExists(node, evt) {
+                const events = Utils.splitEvents(node);
                 for (const e in events) {
                     if (Utils.getEventFromString(e) === evt) {
                         return true;
@@ -816,21 +817,47 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, sep, keySep) {
+            explode(str, node, sep, keySep) {
                 const map = Utils.object(), ksep = keySep || SEP_VALUE;
                 if (str) {
                     const pair = str.split(sep || SEP_PARAM).map(s => s.trim());
                     for (let val of pair) {
                         const pos = val.indexOf(ksep), key = pos > 0 ? val.slice(0, pos) : val;
                         if (key.length > 0) {
-                            map[key] = pos > 0 ? val.slice(pos + ksep.length).trim() : null;
+                            const v = pos > 0 ? val.slice(pos + ksep.length).trim() : null;
+                            map[key] = node ? Utils.resolveVars(node, v || SEP_VAR + key) : v;
                         }
                     }
                 }
                 return map;
             },
-            splitEvents(str) {
-                return Utils.explode(str, SEP_EVENT, SEP_ACTION);
+            resolveVars(node, prop) {
+                if (typeof prop === 'string') {
+                    if (prop.charAt(0) === SEP_VAR) {
+                        return Utils.resolveVars(node, Utils.getNodeValue(node, prop.slice(1)));
+                    }
+                    return prop.charAt(0) === '\\' ? prop.slice(1) : prop;
+                }
+                return prop;
+            },
+            getNodeValue(node, key) {
+                if (key) {
+                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
+                    return key === val || (val === 'true' || val === 'false' ? false : val);
+                }
+                return key;
+            },
+            splitEvents(node) {
+                const values = node.getAttribute('shani-on'), events = Utils.object();
+                if (values) {
+                    values.split(SEP_EVENT).forEach(v => {
+                        const obj = Utils.explode(Utils.resolveVars(node, v), null, SEP_EVENT, SEP_ACTION);
+                        for (const key in obj) {
+                            events[key] = obj[key];
+                        }
+                    });
+                }
+                return events;
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
@@ -907,13 +934,6 @@
                 } else {
                     node.setAttribute(key, val === true ? key : val);
                 }
-            },
-            getNodeValue(node, key) {
-                if (key) {
-                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
-                    return key === val || (val === 'true' || val === 'false' ? false : val);
-                }
-                return key;
             },
             nodeKeyExists(node, key) {
                 return key in node || node.hasAttribute(key);

@@ -8,7 +8,7 @@
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
-    <a href="/shani/0/components/0/stream" shani-http="conn:http.name"
+    <a href="/shani/0/components/0/stream" shani-http="conn:@http.name"
        shani-on="click::loadercreate name:loader-top&color:red&size:.2rem>>.layout-content;
        loadercreate::abortconn name:aaa;abortconn::read mode:replace>>#content;
        httpend::loaderrmv>>.layout-content" class="menu-item menu-item-dir-v">
@@ -36,8 +36,8 @@
        modalcreate::read mode:replace>>#mdl123; 408::timeout; httpend::loaderrmv>>#mdl123;
        httpstart::loadercreate name:loader-spin&size:2.5rem>>#mdl123;
        data::saveas name:file22.txt&type:text/plain;"
-       shani-http="credentials:http.credentials&mode:http.mode&timeout:http.timeout"
-       shani-headers="content-type:type">
+       shani-http="credentials:@http.credentials&mode:@http.mode"
+       shani-headers="content-type:@type">
         <i class="mdi mdi-inbox-full"></i>
         <span class="font-sm menu-label">Modal</span>
     </a>
