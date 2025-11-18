@@ -274,11 +274,7 @@
                 shani[a] = ['inf', 'outf'].includes(a) ? key : Utils.resolveVars(node, key);
             });
             ['headers', 'cache', 'http'].forEach(a => {
-                shani[a] = Utils.object();
-                const values = Utils.explode(node.getAttribute('shani-' + a));
-                for (const key in values) {
-                    shani[a][key] = Utils.resolveVars(node, values[key] || SEP_VAR + key);
-                }
+                shani[a] = Utils.splitParams(node, node.getAttribute('shani-' + a));
             });
         };
         const collectActions = node => {
@@ -290,8 +286,11 @@
                 const parts = events[evt].split(SEP_SELECTOR).map(s => s.trim());
                 const pos = parts[0].search(SEP_FN), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
                 const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
-                const ep = evt.split(SEP_FN).map(s => s.trim()), evtParams = Utils.explode(ep[1], node);
-                map.set(ep[0], Utils.object({fn: fn.trim().toLowerCase(), params, evtParams, selector: parts[1]}));
+                const ep = evt.split(SEP_FN).map(s => s.trim());
+                map.set(ep[0], Utils.object({
+                    fn: fn.trim().toLowerCase(), evtParams: Utils.splitParams(node, ep[1]),
+                    selector: Utils.resolveVars(node, parts[1]), params
+                }));
             }
             return map;
         };
@@ -300,8 +299,9 @@
          * Send HTTP request
          */
         const sendReq = (shani, method, target, params) => {
-            const mode = params && params.mode ? params.mode : 'replace', timeout = shani.http.timeout;
             shani.sync = false;
+            let em = shani.emitter;
+            const mode = params && params.mode ? Utils.resolveVars(em, params.mode) : 'replace', timeout = shani.http.timeout;
             if (timeout) {
                 shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
@@ -311,7 +311,6 @@
             if ('scheme' in shani.http) {
                 return HttpClient.wsocket(shani, target, mode, onConnect);
             }
-            let em = shani.emitter;
             if (em.tagName === 'FORM') {
                 em = em.querySelector('fieldset') || em;
             }
@@ -365,7 +364,7 @@
         const moveNode = (parent, emitter, params, clone) => {
             const index = parseInt(params.pos), len = parent.children.length + 1;
             const pos = index > 0 ? index - 1 : index + len;
-            const kids = params.target ? doc.querySelectorAll(params.target) : [emitter];
+            const kids = params.target ? doc.querySelectorAll(Utils.resolveVars(emitter, params.target)) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
@@ -379,7 +378,8 @@
                 const node = doc.createElement(obj.params['_tag']);
                 delete obj.params['_tag'];
                 for (const key in obj.params) {
-                    Utils.setNodeValue(node, key, obj.params[key] || SEP_VAR + key);
+                    const val = Utils.resolveVars(target, obj.params[key] || SEP_VAR + key);
+                    Utils.setNodeValue(node, key, val);
                 }
                 handler(target, node);
             });
@@ -453,7 +453,7 @@
              */
             close(obj) {
                 if (obj.selector) {
-                    const parent = Utils.getParentNode(this.emitter, obj.selector);
+                    const parent = Utils.getParentNode(this.emitter, Utils.resolveVars(this.emitter, obj.selector));
                     if (parent) {
                         return Utils.removeNode(parent);
                     }
@@ -462,7 +462,7 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    const size = obj.params.size || 'auto';
+                    const size = Utils.resolveVars(this.emitter, obj.params.size) || 'auto';
                     const cover = getCover(obj.targets, 'size:' + size);
                     window.print();
                     cover.remove();
@@ -613,23 +613,23 @@
                 Utils.setNodeValue(this.emitter, output, sum);
             },
             numberformat(obj) {
-                const p = obj.params;
                 obj.targets.forEach(node => {
+                    const p = Utils.resolveParams(node, obj.params);
                     const val = parseNodeNumber(node, p.input || SEP_VAR + 'value');
-                    const prefix = Utils.resolveVars(node, p.prefix) || '';
-                    const suffix = Utils.resolveVars(node, p.suffix) || '';
+                    const prefix = p.prefix || '', suffix = p.suffix || '';
                     const result = val.toLocaleString(undefined, {
-                        maximumFractionDigits: Utils.resolveVars(node, p.maxdecimals) || 2,
-                        minimumFractionDigits: Utils.resolveVars(node, p.mindecimals) || 0
+                        maximumFractionDigits: p.maxdecimals || 2,
+                        minimumFractionDigits: p.mindecimals || 0
                     });
-                    const output = Utils.resolveVars(node, p.output || 'value');
+                    const output = p.output || 'value';
                     Utils.setNodeValue(node, output, prefix + result + suffix);
                 });
             },
             saveas(obj) {
-                const type = obj.params.type || obj.data.headers.get('content-type');
+                const p = Utils.resolveParams(this.emitter, obj.params);
+                const type = p.type || obj.data.headers.get('content-type');
                 const a = doc.createElement('a');
-                a.download = obj.params.name;
+                a.download = p.name;
                 a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
                 a.click();
                 URL.revokeObjectURL(a.href);
@@ -655,7 +655,7 @@
                         Utils.closeConn(key);
                     }
                 } else {
-                    Utils.closeConn(obj.params.name);
+                    Utils.closeConn(Utils.resolveVars(this.emitter, obj.params.name));
                 }
             }
         };
@@ -731,7 +731,7 @@
             }
         };
         const mergeParams = (oldVal, newVal, sep1, sep2) => {
-            const ov = Utils.explode(oldVal, null, sep1, sep2), nv = Utils.explode(newVal, null, sep1, sep2);
+            const ov = Utils.explode(oldVal, sep1, sep2), nv = Utils.explode(newVal, sep1, sep2);
             for (const k in ov) {
                 nv[k] = ov[k];
             }
@@ -817,28 +817,36 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            explode(str, node, sep, keySep) {
+            explode(str, sep, keySep) {
                 const map = Utils.object(), ksep = keySep || SEP_VALUE;
                 if (str) {
                     const pair = str.split(sep || SEP_PARAM).map(s => s.trim());
                     for (let val of pair) {
                         const pos = val.indexOf(ksep), key = pos > 0 ? val.slice(0, pos) : val;
                         if (key.length > 0) {
-                            const v = pos > 0 ? val.slice(pos + ksep.length).trim() : null;
-                            map[key] = node ? Utils.resolveVars(node, v || SEP_VAR + key) : v;
+                            map[key] = pos > 0 ? val.slice(pos + ksep.length).trim() : null;
                         }
                     }
                 }
                 return map;
             },
-            resolveVars(node, prop) {
-                if (typeof prop === 'string') {
-                    if (prop.charAt(0) === SEP_VAR) {
-                        return Utils.resolveVars(node, Utils.getNodeValue(node, prop.slice(1)));
+            resolveVars(node, str) {
+                if (typeof str === 'string') {
+                    if (str.charAt(0) === SEP_VAR) {
+                        return Utils.resolveVars(node, Utils.getNodeValue(node, str.slice(1)));
                     }
-                    return prop.charAt(0) === '\\' ? prop.slice(1) : prop;
+                    return str.charAt(0) === '\\' ? str.slice(1) : str;
                 }
-                return prop;
+                return str;
+            },
+            resolveParams(node, params) {
+                const p = Utils.object();
+                if (params) {
+                    for (const key in params) {
+                        p[key] = Utils.resolveVars(node, params[key]);
+                    }
+                }
+                return p;
             },
             getNodeValue(node, key) {
                 if (key) {
@@ -848,16 +856,19 @@
                 return key;
             },
             splitEvents(node) {
-                const values = node.getAttribute('shani-on'), events = Utils.object();
-                if (values) {
-                    values.split(SEP_EVENT).forEach(v => {
-                        const obj = Utils.explode(Utils.resolveVars(node, v), null, SEP_EVENT, SEP_ACTION);
+                return Utils.splitParams(node, node.getAttribute('shani-on'), SEP_EVENT, SEP_ACTION);
+            },
+            splitParams(node, str, sep1, sep2) {
+                const params = Utils.object(), s1 = sep1 || SEP_PARAM;
+                if (str) {
+                    str.split(s1).forEach(v => {
+                        const obj = Utils.explode(Utils.resolveVars(node, v), s1, sep2 || SEP_VALUE);
                         for (const key in obj) {
-                            events[key] = obj[key];
+                            params[key] = Utils.resolveVars(node, obj[key] || SEP_VAR + key);
                         }
                     });
                 }
-                return events;
+                return params;
             },
             object(o) {
                 return Object.setPrototypeOf(o || {}, null);
