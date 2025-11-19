@@ -4,7 +4,7 @@
     <div class="col">
         <div class="input-group">
             <label>Price:</label>
-            <input type="text" id="unitprice" value="100.00" readonly
+            <input type="text" id="unitprice" value="1300.00" readonly
                    shani-on="load::numberformat input:@value&prefix:@currency">
             <label>Qty:</label>
             <input type="text" id="plus10" value="0" class="width-md-2" readonly
@@ -15,8 +15,8 @@
             <label>Total Price:</label>
             <input type="text" id="totalprice" readonly data-sign="*"
                    class="width-md-2" data-suffix="/="
-                   shani-on="load::propbindthis data-base:@value>>#unitprice;
-                   propbindthis delay:@delay-onload::trigger update;
+                   shani-on="load::propbind this.data-base:@that.value>>#unitprice;
+                   propbind delay:@delay-onload::trigger update;
                    update::numberbind
                    input:@value&output:value&basevalue:@data-base&operator:@data-sign>>#plus10;
                    numberbind::numberformat input:@value&mindecimals:@data.mindec
@@ -42,56 +42,56 @@
 <div class="row">
     <div class="col">
         <button class="button color-alert" data-sign="+" data-base="10"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign&that.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Add 10
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="-" data-base="10"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Minus 10
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="*" data-base="10"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Times 10
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="/" data-base="10"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Divide By 10
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="%" data-base="5"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Reminder By 5
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="^" data-base="2"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Power 2
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="+" data-base="10%"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Add 10%
         </button>
     </div>
     <div class="col">
         <button class="button color-alert" data-sign="-" data-base="10%"
-                shani-on="click::propbind data-sign&data-base>>#plus10;
+                shani-on="click::propbind that.data-sign:@this.data-sign&that.data-base:@this.data-base>>#plus10;
                 propbind::trigger compute>>#plus10">
             Minus 10%
         </button>

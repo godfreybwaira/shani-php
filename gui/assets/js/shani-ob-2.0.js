@@ -385,17 +385,17 @@
             });
         };
         const bindTargetNodeValue = (obj, emitter, flip) => {
-            for (const key in obj.params) {
-                const v = Utils.resolveVars(emitter, obj.params[key] || SEP_VAR + key);
-                const val = flip ? flipValue(v) : v;
-                obj.targets.forEach(node => Utils.setNodeValue(node, key, val));
-            }
-        };
-        const bindSourceNodeValue = (obj, emitter, flip) => {
             obj.targets.forEach(node => {
-                for (const key in obj.params) {
-                    const val = Utils.resolveVars(node, obj.params[key] || SEP_VAR + key);
-                    Utils.setNodeValue(emitter, key, flip ? flipValue(val) : val);
+                for (const k in obj.params) {
+                    let source = node, target = emitter, prefix = 'this.';
+                    if (!k.startsWith(prefix)) {
+                        source = emitter;
+                        target = node;
+                        prefix = 'that.';
+                    }
+                    const key = k.slice(prefix.length);
+                    const val = Utils.resolveVars(source, Utils.cleanProp(obj.params[k]) || SEP_VAR + key);
+                    Utils.setNodeValue(target, key, flip ? flipValue(val) : val);
                 }
             });
         };
@@ -561,18 +561,6 @@
                 for (const key in obj.params) {
                     obj.targets.forEach(node => Utils.removeNodeKey(node, key));
                 }
-            },
-            /**
-             * this.emitter value = that.node value
-             */
-            propbindthis(obj) {
-                bindSourceNodeValue(obj, this.emitter);
-            },
-            /**
-             * this.emitter value = !that.node value
-             */
-            proptogglethis(obj) {
-                bindSourceNodeValue(obj, this.emitter, true);
             },
             /**
              * that.node value = this.emitter value
@@ -847,6 +835,16 @@
                     }
                 }
                 return p;
+            },
+            cleanProp(prop) {
+                if (prop) {
+                    for (const pfx of ['this.', 'that.']) {
+                        if (prop.startsWith(SEP_VAR + pfx)) {
+                            return SEP_VAR + prop.slice(pfx.length);
+                        }
+                    }
+                }
+                return prop;
             },
             getNodeValue(node, key) {
                 if (key) {
