@@ -608,8 +608,8 @@
                 });
             },
             numbersum(obj) {
-                const p = obj.params, output = Utils.resolveVars(this.emitter, p.output || 'value');
                 let sum = 0;
+                const p = obj.params, output = Utils.resolveVars(this.emitter, p.output) || 'value';
                 obj.targets.forEach(node => sum += parseNumber(Utils.resolveVars(node, p.input || SEP_VAR + 'value')));
                 Utils.setNodeValue(this.emitter, output, sum);
             },
@@ -622,8 +622,7 @@
                         maximumFractionDigits: p.maxdecimals || 2,
                         minimumFractionDigits: p.mindecimals || 0
                     });
-                    const output = p.output || 'value';
-                    Utils.setNodeValue(node, output, prefix + result + suffix);
+                    Utils.setNodeValue(node, p.output || 'value', prefix + result + suffix);
                 });
             },
             saveas(obj) {
