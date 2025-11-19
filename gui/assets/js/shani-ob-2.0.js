@@ -832,10 +832,10 @@
             },
             resolveVars(node, str) {
                 if (typeof str === 'string') {
-                    if (str.charAt(0) === SEP_VAR) {
+                    if (str.startsWith(SEP_VAR)) {
                         return Utils.resolveVars(node, Utils.getNodeValue(node, str.slice(1)));
                     }
-                    return str.charAt(0) === '\\' ? str.slice(1) : str;
+                    return str.startsWith('\\') ? str.slice(1) : str;
                 }
                 return str;
             },
