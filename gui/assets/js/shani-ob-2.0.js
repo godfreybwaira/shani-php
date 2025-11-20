@@ -284,8 +284,8 @@
                     throw new Error('Syntax error on ' + evt);
                 }
                 const parts = events[evt].split(SEP_SELECTOR).map(s => s.trim());
-                const pos = parts[0].search(SEP_FN), fn = pos > -1 ? parts[0].slice(0, pos) : parts[0];
-                const params = pos > -1 ? Utils.explode(parts[0].slice(pos + 1)) : null;
+                const pos = parts[0].search(SEP_FN), fn = pos > 0 ? parts[0].slice(0, pos) : parts[0];
+                const params = pos > 0 ? Utils.explode(parts[0].slice(pos + 1)) : null;
                 const ep = evt.split(SEP_FN).map(s => s.trim());
                 map.set(ep[0], Utils.object({
                     fn: fn.trim().toLowerCase(), evtParams: Utils.splitParams(node, ep[1]),

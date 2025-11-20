@@ -16,8 +16,8 @@
             <i class="mdi mdi-rectangle"></i>
             <span class="font-sm menu-label">Containers</span>
         </a>
-        <a href="/shani/0/components/0/inputs"
-           shani-on="click delay:1s&limit:1::read mode:replace>>#content;other::sample params;" class="menu-item">
+        <a href="/shani/0/components/0/inputs" data-mode="replace"
+           shani-on="click delay:1s&limit:1::read mode:@this.data-mode>>#content;other::sample params;" class="menu-item">
             <i class="mdi mdi-inbox-full"></i>
             <span class="font-sm menu-label">Inputs</span>
         </a>
