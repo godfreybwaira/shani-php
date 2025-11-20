@@ -787,7 +787,8 @@
                 activeChild.classList.add(cssClass);
             },
             getEventFromString(str) {
-                return str.split(SEP_FN)[0].trim();
+                const idx = str.search(SEP_FN);
+                return idx > 0 ? str.slice(0, idx).trim() : str;
             },
             eventExists(node, evt) {
                 const events = Utils.splitEvents(node);
