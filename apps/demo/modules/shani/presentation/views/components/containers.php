@@ -400,8 +400,8 @@
         </div>
     </div>
     <div class="col">
-        <input type="text" class="input-box" placeholder="Search table"
-               shani-on="keyup delay:0.3s::search>>#tc2 tbody;search::TEST p1&p2>>#tc2 tbody;test::hello">
+        <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
+               shani-on="keyup @data-delay::search>>#tc2 tbody">
         <div class="table-container" id="tc2">
             <table class="table border-h">
                 <caption>Users</caption>

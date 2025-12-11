@@ -246,15 +246,19 @@
             this.sync = true;
         };
         const setShaniAttrs = (shani, node) => {
-            ['headers', 'cache', 'http', 'history', 'debug'].forEach(a => {
-                shani[a] = Parser.params(node, node.getAttribute('shani-' + a));
+            ['history', 'debug'].forEach(a => {
+                shani[a] = Utils.resolveVariable(node, node.getAttribute('shani-' + a));
+            });
+            ['headers', 'cache', 'http'].forEach(a => {
+                const values = Utils.object();
+                shani[a] = Utils.parseParams(node, node.getAttribute('shani-' + a));
             });
         };
         const collectActions = node => {
             const events = Utils.splitEvents(node), map = new Map();
             for (const e in events) {
-                const ps = Parser.toArray(events[e], SEP_EVT_SELECTOR), selector = ps[1];
-                const parts = Parser.toArray(ps[0], SEP_EVT_ACTION);
+                const ps = Utils.str2array(events[e], SEP_EVT_SELECTOR), selector = ps[1];
+                const parts = Utils.str2array(ps[0], SEP_EVT_ACTION);
                 const fnparams = parts[1] || parts[0];
                 const evtparams = parts.length > 1 ? parts[0] : null;
                 const pos = fnparams.search(SEP_ACTION);
@@ -262,7 +266,7 @@
                 const paramstr = pos > 0 ? fnparams.slice(pos + 1) : null;
                 map.set(e, Utils.object({
                     fn: fn.trim().toLowerCase(), paramstr, selector,
-                    ep: Parser.params(node, evtparams)
+                    ep: Utils.parseParams(node, evtparams)
                 }));
             }
             return map;
@@ -275,7 +279,7 @@
         const sendReq = (shani, method, obj) => {
             shani.sync = false;
             let em = shani.emitter;
-            const target = obj.targets, params = Parser.params(em, obj.paramstr);
+            const target = obj.targets, params = Utils.parseParams(em, obj.paramstr);
             params.mode ||= 'replace';
             const timeout = shani.http.timeout;
             if (timeout) {
@@ -366,24 +370,29 @@
          */
         const moveNode = (parent, emitter, params, clone) => {
             const index = parseInt(params.pos), len = parent.children.length + 1;
-            const offset = index > 0 ? index - 1 : index + len;
-            const kids = params.target ? doc.querySelectorAll(params.target) : [emitter];
+            const pos = index > 0 ? index - 1 : index + len;
+            const kids = params.target ? doc.querySelectorAll(Utils.resolveVariable(emitter, params.target)) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
-                    parent.insertBefore(n, parent.children[offset]);
+                    parent.insertBefore(n, parent.children[pos]);
                     !clone || clone(n);
                 }
             });
         };
-        const addNode = (obj, params, handler) => {
+        const addNode = (obj, emitter, handler) => {
+            const p = Utils.parseParams(emitter, obj.paramstr);
             obj.targets.forEach(target => {
-                const node = doc.createElement(params['_tag']);
-                for (const key in params) {
-                    key === '_tag' || Utils.setNodeValue(node, key, params[key]);
+                const node = doc.createElement(p['_tag']);
+                for (const key in p) {
+                    key === '_tag' || Utils.setNodeValue(node, key, p[key]);
                 }
                 handler(target, node);
             });
+        };
+        const bindTargetNodeValue = (obj, emitter, flip) => {
+            const flipValue = val => typeof val === 'boolean' ? !val : '';
+            Utils.parseParams(emitter, obj.paramstr);
         };
         Obj.prototype = {
             /**
@@ -402,7 +411,7 @@
                 sendReq(this, 'POST', obj);
             },
             trigger(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => node.dispatchEvent(new Event(key, {bubbles: true})));
                 }
@@ -421,7 +430,7 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    const p = Parser.params(this.emitter, obj.paramstr);
+                    const p = Utils.parseParams(this.emitter, obj.paramstr);
                     const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
                     window.print();
                     cover.remove();
@@ -455,24 +464,24 @@
                 obj.targets.forEach(Utils.removeNode);
             },
             nodeappend(obj) {
-                addNode(obj, this.emitter, (target, node) => target.appendChild(node));
+                addNode(obj, (target, node) => target.appendChild(node));
             },
             nodeprepend(obj) {
-                addNode(obj, this.emitter, (target, node) => target.insertBefore(node, target.firstChild));
+                addNode(obj, (target, node) => target.insertBefore(node, target.firstChild));
             },
             nodereplace(obj) {
-                addNode(obj, this.emitter, (target, node) => target.innerHTML = node.outerHTML);
+                addNode(obj, (target, node) => target.innerHTML = node.outerHTML);
             },
             nodeaddprev(obj) {
-                addNode(obj, this.emitter, (target, node) => target.parentElement.insertBefore(node, target));
+                addNode(obj, (target, node) => target.parentElement.insertBefore(node, target));
             },
             nodeaddnext(obj) {
-                addNode(obj, this.emitter, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
+                addNode(obj, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
             },
             nodecopyto(obj) {
-                const params = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 obj.targets.forEach(target => {
-                    moveNode(target, this.emitter, params, (node) => {
+                    moveNode(target, this.emitter, p, (node) => {
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
                             node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
@@ -482,35 +491,35 @@
                 });
             },
             nodemoveto(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 obj.targets.forEach(node => moveNode(node, this.emitter, p));
             },
             cssadd(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => node.classList.add(key));
                 }
             },
             cssrmv(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => node.classList.remove(key));
                 }
             },
             cssreplace(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => node.classList.replace(key, p[key]));
                 }
             },
             csstoggle(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => node.classList.toggle(key));
                 }
             },
             cssexists(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const node of obj.targets) {
                     for (const key in p) {
                         if (!node.classList.contains(key)) {
@@ -524,13 +533,25 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const key in p) {
                     obj.targets.forEach(node => Utils.removeNodeKey(node, key));
                 }
             },
+            /**
+             * that.node value = this.emitter value
+             */
+            propbind(obj) {
+                bindTargetNodeValue(obj, this.emitter);
+            },
+            /**
+             * that.node value = !this.emitter value
+             */
+            proptoggle(obj) {
+                bindTargetNodeValue(obj, this.emitter, true);
+            },
             propexists(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 for (const node of obj.targets) {
                     for (const k in p) {
                         if (!Utils.nodeKeyExists(node, k)) {
@@ -540,35 +561,42 @@
                 }
                 return true;
             },
-            propbind(obj) {
-                obj.targets.forEach(node => Parser.params(node, obj.paramstr));
-            },
             numbercalc(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
-                    const lval = parseNumber(p.lvalue);
-                    const rval = parseNumber(p.rvalue || p.lvalue, true);
-                    const result = compute(lval, rval, p.operator) || 0;
-                    Utils.setNodeValue(target, p.output, result);
+                const p = Utils.object();
+                Utils.parseParams(this.emitter, obj.paramstr, (k, v) => p[k] = v);
+                const sign = Utils.resolveVariable(this.emitter, p.operator);
+                const val = Utils.resolveVariable(this.emitter, p.basevalue || p.input);
+                const rval = parseNumber(val, true);
+                obj.targets.forEach(node => {
+                    const lval = parseNumber(Utils.resolveVariable(node, p.input));
+                    const output = Utils.resolveVariable(node, p.output);
+                    Utils.setNodeValue(this.emitter, output, compute(lval, rval, sign) || '');
                 });
             },
+            numbersum(obj) {
+                let sum = 0;
+                const p = Utils.object();
+                Utils.parseParams(this.emitter, obj.paramstr, (k, v) => p[k] = v);
+                obj.targets.forEach(node => sum += parseNumber(Utils.resolveVariable(node, p.input)));
+                Utils.setNodeValue(this.emitter, p.output, sum);
+            },
             numberformat(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Utils.parseParams(node, obj.paramstr), val = parseNumber(p.input);
                     const prefix = p.prefix || '', suffix = p.suffix || '';
-                    const val = parseNumber(p.input);
                     const result = val.toLocaleString(undefined, {
                         maximumFractionDigits: p.maxdecimals || 2,
                         minimumFractionDigits: p.mindecimals || 0
                     });
-                    Utils.setNodeValue(target, p.output, prefix + result + suffix);
+                    Utils.setNodeValue(node, p.output || 'value', prefix + result + suffix);
                 });
             },
             saveas(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr), a = doc.createElement('a');
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
                 const type = p.type || obj.data.headers.get('content-type');
-                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+                const a = doc.createElement('a');
                 a.download = p.name;
+                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
                 a.click();
                 URL.revokeObjectURL(a.href);
             },
@@ -576,25 +604,29 @@
              * Create HTML modal element
              */
             modalcreate(obj) {
-                Utils.trigger(this, 'ui-modal', {specs: Parser.params(this.emitter, obj.paramstr)});
+                const specs = Utils.parseParams(this.emitter, obj.paramstr);
+                Utils.trigger(this, 'ui-modal', {specs});
             },
             loadercreate(obj) {
-                Utils.trigger(this, 'ui-loader', {specs: Parser.params(this.emitter, obj.paramstr), wrapper: obj.targets});
+                const specs = Utils.parseParams(this.emitter, obj.paramstr);
+                Utils.trigger(this, 'ui-loader', {specs, wrapper: obj.targets});
             },
             loaderrmv(obj) {
-                Utils.trigger(this, 'ui-loader-rmv', {wrapper: obj.targets});
+                const specs = Utils.parseParams(this.emitter, obj.paramstr);
+                Utils.trigger(this, 'ui-loader-rmv', {specs, wrapper: obj.targets});
             },
             /**
              * Cancel ongoing HTTP connection
              */
             abortconn(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                if (!p.name) {
+                const p = Utils.parseParams(this.emitter, obj.paramstr);
+                const name = p.name;
+                if (!name) {
                     for (const key in Utils.connection) {
                         Utils.closeConn(key);
                     }
                 } else {
-                    Utils.closeConn(p.name);
+                    Utils.closeConn(name);
                 }
             }
         };
@@ -664,13 +696,13 @@
             }
         };
         const mergeParams = (params1, params2, sep) => {
-            const p1 = Parser.toArray(params1, sep), p2 = Parser.toArray(params2, sep);
+            const p1 = Utils.str2array(params1, sep), p2 = Utils.str2array(params2, sep);
             p1.forEach(v => p2.includes(v) || p2.push(v));
             return p2.join(sep);
         };
         const mergeEvents = (evt1, evt2) => {
-            const p2 = Parser.events(evt2);
-            Object.assign(p2, Parser.events(evt1));
+            const p2 = Utils.events2object(evt2);
+            Object.assign(p2, Utils.events2object(evt1));
             let str = '';
             for (const k in p2) {
                 str += SEP_EVENT + k + p2[k];
@@ -684,21 +716,25 @@
         };
     })();
     const SEP_EVT_ACTION = '::', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
-    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!';
+    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@';
     const Utils = (() => {
+        const getEventFromString = (str, idx) => {
+            const name = str.slice(0, idx);
+            const idx2 = name.search(SEP_ACTION);
+            return name.slice(0, idx2 > 0 ? idx2 : idx).trim();
+        };
         /**
          * Timer for a delayed actions
          * @type Map
          */
-        const TIMER = new Map();
-        const MEMO = Object.setPrototypeOf({}, null);
+        const timer = new Map();
         const prepareCall = (shani, action, data, evt) => {
-            !isSyncEvent(shani, evt) || clearTimeout(TIMER.get(shani.emitter));
-            TIMER.delete(shani.emitter);
+            !isSyncEvent(shani, evt) || clearTimeout(timer.get(shani.emitter));
+            timer.delete(shani.emitter);
             callNext(shani, action, data);
             doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
             if (isSyncEvent(shani, evt)) {
-                TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
+                timer.set(shani.emitter, recall(shani, data, shani.eventName));
             }
         };
         const shouldSchedule = shani => {
@@ -712,7 +748,7 @@
                 return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
             }
         };
-        const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.event.type);
+        const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.eventName);
         const callNext = (shani, action, data) => {
             const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
@@ -725,7 +761,24 @@
                 cb.call(shani, p) === false || Utils.trigger(shani, action.fn, data);
             }
         };
-        const flipValue = val => typeof val === 'boolean' ? !val : '';
+        const placeholder2Value = (str, pos, memo = {}) => {
+            //pair = #selector@prop
+            const sel = str.slice(0, pos);
+            const resolver = memo[sel] || doc.querySelector(sel);
+            memo[sel] = resolver;
+            const value = Utils.resolveVariable(resolver, str.slice(pos));
+            return Utils.object({value, resolver});
+        };
+        const parsePlaceholder = (node, k, v) => {
+            let pos = k.search(SEP_VAR);
+            const sources = pos > 0 ? doc.querySelectorAll(k.slice(0, pos)) : [node];
+            const key = k.slice(pos + SEP_VAR.length);
+            pos = v.search(SEP_VAR);
+            const resolver = pos > 0 ? doc.querySelector(v.slice(0, pos)) : node;
+            const vaa = pos > -1 ? v.slice(pos) : v;
+            const value = Utils.resolveVariable(resolver, vaa);
+            sources.forEach(source => Utils.setNodeValue(source, key, value));
+        };
         return{
             removeNode(node) {
                 node.style.opacity = 0;
@@ -788,9 +841,9 @@
                         shani.poll.limit = parseInt(p.limit) || null;
                     }
                     if (p.delay) {
-                        clearTimeout(TIMER.get(shani.emitter));
+                        clearTimeout(timer.get(shani.emitter));
                         const id = setTimeout(prepareCall, Utils.time2ms(p.delay), shani, action, data, evt);
-                        return TIMER.set(shani.emitter, id);
+                        return timer.set(shani.emitter, id);
                     }
                 }
                 prepareCall(shani, action, data, evt);
@@ -798,13 +851,45 @@
             resolveVariable(node, str) {
                 if (typeof str === 'string') {
                     if (str.startsWith(SEP_VAR)) {
-                        const key = str.slice(SEP_VAR.length), flip = key.charAt(0) === SEP_NEG;
-                        const value = Utils.getNodeValue(node, flip ? key.slice(SEP_NEG.length) : key);
-                        return Utils.resolveVariable(node, flip ? flipValue(value) : value);
+                        return Utils.resolveVariable(node, Utils.getNodeValue(node, str.slice(SEP_VAR.length)));
                     }
                     return str.charAt(0) === '\\' ? str.slice(1) : str;
                 }
                 return str;
+            },
+            parseParams(node, str, cb, memo = {}) {
+                const obj = Utils.object();
+                if (typeof str === 'string') {
+                    const pairs = Utils.str2array(str, SEP_PARAM);
+                    pairs.forEach(pair => {
+                        const pos = pair.search(SEP_KEY_VAL), pos2 = pair.search(SEP_VAR);
+                        if (pos < 0 && pos2 > 0) {
+                            //pair = #selector@prop
+                            const pv = placeholder2Value(pair, pos2, memo);
+                            Object.assign(obj, Utils.parseParams(pv.resolver, pv.value, cb, memo));
+                        } else {
+                            //pair = prop:val, prop:@val, @prop, prop, #selector@prop:#selector@prop
+                            const prop = pos > 0 ? pair.slice(0, pos) : pair;
+                            const val = pos > 0 ? pair.slice(pos + SEP_KEY_VAL.length) : pair;
+                            const key = pos2 === 0 ? prop.slice(SEP_VAR.length) : prop;
+                            if (pos2 > 0 && pos2 < pos || val.trim().search(SEP_VAR) > 0) {
+                                parsePlaceholder(node, key, val);
+                            } else {
+                                if (cb) {
+                                    cb(key, val, node);
+                                } else {
+                                    const value = Utils.resolveVariable(node, val);
+                                    if (pos > 0 || value === val) {
+                                        obj[key] = value;
+                                    } else {
+                                        Object.assign(obj, Utils.parseParams(node, value, cb, memo));
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                return obj;
             },
             removeNodeKey(node, key) {
                 if (key in node) {
@@ -840,8 +925,27 @@
             nodeKeyExists(node, key) {
                 return  key in node || node.hasAttribute(key);
             },
+            str2array(str, sep = SEP_KEY_VAL) {
+                return str ? str.split(sep).map(s => s.trim()).filter(a => a.length !== 0) : [];
+            },
+            events2object(str) {
+                const arr = Utils.str2array(str, SEP_EVENT), obj = Utils.object();
+                for (const e of arr) {
+                    const idx = e.search(SEP_EVT_ACTION), pos = e.search(SEP_VAR);
+                    if (idx > 0) {
+                        const name = getEventFromString(e, idx);
+                        obj[name] = e.slice(name.length).trim();
+                    } else if (pos > 0) {
+                        const pv = placeholder2Value(e, pos);
+                        Object.assign(obj, Utils.events2object(pv.value));
+                    } else {
+                        throw new Error('Invalid event string: ' + e);
+                    }
+                }
+                return obj;
+            },
             splitEvents(node) {
-                return Parser.events(node.getAttribute('shani-on'));
+                return Utils.events2object(node.getAttribute('shani-on'));
             },
             eventExists(node, evt) {
                 const events = Utils.splitEvents(node);
@@ -858,98 +962,6 @@
                     return parent;
                 }
                 return Utils.getParentNode(parent, parentSelector);
-            },
-            getNodesFromMemo(key) {
-                if (!(key in MEMO)) {
-                    MEMO[key] = doc.querySelectorAll(key);
-                }
-                return MEMO[key];
-//                return doc.querySelectorAll(key);
-            }
-        };
-    })();
-    const Parser = (() => {
-        const splitPair = (str, sep, def = null) => {
-            const pos = str.indexOf(sep);
-            return Utils.object({
-                k: pos > 0 ? str.slice(0, pos) : def,
-                v: pos > 0 ? str.slice(pos + sep.length).trim() : def
-            });
-        };
-        const isSplitable = str => {//prop:val, prop&prop
-            return typeof str === 'string' && (str.indexOf(SEP_PARAM) > 0 || str.indexOf(SEP_KEY_VAL) > 0);
-        };
-        const bindProperty = (node, key, val) => {
-            const value = Parser.variable(val), pair = splitPair(key, SEP_VAR, key);
-            const sources = Parser.isPlaceHolder(key) ? Utils.getNodesFromMemo(pair.k) : [node];
-            const prop = pair.v === key ? key.slice(SEP_VAR.length) : pair.v;
-            sources.forEach(source => Utils.setNodeValue(source, prop, value));
-        };
-        const getEventFromString = (str, idx) => {
-            const name = str.slice(0, idx);
-            const idx2 = name.search(SEP_ACTION);
-            return name.slice(0, idx2 > 0 ? idx2 : idx).trim();
-        };
-        return {
-            params(node, str, skips = []) {
-                const obj = Utils.object();
-                if (typeof str === 'string') {
-                    const pairs = Parser.toArray(str, SEP_PARAM);
-                    pairs.forEach(p => {
-                        const pair = splitPair(p, SEP_KEY_VAL, p);
-                        const val = Utils.resolveVariable(node, pair.v);
-                        if (pair.k.indexOf(SEP_VAR) > -1) {
-                            if (isSplitable(val)) {
-                                Object.assign(obj, Parser.params(node, val, skips));
-                            } else if (p === val) {
-                                const value = Parser.variable(val);
-                                Object.assign(obj, Parser.params(node, value, skips));
-                            } else {
-                                bindProperty(node, pair.k, val);
-                            }
-                        } else {
-                            obj[pair.k] = skips.includes(pair.k) ? pair.v : Parser.variable(val);
-                        }
-                    });
-                }
-                return obj;
-            },
-            variable(str, cb) {
-                if (!Parser.isPlaceHolder(str)) {
-                    return cb ? cb(str) : str;
-                }
-                const pair = splitPair(str, SEP_VAR), val = SEP_VAR + pair.v;
-                if (cb) {
-                    Utils.getNodesFromMemo(pair.k).forEach(r => {
-                        const value = Parser.variable(Utils.resolveVariable(r, val));
-                        cb(value, r);
-                    });
-                    return;
-                }
-                const value = Utils.resolveVariable(doc.querySelector(pair.k), val);
-                return Parser.variable(value);
-            },
-            isPlaceHolder(str) {//selector@prop
-                return typeof str === 'string' && str.indexOf(SEP_VAR) > 0 && str.indexOf(SEP_KEY_VAL) < 0;
-            },
-            events(str) {
-                const arr = Parser.toArray(str, SEP_EVENT), obj = Utils.object();
-                for (const e of arr) {
-                    const idx = e.indexOf(SEP_EVT_ACTION);
-                    if (idx > 0) {
-                        const name = getEventFromString(e, idx);
-                        obj[name] = e.slice(name.length).trim();
-                    } else if (Parser.isPlaceHolder(e)) {
-                        const val = Parser.variable(e);
-                        Object.assign(obj, Parser.events(val));
-                    } else {
-                        throw new Error('Invalid event string: ' + e);
-                    }
-                }
-                return obj;
-            },
-            toArray(str, sep) {
-                return str ? str.split(sep).map(s => s.trim()).filter(a => a.length !== 0) : [];
             }
         };
     })();

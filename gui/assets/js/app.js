@@ -2,22 +2,27 @@
 
 document.addEventListener('shani:init', () => {
     Shani.select('[shani-on]', {
-        'shani-headers': 'x-request-mode:async',
-        'shani-http': 'timeout:1.5s'
+        'shani-headers': '@default-headers',
+        'shani-http': '@default-http'
     });
-    Shani.define('ucase', (a) => a.emitter.value = a.emitter.value.toUpperCase());
-    Shani.define('formatter', (obj) => obj.emitter.innerHTML = obj.data.body);
-    Shani.define('inf', obj => new FormData());
-    Shani.define('data.mindec', 2);
-    Shani.define('data.maxdec', 4);
-    Shani.define('currency', 'TZS ');
-    Shani.define('cache.maxage', '15s');
-    Shani.define('cache.name', 'pubcache');
-    Shani.define('http.name', 'aaa');
-    Shani.define('http.credentials', 'same-origin');
-    Shani.define('http.mode', 'cors');
-    Shani.define('delay-onload', '0.01s');
+    Shani.select('a[shani-on]', {'shani-http': '@http-a'});
+    Shani.select('form[shani-on]', {'shani-http': '@http-form'});
+    ////////////////////////
+    Shani.define('default-headers', 'x-request-mode:async');
+    Shani.define('default-http', 'timeout:10s');
+    Shani.define('default-cache', 'age:@cache.maxage&name:@cache.name');
+    Shani.define('cache.maxage', '20s');
+    Shani.define('cache.name', 'aaa');
+    Shani.define('http-a', 'url:@href');
+    Shani.define('http-form', 'url:@action');
+    Shani.define('evt-delay', 'delay:0.01s');
+    Shani.define('modal-specs', 'id:mdl123&classes:modal modal-type-c width-sm-10 height-sm-10 pos-c&close-btn:pos-tr');
+    Shani.define('loader-circle-specs', 'name:loader-spin&size:2.5rem');
+    Shani.define('loader-bar-specs', 'name:loader-top&color:red&size:.2rem');
+    Shani.define('loader-black', 'name:loader-spin&color:#000&size:2.5rem');
+    Shani.define('saved-file', 'name:file.txt&type:text/plain');
+    Shani.define('http-name', 'aaa');
+    Shani.define('conn', 'name:@http-name');
     //////////////////////////
-    Shani.define('timeout', a => console.log('request timed out (408)'));
-//    Shani.on('200', e => console.log(e.type));
+    Shani.define('currency', 'TZS ');
 });
