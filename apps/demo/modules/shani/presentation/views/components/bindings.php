@@ -14,9 +14,10 @@
                    input:@value&mindecimals:@data.mindec&suffix:@data-suffix&output:value;
                    numberformat::trigger update>>#totalprice;">
             <label>Total Price:</label>
-            <input type="text" id="totalprice" data-summed readonly data-sign="*" class="width-md-2" data-suffix="/="
-                   shani-on="load::trigger update&@data-base:#unitprice@value;
-                   update::numbercalc
+            <input type="text" data-prop="data-base:#unitprice@value" id="totalprice" data-summed readonly data-sign="*" class="width-md-2" data-suffix="/="
+                   shani-on="load::trigger update;
+                   update::propbind @data-prop;
+                   propbind::numbercalc
                    lvalue:#plus10@value&output:value&rvalue:@data-base&operator:@data-sign;
                    numbercalc::numberformat
                    input:@value&mindecimals:@data.mindec&output:value&prefix:@currency&suffix:@data-suffix;
@@ -39,7 +40,9 @@
     </div>
 </div>
 
-<div class="row" id="par1" data-bind="click::trigger compute&#plus10@data-sign:@data-sign&#plus10@data-base:@data-base>>#plus10">
+<div class="row" id="par1" data-bind="
+     click::propbind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base>>#plus10;
+     propbind::trigger compute>>#plus10">
     <div class="col">
         <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
             Add 10
@@ -88,8 +91,8 @@
         <ul class="list">
             <li>
                 <label>
-                    <input type="checkbox" class="toggle" id="binder" shani-ona="input::propbind
-                           [data-check1]@checked:@!checked&[data-check2]@checked:@checked
+                    <input type="checkbox" class="toggle" id="binder" shani-on="input::propbind
+                           [data-check1]@checked:@checked&[data-check2]@checked:@!checked
                            &[data-check3]@checked:@checked;">
                     Check Me
                 </label>
@@ -104,7 +107,7 @@
             <li><label><input type="checkbox" class="checkmark" data-check2> Reverse Binding</label></li>
             <li>
                 <label>
-                    <input type="checkbox" class="checkmark" data-check3 shani-ona="input::propbind
+                    <input type="checkbox" class="checkmark" data-check3 shani-on="input::propbind
                            #binder@checked:@checked;">
                     Double Binding
                 </label>

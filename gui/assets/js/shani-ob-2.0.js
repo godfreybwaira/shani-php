@@ -367,7 +367,7 @@
         const moveNode = (parent, emitter, params, clone) => {
             const index = parseInt(params.pos), len = parent.children.length + 1;
             const offset = index > 0 ? index - 1 : index + len;
-            const kids = params.target ? doc.querySelectorAll(params.target) : [emitter];
+            const kids = params.target ? Utils.getCachedNodes(params.target) : [emitter];
             kids.forEach(node => {
                 if (Math.abs(index) <= len && index !== 0) {
                     const n = clone ? node.cloneNode(true) : node;
@@ -470,8 +470,8 @@
                 addNode(obj, this.emitter, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
             },
             nodecopyto(obj) {
-                const params = Parser.params(this.emitter, obj.paramstr);
                 obj.targets.forEach(target => {
+                    const params = Parser.params(target, obj.paramstr);
                     moveNode(target, this.emitter, params, (node) => {
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
@@ -482,36 +482,46 @@
                 });
             },
             nodemoveto(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                obj.targets.forEach(node => moveNode(node, this.emitter, p));
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    moveNode(node, this.emitter, p);
+                });
             },
             cssadd(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => node.classList.add(key));
-                }
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    for (const key in p) {
+                        obj.targets.forEach(node => node.classList.add(key));
+                    }
+                });
             },
             cssrmv(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => node.classList.remove(key));
-                }
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    for (const key in p) {
+                        obj.targets.forEach(node => node.classList.remove(key));
+                    }
+                });
             },
             cssreplace(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => node.classList.replace(key, p[key]));
-                }
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    for (const key in p) {
+                        obj.targets.forEach(node => node.classList.replace(key, p[key]));
+                    }
+                });
             },
             csstoggle(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => node.classList.toggle(key));
-                }
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    for (const key in p) {
+                        obj.targets.forEach(node => node.classList.toggle(key));
+                    }
+                });
             },
             cssexists(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
                 for (const node of obj.targets) {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
                         if (!node.classList.contains(key)) {
                             return false;
@@ -524,14 +534,16 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => Utils.removeNodeKey(node, key));
-                }
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    for (const key in p) {
+                        obj.targets.forEach(node => Utils.removeNodeKey(node, key));
+                    }
+                });
             },
             propexists(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
                 for (const node of obj.targets) {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const k in p) {
                         if (!Utils.nodeKeyExists(node, k)) {
                             return false;
@@ -541,7 +553,10 @@
                 return true;
             },
             propbind(obj) {
-                obj.targets.forEach(node => Parser.params(node, obj.paramstr));
+                const p = Parser.params(this.emitter, obj.paramstr);
+                for (const k in p) {
+                    Parser.bindProperty(this.emitter, k, p[k]);
+                }
             },
             numbercalc(obj) {
                 obj.targets.forEach(target => {
@@ -703,7 +718,7 @@
         };
         const shouldSchedule = shani => {
             const connected = shani.emitter.isConnected;
-            const underLimit = !shani.poll.limit || (--shani.poll.limit) > 0;
+            const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) > 0);
             return connected && underLimit;
         };
         const recall = (shani, data, evt) => {
@@ -716,7 +731,7 @@
         const callNext = (shani, action, data) => {
             const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
             if (cb instanceof Function) {
-                const targets = action.selector ? doc.querySelectorAll(action.selector) : [shani.emitter];
+                const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
                 const p = Utils.object({
                     paramstr: action.paramstr, evtparams: action.ep,
                     selector: action.selector, targets, data
@@ -859,12 +874,11 @@
                 }
                 return Utils.getParentNode(parent, parentSelector);
             },
-            getNodesFromMemo(key) {
-                if (!(key in MEMO)) {
+            getCachedNodes(key) {
+                if (!MEMO[key] || Array.from(MEMO[key]).some(n => !n.isConnected)) {
                     MEMO[key] = doc.querySelectorAll(key);
                 }
                 return MEMO[key];
-//                return doc.querySelectorAll(key);
             }
         };
     })();
@@ -876,14 +890,8 @@
                 v: pos > 0 ? str.slice(pos + sep.length).trim() : def
             });
         };
-        const isSplitable = str => {//prop:val, prop&prop
-            return typeof str === 'string' && (str.indexOf(SEP_PARAM) > 0 || str.indexOf(SEP_KEY_VAL) > 0);
-        };
-        const bindProperty = (node, key, val) => {
-            const value = Parser.variable(val), pair = splitPair(key, SEP_VAR, key);
-            const sources = Parser.isPlaceHolder(key) ? Utils.getNodesFromMemo(pair.k) : [node];
-            const prop = pair.v === key ? key.slice(SEP_VAR.length) : pair.v;
-            sources.forEach(source => Utils.setNodeValue(source, prop, value));
+        const isPlaceHolder = str => {//selector@prop
+            return typeof str === 'string' && str.indexOf(SEP_VAR) > 0 && str.indexOf(SEP_KEY_VAL) < 0;
         };
         const getEventFromString = (str, idx) => {
             const name = str.slice(0, idx);
@@ -891,36 +899,29 @@
             return name.slice(0, idx2 > 0 ? idx2 : idx).trim();
         };
         return {
-            params(node, str, skips = []) {
+            params(node, str) {
                 const obj = Utils.object();
                 if (typeof str === 'string') {
                     const pairs = Parser.toArray(str, SEP_PARAM);
                     pairs.forEach(p => {
                         const pair = splitPair(p, SEP_KEY_VAL, p);
-                        const val = Utils.resolveVariable(node, pair.v);
-                        if (pair.k.indexOf(SEP_VAR) > -1) {
-                            if (isSplitable(val)) {
-                                Object.assign(obj, Parser.params(node, val, skips));
-                            } else if (p === val) {
-                                const value = Parser.variable(val);
-                                Object.assign(obj, Parser.params(node, value, skips));
-                            } else {
-                                bindProperty(node, pair.k, val);
-                            }
+                        if (pair.k === p && pair.k.indexOf(SEP_VAR) > -1) {//@prop, #id@prop
+                            const value = Utils.resolveVariable(node, pair.k);
+                            Object.assign(obj, Parser.params(node, Parser.variable(value)));
                         } else {
-                            obj[pair.k] = skips.includes(pair.k) ? pair.v : Parser.variable(val);
+                            obj[pair.k] = Parser.variable(Utils.resolveVariable(node, pair.v));
                         }
                     });
                 }
                 return obj;
             },
             variable(str, cb) {
-                if (!Parser.isPlaceHolder(str)) {
+                if (!isPlaceHolder(str)) {
                     return cb ? cb(str) : str;
                 }
                 const pair = splitPair(str, SEP_VAR), val = SEP_VAR + pair.v;
                 if (cb) {
-                    Utils.getNodesFromMemo(pair.k).forEach(r => {
+                    Utils.getCachedNodes(pair.k).forEach(r => {
                         const value = Parser.variable(Utils.resolveVariable(r, val));
                         cb(value, r);
                     });
@@ -929,9 +930,6 @@
                 const value = Utils.resolveVariable(doc.querySelector(pair.k), val);
                 return Parser.variable(value);
             },
-            isPlaceHolder(str) {//selector@prop
-                return typeof str === 'string' && str.indexOf(SEP_VAR) > 0 && str.indexOf(SEP_KEY_VAL) < 0;
-            },
             events(str) {
                 const arr = Parser.toArray(str, SEP_EVENT), obj = Utils.object();
                 for (const e of arr) {
@@ -939,7 +937,7 @@
                     if (idx > 0) {
                         const name = getEventFromString(e, idx);
                         obj[name] = e.slice(name.length).trim();
-                    } else if (Parser.isPlaceHolder(e)) {
+                    } else if (isPlaceHolder(e)) {
                         const val = Parser.variable(e);
                         Object.assign(obj, Parser.events(val));
                     } else {
@@ -950,6 +948,12 @@
             },
             toArray(str, sep) {
                 return str ? str.split(sep).map(s => s.trim()).filter(a => a.length !== 0) : [];
+            },
+            bindProperty(node, prop, val) {
+                const value = Parser.variable(val), pair = splitPair(prop, SEP_VAR, prop);
+                const sources = isPlaceHolder(prop) ? Utils.getCachedNodes(pair.k) : [node];
+                const key = pair.v.startsWith(SEP_VAR) ? pair.v.slice(SEP_VAR.length) : pair.v;
+                sources.forEach(source => Utils.setNodeValue(source, key, value));
             }
         };
     })();
@@ -1149,7 +1153,7 @@
                 selectNode(children, children[nextIdx], 'active');
             };
             const rotate = () => {
-                doc.querySelectorAll('.carousel').forEach(node => {
+                Utils.getCachedNodes('.carousel').forEach(node => {
                     if (node.getAttribute('ui-attr') === 'auto') {
                         rotateItems(node, (total, idx) => (idx + 1) % total);
                     }
