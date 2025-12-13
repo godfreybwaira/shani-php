@@ -3,7 +3,7 @@
         <a href="/shani/0/components/0/generator" shani-cache="@data-cache"
            class="active menu-item" data-maxage="30s"
            shani-on="click::read>>#content;httpend::loaderrmv>>#content;
-           httpstart::loadercreate name:loader-spin>>#content;">
+           httpstart::loadercreate name:loader-spin&size:2.5rem>>#content;">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>
         </a>

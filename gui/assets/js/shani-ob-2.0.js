@@ -364,26 +364,14 @@
          * Move this element to a specified position, to another destination.
          * If a position is not given then the element is placed to the end.
          */
-        const moveNode = (parent, emitter, params, clone) => {
-            const index = parseInt(params.pos), len = parent.children.length + 1;
+        const moveNode = (srcNode, target, params, clone) => {
+            const index = parseInt(params.pos), len = target.children.length + 1;
             const offset = index > 0 ? index - 1 : index + len;
-            const kids = params.target ? Utils.getCachedNodes(params.target) : [emitter];
-            kids.forEach(node => {
-                if (Math.abs(index) <= len && index !== 0) {
-                    const n = clone ? node.cloneNode(true) : node;
-                    parent.insertBefore(n, parent.children[offset]);
-                    !clone || clone(n);
-                }
-            });
-        };
-        const addNode = (obj, params, handler) => {
-            obj.targets.forEach(target => {
-                const node = doc.createElement(params['_tag']);
-                for (const key in params) {
-                    key === '_tag' || Utils.setNodeValue(node, key, params[key]);
-                }
-                handler(target, node);
-            });
+            if (Math.abs(index) <= len && index !== 0) {
+                const n = clone ? srcNode.cloneNode(true) : srcNode;
+                target.insertBefore(n, target.children[offset]);
+                !clone || clone(n);
+            }
         };
         Obj.prototype = {
             /**
@@ -402,10 +390,12 @@
                 sendReq(this, 'POST', obj);
             },
             trigger(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const key in p) {
-                    obj.targets.forEach(node => node.dispatchEvent(new Event(key, {bubbles: true})));
-                }
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    for (const key in p) {
+                        target.dispatchEvent(new Event(key, {bubbles: true}));
+                    }
+                });
             },
             /**
              * Remove node from DOM
@@ -421,10 +411,12 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    const p = Parser.params(this.emitter, obj.paramstr);
-                    const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
-                    window.print();
-                    cover.remove();
+                    obj.targets.forEach(target => {
+                        const p = Parser.params(target, obj.paramstr);
+                        const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
+                        window.print();
+                        cover.remove();
+                    });
                 }
             },
             /**
@@ -432,8 +424,8 @@
              */
             search(obj) {
                 const text = this.emitter.value.trim().toLowerCase();
-                obj.targets.forEach(node => {
-                    for (const row of node.children) {
+                obj.targets.forEach(target => {
+                    for (const row of target.children) {
                         row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
                     }
                 });
@@ -454,25 +446,10 @@
             nodermv(obj) {
                 obj.targets.forEach(Utils.removeNode);
             },
-            nodeappend(obj) {
-                addNode(obj, this.emitter, (target, node) => target.appendChild(node));
-            },
-            nodeprepend(obj) {
-                addNode(obj, this.emitter, (target, node) => target.insertBefore(node, target.firstChild));
-            },
-            nodereplace(obj) {
-                addNode(obj, this.emitter, (target, node) => target.innerHTML = node.outerHTML);
-            },
-            nodeaddprev(obj) {
-                addNode(obj, this.emitter, (target, node) => target.parentElement.insertBefore(node, target));
-            },
-            nodeaddnext(obj) {
-                addNode(obj, this.emitter, (target, node) => target.parentElement.insertBefore(node, target.nextElementSibling));
-            },
             nodecopyto(obj) {
                 obj.targets.forEach(target => {
-                    const params = Parser.params(target, obj.paramstr);
-                    moveNode(target, this.emitter, params, (node) => {
+                    const p = Parser.params(target, obj.paramstr);
+                    moveNode(this.emitter, target, p, node => {
                         node.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
                             node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
@@ -482,40 +459,46 @@
                 });
             },
             nodemoveto(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    moveNode(node, this.emitter, p);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    moveNode(this.emitter, target, p);
                 });
             },
             cssadd(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
                     for (const key in p) {
-                        obj.targets.forEach(node => node.classList.add(key));
+                        target.classList.add(key);
                     }
                 });
             },
             cssrmv(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
                     for (const key in p) {
-                        obj.targets.forEach(node => node.classList.remove(key));
+                        target.classList.remove(key);
                     }
                 });
             },
             cssreplace(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
                     for (const key in p) {
-                        obj.targets.forEach(node => node.classList.replace(key, p[key]));
+                        target.classList.replace(key, p[key]);
                     }
                 });
             },
             csstoggle(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
                     for (const key in p) {
-                        obj.targets.forEach(node => node.classList.toggle(key));
+                        if (key === p[key]) {
+                            target.classList.toggle(key);
+                        } else if (target.classList.contains(key)) {
+                            target.classList.replace(key, p[key]);
+                        } else if (target.classList.contains(p[key])) {
+                            target.classList.replace(p[key], key);
+                        }
                     }
                 });
             },
@@ -534,10 +517,10 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
                     for (const key in p) {
-                        obj.targets.forEach(node => Utils.removeNodeKey(node, key));
+                        Utils.removeNodeKey(target, key);
                     }
                 });
             },
@@ -553,10 +536,12 @@
                 return true;
             },
             propbind(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                for (const k in p) {
-                    Parser.bindProperty(this.emitter, k, p[k]);
-                }
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    for (const k in p) {
+                        Parser.bindProperty(target, k, p[k]);
+                    }
+                });
             },
             numbercalc(obj) {
                 obj.targets.forEach(target => {
@@ -580,21 +565,27 @@
                 });
             },
             saveas(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr), a = doc.createElement('a');
-                const type = p.type || obj.data.headers.get('content-type');
-                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
-                a.download = p.name;
-                a.click();
-                URL.revokeObjectURL(a.href);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr), a = doc.createElement('a');
+                    const type = p.type || obj.data.headers.get('content-type');
+                    a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+                    a.download = p.name;
+                    a.click();
+                    URL.revokeObjectURL(a.href);
+                });
             },
             /**
              * Create HTML modal element
              */
             modalcreate(obj) {
-                Utils.trigger(this, 'ui-modal', {specs: Parser.params(this.emitter, obj.paramstr)});
+                obj.targets.forEach(target => {
+                    Utils.trigger(this, 'ui-modal', {specs: Parser.params(target, obj.paramstr)});
+                });
             },
             loadercreate(obj) {
-                Utils.trigger(this, 'ui-loader', {specs: Parser.params(this.emitter, obj.paramstr), wrapper: obj.targets});
+                obj.targets.forEach(target => {
+                    Utils.trigger(this, 'ui-loader', {specs: Parser.params(target, obj.paramstr), wrapper: obj.targets});
+                });
             },
             loaderrmv(obj) {
                 Utils.trigger(this, 'ui-loader-rmv', {wrapper: obj.targets});
@@ -603,14 +594,16 @@
              * Cancel ongoing HTTP connection
              */
             abortconn(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                if (!p.name) {
-                    for (const key in Utils.connection) {
-                        Utils.closeConn(key);
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    if (!p.name) {
+                        for (const key in Utils.connection) {
+                            Utils.closeConn(key);
+                        }
+                    } else {
+                        Utils.closeConn(p.name);
                     }
-                } else {
-                    Utils.closeConn(p.name);
-                }
+                });
             }
         };
         return {
@@ -891,7 +884,8 @@
             });
         };
         const isPlaceHolder = str => {//selector@prop
-            return typeof str === 'string' && str.indexOf(SEP_VAR) > 0 && str.indexOf(SEP_KEY_VAL) < 0;
+            return typeof str === 'string' && str.indexOf(SEP_VAR) > 0
+                    && str.indexOf(SEP_KEY_VAL) < 0 && str.charAt(0) !== '\\';
         };
         const getEventFromString = (str, idx) => {
             const name = str.slice(0, idx);
@@ -921,11 +915,10 @@
                 }
                 const pair = splitPair(str, SEP_VAR), val = SEP_VAR + pair.v;
                 if (cb) {
-                    Utils.getCachedNodes(pair.k).forEach(r => {
+                    return Utils.getCachedNodes(pair.k).forEach(r => {
                         const value = Parser.variable(Utils.resolveVariable(r, val));
                         cb(value, r);
                     });
-                    return;
                 }
                 const value = Utils.resolveVariable(doc.querySelector(pair.k), val);
                 return Parser.variable(value);
@@ -1219,16 +1212,17 @@
         })();
         const Loader = (() => {
             const createLoader = loader => {
-                const color = loader.specs.color, size = loader.specs.size;
+                const color = loader.specs.color, size = loader.specs.size, thickness = loader.specs.thickness;
                 loader.wrapper.forEach(node => {
                     !color || node.style.setProperty('--loader-color', color);
                     !size || node.style.setProperty('--loader-size', size);
+                    !thickness || node.style.setProperty('--loader-thickness', thickness);
                     node.classList.add(loader.specs.name);
                 });
             };
             const rmvLoader = loader => {
                 loader.wrapper.forEach(node => {
-                    ['--loader-color', '--loader-size'].forEach(p => node.style.removeProperty(p));
+                    ['--loader-color', '--loader-size', '--loader-thickness'].forEach(p => node.style.removeProperty(p));
                     node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };

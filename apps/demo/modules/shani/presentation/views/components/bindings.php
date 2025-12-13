@@ -41,7 +41,7 @@
 </div>
 
 <div class="row" id="par1" data-bind="
-     click::propbind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base>>#plus10;
+     click::propbind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base;
      propbind::trigger compute>>#plus10">
     <div class="col">
         <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
@@ -107,8 +107,8 @@
             <li><label><input type="checkbox" class="checkmark" data-check2> Reverse Binding</label></li>
             <li>
                 <label>
-                    <input type="checkbox" class="checkmark" data-check3 shani-on="input::propbind
-                           #binder@checked:@checked;">
+                    <input type="checkbox" class="checkmark css1 css2" data-check3 shani-on="input::propbind
+                           #binder@checked:@checked;propbind::csstoggle css1:cls1&css2:cls2">
                     Double Binding
                 </label>
             </li>

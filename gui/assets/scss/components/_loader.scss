@@ -6,6 +6,7 @@
     &-spin{
         --loader-size: #{fn.px2rem(22px)};
         --loader-color: currentColor;
+        --loader-thickness: fn.px2rem(2px);
         pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
@@ -20,7 +21,7 @@
             z-index: 99;
             width: var(--loader-size);
             height: var(--loader-size);
-            border: fn.px2rem(2px) solid var(--loader-color);
+            border: var(--loader-thickness) solid var(--loader-color);
             border-top-color: transparent;
             border-left-color: transparent;
             animation: spin $speed linear infinite;
@@ -28,17 +29,17 @@
         }
     }
     &-bottom,&-top{
-        --loader-size: #{fn.px2rem(2px)};
+        --loader-size: 30%;
         --loader-color: currentColor;
+        --loader-thickness: fn.px2rem(2px);
         @extend %position_relative, %overflow_hide;
         &:before{
-            $width:30%;
             left: 0;
             content: '';
-            width: $width;
-            margin-left: $width * -1;
+            width: var(--loader-size);
+            margin-left: calc(var(--loader-size) * -1);
             animation: pg_move $speed linear infinite;
-            height: var(--loader-size);
+            height: var(--loader-thickness);
             background: var(--loader-color);
             @extend %position_absolute;
         }
