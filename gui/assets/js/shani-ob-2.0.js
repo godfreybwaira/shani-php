@@ -546,8 +546,7 @@
             numbercalc(obj) {
                 obj.targets.forEach(target => {
                     const p = Parser.params(target, obj.paramstr);
-                    const lval = parseNumber(p.lvalue);
-                    const rval = parseNumber(p.rvalue || p.lvalue, true);
+                    const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
                     const result = compute(lval, rval, p.operator) || 0;
                     Utils.setNodeValue(target, p.output, result);
                 });

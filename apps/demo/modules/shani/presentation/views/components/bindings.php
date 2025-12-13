@@ -1,5 +1,4 @@
 <h3>Data Bindings</h3>
-<div class="divider">propbind</div>
 <div class="row">
     <div class="col">
         <div class="input-group">
@@ -85,7 +84,6 @@
     </div>
 </div>
 <h4>Toggle binding</h4>
-<div class="divider">Extras</div>
 <div class="row">
     <div class="col">
         <ul class="list">
@@ -113,5 +111,52 @@
                 </label>
             </li>
         </ul>
+    </div>
+</div>
+<h4>One way binding</h4>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-group">
+            <label>Input:</label>
+            <input type="text" placeholder="Write something..."
+                   shani-on="keyup::propbind #text1b@value:@value">
+            <label>Output:</label>
+            <input type="text" id="text1b" placeholder="See the result...">
+        </div>
+    </div>
+</div>
+<h4>Two ways binding</h4>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-group">
+            <label>Input:</label>
+            <input type="text" id="text2a" placeholder="Write something..."
+                   shani-on="keyup::propbind #text2b@value:@value">
+            <label>Output:</label>
+            <input type="text" id="text2b" placeholder="See the result..."
+                   shani-on="keyup::propbind #text2a@value:@value">
+        </div>
+    </div>
+</div>
+<h4>More bindings...</h4>
+<div class="row row-stretch">
+    <div class="col">
+        <label>
+            <input type="checkbox" class="toggle" shani-on="input::propbind
+                   option[value=TZ]@selected:@checked;">
+            Tanzania
+        </label>
+    </div>
+    <div class="col">
+        <div class="input-group">
+            <label>Select a country</label>
+            <select>
+                <option value="">My country is...</option>
+                <option value="TZ">Tanzania</option>
+                <option value="KE">Kenya</option>
+                <option value="UG">Uganda</option>
+                <option value="RW">Rwanda</option>
+            </select>
+        </div>
     </div>
 </div>
