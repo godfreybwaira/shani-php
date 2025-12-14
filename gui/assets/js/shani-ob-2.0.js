@@ -246,7 +246,10 @@
             this.sync = true;
         };
         const setShaniAttrs = (shani, node) => {
-            ['headers', 'cache', 'http', 'history', 'debug'].forEach(a => {
+            ['history', 'debug'].forEach(a => {
+                shani[a] = Utils.resolveVariable(node, node.getAttribute('shani-' + a));
+            });
+            ['headers', 'cache', 'http'].forEach(a => {
                 shani[a] = Parser.params(node, node.getAttribute('shani-' + a));
             });
         };
@@ -756,6 +759,7 @@
             }
         };
         const flipValue = val => typeof val === 'boolean' ? !val : '';
+        const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
             removeNode(node) {
                 node.style.opacity = 0;
@@ -832,7 +836,7 @@
                         const value = Utils.getNodeValue(node, flip ? key.slice(SEP_NEG.length) : key);
                         return Utils.resolveVariable(node, flip ? flipValue(value) : value);
                     }
-                    return str.charAt(0) === '\\' ? str.slice(1) : str;
+                    return str.charAt(0) === '\\' ? str.slice(1) : cast(str);
                 }
                 return str;
             },
@@ -863,7 +867,7 @@
             getNodeValue(node, key) {
                 if (typeof key === 'string') {
                     let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
-                    return key === val || (val === 'true' || val === 'false' ? false : val);
+                    return key === val || cast(val);
                 }
                 return key;
             },
