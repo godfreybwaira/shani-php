@@ -402,7 +402,8 @@
              */
             close(obj) {
                 if (obj.selector) {
-                    const parent = Utils.getParentNode(this.emitter, Utils.resolveVariable(this.emitter, obj.selector));
+                    const selector = Utils.resolveVariable(this.emitter, obj.selector);
+                    const parent = Utils.getParentNode(this.emitter, selector);
                     if (parent) {
                         return Utils.removeNode(parent);
                     }
