@@ -40,7 +40,7 @@
      click::propbind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base;
      propbind::trigger compute>>#plus10,#results">
     <div class="col">
-        <button class="button color-alert" shani-debug="true" data-sign="+" data-base="10" shani-on="#par1@data-bind">
+        <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
             Add 10
         </button>
     </div>
