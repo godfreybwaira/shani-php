@@ -25,4 +25,10 @@ document.addEventListener('shani:init', () => {
     Shani.define('conn', 'name:@http-name');
     //////////////////////////
     Shani.define('currency', 'TZS ');
+    Shani.define('money-suffix', '/=');
+    Shani.define('numformatter', 'mindecimals:2&maxdecimals:4&@num.io');
+    Shani.define('num.io', 'input:@value&output:value');
+    Shani.define('numberaffix', 'prefix:@data-prefix&suffix:@data-suffix&@num.io');
+    //////////////////////////
+    Shani.define('ucase', str => typeof str === 'string' ? str.toUpperCase() : str);
 });

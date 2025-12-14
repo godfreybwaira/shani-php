@@ -1,47 +1,44 @@
 <h3>Data Bindings</h3>
 <div class="row">
     <div class="col">
-        <div class="input-group">
+        <div class="input-group" id="acc1">
             <label>Price:</label>
-            <input type="text" id="unitprice" value="1300.00" readonly
-                   shani-on="load::numberformat input:@value&prefix:@currency&output:value">
+            <input type="text" id="unitprice" value="1300.00" readonly data-prefix="@currency" data-suffix="@money-suffix"
+                   shani-on="load::numberformat @numformatter;numberformat::affix @numberaffix;">
             <label>Qty:</label>
             <input type="text" id="plus10" value="0" class="width-md-2" readonly
                    data-suffix="kg" shani-on="compute::numbercalc
                    lvalue:@value&output:value&rvalue:@data-base&operator:@data-sign;
-                   numbercalc::numberformat
-                   input:@value&mindecimals:@data.mindec&suffix:@data-suffix&output:value;
-                   numberformat::trigger update>>#totalprice;">
+                   numbercalc::numberformat @numformatter;numberformat::affix @numberaffix;
+                   affix::trigger update>>#totalprice;">
             <label>Total Price:</label>
-            <input type="text" data-prop="data-base:#unitprice@value" id="totalprice" data-summed readonly data-sign="*" class="width-md-2" data-suffix="/="
-                   shani-on="load::trigger update;
-                   update::propbind @data-prop;
+            <input type="text" id="totalprice" data-summed readonly data-sign="*" class="width-md-2"
+                   data-suffix="@money-suffix" data-prefix="@currency" shani-on="load::trigger update;
+                   update::propbind data-base:#unitprice@value;
                    propbind::numbercalc
                    lvalue:#plus10@value&output:value&rvalue:@data-base&operator:@data-sign;
-                   numbercalc::numberformat
-                   input:@value&mindecimals:@data.mindec&output:value&prefix:@currency&suffix:@data-suffix;
-                   numberformat::trigger update>>#vat;">
+                   numbercalc::numberformat @numformatter;numberformat::affix @numberaffix;
+                   affix::trigger update>>#vat;">
             <label>VAT (18%):</label>
             <input type="text" id="vat" readonly data-sign="*" data-vat="0.18" data-summed
-                   class="width-md-2" data-suffix="/="
+                   class="width-md-2" data-suffix="@money-suffix" data-prefix="@currency"
                    shani-on="update::numbercalc
                    lvalue:#totalprice@value&output:value&rvalue:@data-vat&operator:@data-sign;
-                   numbercalc::numberformat
-                   input:@value&mindecimals:@data.mindec&output:value&prefix:@currency&suffix:@data-suffix;
-                   numberformat::trigger update>>#total;">
+                   numbercalc::numberformat @numformatter;numberformat::affix @numberaffix;
+                   affix::trigger update>>#total;">
             <label>TOTAL:</label>
-            <input type="text" id="total" readonly data-sign="+" class="width-md-2" data-suffix="/="
+            <input type="text" id="total" readonly data-sign="+" class="width-md-2"
+                   data-suffix="@money-suffix" data-prefix="@currency"
                    shani-on="update::numbercalc
                    lvalue:#totalprice@value&output:value&rvalue:#vat@value&operator:@data-sign;
-                   numbercalc::numberformat input:@value&mindecimals:@data.mindec&output:value
-                   &prefix:@currency&suffix:@data-suffix;">
+                   numbercalc::numberformat @numformatter;numberformat::affix @numberaffix;">
         </div>
     </div>
 </div>
 
 <div class="row" id="par1" data-bind="
      click::propbind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base;
-     propbind::trigger compute>>#plus10">
+     propbind::trigger compute>>#plus10,#results">
     <div class="col">
         <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
             Add 10
@@ -80,6 +77,17 @@
     <div class="col">
         <button class="button color-alert" data-sign="-" data-base="10%" shani-on="#par1@data-bind">
             Minus 10%
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert" data-suffix="@money-suffix" id="results"
+                shani-on="compute::trigger click;
+                click::numberaccumulate
+                initial:0&input:@value&operator:+&output:textContent>>#acc1 input;
+                numberaccumulate::numberformat
+                input:@textContent&mindecimals:@data.mindec&output:textContent;
+                numberformat::affix input:@textContent&output:textContent&prefix:@currency&suffix:@data-suffix">
+            Result
         </button>
     </div>
 </div>
@@ -157,6 +165,30 @@
                 <option value="UG">Uganda</option>
                 <option value="RW">Rwanda</option>
             </select>
+        </div>
+    </div>
+</div>
+<h4>Even more bindings...</h4>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-group">
+            <label>Input:</label>
+            <input type="text" placeholder="Write something..."
+                   shani-on="keyup::propbind .output@textContent:@value;
+                   propbind::trigger alter>>.output">
+        </div>
+    </div>
+    <div class="col">
+        <div class="output" data-prefix='He said, "' data-suffix='!"'
+             shani-on="alter::affix input:@textContent&output:textContent&prefix:@data-prefix&suffix:@data-suffix">
+            hey
+        </div>
+        <div class="output">
+            hey
+        </div>
+        <div class="output" shani-debug="true"
+             shani-on="alter::transform input:@textContent&output:textContent&transformer:ucase">
+            hey
         </div>
     </div>
 </div>

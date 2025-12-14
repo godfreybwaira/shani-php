@@ -551,16 +551,38 @@
                     Utils.setNodeValue(target, p.output, result);
                 });
             },
+            numberaccumulate(obj) {
+                const p = Parser.params(this.emitter, obj.paramstr);
+                let result = parseFloat(p.initial) || 0;
+                obj.targets.forEach(target => {
+                    const param = Parser.params(target, obj.paramstr);
+                    const value = parseNumber(param.input, true);
+                    result = compute(result, value, param.operator);
+                });
+                Utils.setNodeValue(this.emitter, p.output, result);
+            },
             numberformat(obj) {
                 obj.targets.forEach(target => {
                     const p = Parser.params(target, obj.paramstr);
-                    const prefix = p.prefix || '', suffix = p.suffix || '';
-                    const val = parseNumber(p.input);
-                    const result = val.toLocaleString(undefined, {
+                    const result = parseNumber(p.input).toLocaleString(undefined, {
                         maximumFractionDigits: p.maxdecimals || 2,
                         minimumFractionDigits: p.mindecimals || 0
                     });
-                    Utils.setNodeValue(target, p.output, prefix + result + suffix);
+                    Utils.setNodeValue(target, p.output, result);
+                });
+            },
+            affix(obj) {
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    const prefix = p.prefix || '', suffix = p.suffix || '';
+                    Utils.setNodeValue(target, p.output, prefix + p.input + suffix);
+                });
+            },
+            transform(obj) {
+                obj.targets.forEach(target => {
+                    const p = Parser.params(target, obj.paramstr);
+                    const result = Utils.calludf(p.transformer, [p.input, target]);
+                    Utils.setNodeValue(target, p.output, result);
                 });
             },
             saveas(obj) {
@@ -833,8 +855,8 @@
                     node.setAttribute(key, val === true ? key : val);
                 }
             },
-            calludf(path, args, thisArg) {
-                const v = UDF.map.get(path);
+            calludf(name, args, thisArg) {
+                const v = UDF.map.get(name);
                 return v instanceof Function ? v.apply(thisArg, args) : v;
             },
             getNodeValue(node, key) {
