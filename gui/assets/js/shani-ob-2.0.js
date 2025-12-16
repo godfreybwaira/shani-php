@@ -376,6 +376,25 @@
                 !clone || clone(n);
             }
         };
+
+        const str2number = str => {
+            const date = Date.parse(str);
+            if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
+                return date;
+            }
+            const num = str.replace(/[^\d.-]/g, ''), value = parseFloat(num);
+            if (!isNaN(value) && num !== '') {
+                return value;
+            }
+            return str.toLowerCase();
+        };
+        const walk = (obj, cb) => {
+            Utils.traverse(obj, (p, node) => {
+                for (const k in p) {
+                    cb(node, k, p[k]);
+                }
+            });
+        };
         Obj.prototype = {
             /**
              * Read content from server.
@@ -393,12 +412,7 @@
                 sendReq(this, 'POST', obj);
             },
             trigger(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        node.dispatchEvent(new Event(key, {bubbles: true}));
-                    }
-                });
+                walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
             },
             /**
              * Remove node from DOM
@@ -415,8 +429,7 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    obj.targets.forEach(node => {
-                        const p = Parser.params(node, obj.paramstr);
+                    Utils.traverse(obj, p => {
                         const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
                         window.print();
                         cover.remove();
@@ -451,8 +464,7 @@
                 obj.targets.forEach(Utils.removeNode);
             },
             nodecopyto(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     moveNode(this.emitter, node, p, copy => {
                         copy.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
@@ -463,48 +475,19 @@
                 });
             },
             nodemoveto(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    moveNode(this.emitter, node, p);
-                });
+                Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
             },
             cssadd(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        node.classList.add(key);
-                    }
-                });
+                walk(obj, (node, key) => node.classList.add(key));
             },
             cssrmv(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        node.classList.remove(key);
-                    }
-                });
+                walk(obj, (node, key) => node.classList.remove(key));
             },
             cssreplace(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        node.classList.replace(key, p[key]);
-                    }
-                });
+                walk(obj, (node, key, val) => node.classList.replace(key, val));
             },
             csstoggle(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        if (key === p[key]) {
-                            node.classList.toggle(key);
-                        } else if (node.classList.contains(key)) {
-                            node.classList.replace(key, p[key]);
-                        } else if (node.classList.contains(p[key])) {
-                            node.classList.replace(p[key], key);
-                        }
-                    }
-                });
+                walk(obj, (node, key) => node.classList.toggle(key));
             },
             cssexists(obj) {
                 for (const node of obj.targets) {
@@ -521,12 +504,7 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        Utils.removeNodeKey(node, key);
-                    }
-                });
+                walk(obj, (node, key) => Utils.removeNodeKey(node, key));
             },
             propexists(obj) {
                 for (const node of obj.targets) {
@@ -539,17 +517,23 @@
                 }
                 return true;
             },
-            propbind(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const k in p) {
-                        Parser.bindProperty(node, k, p[k]);
+            proptoggle(obj) {
+                //data-prop:val1,val2
+                walk(obj, (node, key, val) => {
+                    const oldval = Utils.getNodeValue(node, key);
+                    const arr = Parser.toArray(val, SEP_LIST);
+                    for (const v of arr) {
+                        if (v !== oldval) {
+                            return Utils.setNodeValue(node, key, v);
+                        }
                     }
                 });
             },
+            propbind(obj) {
+                walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
+            },
             numbercalc(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
                     const result = compute(lval, rval, p.operator) || 0;
                     Utils.setNodeValue(node, p.output, result);
@@ -558,16 +542,14 @@
             numberaccumulate(obj) {
                 const p = Parser.params(this.emitter, obj.paramstr);
                 let result = parseFloat(p.initial) || 0;
-                obj.targets.forEach(node => {
-                    const param = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (_, param) => {
                     const value = parseNumber(param.input, true);
                     result = compute(result, value, param.operator);
                 });
                 Utils.setNodeValue(this.emitter, p.output, result);
             },
             numberformat(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     const result = parseNumber(p.input).toLocaleString(undefined, {
                         maximumFractionDigits: p.maxdecimals || 2,
                         minimumFractionDigits: p.mindecimals || 0
@@ -576,15 +558,13 @@
                 });
             },
             affix(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     const prefix = p.prefix || '', suffix = p.suffix || '';
                     Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
                 });
             },
             transform(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     const result = Utils.calludf(p.transformer, [p, node]);
                     if (result !== undefined) {
                         Utils.setNodeValue(node, p.output, result);
@@ -592,8 +572,8 @@
                 });
             },
             saveas(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr), a = doc.createElement('a');
+                Utils.traverse(obj, p => {
+                    const a = doc.createElement('a');
                     const type = p.type || obj.data.headers.get('content-type');
                     a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
                     a.download = p.name;
@@ -617,8 +597,7 @@
              * Cancel ongoing HTTP connection
              */
             abortconn(obj) {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, p => {
                     if (!p.name) {
                         for (const key in Utils.connection) {
                             Utils.closeConn(key);
@@ -627,6 +606,26 @@
                         Utils.closeConn(p.name);
                     }
                 });
+            },
+            sort(obj) {
+                const targets = [];
+                const param = Parser.params(this.emitter, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
+                    targets.push(Utils.object({
+                        node: Utils.getParentNode(node, 'tr'), value: p.input.trim()
+                    }));
+                });
+                targets.sort((r1, r2) => {
+                    const v1 = str2number(r1.value), v2 = str2number(r2.value);
+                    if (typeof v1 === 'number' && typeof v2 === 'number') {
+                        return param.order === 'asc' ? v1 - v2 : v2 - v1;
+                    }
+                    return param.order === 'asc'
+                            ? String(v1).localeCompare(String(v2))
+                            : String(v2).localeCompare(String(v1));
+                });
+                const tbody = targets[0].node.parentElement;
+                targets.forEach(row => tbody.appendChild(row.node));
             }
         };
         return {
@@ -715,7 +714,7 @@
         };
     })();
     const SEP_EVT_ACTION = '::', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
-    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!';
+    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
     const Utils = (() => {
         /**
          * Timer for a delayed actions
@@ -759,6 +758,12 @@
         const flipValue = val => typeof val === 'boolean' ? !val : '';
         const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
+            traverse(obj, cb) {
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    cb(p, node);
+                });
+            },
             removeNode(node) {
                 node.style.opacity = 0;
                 node.addEventListener('transitionend', () => node.remove());
@@ -1217,8 +1222,7 @@
                 }
             };
             const createModal = obj => {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, p => {
                     const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                     const wrapper = doc.createElement('div');
                     wrapper.id = p.id;
@@ -1239,8 +1243,7 @@
         })();
         const Loader = (() => {
             const createLoader = obj => {
-                obj.targets.forEach(node => {
-                    const p = Parser.params(node, obj.paramstr);
+                Utils.traverse(obj, (p, node) => {
                     !p.color || node.style.setProperty('--loader-color', p.color);
                     !p.size || node.style.setProperty('--loader-size', p.size);
                     !p.thickness || node.style.setProperty('--loader-thickness', p.thickness);

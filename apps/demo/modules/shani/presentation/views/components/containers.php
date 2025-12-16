@@ -355,45 +355,59 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="table-container" id="tc1">
-            <table class="table border-v">
+            <table class="table border-v" id="ltable">
                 <caption>Users</caption>
                 <thead class="color-12">
                     <tr>
-                        <th>Company</th>
-                        <th>Contact</th>
-                        <th>Country</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-even">
                     <tr>
-                        <td>Alfreds Futterkiste</td>
-                        <td>Maria Anders</td>
-                        <td>Germany</td>
+                        <td class="sn">1.</td>
+                        <td class="myname">John Doe</td>
+                        <td class="myage">29</td>
+                        <td class="mysalary">$65,000</td>
+                        <td class="mydate">2021-05-15</td>
                     </tr>
                     <tr>
-                        <td>Centro commercial Moctezuma</td>
-                        <td>Francisco Chang</td>
-                        <td>Mexico</td>
+                        <td class="sn">2.</td>
+                        <td class="myname">Jane Smith</td>
+                        <td class="myage">34</td>
+                        <td class="mysalary">$82,500</td>
+                        <td class="mydate">2019-11-01</td>
                     </tr>
                     <tr>
-                        <td>Ernst Handel</td>
-                        <td>Roland Mendel</td>
-                        <td>Austria</td>
+                        <td class="sn">3.</td>
+                        <td class="myname">Alice Johnson</td>
+                        <td class="myage">22</td>
+                        <td class="mysalary">$45,000</td>
+                        <td class="mydate">2023-01-20</td>
                     </tr>
                     <tr>
-                        <td>Island Trading</td>
-                        <td>Helen Bennett</td>
-                        <td>UK</td>
+                        <td class="sn">4.</td>
+                        <td class="myname">Bob Williams</td>
+                        <td class="myage">45</td>
+                        <td class="mysalary">$110,000</td>
+                        <td class="mydate">2015-08-30</td>
                     </tr>
                     <tr>
-                        <td>Laughing Bacchus Winecellars</td>
-                        <td>Yoshi Tannamuri</td>
-                        <td>Canada</td>
+                        <td class="sn">5.</td>
+                        <td class="myname">Charlie Brown</td>
+                        <td class="myage">29</td>
+                        <td class="mysalary">$65,000</td>
+                        <td class="mydate">2021-02-10</td>
                     </tr>
                     <tr>
-                        <td>Magazzini Alimentari Riuniti</td>
-                        <td>Giovanni Rovelli</td>
-                        <td>Italy</td>
+                        <td class="sn">6.</td>
+                        <td class="myname">David Davis</td>
+                        <td class="myage">52</td>
+                        <td class="mysalary">$95,000</td>
+                        <td class="mydate">2010-12-12</td>
                     </tr>
                 </tbody>
             </table>
@@ -403,45 +417,59 @@
         <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
                shani-on="keyup @data-delay::search>>#tc2 tbody">
         <div class="table-container" id="tc2">
-            <table class="table border-h">
+            <table class="table border-h" id="rtable" data-ptoggle="sort::proptoggle data-order:asc,desc">
                 <caption>Users</caption>
                 <thead>
                     <tr>
-                        <th>Company</th>
-                        <th>Contact</th>
-                        <th>Country</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-odd">
                     <tr>
-                        <td>Alfreds Futterkiste</td>
-                        <td>Maria Anders</td>
-                        <td>Germany</td>
+                        <td class="sn">1.</td>
+                        <td class="myname">John Doe</td>
+                        <td class="myage">29</td>
+                        <td class="mysalary">$65,000</td>
+                        <td class="mydate">2021-05-15</td>
                     </tr>
                     <tr>
-                        <td>Centro commercial Moctezuma</td>
-                        <td>Francisco Chang</td>
-                        <td>Mexico</td>
+                        <td class="sn">2.</td>
+                        <td class="myname">Jane Smith</td>
+                        <td class="myage">34</td>
+                        <td class="mysalary">$82,500</td>
+                        <td class="mydate">2019-11-01</td>
                     </tr>
                     <tr>
-                        <td>Ernst Handel</td>
-                        <td>Roland Mendel</td>
-                        <td>Austria</td>
+                        <td class="sn">3.</td>
+                        <td class="myname">Alice Johnson</td>
+                        <td class="myage">22</td>
+                        <td class="mysalary">$45,000</td>
+                        <td class="mydate">2023-01-20</td>
                     </tr>
                     <tr>
-                        <td>Island Trading</td>
-                        <td>Helen Bennett</td>
-                        <td>UK</td>
+                        <td class="sn">4.</td>
+                        <td class="myname">Bob Williams</td>
+                        <td class="myage">45</td>
+                        <td class="mysalary">$110,000</td>
+                        <td class="mydate">2015-08-30</td>
                     </tr>
                     <tr>
-                        <td>Laughing Bacchus Winecellars</td>
-                        <td>Yoshi Tannamuri</td>
-                        <td>Canada</td>
+                        <td class="sn">5.</td>
+                        <td class="myname">Charlie Brown</td>
+                        <td class="myage">29</td>
+                        <td class="mysalary">$65,000</td>
+                        <td class="mydate">2021-02-10</td>
                     </tr>
                     <tr>
-                        <td>Magazzini Alimentari Riuniti</td>
-                        <td>Giovanni Rovelli</td>
-                        <td>Italy</td>
+                        <td class="sn">6.</td>
+                        <td class="myname">David Davis</td>
+                        <td class="myage">52</td>
+                        <td class="mysalary">$95,000</td>
+                        <td class="mydate">2010-12-12</td>
                     </tr>
                 </tbody>
             </table>
