@@ -393,10 +393,10 @@
                 sendReq(this, 'POST', obj);
             },
             trigger(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
-                        target.dispatchEvent(new Event(key, {bubbles: true}));
+                        node.dispatchEvent(new Event(key, {bubbles: true}));
                     }
                 });
             },
@@ -415,8 +415,8 @@
             },
             print(obj) {
                 if (window.print instanceof Function) {
-                    obj.targets.forEach(target => {
-                        const p = Parser.params(target, obj.paramstr);
+                    obj.targets.forEach(node => {
+                        const p = Parser.params(node, obj.paramstr);
                         const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
                         window.print();
                         cover.remove();
@@ -428,8 +428,8 @@
              */
             search(obj) {
                 const text = this.emitter.value.trim().toLowerCase();
-                obj.targets.forEach(target => {
-                    for (const row of target.children) {
+                obj.targets.forEach(node => {
+                    for (const row of node.children) {
                         row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
                     }
                 });
@@ -451,57 +451,57 @@
                 obj.targets.forEach(Utils.removeNode);
             },
             nodecopyto(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
-                    moveNode(this.emitter, target, p, node => {
-                        node.querySelectorAll('[id]').forEach(el => {
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    moveNode(this.emitter, node, p, copy => {
+                        copy.querySelectorAll('[id]').forEach(el => {
                             const id = Utils.getId();
-                            node.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
+                            copy.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
                             el.id = id;
                         });
                     });
                 });
             },
             nodemoveto(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
-                    moveNode(this.emitter, target, p);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    moveNode(this.emitter, node, p);
                 });
             },
             cssadd(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
-                        target.classList.add(key);
+                        node.classList.add(key);
                     }
                 });
             },
             cssrmv(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
-                        target.classList.remove(key);
+                        node.classList.remove(key);
                     }
                 });
             },
             cssreplace(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
-                        target.classList.replace(key, p[key]);
+                        node.classList.replace(key, p[key]);
                     }
                 });
             },
             csstoggle(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
                         if (key === p[key]) {
-                            target.classList.toggle(key);
-                        } else if (target.classList.contains(key)) {
-                            target.classList.replace(key, p[key]);
-                        } else if (target.classList.contains(p[key])) {
-                            target.classList.replace(p[key], key);
+                            node.classList.toggle(key);
+                        } else if (node.classList.contains(key)) {
+                            node.classList.replace(key, p[key]);
+                        } else if (node.classList.contains(p[key])) {
+                            node.classList.replace(p[key], key);
                         }
                     }
                 });
@@ -521,10 +521,10 @@
              * Remove properties from extisting node
              */
             proprmv(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const key in p) {
-                        Utils.removeNodeKey(target, key);
+                        Utils.removeNodeKey(node, key);
                     }
                 });
             },
@@ -540,58 +540,60 @@
                 return true;
             },
             propbind(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     for (const k in p) {
-                        Parser.bindProperty(target, k, p[k]);
+                        Parser.bindProperty(node, k, p[k]);
                     }
                 });
             },
             numbercalc(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
                     const result = compute(lval, rval, p.operator) || 0;
-                    Utils.setNodeValue(target, p.output, result);
+                    Utils.setNodeValue(node, p.output, result);
                 });
             },
             numberaccumulate(obj) {
                 const p = Parser.params(this.emitter, obj.paramstr);
                 let result = parseFloat(p.initial) || 0;
-                obj.targets.forEach(target => {
-                    const param = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const param = Parser.params(node, obj.paramstr);
                     const value = parseNumber(param.input, true);
                     result = compute(result, value, param.operator);
                 });
                 Utils.setNodeValue(this.emitter, p.output, result);
             },
             numberformat(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     const result = parseNumber(p.input).toLocaleString(undefined, {
                         maximumFractionDigits: p.maxdecimals || 2,
                         minimumFractionDigits: p.mindecimals || 0
                     });
-                    Utils.setNodeValue(target, p.output, result);
+                    Utils.setNodeValue(node, p.output, result);
                 });
             },
             affix(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     const prefix = p.prefix || '', suffix = p.suffix || '';
-                    Utils.setNodeValue(target, p.output, prefix + p.input + suffix);
+                    Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
                 });
             },
             transform(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
-                    const result = Utils.calludf(p.transformer, [p.input, target]);
-                    Utils.setNodeValue(target, p.output, result);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    const result = Utils.calludf(p.transformer, [p, node]);
+                    if (result !== undefined) {
+                        Utils.setNodeValue(node, p.output, result);
+                    }
                 });
             },
             saveas(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr), a = doc.createElement('a');
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr), a = doc.createElement('a');
                     const type = p.type || obj.data.headers.get('content-type');
                     a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
                     a.download = p.name;
@@ -603,24 +605,20 @@
              * Create HTML modal element
              */
             modalcreate(obj) {
-                obj.targets.forEach(target => {
-                    Utils.trigger(this, 'ui-modal', {specs: Parser.params(target, obj.paramstr)});
-                });
+                Utils.trigger(this, 'ui-modal', obj);
             },
             loadercreate(obj) {
-                obj.targets.forEach(target => {
-                    Utils.trigger(this, 'ui-loader', {specs: Parser.params(target, obj.paramstr), wrapper: obj.targets});
-                });
+                Utils.trigger(this, 'ui-loader', obj);
             },
             loaderrmv(obj) {
-                Utils.trigger(this, 'ui-loader-rmv', {wrapper: obj.targets});
+                Utils.trigger(this, 'ui-loader-rmv', obj);
             },
             /**
              * Cancel ongoing HTTP connection
              */
             abortconn(obj) {
-                obj.targets.forEach(target => {
-                    const p = Parser.params(target, obj.paramstr);
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
                     if (!p.name) {
                         for (const key in Utils.connection) {
                             Utils.closeConn(key);
@@ -1218,37 +1216,41 @@
                     return btn;
                 }
             };
-            const createModal = specs => {
-                const mdbg = doc.createElement('div'), modal = doc.createElement('div');
-                const wrapper = doc.createElement('div');
-                wrapper.id = specs.id;
-                wrapper.className = 'full-size';
-                if ('close-btn' in specs) {
-                    const btn = getCloseBtn(specs['close-btn']);
-                    btn.style.margin = 'var(--spacing)';
-                    modal.appendChild(btn);
-                }
-                modal.className = specs.classes;
-                modal.appendChild(wrapper);
-                mdbg.className = COVER;
-                mdbg.appendChild(modal);
-                doc.body.appendChild(mdbg);
-            };
-            Shani.on('ui-modal', e => createModal(e.detail.specs));
-        })();
-        const Loader = (() => {
-            const createLoader = loader => {
-                const color = loader.specs.color, size = loader.specs.size, thickness = loader.specs.thickness;
-                loader.wrapper.forEach(node => {
-                    !color || node.style.setProperty('--loader-color', color);
-                    !size || node.style.setProperty('--loader-size', size);
-                    !thickness || node.style.setProperty('--loader-thickness', thickness);
-                    node.classList.add(loader.specs.name);
+            const createModal = obj => {
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    const mdbg = doc.createElement('div'), modal = doc.createElement('div');
+                    const wrapper = doc.createElement('div');
+                    wrapper.id = p.id;
+                    wrapper.className = 'full-size';
+                    if ('close-btn' in p) {
+                        const btn = getCloseBtn(p['close-btn']);
+                        btn.style.margin = 'var(--spacing)';
+                        modal.appendChild(btn);
+                    }
+                    modal.className = p.classes;
+                    modal.appendChild(wrapper);
+                    mdbg.className = COVER;
+                    mdbg.appendChild(modal);
+                    doc.body.appendChild(mdbg);
                 });
             };
-            const rmvLoader = loader => {
-                loader.wrapper.forEach(node => {
-                    ['--loader-color', '--loader-size', '--loader-thickness'].forEach(p => node.style.removeProperty(p));
+            Shani.on('ui-modal', e => createModal(e.detail));
+        })();
+        const Loader = (() => {
+            const createLoader = obj => {
+                obj.targets.forEach(node => {
+                    const p = Parser.params(node, obj.paramstr);
+                    !p.color || node.style.setProperty('--loader-color', p.color);
+                    !p.size || node.style.setProperty('--loader-size', p.size);
+                    !p.thickness || node.style.setProperty('--loader-thickness', p.thickness);
+                    node.classList.add(p.name);
+                });
+            };
+            const rmvLoader = obj => {
+                const props = ['--loader-color', '--loader-size', '--loader-thickness'];
+                obj.targets.forEach(node => {
+                    props.forEach(p => node.style.removeProperty(p));
                     node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };

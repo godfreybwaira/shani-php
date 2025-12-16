@@ -186,8 +186,7 @@
         <div class="output">
             hey
         </div>
-        <div class="output" shani-debug="true"
-             shani-on="alter::transform input:@textContent&output:textContent&transformer:ucase">
+        <div class="output" shani-on="alter::transform input:@textContent&output:textContent&transformer:ucase">
             hey
         </div>
     </div>
