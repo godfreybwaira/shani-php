@@ -612,7 +612,7 @@
                 const param = Parser.params(this.emitter, obj.paramstr);
                 Utils.traverse(obj, (p, node) => {
                     targets.push(Utils.object({
-                        node: Utils.getParentNode(node, 'tr'), value: p.input.trim()
+                        node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
                     }));
                 });
                 targets.sort((r1, r2) => {
