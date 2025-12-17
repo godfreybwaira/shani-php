@@ -430,8 +430,10 @@
             print(obj) {
                 if (window.print instanceof Function) {
                     Utils.traverse(obj, p => {
-                        const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
+                        const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
+                        doc.title = p.title || title;
                         window.print();
+                        doc.title = title;
                         cover.remove();
                     });
                 }
