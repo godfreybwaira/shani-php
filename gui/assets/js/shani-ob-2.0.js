@@ -611,9 +611,9 @@
                 const rows = [];
                 const param = Parser.params(this.emitter, obj.paramstr);
                 Utils.traverse(obj, (p, node) => {
-                    rows.push(Utils.object({
+                    rows.push({
                         node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
-                    }));
+                    });
                 });
                 rows.sort((r1, r2) => {
                     const v1 = str2number(r1.value), v2 = str2number(r2.value);
