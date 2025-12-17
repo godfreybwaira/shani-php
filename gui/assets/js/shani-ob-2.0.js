@@ -389,9 +389,9 @@
             return str.toLowerCase();
         };
         const walk = (obj, cb) => {
-            Utils.traverse(obj, (p, node) => {
-                for (const k in p) {
-                    cb(node, k, p[k]);
+            Utils.traverse(obj, (params, node) => {
+                for (const key in params) {
+                    cb(node, key, params[key]);
                 }
             });
         };
@@ -905,18 +905,17 @@
     const Parser = (() => {
         const splitPair = (str, sep, def = null) => {
             const pos = str.indexOf(sep);
-            return Utils.object({
+            return {
                 k: pos > 0 ? str.slice(0, pos) : def,
                 v: pos > 0 ? str.slice(pos + sep.length).trim() : def
-            });
+            };
         };
         const isPlaceHolder = str => {//selector@prop
             return typeof str === 'string' && str.indexOf(SEP_VAR) > 0
                     && str.indexOf(SEP_KEY_VAL) < 0 && str.charAt(0) !== '\\';
         };
         const getEventFromString = (str, idx) => {
-            const name = str.slice(0, idx);
-            const idx2 = name.search(SEP_ACTION);
+            const name = str.slice(0, idx), idx2 = name.search(SEP_ACTION);
             return name.slice(0, idx2 > 0 ? idx2 : idx).trim();
         };
         return {
