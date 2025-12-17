@@ -382,9 +382,9 @@
             if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
                 return date;
             }
-            const num = str.replace(/[^\d.-]/g, ''), value = parseFloat(num);
-            if (!isNaN(value) && num !== '') {
-                return value;
+            const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);
+            if (!isNaN(num) && value !== '') {
+                return num;
             }
             return str.toLowerCase();
         };
@@ -608,14 +608,14 @@
                 });
             },
             sort(obj) {
-                const targets = [];
+                const rows = [];
                 const param = Parser.params(this.emitter, obj.paramstr);
                 Utils.traverse(obj, (p, node) => {
-                    targets.push(Utils.object({
+                    rows.push(Utils.object({
                         node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
                     }));
                 });
-                targets.sort((r1, r2) => {
+                rows.sort((r1, r2) => {
                     const v1 = str2number(r1.value), v2 = str2number(r2.value);
                     if (typeof v1 === 'number' && typeof v2 === 'number') {
                         return param.order === 'asc' ? v1 - v2 : v2 - v1;
@@ -624,8 +624,8 @@
                             ? String(v1).localeCompare(String(v2))
                             : String(v2).localeCompare(String(v1));
                 });
-                const tbody = targets[0].node.parentElement;
-                targets.forEach(row => tbody.appendChild(row.node));
+                const tbody = rows[0].node.parentElement;
+                rows.forEach(row => tbody.appendChild(row.node));
             }
         };
         return {
