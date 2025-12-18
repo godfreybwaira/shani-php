@@ -685,10 +685,10 @@
                 let val = Utils.getNodeValue(node, key);
                 if (val === undefined) {
                     val = values[key];
-                } else if (['shani-http', 'shani-cache', 'shani-headers'].includes(key)) {
-                    val = mergeParams(val, values[key], SEP_PARAM);
                 } else if (key === 'shani-on') {
                     val = mergeEvents(val, values[key]);
+                } else {
+                    val = mergeParams(val, values[key], SEP_PARAM);
                 }
                 Utils.setNodeValue(node, key, val);
             }

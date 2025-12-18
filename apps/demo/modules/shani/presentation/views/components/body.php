@@ -1,6 +1,6 @@
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar" id="parent1" data-prop="prop7:val7&prop8:@data-prop8" data-prop8="val8">
-        <a href="/shani/0/components/0/generator" shani-cache="@data-cache"
+        <a href="/shani/0/components/0/generator" shani-cache="age:5s"
            class="active menu-item" data-maxage="30s"
            shani-on="click->read>>#content;httpend->loaderrmv>>#content;
            httpstart->loadercreate name:loader-spin&size:2.5rem>>#content;">
