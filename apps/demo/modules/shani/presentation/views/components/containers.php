@@ -359,11 +359,11 @@
                 <caption>Users</caption>
                 <thead class="color-12">
                     <tr>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-even">
@@ -415,17 +415,17 @@
     </div>
     <div class="col">
         <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
-               shani-on="keyup @data-delay::search>>#tc2 tbody">
+               shani-on="keyup @data-delay->search>>#tc2 tbody">
         <div class="table-container" id="tc2">
-            <table class="table border-h" id="rtable" data-ptoggle="sort::proptoggle data-order:asc,desc">
+            <table class="table border-h" id="rtable" data-ptoggle="sort->proptoggle data-order:asc,desc">
                 <caption>Users</caption>
                 <thead>
                     <tr>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click::sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-odd">
@@ -543,20 +543,20 @@
 <div class="divider">Modals</div>
 <ul>
     <li><a href="/shani/0/components/0/modals?type=c"
-           shani-on="click::read mode:append>>body">Type C</a></li>
+           shani-on="click->read mode:append>>body">Type C</a></li>
     <li><a href="/shani/0/components/0/modals?type=cl"
-           shani-on="click::read mode:append>>body">Type C With layout</a></li>
+           shani-on="click->read mode:append>>body">Type C With layout</a></li>
     <li><a href="/shani/0/components/0/modals?type=vr"
-           shani-on="click::read mode:append>>body">Type VR</a></li>
+           shani-on="click->read mode:append>>body">Type VR</a></li>
     <li><a href="/shani/0/components/0/modals?type=vl"
-           shani-on="click::read mode:append>>body">Type VL</a></li>
+           shani-on="click->read mode:append>>body">Type VL</a></li>
     <li><a href="/shani/0/components/0/modals?type=ht"
-           shani-on="click::read mode:append>>body">Type HT</a></li>
+           shani-on="click->read mode:append>>body">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
-           shani-on="click::read mode:append>>body">Type HB</a></li>
+           shani-on="click->read mode:append>>body">Type HB</a></li>
 </ul>
 <div class="divider">Misc</div>
 <ul>
-    <li><a href="#" shani-on="click::fs>>#tc2">Full screen</a></li>
-    <li><a href="#" shani-on="click::print size:A4 landscape&title:#tc2 caption@textContent>>#tc2">Print</a></li>
+    <li><a href="#" shani-on="click->fs>>#tc2">Full screen</a></li>
+    <li><a href="#" shani-on="click->print size:A4 landscape&title:#tc2 caption@textContent>>#tc2">Print</a></li>
 </ul>

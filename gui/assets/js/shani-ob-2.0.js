@@ -543,8 +543,8 @@
             },
             numberaccumulate(obj) {
                 const p = Parser.params(this.emitter, obj.paramstr);
-                let result = parseFloat(p.initial) || 0;
-                Utils.traverse(obj, (_, param) => {
+                let result = parseNumber(p.initial) || 0;
+                Utils.traverse(obj, param => {
                     const value = parseNumber(param.input, true);
                     result = compute(result, value, param.operator);
                 });
@@ -713,7 +713,7 @@
             root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
-    const SEP_EVT_ACTION = '::', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
+    const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
     const Utils = (() => {
         /**
