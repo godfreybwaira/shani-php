@@ -543,17 +543,17 @@
 <div class="divider">Modals</div>
 <ul>
     <li><a href="/shani/0/components/0/modals?type=c"
-           shani-on="click->read mode:append>>body">Type C</a></li>
+           shani-on="click->pull mode:append>>body">Type C</a></li>
     <li><a href="/shani/0/components/0/modals?type=cl"
-           shani-on="click->read mode:append>>body">Type C With layout</a></li>
+           shani-on="click->pull mode:append>>body">Type C With layout</a></li>
     <li><a href="/shani/0/components/0/modals?type=vr"
-           shani-on="click->read mode:append>>body">Type VR</a></li>
+           shani-on="click->pull mode:append>>body">Type VR</a></li>
     <li><a href="/shani/0/components/0/modals?type=vl"
-           shani-on="click->read mode:append>>body">Type VL</a></li>
+           shani-on="click->pull mode:append>>body">Type VL</a></li>
     <li><a href="/shani/0/components/0/modals?type=ht"
-           shani-on="click->read mode:append>>body">Type HT</a></li>
+           shani-on="click->pull mode:append>>body">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
-           shani-on="click->read mode:append>>body">Type HB</a></li>
+           shani-on="click->pull mode:append>>body">Type HB</a></li>
 </ul>
 <div class="divider">Misc</div>
 <ul>

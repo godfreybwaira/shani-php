@@ -242,7 +242,7 @@
             this.poll = Utils.object();
             this.actions = collectActions(node);
             this.headers = new Headers(this.headers);
-            /**for HTTP read() and write() sync become false**/
+            /**for HTTP push() and pull() sync become false**/
             this.sync = true;
         };
         const setShaniAttrs = (shani, node) => {
@@ -399,7 +399,7 @@
             /**
              * Read content from server.
              */
-            read(obj) {
+            pull(obj) {
                 if (this.history === true) {
                     history.pushState(null, '', this.url);
                 }
@@ -408,7 +408,7 @@
             /**
              * Write content to server
              */
-            write(obj) {
+            push(obj) {
                 sendReq(this, 'POST', obj);
             },
             trigger(obj) {
@@ -626,6 +626,11 @@
                 });
                 const tbody = rows[0].node.parentElement;
                 rows.forEach(row => tbody.appendChild(row.node));
+            },
+            copy(obj) {
+                if (navigator.clipboard) {
+                    Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
+                }
             }
         };
         return {
