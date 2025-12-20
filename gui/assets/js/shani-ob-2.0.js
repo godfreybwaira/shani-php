@@ -211,10 +211,13 @@
         const insertData = (target, data, params) => {
             const modes = {
                 prepend: 'afterbegin', append: 'beforeend',
-                before: 'beforebegin', after: 'afterend'
+                before: 'beforebegin', after: 'afterend', swap: 'afterend'
             };
             const key = 'insertAdjacent' + (params.escape ? 'Text' : 'HTML');
             target[key](modes[params.mode], data);
+            if (params.mode === 'swap') {
+                target.remove();
+            }
         };
         const handleDataInsertion = (target, resp, params) => {
             if (params.mode !== 'discard') {
