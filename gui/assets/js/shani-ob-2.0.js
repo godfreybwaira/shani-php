@@ -73,9 +73,10 @@
                 map.forEach((v, k) => obj[k] = v);
                 return obj;
             },
-            input2form(node) {
+            input2form(node, ts) {
+                let fd = null;
                 if (['SELECT', 'INPUT', 'TEXTAREA'].includes(node.tagName)) {
-                    const fd = new FormData();
+                    fd = new FormData();
                     if (!node.files) {
                         fd.append(node.name || 'value', node.value);
                     } else {
@@ -83,9 +84,10 @@
                             fd.append(node.name || 'file[]', node.files[f]);
                         }
                     }
-                    return fd;
+                } else {
+                    node.tagName !== 'FORM' || (fd = new FormData(node));
                 }
-                return node.tagName === 'FORM' ? new FormData(node) : null;
+                return ts ? Utils.calludf(ts, [fd]) : fd;
             },
             form2json(fd) {
                 const data = Utils.object(), keys = [];
@@ -198,42 +200,41 @@
         };
     })();
     const HTML = (() => {
-        const setInputData = (target, output, data, params) => {
+        const setInputData = (target, output, content, params) => {
             const value = Utils.getNodeValue(target, output);
             if (params.mode === 'prepend') {
-                Utils.setNodeValue(target, output, data + value);
+                Utils.setNodeValue(target, output, content + value);
             } else if (params.mode === 'append') {
-                Utils.setNodeValue(target, output, value + data);
+                Utils.setNodeValue(target, output, value + content);
             } else {
-                insertData(target, data, params);
+                insertData(target, content, params);
             }
         };
-        const insertData = (target, data, params) => {
+        const insertData = (target, content, params) => {
             const modes = {
                 prepend: 'afterbegin', append: 'beforeend',
                 before: 'beforebegin', after: 'afterend', swap: 'afterend'
             };
             const key = 'insertAdjacent' + (params.escape ? 'Text' : 'HTML');
-            target[key](modes[params.mode], data);
-            if (params.mode === 'swap') {
-                target.remove();
-            }
+            target[key](modes[params.mode], content);
+            params.mode !== 'swap' || target.remove();
         };
         const handleDataInsertion = (target, resp, params) => {
             if (params.mode !== 'discard') {
-                const data = params.outf ? Utils.calludf(params.outf, resp) : resp.body || '';
+                const body = params.transformer ? Utils.calludf(params.transformer, [resp]) : resp.body || '';
                 const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
                 const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
+                const content = body instanceof Element ? body.outerHTML : body;
                 if (params.mode === 'replace') {
-                    return Utils.setNodeValue(target, output, data);
+                    return Utils.setNodeValue(target, output, content);
                 }
-                return isInput ? setInputData(target, output, data, params) : insertData(target, data, params);
+                return isInput ? setInputData(target, output, content, params) : insertData(target, content, params);
             }
         };
         return {
-            processResponse(shani, target, response, params) {
+            processResponse(shani, targets, response, params) {
                 Utils.trigger(shani, 'data', response);
-                target.forEach(node => handleDataInsertion(node, response, params));
+                targets.forEach(node => handleDataInsertion(node, response, params));
             }
         };
     })();
@@ -287,6 +288,9 @@
             if (timeout) {
                 shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
             }
+            if (!('url' in shani.http)) {
+                return sendWithoutUrl(shani, target, params);
+            }
             if (shani.http.scheme === 'sse') {
                 return HttpClient.sse(shani, target, params, onConnect);
             }
@@ -296,7 +300,7 @@
             if (em.tagName === 'FORM') {
                 em = em.querySelector('fieldset') || em;
             }
-            HttpClient.http(shani, shani.http.method || method, request => {
+            HttpClient.http(shani, params, shani.http.method || method, request => {
                 Utils.setNodeValue(em, 'disabled', true);
                 Utils.trigger(shani, 'httpstart', {request});
             }, () => {
@@ -305,22 +309,28 @@
                 Utils.trigger(shani, 'httpend');
             }, resp => onSuccessReq(shani, target, resp, params), err => {
                 const status = err.name === 'AbortError' ? 408 : 400;
-                if (shani.poll.limit !== null) {
+                if (!isNaN(shani.poll.limit)) {
                     shani.poll.limit++;
                 }
                 const resp = Utils.object({headers: new Headers(), status, body: ''});
                 onSuccessReq(shani, target, resp, params);
             });
         };
-        const onSuccessReq = (shani, target, resp, params) => {
+        const onSuccessReq = (shani, targets, resp, params) => {
             const text = Utils.code2text(resp.status);
             Utils.trigger(shani, '' + resp.status, resp);
             Utils.trigger(shani, text, resp);
-            HTML.processResponse(shani, target, resp, params);
+            HTML.processResponse(shani, targets, resp, params);
             if (text === 'redirect') {
                 const url = resp.headers.get('location');
                 url === '#' ? location.reload() : location = url;
             }
+        };
+        const sendWithoutUrl = (shani, target, params) => {
+            const resp = Utils.object({
+                status: 200, text: 'OK', body: null, headers: new Headers()
+            });
+            onSuccessReq(shani, target, resp, params);
         };
         const getCover = (target, pageSize, fontSize) => {
             const id = Utils.getId(), style = doc.createElement('style');
@@ -863,12 +873,13 @@
                 return Object.setPrototypeOf(o || {}, null);
             },
             setNodeValue(node, key, val) {
+                const v = val instanceof Element ? val.outerHTML : val;
                 if (key in node) {
-                    node[key] = val;
-                } else if (val === false) {
+                    node[key] = v;
+                } else if (v === false) {
                     node.removeAttribute(key);
                 } else {
-                    node.setAttribute(key, val === true ? key : val);
+                    node.setAttribute(key, v === true ? key : v);
                 }
             },
             calludf(name, args, thisArg) {
@@ -877,7 +888,7 @@
             },
             getNodeValue(node, key) {
                 if (typeof key === 'string') {
-                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, node);
+                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, [node]);
                     return key === val || cast(val);
                 }
                 return key;
@@ -987,8 +998,8 @@
         };
     })();
     const HttpClient = (() => {
-        const createHttpPayload = (shani, method) => {
-            const fd = Convertor.input2form(shani.emitter);
+        const createHttpPayload = (shani, params, method) => {
+            const fd = Convertor.input2form(shani.emitter, params.transformer);
             const payload = Utils.object({
                 url: shani.http.url, data: null, headers: shani.headers
             });
@@ -1003,21 +1014,21 @@
             }
             return payload;
         };
-        const createWSocketPayload = shani => {
+        const createWSocketPayload = (shani, params) => {
             const payload = Utils.object({url: shani.http.url, data: null, headers: shani.headers});
-            const formdata = Convertor.input2form(shani.emitter);
-            if (formdata) {
+            const fd = Convertor.input2form(shani.emitter, params.transformer);
+            if (fd) {
                 const type = Utils.getSubtype(shani.headers.get('content-type'));
                 payload.data = JSON.stringify({
                     headers: Convertor.map2json(shani.headers),
-                    body: Convertor.form2(formdata, type)
+                    body: Convertor.form2(fd, type)
                 });
             }
             return payload;
         };
         return {
-            http(shani, method, onStart, onEnd, onSuccess, onError) {
-                const payload = createHttpPayload(shani, method), req = Utils.object();
+            http(shani, params, method, onStart, onEnd, onSuccess, onError) {
+                const payload = createHttpPayload(shani, params, method), req = Utils.object();
                 const p = shani.cache;
                 if (p.age) {
                     req.cacheAge = Utils.time2ms(p.age);
@@ -1034,7 +1045,7 @@
                 onStart(req);
                 FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
             },
-            sse(shani, target, params, onConnect) {
+            sse(shani, targets, params, onConnect) {
                 const name = shani.http.conn || 'sse';
                 Utils.connection[name] = new EventSource(shani.http.url, {
                     withCredentials: shani.http.credentials === 'include'
@@ -1044,7 +1055,7 @@
                     const resp = Utils.object({
                         body: e.data || '', headers: new Headers({'content-type': 'text/html'})
                     });
-                    HTML.processResponse(shani, target, resp, params);
+                    HTML.processResponse(shani, targets, resp, params);
                 });
                 on('open', e => {
                     onConnect(shani);
@@ -1056,14 +1067,14 @@
                 });
                 on('close', e => Utils.trigger(shani, 'httpend'));
             },
-            wsocket(shani, target, params, onConnect) {
+            wsocket(shani, targets, params, onConnect) {
                 const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
                 const name = shani.http.conn || 'ws';
                 Utils.connection[name] = new WebSocket(host + shani.http.url);
                 const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
                 on('open', e => {
                     onConnect(shani);
-                    const payload = createWSocketPayload(shani);
+                    const payload = createWSocketPayload(shani, params);
                     Utils.trigger(shani, 'httpstart', {request: payload});
                     Utils.connection[name].send(payload.data || '');
                 });
@@ -1073,7 +1084,7 @@
                 });
                 on('message', e => {
                     const resp = Utils.object({body: e.data || '', headers: new Headers()});
-                    HTML.processResponse(shani, target, resp, params);
+                    HTML.processResponse(shani, targets, resp, params);
                 });
                 on('close', e => Utils.trigger(shani, 'httpend'));
             }
