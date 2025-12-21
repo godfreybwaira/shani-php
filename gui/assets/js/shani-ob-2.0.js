@@ -608,6 +608,14 @@
             loaderrmv(obj) {
                 Utils.trigger(this, 'ui-loader-rmv', obj);
             },
+            carousel(obj) {
+                Utils.trigger(this, 'ui-carousel', obj);
+            },
+            select(obj) {
+                Utils.trigger(this, 'ui-select', {
+                    emitter: this.emitter, params: Parser.params(this.emitter, obj.paramstr)
+                });
+            },
             /**
              * Cancel ongoing HTTP connection
              */
@@ -1178,55 +1186,40 @@
         };
     })();
     const UI = (() => {
-        const selectNode = (children, activeChild, cssClass) => {
-            for (const child of children) {
-                child.classList.remove(cssClass);
+        const selectNode = (currNode, nextNode, cssClass) => {
+            if (currNode !== nextNode) {
+                currNode.classList.remove(cssClass);
+                nextNode.classList.add(cssClass);
             }
-            activeChild.classList.add(cssClass);
         };
         const Carousel = (() => {
-            const rotateItems = (carousel, cb) => {
-                const children = carousel.querySelectorAll('.carousel-body>*');
-                const currentActive = carousel.querySelector('.carousel-body>.active');
-                const currentIdx = Array.from(children).indexOf(currentActive);
-                const nextIdx = cb(children.length, currentIdx);
-                selectNode(children, children[nextIdx], 'active');
-            };
-            const rotate = () => {
-                Utils.getCachedNodes('.carousel').forEach(node => {
-                    if (node.getAttribute('ui-attr') === 'auto') {
-                        rotateItems(node, (total, idx) => (idx + 1) % total);
+            const rotateItems = (node, params, cb) => {
+                const cls = params['active-class'];
+                const kids = node.parentElement.querySelector(params['children-wrapper']).children;
+                for (let i in kids) {
+                    if (kids[i].classList.contains(cls)) {
+                        const nextIdx = cb(kids.length, i);
+                        return selectNode(kids[i], kids[nextIdx], cls);
                     }
-                });
-                setTimeout(rotate, 5000);
+                }
             };
-            doc.addEventListener('click', e => {
-                const cls = e.target.classList;
-                if (cls && cls.contains('carousel-next')) {
-                    // Calculate next index: cycle to 0 if at end.
-                    rotateItems(e.target.parentElement, (total, idx) => (idx + 1) % total);
-                } else if (cls && cls.contains('carousel-prev')) {
-                    // Calculate previous index: add total length to avoid negative modulus.
-                    rotateItems(e.target.parentElement, (total, idx) => (idx - 1 + total) % total);
-                }
-            });
-            setTimeout(rotate, 5000);
-        })();
-        const Selection = (() => {
-            const getEmittingChild = (target, root) => {
-                while (target !== root && target.parentElement !== root) {
-                    target = target.parentElement;
-                }
-                return target;
+            const callbacks = {
+                next: (total, idx) => (idx + 1) % total,
+                prev: (total, idx) => (idx - 1 + total) % total
             };
-            doc.addEventListener('click', e => {
-                const parent = Utils.getParentNode(e.target, '.accordion,.menubar');
-                if (parent) {
-                    const child = getEmittingChild(e.target, parent);
-                    selectNode(parent.children, child, 'active');
-                }
+            Shani.on('ui-carousel', e => {
+                Utils.traverse(e.detail, (p, node) => rotateItems(node, p, callbacks[p.direction]));
             });
         })();
+        Shani.on('ui-select', e => {
+            const emitter = e.detail.emitter, p = e.detail.params, cls = p['active-class'];
+            const kids = emitter.parentElement.children;
+            for (let i in kids) {
+                if (kids[i].classList.contains(cls)) {
+                    return selectNode(kids[i], emitter, cls);
+                }
+            }
+        });
         const Modal = (() => {
             const COVER = 'modal-background';
             const getCloseBtn = classList => {

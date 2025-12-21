@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col">
         <ul class="accordion borders border-h radius-sm">
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -10,7 +10,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active">
+            <li class="active" shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -18,10 +18,10 @@
                     </div>
                 </div>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -33,7 +33,7 @@
     </div>
     <div class="col">
         <ul class="accordion borders radius-sm">
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active">
+            <li class="active" shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -49,10 +49,10 @@
                     </div>
                 </div>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -64,7 +64,7 @@
     </div>
     <div class="col">
         <ul class="accordion border-h">
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active">
+            <li class="active" shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -80,10 +80,10 @@
                     </div>
                 </div>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li>
+            <li shani-on="click->select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -96,8 +96,8 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="space-around">
-    <div class="carousel width-md-7 width-sm-max" ui-attr="auto">
-        <button class="carousel-prev"></button>
+    <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:5s->trigger click>>.carousel-next">
+        <button class="carousel-prev" shani-on="click->carousel direction:prev&children-wrapper:.carousel-body&active-class:active"></button>
         <div class="carousel-body">
             <div class="media">
                 <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt="">
@@ -123,7 +123,7 @@
                 </div>
             </div>
         </div>
-        <button class="carousel-next"></button>
+        <button class="carousel-next" shani-on="click->carousel direction:next&children-wrapper:.carousel-body&active-class:active"></button>
     </div>
 </div>
 <div class="divider">Vertical Cards</div>
@@ -266,15 +266,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -287,15 +287,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-b borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item">
+                <a href="#" class="active menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -311,15 +311,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-l borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -332,15 +332,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-r borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item">
+                <a href="#" class="active menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="#" class="menu-item" shani-on="click->select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>

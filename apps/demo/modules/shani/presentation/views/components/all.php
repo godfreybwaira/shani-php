@@ -175,19 +175,19 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item menu-item-dir-v">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                 <i class="mdi mdi-professional-hexagon"></i>
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                 <i class="mdi mdi-account-group"></i>
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                 <i class="mdi mdi-cog"></i>
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
                 <i class="mdi mdi-account"></i>
                 <span class="font-sm">Profile</span>
             </a>
@@ -198,19 +198,19 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <i class="mdi mdi-professional-hexagon"></i>
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="active menu-item">
+            <a href="#" class="active menu-item" shani-on="click->select active-class:active">
                 <i class="mdi mdi-account-group"></i>
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <i class="mdi mdi-cog"></i>
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <i class="mdi mdi-account"></i>
                 <span class="font-sm">Profile</span>
             </a>
@@ -221,16 +221,16 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="active menu-item">
+            <a href="#" class="active menu-item" shani-on="click->select active-class:active">
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item">
+            <a href="#" class="menu-item" shani-on="click->select active-class:active">
                 <span class="font-sm">Profile</span>
             </a>
         </div>
@@ -240,16 +240,16 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item" title="Professional">
+            <a href="#" class="menu-item" title="Professional" shani-on="click->select active-class:active">
                 <i class="mdi mdi-24px mdi-professional-hexagon"></i>
             </a>
-            <a href="#" class="active menu-item" title="All Users">
+            <a href="#" class="active menu-item" title="All Users" shani-on="click->select active-class:active">
                 <i class="mdi mdi-24px mdi-account-group"></i>
             </a>
-            <a href="#" class="menu-item" title="Settings">
+            <a href="#" class="menu-item" title="Settings" shani-on="click->select active-class:active">
                 <i class="mdi mdi-24px mdi-cog"></i>
             </a>
-            <a href="#" class="menu-item" title="Profile">
+            <a href="#" class="menu-item" title="Profile" shani-on="click->select active-class:active">
                 <i class="mdi mdi-24px mdi-account"></i>
             </a>
         </div>
