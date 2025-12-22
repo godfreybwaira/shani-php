@@ -175,19 +175,19 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-professional-hexagon"></i>
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-account-group"></i>
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-cog"></i>
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-account"></i>
                 <span class="font-sm">Profile</span>
             </a>
@@ -198,19 +198,19 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-professional-hexagon"></i>
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="active menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-account-group"></i>
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-cog"></i>
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-account"></i>
                 <span class="font-sm">Profile</span>
             </a>
@@ -221,16 +221,16 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <span class="font-sm">Professional</span>
             </a>
-            <a href="#" class="active menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
                 <span class="font-sm">All Users</span>
             </a>
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <span class="font-sm">Settings</span>
             </a>
-            <a href="#" class="menu-item" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                 <span class="font-sm">Profile</span>
             </a>
         </div>
@@ -240,16 +240,16 @@
 <div class="row row-stretch">
     <div class="col">
         <div class="menubar color-alert">
-            <a href="#" class="menu-item" title="Professional" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" title="Professional" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-24px mdi-professional-hexagon"></i>
             </a>
-            <a href="#" class="active menu-item" title="All Users" shani-on="click->select active-class:active">
+            <a href="#" class="active menu-item" title="All Users" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-24px mdi-account-group"></i>
             </a>
-            <a href="#" class="menu-item" title="Settings" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" title="Settings" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-24px mdi-cog"></i>
             </a>
-            <a href="#" class="menu-item" title="Profile" shani-on="click->select active-class:active">
+            <a href="#" class="menu-item" title="Profile" shani-on="click->ui.select active-class:active">
                 <i class="mdi mdi-24px mdi-account"></i>
             </a>
         </div>
@@ -258,12 +258,12 @@
 <div class="divider">Toaster</div>
 <ul>
     <li>
-        <a href="/shani/0/components/0/toaster?type=t" shani-on="click->pull mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=t" shani-on="click->http.pull mode:append>>body">
             Toaster from Top
         </a>
     </li>
     <li>
-        <a href="/shani/0/components/0/toaster?type=b" shani-on="click->pull mode:append>>body">
+        <a href="/shani/0/components/0/toaster?type=b" shani-on="click->http.pull mode:append>>body">
             Toaster from Bottom
         </a>
     </li>
@@ -275,7 +275,7 @@
 <div class="divider">Timeline</div>
 <div class="row">
     <div class="col">
-        <ul class="timeline" shani-on="demand steps:3s->pull mode:append>>.timeline" shani-http="url:@action" action="/shani/0/components/0/timeline">
+        <ul class="timeline" shani-on="demand steps:3s->http.pull mode:append>>.timeline" shani-http="url:@action" action="/shani/0/components/0/timeline">
             <li>
                 <h3>My Title</h3>
                 <div class="text-muted font-sm mb-md">2011-2012</div>

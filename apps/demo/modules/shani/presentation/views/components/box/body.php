@@ -1,18 +1,18 @@
 <div class="tab tab-pos-b">
     <div class="tab-menu menubar">
-        <a href="#" class="menu-item" shani-on="click->select active-class:active">
+        <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
             <i class="mdi mdi-professional-hexagon"></i>
             <span class="font-sm">Test</span>
         </a>
-        <a href="#" class="active menu-item" shani-on="click->select active-class:active">
+        <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
             <i class="mdi mdi-account-group"></i>
             <span class="font-sm">All Users</span>
         </a>
-        <a href="#" class="menu-item" shani-on="click->select active-class:active">
+        <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm">Settings</span>
         </a>
-        <a href="#" class="menu-item" shani-on="click->select active-class:active">
+        <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
             <i class="mdi mdi-account"></i>
             <span class="font-sm">Profile</span>
         </a>

@@ -2,7 +2,7 @@
 <div class="row">
     <div class="col">
         <ul class="accordion borders border-h radius-sm">
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -10,7 +10,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active" shani-on="click->select active-class:active">
+            <li class="active" shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -18,10 +18,10 @@
                     </div>
                 </div>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -33,7 +33,7 @@
     </div>
     <div class="col">
         <ul class="accordion borders radius-sm">
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active" shani-on="click->select active-class:active">
+            <li class="active" shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -49,10 +49,10 @@
                     </div>
                 </div>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -64,7 +64,7 @@
     </div>
     <div class="col">
         <ul class="accordion border-h">
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active" shani-on="click->select active-class:active">
+            <li class="active" shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -80,10 +80,10 @@
                     </div>
                 </div>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li shani-on="click->select active-class:active">
+            <li shani-on="click->ui.select active-class:active">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -96,7 +96,7 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="space-around">
-    <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:5s->trigger click>>.carousel-next">
+    <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:5s->util.trigger click>>.carousel-next">
         <button class="carousel-prev" shani-on="click->carousel direction:prev&children-wrapper:.carousel-body&active-class:active"></button>
         <div class="carousel-body">
             <div class="media">
@@ -266,15 +266,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -287,15 +287,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-b borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -311,15 +311,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-l borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -332,15 +332,15 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-r borders">
             <div class="tab-menu menubar">
-                <a href="#" class="active menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -359,11 +359,11 @@
                 <caption>Users</caption>
                 <thead class="color-12">
                     <tr>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-even">
@@ -415,17 +415,17 @@
     </div>
     <div class="col">
         <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
-               shani-on="keyup @data-delay->search>>#tc2 tbody">
+               shani-on="keyup @data-delay->ui.search>>#tc2 tbody">
         <div class="table-container" id="tc2">
-            <table class="table border-h" id="rtable" data-ptoggle="sort->proptoggle data-order:asc,desc">
+            <table class="table border-h" id="rtable" data-ptoggle="ui.sort->prop.toggle data-order:asc,desc">
                 <caption>Users</caption>
                 <thead>
                     <tr>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click->sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-odd">
@@ -543,17 +543,17 @@
 <div class="divider">Modals</div>
 <ul>
     <li><a href="/shani/0/components/0/modals?type=c"
-           shani-on="click->pull mode:append>>body">Type C</a></li>
+           shani-on="click->http.pull mode:append>>body">Type C</a></li>
     <li><a href="/shani/0/components/0/modals?type=cl"
-           shani-on="click->pull mode:append>>body">Type C With layout</a></li>
+           shani-on="click->http.pull mode:append>>body">Type C With layout</a></li>
     <li><a href="/shani/0/components/0/modals?type=vr"
-           shani-on="click->pull mode:append>>body">Type VR</a></li>
+           shani-on="click->http.pull mode:append>>body">Type VR</a></li>
     <li><a href="/shani/0/components/0/modals?type=vl"
-           shani-on="click->pull mode:append>>body">Type VL</a></li>
+           shani-on="click->http.pull mode:append>>body">Type VL</a></li>
     <li><a href="/shani/0/components/0/modals?type=ht"
-           shani-on="click->pull mode:append>>body">Type HT</a></li>
+           shani-on="click->http.pull mode:append>>body">Type HT</a></li>
     <li><a href="/shani/0/components/0/modals?type=hb"
-           shani-on="click->pull mode:append>>body">Type HB</a></li>
+           shani-on="click->http.pull mode:append>>body">Type HB</a></li>
 </ul>
 <div class="divider">Misc</div>
 <ul>

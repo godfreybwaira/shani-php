@@ -3,25 +3,33 @@
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
             window.Shani = Utils.object({
-                select: (selector, obj) => UDF.attr.set(selector, Utils.object(obj)),
-                define: (name, val, replace) => {
-                    const n = name.toLowerCase();
-                    if (!replace && UDF.map.has(n)) {
-                        console.warn(name + ' already exists.');
-                    } else {
-                        UDF.map.set(n, val);
-                    }
-                },
+                select: (selector, obj) => Selectors.set(selector, Utils.object(obj)),
+                define: Actions.set,
                 on: Shani.on
             });
             Object.freeze(window.Shani);
-            Object.freeze(UDF);
             doc.dispatchEvent(new Event('shani:init'));
         }
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const UDF = Object.setPrototypeOf({attr: new Map(), map: new Map()}, null);
+    const Actions = (() => {
+        const acts = new Map();
+        return {
+            set(name, value, replace) {
+                const n = name.toLowerCase();
+                if (!replace && acts.has(n)) {
+                    console.warn(name + ' already exists.');
+                } else {
+                    acts.set(n, value);
+                }
+            },
+            get(name) {
+                return acts.get(name);
+            }
+        };
+    })();
+    const Selectors = new Map();
     const Observers = (() => {
         const runScript = node => {
             if (Utils.nodeKeyExists(node, 'src')) {
@@ -389,7 +397,6 @@
                 !clone || clone(n);
             }
         };
-
         const str2number = str => {
             const date = Date.parse(str);
             if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
@@ -408,252 +415,213 @@
                 }
             });
         };
-        Obj.prototype = {
-            /**
-             * Read content from server.
-             */
-            pull(obj) {
-                if (this.history === true) {
-                    history.pushState(null, '', this.url);
-                }
-                sendReq(this, 'GET', obj);
-            },
-            /**
-             * Write content to server
-             */
-            push(obj) {
-                sendReq(this, 'POST', obj);
-            },
-            trigger(obj) {
-                walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
-            },
-            /**
-             * Remove node from DOM
-             */
-            close(obj) {
-                if (obj.selector) {
-                    const selector = Utils.resolveVariable(this.emitter, obj.selector);
-                    const parent = Utils.getParentNode(this.emitter, selector);
-                    if (parent) {
-                        return Utils.removeNode(parent);
+        /** ==============HTTP=============*/
+        Actions.set('http.pull', function (obj) {
+            if (this.history === true) {
+                history.pushState(null, '', this.url);
+            }
+            sendReq(this, 'GET', obj);
+        });
+        Actions.set('http.push', function (obj) {
+            sendReq(this, 'POST', obj);
+        });
+        Actions.set('http.abort', obj => {
+            Utils.traverse(obj, p => {
+                if (!p.name) {
+                    for (const key in Utils.connection) {
+                        Utils.closeConn(key);
                     }
-                    obj.targets.forEach(Utils.removeNode);
+                } else {
+                    Utils.closeConn(p.name);
                 }
-            },
-            print(obj) {
-                if (window.print instanceof Function) {
-                    Utils.traverse(obj, p => {
-                        const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
-                        doc.title = p.title || title;
-                        window.print();
-                        doc.title = title;
-                        cover.remove();
-                    });
+            });
+        });
+        /** ==============UI=============*/
+        Actions.set('ui.close', function (obj) {
+            if (obj.selector) {
+                const selector = Utils.resolveVariable(this.emitter, obj.selector);
+                const parent = Utils.getParentNode(this.emitter, selector);
+                if (parent) {
+                    return Utils.removeNode(parent);
                 }
-            },
-            /**
-             * Offline search
-             */
-            search(obj) {
-                const text = this.emitter.value.trim().toLowerCase();
-                obj.targets.forEach(node => {
-                    for (const row of node.children) {
-                        row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
-                    }
-                });
-            },
-            /**
-             * Full screen
-             */
-            fs(obj) {
-                if (doc.fullscreenEnabled) {
-                    const cover = getCover(obj.targets, '', 135);
-                    doc.documentElement.requestFullscreen().then(() => {
-                        doc.addEventListener('fullscreenchange', () => {
-                            doc.fullscreenElement || cover.remove();
-                        });
-                    }).catch(() => cover.remove());
-                }
-            },
-            nodermv(obj) {
                 obj.targets.forEach(Utils.removeNode);
-            },
-            nodecopyto(obj) {
-                Utils.traverse(obj, (p, node) => {
-                    moveNode(this.emitter, node, p, copy => {
-                        copy.querySelectorAll('[id]').forEach(el => {
-                            const id = Utils.getId();
-                            copy.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
-                            el.id = id;
-                        });
-                    });
-                });
-            },
-            nodemoveto(obj) {
-                Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
-            },
-            cssadd(obj) {
-                walk(obj, (node, key) => node.classList.add(key));
-            },
-            cssrmv(obj) {
-                walk(obj, (node, key) => node.classList.remove(key));
-            },
-            cssreplace(obj) {
-                walk(obj, (node, key, val) => node.classList.replace(key, val));
-            },
-            csstoggle(obj) {
-                walk(obj, (node, key) => node.classList.toggle(key));
-            },
-            cssexists(obj) {
-                for (const node of obj.targets) {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const key in p) {
-                        if (!node.classList.contains(key)) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            },
-            /**
-             * Remove properties from extisting node
-             */
-            proprmv(obj) {
-                walk(obj, (node, key) => Utils.removeNodeKey(node, key));
-            },
-            propexists(obj) {
-                for (const node of obj.targets) {
-                    const p = Parser.params(node, obj.paramstr);
-                    for (const k in p) {
-                        if (!Utils.nodeKeyExists(node, k)) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            },
-            proptoggle(obj) {
-                //data-prop:val1,val2
-                walk(obj, (node, key, val) => {
-                    const oldval = Utils.getNodeValue(node, key);
-                    const arr = Parser.toArray(val, SEP_LIST);
-                    for (const v of arr) {
-                        if (v !== oldval) {
-                            return Utils.setNodeValue(node, key, v);
-                        }
-                    }
-                });
-            },
-            propbind(obj) {
-                walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
-            },
-            numbercalc(obj) {
-                Utils.traverse(obj, (p, node) => {
-                    const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
-                    const result = compute(lval, rval, p.operator) || 0;
-                    Utils.setNodeValue(node, p.output, result);
-                });
-            },
-            numberaccumulate(obj) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                let result = parseNumber(p.initial) || 0;
-                Utils.traverse(obj, param => {
-                    const value = parseNumber(param.input, true);
-                    result = compute(result, value, param.operator);
-                });
-                Utils.setNodeValue(this.emitter, p.output, result);
-            },
-            numberformat(obj) {
-                Utils.traverse(obj, (p, node) => {
-                    const result = parseNumber(p.input).toLocaleString(undefined, {
-                        maximumFractionDigits: p.maxdecimals || 2,
-                        minimumFractionDigits: p.mindecimals || 0
-                    });
-                    Utils.setNodeValue(node, p.output, result);
-                });
-            },
-            affix(obj) {
-                Utils.traverse(obj, (p, node) => {
-                    const prefix = p.prefix || '', suffix = p.suffix || '';
-                    Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
-                });
-            },
-            transform(obj) {
-                Utils.traverse(obj, (p, node) => {
-                    const result = Utils.calludf(p.transformer, [p, node]);
-                    if (result !== undefined) {
-                        Utils.setNodeValue(node, p.output, result);
-                    }
-                });
-            },
-            saveas(obj) {
+            }
+        });
+        Actions.set('ui.print', obj => {
+            if (window.print instanceof Function) {
                 Utils.traverse(obj, p => {
-                    const a = doc.createElement('a');
-                    const type = p.type || obj.data.headers.get('content-type');
-                    a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
-                    a.download = p.name;
-                    a.click();
-                    URL.revokeObjectURL(a.href);
+                    const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
+                    doc.title = p.title || title;
+                    window.print();
+                    doc.title = title;
+                    cover.remove();
                 });
-            },
-            /**
-             * Create HTML modal element
-             */
-            modalcreate(obj) {
-                Utils.trigger(this, 'ui-modal', obj);
-            },
-            loadercreate(obj) {
-                Utils.trigger(this, 'ui-loader', obj);
-            },
-            loaderrmv(obj) {
-                Utils.trigger(this, 'ui-loader-rmv', obj);
-            },
-            carousel(obj) {
-                Utils.trigger(this, 'ui-carousel', obj);
-            },
-            select(obj) {
-                Utils.trigger(this, 'ui-select', {
-                    emitter: this.emitter, params: Parser.params(this.emitter, obj.paramstr)
+            }
+        });
+        Actions.set('ui.search', function (obj) {
+            const text = this.emitter.value.trim().toLowerCase();
+            obj.targets.forEach(node => {
+                for (const row of node.children) {
+                    row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
+                }
+            });
+        });
+        Actions.set('ui.fs', obj => {
+            if (doc.fullscreenEnabled) {
+                const cover = getCover(obj.targets, '', 135);
+                doc.documentElement.requestFullscreen().then(() => {
+                    doc.addEventListener('fullscreenchange', () => {
+                        doc.fullscreenElement || cover.remove();
+                    });
+                }).catch(() => cover.remove());
+            }
+        });
+        Actions.set('ui.sort', function (obj) {
+            const rows = [];
+            Utils.traverse(obj, (p, node) => {
+                rows.push({
+                    node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
                 });
-            },
-            /**
-             * Cancel ongoing HTTP connection
-             */
-            abortconn(obj) {
-                Utils.traverse(obj, p => {
-                    if (!p.name) {
-                        for (const key in Utils.connection) {
-                            Utils.closeConn(key);
-                        }
-                    } else {
-                        Utils.closeConn(p.name);
-                    }
-                });
-            },
-            sort(obj) {
-                const rows = [];
-                Utils.traverse(obj, (p, node) => {
-                    rows.push({
-                        node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
+            });
+            const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
+            rows.sort((r1, r2) => {
+                const v1 = str2number(r1.value), v2 = str2number(r2.value);
+                if (typeof v1 === 'number' && typeof v2 === 'number') {
+                    return asc ? v1 - v2 : v2 - v1;
+                }
+                return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
+            });
+            const tbody = rows[0].node.parentElement;
+            rows.forEach(row => tbody.appendChild(row.node));
+        });
+        Actions.set('ui.copy', obj => {
+            if (navigator.clipboard) {
+                Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
+            }
+        });
+        /**============NODE===============*/
+        Actions.set('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
+        Actions.set('node.copy', function (obj) {
+            Utils.traverse(obj, (p, node) => {
+                moveNode(this.emitter, node, p, copy => {
+                    copy.querySelectorAll('[id]').forEach(el => {
+                        const id = Utils.getId();
+                        copy.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
+                        el.id = id;
                     });
                 });
-                const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
-                rows.sort((r1, r2) => {
-                    const v1 = str2number(r1.value), v2 = str2number(r2.value);
-                    if (typeof v1 === 'number' && typeof v2 === 'number') {
-                        return asc ? v1 - v2 : v2 - v1;
+            });
+        });
+        Actions.set('node.move', function (obj) {
+            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
+        });
+        /** =============CSS==============*/
+        Actions.set('css.add', obj => {
+            walk(obj, (node, key) => node.classList.add(key));
+        });
+        Actions.set('css.rmv', obj => {
+            walk(obj, (node, key) => node.classList.remove(key));
+        });
+        Actions.set('css.replace', obj => {
+            walk(obj, (node, key, val) => node.classList.replace(key, val));
+        });
+        Actions.set('css.toggle', obj => {
+            walk(obj, (node, key) => node.classList.toggle(key));
+        });
+        Actions.set('css.exists', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                for (const key in p) {
+                    if (!node.classList.contains(key)) {
+                        return false;
                     }
-                    return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
-                });
-                const tbody = rows[0].node.parentElement;
-                rows.forEach(row => tbody.appendChild(row.node));
-            },
-            copy(obj) {
-                if (navigator.clipboard) {
-                    Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
                 }
             }
-        };
+            return true;
+        });
+        /** ============PROPS===============*/
+        Actions.set('prop.rmv', obj => {
+            walk(obj, (node, key) => Utils.removeNodeKey(node, key));
+        });
+        Actions.set('prop.exists', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                for (const k in p) {
+                    if (!Utils.nodeKeyExists(node, k)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+        Actions.set('prop.toggle', obj => {
+            walk(obj, (node, key, val) => {
+                const oldval = Utils.getNodeValue(node, key);
+                const arr = Parser.toArray(val, SEP_LIST);
+                for (const v of arr) {
+                    if (v !== oldval) {
+                        return Utils.setNodeValue(node, key, v);
+                    }
+                }
+            });
+        });
+        Actions.set('prop.bind', obj => {
+            walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
+        });
+        /** =============Number==============*/
+        Actions.set('number.calc', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
+                const result = compute(lval, rval, p.operator) || 0;
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+        Actions.set('number.accumulate', function (obj) {
+            const p = Parser.params(this.emitter, obj.paramstr);
+            let result = parseNumber(p.initial) || 0;
+            Utils.traverse(obj, param => {
+                const value = parseNumber(param.input, true);
+                result = compute(result, value, param.operator);
+            });
+            Utils.setNodeValue(this.emitter, p.output, result);
+        });
+        Actions.set('number.format', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const result = parseNumber(p.input).toLocaleString(undefined, {
+                    maximumFractionDigits: p.maxdecimals || 2,
+                    minimumFractionDigits: p.mindecimals || 0
+                });
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+        /** ==============UTILITY=============*/
+        Actions.set('util.affix', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const prefix = p.prefix || '', suffix = p.suffix || '';
+                Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
+            });
+        });
+        Actions.set('util.transform', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const result = Utils.calludf(p.transformer, [p, node]);
+                if (result !== undefined) {
+                    Utils.setNodeValue(node, p.output, result);
+                }
+            });
+        });
+        Actions.set('util.trigger', obj => {
+            walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
+        });
+        Actions.set('util.saveas', obj => {
+            Utils.traverse(obj, p => {
+                const a = doc.createElement('a');
+                const type = p.type || obj.data.headers.get('content-type');
+                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+                a.download = p.name;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+        });
         return {
             create(node, event) {
                 if (!Utils.getNodeValue(node, 'disabled')) {
@@ -698,7 +666,7 @@
             }
         };
         const setUserAttributes = root => {
-            for (let sel of UDF.attr) {
+            for (let sel of Selectors) {
                 if (root.matches(sel[0])) {
                     addAttributes(root, sel[1]);
                 }
@@ -770,7 +738,7 @@
         };
         const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.event.type);
         const callNext = (shani, action, data) => {
-            const cb = action ? UDF.map.get(action.fn) || shani[action.fn] : null;
+            const cb = action ? Actions.get(action.fn) : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
                 const p = Utils.object({
@@ -891,7 +859,7 @@
                 }
             },
             calludf(name, args, thisArg) {
-                const v = UDF.map.get(name);
+                const v = Actions.get(name);
                 return v instanceof Function ? v.apply(thisArg, args) : v;
             },
             getNodeValue(node, key) {
@@ -1186,12 +1154,6 @@
         };
     })();
     const UI = (() => {
-        const selectNode = (currNode, nextNode, cssClass) => {
-            if (currNode !== nextNode) {
-                currNode.classList.remove(cssClass);
-                nextNode.classList.add(cssClass);
-            }
-        };
         const Carousel = (() => {
             const rotateItems = (node, params, cb) => {
                 const cls = params['active-class'];
@@ -1203,23 +1165,29 @@
                     }
                 }
             };
+            const selectNode = (currNode, nextNode, cssClass) => {
+                if (currNode !== nextNode) {
+                    currNode.classList.remove(cssClass);
+                    nextNode.classList.add(cssClass);
+                }
+            };
             const callbacks = {
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Shani.on('ui-carousel', e => {
-                Utils.traverse(e.detail, (p, node) => rotateItems(node, p, callbacks[p.direction]));
+            Actions.set('ui.carousel', obj => {
+                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction]));
+            });
+            Actions.set('ui.select', function (obj) {
+                const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
+                const kids = this.emitter.parentElement.children;
+                for (let i in kids) {
+                    if (kids[i].classList.contains(cls)) {
+                        return selectNode(kids[i], this.emitter, cls);
+                    }
+                }
             });
         })();
-        Shani.on('ui-select', e => {
-            const emitter = e.detail.emitter, p = e.detail.params, cls = p['active-class'];
-            const kids = emitter.parentElement.children;
-            for (let i in kids) {
-                if (kids[i].classList.contains(cls)) {
-                    return selectNode(kids[i], emitter, cls);
-                }
-            }
-        });
         const Modal = (() => {
             const COVER = 'modal-background';
             const getCloseBtn = classList => {
@@ -1227,7 +1195,7 @@
                     const btn = doc.createElement('button');
                     btn.className = 'button button-times ' + classList;
                     Utils.setNodeValue(btn, 'type', 'button');
-                    Utils.setNodeValue(btn, 'shani-on', 'click' + SEP_EVT_ACTION + 'close' + SEP_EVT_SELECTOR + '.' + COVER);
+                    Utils.setNodeValue(btn, 'shani-on', 'click' + SEP_EVT_ACTION + 'ui.close' + SEP_EVT_SELECTOR + '.' + COVER);
                     btn.innerHTML = '&times;';
                     return btn;
                 }
@@ -1250,7 +1218,7 @@
                     doc.body.appendChild(mdbg);
                 });
             };
-            Shani.on('ui-modal', e => createModal(e.detail));
+            Actions.set('ui.modal', obj => createModal(obj));
         })();
         const Loader = (() => {
             const createLoader = obj => {
@@ -1268,8 +1236,8 @@
                     node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
                 });
             };
-            Shani.on('ui-loader', e => createLoader(e.detail));
-            Shani.on('ui-loader-rmv', e => rmvLoader(e.detail));
+            Actions.set('ui.loader', obj => createLoader(obj));
+            Actions.set('ui.loader.rmv', obj => rmvLoader(obj));
         })();
     })();
 })(document);
