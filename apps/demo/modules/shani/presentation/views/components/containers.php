@@ -97,7 +97,7 @@
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="space-around">
     <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:5s->util.trigger click>>.carousel-next">
-        <button class="carousel-prev" shani-on="click->carousel direction:prev&children-wrapper:.carousel-body&active-class:active"></button>
+        <button class="carousel-prev" shani-on="click->ui.carousel direction:prev&children-wrapper:.carousel-body&active-class:active"></button>
         <div class="carousel-body">
             <div class="media">
                 <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt="">
@@ -123,7 +123,7 @@
                 </div>
             </div>
         </div>
-        <button class="carousel-next" shani-on="click->carousel direction:next&children-wrapper:.carousel-body&active-class:active"></button>
+        <button class="carousel-next" shani-on="click->ui.carousel direction:next&children-wrapper:.carousel-body&active-class:active"></button>
     </div>
 </div>
 <div class="divider">Vertical Cards</div>
