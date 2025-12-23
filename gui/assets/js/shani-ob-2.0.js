@@ -282,346 +282,6 @@
             }
             return map;
         };
-        const onConnect = shani => clearTimeout(shani.timeoutId);
-
-        /**
-         * Send HTTP request
-         */
-        const sendReq = (shani, method, obj) => {
-            shani.sync = false;
-            let em = shani.emitter;
-            const target = obj.targets, params = Parser.params(em, obj.paramstr);
-            params.mode ||= 'replace';
-            const timeout = shani.http.timeout;
-            if (timeout) {
-                shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
-            }
-            if (!('url' in shani.http)) {
-                return sendWithoutUrl(shani, target, params);
-            }
-            if (shani.http.scheme === 'sse') {
-                return HttpClient.sse(shani, target, params, onConnect);
-            }
-            if ('scheme' in shani.http) {
-                return HttpClient.wsocket(shani, target, params, onConnect);
-            }
-            if (em.tagName === 'FORM') {
-                em = em.querySelector('fieldset') || em;
-            }
-            HttpClient.http(shani, params, shani.http.method || method, request => {
-                Utils.setNodeValue(em, 'disabled', true);
-                Utils.trigger(shani, 'httpstart', {request});
-            }, () => {
-                onConnect(shani);
-                Utils.setNodeValue(em, 'disabled', false);
-                Utils.trigger(shani, 'httpend');
-            }, resp => onSuccessReq(shani, target, resp, params), err => {
-                const status = err.name === 'AbortError' ? 408 : 400;
-                if (!isNaN(shani.poll.limit)) {
-                    shani.poll.limit++;
-                }
-                const resp = Utils.object({headers: new Headers(), status, body: ''});
-                onSuccessReq(shani, target, resp, params);
-            });
-        };
-        const onSuccessReq = (shani, targets, resp, params) => {
-            const text = Utils.code2text(resp.status);
-            Utils.trigger(shani, '' + resp.status, resp);
-            Utils.trigger(shani, text, resp);
-            HTML.processResponse(shani, targets, resp, params);
-            if (text === 'redirect') {
-                const url = resp.headers.get('location');
-                url === '#' ? location.reload() : location = url;
-            }
-        };
-        const sendWithoutUrl = (shani, target, params) => {
-            const resp = Utils.object({
-                status: 200, text: 'OK', body: null, headers: new Headers()
-            });
-            onSuccessReq(shani, target, resp, params);
-        };
-        const getCover = (target, pageSize, fontSize) => {
-            const id = Utils.getId(), style = doc.createElement('style');
-            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;';
-            s += 'font-size:' + (fontSize || 100) + '%}body>:not(#' + id + '){display:none}';
-            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
-            s += '@page{margin:0;page-break-after:always;break-after:page}';
-            style.type = 'text/css';
-            style.textContent = s;
-            const cover = doc.createElement('div');
-            cover.appendChild(style);
-            cover.id = id;
-            for (const t of target) {
-                cover.appendChild(t.cloneNode(true));
-            }
-            doc.body.insertBefore(cover, doc.body.firstChild);
-            return cover;
-        };
-        const compute = (lval, nv, sign) => {
-            const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
-            switch (sign) {
-                case '+':
-                    return lval + rval;
-                case '-':
-                    return lval - rval;
-                case '*':
-                    return lval * rval;
-                case '/':
-                    return lval / rval;
-                case '%':
-                    return lval % rval;
-                case '^':
-                    return Math.pow(lval, rval);
-                default:
-                    throw new Error('valid math operators are: +-*/%^');
-            }
-        };
-        const parseNumber = (val, allowPercent) => {
-            val ||=  '0';
-            const num = val.replace(/[^\d%.-]/g, '');
-            if (/^-?\d+(\.\d+)?%?$/.test(num)) {
-                return allowPercent ? num : parseFloat(num);
-            }
-            throw new Error('Invalid number "' + val + '"');
-        };
-        /**
-         * Move this element to a specified position, to another destination.
-         * If a position is not given then the element is placed to the end.
-         */
-        const moveNode = (srcNode, target, params, clone) => {
-            const index = parseInt(params.pos), len = target.children.length + 1;
-            const offset = index > 0 ? index - 1 : index + len;
-            if (Math.abs(index) <= len && index !== 0) {
-                const n = clone ? srcNode.cloneNode(true) : srcNode;
-                target.insertBefore(n, target.children[offset]);
-                !clone || clone(n);
-            }
-        };
-        const str2number = str => {
-            const date = Date.parse(str);
-            if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
-                return date;
-            }
-            const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);
-            if (!isNaN(num) && value !== '') {
-                return num;
-            }
-            return str.toLowerCase();
-        };
-        const walk = (obj, cb) => {
-            Utils.traverse(obj, (params, node) => {
-                for (const key in params) {
-                    cb(node, key, params[key]);
-                }
-            });
-        };
-        /** ==============HTTP=============*/
-        Actions.set('http.pull', function (obj) {
-            if (this.history === true) {
-                history.pushState(null, '', this.url);
-            }
-            sendReq(this, 'GET', obj);
-        });
-        Actions.set('http.push', function (obj) {
-            sendReq(this, 'POST', obj);
-        });
-        Actions.set('http.abort', obj => {
-            Utils.traverse(obj, p => {
-                if (!p.name) {
-                    for (const key in Utils.connection) {
-                        Utils.closeConn(key);
-                    }
-                } else {
-                    Utils.closeConn(p.name);
-                }
-            });
-        });
-        /** ==============UI=============*/
-        Actions.set('ui.close', function (obj) {
-            if (obj.selector) {
-                const selector = Utils.resolveVariable(this.emitter, obj.selector);
-                const parent = Utils.getParentNode(this.emitter, selector);
-                if (parent) {
-                    return Utils.removeNode(parent);
-                }
-                obj.targets.forEach(Utils.removeNode);
-            }
-        });
-        Actions.set('ui.print', obj => {
-            if (window.print instanceof Function) {
-                Utils.traverse(obj, p => {
-                    const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
-                    doc.title = p.title || title;
-                    window.print();
-                    doc.title = title;
-                    cover.remove();
-                });
-            }
-        });
-        Actions.set('ui.search', function (obj) {
-            const text = this.emitter.value.trim().toLowerCase();
-            obj.targets.forEach(node => {
-                for (const row of node.children) {
-                    row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
-                }
-            });
-        });
-        Actions.set('ui.fs', obj => {
-            if (doc.fullscreenEnabled) {
-                const cover = getCover(obj.targets, '', 135);
-                doc.documentElement.requestFullscreen().then(() => {
-                    doc.addEventListener('fullscreenchange', () => {
-                        doc.fullscreenElement || cover.remove();
-                    });
-                }).catch(() => cover.remove());
-            }
-        });
-        Actions.set('ui.sort', function (obj) {
-            const rows = [];
-            Utils.traverse(obj, (p, node) => {
-                rows.push({
-                    node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
-                });
-            });
-            const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
-            rows.sort((r1, r2) => {
-                const v1 = str2number(r1.value), v2 = str2number(r2.value);
-                if (typeof v1 === 'number' && typeof v2 === 'number') {
-                    return asc ? v1 - v2 : v2 - v1;
-                }
-                return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
-            });
-            const tbody = rows[0].node.parentElement;
-            rows.forEach(row => tbody.appendChild(row.node));
-        });
-        Actions.set('ui.copy', obj => {
-            if (navigator.clipboard) {
-                Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
-            }
-        });
-        /**============NODE===============*/
-        Actions.set('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
-        Actions.set('node.copy', function (obj) {
-            Utils.traverse(obj, (p, node) => {
-                moveNode(this.emitter, node, p, copy => {
-                    copy.querySelectorAll('[id]').forEach(el => {
-                        const id = Utils.getId();
-                        copy.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
-                        el.id = id;
-                    });
-                });
-            });
-        });
-        Actions.set('node.move', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
-        });
-        /** =============CSS==============*/
-        Actions.set('css.add', obj => {
-            walk(obj, (node, key) => node.classList.add(key));
-        });
-        Actions.set('css.rmv', obj => {
-            walk(obj, (node, key) => node.classList.remove(key));
-        });
-        Actions.set('css.replace', obj => {
-            walk(obj, (node, key, val) => node.classList.replace(key, val));
-        });
-        Actions.set('css.toggle', obj => {
-            walk(obj, (node, key) => node.classList.toggle(key));
-        });
-        Actions.set('css.exists', obj => {
-            for (const node of obj.targets) {
-                const p = Parser.params(node, obj.paramstr);
-                for (const key in p) {
-                    if (!node.classList.contains(key)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        });
-        /** ============PROPS===============*/
-        Actions.set('prop.rmv', obj => {
-            walk(obj, (node, key) => Utils.removeNodeKey(node, key));
-        });
-        Actions.set('prop.exists', obj => {
-            for (const node of obj.targets) {
-                const p = Parser.params(node, obj.paramstr);
-                for (const k in p) {
-                    if (!Utils.nodeKeyExists(node, k)) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        });
-        Actions.set('prop.toggle', obj => {
-            walk(obj, (node, key, val) => {
-                const oldval = Utils.getNodeValue(node, key);
-                const arr = Parser.toArray(val, SEP_LIST);
-                for (const v of arr) {
-                    if (v !== oldval) {
-                        return Utils.setNodeValue(node, key, v);
-                    }
-                }
-            });
-        });
-        Actions.set('prop.bind', obj => {
-            walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
-        });
-        /** =============Number==============*/
-        Actions.set('number.calc', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
-                const result = compute(lval, rval, p.operator) || 0;
-                Utils.setNodeValue(node, p.output, result);
-            });
-        });
-        Actions.set('number.accumulate', function (obj) {
-            const p = Parser.params(this.emitter, obj.paramstr);
-            let result = parseNumber(p.initial) || 0;
-            Utils.traverse(obj, param => {
-                const value = parseNumber(param.input, true);
-                result = compute(result, value, param.operator);
-            });
-            Utils.setNodeValue(this.emitter, p.output, result);
-        });
-        Actions.set('number.format', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const result = parseNumber(p.input).toLocaleString(undefined, {
-                    maximumFractionDigits: p.maxdecimals || 2,
-                    minimumFractionDigits: p.mindecimals || 0
-                });
-                Utils.setNodeValue(node, p.output, result);
-            });
-        });
-        /** ==============UTILITY=============*/
-        Actions.set('util.affix', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const prefix = p.prefix || '', suffix = p.suffix || '';
-                Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
-            });
-        });
-        Actions.set('util.transform', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const result = Utils.calludf(p.transformer, [p, node]);
-                if (result !== undefined) {
-                    Utils.setNodeValue(node, p.output, result);
-                }
-            });
-        });
-        Actions.set('util.trigger', obj => {
-            walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
-        });
-        Actions.set('util.saveas', obj => {
-            Utils.traverse(obj, p => {
-                const a = doc.createElement('a');
-                const type = p.type || obj.data.headers.get('content-type');
-                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
-                a.download = p.name;
-                a.click();
-                URL.revokeObjectURL(a.href);
-            });
-        });
         return {
             create(node, event) {
                 if (!Utils.getNodeValue(node, 'disabled')) {
@@ -758,6 +418,13 @@
                     cb(p, node);
                 });
             },
+            walk(obj, cb) {
+                Utils.traverse(obj, (params, node) => {
+                    for (const key in params) {
+                        cb(node, key, params[key]);
+                    }
+                });
+            },
             removeNode(node) {
                 node.style.opacity = 0;
                 node.addEventListener('transitionend', () => node.remove());
@@ -778,16 +445,6 @@
                 return code < 200 ? 'info' : 'offline';
             },
             connection: Object.setPrototypeOf({}, null),
-            closeConn(name) {
-                const cn = Utils.connection[name];
-                if (cn) {
-                    if (cn instanceof AbortController) {
-                        cn.abort();
-                    } else {
-                        cn.close();
-                    }
-                }
-            },
             getSubtype(header) {
                 if (header) {
                     const subtype = header.slice(header.indexOf('/') + 1).split(';')[0];
@@ -1002,69 +659,149 @@
             }
             return payload;
         };
-        return {
-            http(shani, params, method, onStart, onEnd, onSuccess, onError) {
-                const payload = createHttpPayload(shani, params, method), req = Utils.object();
-                const p = shani.cache;
-                if (p.age) {
-                    req.cacheAge = Utils.time2ms(p.age);
-                    req.cacheName = p.name || 'pubcache';
+        const onConnect = shani => clearTimeout(shani.timeoutId);
+
+        /**
+         * Send HTTP request
+         */
+        const sendReq = (shani, method, obj) => {
+            shani.sync = false;
+            let em = shani.emitter;
+            const target = obj.targets, params = Parser.params(em, obj.paramstr);
+            params.mode ||= 'replace';
+            const timeout = shani.http.timeout;
+            if (timeout) {
+                shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
+            }
+            if (!('url' in shani.http)) {
+                return sendWithoutUrl(shani, target, params);
+            }
+            if (shani.http.scheme === 'sse') {
+                return sse(shani, target, params);
+            }
+            if ('scheme' in shani.http) {
+                return wsocket(shani, target, params);
+            }
+            if (em.tagName === 'FORM') {
+                em = em.querySelector('fieldset') || em;
+            }
+            http(shani, params, shani.http.method || method, request => {
+                Utils.setNodeValue(em, 'disabled', true);
+                Utils.trigger(shani, 'httpstart', {request});
+            }, () => {
+                onConnect(shani);
+                Utils.setNodeValue(em, 'disabled', false);
+                Utils.trigger(shani, 'httpend');
+            }, resp => onSuccessReq(shani, target, resp, params), err => {
+                const status = err.name === 'AbortError' ? 408 : 400;
+                if (!isNaN(shani.poll.limit)) {
+                    shani.poll.limit++;
                 }
-                req.conn = shani.http.conn || 'http';
-                req.options = Utils.object({
-                    headers: payload.headers,
-                    body: payload.data,
-                    method: method,
-                    credentials: shani.http.credentials,
-                    mode: shani.http.mode
-                });
-                onStart(req);
-                FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
-            },
-            sse(shani, targets, params, onConnect) {
-                const name = shani.http.conn || 'sse';
-                Utils.connection[name] = new EventSource(shani.http.url, {
-                    withCredentials: shani.http.credentials === 'include'
-                });
-                const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
-                on('message', e => {
-                    const resp = Utils.object({
-                        body: e.data || '', headers: new Headers({'content-type': 'text/html'})
-                    });
-                    HTML.processResponse(shani, targets, resp, params);
-                });
-                on('open', e => {
-                    onConnect(shani);
-                    Utils.trigger(shani, 'httpstart');
-                });
-                on('error', e => {
-                    onConnect(shani);
-                    Utils.trigger(shani, 'error');
-                });
-                on('close', e => Utils.trigger(shani, 'httpend'));
-            },
-            wsocket(shani, targets, params, onConnect) {
-                const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
-                const name = shani.http.conn || 'ws';
-                Utils.connection[name] = new WebSocket(host + shani.http.url);
-                const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
-                on('open', e => {
-                    onConnect(shani);
-                    const payload = createWSocketPayload(shani, params);
-                    Utils.trigger(shani, 'httpstart', {request: payload});
-                    Utils.connection[name].send(payload.data || '');
-                });
-                on('error', e => {
-                    onConnect(shani);
-                    Utils.trigger(shani, 'error');
-                });
-                on('message', e => {
-                    const resp = Utils.object({body: e.data || '', headers: new Headers()});
-                    HTML.processResponse(shani, targets, resp, params);
-                });
-                on('close', e => Utils.trigger(shani, 'httpend'));
+                const resp = Utils.object({headers: new Headers(), status, body: ''});
+                onSuccessReq(shani, target, resp, params);
+            });
+        };
+        const onSuccessReq = (shani, targets, resp, params) => {
+            const text = Utils.code2text(resp.status);
+            Utils.trigger(shani, '' + resp.status, resp);
+            Utils.trigger(shani, text, resp);
+            HTML.processResponse(shani, targets, resp, params);
+            if (text === 'redirect') {
+                const url = resp.headers.get('location');
+                url === '#' ? location.reload() : location = url;
             }
         };
+        const sendWithoutUrl = (shani, target, params) => {
+            const resp = Utils.object({
+                status: 200, text: 'OK', body: null, headers: new Headers()
+            });
+            onSuccessReq(shani, target, resp, params);
+        };
+        const closeConn = name => {
+            const cn = Utils.connection[name];
+            !cn || cn instanceof AbortController ? cn.abort() : cn.close();
+        };
+        const http = (shani, params, method, onStart, onEnd, onSuccess, onError) => {
+            const payload = createHttpPayload(shani, params, method), req = Utils.object();
+            const p = shani.cache;
+            if (p.age) {
+                req.cacheAge = Utils.time2ms(p.age);
+                req.cacheName = p.name || 'pubcache';
+            }
+            req.conn = shani.http.conn || 'http';
+            req.options = Utils.object({
+                headers: payload.headers,
+                body: payload.data,
+                method: method,
+                credentials: shani.http.credentials,
+                mode: shani.http.mode
+            });
+            onStart(req);
+            FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
+        };
+        const sse = (shani, targets, params) => {
+            const name = shani.http.conn || 'sse';
+            Utils.connection[name] = new EventSource(shani.http.url, {
+                withCredentials: shani.http.credentials === 'include'
+            });
+            const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
+            on('message', e => {
+                const resp = Utils.object({
+                    body: e.data || '', headers: new Headers({'content-type': 'text/html'})
+                });
+                HTML.processResponse(shani, targets, resp, params);
+            });
+            on('open', e => {
+                onConnect(shani);
+                Utils.trigger(shani, 'httpstart');
+            });
+            on('error', e => {
+                onConnect(shani);
+                Utils.trigger(shani, 'error');
+            });
+            on('close', e => Utils.trigger(shani, 'httpend'));
+        };
+        const wsocket = (shani, targets, params) => {
+            const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
+            const name = shani.http.conn || 'ws';
+            Utils.connection[name] = new WebSocket(host + shani.http.url);
+            const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
+            on('open', e => {
+                onConnect(shani);
+                const payload = createWSocketPayload(shani, params);
+                Utils.trigger(shani, 'httpstart', {request: payload});
+                Utils.connection[name].send(payload.data || '');
+            });
+            on('error', e => {
+                onConnect(shani);
+                Utils.trigger(shani, 'error');
+            });
+            on('message', e => {
+                const resp = Utils.object({body: e.data || '', headers: new Headers()});
+                HTML.processResponse(shani, targets, resp, params);
+            });
+            on('close', e => Utils.trigger(shani, 'httpend'));
+        };
+        /** ==============HTTP=============*/
+        Actions.set('http.pull', function (obj) {
+            if (this.history === true) {
+                history.pushState(null, '', this.url);
+            }
+            sendReq(this, 'GET', obj);
+        });
+        Actions.set('http.push', function (obj) {
+            sendReq(this, 'POST', obj);
+        });
+        Actions.set('http.abort', obj => {
+            Utils.traverse(obj, p => {
+                if (p.name) {
+                    return closeConn(p.name);
+                }
+                for (const key in Utils.connection) {
+                    closeConn(key);
+                }
+            });
+        });
     })();
     const FetchClient = (() => {
         const cacheResponse = (cache, req, res, url) => {
@@ -1153,7 +890,171 @@
             }
         };
     })();
-    const UI = (() => {
+    const _CSS = (() => {
+        Actions.set('css.add', obj => {
+            Utils.walk(obj, (node, key) => node.classList.add(key));
+        });
+        Actions.set('css.rmv', obj => {
+            Utils.walk(obj, (node, key) => node.classList.remove(key));
+        });
+        Actions.set('css.replace', obj => {
+            Utils.walk(obj, (node, key, val) => node.classList.replace(key, val));
+        });
+        Actions.set('css.toggle', obj => {
+            Utils.walk(obj, (node, key) => node.classList.toggle(key));
+        });
+        Actions.set('css.exists', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                for (const key in p) {
+                    if (!node.classList.contains(key)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+    })();
+    const _Props = (() => {
+        Actions.set('prop.rmv', obj => {
+            Utils.walk(obj, (node, key) => Utils.removeNodeKey(node, key));
+        });
+        Actions.set('prop.exists', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                for (const k in p) {
+                    if (!Utils.nodeKeyExists(node, k)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        });
+        Actions.set('prop.toggle', obj => {
+            Utils.walk(obj, (node, key, val) => {
+                const oldval = Utils.getNodeValue(node, key);
+                const arr = Parser.toArray(val, SEP_LIST);
+                for (const v of arr) {
+                    if (v !== oldval) {
+                        return Utils.setNodeValue(node, key, v);
+                    }
+                }
+            });
+        });
+        Actions.set('prop.bind', obj => {
+            Utils.walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
+        });
+    })();
+    const _Others = (() => {
+        Actions.set('util.affix', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const prefix = p.prefix || '', suffix = p.suffix || '';
+                Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
+            });
+        });
+        Actions.set('util.transform', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const result = Utils.calludf(p.transformer, [p, node]);
+                if (result !== undefined) {
+                    Utils.setNodeValue(node, p.output, result);
+                }
+            });
+        });
+        Actions.set('util.trigger', obj => {
+            Utils.walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
+        });
+        Actions.set('util.saveas', obj => {
+            Utils.traverse(obj, p => {
+                const a = doc.createElement('a');
+                const type = p.type || obj.data.headers.get('content-type');
+                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+                a.download = p.name;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+        });
+    })();
+    const _Node = (() => {
+        const moveNode = (srcNode, target, params, clone) => {
+            const index = parseInt(params.pos), len = target.children.length + 1;
+            const offset = index > 0 ? index - 1 : index + len;
+            if (Math.abs(index) <= len && index !== 0) {
+                const n = clone ? srcNode.cloneNode(true) : srcNode;
+                target.insertBefore(n, target.children[offset]);
+                !clone || clone(n);
+            }
+        };
+        Actions.set('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
+        Actions.set('node.copy', function (obj) {
+            Utils.traverse(obj, (p, node) => {
+                moveNode(this.emitter, node, p, copy => {
+                    copy.querySelectorAll('[id]').forEach(el => {
+                        const id = Utils.getId();
+                        copy.querySelectorAll('[for="' + el.id + '"]').forEach(label => label.for = id);
+                        el.id = id;
+                    });
+                });
+            });
+        });
+        Actions.set('node.move', function (obj) {
+            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
+        });
+    })();
+    const _Number = (() => {
+        const compute = (lval, nv, sign) => {
+            const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
+            switch (sign) {
+                case '+':
+                    return lval + rval;
+                case '-':
+                    return lval - rval;
+                case '*':
+                    return lval * rval;
+                case '/':
+                    return lval / rval;
+                case '%':
+                    return lval % rval;
+                case '^':
+                    return Math.pow(lval, rval);
+                default:
+                    throw new Error('valid math operators are: +-*/%^');
+            }
+        };
+        const parseNumber = (val, allowPercent) => {
+            val ||=  '0';
+            const num = val.replace(/[^\d%.-]/g, '');
+            if (/^-?\d+(\.\d+)?%?$/.test(num)) {
+                return allowPercent ? num : parseFloat(num);
+            }
+            throw new Error('Invalid number "' + val + '"');
+        };
+        Actions.set('number.calc', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
+                const result = compute(lval, rval, p.operator) || 0;
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+        Actions.set('number.accumulate', function (obj) {
+            const p = Parser.params(this.emitter, obj.paramstr);
+            let result = parseNumber(p.initial) || 0;
+            Utils.traverse(obj, param => {
+                const value = parseNumber(param.input, true);
+                result = compute(result, value, param.operator);
+            });
+            Utils.setNodeValue(this.emitter, p.output, result);
+        });
+        Actions.set('number.format', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const result = parseNumber(p.input).toLocaleString(undefined, {
+                    maximumFractionDigits: p.maxdecimals || 2,
+                    minimumFractionDigits: p.mindecimals || 0
+                });
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+    })();
+    const _UI = (() => {
         const Carousel = (() => {
             const rotateItems = (node, params, cb) => {
                 const cls = params['active-class'];
@@ -1239,5 +1140,95 @@
             Actions.set('ui.loader', obj => createLoader(obj));
             Actions.set('ui.loader.rmv', obj => rmvLoader(obj));
         })();
+        const getCover = (target, pageSize, fontSize) => {
+            const id = Utils.getId(), style = doc.createElement('style');
+            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;';
+            s += 'font-size:' + (fontSize || 100) + '%}body>:not(#' + id + '){display:none}';
+            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
+            s += '@page{margin:0;page-break-after:always;break-after:page}';
+            style.type = 'text/css';
+            style.textContent = s;
+            const cover = doc.createElement('div');
+            cover.appendChild(style);
+            cover.id = id;
+            for (const t of target) {
+                cover.appendChild(t.cloneNode(true));
+            }
+            doc.body.insertBefore(cover, doc.body.firstChild);
+            return cover;
+        };
+        const str2number = str => {
+            const date = Date.parse(str);
+            if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
+                return date;
+            }
+            const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);
+            if (!isNaN(num) && value !== '') {
+                return num;
+            }
+            return str.toLowerCase();
+        };
+        Actions.set('ui.close', function (obj) {
+            if (obj.selector) {
+                const selector = Utils.resolveVariable(this.emitter, obj.selector);
+                const parent = Utils.getParentNode(this.emitter, selector);
+                if (parent) {
+                    return Utils.removeNode(parent);
+                }
+                obj.targets.forEach(Utils.removeNode);
+            }
+        });
+        Actions.set('ui.print', obj => {
+            if (window.print instanceof Function) {
+                Utils.traverse(obj, p => {
+                    const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
+                    doc.title = p.title || title;
+                    window.print();
+                    doc.title = title;
+                    cover.remove();
+                });
+            }
+        });
+        Actions.set('ui.search', function (obj) {
+            const text = this.emitter.value.trim().toLowerCase();
+            obj.targets.forEach(node => {
+                for (const row of node.children) {
+                    row.style.display = row.textContent.toLowerCase().includes(text) ? null : 'none';
+                }
+            });
+        });
+        Actions.set('ui.fs', obj => {
+            if (doc.fullscreenEnabled) {
+                const cover = getCover(obj.targets, '', 135);
+                doc.documentElement.requestFullscreen().then(() => {
+                    doc.addEventListener('fullscreenchange', () => {
+                        doc.fullscreenElement || cover.remove();
+                    });
+                }).catch(() => cover.remove());
+            }
+        });
+        Actions.set('ui.sort', function (obj) {
+            const rows = [];
+            Utils.traverse(obj, (p, node) => {
+                rows.push({
+                    node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
+                });
+            });
+            const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
+            rows.sort((r1, r2) => {
+                const v1 = str2number(r1.value), v2 = str2number(r2.value);
+                if (typeof v1 === 'number' && typeof v2 === 'number') {
+                    return asc ? v1 - v2 : v2 - v1;
+                }
+                return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
+            });
+            const tbody = rows[0].node.parentElement;
+            rows.forEach(row => tbody.appendChild(row.node));
+        });
+        Actions.set('ui.copy', obj => {
+            if (navigator.clipboard) {
+                Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
+            }
+        });
     })();
 })(document);

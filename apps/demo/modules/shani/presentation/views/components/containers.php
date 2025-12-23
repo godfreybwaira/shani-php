@@ -557,6 +557,6 @@
 </ul>
 <div class="divider">Misc</div>
 <ul>
-    <li><a href="#" shani-on="click->fs>>#tc2">Full screen</a></li>
-    <li><a href="#" shani-on="click->print size:A4 landscape&title:#tc2 caption@textContent>>#tc2">Print</a></li>
+    <li><a href="#" shani-on="click->ui.fs>>#tc2">Full screen</a></li>
+    <li><a href="#" shani-on="click->ui.print size:A4 landscape&title:#tc2 caption@textContent>>#tc2">Print</a></li>
 </ul>
