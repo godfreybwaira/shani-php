@@ -4,7 +4,7 @@
         if (!window.Shani) {
             window.Shani = Utils.object({
                 select: (selector, obj) => Selectors.set(selector, Utils.object(obj)),
-                define: Actions.set,
+                define: Action.set,
                 on: Shani.on
             });
             Object.freeze(window.Shani);
@@ -13,7 +13,7 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const Actions = (() => {
+    const Action = (() => {
         const acts = new Map();
         return {
             set(name, value, replace) {
@@ -398,7 +398,7 @@
         };
         const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.event.type);
         const callNext = (shani, action, data) => {
-            const cb = action ? Actions.get(action.fn) : null;
+            const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
                 const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
                 const p = Utils.object({
@@ -516,7 +516,7 @@
                 }
             },
             calludf(name, args, thisArg) {
-                const v = Actions.get(name);
+                const v = Action.get(name);
                 return v instanceof Function ? v.apply(thisArg, args) : v;
             },
             getNodeValue(node, key) {
@@ -783,16 +783,16 @@
             on('close', e => Utils.trigger(shani, 'httpend'));
         };
         /** ==============HTTP=============*/
-        Actions.set('http.pull', function (obj) {
+        Action.set('http.pull', function (obj) {
             if (this.history === true) {
                 history.pushState(null, '', this.url);
             }
             sendReq(this, 'GET', obj);
         });
-        Actions.set('http.push', function (obj) {
+        Action.set('http.push', function (obj) {
             sendReq(this, 'POST', obj);
         });
-        Actions.set('http.abort', obj => {
+        Action.set('http.abort', obj => {
             Utils.traverse(obj, p => {
                 if (p.name) {
                     return closeConn(p.name);
@@ -891,19 +891,19 @@
         };
     })();
     const _CSS = (() => {
-        Actions.set('css.add', obj => {
+        Action.set('css.add', obj => {
             Utils.walk(obj, (node, key) => node.classList.add(key));
         });
-        Actions.set('css.rmv', obj => {
+        Action.set('css.rmv', obj => {
             Utils.walk(obj, (node, key) => node.classList.remove(key));
         });
-        Actions.set('css.replace', obj => {
+        Action.set('css.replace', obj => {
             Utils.walk(obj, (node, key, val) => node.classList.replace(key, val));
         });
-        Actions.set('css.toggle', obj => {
+        Action.set('css.toggle', obj => {
             Utils.walk(obj, (node, key) => node.classList.toggle(key));
         });
-        Actions.set('css.exists', obj => {
+        Action.set('css.exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 for (const key in p) {
@@ -916,10 +916,10 @@
         });
     })();
     const _Props = (() => {
-        Actions.set('prop.rmv', obj => {
+        Action.set('prop.rmv', obj => {
             Utils.walk(obj, (node, key) => Utils.removeNodeKey(node, key));
         });
-        Actions.set('prop.exists', obj => {
+        Action.set('prop.exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 for (const k in p) {
@@ -930,7 +930,7 @@
             }
             return true;
         });
-        Actions.set('prop.toggle', obj => {
+        Action.set('prop.toggle', obj => {
             Utils.walk(obj, (node, key, val) => {
                 const oldval = Utils.getNodeValue(node, key);
                 const arr = Parser.toArray(val, SEP_LIST);
@@ -941,18 +941,18 @@
                 }
             });
         });
-        Actions.set('prop.bind', obj => {
+        Action.set('prop.bind', obj => {
             Utils.walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
         });
     })();
     const _Others = (() => {
-        Actions.set('util.affix', obj => {
+        Action.set('util.affix', obj => {
             Utils.traverse(obj, (p, node) => {
                 const prefix = p.prefix || '', suffix = p.suffix || '';
                 Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
             });
         });
-        Actions.set('util.transform', obj => {
+        Action.set('util.transform', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = Utils.calludf(p.transformer, [p, node]);
                 if (result !== undefined) {
@@ -960,10 +960,10 @@
                 }
             });
         });
-        Actions.set('util.trigger', obj => {
+        Action.set('util.trigger', obj => {
             Utils.walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
         });
-        Actions.set('util.saveas', obj => {
+        Action.set('util.saveas', obj => {
             Utils.traverse(obj, p => {
                 const a = doc.createElement('a');
                 const type = p.type || obj.data.headers.get('content-type');
@@ -984,8 +984,8 @@
                 !clone || clone(n);
             }
         };
-        Actions.set('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
-        Actions.set('node.copy', function (obj) {
+        Action.set('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
+        Action.set('node.copy', function (obj) {
             Utils.traverse(obj, (p, node) => {
                 moveNode(this.emitter, node, p, copy => {
                     copy.querySelectorAll('[id]').forEach(el => {
@@ -996,7 +996,7 @@
                 });
             });
         });
-        Actions.set('node.move', function (obj) {
+        Action.set('node.move', function (obj) {
             Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
         });
     })();
@@ -1028,14 +1028,14 @@
             }
             throw new Error('Invalid number "' + val + '"');
         };
-        Actions.set('number.calc', obj => {
+        Action.set('number.calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
                 const result = compute(lval, rval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Actions.set('number.accumulate', function (obj) {
+        Action.set('number.accumulate', function (obj) {
             const p = Parser.params(this.emitter, obj.paramstr);
             let result = parseNumber(p.initial) || 0;
             Utils.traverse(obj, param => {
@@ -1044,7 +1044,7 @@
             });
             Utils.setNodeValue(this.emitter, p.output, result);
         });
-        Actions.set('number.format', obj => {
+        Action.set('number.format', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = parseNumber(p.input).toLocaleString(undefined, {
                     maximumFractionDigits: p.maxdecimals || 2,
@@ -1076,10 +1076,10 @@
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Actions.set('ui.carousel', obj => {
+            Action.set('ui.carousel', obj => {
                 Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction]));
             });
-            Actions.set('ui.select', function (obj) {
+            Action.set('ui.select', function (obj) {
                 const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
                 const kids = this.emitter.parentElement.children;
                 for (let i in kids) {
@@ -1101,7 +1101,7 @@
                     return btn;
                 }
             };
-            Actions.set('ui.modal', obj => {
+            Action.set('ui.modal', obj => {
                 Utils.traverse(obj, p => {
                     const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                     const wrapper = doc.createElement('div');
@@ -1148,7 +1148,7 @@
             }
             return str.toLowerCase();
         };
-        Actions.set('ui.close', function (obj) {
+        Action.set('ui.close', function (obj) {
             if (obj.selector) {
                 const selector = Utils.resolveVariable(this.emitter, obj.selector);
                 const parent = Utils.getParentNode(this.emitter, selector);
@@ -1158,7 +1158,7 @@
                 obj.targets.forEach(Utils.removeNode);
             }
         });
-        Actions.set('ui.print', obj => {
+        Action.set('ui.print', obj => {
             if (window.print instanceof Function) {
                 Utils.traverse(obj, p => {
                     const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
@@ -1169,7 +1169,7 @@
                 });
             }
         });
-        Actions.set('ui.search', function (obj) {
+        Action.set('ui.search', function (obj) {
             const text = this.emitter.value.trim().toLowerCase();
             obj.targets.forEach(node => {
                 for (const row of node.children) {
@@ -1177,7 +1177,7 @@
                 }
             });
         });
-        Actions.set('ui.fs', obj => {
+        Action.set('ui.fs', obj => {
             if (doc.fullscreenEnabled) {
                 const cover = getCover(obj.targets, '', 135);
                 doc.documentElement.requestFullscreen().then(() => {
@@ -1187,7 +1187,7 @@
                 }).catch(() => cover.remove());
             }
         });
-        Actions.set('ui.sort', function (obj) {
+        Action.set('ui.sort', function (obj) {
             const rows = [];
             Utils.traverse(obj, (p, node) => {
                 rows.push({
@@ -1205,12 +1205,12 @@
             const tbody = rows[0].node.parentElement;
             rows.forEach(row => tbody.appendChild(row.node));
         });
-        Actions.set('ui.copy', obj => {
+        Action.set('ui.copy', obj => {
             if (navigator.clipboard) {
                 Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
             }
         });
-        Actions.set('ui.loader', obj => {
+        Action.set('ui.loader', obj => {
             Utils.traverse(obj, (p, node) => {
                 !p.color || node.style.setProperty('--loader-color', p.color);
                 !p.size || node.style.setProperty('--loader-size', p.size);
@@ -1218,7 +1218,7 @@
                 node.classList.add(p.name);
             });
         });
-        Actions.set('ui.loader.rmv', obj => {
+        Action.set('ui.loader.rmv', obj => {
             const props = ['--loader-color', '--loader-size', '--loader-thickness'];
             obj.targets.forEach(node => {
                 props.forEach(p => node.style.removeProperty(p));
