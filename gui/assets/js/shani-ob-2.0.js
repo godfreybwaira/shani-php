@@ -14,18 +14,18 @@
         Observers.mutate(doc.body);
     });
     const Action = (() => {
-        const acts = new Map();
+        const acts = Object.setPrototypeOf({}, null);
         return {
             set(name, value, replace) {
                 const n = name.toLowerCase();
-                if (!replace && acts.has(n)) {
+                if (!replace && n in acts) {
                     console.warn(name + ' already exists.');
                 } else {
-                    acts.set(n, value);
+                    acts[n] = value;
                 }
             },
             get(name) {
-                return acts.get(name);
+                return acts[name];
             }
         };
     })();
