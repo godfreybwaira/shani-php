@@ -1101,7 +1101,7 @@
                     return btn;
                 }
             };
-            const createModal = obj => {
+            Actions.set('ui.modal', obj => {
                 Utils.traverse(obj, p => {
                     const mdbg = doc.createElement('div'), modal = doc.createElement('div');
                     const wrapper = doc.createElement('div');
@@ -1118,27 +1118,7 @@
                     mdbg.appendChild(modal);
                     doc.body.appendChild(mdbg);
                 });
-            };
-            Actions.set('ui.modal', obj => createModal(obj));
-        })();
-        const Loader = (() => {
-            const createLoader = obj => {
-                Utils.traverse(obj, (p, node) => {
-                    !p.color || node.style.setProperty('--loader-color', p.color);
-                    !p.size || node.style.setProperty('--loader-size', p.size);
-                    !p.thickness || node.style.setProperty('--loader-thickness', p.thickness);
-                    node.classList.add(p.name);
-                });
-            };
-            const rmvLoader = obj => {
-                const props = ['--loader-color', '--loader-size', '--loader-thickness'];
-                obj.targets.forEach(node => {
-                    props.forEach(p => node.style.removeProperty(p));
-                    node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
-                });
-            };
-            Actions.set('ui.loader', obj => createLoader(obj));
-            Actions.set('ui.loader.rmv', obj => rmvLoader(obj));
+            });
         })();
         const getCover = (target, pageSize, fontSize) => {
             const id = Utils.getId(), style = doc.createElement('style');
@@ -1229,6 +1209,21 @@
             if (navigator.clipboard) {
                 Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
             }
+        });
+        Actions.set('ui.loader', obj => {
+            Utils.traverse(obj, (p, node) => {
+                !p.color || node.style.setProperty('--loader-color', p.color);
+                !p.size || node.style.setProperty('--loader-size', p.size);
+                !p.thickness || node.style.setProperty('--loader-thickness', p.thickness);
+                node.classList.add(p.name);
+            });
+        });
+        Actions.set('ui.loader.rmv', obj => {
+            const props = ['--loader-color', '--loader-size', '--loader-thickness'];
+            obj.targets.forEach(node => {
+                props.forEach(p => node.style.removeProperty(p));
+                node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
+            });
         });
     })();
 })(document);
