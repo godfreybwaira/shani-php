@@ -458,9 +458,9 @@
                 return null;
             },
             time2ms(time) {
-                if (/^\s*\d+(\.\d+)?[smhdy]\s*$/.test(time)) {
+                if (/^\s*-?\d+(\.\d+)?[smhdwy]\s*$/.test(time)) {
                     const TIME_UNITS = {
-                        s: 1, m: 60, h: 3600, d: 24 * 3600, y: 24 * 3600 * 365
+                        s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, y: 86400 * 365
                     };
                     time = time.trim();
                     const unit = time.slice(-1).toLowerCase();
@@ -959,9 +959,7 @@
         Action.set('util.transform', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = Utils.calludf(p.transformer, [p, node]);
-                if (result !== undefined) {
-                    Utils.setNodeValue(node, p.output, result);
-                }
+                result === undefined || Utils.setNodeValue(node, p.output, result);
             });
         });
         Action.set('util.trigger', obj => {
@@ -1091,6 +1089,13 @@
         Action.set('date.gt', obj => compareDate(obj, (d1, d2) => d1 > d2));
         Action.set('date.gte', obj => compareDate(obj, (d1, d2) => d1 >= d2));
         Action.set('date.btw', obj => between(obj, Utils.date2ms));
+        Action.set('date.add', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const input = Utils.date2ms(p.input), unit = Utils.time2ms(p.unit);
+                const result = new Date(input + unit);
+                Utils.setNodeValue(node, p.output, result.toISOString());
+            });
+        });
     })();
     const _UI = (() => {
         const Carousel = (() => {

@@ -202,9 +202,8 @@
     <div class="col">
         <div class="input-group">
             <label>Date:</label>
-            <input type="text" readonly data-d1="2025-12-20T06:20:57.645Z" data-d2="2025-12-20T06:20:57.845Z"
-                   data-in="2025-12-20T06:20:57.655Z"
-                   shani-on="click->date.btw input:@data-in&min:@data-d1&max:@data-d2;date.btw->prop.bind value:@data-in">
+            <input type="text" readonly value="2007-04-21T12:42:51.424Z"
+                   shani-on="click->date.add input:@value&unit:-112w&output:value">
         </div>
     </div>
 </div>
