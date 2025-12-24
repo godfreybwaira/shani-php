@@ -412,6 +412,10 @@
         const flipValue = val => typeof val === 'boolean' ? !val : '';
         const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
+            date2ms(date) {
+                const value = Date.parse(date);
+                return !isNaN(value) && /[-./]/.test(date) ? value : null;
+            },
             traverse(obj, cb) {
                 obj.targets.forEach(node => {
                     const p = Parser.params(node, obj.paramstr);
@@ -1002,7 +1006,7 @@
     })();
     const _Number = (() => {
         const compute = (lval, nv, sign) => {
-            const rval = (nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
+            const rval = (typeof nv === 'number' && nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
             switch (sign) {
                 case '+':
                     return lval + rval;
@@ -1021,6 +1025,9 @@
             }
         };
         const parseNumber = (val, allowPercent) => {
+            if (typeof val === 'number') {
+                return val;
+            }
             val ||=  '0';
             const num = val.replace(/[^\d%.-]/g, '');
             if (/^-?\d+(\.\d+)?%?$/.test(num)) {
@@ -1028,6 +1035,28 @@
             }
             throw new Error('Invalid number "' + val + '"');
         };
+        const compare = (obj, evaluator, cb) => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                const lval = evaluator(p.lvalue), rval = evaluator(p.rvalue);
+                if (!cb(lval, rval)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        const between = (obj, cb) => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                const min = cb(p.min), max = cb(p.max), input = cb(p.input);
+                if (min > input || input > max) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        const compareNum = (obj, cb) => compare(obj, parseNumber, cb);
+        const compareDate = (obj, cb) => compare(obj, Utils.date2ms, cb);
         Action.set('number.calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
@@ -1053,6 +1082,15 @@
                 Utils.setNodeValue(node, p.output, result);
             });
         });
+        Action.set('number.eq', obj => compareNum(obj, (n1, n2) => n1 === n2));
+        Action.set('number.gt', obj => compareNum(obj, (n1, n2) => n1 > n2));
+        Action.set('number.gte', obj => compareNum(obj, (n1, n2) => n1 >= n2));
+        Action.set('number.btw', obj => between(obj, parseNumber));
+        //////////////////////////////
+        Action.set('date.eq', obj => compareDate(obj, (d1, d2) => d1 === d2));
+        Action.set('date.gt', obj => compareDate(obj, (d1, d2) => d1 > d2));
+        Action.set('date.gte', obj => compareDate(obj, (d1, d2) => d1 >= d2));
+        Action.set('date.btw', obj => between(obj, Utils.date2ms));
     })();
     const _UI = (() => {
         const Carousel = (() => {
@@ -1138,8 +1176,8 @@
             return cover;
         };
         const str2number = str => {
-            const date = Date.parse(str);
-            if (!isNaN(date) && (str.includes('-') || str.includes('/'))) {
+            const date = Utils.date2ms(str);
+            if (date) {
                 return date;
             }
             const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);

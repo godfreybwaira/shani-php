@@ -191,3 +191,20 @@
         </div>
     </div>
 </div>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-group">
+            <label>Countdown:</label>
+            <input type="text" readonly placeholder="Click to count down..." value="10"
+                   shani-on="click delay:2s&limit:10&steps:1s->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
+        </div>
+    </div>
+    <div class="col">
+        <div class="input-group">
+            <label>Date:</label>
+            <input type="text" readonly data-d1="2025-12-20T06:20:57.645Z" data-d2="2025-12-20T06:20:57.845Z"
+                   data-in="2025-12-20T06:20:57.655Z"
+                   shani-on="click->date.btw input:@data-in&min:@data-d1&max:@data-d2;date.btw->prop.bind value:@data-in">
+        </div>
+    </div>
+</div>
