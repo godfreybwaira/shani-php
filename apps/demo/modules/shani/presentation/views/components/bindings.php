@@ -196,7 +196,7 @@
         <div class="input-group">
             <label>Countdown:</label>
             <input type="text" readonly placeholder="Click to count down..." value="10"
-                   shani-on="click delay:2s&limit:10&steps:1s->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
+                   shani-on="click delay:0.2s&limit:10&steps:1s->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
         </div>
     </div>
     <div class="col">
