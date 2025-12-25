@@ -96,7 +96,7 @@
 </div>
 <div class="divider">Carousel</div>
 <div style="height: 300px" class="space-around">
-    <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:5s->util.trigger click>>.carousel-next">
+    <div class="carousel width-md-7 width-sm-max" shani-on="load delay:5s&steps:3s->util.trigger click>>.carousel-next">
         <button class="carousel-prev" shani-on="click->ui.carousel direction:prev&children-wrapper:.carousel-body&active-class:active"></button>
         <div class="carousel-body">
             <div class="media">

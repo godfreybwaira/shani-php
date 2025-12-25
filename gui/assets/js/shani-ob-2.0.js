@@ -965,7 +965,7 @@
             });
         });
         Action.set('util.trigger', obj => {
-            Utils.walk(obj, (node, key) => node.dispatchEvent(new Event(key, {bubbles: true})));
+            Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: obj, bubbles: true})));
         });
         Action.set('util.saveas', obj => {
             Utils.traverse(obj, p => {
@@ -1130,8 +1130,9 @@
     })();
     const _UI = (() => {
         const Carousel = (() => {
-            const rotateItems = (node, params, cb) => {
+            const rotateItems = (node, params, cb, speed) => {
                 const cls = params['active-class'];
+                !speed || node.parentElement.style.setProperty('--speed', speed);
                 const kids = node.parentElement.querySelector(params['children-wrapper']).children;
                 for (let i in kids) {
                     if (kids[i].classList.contains(cls)) {
@@ -1150,8 +1151,9 @@
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Action.set('ui.carousel', obj => {
-                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction]));
+            Action.set('ui.carousel', function (obj) {
+                const speed = this.event.detail.evtparams?.steps;
+                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction], speed));
             });
             Action.set('ui.select', function (obj) {
                 const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];

@@ -84,9 +84,9 @@ namespace lib\http {
         /**
          * Gets the max-age attribute.
          *
-         * @return \DateTime
+         * @return \DateTimeImmutable
          */
-        public function maxAge(): \DateTime
+        public function maxAge(): \DateTimeImmutable
         {
             return $this->cookie['max-age'];
         }
@@ -94,9 +94,9 @@ namespace lib\http {
         /**
          * Gets the time the cookie expires.
          *
-         * @return \DateTime|null
+         * @return \DateTimeImmutable|null
          */
-        public function expires(): ?\DateTime
+        public function expires(): ?\DateTimeImmutable
         {
             return $this->cookie['expires'] ?? null;
         }
