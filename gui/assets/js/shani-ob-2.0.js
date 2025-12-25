@@ -451,6 +451,9 @@
                 return code < 200 ? 'info' : 'offline';
             },
             connection: Object.setPrototypeOf({}, null),
+            TIME_UNITS: Object.setPrototypeOf({
+                s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, y: 86400 * 365
+            }, null),
             getSubtype(header) {
                 if (header) {
                     const subtype = header.slice(header.indexOf('/') + 1).split(';')[0];
@@ -461,13 +464,10 @@
             },
             time2ms(time) {
                 if (/^\s*-?\d+(\.\d+)?[smhdwy]\s*$/.test(time)) {
-                    const TIME_UNITS = {
-                        s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, y: 86400 * 365
-                    };
                     time = time.trim();
                     const unit = time.slice(-1).toLowerCase();
                     const val = parseFloat(time.slice(0, -1));
-                    return Math.round(TIME_UNITS[unit] * val * 1000);
+                    return Math.round(Utils.TIME_UNITS[unit] * val * 1000);
                 }
                 throw new Error('Invalid duration ' + time);
             },
@@ -1045,20 +1045,20 @@
             }
             throw new Error('Invalid number "' + val + '"');
         };
-        const compare = (obj, cb, evaluator) => {
+        const compare = (obj, cb, evaluator, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const lval = cb(p.lvalue), rval = cb(p.rvalue);
+                const lval = cb(p.lvalue) || defval, rval = cb(p.rvalue) || defval;
                 if (!evaluator(lval, rval)) {
                     return false;
                 }
             }
             return true;
         };
-        const between = (obj, cb, evaluator) => {
+        const between = (obj, cb, evaluator, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const min = cb(p.min), max = cb(p.max), input = cb(p.input);
+                const min = cb(p.min) || defval, max = cb(p.max) || defval, input = cb(p.input);
                 if (!evaluator(min, input, max)) {
                     return false;
                 }
@@ -1066,9 +1066,10 @@
             return true;
         };
         const compareNum = (obj, sign) => compare(obj, parseNumber, comparator[sign]);
-        const compareDate = (obj, sign) => compare(obj, Utils.date2ms, comparator[sign]);
-        const betweenDate = (obj, sign) => between(obj, Utils.date2ms, comparator[sign]);
+        const compareDate = (obj, sign) => compare(obj, Utils.date2ms, comparator[sign], Date.now());
+        const betweenDate = (obj, sign) => between(obj, Utils.date2ms, comparator[sign], Date.now());
         const betweenNum = (obj, sign) => between(obj, Utils.parseNumber, comparator[sign]);
+        const timestamp2unit = (ts, unit) => Math.floor(ts / (Utils.TIME_UNITS[unit] * 1000));
         Action.set('number.calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
@@ -1111,9 +1112,17 @@
         Action.set('date.lte', obj => compareDate(obj, 'lte'));
         Action.set('date.btw', obj => betweenDate(obj, 'btw'));
         Action.set('date.nbtw', obj => betweenDate(obj, 'nbtw'));
-        Action.set('date.calc', obj => {
+        Action.set('date.diff', obj => {
+            const now = Date.now();
             Utils.traverse(obj, (p, node) => {
-                const input = Utils.date2ms(p.input) || Date.now(), interval = Utils.time2ms(p.interval);
+                const lvalue = Utils.date2ms(p.lvalue) || now, rvalue = Utils.date2ms(p.rvalue) || now;
+                Utils.setNodeValue(node, p.output, timestamp2unit(lvalue - rvalue, p.unit || 'd'));
+            });
+        });
+        Action.set('date.calc', obj => {
+            const now = Date.now();
+            Utils.traverse(obj, (p, node) => {
+                const input = Utils.date2ms(p.input) || now, interval = Utils.time2ms(p.interval);
                 const result = compute(input, interval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, new Date(result).toISOString());
             });
