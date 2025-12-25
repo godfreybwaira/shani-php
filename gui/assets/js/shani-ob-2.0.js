@@ -1006,7 +1006,7 @@
     })();
     const _Number = (() => {
         const compute = (lval, nv, sign) => {
-            const rval = (typeof nv === 'number' && nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
+            const rval = (typeof nv === 'string' && nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
             switch (sign) {
                 case '+':
                     return lval + rval;
@@ -1111,11 +1111,11 @@
         Action.set('date.lte', obj => compareDate(obj, 'lte'));
         Action.set('date.btw', obj => betweenDate(obj, 'btw'));
         Action.set('date.nbtw', obj => betweenDate(obj, 'nbtw'));
-        Action.set('date.add', obj => {
+        Action.set('date.calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const input = Utils.date2ms(p.input) || Date.now(), interval = Utils.time2ms(p.interval);
-                const result = new Date(input + interval);
-                Utils.setNodeValue(node, p.output, result.toISOString());
+                const result = compute(input, interval, p.operator) || 0;
+                Utils.setNodeValue(node, p.output, new Date(result).toISOString());
             });
         });
     })();

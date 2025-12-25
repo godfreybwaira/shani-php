@@ -202,8 +202,8 @@
     <div class="col">
         <div class="input-group">
             <label>Date:</label>
-            <input type="text" readonly value="2007-04-21T12:42:51.424Z"
-                   shani-on="click->date.add input:@value&interval:2d&output:value">
+            <input type="text" readonly value="2007-04-21T12:42:51.424Z" data-op="+"
+                   shani-on="click->date.calc input:@value&interval:2d&output:value&operator:@data-op">
         </div>
     </div>
 </div>
