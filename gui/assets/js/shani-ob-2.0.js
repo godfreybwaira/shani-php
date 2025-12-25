@@ -413,8 +413,10 @@
         const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
             date2ms(date) {
-                const value = Date.parse(date);
-                return !isNaN(value) && /[-./]/.test(date) ? value : null;
+                if (date) {
+                    const value = Date.parse(date);
+                    return !isNaN(value) && /[-./]/.test(date) ? value : null;
+                }
             },
             traverse(obj, cb) {
                 obj.targets.forEach(node => {
@@ -1022,6 +1024,16 @@
                     throw new Error('valid math operators are: +-*/%^');
             }
         };
+        const comparator = {
+            'eq': (n1, n2) => n1 === n2,
+            'neq': (n1, n2) => n1 !== n2,
+            'gt': (n1, n2) => n1 > n2,
+            'gte': (n1, n2) => n1 >= n2,
+            'lt': (n1, n2) => n1 < n2,
+            'lte': (n1, n2) => n1 <= n2,
+            'btw': (min, input, max) => min <= input && input <= max,
+            'nbtw': (min, input, max) => min > input || max < input
+        };
         const parseNumber = (val, allowPercent) => {
             if (typeof val === 'number') {
                 return val;
@@ -1033,28 +1045,30 @@
             }
             throw new Error('Invalid number "' + val + '"');
         };
-        const compare = (obj, evaluator, cb) => {
+        const compare = (obj, cb, evaluator) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const lval = evaluator(p.lvalue), rval = evaluator(p.rvalue);
-                if (!cb(lval, rval)) {
+                const lval = cb(p.lvalue), rval = cb(p.rvalue);
+                if (!evaluator(lval, rval)) {
                     return false;
                 }
             }
             return true;
         };
-        const between = (obj, cb) => {
+        const between = (obj, cb, evaluator) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 const min = cb(p.min), max = cb(p.max), input = cb(p.input);
-                if (min > input || input > max) {
+                if (!evaluator(min, input, max)) {
                     return false;
                 }
             }
             return true;
         };
-        const compareNum = (obj, cb) => compare(obj, parseNumber, cb);
-        const compareDate = (obj, cb) => compare(obj, Utils.date2ms, cb);
+        const compareNum = (obj, sign) => compare(obj, parseNumber, comparator[sign]);
+        const compareDate = (obj, sign) => compare(obj, Utils.date2ms, comparator[sign]);
+        const betweenDate = (obj, sign) => between(obj, Utils.date2ms, comparator[sign]);
+        const betweenNum = (obj, sign) => between(obj, Utils.parseNumber, comparator[sign]);
         Action.set('number.calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
@@ -1080,19 +1094,27 @@
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.set('number.eq', obj => compareNum(obj, (n1, n2) => n1 === n2));
-        Action.set('number.gt', obj => compareNum(obj, (n1, n2) => n1 > n2));
-        Action.set('number.gte', obj => compareNum(obj, (n1, n2) => n1 >= n2));
-        Action.set('number.btw', obj => between(obj, parseNumber));
+        Action.set('number.eq', obj => compareNum(obj, 'eq'));
+        Action.set('number.neq', obj => compareNum(obj, 'neq'));
+        Action.set('number.gt', obj => compareNum(obj, 'gt'));
+        Action.set('number.gte', obj => compareNum(obj, 'gte'));
+        Action.set('number.lt', obj => compareNum(obj, 'lt'));
+        Action.set('number.lte', obj => compareNum(obj, 'lte'));
+        Action.set('number.btw', obj => betweenNum(obj, 'btw'));
+        Action.set('number.nbtw', obj => betweenNum(obj, 'nbtw'));
         //////////////////////////////
-        Action.set('date.eq', obj => compareDate(obj, (d1, d2) => d1 === d2));
-        Action.set('date.gt', obj => compareDate(obj, (d1, d2) => d1 > d2));
-        Action.set('date.gte', obj => compareDate(obj, (d1, d2) => d1 >= d2));
-        Action.set('date.btw', obj => between(obj, Utils.date2ms));
+        Action.set('date.eq', obj => compareDate(obj, 'eq'));
+        Action.set('date.neq', obj => compareDate(obj, 'neq'));
+        Action.set('date.gt', obj => compareDate(obj, 'gt'));
+        Action.set('date.gte', obj => compareDate(obj, 'gte'));
+        Action.set('date.lt', obj => compareDate(obj, 'lt'));
+        Action.set('date.lte', obj => compareDate(obj, 'lte'));
+        Action.set('date.btw', obj => betweenDate(obj, 'btw'));
+        Action.set('date.nbtw', obj => betweenDate(obj, 'nbtw'));
         Action.set('date.add', obj => {
             Utils.traverse(obj, (p, node) => {
-                const input = Utils.date2ms(p.input), unit = Utils.time2ms(p.unit);
-                const result = new Date(input + unit);
+                const input = Utils.date2ms(p.input) || Date.now(), interval = Utils.time2ms(p.interval);
+                const result = new Date(input + interval);
                 Utils.setNodeValue(node, p.output, result.toISOString());
             });
         });

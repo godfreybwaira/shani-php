@@ -203,7 +203,7 @@
         <div class="input-group">
             <label>Date:</label>
             <input type="text" readonly value="2007-04-21T12:42:51.424Z"
-                   shani-on="click->date.add input:@value&unit:-112w&output:value">
+                   shani-on="click->date.add input:@value&interval:2d&output:value">
         </div>
     </div>
 </div>
