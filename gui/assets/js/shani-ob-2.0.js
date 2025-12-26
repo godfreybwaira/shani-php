@@ -380,7 +380,7 @@
             !isSyncEvent(shani, evt) || clearTimeout(TIMER.get(shani.emitter));
             TIMER.delete(shani.emitter);
             callNext(shani, action, data);
-            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: data}));
+            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: shani}));
             if (isSyncEvent(shani, evt)) {
                 TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
             }
@@ -402,8 +402,7 @@
             if (cb instanceof Function) {
                 const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
                 const p = Utils.object({
-                    paramstr: action.paramstr, evtparams: action.ep,
-                    selector: action.selector, targets, data
+                    paramstr: action.paramstr, selector: action.selector, targets, data
                 });
                 shani.debug !== true || console.log(p);
                 cb.call(shani, p) === false || Utils.trigger(shani, action.fn, data);
@@ -474,7 +473,6 @@
             trigger(shani, evt, data = {}) {
                 const action = shani.actions.get(evt);
                 data = Utils.object(data);
-                data.shani = shani;
                 if (action) {
                     const p = action.ep;
                     if (p.steps) {
@@ -964,8 +962,8 @@
                 result === undefined || Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.set('util.trigger', obj => {
-            Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: obj, bubbles: true})));
+        Action.set('util.trigger', function (obj) {
+            Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: this, bubbles: true})));
         });
         Action.set('util.saveas', obj => {
             Utils.traverse(obj, p => {
@@ -1130,9 +1128,9 @@
     })();
     const _UI = (() => {
         const Carousel = (() => {
-            const rotateItems = (node, params, cb, speed) => {
+            const rotateItems = (node, params, cb) => {
                 const cls = params['active-class'];
-                !speed || node.parentElement.style.setProperty('--speed', speed);
+                !params.speed || node.parentElement.style.setProperty('--speed', params.speed);
                 const kids = node.parentElement.querySelector(params['children-wrapper']).children;
                 for (let i in kids) {
                     if (kids[i].classList.contains(cls)) {
@@ -1151,16 +1149,16 @@
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Action.set('ui.carousel', function (obj) {
-                const speed = this.event.detail.evtparams?.steps;
-                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction], speed));
+            Action.set('ui.carousel', obj => {
+                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction]));
             });
             Action.set('ui.select', function (obj) {
+                const node = this.event.detail.emitter;
                 const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
-                const kids = this.emitter.parentElement.children;
-                for (let i in kids) {
-                    if (kids[i].classList.contains(cls)) {
-                        return selectNode(kids[i], this.emitter, cls);
+                const children = this.emitter.children;
+                for (let i in children) {
+                    if (children[i].classList.contains(cls)) {
+                        return selectNode(children[i], node, cls);
                     }
                 }
             });

@@ -1,28 +1,28 @@
 <div class="tab tab-pos-b">
-    <div class="tab-menu menubar" id="parent1">
+    <div class="tab-menu menubar" id="parent1" shani-on="ui-select->ui.select active-class:active">
         <a href="/shani/0/components/0/generator" shani-cache="age:5s"
            class="active menu-item" data-maxage="30s"
-           shani-on="click->ui.select active-class:active;ui.select->http.pull>>#content;httpend->ui.loader.rmv>>#content;
+           shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content;httpend->ui.loader.rmv>>#content;
            httpstart->ui.loader name:loader-spin&size:2.5rem>>#content;">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>
         </a>
-        <a href="/shani/0/components/0/all" shani-on="click->ui.select active-class:active;ui.select->http.pull>>#content" class="menu-item">
+        <a href="/shani/0/components/0/all" shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content" class="menu-item">
             <i class="mdi mdi-tab"></i>
             <span class="font-sm menu-label">Components</span>
         </a>
         <a href="/shani/0/components/0/containers"
-           shani-on="click->ui.select active-class:active;ui.select->http.pull>>#content" class="menu-item">
+           shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content" class="menu-item">
             <i class="mdi mdi-rectangle"></i>
             <span class="font-sm menu-label">Containers</span>
         </a>
         <a href="/shani/0/components/0/inputs" data-read="mode:@data-mode"
-           shani-on="click->ui.select active-class:active;ui.select->http.pull @data-read>>#content;" data-mode="replace"
+           shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull @data-read>>#content;" data-mode="replace"
            shani-headers="@data-headers" class="menu-item">
             <i class="mdi mdi-inbox-full"></i>
             <span class="font-sm menu-label">Inputs</span>
         </a>
-        <a href="/shani/0/components/0/bindings" shani-on="click->ui.select active-class:active;ui.select->http.pull>>#content" class="menu-item">
+        <a href="/shani/0/components/0/bindings" shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content" class="menu-item">
             <i class="mdi mdi-anchor"></i>
             <span class="font-sm menu-label">Bindings</span>
         </a>

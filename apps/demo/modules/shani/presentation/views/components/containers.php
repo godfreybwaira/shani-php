@@ -123,7 +123,7 @@
                 </div>
             </div>
         </div>
-        <button class="carousel-next" shani-on="click->ui.carousel direction:next&children-wrapper:.carousel-body&active-class:active"></button>
+        <button class="carousel-next" shani-on="click->ui.carousel speed:3s&direction:next&children-wrapper:.carousel-body&active-class:active"></button>
     </div>
 </div>
 <div class="divider">Vertical Cards</div>
