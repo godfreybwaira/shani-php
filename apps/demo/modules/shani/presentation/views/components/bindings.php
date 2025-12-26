@@ -196,8 +196,8 @@
         <div class="input-group">
             <label>Countdown:</label>
             <input type="text" readonly placeholder="Click to count down..." value="10"
-                   shani-on="click delay:0.2s&limit:10&steps:1s->number.gt lvalue:@value&rvalue:0;
-                   number.gt->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
+                   shani-on="click delay:0.2s&limit:10&steps:1s->number.compare lvalue:@value&rvalue:0&operator:gt;
+                   number.compare->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
 
         </div>
     </div>
