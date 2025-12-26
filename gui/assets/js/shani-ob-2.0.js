@@ -5,7 +5,7 @@
             window.Shani = Utils.object({
                 select: (selector, obj) => Selectors.set(selector, Utils.object(obj)),
                 define: Action.set,
-                on: Shani.on
+                on: (e, cb) => doc.addEventListener('shani:on:' + e, cb)
             });
             Object.freeze(window.Shani);
             doc.dispatchEvent(new Event('shani:init'));
@@ -288,10 +288,6 @@
                     const shani = new Obj(node, event);
                     Utils.trigger(shani, event.type);
                 }
-            },
-            on(e, cb) {
-                doc.addEventListener('shani:on:' + e, cb);
-                return Shani.on;
             }
         };
     })();
@@ -1046,7 +1042,7 @@
         const compare = (obj, cb, evaluator, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const lval = cb(p.lvalue) || defval, rval = cb(p.rvalue) || defval;
+                const lval = cb(p.lvalue || defval), rval = cb(p.rvalue || defval);
                 if (!evaluator(lval, rval)) {
                     return false;
                 }
@@ -1056,7 +1052,7 @@
         const between = (obj, cb, evaluator, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const min = cb(p.min) || defval, max = cb(p.max) || defval, input = cb(p.input);
+                const min = cb(p.min || defval), max = cb(p.max || defval), input = cb(p.input);
                 if (!evaluator(min, input, max)) {
                     return false;
                 }

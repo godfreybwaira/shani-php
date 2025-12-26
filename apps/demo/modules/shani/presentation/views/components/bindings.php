@@ -196,14 +196,16 @@
         <div class="input-group">
             <label>Countdown:</label>
             <input type="text" readonly placeholder="Click to count down..." value="10"
-                   shani-on="click delay:0.2s&limit:10&steps:1s->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
+                   shani-on="click delay:0.2s&limit:10&steps:1s->number.gt lvalue:@value&rvalue:0;
+                   number.gt->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
+
         </div>
     </div>
     <div class="col">
         <div class="input-group">
             <label>Date:</label>
-            <input type="text" readonly data-val="2024-12-24T12:42:51.424Z" data-op="d"
-                   shani-on="click->date.diff rvalue:@data-val&output:value&unit:@data-op">
+            <input type="text" readonly data-val="2024-12-24T12:42:51.424Z" data-unit="d"
+                   shani-on="click->date.diff rvalue:@data-val&output:value&unit:@data-unit">
         </div>
     </div>
 </div>
