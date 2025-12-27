@@ -382,7 +382,7 @@
         };
         const shouldSchedule = shani => {
             const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) > 0);
-            return shani.emitter.isConnected && underLimit;
+            return underLimit && shani.emitter.isConnected;
         };
         const recall = (shani, data, evt) => {
             if (shouldSchedule(shani)) {
