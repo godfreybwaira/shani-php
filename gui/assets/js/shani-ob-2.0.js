@@ -807,15 +807,17 @@
         });
     })();
     const FetchClient = (() => {
-        const cacheResponse = (cache, req, res, url) => {
-            const headers = new Headers(res.headers);
-            headers.set('x-expires', Date.now() + req.cacheAge);
-            const cached = new Response(res.body, {
-                statusText: res.statusText,
-                status: res.status,
-                headers
-            });
-            cache.put(url, cached);
+        const cacheResponse = (cache, req, response, url) => {
+            if (req.cacheAge) {
+                const res = response.clone(), headers = new Headers(res.headers);
+                headers.set('x-expires', Date.now() + req.cacheAge);
+                const cached = new Response(res.body, {
+                    statusText: res.statusText,
+                    status: res.status,
+                    headers
+                });
+                cache.put(url, cached);
+            }
         };
         const parseResponse = (res, accept, onSuccess, onError) => {
             if (res.status === 206) {
@@ -864,7 +866,7 @@
         };
         const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
             fetchWithRetry(url, req, res => {
-                cacheResponse(cache, req, res.clone(), url);
+                cacheResponse(cache, req, res, url);
                 parseResponse(res, type, onSuccess, onError);
             }).catch(onError);
         };
