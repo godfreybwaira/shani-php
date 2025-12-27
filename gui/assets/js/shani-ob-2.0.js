@@ -381,9 +381,8 @@
             !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {
-            const connected = shani.emitter.isConnected;
             const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) > 0);
-            return connected && underLimit;
+            return shani.emitter.isConnected && underLimit;
         };
         const recall = (shani, data, evt) => {
             if (shouldSchedule(shani)) {
