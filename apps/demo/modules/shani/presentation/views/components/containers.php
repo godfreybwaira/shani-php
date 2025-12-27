@@ -1,8 +1,8 @@
 <div class="divider">Accordion</div>
 <div class="row">
     <div class="col">
-        <ul class="accordion borders border-h radius-sm">
-            <li shani-on="click->ui.select active-class:active">
+        <ul class="accordion borders border-h radius-sm" shani-on="ui-select->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -10,7 +10,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active" shani-on="click->ui.select active-class:active">
+            <li class="active" shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -18,41 +18,10 @@
                     </div>
                 </div>
             </li>
-            <li shani-on="click->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li shani-on="click->ui.select active-class:active">
-                <span class="accordion-title">My Title</span>
-                <div class="accordion-body">
-                    <div class="padding-md">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-    <div class="col">
-        <ul class="accordion borders radius-sm">
-            <li shani-on="click->ui.select active-class:active">
-                <span class="accordion-title">My Title</span>
-                <div class="accordion-body">
-                    <div class="padding-md">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </div>
-                </div>
-            </li>
-            <li class="active" shani-on="click->ui.select active-class:active">
-                <span class="accordion-title">My Title</span>
-                <div class="accordion-body">
-                    <div class="padding-md">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                    </div>
-                </div>
-            </li>
-            <li shani-on="click->ui.select active-class:active">
-                <span class="accordion-title">My Title</span>
-            </li>
-            <li shani-on="click->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -63,8 +32,8 @@
         </ul>
     </div>
     <div class="col">
-        <ul class="accordion border-h">
-            <li shani-on="click->ui.select active-class:active">
+        <ul class="accordion borders radius-sm" shani-on="ui-select->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -72,7 +41,7 @@
                     </div>
                 </div>
             </li>
-            <li class="active" shani-on="click->ui.select active-class:active">
+            <li class="active" shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -80,10 +49,41 @@
                     </div>
                 </div>
             </li>
-            <li shani-on="click->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
             </li>
-            <li shani-on="click->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
+                <span class="accordion-title">My Title</span>
+                <div class="accordion-body">
+                    <div class="padding-md">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="col">
+        <ul class="accordion border-h" shani-on="ui-select->ui.select active-class:active">
+            <li shani-on="click->util.trigger ui-select>>.accordion">
+                <span class="accordion-title">My Title</span>
+                <div class="accordion-body">
+                    <div class="padding-md">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </div>
+                </div>
+            </li>
+            <li class="active" shani-on="click->util.trigger ui-select>>.accordion">
+                <span class="accordion-title">My Title</span>
+                <div class="accordion-body">
+                    <div class="padding-md">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </div>
+                </div>
+            </li>
+            <li shani-on="click->util.trigger ui-select>>.accordion">
+                <span class="accordion-title">My Title</span>
+            </li>
+            <li shani-on="click->util.trigger ui-select>>.accordion">
                 <span class="accordion-title">My Title</span>
                 <div class="accordion-body">
                     <div class="padding-md">
@@ -265,16 +265,16 @@
 <div class="row">
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-t borders">
-            <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+            <div class="tab-menu menubar" shani-on="ui-select->ui.select active-class:active">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -286,16 +286,16 @@
     </div>
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-b borders">
-            <div class="tab-menu menubar">
-                <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
+            <div class="tab-menu menubar" shani-on="ui-select->ui.select active-class:active">
+                <a href="#" class="active menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -310,16 +310,16 @@
 <div class="row">
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-l borders">
-            <div class="tab-menu menubar">
-                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+            <div class="tab-menu menubar" shani-on="ui-select->ui.select active-class:active">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>
@@ -331,16 +331,16 @@
     </div>
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-r borders">
-            <div class="tab-menu menubar">
-                <a href="#" class="active menu-item" shani-on="click->ui.select active-class:active">
+            <div class="tab-menu menubar" shani-on="ui-select->ui.select active-class:active">
+                <a href="#" class="active menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-cog"></i>
                     <span class="font-sm">Settings</span>
                 </a>
-                <a href="#" class="menu-item" shani-on="click->ui.select active-class:active">
+                <a href="#" class="menu-item" shani-on="click->util.trigger ui-select>>.menubar">
                     <i class="mdi mdi-account"></i>
                     <span class="font-sm">Profile</span>
                 </a>

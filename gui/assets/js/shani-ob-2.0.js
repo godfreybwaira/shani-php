@@ -1134,11 +1134,13 @@
             });
             Action.set('ui.select', function (obj) {
                 const node = this.event.detail.emitter;
-                const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
                 const children = this.emitter.children;
-                for (let i in children) {
-                    if (children[i].classList.contains(cls)) {
-                        return selectNode(children[i], node, cls);
+                if (Array.from(children).includes(node)) {
+                    const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
+                    for (let i in children) {
+                        if (children[i].classList.contains(cls)) {
+                            return selectNode(children[i], node, cls);
+                        }
                     }
                 }
             });
