@@ -403,7 +403,7 @@
                     shani.debug !== true || console.log(p);
                     cb.call(shani, p) === false || Utils.trigger(shani, evtName, data);
                 } else {
-                    throw new Error('Operation stopped, event name ' + evtName + ' is similar to action name.');
+                    console.warn('Operation stopped, event name ' + evtName + ' is similar to action name.');
                 }
             }
         };
