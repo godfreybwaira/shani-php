@@ -1108,10 +1108,11 @@
     })();
     const _UI = (() => {
         const Carousel = (() => {
-            const rotateItems = (node, params, cb) => {
+            const rotateItems = (params, node) => {
                 const cls = params['active-class'];
                 !params.speed || node.parentElement.style.setProperty('--speed', params.speed);
                 const kids = node.parentElement.querySelector(params['children-wrapper']).children;
+                const cb = callbacks[params.direction];
                 for (let i in kids) {
                     if (kids[i].classList.contains(cls)) {
                         const nextIdx = cb(kids.length, i);
@@ -1129,9 +1130,7 @@
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Action.set('ui.carousel', obj => {
-                Utils.traverse(obj, (p, node) => rotateItems(node, p, callbacks[p.direction]));
-            });
+            Action.set('ui.carousel', obj => Utils.traverse(obj, rotateItems));
             Action.set('ui.select', function (obj) {
                 const node = this.event.detail.emitter;
                 const children = this.emitter.children;
