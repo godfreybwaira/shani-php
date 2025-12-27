@@ -731,7 +731,7 @@
                 req.cacheAge = Utils.time2ms(p.age);
                 req.cacheName = p.name || 'pubcache';
             }
-            req.conn = shani.http.conn || 'http';
+            req.cname = shani.http.cname || 'http';
             req.options = Utils.object({
                 headers: payload.headers,
                 body: payload.data,
@@ -743,7 +743,7 @@
             FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
         };
         const sse = (shani, targets, params) => {
-            const name = shani.http.conn || 'sse';
+            const name = shani.http.cname || 'sse';
             Utils.connection[name] = new EventSource(shani.http.url, {
                 withCredentials: shani.http.credentials === 'include'
             });
@@ -766,7 +766,7 @@
         };
         const wsocket = (shani, targets, params) => {
             const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
-            const name = shani.http.conn || 'ws';
+            const name = shani.http.cname || 'ws';
             Utils.connection[name] = new WebSocket(host + shani.http.url);
             const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
             on('open', e => {
@@ -858,10 +858,10 @@
             }).catch(onError);
         };
         const fetchWithRetry = (url, req, responseHandler) => {
-            if (!Utils.connection[req.conn] || Utils.connection[req.conn].signal.aborted) {
-                Utils.connection[req.conn] = new AbortController();
+            if (!Utils.connection[req.cname] || Utils.connection[req.cname].signal.aborted) {
+                Utils.connection[req.cname] = new AbortController();
             }
-            req.options.signal = Utils.connection[req.conn].signal;
+            req.options.signal = Utils.connection[req.cname].signal;
             return fetch(url, req.options).then(responseHandler);
         };
         const fetchAndCache = (cache, url, req, type, onSuccess, onError) => {
