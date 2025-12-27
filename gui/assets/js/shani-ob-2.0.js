@@ -1093,14 +1093,14 @@
         Action.set('date.diff', obj => {
             const now = Date.now();
             Utils.traverse(obj, (p, node) => {
-                const lvalue = Utils.date2ms(p.lvalue) || now, rvalue = Utils.date2ms(p.rvalue) || now;
+                const lvalue = Utils.date2ms(p.lvalue || now), rvalue = Utils.date2ms(p.rvalue || now);
                 Utils.setNodeValue(node, p.output, timestamp2unit(lvalue - rvalue, p.unit || 'd'));
             });
         });
         Action.set('date.calc', obj => {
             const now = Date.now();
             Utils.traverse(obj, (p, node) => {
-                const input = Utils.date2ms(p.input) || now, interval = Utils.time2ms(p.interval);
+                const input = Utils.date2ms(p.input || now), interval = Utils.time2ms(p.interval);
                 const result = compute(input, interval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, new Date(result).toISOString());
             });
