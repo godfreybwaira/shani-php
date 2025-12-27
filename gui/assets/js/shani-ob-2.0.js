@@ -373,13 +373,12 @@
         const TIMER = new Map();
         const MEMO = Object.setPrototypeOf({}, null);
         const prepareCall = (shani, action, data, evt) => {
-            !isSyncEvent(shani, evt) || clearTimeout(TIMER.get(shani.emitter));
+            const sure = isSyncEvent(shani, evt);
+            !sure || clearTimeout(TIMER.get(shani.emitter));
             TIMER.delete(shani.emitter);
-            callNext(shani, action, data);
+            callNext(shani, action, data, evt);
             doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: shani}));
-            if (isSyncEvent(shani, evt)) {
-                TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
-            }
+            !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {
             const connected = shani.emitter.isConnected;
@@ -393,15 +392,20 @@
             }
         };
         const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.event.type);
-        const callNext = (shani, action, data) => {
+        const callNext = (shani, action, data, evt) => {
             const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
-                const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
-                const p = Utils.object({
-                    paramstr: action.paramstr, selector: action.selector, targets, data
-                });
-                shani.debug !== true || console.log(p);
-                cb.call(shani, p) === false || Utils.trigger(shani, action.fn, data);
+                const evtName = action.ep.event || action.fn;
+                if (evtName !== evt) {
+                    const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
+                    const p = Utils.object({
+                        paramstr: action.paramstr, selector: action.selector, targets, data
+                    });
+                    shani.debug !== true || console.log(p);
+                    cb.call(shani, p) === false || Utils.trigger(shani, evtName, data);
+                } else {
+                    throw new Error('Operation stopped, event name ' + evtName + ' is similar to action name.');
+                }
             }
         };
         const flipValue = val => typeof val === 'boolean' ? !val : '';
