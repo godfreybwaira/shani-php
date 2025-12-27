@@ -722,7 +722,7 @@
         };
         const closeConn = name => {
             const cn = Utils.connection[name];
-            !cn || cn instanceof AbortController ? cn.abort() : cn.close();
+            !cn || (cn instanceof AbortController ? cn.abort() : cn.close());
         };
         const http = (shani, params, method, onStart, onEnd, onSuccess, onError) => {
             const payload = createHttpPayload(shani, params, method), req = Utils.object();
