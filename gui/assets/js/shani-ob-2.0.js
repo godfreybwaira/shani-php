@@ -18,10 +18,10 @@
         return {
             add(name, value, replace) {
                 const n = name.toLowerCase();
-                if (!replace && n in acts) {
-                    console.warn(name + ' already exists.');
-                } else {
+                if (!(n in acts) || replace) {
                     acts[n] = value;
+                } else {
+                    console.warn(name + ' already exists.');
                 }
             },
             get(name) {
