@@ -984,17 +984,16 @@
         });
     })();
     const _Node = (() => {
-        const moveNode = (srcNode, target, params, clone) => {
-            const index = parseInt(params.pos), len = target.children.length + 1;
+        const moveNode = (target, parent, params) => {
+            const index = parseInt(params.pos), len = parent.children.length + 1;
             const offset = index > 0 ? index - 1 : index + len;
             if (Math.abs(index) <= len && index !== 0) {
-                const node = clone ? srcNode.cloneNode(true) : srcNode;
-                target.insertBefore(node, target.children[offset]);
+                parent.insertBefore(target, parent.children[offset]);
             }
         };
         Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
         Action.add('node.copy', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p, true));
+            Utils.traverse(obj, (p, node) => moveNode(this.emitter.cloneNode(true), node, p));
         });
         Action.add('node.move', function (obj) {
             Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
