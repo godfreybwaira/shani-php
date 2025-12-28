@@ -922,9 +922,7 @@
         });
     })();
     const _Props = (() => {
-        Action.add('prop.rmv', obj => {
-            Utils.walk(obj, (node, key) => Utils.removeNodeKey(node, key));
-        });
+        Action.add('prop.rmv', obj => Utils.walk(obj, Utils.removeNodeKey));
         Action.add('prop.exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
