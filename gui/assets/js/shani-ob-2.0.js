@@ -411,10 +411,11 @@
         const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
             date2ms(date) {
-                if (date) {
-                    const value = Date.parse(date);
-                    return !isNaN(value) && /[-./]/.test(date) ? value : null;
+                if (typeof date === 'number') {
+                    return date;
                 }
+                const value = Date.parse(date);
+                return !isNaN(value) && /[-./]/.test(date) ? value : null;
             },
             traverse(obj, cb) {
                 obj.targets.forEach(node => {
