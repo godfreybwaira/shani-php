@@ -229,7 +229,7 @@
         };
         const handleDataInsertion = (target, resp, params) => {
             if (params.mode !== 'discard') {
-                const body = params.transformer ? Utils.calludf(params.transformer, [resp]) : resp.body || '';
+                const body = params.outputf ? Utils.calludf(params.outputf, [resp]) : resp.body || '';
                 const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
                 const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
                 const content = body instanceof Element ? body.outerHTML : body;
@@ -451,7 +451,7 @@
             },
             connection: Object.setPrototypeOf({}, null),
             TIME_UNITS: Object.setPrototypeOf({
-                s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, y: 86400 * 365
+                s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, q: 86400 * 91.25, y: 86400 * 365
             }, null),
             getSubtype(header) {
                 if (header) {
@@ -462,7 +462,7 @@
                 return null;
             },
             time2ms(time) {
-                if (/^\s*-?\d+(\.\d+)?[smhdwy]\s*$/.test(time)) {
+                if (/^\s*-?\d+(\.\d+)?[smhdwqy]\s*$/.test(time)) {
                     time = time.trim();
                     const unit = time.slice(-1).toLowerCase();
                     const val = parseFloat(time.slice(0, -1));
@@ -636,7 +636,7 @@
     })();
     const HttpClient = (() => {
         const createHttpPayload = (shani, params, method) => {
-            const fd = Convertor.input2form(shani.emitter, params.transformer);
+            const fd = Convertor.input2form(shani.emitter, params.inputf);
             const payload = Utils.object({
                 url: shani.http.url, data: null, headers: shani.headers
             });
@@ -653,7 +653,7 @@
         };
         const createWSocketPayload = (shani, params) => {
             const payload = Utils.object({url: shani.http.url, data: null, headers: shani.headers});
-            const fd = Convertor.input2form(shani.emitter, params.transformer);
+            const fd = Convertor.input2form(shani.emitter, params.inputf);
             if (fd) {
                 const type = Utils.getSubtype(shani.headers.get('content-type'));
                 payload.data = JSON.stringify({

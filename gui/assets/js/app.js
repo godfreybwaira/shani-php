@@ -31,4 +31,6 @@ document.addEventListener('shani:init', () => {
     Shani.define('numberaffix', 'prefix:@data-prefix&suffix:@data-suffix&@num.io');
     //////////////////////////
     Shani.define('ucase', p => typeof p.input === 'string' ? p.input.toUpperCase() : p.input);
+//    Shani.on('data', d => console.log(d.detail));
+    Shani.define('data-formatter', d => d.body);
 });

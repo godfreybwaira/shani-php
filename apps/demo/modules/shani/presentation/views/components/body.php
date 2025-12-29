@@ -22,7 +22,8 @@
             <i class="mdi mdi-inbox-full"></i>
             <span class="font-sm menu-label">Inputs</span>
         </a>
-        <a href="/shani/0/components/0/bindings" shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content" class="menu-item">
+        <a href="/shani/0/components/0/bindings" shani-on="click->util.trigger ui-select>>#parent1;
+           util.trigger->http.pull outputf:data-formatter>>#content" class="menu-item">
             <i class="mdi mdi-anchor"></i>
             <span class="font-sm menu-label">Bindings</span>
         </a>
