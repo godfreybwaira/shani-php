@@ -219,7 +219,7 @@
             !sure || clearTimeout(TIMER.get(shani.emitter));
             TIMER.delete(shani.emitter);
             callNext(shani, action, data, evt);
-            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: shani}));
+            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object({shani, data})}));
             !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {

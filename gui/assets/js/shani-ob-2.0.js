@@ -368,7 +368,7 @@
             !sure || clearTimeout(TIMER.get(shani.emitter));
             TIMER.delete(shani.emitter);
             callNext(shani, action, data, evt);
-            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: shani}));
+            doc.dispatchEvent(new CustomEvent('shani:on:' + evt, {detail: Utils.object({shani, data})}));
             !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {
@@ -949,7 +949,8 @@
             });
         });
         Action.add('util.trigger', function (obj) {
-            Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: this, bubbles: true})));
+            const data = Utils.object({shani: this, data: obj.data});
+            Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: data, bubbles: true})));
         });
         Action.add('util.saveas', obj => {
             Utils.traverse(obj, p => {
@@ -1113,7 +1114,7 @@
             };
             Action.add('ui.carousel', obj => Utils.traverse(obj, rotateItems));
             Action.add('ui.select', function (obj) {
-                const node = this.event.detail.emitter;
+                const node = this.event.detail.shani.emitter;
                 const children = this.emitter.children;
                 if (Array.from(children).includes(node)) {
                     const p = Parser.params(this.emitter, obj.paramstr), cls = p['active-class'];
