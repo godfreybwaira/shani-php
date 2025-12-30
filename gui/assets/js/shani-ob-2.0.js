@@ -14,7 +14,7 @@
         Observers.mutate(doc.body);
     });
     const Action = (() => {
-        const acts = Object.setPrototypeOf({}, null);
+        const acts = Object.create(null);
         return {
             add(name, value, replace) {
                 const n = name.toLowerCase();
@@ -57,11 +57,11 @@
                 }
             }
         };
-        const demand = function (changes) {
+        const demand = (changes, observer) => {
             for (let change of changes) {
                 if (change.isIntersecting) {
                     change.target.dispatchEvent(new Event('demand', {bubbles: true}));
-                    this.disconnect();
+                    observer.disconnect();
                 }
             }
         };
@@ -178,18 +178,6 @@
                 }
                 return output.slice(1);
             },
-            //            file2json(file) {
-            //                const fr = new FileReader();
-            //                fr.readAsDataURL(file);
-            //                return new Promise(function (ok) {
-            //                    fr.addEventListener('load', e => {
-            //                        ok(Utils.object({
-            //                            name: file.name, size: file.size, type: file.type,
-            //                            base64: e.target.result.slice(e.target.result.indexOf(',') + 1)
-            //                        }));
-            //                    });
-            //                });
-            //            },
             form2(fd, type) {
                 switch (type) {
                     case 'json':
@@ -371,7 +359,7 @@
          * @type Map
          */
         const TIMER = new Map();
-        const MEMO = Object.setPrototypeOf({}, null);
+        const MEMO = Object.create(null);
         const prepareCall = (shani, action, data, evt) => {
             const sure = isSyncEvent(shani, evt);
             !sure || clearTimeout(TIMER.get(shani.emitter));
@@ -403,7 +391,7 @@
                     shani.debug !== true || console.log(p);
                     cb.call(shani, p) === false || Utils.trigger(shani, evtName, data);
                 } else {
-                    console.warn('Operation stopped, event name ' + evtName + ' is similar to action name.');
+                    console.warn('Operation stopped, event name ' + evtName + ' creates a loop with action name.');
                 }
             }
         };
@@ -449,10 +437,10 @@
                 }
                 return code < 200 ? 'info' : 'offline';
             },
-            connection: Object.setPrototypeOf({}, null),
-            TIME_UNITS: Object.setPrototypeOf({
+            connection: Object.create(null),
+            TIME_UNITS: {
                 s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, q: 86400 * 91.25, y: 86400 * 365
-            }, null),
+            },
             getSubtype(header) {
                 if (header) {
                     const subtype = header.slice(header.indexOf('/') + 1).split(';')[0];
@@ -507,7 +495,8 @@
                 }
             },
             object(o) {
-                return Object.setPrototypeOf(o || {}, null);
+                const obj = Object.create(null);
+                return o ? Object.assign(obj, o) : obj;
             },
             setNodeValue(node, key, val) {
                 const v = val instanceof Element ? val.outerHTML : val;
