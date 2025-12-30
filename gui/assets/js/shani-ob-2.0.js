@@ -220,14 +220,16 @@
         };
         const handleDataInsertion = (target, resp, params) => {
             if (params.mode !== 'discard') {
-                const body = params.outputf ? Utils.calludf(params.outputf, [resp]) : resp.body || '';
-                const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
-                const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
-                const content = body instanceof Element ? body.outerHTML : body;
-                if (params.mode === 'replace') {
-                    return Utils.setNodeValue(target, output, content);
+                const body = params.outputf ? Utils.calludf(params.outputf, [resp, target]) : resp.body || '';
+                if (body !== undefined) {
+                    const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
+                    const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
+                    const content = body instanceof Element ? body.outerHTML : body;
+                    if (params.mode === 'replace') {
+                        return Utils.setNodeValue(target, output, content);
+                    }
+                    return isInput ? setInputData(target, output, content, params) : insertData(target, content, params);
                 }
-                return isInput ? setInputData(target, output, content, params) : insertData(target, content, params);
             }
         };
         return {
