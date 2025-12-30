@@ -423,9 +423,7 @@
                 node.style.opacity = 0;
                 node.addEventListener('transitionend', () => node.remove());
             },
-            getId() {
-                return Math.random().toString(36).slice(2);
-            },
+            getId: () => Math.random().toString(36).slice(2),
             code2text(code) {
                 if (code > 199 && code < 300) {
                     return 'success';
@@ -520,12 +518,8 @@
                 }
                 return key;
             },
-            nodeKeyExists(node, key) {
-                return  key in node || node.hasAttribute(key);
-            },
-            splitEvents(node) {
-                return Parser.events(node.getAttribute('shani-on'));
-            },
+            nodeKeyExists: (node, key) => key in node || node.hasAttribute(key),
+            splitEvents: node => Parser.events(node.getAttribute('shani-on')),
             eventExists(node, evt) {
                 const events = Utils.splitEvents(node);
                 for (const e in events) {

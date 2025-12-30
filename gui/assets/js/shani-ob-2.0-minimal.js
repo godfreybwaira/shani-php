@@ -317,9 +317,7 @@
                 }
                 return key;
             },
-            splitEvents(node) {
-                return Parser.events(node.getAttribute('shani-on'));
-            },
+            splitEvents: node => Parser.events(node.getAttribute('shani-on')),
             getParentNode(childNode, parentSelector) {
                 const parent = childNode.parentElement;
                 if (!parent || parent.matches(parentSelector)) {
