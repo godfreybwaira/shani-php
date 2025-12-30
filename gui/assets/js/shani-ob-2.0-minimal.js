@@ -3,6 +3,9 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 (doc => {
     'use strict';
+    const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
+    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
+
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
             window.Shani = Utils.object({
@@ -203,8 +206,6 @@
             root.querySelectorAll('[shani-on]').forEach(addListener);
         };
     })();
-    const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
-    const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
     const LAST_EVENT = 'httpend';
     const Utils = (() => {
         /**
@@ -297,7 +298,7 @@
             },
             object(o) {
                 const obj = Object.create(null);
-                return o ? Object.assign(obj, o) : obj;
+                return !o ? obj : Object.assign(obj, o);
             },
             setNodeValue(node, key, val) {
                 const v = val instanceof Element ? val.outerHTML : val;
