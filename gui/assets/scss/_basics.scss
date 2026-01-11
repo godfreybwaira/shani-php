@@ -103,7 +103,7 @@
     --spacing-sm: #{math.div(var.$spacing,4)} #{math.div(var.$spacing,2)};
     --radius-sm: #{map.get(var.$border_radius,sm)};
 }
-*,:before,:after{
+:not([draggable]),:before,:after{
     transition: all .3s,color 0s;
 }
 @each $name,$color in var.$action_colors{

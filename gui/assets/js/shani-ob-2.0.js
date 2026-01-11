@@ -240,23 +240,22 @@
         };
     })();
     const Shani = (() => {
-        const Obj = function (node, e) {
-            this.event = e;
-            this.emitter = node;
-            setShaniAttrs(this, node);
-            this.poll = Utils.object();
-            this.actions = collectActions(node);
-            this.headers = new Headers(this.headers);
-            /**for HTTP push() and pull() sync become false**/
-            this.sync = true;
-        };
-        const setShaniAttrs = (shani, node) => {
+        const getObject = (node, event) => {
+            const shani = Utils.object({
+                sync: true,
+                event: event,
+                emitter: node,
+                poll: Utils.object(),
+                actions: collectActions(node)
+            });
             ['history', 'debug'].forEach(a => {
                 shani[a] = Utils.resolveVariable(node, node.getAttribute('shani-' + a));
             });
             ['headers', 'cache', 'http'].forEach(a => {
                 shani[a] = Parser.params(node, node.getAttribute('shani-' + a));
             });
+            shani.headers = new Headers(shani.headers);
+            return shani;
         };
         const collectActions = node => {
             const events = Utils.splitEvents(node), map = new Map();
@@ -278,7 +277,7 @@
         return {
             create(node, event) {
                 if (!Utils.getNodeValue(node, 'disabled')) {
-                    const shani = new Obj(node, event);
+                    const shani = getObject(node, event);
                     Utils.trigger(shani, event.type);
                 }
             }

@@ -1,28 +1,32 @@
-<div class="menubar accent-color">
+<div class="menubar accent-color" id="sidemenu" shani-on="ui-select->ui.select active-class:active">
     <a href="/" class="active menu-item menu-item-dir-v" shani-on="click->ui.select active-class:active">
         <i class="mdi mdi-home"></i>
         <span class="font-sm menu-label">Home</span>
     </a>
     <a href="/shani/0/components/0/shani"
-       shani-on="click->ui.select active-class:active;ui.select->http.pull>>#mainbody" class="menu-item menu-item-dir-v">
+       shani-on="click->util.trigger ui-select>>#sidemenu;
+       util.trigger->http.pull>>#mainbody" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
     <a href="/shani/0/components/0/stream" shani-http="@data-conn" data-conn="cname:@http-name"
-       shani-on="click->ui.select active-class:active;ui.select->ui.loader @loader-bar-specs>>.layout-content;
+       shani-on="click->util.trigger ui-select>>#sidemenu;
+       util.trigger->ui.loader @loader-bar-specs>>.layout-content;
        ui.loader->http.abort @conn;http.abort->http.pull>>#content;
        httpend->ui.loader.rmv>>.layout-content" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-water"></i>
         <span class="font-sm menu-label">Streaming</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
-       shani-on="click->ui.select active-class:active;ui.select->ui.loader name:loader-top&size:.2rem>>.layout-content;
+       shani-on="click->util.trigger ui-select>>#sidemenu;
+       util.trigger->ui.loader name:loader-top&size:.2rem>>.layout-content;
        cssadd->http.pull>>#content;httpend->ui.loader.rmv>>.layout-content">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 1</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
-       shani-on="click->ui.select active-class:active;ui.select->ui.loader @loader-black>>.layout-container;
+       shani-on="click->util.trigger ui-select>>#sidemenu;
+       util.trigger->ui.loader @loader-black>>.layout-container;
        ui.loader->http.abort @conn;
        http.abort->http.pull>>#content;
        httpend->ui.loader.rmv>>.layout-container">
@@ -30,7 +34,8 @@
         <span class="font-sm menu-label">Loader 2</span>
     </a>
     <a href="/shani/0/components/0/card" class="menu-item menu-item-dir-v" data-headers="content-type:application/json"
-       shani-on="click->ui.select active-class:active;ui.select->ui.modal @modal-specs;
+       shani-on="click->util.trigger ui-select>>#sidemenu;
+       util.trigger->ui.modal @modal-specs;
        ui.modal->http.pull>>#mdl123; 408->timeout;
        httpend->ui.loader.rmv>>#mdl123;
        httpstart->ui.loader @loader-circle-specs>>#mdl123;
