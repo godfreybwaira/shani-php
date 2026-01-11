@@ -239,11 +239,11 @@
             }
         };
     })();
-    const Shani = (() => {
+    const Shanify = (() => {
         const getObject = (node, event) => {
             const shani = Utils.object({
+                event,
                 sync: true,
-                event: event,
                 emitter: node,
                 poll: Utils.object(),
                 actions: collectActions(node)
@@ -274,23 +274,14 @@
             }
             return map;
         };
-        return {
-            create(node, event) {
-                if (!Utils.getNodeValue(node, 'disabled')) {
-                    const shani = getObject(node, event);
-                    Utils.trigger(shani, event.type);
-                }
-            }
-        };
-    })();
-    const Shanify = (() => {
         const listen = e => {
             const node = getTargetNode(e.target.closest('[shani-on]'), e.type);
-            if (node) {
+            if (node && !Utils.getNodeValue(node, 'disabled')) {
                 if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
                     e.preventDefault();
                 }
-                Shani.create(node, e);
+                const shani = getObject(node, e);
+                Utils.trigger(shani, e.type);
             }
         };
         const getTargetNode = (node, evt) => {
