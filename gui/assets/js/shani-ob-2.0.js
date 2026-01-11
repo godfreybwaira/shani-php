@@ -35,7 +35,7 @@
     const Selectors = new Map();
     const Observers = (() => {
         const runScript = node => {
-            if (Utils.nodeKeyExists(node, 'src')) {
+            if (node.src.length > 0) {
                 const found = doc.head.querySelector('script[src="' + node.src + '"]') !== null;
                 if (!found) {
                     doc.head.appendChild(node);
