@@ -19,8 +19,7 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const Action = (() => {
-        const acts = Object.create(null);
+    const Action = (acts => {
         return {
             add(name, value, replace) {
                 const n = name.toLowerCase();
@@ -38,7 +37,7 @@
                 return phrase === undefined ? keys : keys.filter(v => v.indexOf(phrase) > -1);
             }
         };
-    })();
+    })(Object.create(null));
     const Observers = (() => {
         const runScript = node => {
             if (node.src.length > 0) {
