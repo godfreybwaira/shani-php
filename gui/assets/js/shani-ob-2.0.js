@@ -29,9 +29,7 @@
                     console.warn(name + ' already exists.');
                 }
             },
-            get(name) {
-                return acts[name];
-            },
+            get: name => acts[name],
             asList(phrase) {
                 const keys = Object.keys(acts);
                 return phrase === undefined ? keys : keys.filter(v => v.indexOf(phrase) > -1);
@@ -203,7 +201,7 @@
             }
         };
     })();
-    const HTML = (() => {
+    const HTMLResponse = (() => {
         const setInputData = (target, output, content, params) => {
             const value = Utils.getNodeValue(target, output);
             if (params.mode === 'prepend') {
@@ -237,11 +235,9 @@
                 }
             }
         };
-        return {
-            processResponse(shani, targets, response, params) {
-                Utils.trigger(shani, 'data', response);
-                targets.forEach(node => handleDataInsertion(node, response, params));
-            }
+        return(shani, targets, response, params) => {
+            Utils.trigger(shani, 'data', response);
+            targets.forEach(node => handleDataInsertion(node, response, params));
         };
     })();
     const Shanify = (() => {
@@ -690,7 +686,7 @@
             const text = Utils.code2text(resp.status);
             Utils.trigger(shani, '' + resp.status, resp);
             Utils.trigger(shani, text, resp);
-            HTML.processResponse(shani, targets, resp, params);
+            HTMLResponse(shani, targets, resp, params);
             if (text === 'redirect') {
                 const url = resp.headers.get('location');
                 url === '#' ? location.reload() : location = url;
@@ -734,7 +730,7 @@
                 const resp = Utils.object({
                     body: e.data || '', headers: new Headers({'content-type': 'text/html'})
                 });
-                HTML.processResponse(shani, targets, resp, params);
+                HTMLResponse(shani, targets, resp, params);
             });
             on('open', e => {
                 onConnect(shani);
@@ -763,7 +759,7 @@
             });
             on('message', e => {
                 const resp = Utils.object({body: e.data || '', headers: new Headers()});
-                HTML.processResponse(shani, targets, resp, params);
+                HTMLResponse(shani, targets, resp, params);
             });
             on('close', e => Utils.trigger(shani, 'httpend'));
         };
