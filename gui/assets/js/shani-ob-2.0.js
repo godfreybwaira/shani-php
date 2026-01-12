@@ -7,7 +7,9 @@
         if (!window.Shani) {
             window.Shani = Utils.object({
                 select: (selector, obj) => Selectors.set(selector, Utils.object(obj)),
+                selectors: name => name === undefined ? Selectors : Selectors.get(name),
                 define: Action.add,
+                definitions: Action.asList,
                 on: (e, cb) => doc.addEventListener('shani:on:' + e, cb)
             });
             Object.freeze(window.Shani);
@@ -29,6 +31,10 @@
             },
             get(name) {
                 return acts[name];
+            },
+            asList(prefix) {
+                const keys = Object.keys(acts);
+                return prefix === undefined ? keys : keys.filter(v => v.startsWith(prefix));
             }
         };
     })();
