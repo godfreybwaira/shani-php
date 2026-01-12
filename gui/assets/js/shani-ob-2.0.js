@@ -222,22 +222,22 @@
             params.mode !== 'swap' || target.remove();
         };
         const handleDataInsertion = (target, resp, params) => {
-            if (params.mode !== 'discard') {
-                const body = params.outputf ? Utils.calludf(params.outputf, [resp, target]) : resp.body || '';
-                if (body !== undefined) {
-                    const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
-                    const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
-                    const content = body instanceof Element ? body.outerHTML : body;
-                    if (params.mode === 'replace') {
-                        return Utils.setNodeValue(target, output, content);
-                    }
-                    return isInput ? setInputData(target, output, content, params) : insertData(target, content, params);
+            const body = params.outputf ? Utils.calludf(params.outputf, [resp, target]) : resp.body || '';
+            if (body !== undefined) {
+                const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
+                const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
+                const content = body instanceof Element ? body.outerHTML : body;
+                if (params.mode === 'replace') {
+                    return Utils.setNodeValue(target, output, content);
                 }
+                isInput ? setInputData(target, output, content, params) : insertData(target, content, params);
             }
         };
         return(shani, targets, response, params) => {
             Utils.trigger(shani, 'data', response);
-            targets.forEach(node => handleDataInsertion(node, response, params));
+            if (params.mode !== 'discard') {
+                targets.forEach(node => handleDataInsertion(node, response, params));
+            }
         };
     })();
     const Shanify = (() => {
