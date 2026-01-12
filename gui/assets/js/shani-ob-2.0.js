@@ -2,6 +2,7 @@
     'use strict';
     const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
+    const Selectors = new Map();
 
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
@@ -32,13 +33,12 @@
             get(name) {
                 return acts[name];
             },
-            asList(prefix) {
+            asList(phrase) {
                 const keys = Object.keys(acts);
-                return prefix === undefined ? keys : keys.filter(v => v.startsWith(prefix));
+                return phrase === undefined ? keys : keys.filter(v => v.indexOf(phrase) > -1);
             }
         };
     })();
-    const Selectors = new Map();
     const Observers = (() => {
         const runScript = node => {
             if (node.src.length > 0) {
