@@ -11,7 +11,7 @@
                 selectors: name => name === undefined ? Selectors : Selectors.get(name),
                 define: Action.add,
                 definitions: Action.asList,
-                on: (e, cb) => doc.addEventListener('shani:on:' + e, cb)
+                on: (event, cb) => doc.addEventListener('shani:on:' + event, cb)
             });
             Object.freeze(window.Shani);
             doc.dispatchEvent(new Event('shani:init'));
