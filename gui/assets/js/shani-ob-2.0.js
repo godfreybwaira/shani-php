@@ -32,7 +32,7 @@
             get: name => acts[name],
             asList(phrase) {
                 const keys = Object.keys(acts);
-                return phrase === undefined ? keys : keys.filter(v => v.indexOf(phrase) > -1);
+                return phrase === undefined ? keys : keys.filter(v => v.includes(phrase));
             }
         };
     })(Object.create(null));
@@ -106,7 +106,7 @@
             form2json(fd) {
                 const data = Utils.object(), keys = [];
                 for (let input of fd) {
-                    if (keys.indexOf(input[0]) > -1) {
+                    if (keys.includes(input[0])) {
                         continue;
                     }
                     keys.push(input[0]);
@@ -173,7 +173,7 @@
                 const keys = [];
                 let output = '';
                 for (let input of fd) {
-                    if (keys.indexOf(input[0]) > -1) {
+                    if (keys.includes(input[0])) {
                         continue;
                     }
                     const vals = fd.getAll(input[0]);
@@ -278,7 +278,7 @@
         const listen = e => {
             const node = getTargetNode(e.target.closest('[shani-on]'), e.type);
             if (node && !Utils.getNodeValue(node, 'disabled')) {
-                if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
+                if (['A', 'AREA', 'FORM'].includes(node.tagName)) {
                     e.preventDefault();
                 }
                 const shani = getObject(node, e);
@@ -547,7 +547,7 @@
         };
         const isPlaceHolder = str => {//selector@prop
             return typeof str === 'string' && str.indexOf(SEP_VAR) > 0
-                    && str.indexOf(SEP_KEY_VAL) < 0 && str.charAt(0) !== '\\';
+                    && !str.includes(SEP_KEY_VAL) && str.charAt(0) !== '\\';
         };
         const getEventFromString = (str, idx) => {
             const name = str.slice(0, idx), idx2 = name.search(SEP_ACTION);
@@ -560,7 +560,7 @@
                     const pairs = Parser.toArray(str, SEP_PARAM);
                     pairs.forEach(p => {
                         const pair = splitPair(p, SEP_KEY_VAL, p);
-                        if (pair.k === p && pair.k.indexOf(SEP_VAR) > -1) {//@prop, #id@prop
+                        if (pair.k === p && pair.k.includes(SEP_VAR)) {//@prop, #id@prop
                             const value = Utils.resolveVariable(node, pair.k);
                             Object.assign(obj, Parser.params(node, Parser.variable(value)));
                         } else {
@@ -619,7 +619,7 @@
             });
             if (fd) {
                 if (method.toUpperCase() === 'GET') {
-                    const mark = shani.http.url.indexOf('?') < 0 ? '?' : '&';
+                    const mark = shani.http.url.includes('?') ? '&' : '?';
                     payload.url = shani.http.url + mark + Convertor.urlencoded(fd);
                 } else {
                     const type = Utils.getSubtype(payload.headers.get('content-type'));
