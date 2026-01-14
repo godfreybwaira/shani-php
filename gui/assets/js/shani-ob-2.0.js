@@ -2,7 +2,7 @@
     'use strict';
     const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
-    const Selectors = new Map();
+    const Selectors = new Map(), START_EVENT = 'httpstart', END_EVENT = 'httpend';
 
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
@@ -372,7 +372,7 @@
                 return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
             }
         };
-        const isSyncEvent = (shani, evt) => evt === 'httpend' || (shani.sync && evt === shani.event.type);
+        const isSyncEvent = (shani, evt) => evt === END_EVENT || (shani.sync && evt === shani.event.type);
         const callNext = (shani, action, data, evt) => {
             const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
@@ -668,11 +668,11 @@
             }
             http(shani, params, shani.http.method || method, request => {
                 Utils.setNodeValue(em, 'disabled', true);
-                Utils.trigger(shani, 'httpstart', {request});
+                Utils.trigger(shani, START_EVENT, {request});
             }, () => {
                 onConnect(shani);
                 Utils.setNodeValue(em, 'disabled', false);
-                Utils.trigger(shani, 'httpend');
+                Utils.trigger(shani, END_EVENT);
             }, resp => onSuccessReq(shani, target, resp, params), err => {
                 const status = err.name === 'AbortError' ? 408 : 400;
                 if (!isNaN(shani.poll.limit)) {
@@ -734,13 +734,13 @@
             });
             on('open', e => {
                 onConnect(shani);
-                Utils.trigger(shani, 'httpstart');
+                Utils.trigger(shani, START_EVENT);
             });
             on('error', e => {
                 onConnect(shani);
                 Utils.trigger(shani, 'error');
             });
-            on('close', e => Utils.trigger(shani, 'httpend'));
+            on('close', e => Utils.trigger(shani, END_EVENT));
         };
         const wsocket = (shani, targets, params) => {
             const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
@@ -750,7 +750,7 @@
             on('open', e => {
                 onConnect(shani);
                 const payload = createWSocketPayload(shani, params);
-                Utils.trigger(shani, 'httpstart', {request: payload});
+                Utils.trigger(shani, START_EVENT, {request: payload});
                 Utils.connection[name].send(payload.data || '');
             });
             on('error', e => {
@@ -761,7 +761,7 @@
                 const resp = Utils.object({body: e.data || '', headers: new Headers()});
                 HTMLResponse(shani, targets, resp, params);
             });
-            on('close', e => Utils.trigger(shani, 'httpend'));
+            on('close', e => Utils.trigger(shani, END_EVENT));
         };
         /** ==============HTTP=============*/
         Action.add('http.pull', function (obj) {
