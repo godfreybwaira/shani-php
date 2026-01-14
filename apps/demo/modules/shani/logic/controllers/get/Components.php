@@ -123,11 +123,6 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app->writer->send(new WebUIBuilder());
         }
 
-        public function dragging(): void
-        {
-            $this->app->writer->send(new WebUIBuilder());
-        }
-
         public function client(): void
         {
             $client = new HttpClient(new URI('https://dev.shani.v2.local'));
