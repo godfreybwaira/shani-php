@@ -601,7 +601,11 @@
                 return obj;
             },
             toArray(str, sep) {
-                return str ? str.split(sep).map(s => s.trim()).filter(a => a.length !== 0) : [];
+                return typeof str !== 'string' ? [] : str.split(sep).reduce((acc, s) => {
+                    const a = s.trim();
+                    a === '' || acc.push(a);
+                    return acc;
+                }, []);
             },
             bindProperty(node, prop, val) {
                 const value = Parser.variable(val), pair = splitPair(prop, SEP_VAR, prop);
