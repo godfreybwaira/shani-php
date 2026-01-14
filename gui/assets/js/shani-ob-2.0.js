@@ -937,9 +937,9 @@
                 Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
             });
         });
-        Action.add('util.transform', obj => {
+        Action.add('util.call', obj => {
             Utils.traverse(obj, (p, node) => {
-                const result = Utils.calludf(p.transformer, [p, node]);
+                const result = Utils.calludf(p.fn, [p, node]);
                 result === undefined || Utils.setNodeValue(node, p.output, result);
             });
         });
