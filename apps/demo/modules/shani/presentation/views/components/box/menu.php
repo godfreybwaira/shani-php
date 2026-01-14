@@ -39,7 +39,7 @@
        ui.modal->http.pull>>#mdl123; 408->timeout;
        httpend->ui.loader.rmv>>#mdl123;
        httpstart->ui.loader @loader-circle-specs>>#mdl123;
-       data->util.saveas @saved-file;"
+       data->util.asfile @saved-file;"
        shani-http="@default-http" shani-headers="@data-headers">
         <i class="mdi mdi-inbox-full"></i>
         <span class="font-sm menu-label">Modal</span>
