@@ -1252,8 +1252,8 @@
         });
         Action.add('ui.loader.rmv', obj => {
             const props = ['--loader-color', '--loader-size', '--loader-thickness'];
-            obj.targets.forEach(node => {
-                props.forEach(p => node.style.removeProperty(p));
+            Utils.traverse(obj, (_, node) => {
+                props.forEach(pr => node.style.removeProperty(pr));
                 node.classList.remove('loader-spin', 'loader-bottom', 'loader-top');
             });
         });
