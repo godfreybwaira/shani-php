@@ -2,7 +2,7 @@
     'use strict';
     const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
-    const Selectors = new Map(), START_EVENT = 'httpstart', END_EVENT = 'httpend';
+    const Selectors = new Map(), START_EVENT = 'httpstart', END_EVENT = 'httpend', PARENT_SELECTOR = '&';
 
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
@@ -235,9 +235,7 @@
         };
         return(shani, targets, response, params) => {
             Utils.trigger(shani, 'data', response);
-            if (params.mode !== 'discard') {
-                targets.forEach(node => handleDataInsertion(node, response, params));
-            }
+            params.mode === 'discard' || targets.forEach(node => handleDataInsertion(node, response, params));
         };
     })();
     const Shanify = (() => {
@@ -378,7 +376,7 @@
             if (cb instanceof Function) {
                 const evtName = action.ep.event || action.fn;
                 if (evtName !== evt) {
-                    const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
+                    const targets = action.selector === PARENT_SELECTOR ? [shani.emitter.parentElement] : action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
                     const p = Utils.object({
                         paramstr: action.paramstr, selector: action.selector, targets, data
                     });
@@ -966,18 +964,44 @@
     })();
     const _Node = (() => {
         const moveNode = (target, parent, params) => {
+            const offset = getOffset(parent, params);
+            offset === null || parent.insertBefore(target, parent.children[offset]);
+        };
+        const getOffset = (parent, params) => {
             const index = parseInt(params.pos), len = parent.children.length + 1;
-            const offset = index > 0 ? index - 1 : index + len;
-            if (Math.abs(index) <= len && index !== 0) {
-                parent.insertBefore(target, parent.children[offset]);
-            }
+            const offset = index > 0 ? index - 1 : index < 0 ? index + len : Math.floor(len / 2);
+            return Math.abs(index) <= len ? offset : null;
         };
         Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
+        Action.add('node.clear', obj => {
+            obj.targets.forEach(node => {
+                while (node.lastChild) {
+                    node.lastChild.remove();
+                }
+            });
+        });
         Action.add('node.copy', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(this.emitter.cloneNode(true), node, p));
+            Utils.traverse(obj, (p, node) => moveNode(node.cloneNode(true), this.emitter, p));
         });
         Action.add('node.move', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, p));
+            Utils.traverse(obj, (p, node) => moveNode(node, this.emitter, p));
+        });
+        Action.add('node.replace', function (obj) {
+            Utils.traverse(obj, (p, node) => {
+                const offset = getOffset(this.emitter, p);
+                offset === null || this.emitter.children[offset].replaceWith(node);
+            });
+        });
+        Action.add('node.swap', function (obj) {
+            Utils.traverse(obj, (p, node) => {
+                const offset = getOffset(this.emitter, p);
+                if (offset !== null) {
+                    const placeholder = doc.createTextNode(''), target = this.emitter.children[offset];
+                    target.replaceWith(placeholder);
+                    node.replaceWith(target);
+                    placeholder.replaceWith(node);
+                }
+            });
         });
     })();
     const _Number = (() => {

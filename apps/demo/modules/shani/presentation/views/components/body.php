@@ -27,6 +27,11 @@
             <i class="mdi mdi-anchor"></i>
             <span class="font-sm menu-label">Bindings</span>
         </a>
+        <a href="/shani/0/components/0/nodes" shani-on="click->util.trigger ui-select>>#parent1;
+           util.trigger->http.pull outputf:data-formatter>>#content" class="menu-item">
+            <i class="mdi mdi-sitemap"></i>
+            <span class="font-sm menu-label">Nodes</span>
+        </a>
     </div>
     <div class="tab-body container" id="content">
         <?php $web->import($web->view('/all')); ?>

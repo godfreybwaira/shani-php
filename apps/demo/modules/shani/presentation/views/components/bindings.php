@@ -35,7 +35,6 @@
         </div>
     </div>
 </div>
-
 <div class="row" id="par1" data-bind="
      click->prop.bind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base;
      prop.bind->util.trigger compute>>#plus10,#results">
