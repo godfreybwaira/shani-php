@@ -370,13 +370,25 @@
                 return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
             }
         };
+        const getElement = (selector, emitter) => {
+            if (selector) {
+                if (selector === PARENT_SELECTOR) {
+                    return [emitter.parentElement];
+                }
+                if (selector.startsWith(PARENT_SELECTOR)) {
+                    return [Utils.getParentNode(emitter, selector.slice(PARENT_SELECTOR.length))];
+                }
+                return  Utils.getCachedNodes(selector);
+            }
+            return [emitter];
+        };
         const isSyncEvent = (shani, evt) => evt === END_EVENT || (shani.sync && evt === shani.event.type);
         const callNext = (shani, action, data, evt) => {
             const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
                 const evtName = action.ep.event || action.fn;
                 if (evtName !== evt) {
-                    const targets = action.selector === PARENT_SELECTOR ? [shani.emitter.parentElement] : action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
+                    const targets = getElement(action.selector, shani.emitter);
                     const p = Utils.object({
                         paramstr: action.paramstr, selector: action.selector, targets, data
                     });

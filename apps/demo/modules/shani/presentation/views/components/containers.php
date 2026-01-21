@@ -266,7 +266,7 @@
     <div class="col width-md-half width-sm-max">
         <div class="tab tab-pos-t borders">
             <div class="tab-menu menubar" shani-on="ui-select->ui.select active-class:active">
-                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>.menubar">
+                <a href="#" class="active menu-item menu-item-dir-v" shani-on="click->util.trigger ui-select>>&">
                     <i class="mdi mdi-account-group"></i>
                     <span class="font-sm">Users</span>
                 </a>
