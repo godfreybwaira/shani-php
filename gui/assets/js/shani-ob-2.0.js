@@ -975,14 +975,11 @@
         });
     })();
     const _Node = (() => {
-        const moveNode = (target, parent, params) => {
-            const offset = getOffset(parent, params);
-            offset === null || parent.insertBefore(target, parent.children[offset]);
-        };
-        const getOffset = (parent, params) => {
-            const index = parseInt(params.pos), len = parent.children.length + 1;
-            const offset = index > 0 ? index - 1 : index < 0 ? index + len : Math.floor(len / 2);
-            return Math.abs(index) <= len ? offset : null;
+        const moveNode = (target, parent, paramstr) => {
+            const p = Parser.params(target, paramstr);
+            const pos = parseInt(p.pos), kids = parent.children;
+            const offset = pos > 0 ? pos - 1 : pos < 0 ? pos + 1 + kids.length : Math.floor(kids.length / 2);
+            parent.insertBefore(target, kids[offset]);
         };
         Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
         Action.add('node.clear', obj => {
@@ -993,27 +990,37 @@
             });
         });
         Action.add('node.copy', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(node.cloneNode(true), this.emitter, p));
+            Utils.traverse(obj, (p, node) => moveNode(this.emitter.cloneNode(true), node, obj.paramstr));
         });
         Action.add('node.move', function (obj) {
-            Utils.traverse(obj, (p, node) => moveNode(node, this.emitter, p));
+            Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, obj.paramstr));
         });
         Action.add('node.replace', function (obj) {
-            Utils.traverse(obj, (p, node) => {
-                const offset = getOffset(this.emitter, p);
-                offset === null || this.emitter.children[offset].replaceWith(node);
-            });
+            Utils.traverse(obj, (p, node) => node.replaceWith(this.emitter));
         });
         Action.add('node.swap', function (obj) {
             Utils.traverse(obj, (p, node) => {
-                const offset = getOffset(this.emitter, p);
-                if (offset !== null) {
-                    const placeholder = doc.createTextNode(''), target = this.emitter.children[offset];
-                    target.replaceWith(placeholder);
-                    node.replaceWith(target);
-                    placeholder.replaceWith(node);
-                }
+                const placeholder = doc.createTextNode('');
+                this.emitter.replaceWith(placeholder);
+                node.replaceWith(this.emitter);
+                placeholder.replaceWith(node);
             });
+        });
+        Action.add('node.walk', function (obj) {
+            const me = this.emitter, p = Parser.params(me, obj.paramstr);
+            const parent = me.parentNode;
+            if (p.direction === 'next') {
+                const neighbor = me.nextElementSibling;
+                const next = neighbor ? neighbor.nextElementSibling : parent.firstChild;
+                parent.insertBefore(me, next);
+            } else {
+                const neighbor = me.previousElementSibling;
+                if (neighbor) {
+                    parent.insertBefore(me, neighbor);
+                } else {
+                    parent.appendChild(me);
+                }
+            }
         });
     })();
     const _Number = (() => {
