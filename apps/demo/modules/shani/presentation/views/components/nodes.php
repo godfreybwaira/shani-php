@@ -193,3 +193,38 @@
         </button>
     </div>
 </div>
+<div class="divider">Node Sort</div>
+<div class="row" id="nsort" shani-on="--sort->node.sort order:asc&row:.col&input:@textContent>>.sortme">
+    <div class="col">
+        <button class="button color-alert sortme">
+            Item 2
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert sortme">
+            Item 5
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert sortme">
+            Item 3
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert sortme">
+            Item 1
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-alert sortme">
+            Item 4
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <button class="button color-success" shani-on="click->util.trigger --sort>>#nsort">
+            Sort
+        </button>
+    </div>
+</div>
