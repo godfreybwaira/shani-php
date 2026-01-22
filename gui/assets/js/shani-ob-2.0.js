@@ -981,6 +981,17 @@
             const offset = pos > 0 ? pos - 1 : pos < 0 ? pos + 1 + kids.length : Math.floor(kids.length / 2);
             parent.insertBefore(target, kids[offset]);
         };
+        const str2number = str => {
+            const date = Utils.date2ms(str);
+            if (date) {
+                return date;
+            }
+            const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);
+            if (!isNaN(num) && value !== '') {
+                return num;
+            }
+            return str.toLowerCase();
+        };
         Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
         Action.add('node.clear', obj => {
             obj.targets.forEach(node => {
@@ -1021,6 +1032,24 @@
                     parent.appendChild(me);
                 }
             }
+        });
+        Action.add('node.sort', function (obj) {
+            const rows = [];
+            Utils.traverse(obj, (p, node) => {
+                rows.push({
+                    node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
+                });
+            });
+            const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
+            rows.sort((r1, r2) => {
+                const v1 = str2number(r1.value), v2 = str2number(r2.value);
+                if (typeof v1 === 'number' && typeof v2 === 'number') {
+                    return asc ? v1 - v2 : v2 - v1;
+                }
+                return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
+            });
+            const tbody = rows[0].node.parentElement;
+            rows.forEach(row => tbody.appendChild(row.node));
         });
     })();
     const _Number = (() => {
@@ -1212,17 +1241,6 @@
             doc.body.insertBefore(cover, doc.body.firstChild);
             return cover;
         };
-        const str2number = str => {
-            const date = Utils.date2ms(str);
-            if (date) {
-                return date;
-            }
-            const value = str.replace(/[^\d.-]/g, ''), num = parseFloat(value);
-            if (!isNaN(num) && value !== '') {
-                return num;
-            }
-            return str.toLowerCase();
-        };
         Action.add('ui.close', function (obj) {
             if (obj.selector) {
                 const selector = Utils.resolveVariable(this.emitter, obj.selector);
@@ -1261,24 +1279,6 @@
                     });
                 }).catch(() => cover.remove());
             }
-        });
-        Action.add('ui.sort', function (obj) {
-            const rows = [];
-            Utils.traverse(obj, (p, node) => {
-                rows.push({
-                    node: Utils.getParentNode(node, p.row || 'tr'), value: p.input.trim()
-                });
-            });
-            const p = Parser.params(this.emitter, obj.paramstr), asc = p.order === 'asc';
-            rows.sort((r1, r2) => {
-                const v1 = str2number(r1.value), v2 = str2number(r2.value);
-                if (typeof v1 === 'number' && typeof v2 === 'number') {
-                    return asc ? v1 - v2 : v2 - v1;
-                }
-                return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
-            });
-            const tbody = rows[0].node.parentElement;
-            rows.forEach(row => tbody.appendChild(row.node));
         });
         Action.add('ui.copy', obj => {
             if (navigator.clipboard) {

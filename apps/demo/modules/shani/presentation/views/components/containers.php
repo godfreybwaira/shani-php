@@ -359,11 +359,11 @@
                 <caption>Users</caption>
                 <thead class="color-12">
                     <tr>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#ltable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#ltable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#ltable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#ltable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#ltable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-even">
@@ -417,15 +417,15 @@
         <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
                shani-on="keyup @data-delay->ui.search>>#tc2 tbody">
         <div class="table-container" id="tc2">
-            <table class="table border-h" id="rtable" data-ptoggle="ui.sort->prop.toggle data-order:asc,desc">
+            <table class="table border-h" id="rtable" data-ptoggle="node.sort->prop.toggle data-order:asc,desc">
                 <caption>Users</caption>
                 <thead>
                     <tr>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
-                        <th data-order="asc" shani-on="click->ui.sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#rtable .sn;#rtable@data-ptoggle">S/N</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#rtable .myname;#rtable@data-ptoggle">Name</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#rtable .myage;#rtable@data-ptoggle">Age</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#rtable .mysalary;#rtable@data-ptoggle">Salary</th>
+                        <th data-order="asc" shani-on="click->node.sort order:@data-order&input:@textContent>>#rtable .mydate;#rtable@data-ptoggle">Start Date</th>
                     </tr>
                 </thead>
                 <tbody class="stripes-odd">
