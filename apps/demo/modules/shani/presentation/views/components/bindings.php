@@ -39,13 +39,13 @@
      click->prop.bind #plus10@data-sign:@data-sign&#plus10@data-base:@data-base;
      prop.bind->util.trigger compute>>#plus10,#results">
     <div class="col">
-        <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
-            Add 10
+        <button class="button color-alert" data-sign="-" data-base="10" shani-on="#par1@data-bind">
+            Minus 10
         </button>
     </div>
     <div class="col">
-        <button class="button color-alert" data-sign="-" data-base="10" shani-on="#par1@data-bind">
-            Minus 10
+        <button class="button color-alert" data-sign="+" data-base="10" shani-on="#par1@data-bind">
+            Add 10
         </button>
     </div>
     <div class="col">

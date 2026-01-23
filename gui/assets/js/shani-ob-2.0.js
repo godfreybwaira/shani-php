@@ -1020,17 +1020,13 @@
         Action.add('node.walk', function (obj) {
             const me = this.emitter, p = Parser.params(me, obj.paramstr);
             const parent = me.parentNode;
-            if (p.direction === 'next') {
+            if (p.direction === 'prev') {
+                const neighbor = me.previousElementSibling;
+                neighbor ? parent.insertBefore(me, neighbor) : parent.appendChild(me);
+            } else {
                 const neighbor = me.nextElementSibling;
                 const next = neighbor ? neighbor.nextElementSibling : parent.firstChild;
                 parent.insertBefore(me, next);
-            } else {
-                const neighbor = me.previousElementSibling;
-                if (neighbor) {
-                    parent.insertBefore(me, neighbor);
-                } else {
-                    parent.appendChild(me);
-                }
             }
         });
         Action.add('node.sort', function (obj) {

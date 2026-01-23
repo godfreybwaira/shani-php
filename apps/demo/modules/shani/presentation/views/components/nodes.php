@@ -100,10 +100,16 @@
         <button class="button color-danger">
             Item 1
         </button>
+        <button class="button color-danger">
+            Item 2
+        </button>
     </div>
     <div class="col swapme">
         <button class="button color-success">
-            Item 2
+            Item 3
+        </button>
+        <button class="button color-success">
+            Item 4
         </button>
     </div>
 </div>
@@ -111,7 +117,7 @@
 <div class="row">
     <div class="col">
         <button class="button color-alert" shani-on="click->util.trigger --swap>>#nswap">
-            Click to Swap
+            <i class="mdi mdi-swap-horizontal-bold"></i> Click to Swap
         </button>
     </div>
 </div>
@@ -145,11 +151,11 @@
 </div>
 <div class="row">
     <div class="col">
-        <button class="button color-info" shani-on="click->prop.bind #nwalk@data-dir:next;prop.bind->util.trigger --walk>>#nwalk">
-            Go Right
-        </button>
         <button class="button color-success" shani-on="click->prop.bind #nwalk@data-dir:prev;prop.bind->util.trigger --walk>>#nwalk">
-            Go Left
+            <i class="mdi mdi-arrow-left"></i> Go Left
+        </button>
+        <button class="button color-info" shani-on="click->prop.bind #nwalk@data-dir:next;prop.bind->util.trigger --walk>>#nwalk">
+            Go Right <i class="mdi mdi-arrow-right"></i>
         </button>
     </div>
 </div>
@@ -169,7 +175,7 @@
 <div class="row">
     <div class="col">
         <button class="button color-alert" shani-on="click->util.trigger --remove>>#nremove">
-            Remove
+            <i class="mdi mdi-trash-can-outline"></i> Remove
         </button>
     </div>
 </div>
@@ -189,12 +195,12 @@
 <div class="row">
     <div class="col">
         <button class="button color-danger" shani-on="click->util.trigger --clear>>#nclear">
-            Clear
+            <i class="mdi mdi-trash-can-outline"></i> Clear
         </button>
     </div>
 </div>
 <div class="divider">Node Sort</div>
-<div class="row" id="nsort" shani-on="--sort->node.sort order:asc&row:.col&input:@textContent>>.sortme">
+<div class="row" id="nsort" data-sort="asc" shani-on="--sort->node.sort order:@data-sort&row:.col&input:@textContent>>.sortme">
     <div class="col">
         <button class="button color-alert sortme">
             Item 2
@@ -223,8 +229,13 @@
 </div>
 <div class="row">
     <div class="col">
-        <button class="button color-success" shani-on="click->util.trigger --sort>>#nsort">
-            Sort
+        <button class="button color-success" shani-on="click->prop.bind #nsort@data-sort:asc;prop.bind->util.trigger --sort>>#nsort">
+            <i class="mdi mdi-sort-ascending"></i> Sort Asc
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-success" shani-on="click->prop.bind #nsort@data-sort:desc;prop.bind->util.trigger --sort>>#nsort">
+            <i class="mdi mdi-sort-descending"></i> Sort Desc
         </button>
     </div>
 </div>
