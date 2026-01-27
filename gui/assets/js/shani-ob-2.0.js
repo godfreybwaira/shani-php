@@ -1246,8 +1246,8 @@
         });
         Action.add('ui.print', function (obj) {
             if (window.print instanceof Function) {
-                const p = Parser.params(this.emitter, obj.paramstr);
-                const cover = getCover(obj.targets, 'size:' + (p.size || 'auto')), title = doc.title;
+                const p = Parser.params(this.emitter, obj.paramstr), title = doc.title;
+                const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
                 doc.title = p.title || title;
                 window.print();
                 doc.title = title;
