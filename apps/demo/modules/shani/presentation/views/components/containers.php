@@ -415,7 +415,7 @@
     </div>
     <div class="col">
         <input type="text" class="input-box" placeholder="Search table" data-delay="delay:0.35s"
-               shani-on="keyup @data-delay->ui.search>>#tc2 tbody">
+               shani-on="keyup @data-delay->input.search>>#tc2 tbody">
         <div class="table-container" id="tc2">
             <table class="table border-h" id="rtable" data-ptoggle="node.sort->prop.toggle data-order:asc,desc">
                 <caption>Users</caption>

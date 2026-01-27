@@ -1194,10 +1194,10 @@
             const getCloseBtn = classList => {
                 if (classList) {
                     const btn = doc.createElement('button');
-                    btn.className = 'button button-times ' + classList;
-                    Utils.setNodeValue(btn, 'type', 'button');
-                    Utils.setNodeValue(btn, 'shani-on', 'click' + SEP_EVT_ACTION + 'ui.close' + SEP_EVT_SELECTOR + '.' + COVER);
+                    btn.type = 'button';
                     btn.innerHTML = '&times;';
+                    btn.className = 'button button-times ' + classList;
+                    Utils.setNodeValue(btn, 'shani-on', 'click' + SEP_EVT_ACTION + 'ui.close' + SEP_EVT_SELECTOR + '.' + COVER);
                     return btn;
                 }
             };
@@ -1241,10 +1241,7 @@
             if (obj.selector) {
                 const selector = Utils.resolveVariable(this.emitter, obj.selector);
                 const parent = Utils.getParentNode(this.emitter, selector);
-                if (parent) {
-                    return Utils.removeNode(parent);
-                }
-                obj.targets.forEach(Utils.removeNode);
+                parent ? Utils.removeNode(parent) : obj.targets.forEach(Utils.removeNode);
             }
         });
         Action.add('ui.print', obj => {
@@ -1258,7 +1255,7 @@
                 });
             }
         });
-        Action.add('ui.search', function (obj) {
+        Action.add('input.search', function (obj) {
             const text = this.emitter.value.trim().toLowerCase();
             obj.targets.forEach(node => {
                 for (const row of node.children) {
