@@ -993,7 +993,7 @@
             return str.toLowerCase();
         };
         Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
-        Action.add('node.clear', obj => {
+        Action.add('node.empty', obj => {
             obj.targets.forEach(node => {
                 while (node.lastChild) {
                     node.lastChild.remove();

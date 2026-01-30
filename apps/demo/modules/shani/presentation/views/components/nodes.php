@@ -179,8 +179,8 @@
         </button>
     </div>
 </div>
-<div class="divider">Node Clear</div>
-<div class="row" id="nclear" shani-on="--clear->node.clear">
+<div class="divider">Node Empty</div>
+<div class="row" id="nempty" shani-on="--empty->node.empty">
     <div class="col">
         <button class="button color-success">
             Item 1
@@ -194,8 +194,8 @@
 </div>
 <div class="row">
     <div class="col">
-        <button class="button color-danger" shani-on="click->util.trigger --clear>>#nclear">
-            <i class="mdi mdi-trash-can-outline"></i> Clear
+        <button class="button color-danger" shani-on="click->util.trigger --empty>>#nempty">
+            <i class="mdi mdi-trash-can-outline"></i> Empty
         </button>
     </div>
 </div>
