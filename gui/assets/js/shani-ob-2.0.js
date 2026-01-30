@@ -340,9 +340,11 @@
             return str.slice(SEP_EVENT.length);
         };
         return root => {
-            setUserAttributes(root);
-            addListener(root);
-            root.querySelectorAll('[shani-on]').forEach(addListener);
+            if (root.tagName !== 'TEMPLATE') {
+                setUserAttributes(root);
+                addListener(root);
+                root.querySelectorAll('[shani-on]').forEach(addListener);
+            }
         };
     })();
     const Utils = (() => {
@@ -967,12 +969,7 @@
                 URL.revokeObjectURL(a.href);
             });
         });
-        Action.add('util.id', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const prefix = p.prefix || 'a';
-                Utils.setNodeValue(node, p.output, prefix + Utils.getId());
-            });
-        });
+        Action.add('get.uid', () => 'a' + Utils.getId());
     })();
     const _Node = (() => {
         const moveNode = (target, parent, paramstr) => {
@@ -1142,6 +1139,7 @@
                 Utils.setNodeValue(node, p.output, timestamp2unit(lvalue - rvalue, p.unit || 'd'));
             });
         });
+        Action.add('date.now', Date.now);
         Action.add('date.calc', obj => {
             const now = Date.now();
             Utils.traverse(obj, (p, node) => {
