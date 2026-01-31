@@ -13,14 +13,14 @@
        shani-on="click->util.trigger ui-select>>#sidemenu;
        util.trigger->ui.loader @loader-bar-specs>>.layout-content;
        ui.loader->http.abort @conn;http.abort->http.pull>>#content;
-       httpend->ui.loader.rmv>>.layout-content" class="menu-item menu-item-dir-v">
+       httpend->ui.loader.rmv name:loader-top>>.layout-content" class="menu-item menu-item-dir-v">
         <i class="mdi mdi-water"></i>
         <span class="font-sm menu-label">Streaming</span>
     </a>
     <a href="/shani/0/components/0/generator" class="menu-item menu-item-dir-v"
        shani-on="click->util.trigger ui-select>>#sidemenu;
        util.trigger->ui.loader name:loader-top&size:.2rem>>.layout-content;
-       cssadd->http.pull>>#content;httpend->ui.loader.rmv>>.layout-content">
+       cssadd->http.pull>>#content;httpend->ui.loader.rmv name:loader-top>>.layout-content">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 1</span>
     </a>
@@ -29,7 +29,7 @@
        util.trigger->ui.loader @loader-black>>.layout-container;
        ui.loader->http.abort @conn;
        http.abort->http.pull>>#content;
-       httpend->ui.loader.rmv>>.layout-container">
+       httpend->ui.loader.rmv name:loader-spin>>.layout-container">
         <i class="mdi mdi-loading"></i>
         <span class="font-sm menu-label">Loader 2</span>
     </a>
@@ -37,7 +37,7 @@
        shani-on="click->util.trigger ui-select>>#sidemenu;
        util.trigger->ui.modal @modal-specs;
        ui.modal->http.pull>>#mdl123; 408->timeout;
-       httpend->ui.loader.rmv>>#mdl123;
+       httpend->ui.loader.rmv name:loader-spin>>#mdl123;
        httpstart->ui.loader @loader-circle-specs>>#mdl123;
        data->util.asfile @saved-file;"
        shani-http="@default-http" shani-headers="@data-headers">

@@ -11,7 +11,7 @@
             <button shani-on="click->ui.close>>.modal-background" class="button button-times pos-tr"
                     style="margin: var(--spacing)">&times;</button>
             <div class="card" action="/shani/0/components/0/generator"
-                 shani-on="load delay:2s&steps:3s&limit:4->http.pull;httpend->ui.loader.rmv;
+                 shani-on="load delay:2s&steps:3s&limit:4->http.pull;httpend->ui.loader.rmv name:loader-spin;
                  httpstart->ui.loader name:loader-spin&size:2.5rem;"
                  shani-http="url:@action">
             </div>
