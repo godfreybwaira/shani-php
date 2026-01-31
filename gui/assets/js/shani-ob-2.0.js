@@ -725,7 +725,7 @@
                 req.cacheAge = Utils.time2ms(p.age);
                 req.cacheName = p.name || 'pubcache';
             }
-            req.cname = shani.http.cname || 'http';
+            req.cname = shani.http.name || 'http';
             req.options = Utils.object({
                 headers: payload.headers,
                 body: payload.data,
@@ -737,7 +737,7 @@
             FetchClient.send(payload.url, req, onSuccess, onError, onEnd);
         };
         const sse = (shani, targets, params) => {
-            const name = shani.http.cname || 'sse';
+            const name = shani.http.name || 'sse';
             Utils.connection[name] = new EventSource(shani.http.url, {
                 withCredentials: shani.http.credentials === 'include'
             });
@@ -760,7 +760,7 @@
         };
         const wsocket = (shani, targets, params) => {
             const host = shani.http.url.contains('://') ? '' : shani.http.scheme + '://' + location.host;
-            const name = shani.http.cname || 'ws';
+            const name = shani.http.name || 'ws';
             Utils.connection[name] = new WebSocket(host + shani.http.url);
             const on = (e, cb) => Utils.connection[name].addEventListener(e, cb);
             on('open', e => {
@@ -1042,7 +1042,9 @@
                 return asc ? String(v1).localeCompare(String(v2)) : String(v2).localeCompare(String(v1));
             });
             const tbody = rows[0].node.parentElement;
-            rows.forEach(row => tbody.appendChild(row.node));
+            const df = doc.createDocumentFragment();
+            rows.forEach(row => df.appendChild(row.node));
+            tbody.appendChild(df);
         });
     })();
     const _Number = (() => {
@@ -1227,11 +1229,13 @@
             style.type = 'text/css';
             style.textContent = s;
             const cover = doc.createElement('div');
+            const df = doc.createDocumentFragment();
             cover.appendChild(style);
             cover.id = id;
             for (const t of target) {
-                cover.appendChild(t.cloneNode(true));
+                df.appendChild(t.cloneNode(true));
             }
+            cover.appendChild(df);
             doc.body.insertBefore(cover, doc.body.firstChild);
             return cover;
         };

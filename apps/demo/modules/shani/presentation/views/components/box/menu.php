@@ -9,7 +9,7 @@
         <i class="mdi mdi-code-tags"></i>
         <span class="font-sm menu-label">Shani</span>
     </a>
-    <a href="/shani/0/components/0/stream" shani-http="@data-conn" data-conn="cname:@http-name"
+    <a href="/shani/0/components/0/stream" shani-http="@data-conn" data-conn="name:@http-name"
        shani-on="click->util.trigger ui-select>>#sidemenu;
        util.trigger->ui.loader @loader-bar-specs>>.layout-content;
        ui.loader->http.abort @conn;http.abort->http.pull>>#content;
