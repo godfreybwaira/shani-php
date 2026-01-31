@@ -363,13 +363,16 @@
             !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {
-            const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) > 0);
+            const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) >= 0);
             return underLimit && shani.emitter.isConnected;
         };
         const recall = (shani, data, evt) => {
+            const sp = shani.poll;
             if (shouldSchedule(shani)) {
                 const action = shani.actions.get(evt);
-                return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
+                return setTimeout(prepareCall, sp.steps, shani, action, data, evt);
+            } else if (sp.ondone && sp.steps) {
+                setTimeout(() => Utils.trigger(shani, sp.ondone, data), sp.steps);
             }
         };
         const getElement = (selector, emitter) => {
@@ -470,6 +473,7 @@
                     if (p.steps) {
                         shani.poll.steps = Utils.time2ms(p.steps);
                         shani.poll.limit = parseInt(p.limit) || null;
+                        shani.poll.ondone = p.ondone || null;
                     }
                     if (p.delay) {
                         clearTimeout(TIMER.get(shani.emitter));

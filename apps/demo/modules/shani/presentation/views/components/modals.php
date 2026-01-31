@@ -8,11 +8,13 @@
         </div>
     <?php elseif ($type === 'vl'): ?>
         <div class="modal modal-type-v width-md-1q width-sm-3q pos-l">
-            <button shani-on="click->ui.close>>.modal-background" class="button button-times pos-tr"
+            <button shani-on="click->ui.close>>.modal-background" id="closebtn1" class="button button-times pos-tr"
                     style="margin: var(--spacing)">&times;</button>
             <div class="card" action="/shani/0/components/0/generator"
-                 shani-on="load delay:2s&steps:3s&limit:4->http.pull;httpend->ui.loader.rmv name:loader-spin;
-                 httpstart->ui.loader name:loader-spin&size:2.5rem;"
+                 shani-on="load delay:2s&steps:3s&limit:4&ondone:--close-me->http.pull;
+                 httpend->ui.loader.rmv name:loader-spin;
+                 httpstart->ui.loader name:loader-spin&size:2.5rem;
+                 --close-me->util.trigger click>>#closebtn1"
                  shani-http="url:@action">
             </div>
         </div>
