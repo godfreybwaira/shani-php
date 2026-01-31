@@ -1230,7 +1230,7 @@
             style.textContent = s;
             const cover = doc.createElement('div');
             const df = doc.createDocumentFragment();
-            cover.appendChild(style);
+            df.appendChild(style);
             cover.id = id;
             for (const t of target) {
                 df.appendChild(t.cloneNode(true));
