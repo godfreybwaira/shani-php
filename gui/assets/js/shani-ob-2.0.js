@@ -371,8 +371,8 @@
             if (shouldSchedule(shani)) {
                 const action = shani.actions.get(evt);
                 return setTimeout(prepareCall, sp.steps, shani, action, data, evt);
-            } else if (sp.ondone && sp.steps) {
-                setTimeout(() => Utils.trigger(shani, sp.ondone, data), sp.steps);
+            } else if (sp.onend && sp.steps) {
+                return setTimeout(() => Utils.trigger(shani, sp.onend, data), sp.steps);
             }
         };
         const getElement = (selector, emitter) => {
@@ -427,10 +427,6 @@
                     }
                 });
             },
-            removeNode(node) {
-                node.style.opacity = 0;
-                node.addEventListener('transitionend', () => node.remove());
-            },
             getId: () => Math.random().toString(36).slice(2),
             code2text(code) {
                 if (code > 199 && code < 300) {
@@ -473,11 +469,14 @@
                     if (p.steps) {
                         shani.poll.steps = Utils.time2ms(p.steps);
                         shani.poll.limit = parseInt(p.limit) || null;
-                        shani.poll.ondone = p.ondone || null;
+                        shani.poll.onend = p.onend || null;
                     }
                     if (p.delay) {
                         clearTimeout(TIMER.get(shani.emitter));
-                        const id = setTimeout(prepareCall, Utils.time2ms(p.delay), shani, action, data, evt);
+                        const id = setTimeout(() => {
+                            !p.onstart || Utils.trigger(shani, p.onstart, data);
+                            prepareCall(shani, action, data, evt);
+                        }, Utils.time2ms(p.delay));
                         return TIMER.set(shani.emitter, id);
                     }
                 }
@@ -993,7 +992,7 @@
             }
             return str.toLowerCase();
         };
-        Action.add('node.rmv', obj => obj.targets.forEach(Utils.removeNode));
+        Action.add('node.rmv', obj => obj.targets.forEach(node => node.remove()));
         Action.add('node.empty', obj => {
             obj.targets.forEach(node => {
                 while (node.lastChild) {
@@ -1247,7 +1246,7 @@
             if (obj.selector) {
                 const selector = Utils.resolveVariable(this.emitter, obj.selector);
                 const parent = Utils.getParentNode(this.emitter, selector);
-                parent ? Utils.removeNode(parent) : obj.targets.forEach(Utils.removeNode);
+                parent ? parent.remove() : obj.targets.forEach(node => node.remove());
             }
         });
         Action.add('ui.print', function (obj) {
