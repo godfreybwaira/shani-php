@@ -197,7 +197,6 @@
             <input type="text" readonly placeholder="Click to count down..." value="10"
                    shani-on="click delay:0.2s&limit:10&steps:1s->number.compare lvalue:@value&rvalue:0&operator:gt;
                    number.compare->number.calc lvalue:@value&output:value&rvalue:-1&operator:+">
-
         </div>
     </div>
     <div class="col">
@@ -205,6 +204,56 @@
             <label>Date:</label>
             <input type="text" readonly data-val="2024-12-24T12:42:51.424Z" data-unit="d"
                    shani-on="click->date.diff rvalue:@data-val&output:value&unit:@data-unit">
+        </div>
+    </div>
+</div>
+<div class="row row-stretch">
+    <div class="col">
+        <div class="input-group">
+            <label>Char Insertion</label>
+            <input type="text"
+                   shani-on="input name:--set-pos4->char.insert pos:4&char:-&input:@value&output:value;
+                   --set-pos4 name:--set-pos12->char.insert pos:8&char:-&input:@value&output:value;
+                   --set-pos12->char.insert pos:12&char:-&input:@value&output:value"
+                   placeholder="Start typing or paste some contennt...">
+        </div>
+    </div>
+</div>
+<h4>Random Generators</h4>
+<div class="row">
+    <div class="col">
+        <div class="input-group">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rint">
+                Random Int
+            </button>
+            <input type="number" id="rint" min="10" max="99" readonly placeholder="From 10 to 99"
+                   shani-on="load->random.int min:@min&max:@max&output:value">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rfloat">
+                Random Float
+            </button>
+            <input type="text" id="rfloat" min="1.0" max="2.9" readonly placeholder="From 1.0 to 2.9"
+                   shani-on="load->random.float min:@min&max:@max&output:value;
+                   random.float->number.format @numformatter">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rdate">
+                Random Date
+            </button>
+            <input type="text" id="rdate" min="2022-10-12" max="2024-12-01" readonly placeholder="From 2022-10-12 to 2024-12-01"
+                   shani-on="load->random.date min:@min&max:@max&output:value">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="input-group">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rval">
+                Random Value
+            </button>
+            <input type="text" id="rval" data-values="monday,tuesday,wednesday,thursday,friday"
+                   shani-on="load->random.value values:@data-values&output:value">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rstr">
+                Random String
+            </button>
+            <input type="text" id="rstr" shani-on="load->random.str output:value;">
         </div>
     </div>
 </div>

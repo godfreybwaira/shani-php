@@ -391,7 +391,7 @@
         const callNext = (shani, action, data, evt) => {
             const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
-                const evtName = action.ep.event || action.fn;
+                const evtName = action.ep.name || action.fn;
                 if (evtName !== evt) {
                     const targets = getElement(action.selector, shani.emitter);
                     const p = Utils.object({
@@ -972,7 +972,15 @@
                 URL.revokeObjectURL(a.href);
             });
         });
-        Action.add('get.uid', () => 'a' + Utils.getId());
+        Action.add('char.insert', obj => {
+            Utils.traverse(obj, (p, node) => {
+                let value = p.input, pos = parseInt(p.pos) - 1;
+                if (pos < value.length && value.charAt(pos) !== p.char) {
+                    value = value.slice(0, pos) + p.char + value.slice(pos);
+                }
+                Utils.setNodeValue(node, p.output, value);
+            });
+        });
     })();
     const _Node = (() => {
         const moveNode = (target, parent, paramstr) => {
@@ -1151,6 +1159,42 @@
                 const input = Utils.date2ms(p.input || now), interval = Utils.time2ms(p.interval);
                 const result = compute(input, interval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, new Date(result).toISOString());
+            });
+        });
+    })();
+    const _Random = (() => {
+        const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        Action.add('random.int', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const result = randInt(Math.ceil(p.min), Math.floor(p.max));
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+        Action.add('random.float', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const min = parseFloat(p.min), max = parseFloat(p.max);
+                const result = Math.random() * (max - min) + min;
+                Utils.setNodeValue(node, p.output, result);
+            });
+        });
+        Action.add('random.date', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const min = new Date(Utils.date2ms(p.min)), max = new Date(Utils.date2ms(p.max));
+                const timestamp = min.getTime() + Math.random() * (max.getTime() - min.getTime());
+                const date = new Date(timestamp).toISOString();
+                Utils.setNodeValue(node, p.output, date.slice(0, date.indexOf('T')));
+            });
+        });
+        Action.add('random.str', obj => {
+            Utils.traverse(obj, (p, node) => {
+                Utils.setNodeValue(node, p.output, Utils.getId());
+            });
+        });
+        Action.add('random.value', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const values = p.values.split(SEP_LIST);
+                const idx = randInt(0, values.length - 1);
+                Utils.setNodeValue(node, p.output, p.trim ? values[idx].trim() : values[idx]);
             });
         });
     })();
