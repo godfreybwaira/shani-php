@@ -1187,7 +1187,13 @@
         });
         Action.add('random.str', obj => {
             Utils.traverse(obj, (p, node) => {
-                Utils.setNodeValue(node, p.output, Utils.getId());
+                let str = '';
+                const min = parseInt(p.min), max = parseInt(p.max), limit = randInt(min, max);
+                for (let i = 0; i < limit; i++) {
+                    const idx = randInt(0, p.values.length - 1);
+                    str += p.values.charAt(idx);
+                }
+                Utils.setNodeValue(node, p.output, str);
             });
         });
         Action.add('random.value', obj => {

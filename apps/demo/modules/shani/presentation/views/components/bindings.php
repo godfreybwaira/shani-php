@@ -254,7 +254,8 @@
             <button class="button color-alert" shani-on="click->util.trigger load>>#rstr">
                 Random String
             </button>
-            <input type="text" id="rstr" shani-on="load->random.str output:value;">
+            <input type="text" id="rstr" data-chars="XYZabc123DEF" readonly min="3" max="10"
+                   shani-on="load->random.str values:@data-chars&min:@min&max:@max&output:value">
             <button class="button color-alert" shani-on="click->util.trigger load>>#rphone">
                 Random Phone Number
             </button>
