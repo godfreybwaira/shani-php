@@ -211,10 +211,11 @@
     <div class="col">
         <div class="input-group">
             <label>Char Insertion</label>
-            <input type="text"
-                   shani-on="input name:--set-pos4->char.insert pos:4&char:-&input:@value&output:value;
-                   --set-pos4 name:--set-pos12->char.insert pos:8&char:-&input:@value&output:value;
-                   --set-pos12->char.insert pos:12&char:-&input:@value&output:value"
+            <input type="text" data-dash="-" data-lbr="(" data-rbr=")" maxlength="16"
+                   shani-on="input name:--set-pos1->char.insert pos:1&char:@data-lbr&input:@value&output:value;
+                   --set-pos1 name:--set-pos5->char.insert pos:5&char:@data-rbr&input:@value&output:value;
+                   --set-pos5 name:--set-pos9->char.insert pos:9&char:@data-dash&input:@value&output:value;
+                   --set-pos9 name:--set-pos13->char.insert pos:13&char:@data-dash&input:@value&output:value;"
                    placeholder="Start typing or paste some contennt...">
         </div>
     </div>
@@ -254,6 +255,17 @@
                 Random String
             </button>
             <input type="text" id="rstr" shani-on="load->random.str output:value;">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rphone">
+                Random Phone Number
+            </button>
+            <input type="text" data-dash="-" data-lbr="(" data-rbr=")" maxlength="16" id="rphone"
+                   readonly data-prefix="+" min="12345678900" max="99999999999"
+                   shani-on="load->random.int min:@min&max:@max&output:value;
+                   random.int->util.affix input:@value&output:value&prefix:@data-prefix;
+                   util.affix name:--set-pos1->char.insert pos:1&char:@data-lbr&input:@value&output:value;
+                   --set-pos1 name:--set-pos5->char.insert pos:5&char:@data-rbr&input:@value&output:value;
+                   --set-pos5 name:--set-pos9->char.insert pos:9&char:@data-dash&input:@value&output:value;
+                   --set-pos9 name:--set-pos13->char.insert pos:13&char:@data-dash&input:@value&output:value;">
         </div>
     </div>
 </div>

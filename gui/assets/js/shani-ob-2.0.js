@@ -1075,7 +1075,7 @@
                 case '^':
                     return Math.pow(lval, rval);
                 default:
-                    throw new Error('valid math operators are: +-*/%^');
+                    throw new Error('Valid math operators are: +-*/%^');
             }
         };
         const comparator = {
