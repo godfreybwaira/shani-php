@@ -265,13 +265,13 @@
                 Advanced Random String
             </button>
             <input type="text" id="advrstr" data-nums="123456789" data-chars="ABCDEFGHJKL" readonly min="3"
-                   data-num1 data-num2 data-num3 data-str1 data-str2 data-dash="-"
+                   data-num1 data-num2 data-num3 data-str1 data-str2 data-dash="-" data-h=""
                    shani-on="load name:--rand-num1->random.str values:@data-nums&min:@min&max:@min&output:data-num1;
                    --rand-num1 name:--rand-str1->random.str values:@data-chars&min:@min&max:@min&output:data-str1;
                    --rand-str1 name:--rand-num2->random.str values:@data-nums&min:@min&max:@min&output:data-num2;
                    --rand-num2 name:--rand-str2->random.str values:@data-chars&min:@min&max:@min&output:data-str2;
                    --rand-str2 name:--rand-num3->random.str values:@data-nums&min:@min&max:@min&output:data-num3;
-                   --rand-num3->char.concat output:value&props:data-num1, data-str1, data-num2, data-str2, data-num3;
+                   --rand-num3->char.concat output:value&char:@data-h&props:data-num1, data-str1, data-num2, data-str2, data-num3;
                    char.concat name:--set-pos4->char.insert pos:4&char:@data-dash&input:@value&output:value;
                    --set-pos4 name:--set-pos8->char.insert pos:8&char:@data-dash&input:@value&output:value;
                    --set-pos8 name:--set-pos12->char.insert pos:12&char:@data-dash&input:@value&output:value;

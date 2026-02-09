@@ -983,8 +983,8 @@
         });
         Action.add('char.concat', obj => {
             Utils.traverse(obj, (p, node) => {
-                const str = p.props.split(SEP_LIST).reduce((acc, s) => acc + Utils.getNodeValue(node, s.trim()), '');
-                Utils.setNodeValue(node, p.output, str);
+                const values = p.props.split(SEP_LIST).map(s => Utils.getNodeValue(node, s.trim()));
+                Utils.setNodeValue(node, p.output, values.join(p.char || ''));
             });
         });
     })();
