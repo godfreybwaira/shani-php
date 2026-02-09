@@ -981,6 +981,12 @@
                 Utils.setNodeValue(node, p.output, value);
             });
         });
+        Action.add('char.concat', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const str = p.props.split(SEP_LIST).reduce((acc, s) => acc + Utils.getNodeValue(node, s.trim()), '');
+                Utils.setNodeValue(node, p.output, str);
+            });
+        });
     })();
     const _Node = (() => {
         const moveNode = (target, parent, paramstr) => {
@@ -1164,6 +1170,10 @@
     })();
     const _Random = (() => {
         const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const randDate = (min, max) => {
+            const timestamp = min.getTime() + Math.random() * (max.getTime() - min.getTime());
+            return new Date(timestamp);
+        };
         Action.add('random.int', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = randInt(Math.ceil(p.min), Math.floor(p.max));
@@ -1180,9 +1190,17 @@
         Action.add('random.date', obj => {
             Utils.traverse(obj, (p, node) => {
                 const min = new Date(Utils.date2ms(p.min)), max = new Date(Utils.date2ms(p.max));
-                const timestamp = min.getTime() + Math.random() * (max.getTime() - min.getTime());
-                const date = new Date(timestamp).toISOString();
+                const date = randDate(min, max).toISOString();
                 Utils.setNodeValue(node, p.output, date.slice(0, date.indexOf('T')));
+            });
+        });
+        Action.add('random.time', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const tmin = p.min.split(':'), tmax = p.max.split(':'), today = new Date();
+                const min = new Date(today.setHours(parseInt(tmin[0]), parseInt(tmin[1]), parseInt(tmin[2]) || 0));
+                const max = new Date(today.setHours(parseInt(tmax[0]), parseInt(tmax[1]), parseInt(tmax[2]) || 0));
+                const time = randDate(min, max).toLocaleTimeString(undefined, {hour12: p.hour12});
+                Utils.setNodeValue(node, p.output, time);
             });
         });
         Action.add('random.str', obj => {
@@ -1200,7 +1218,7 @@
             Utils.traverse(obj, (p, node) => {
                 const values = p.values.split(SEP_LIST);
                 const idx = randInt(0, values.length - 1);
-                Utils.setNodeValue(node, p.output, p.trim ? values[idx].trim() : values[idx]);
+                Utils.setNodeValue(node, p.output, values[idx].trim());
             });
         });
     })();
