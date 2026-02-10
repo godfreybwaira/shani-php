@@ -1051,7 +1051,7 @@
                 parent.insertBefore(me, next);
             }
         });
-        Action.add('node.shuffle', function (obj) {
+        Action.add('node.shuffle', obj => {
             Utils.traverse(obj, (p, node) => {
                 const rows = Utils.shuffle(Array.from(node.children));
                 const df = doc.createDocumentFragment();
