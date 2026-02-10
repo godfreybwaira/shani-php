@@ -972,7 +972,7 @@
                 URL.revokeObjectURL(a.href);
             });
         });
-        Action.add('char.insert', obj => {
+        Action.add('str.insert', obj => {
             Utils.traverse(obj, (p, node) => {
                 let value = p.input, pos = parseInt(p.pos) - 1;
                 if (pos < value.length && value.charAt(pos) !== p.char) {
@@ -981,9 +981,9 @@
                 Utils.setNodeValue(node, p.output, value);
             });
         });
-        Action.add('char.concat', obj => {
+        Action.add('str.concat', obj => {
             Utils.traverse(obj, (p, node) => {
-                const values = p.props.split(SEP_LIST).map(s => Utils.getNodeValue(node, s.trim()));
+                const values = p.props.split(p.separator || SEP_LIST).map(s => Utils.getNodeValue(node, s.trim()));
                 Utils.setNodeValue(node, p.output, values.join(p.char || ''));
             });
         });
@@ -1216,9 +1216,19 @@
         });
         Action.add('random.value', obj => {
             Utils.traverse(obj, (p, node) => {
-                const values = p.values.split(SEP_LIST);
+                const sep = p.separator || SEP_LIST, values = p.values.split(sep);
                 const idx = randInt(0, values.length - 1);
                 Utils.setNodeValue(node, p.output, values[idx].trim());
+            });
+        });
+        Action.add('random.shuffle', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const sep = p.separator || SEP_LIST, values = p.values.split(sep);
+                for (let i = values.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [values[i], values[j]] = [values[j], values[i]];
+                }
+                Utils.setNodeValue(node, p.output, values.join(sep));
             });
         });
     })();

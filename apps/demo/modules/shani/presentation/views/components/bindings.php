@@ -212,10 +212,10 @@
         <div class="input-group">
             <label>Char Insertion</label>
             <input type="text" data-dash="-" data-lbr="(" data-rbr=")" maxlength="16"
-                   shani-on="input name:--set-pos1->char.insert pos:1&char:@data-lbr&input:@value&output:value;
-                   --set-pos1 name:--set-pos5->char.insert pos:5&char:@data-rbr&input:@value&output:value;
-                   --set-pos5 name:--set-pos9->char.insert pos:9&char:@data-dash&input:@value&output:value;
-                   --set-pos9 name:--set-pos13->char.insert pos:13&char:@data-dash&input:@value&output:value;"
+                   shani-on="input name:--set-pos1->str.insert pos:1&char:@data-lbr&input:@value&output:value;
+                   --set-pos1 name:--set-pos5->str.insert pos:5&char:@data-rbr&input:@value&output:value;
+                   --set-pos5 name:--set-pos9->str.insert pos:9&char:@data-dash&input:@value&output:value;
+                   --set-pos9 name:--set-pos13->str.insert pos:13&char:@data-dash&input:@value&output:value;"
                    placeholder="Start typing or paste some contennt...">
         </div>
     </div>
@@ -245,6 +245,11 @@
             </button>
             <input type="text" id="rtime" min="10:20:03" max="21:00:04" readonly placeholder="From 10:20:03 to 21:00:04"
                    shani-on="load->random.time min:@min&max:@max&output:value&hour12:true;">
+            <button class="button color-alert" shani-on="click->util.trigger load>>#rshuffle">
+                Shuffling
+            </button>
+            <input type="text" id="rshuffle" data-values="one,two,three,four,five"
+                   shani-on="load->random.shuffle values:@data-values&output:value">
         </div>
     </div>
 </div>
@@ -266,16 +271,17 @@
             </button>
             <input type="text" id="advrstr" data-nums="123456789" data-chars="ABCDEFGHJKL" readonly min="3"
                    data-num1 data-num2 data-num3 data-str1 data-str2 data-dash="-" data-h=""
+                   data-props="data-num1, data-str1, data-num2, data-str2, data-num3"
                    shani-on="load name:--rand-num1->random.str values:@data-nums&min:@min&max:@min&output:data-num1;
                    --rand-num1 name:--rand-str1->random.str values:@data-chars&min:@min&max:@min&output:data-str1;
                    --rand-str1 name:--rand-num2->random.str values:@data-nums&min:@min&max:@min&output:data-num2;
                    --rand-num2 name:--rand-str2->random.str values:@data-chars&min:@min&max:@min&output:data-str2;
                    --rand-str2 name:--rand-num3->random.str values:@data-nums&min:@min&max:@min&output:data-num3;
-                   --rand-num3->char.concat output:value&char:@data-h&props:data-num1, data-str1, data-num2, data-str2, data-num3;
-                   char.concat name:--set-pos4->char.insert pos:4&char:@data-dash&input:@value&output:value;
-                   --set-pos4 name:--set-pos8->char.insert pos:8&char:@data-dash&input:@value&output:value;
-                   --set-pos8 name:--set-pos12->char.insert pos:12&char:@data-dash&input:@value&output:value;
-                   --set-pos12 name:--set-pos16->char.insert pos:16&char:@data-dash&input:@value&output:value;">
+                   --rand-num3->str.concat output:value&char:@data-h&props:@data-props;
+                   str.concat name:--set-pos4->str.insert pos:4&char:@data-dash&input:@value&output:value;
+                   --set-pos4 name:--set-pos8->str.insert pos:8&char:@data-dash&input:@value&output:value;
+                   --set-pos8 name:--set-pos12->str.insert pos:12&char:@data-dash&input:@value&output:value;
+                   --set-pos12 name:--set-pos16->str.insert pos:16&char:@data-dash&input:@value&output:value;">
             <button class="button color-alert" shani-on="click->util.trigger load>>#rphone">
                 Random Phone Number
             </button>
@@ -283,10 +289,10 @@
                    readonly data-prefix="+" min="12345678900" max="99999999999"
                    shani-on="load->random.int min:@min&max:@max&output:value;
                    random.int->util.affix input:@value&output:value&prefix:@data-prefix;
-                   util.affix name:--set-pos1->char.insert pos:1&char:@data-lbr&input:@value&output:value;
-                   --set-pos1 name:--set-pos5->char.insert pos:5&char:@data-rbr&input:@value&output:value;
-                   --set-pos5 name:--set-pos9->char.insert pos:9&char:@data-dash&input:@value&output:value;
-                   --set-pos9 name:--set-pos13->char.insert pos:13&char:@data-dash&input:@value&output:value;">
+                   util.affix name:--set-pos1->str.insert pos:1&char:@data-lbr&input:@value&output:value;
+                   --set-pos1 name:--set-pos5->str.insert pos:5&char:@data-rbr&input:@value&output:value;
+                   --set-pos5 name:--set-pos9->str.insert pos:9&char:@data-dash&input:@value&output:value;
+                   --set-pos9 name:--set-pos13->str.insert pos:13&char:@data-dash&input:@value&output:value;">
         </div>
     </div>
 </div>
