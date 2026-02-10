@@ -200,7 +200,9 @@
     </div>
 </div>
 <div class="divider">Node Sort</div>
-<div class="row" id="nsort" data-sort="asc" shani-on="--sort->node.sort order:@data-sort&row:.col&input:@textContent>>.sortme">
+<div class="row" id="nsort" data-sort="asc"
+     shani-on="--sort->node.sort order:@data-sort&row:.col&input:@textContent>>.sortme;
+     --shuffle->node.shuffle">
     <div class="col">
         <button class="button color-alert sortme">
             Item 2
@@ -236,6 +238,11 @@
     <div class="col">
         <button class="button color-success" shani-on="click->prop.bind #nsort@data-sort:desc;prop.bind->util.trigger --sort>>#nsort">
             <i class="mdi mdi-sort-descending"></i> Sort Desc
+        </button>
+    </div>
+    <div class="col">
+        <button class="button color-success" shani-on="click->util.trigger --shuffle>>#nsort">
+            <i class="mdi mdi-shuffle"></i> Shuffle
         </button>
     </div>
 </div>

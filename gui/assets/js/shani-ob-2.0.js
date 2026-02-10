@@ -549,6 +549,14 @@
                     MEMO[key] = doc.querySelectorAll(key);
                 }
                 return MEMO[key];
+            },
+            shuffle(rows) {
+                // Fisher–Yates shuffle
+                for (let i = rows.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [rows[i], rows[j]] = [rows[j], rows[i]];
+                }
+                return rows;
             }
         };
     })();
@@ -1043,6 +1051,14 @@
                 parent.insertBefore(me, next);
             }
         });
+        Action.add('node.shuffle', function (obj) {
+            Utils.traverse(obj, (p, node) => {
+                const rows = Utils.shuffle(Array.from(node.children));
+                const df = doc.createDocumentFragment();
+                rows.forEach(row => df.appendChild(row));
+                node.appendChild(df);
+            });
+        });
         Action.add('node.sort', function (obj) {
             const rows = [];
             Utils.traverse(obj, (p, node) => {
@@ -1223,11 +1239,7 @@
         });
         Action.add('random.shuffle', obj => {
             Utils.traverse(obj, (p, node) => {
-                const sep = p.separator || SEP_LIST, values = p.values.split(sep);
-                for (let i = values.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [values[i], values[j]] = [values[j], values[i]];
-                }
+                const sep = p.separator || SEP_LIST, values = Utils.shuffle(p.values.split(sep));
                 Utils.setNodeValue(node, p.output, values.join(sep));
             });
         });
