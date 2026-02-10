@@ -946,12 +946,6 @@
         });
     })();
     const _Others = (() => {
-        Action.add('util.affix', obj => {
-            Utils.traverse(obj, (p, node) => {
-                const prefix = p.prefix || '', suffix = p.suffix || '';
-                Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
-            });
-        });
         Action.add('util.call', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = Utils.calludf(p.fn, [p, node]);
@@ -985,6 +979,12 @@
             Utils.traverse(obj, (p, node) => {
                 const values = p.props.split(p.separator || SEP_LIST).map(s => Utils.getNodeValue(node, s.trim()));
                 Utils.setNodeValue(node, p.output, values.join(p.char || ''));
+            });
+        });
+        Action.add('str.affix', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const prefix = p.prefix || '', suffix = p.suffix || '';
+                Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
             });
         });
     })();

@@ -4,34 +4,34 @@
         <div class="input-group" id="acc1">
             <label>Price:</label>
             <input type="text" id="unitprice" value="1300.00" readonly data-prefix="@currency" data-suffix="@money-suffix"
-                   shani-on="load->number.format @numformatter;number.format->util.affix @numberaffix;">
+                   shani-on="load->number.format @numformatter;number.format->str.affix @numberaffix;">
             <label>Qty:</label>
             <input type="text" id="plus10" value="0" class="width-md-2" readonly
                    data-suffix="kg" shani-on="compute->number.calc
                    lvalue:@value&output:value&rvalue:@data-base&operator:@data-sign;
-                   number.calc->number.format @numformatter;number.format->util.affix @numberaffix;
-                   util.affix->util.trigger update>>#totalprice;">
+                   number.calc->number.format @numformatter;number.format->str.affix @numberaffix;
+                   str.affix->util.trigger update>>#totalprice;">
             <label>Total Price:</label>
             <input type="text" id="totalprice" readonly data-sign="*" class="width-md-2"
                    data-suffix="@money-suffix" data-prefix="@currency" shani-on="load->util.trigger update;
                    update->prop.bind data-base:#unitprice@value;
                    prop.bind->number.calc
                    lvalue:#plus10@value&output:value&rvalue:@data-base&operator:@data-sign;
-                   number.calc->number.format @numformatter;number.format->util.affix @numberaffix;
-                   util.affix->util.trigger update>>#vat;">
+                   number.calc->number.format @numformatter;number.format->str.affix @numberaffix;
+                   str.affix->util.trigger update>>#vat;">
             <label>VAT (18%):</label>
             <input type="text" id="vat" readonly data-sign="*" data-vat="0.18"
                    class="width-md-2" data-suffix="@money-suffix" data-prefix="@currency"
                    shani-on="update->number.calc
                    lvalue:#totalprice@value&output:value&rvalue:@data-vat&operator:@data-sign;
-                   number.calc->number.format @numformatter;number.format->util.affix @numberaffix;
-                   util.affix->util.trigger update>>#total;">
+                   number.calc->number.format @numformatter;number.format->str.affix @numberaffix;
+                   str.affix->util.trigger update>>#total;">
             <label>TOTAL:</label>
             <input type="text" id="total" readonly data-sign="+" class="width-md-2"
                    data-suffix="@money-suffix" data-prefix="@currency"
                    shani-on="update->number.calc
                    lvalue:#totalprice@value&output:value&rvalue:#vat@value&operator:@data-sign;
-                   number.calc->number.format @numformatter;number.format->util.affix @numberaffix;">
+                   number.calc->number.format @numformatter;number.format->str.affix @numberaffix;">
         </div>
     </div>
 </div>
@@ -85,7 +85,7 @@
                 initial:0&input:@value&operator:+&output:textContent>>#acc1 input;
                 number.accumulate->number.format
                 input:@textContent&mindecimals:@data.mindec&output:textContent;
-                number.format->util.affix input:@textContent&output:textContent&prefix:@currency&suffix:@data-suffix">
+                number.format->str.affix input:@textContent&output:textContent&prefix:@currency&suffix:@data-suffix">
             Result
         </button>
     </div>
@@ -179,7 +179,7 @@
     </div>
     <div class="col">
         <div class="output" data-prefix='He said, "' data-suffix='!"'
-             shani-on="alter->util.affix input:@textContent&output:textContent&prefix:@data-prefix&suffix:@data-suffix">
+             shani-on="alter->str.affix input:@textContent&output:textContent&prefix:@data-prefix&suffix:@data-suffix">
             hey
         </div>
         <div class="output">
@@ -288,8 +288,8 @@
             <input type="text" data-dash="-" data-lbr="(" data-rbr=")" maxlength="16" id="rphone"
                    readonly data-prefix="+" min="12345678900" max="99999999999"
                    shani-on="load->random.int min:@min&max:@max&output:value;
-                   random.int->util.affix input:@value&output:value&prefix:@data-prefix;
-                   util.affix name:--set-pos1->str.insert pos:1&char:@data-lbr&input:@value&output:value;
+                   random.int->str.affix input:@value&output:value&prefix:@data-prefix;
+                   str.affix name:--set-pos1->str.insert pos:1&char:@data-lbr&input:@value&output:value;
                    --set-pos1 name:--set-pos5->str.insert pos:5&char:@data-rbr&input:@value&output:value;
                    --set-pos5 name:--set-pos9->str.insert pos:9&char:@data-dash&input:@value&output:value;
                    --set-pos9 name:--set-pos13->str.insert pos:13&char:@data-dash&input:@value&output:value;">
