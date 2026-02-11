@@ -157,6 +157,7 @@
     </div>
     <div class="col width-md-1q width-sm-max">
         <div class="card">
+            <div class="card-title">About Card</div>
             <div class="card-body">
                 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
             </div>

@@ -5,13 +5,16 @@
     'use strict';
     const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
+    const Selectors = new Map(), START_EVENT = 'httpstart', END_EVENT = 'httpend', PARENT_SELECTOR = '&';
 
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
             window.Shani = Utils.object({
                 select: (selector, obj) => Selectors.set(selector, Utils.object(obj)),
+                selectors: name => name === undefined ? Selectors : Selectors.get(name),
                 define: Action.add,
-                on: (e, cb) => doc.addEventListener('shani:on:' + e, cb)
+                definitions: Action.asList,
+                on: (event, cb) => doc.addEventListener('shani:on:' + event, cb)
             });
             Object.freeze(window.Shani);
             doc.dispatchEvent(new Event('shani:init'));
@@ -19,8 +22,7 @@
         Shanify(doc.body);
         Observers.mutate(doc.body);
     });
-    const Action = (() => {
-        const acts = Object.create(null);
+    const Action = (acts => {
         return {
             add(name, value, replace) {
                 const n = name.toLowerCase();
@@ -30,16 +32,16 @@
                     console.warn(name + ' already exists.');
                 }
             },
-            get(name) {
-                return acts[name];
+            get: name => acts[name],
+            asList(phrase) {
+                const keys = Object.keys(acts);
+                return phrase === undefined ? keys : keys.filter(v => v.includes(phrase));
             }
         };
-    })();
-    const Selectors = new Map();
+    })(Object.create(null));
     const Observers = (() => {
-        const nodeKeyExists = (node, key) => key in node || node.hasAttribute(key);
         const runScript = node => {
-            if (nodeKeyExists(node, 'src')) {
+            if (node.src.length > 0) {
                 const found = doc.head.querySelector('script[src="' + node.src + '"]') !== null;
                 if (!found) {
                     doc.head.appendChild(node);
@@ -80,24 +82,23 @@
             }
         };
     })();
-    const Shani = (() => {
-        const Obj = function (node, e) {
-            this.event = e;
-            this.emitter = node;
-            setShaniAttrs(this, node);
-            this.poll = Utils.object();
-            this.actions = collectActions(node);
-            this.headers = new Headers(this.headers);
-            /**for HTTP push() and pull() sync become false**/
-            this.sync = true;
-        };
-        const setShaniAttrs = (shani, node) => {
+    const Shanify = (() => {
+        const getObject = (node, event) => {
+            const shani = Utils.object({
+                event,
+                sync: true,
+                emitter: node,
+                poll: Utils.object(),
+                actions: collectActions(node)
+            });
             ['history', 'debug'].forEach(a => {
                 shani[a] = Utils.resolveVariable(node, node.getAttribute('shani-' + a));
             });
             ['headers', 'cache', 'http'].forEach(a => {
                 shani[a] = Parser.params(node, node.getAttribute('shani-' + a));
             });
+            shani.headers = new Headers(shani.headers);
+            return shani;
         };
         const collectActions = node => {
             const events = Utils.splitEvents(node), map = new Map();
@@ -116,37 +117,19 @@
             }
             return map;
         };
-        return {
-            create(node, event) {
-                if (!Utils.getNodeValue(node, 'disabled')) {
-                    const shani = new Obj(node, event);
-                    Utils.trigger(shani, event.type);
-                }
-            }
-        };
-    })();
-    const Shanify = (() => {
         const listen = e => {
             const node = getTargetNode(e.target.closest('[shani-on]'), e.type);
-            if (node) {
-                if (['A', 'AREA', 'FORM'].indexOf(node.tagName) > -1) {
+            if (node && !Utils.getNodeValue(node, 'disabled')) {
+                if (['A', 'AREA', 'FORM'].includes(node.tagName)) {
                     e.preventDefault();
                 }
-                Shani.create(node, e);
+                const shani = getObject(node, e);
+                Utils.trigger(shani, e.type);
             }
-        };
-        const eventExists = (node, evt) => {
-            const events = Utils.splitEvents(node);
-            for (const e in events) {
-                if (e === evt) {
-                    return true;
-                }
-            }
-            return false;
         };
         const getTargetNode = (node, evt) => {
             if (node) {
-                if (eventExists(node, evt)) {
+                if (Utils.eventExists(node, evt)) {
                     return node;
                 }
                 return getTargetNode(Utils.getParentNode(node, '[shani-on]'), evt);
@@ -201,12 +184,13 @@
             return str.slice(SEP_EVENT.length);
         };
         return root => {
-            setUserAttributes(root);
-            addListener(root);
-            root.querySelectorAll('[shani-on]').forEach(addListener);
+            if (root.tagName !== 'TEMPLATE') {
+                setUserAttributes(root);
+                addListener(root);
+                root.querySelectorAll('[shani-on]').forEach(addListener);
+            }
         };
     })();
-    const LAST_EVENT = 'httpend';
     const Utils = (() => {
         /**
          * Timer for a delayed actions
@@ -223,22 +207,37 @@
             !sure || TIMER.set(shani.emitter, recall(shani, data, shani.event.type));
         };
         const shouldSchedule = shani => {
-            const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) > 0);
+            const underLimit = shani.poll.steps && (shani.poll.limit === null || (--shani.poll.limit) >= 0);
             return underLimit && shani.emitter.isConnected;
         };
         const recall = (shani, data, evt) => {
+            const sp = shani.poll;
             if (shouldSchedule(shani)) {
                 const action = shani.actions.get(evt);
-                return setTimeout(prepareCall, shani.poll.steps, shani, action, data, evt);
+                return setTimeout(prepareCall, sp.steps, shani, action, data, evt);
+            } else if (sp.onend && sp.steps) {
+                return setTimeout(() => Utils.trigger(shani, sp.onend, data), sp.steps);
             }
         };
-        const isSyncEvent = (shani, evt) => evt === LAST_EVENT || (shani.sync && evt === shani.event.type);
+        const getElement = (selector, emitter) => {
+            if (selector) {
+                if (selector === PARENT_SELECTOR) {
+                    return [emitter.parentElement];
+                }
+                if (selector.startsWith(PARENT_SELECTOR)) {
+                    return [Utils.getParentNode(emitter, selector.slice(PARENT_SELECTOR.length))];
+                }
+                return  Utils.getCachedNodes(selector);
+            }
+            return [emitter];
+        };
+        const isSyncEvent = (shani, evt) => evt === END_EVENT || (shani.sync && evt === shani.event.type);
         const callNext = (shani, action, data, evt) => {
             const cb = action ? Action.get(action.fn) : null;
             if (cb instanceof Function) {
-                const evtName = action.ep.event || action.fn;
+                const evtName = action.ep.name || action.fn;
                 if (evtName !== evt) {
-                    const targets = action.selector ? Utils.getCachedNodes(action.selector) : [shani.emitter];
+                    const targets = getElement(action.selector, shani.emitter);
                     const p = Utils.object({
                         paramstr: action.paramstr, selector: action.selector, targets, data
                     });
@@ -251,35 +250,35 @@
         };
         const flipValue = val => typeof val === 'boolean' ? !val : '';
         const cast = val => val === 'true' || (val === 'false' ? false : val);
-        const TIME_UNITS = {
-            s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, q: 86400 * 91.25, y: 86400 * 365
-        };
-        const time2ms = time => {
-            if (/^\s*-?\d+(\.\d+)?[smhdwqy]\s*$/.test(time)) {
-                time = time.trim();
-                const unit = time.slice(-1).toLowerCase();
-                const val = parseFloat(time.slice(0, -1));
-                return Math.round(TIME_UNITS[unit] * val * 1000);
-            }
-            throw new Error('Invalid duration ' + time);
-        };
-        const calludf = (name, args, thisArg) => {
-            const v = Action.get(name);
-            return v instanceof Function ? v.apply(thisArg, args) : v;
-        };
         return{
+            TIME_UNITS: {
+                s: 1, m: 60, h: 3600, d: 86400, w: 86400 * 7, q: 86400 * 91.25, y: 86400 * 365
+            },
+            time2ms(time) {
+                if (/^\s*-?\d+(\.\d+)?[smhdwqy]\s*$/.test(time)) {
+                    time = time.trim();
+                    const unit = time.slice(-1).toLowerCase();
+                    const val = parseFloat(time.slice(0, -1));
+                    return Math.round(Utils.TIME_UNITS[unit] * val * 1000);
+                }
+                throw new Error('Invalid duration ' + time);
+            },
             trigger(shani, evt, data = {}) {
                 const action = shani.actions.get(evt);
                 data = Utils.object(data);
                 if (action) {
                     const p = action.ep;
                     if (p.steps) {
-                        shani.poll.steps = time2ms(p.steps);
+                        shani.poll.steps = Utils.time2ms(p.steps);
                         shani.poll.limit = parseInt(p.limit) || null;
+                        shani.poll.onend = p.onend || null;
                     }
                     if (p.delay) {
                         clearTimeout(TIMER.get(shani.emitter));
-                        const id = setTimeout(prepareCall, time2ms(p.delay), shani, action, data, evt);
+                        const id = setTimeout(() => {
+                            !p.onstart || Utils.trigger(shani, p.onstart, data);
+                            prepareCall(shani, action, data, evt);
+                        }, Utils.time2ms(p.delay));
                         return TIMER.set(shani.emitter, id);
                     }
                 }
@@ -310,14 +309,27 @@
                     node.setAttribute(key, v === true ? key : v);
                 }
             },
+            calludf(name, args, thisArg) {
+                const v = Action.get(name);
+                return v instanceof Function ? v.apply(thisArg, args) : v;
+            },
             getNodeValue(node, key) {
                 if (typeof key === 'string') {
-                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : calludf(key, [node]);
+                    let val = key in node ? node[key] : node.hasAttribute(key) ? node.getAttribute(key) : Utils.calludf(key, [node]);
                     return key === val || cast(val);
                 }
                 return key;
             },
             splitEvents: node => Parser.events(node.getAttribute('shani-on')),
+            eventExists(node, evt) {
+                const events = Utils.splitEvents(node);
+                for (const e in events) {
+                    if (e === evt) {
+                        return true;
+                    }
+                }
+                return false;
+            },
             getParentNode(childNode, parentSelector) {
                 const parent = childNode.parentElement;
                 if (!parent || parent.matches(parentSelector)) {
@@ -343,7 +355,7 @@
         };
         const isPlaceHolder = str => {//selector@prop
             return typeof str === 'string' && str.indexOf(SEP_VAR) > 0
-                    && str.indexOf(SEP_KEY_VAL) < 0 && str.charAt(0) !== '\\';
+                    && !str.includes(SEP_KEY_VAL) && str.charAt(0) !== '\\';
         };
         const getEventFromString = (str, idx) => {
             const name = str.slice(0, idx), idx2 = name.search(SEP_ACTION);
@@ -356,7 +368,7 @@
                     const pairs = Parser.toArray(str, SEP_PARAM);
                     pairs.forEach(p => {
                         const pair = splitPair(p, SEP_KEY_VAL, p);
-                        if (pair.k === p && pair.k.indexOf(SEP_VAR) > -1) {//@prop, #id@prop
+                        if (pair.k === p && pair.k.includes(SEP_VAR)) {//@prop, #id@prop
                             const value = Utils.resolveVariable(node, pair.k);
                             Object.assign(obj, Parser.params(node, Parser.variable(value)));
                         } else {
@@ -397,7 +409,11 @@
                 return obj;
             },
             toArray(str, sep) {
-                return str ? str.split(sep).map(s => s.trim()).filter(a => a.length !== 0) : [];
+                return typeof str !== 'string' ? [] : str.split(sep).reduce((acc, s) => {
+                    const a = s.trim();
+                    a === '' || acc.push(a);
+                    return acc;
+                }, []);
             }
         };
     })();

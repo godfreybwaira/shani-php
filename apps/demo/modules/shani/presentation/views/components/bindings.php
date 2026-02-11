@@ -206,8 +206,6 @@
                    shani-on="click->date.diff rvalue:@data-val&output:value&unit:@data-unit">
         </div>
     </div>
-</div>
-<div class="row row-stretch">
     <div class="col">
         <div class="input-group">
             <label>Char Insertion</label>
