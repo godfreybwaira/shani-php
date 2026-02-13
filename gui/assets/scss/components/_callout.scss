@@ -4,7 +4,6 @@
 @use 'sass:color';
 
 .callout {
-    font-style: italic;
     @extend %padding_xy,%margin_xy,%zoomOut;
     border-radius: var(--radius-sm);
     border-left: fn.px2rem(5px) solid currentColor;

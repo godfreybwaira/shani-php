@@ -901,19 +901,19 @@
         };
     })();
     const _CSS = (() => {
-        Action.add('css.add', obj => {
+        Action.add('class.add', obj => {
             Utils.walk(obj, (node, key) => node.classList.add(key));
         });
-        Action.add('css.rmv', obj => {
+        Action.add('class.rmv', obj => {
             Utils.walk(obj, (node, key) => node.classList.remove(key));
         });
-        Action.add('css.replace', obj => {
+        Action.add('class.replace', obj => {
             Utils.walk(obj, (node, key, val) => node.classList.replace(key, val));
         });
-        Action.add('css.toggle', obj => {
+        Action.add('class.toggle', obj => {
             Utils.walk(obj, (node, key) => node.classList.toggle(key));
         });
-        Action.add('css.exists', obj => {
+        Action.add('class.exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 for (const key in p) {
