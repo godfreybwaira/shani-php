@@ -962,19 +962,6 @@
         Action.add('prop.bind', obj => {
             Utils.walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
         });
-        Action.add('prop.compare', obj => {
-            for (const node of obj.targets) {
-                const p = Parser.params(node, obj.paramstr);
-                const evaluator = Utils.comparator[p.operator];
-                if (!evaluator) {
-                    throw new Error('Invalid comparison operator: ' + p.operator);
-                }
-                if (!evaluator(p.lvalue, p.rvalue)) {
-                    return false;
-                }
-            }
-            return true;
-        });
     })();
     const _Others = (() => {
         Action.add('util.call', obj => {
@@ -1017,6 +1004,20 @@
                 const prefix = p.prefix || '', suffix = p.suffix || '';
                 Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
             });
+        });
+        Action.add('str.compare', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                const evaluator = Utils.comparator[p.operator];
+                if (!evaluator) {
+                    throw new Error('Invalid comparison operator: ' + p.operator);
+                }
+                const result = String(p.lvalue).localeCompare(String(p.rvalue));
+                if (!evaluator(result, 0)) {
+                    return false;
+                }
+            }
+            return true;
         });
     })();
     const _Node = (() => {
