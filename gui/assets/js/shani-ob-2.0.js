@@ -557,6 +557,16 @@
                     [rows[i], rows[j]] = [rows[j], rows[i]];
                 }
                 return rows;
+            },
+            comparator: {
+                eq: (n1, n2) => n1 === n2,
+                neq: (n1, n2) => n1 !== n2,
+                gt: (n1, n2) => n1 > n2,
+                gte: (n1, n2) => n1 >= n2,
+                lt: (n1, n2) => n1 < n2,
+                lte: (n1, n2) => n1 <= n2,
+                btw: (min, input, max) => min <= input && input <= max,
+                nbtw: (min, input, max) => min > input || max < input
             }
         };
     })();
@@ -952,6 +962,19 @@
         Action.add('prop.bind', obj => {
             Utils.walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
         });
+        Action.add('prop.compare', obj => {
+            for (const node of obj.targets) {
+                const p = Parser.params(node, obj.paramstr);
+                const evaluator = Utils.comparator[p.operator];
+                if (!evaluator) {
+                    throw new Error('Invalid comparison operator: ' + p.operator);
+                }
+                if (!evaluator(p.lvalue, p.rvalue)) {
+                    return false;
+                }
+            }
+            return true;
+        });
     })();
     const _Others = (() => {
         Action.add('util.call', obj => {
@@ -1100,16 +1123,6 @@
                     throw new Error('Valid math operators are: +-*/%^');
             }
         };
-        const comparator = {
-            'eq': (n1, n2) => n1 === n2,
-            'neq': (n1, n2) => n1 !== n2,
-            'gt': (n1, n2) => n1 > n2,
-            'gte': (n1, n2) => n1 >= n2,
-            'lt': (n1, n2) => n1 < n2,
-            'lte': (n1, n2) => n1 <= n2,
-            'btw': (min, input, max) => min <= input && input <= max,
-            'nbtw': (min, input, max) => min > input || max < input
-        };
         const parseNumber = (val, allowPercent) => {
             if (typeof val === 'number') {
                 return val;
@@ -1124,7 +1137,7 @@
         const compare = (obj, cb, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const evaluator = comparator[p.operator];
+                const evaluator = Utils.comparator[p.operator];
                 if (!evaluator) {
                     throw new Error('Invalid comparison operator: ' + p.operator);
                 }
