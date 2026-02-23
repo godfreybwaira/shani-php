@@ -558,15 +558,21 @@
                 }
                 return rows;
             },
-            comparator: {
-                eq: (n1, n2) => n1 === n2,
-                neq: (n1, n2) => n1 !== n2,
-                gt: (n1, n2) => n1 > n2,
-                gte: (n1, n2) => n1 >= n2,
-                lt: (n1, n2) => n1 < n2,
-                lte: (n1, n2) => n1 <= n2,
-                btw: (min, input, max) => min <= input && input <= max,
-                nbtw: (min, input, max) => min > input || max < input
+            comparator(oprt) {
+                const operators = {
+                    eq: (n1, n2) => n1 === n2,
+                    neq: (n1, n2) => n1 !== n2,
+                    gt: (n1, n2) => n1 > n2,
+                    gte: (n1, n2) => n1 >= n2,
+                    lt: (n1, n2) => n1 < n2,
+                    lte: (n1, n2) => n1 <= n2,
+                    btw: (min, input, max) => min <= input && input <= max,
+                    nbtw: (min, input, max) => min > input || max < input
+                };
+                if (!operators[oprt]) {
+                    throw new Error('Invalid comparison operator: ' + oprt);
+                }
+                return operators[oprt];
             }
         };
     })();
@@ -1008,10 +1014,7 @@
         Action.add('str.compare', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const evaluator = Utils.comparator[p.operator];
-                if (!evaluator) {
-                    throw new Error('Invalid comparison operator: ' + p.operator);
-                }
+                const evaluator = Utils.comparator(p.operator);
                 const result = String(p.lvalue).localeCompare(String(p.rvalue));
                 if (!evaluator(result, 0)) {
                     return false;
@@ -1138,10 +1141,7 @@
         const compare = (obj, cb, defval) => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
-                const evaluator = Utils.comparator[p.operator];
-                if (!evaluator) {
-                    throw new Error('Invalid comparison operator: ' + p.operator);
-                }
+                const evaluator = Utils.comparator(p.operator);
                 const lval = cb(p.lvalue || defval), rval = cb(p.rvalue || defval);
                 if (['btw', 'nbtw'].includes(p.operator)) {
                     if (!evaluator(lval, cb(p.input), rval)) {
