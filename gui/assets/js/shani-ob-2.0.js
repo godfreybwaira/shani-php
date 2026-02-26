@@ -3,6 +3,8 @@
     const SEP_EVT_ACTION = '->', SEP_EVENT = ';', SEP_EVT_SELECTOR = '>>', SEP_ACTION = /\s/;
     const SEP_PARAM = '&', SEP_KEY_VAL = ':', SEP_VAR = '@', SEP_NEG = '!', SEP_LIST = ',';
     const Selectors = new Map(), START_EVENT = 'httpstart', END_EVENT = 'httpend', PARENT_SELECTOR = '&';
+    const ERROR_EVENT = 'error', INFO_EVENT = 'info', OFFLINE_EVENT = 'offline', REDIRECT_EVENT = 'redirect';
+    const TIMEOUT_EVENT = 'timeout', DATA_EVENT = 'data', SUCCESS_EVENT = 'success';
 
     doc.addEventListener('DOMContentLoaded', () => {
         if (!window.Shani) {
@@ -234,7 +236,7 @@
             }
         };
         return(shani, targets, response, params) => {
-            Utils.trigger(shani, 'data', response);
+            Utils.trigger(shani, DATA_EVENT, response);
             params.mode === 'discard' || targets.forEach(node => handleDataInsertion(node, response, params));
         };
     })();
@@ -430,15 +432,15 @@
             getId: () => Math.random().toString(36).slice(2),
             code2text(code) {
                 if (code > 199 && code < 300) {
-                    return 'success';
+                    return SUCCESS_EVENT;
                 }
                 if (code > 299 && code < 400) {
-                    return 'redirect';
+                    return REDIRECT_EVENT;
                 }
                 if (code > 399 && code < 500) {
-                    return 'error';
+                    return ERROR_EVENT;
                 }
-                return code < 200 ? 'info' : 'offline';
+                return code < 200 ? INFO_EVENT : OFFLINE_EVENT;
             },
             connection: Object.create(null),
             TIME_UNITS: {
@@ -695,7 +697,7 @@
             params.mode ||= 'replace';
             const timeout = shani.http.timeout;
             if (timeout) {
-                shani.timeoutId = setTimeout(() => Utils.trigger(shani, 'timeout'), Utils.time2ms(timeout));
+                shani.timeoutId = setTimeout(() => Utils.trigger(shani, TIMEOUT_EVENT), Utils.time2ms(timeout));
             }
             if (!('url' in shani.http)) {
                 return sendWithoutUrl(shani, target, params);
@@ -781,7 +783,7 @@
             });
             on('error', e => {
                 onConnect(shani);
-                Utils.trigger(shani, 'error');
+                Utils.trigger(shani, ERROR_EVENT);
             });
             on('close', e => Utils.trigger(shani, END_EVENT));
         };
@@ -798,7 +800,7 @@
             });
             on('error', e => {
                 onConnect(shani);
-                Utils.trigger(shani, 'error');
+                Utils.trigger(shani, ERROR_EVENT);
             });
             on('message', e => {
                 const resp = Utils.object({body: e.data || '', headers: new Headers()});
