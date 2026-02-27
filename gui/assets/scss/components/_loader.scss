@@ -15,18 +15,19 @@
             content: '';
             z-index: 89;
             backdrop-filter:blur(fn.px2rem(4px));
-            @extend %position_absolute;
+            position: absolute;
         }
         &:after{
             content: '';
             z-index: 99;
+            position: absolute;
             width: var(--loader-size);
             height: var(--loader-size);
             border: var(--loader-thickness) solid var(--loader-color);
             border-top-color: transparent;
             border-left-color: transparent;
             animation: spin $speed linear infinite;
-            @extend %round_corner, %position_absolute, %position_center;
+            @extend %round_corner, %position_center;
         }
     }
     &-bottom,&-top{
@@ -42,7 +43,7 @@
             animation: pg_move $speed linear infinite;
             height: var(--loader-thickness);
             background: var(--loader-color);
-            @extend %position_absolute;
+            position: absolute;
         }
     }
     &-bottom:before{
