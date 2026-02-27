@@ -982,7 +982,7 @@
             const data = Utils.object({shani: this, data: obj.data});
             Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: data, bubbles: true})));
         });
-        Action.add('util.asfile', obj => {
+        Action.add('file.saveas', obj => {
             Utils.traverse(obj, p => {
                 const a = doc.createElement('a');
                 const type = p.type || obj.data.headers.get('content-type');
