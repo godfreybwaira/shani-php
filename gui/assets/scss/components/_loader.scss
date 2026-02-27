@@ -2,11 +2,12 @@
 @use '../utils/callables/functions' as fn;
 
 .loader{
+    $thickness: fn.px2rem(2px);
     $speed: .5s;
     &-spin{
-        --loader-size: #{fn.px2rem(22px)};
+        --loader-size: #{$thickness * 11};
         --loader-color: currentColor;
-        --loader-thickness: fn.px2rem(2px);
+        --loader-thickness: #{$thickness};
         pointer-events: none;
         @extend %position_relative, %overflow_hide;
         &:before{
@@ -31,7 +32,7 @@
     &-bottom,&-top{
         --loader-size: 30%;
         --loader-color: currentColor;
-        --loader-thickness: fn.px2rem(2px);
+        --loader-thickness: #{$thickness};
         @extend %position_relative, %overflow_hide;
         &:before{
             left: 0;
