@@ -38,7 +38,7 @@ namespace shani\documentation\scanners {
             foreach ($classes as $class) {
                 $classPath = $path . '/' . $class;
                 if (is_file($classPath)) {
-                    $this->classList[] = new Controllers($this->moduleName, $reqMethod, substr($classPath, strlen(SERVER_ROOT)));
+                    $this->classList[] = new Controllers($this->moduleName, $reqMethod, substr($classPath, strlen(SHANI_SERVER_ROOT)));
                 }
             }
         }

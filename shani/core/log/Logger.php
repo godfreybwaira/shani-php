@@ -48,7 +48,7 @@ namespace shani\core\log {
                 LogLevel::ERROR => ConsolePrinter::COLOR_RED,
                 LogLevel::INFO => ConsolePrinter::COLOR_CYAN,
             };
-            $text = $structure->time . $space;
+            $text = LogStructure::NOW . $space;
             $text .= '[ ' . ConsolePrinter::colorText($structure->level, $textColor) . ' ]';
             if (PHP_SAPI === 'cli') {
                 echo $text . $space . $structure->message . PHP_EOL;

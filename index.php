@@ -10,12 +10,13 @@ use shani\WebServer;
 /**
  * Server root directory
  */
-define('SERVER_ROOT', __DIR__);
+define('SHANI_SERVER_ROOT', __DIR__);
 //set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
 $config = new FrameworkConfig();
+define('SHANI_CURRENT_TIMESTAMP', date(DATE_RFC3339));
 
 if (PHP_SAPI === 'cli') {
     /**

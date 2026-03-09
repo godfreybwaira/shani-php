@@ -31,7 +31,7 @@ namespace shani\core {
         /**
          * Configuration directory path
          */
-        public const DIR_CONFIG = SERVER_ROOT . '/config';
+        public const DIR_CONFIG = SHANI_SERVER_ROOT . '/config';
 
         /**
          * SSL files directory path
@@ -46,12 +46,12 @@ namespace shani\core {
         /**
          * GUI directory path
          */
-        public const DIR_GUI = SERVER_ROOT . '/gui';
+        public const DIR_GUI = SHANI_SERVER_ROOT . '/gui';
 
         /**
          * Storage directory path
          */
-        public const DIR_STORAGE = SERVER_ROOT . '/storage';
+        public const DIR_STORAGE = SHANI_SERVER_ROOT . '/storage';
 
         /**
          * Storage directory path
@@ -66,7 +66,7 @@ namespace shani\core {
         /**
          * Application directory path
          */
-        public const DIR_APPS = SERVER_ROOT . '/apps';
+        public const DIR_APPS = SHANI_SERVER_ROOT . '/apps';
 
         /**
          * Minimum PHP version supported by Shani framework

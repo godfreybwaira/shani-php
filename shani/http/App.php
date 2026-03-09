@@ -233,7 +233,7 @@ namespace shani\http {
         public function processRequest(): void
         {
             $classPath = $this->getClassPath();
-            if (!is_file(SERVER_ROOT . $classPath . '.php')) {
+            if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
                 throw CustomException::notFound($this);
             }
             $className = str_replace('/', '\\', $classPath);

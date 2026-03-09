@@ -12,19 +12,20 @@ namespace shani\core\log {
     final class LogStructure implements \Stringable
     {
 
-        public readonly string $message, $level, $time;
+        public readonly string $message, $level;
+
+        public const NOW = SHANI_CURRENT_TIMESTAMP;
 
         public function __construct(string $message, LogLevel $level)
         {
             $this->message = $message;
             $this->level = $level->name;
-            $this->time = date(DATE_ATOM);
         }
 
         #[\Override]
         public function __toString(): string
         {
-            return $this->time . ' [ ' . $this->level . ' ] ' . $this->message . PHP_EOL;
+            return self::NOW . ' [ ' . $this->level . ' ] ' . $this->message . PHP_EOL;
         }
     }
 

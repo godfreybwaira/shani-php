@@ -89,7 +89,7 @@ namespace lib\http {
         }
 
         /**
-         * Raw request body
+         * Get raw request body
          * @return string|null Raw input data or null
          */
         public function raw(): ?string
@@ -98,7 +98,7 @@ namespace lib\http {
         }
 
         /**
-         * Request body
+         * Get request body
          * @return ReadableMap
          */
         public function body(): ReadableMap
@@ -117,6 +117,10 @@ namespace lib\http {
             return $this;
         }
 
+        /**
+         * Get HTTP request route
+         * @return RequestRoute
+         */
         public function route(): RequestRoute
         {
             return $this->route;

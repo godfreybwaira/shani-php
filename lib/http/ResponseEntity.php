@@ -84,7 +84,7 @@ namespace lib\http {
         }
 
         /**
-         * Raw response body
+         * Get raw response body
          * @return string|null
          */
         public function body(): ?string
