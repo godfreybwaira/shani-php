@@ -66,10 +66,11 @@ namespace shani\persistence {
 
         /**
          * Execute SQL query and all rows (if available) found. For a large data set
-         * (more than 1 row) use <code>loop</code> for efficiency.
+         * (more than 1 row) use <code>collect</code> for efficiency.
          * @param string $query A query to execute
          * @param array|null $data
          * @return ReadableMap Iterable object contains rows returned as the result of SQL query.
+         * @see self::collect
          */
         public function get(string $query, ?array $data = null): ReadableMap
         {
@@ -88,6 +89,7 @@ namespace shani\persistence {
          * @param string $query A query to execute
          * @param array|null $data
          * @return \Generator Iterable object of ReadableMap contains rows returned as the result of SQL query.
+         * @see self::get
          */
         public function collect(string $query, ?array $data = null): \Generator
         {
@@ -103,23 +105,17 @@ namespace shani\persistence {
 
         private static function getConnectionString(DatabaseDriver $driver, string $database, ?string $host, ?int $port): string
         {
-            switch ($driver) {
-                case DatabaseDriver::MYSQL:
-                case DatabaseDriver::POSTGRES:
-                case DatabaseDriver::SYBASE:
-                case DatabaseDriver::MSSQL:
-                    return $driver->value . ':host=' . $host . ':' . $port . ';dbname=' . $database;
-                case DatabaseDriver::DBLIB:
-                    return 'dblib:host=' . $host . ':dbname=' . $database;
-                case DatabaseDriver::ORACLE:
-                    return 'oci:dbname=//' . $host . ':' . $port . '/' . $database;
-                case DatabaseDriver::SQLITE:
-                    return 'sqlite:' . $database;
-                case DatabaseDriver::SQL_SERVER:
-                    return 'sqlsrv:Server=' . $host . ';Database=' . $database;
-                case DatabaseDriver::ODBC:
-                    return 'odbc:Driver=FreeTDS;Server=' . $host . ':' . $port . ';Database=' . $database;
-            }
+            return match ($driver) {
+                DatabaseDriver::MYSQL,
+                DatabaseDriver::POSTGRES,
+                DatabaseDriver::SYBASE,
+                DatabaseDriver::DBLIB,
+                DatabaseDriver::MSSQL => $driver->value . ':host=' . $host . ':' . $port . ';dbname=' . $database,
+                DatabaseDriver::ORACLE => $driver->value . ':dbname=//' . $host . ':' . $port . '/' . $database,
+                DatabaseDriver::SQLITE => $driver->value . ':' . $database,
+                DatabaseDriver::SQL_SERVER => $driver->value . ':Server=' . $host . ',' . $port . ';Database=' . $database,
+                DatabaseDriver::ODBC => $driver->value . ':Driver=FreeTDS;Server=' . $host . ',' . $port . ';Database=' . $database
+            };
         }
     }
 

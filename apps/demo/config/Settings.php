@@ -9,10 +9,12 @@
 
 namespace apps\demo\config {
 
+    use apps\demo\middleware\Oauth2Client;
     use apps\demo\middleware\Test;
     use lib\client\HttpClient;
     use lib\http\HttpStatus;
     use lib\http\ResponseEntity;
+    use lib\oauth2\Oauth2Repository;
     use lib\URI;
     use shani\advisors\Configuration;
     use shani\core\Framework;
@@ -139,6 +141,11 @@ namespace apps\demo\config {
         public function database(): DatabaseConnection
         {
             return new DatabaseConnection(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
+        }
+
+        public function getOauth2Repository(): Oauth2Repository
+        {
+            return new Oauth2Client();
         }
     }
 

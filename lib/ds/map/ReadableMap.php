@@ -22,12 +22,28 @@ namespace lib\ds\map {
          */
         public function exists(string|int ...$key): bool
         {
-            foreach ($key as $key) {
-                if (!array_key_exists($key, $this->data)) {
+            foreach ($key as $k) {
+                if (!array_key_exists($k, $this->data)) {
                     return false;
                 }
             }
             return true;
+        }
+
+        /**
+         * Check the absence of given keys in a collection and return all absent keys.
+         * @param array $keys Keys to check for absence
+         * @return array|null A collection of all absent keys, null if all keys exists
+         */
+        public function absentKeys(array $keys): ?array
+        {
+            $absentKeys = [];
+            foreach ($keys as $k) {
+                if (!array_key_exists($k, $this->data)) {
+                    $absentKeys[] = $k;
+                }
+            }
+            return !empty($absentKeys) ? $absentKeys : null;
         }
 
         /**

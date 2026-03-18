@@ -34,7 +34,7 @@ namespace lib\http {
         public readonly int $time;
 
         /**
-         * Request method
+         * HTTP Request method
          * @var string
          */
         public readonly string $method;

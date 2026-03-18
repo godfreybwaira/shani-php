@@ -3,7 +3,6 @@
 namespace lib\http {
 
     use lib\ds\map\MutableMap;
-    use lib\ds\map\ReadableMap;
 
     final class HttpHeader extends MutableMap
     {
@@ -99,6 +98,27 @@ namespace lib\http {
         }
 
         /**
+         *
+         * Retrieve Basic Authentication credentials.
+         *
+         * This method attempts to fetch a stored authorization value (expected to be
+         * a Base64-encoded string in the format "username:password"). If found, it
+         * decodes the string and splits it into its two components.
+         *
+         * @return array|null Returns an array containing the username and password
+         * if credentials are available, or null if none exist.
+         */
+        public function getBasicAuth(): ?array
+        {
+            $str = $this->getOne(self::AUTHORIZATION);
+            if ($str !== null && str_starts_with($str, 'Basic ')) {
+                $creds = ltrim(substr(strlen('Basic '), $str));
+                return explode(':', base64_decode($creds));
+            }
+            return null;
+        }
+
+        /**
          * Set the value of the Authorization header to the given Bearer token.
          * @param string $token the Base64 encoded token
          * @return self
@@ -106,6 +126,24 @@ namespace lib\http {
         public function setBearerAuth(string $token): self
         {
             return parent::addOne(self::AUTHORIZATION, 'Bearer ' . $token);
+        }
+
+        /**
+         * Retrieve Bearer Authentication token.
+         *
+         * This method attempts to fetch a stored authorization value (expected to be
+         * a string beginning with "Bearer"). If found, it extracts and returns the
+         * token portion following the "Bearer" prefix.
+         *
+         * @return string|null Returns the bearer token string if available, or null if no valid token exists.
+         */
+        public function getBearerAuth(): ?string
+        {
+            $token = $this->getOne(self::AUTHORIZATION);
+            if ($token !== null && str_starts_with($token, 'Bearer ')) {
+                return ltrim(substr(strlen('Bearer '), $token));
+            }
+            return null;
         }
 
         /**

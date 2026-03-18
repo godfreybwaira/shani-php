@@ -20,6 +20,12 @@ namespace lib {
         case MONTHS;
         case YEARS;
 
+        /**
+         * Convert Duration object into DatetimeInterface
+         * @param int $value Duration value
+         * @param Duration $duration Duration unit
+         * @return \DateTimeInterface
+         */
         public static function of(int $value, Duration $duration): \DateTimeInterface
         {
             return new \DateTimeImmutable($value . ' ' . $duration->name);

@@ -14,6 +14,7 @@ namespace shani\advisors {
     use lib\crypto\Encryption;
     use lib\DataCompression;
     use lib\Duration;
+    use lib\oauth2\Oauth2Repository;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
@@ -453,8 +454,7 @@ namespace shani\advisors {
          */
         public function logFileName(): string
         {
-//            return date('Y-m-d') . '.log';
-            return 'php://stdout';
+            return date('Y-m-d') . '.log';
         }
 
         /**
@@ -524,6 +524,15 @@ namespace shani\advisors {
          * @return DatabaseConnection Database connection
          */
         public abstract function database(): DatabaseConnection;
+
+        /**
+         * Get Oauth 2.0 repository for data exchange.
+         * @return Oauth2Repository|null Oauth 2.0 repository object
+         */
+        public function getOauth2Repository(): ?Oauth2Repository
+        {
+            return null;
+        }
     }
 
 }

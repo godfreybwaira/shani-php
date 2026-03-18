@@ -285,6 +285,25 @@ namespace lib {
             }
             return $result;
         }
+
+        public static function array2JsonSerializable(array $data): \JsonSerializable
+        {
+            return new class($data) implements \JsonSerializable {
+
+                private readonly array $data;
+
+                public function __construct(array $data)
+                {
+                    $this->data = $data;
+                }
+
+                #[\Override]
+                public function jsonSerialize(): array
+                {
+                    return $this->data;
+                }
+            };
+        }
     }
 
 }
