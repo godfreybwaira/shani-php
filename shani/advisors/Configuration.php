@@ -240,24 +240,24 @@ namespace shani\advisors {
         }
 
         /**
-         * Check whether a client possess a given group id. Client can have multiple
+         * Check whether a user has a given group id. Client can have multiple
          * group ids
          * @param string $groupId The group Id to check
          * @return bool True if client has the given group id, false otherwise
          */
-        public function clientGroupIdExists(string $groupId): bool
+        public function userGroupIdExists(string $groupId): bool
         {
             return false;
         }
 
         /**
-         * Returns client private unique Id. This Id helps accessing and protecting
+         * Returns user private unique Id. This Id helps accessing and protecting
          * private resources (e.g uploaded files) against outsiders. This ID should not
          * be changed anyhow, otherwise client will loose access to their private
          * uploaded files.
          * @return string|null Private unique id
          */
-        public function clientPrivateId(): ?string
+        public function userPrivateId(): ?string
         {
             return '123';
         }

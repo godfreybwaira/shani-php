@@ -18,9 +18,9 @@ namespace lib\oauth2\dto {
         public readonly string $clientId;
 
         /**
-         *  @var string Hashed client secret (never store plain text)
+         *  @var string|null Hashed client secret (never store plain text)
          */
-        public readonly string $clientSecret;
+        public readonly ?string $clientSecret;
 
         /**
          *  @var string|null Exact redirect URI registered for this client (OAuth 2.1 requires exact match)
@@ -29,10 +29,10 @@ namespace lib\oauth2\dto {
 
         /**
          * @param string $clientId      Unique client identifier registered in the database.
-         * @param string $clientSecret  Hashed client secret. For public clients (PKCE), this can be an empty string.
+         * @param string|null $clientSecret  Hashed client secret. For public clients (PKCE), this can be an empty string.
          * @param string|null $redirectUri   Exact redirect URI.
          */
-        public function __construct(string $clientId, string $clientSecret, ?string $redirectUri)
+        public function __construct(string $clientId, ?string $clientSecret, ?string $redirectUri)
         {
             $this->clientId = $clientId;
             $this->clientSecret = $clientSecret;

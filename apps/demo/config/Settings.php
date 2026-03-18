@@ -69,6 +69,11 @@ namespace apps\demo\config {
 
         public function clientPermissions(): ?string
         {
+            if ($this->app->request->header()->getBearerAuth() !== null) {
+                $route = $this->app->request->route();
+                $scope = \shani\documentation\scanners\Endpoints::create($this->app->request->method, $route->module, $route->controller, $route->action);
+                return $scope[0];
+            }
             return null;
         }
 
@@ -94,7 +99,7 @@ namespace apps\demo\config {
 
         public function accessibleByPublic(): bool
         {
-            return in_array($this->app->request->route()->module, ['schools', 'shani', 'files']);
+            return in_array($this->app->request->route()->module, ['shani', 'security']);
         }
 
         public static function runTest(): TestResult

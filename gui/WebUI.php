@@ -172,13 +172,12 @@ namespace gui {
          * Set and get URL safe from CSRF attack. if CSRF is enabled, then the
          * application will be protected against CSRF attack and the URL will be
          * returned, otherwise the URL will be returned but CSRF will be turned off.
-         * @param string|null $urlPath URL to protect from CSRF. If not supplied
+         * @param string|null $url URL to protect from CSRF. If not supplied
          * then the request URI path will be used.
          * @return string URL safe from CSRF attack
          */
-        public function csrf(?string $urlPath = null): string
+        public function csrf(?string $url = null): string
         {
-            $url = $urlPath ?? $this->app->request->uri->path();
             if (!$this->app->config->skipCsrfProtection()) {
                 $tokenName = $this->app->config->csrfTokenName();
                 $token = $this->app->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
@@ -189,7 +188,7 @@ namespace gui {
                         ->setSecure($this->app->request->uri->secure());
                 $this->app->response->header()->setCookie($cookie);
             }
-            return $this->app->request->uri->host() . $url;
+            return $url ?? $this->app->request->uri;
         }
     }
 

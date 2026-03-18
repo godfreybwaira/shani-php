@@ -76,6 +76,20 @@ namespace lib\oauth2 {
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 3600): AccessTokenDto;
 
         /**
+         * Generate, store and return client authorization token
+         *
+         * @param string $clientId Client ID
+         * @param string|null $scope Scope (permissions)
+         * @param string $userId User ID who's granting permission to an app (null for client credentials)
+         * @param string $redirectUri Redirect URL
+         * @param string|null $codeChallenge PKCE challenge.
+         * @param string|null $codeChallengeMethod PKCE method (S256).
+         * @param int $expiresIn Expiration in seconds.
+         * @return AccessTokenDto Access token details
+         */
+        public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto;
+
+        /**
          * Generate, store and return client refresh token
          * @param string $clientId Client ID
          * @param string|null $scope Scope (permissions)

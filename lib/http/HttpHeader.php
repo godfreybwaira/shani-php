@@ -112,7 +112,7 @@ namespace lib\http {
         {
             $str = $this->getOne(self::AUTHORIZATION);
             if ($str !== null && str_starts_with($str, 'Basic ')) {
-                $creds = ltrim(substr(strlen('Basic '), $str));
+                $creds = ltrim(substr($str, strlen('Basic ')));
                 return explode(':', base64_decode($creds));
             }
             return null;
@@ -141,7 +141,7 @@ namespace lib\http {
         {
             $token = $this->getOne(self::AUTHORIZATION);
             if ($token !== null && str_starts_with($token, 'Bearer ')) {
-                return ltrim(substr(strlen('Bearer '), $token));
+                return ltrim(substr($token, strlen('Bearer ')));
             }
             return null;
         }

@@ -60,6 +60,11 @@ namespace apps\demo\middleware {
         {
             return new UserDetailsDto('123', $username, $password);
         }
+
+        public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto
+        {
+            return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+        }
     }
 
 }

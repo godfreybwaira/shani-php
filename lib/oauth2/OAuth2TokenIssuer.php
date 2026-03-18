@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of OAuth2Server
+ * Description of OAuth2TokenIssuer
  * @author goddy
  *
  * Created on: Mar 9, 2026 at 11:25:31 AM
@@ -15,7 +15,7 @@ namespace lib\oauth2 {
     use lib\MediaType;
     use shani\http\App;
 
-    final class OAuth2Server
+    final class OAuth2TokenIssuer
     {
 
         private readonly App $app;
@@ -32,6 +32,10 @@ namespace lib\oauth2 {
             $this->repo = $app->config->getOauth2Repository();
         }
 
+        /**
+         * Handles incoming requests and routes to appropriate oauth handler method.
+         * @return Oauth2Response Returns Oauth 2 response on success
+         */
         public function handleRequest(): Oauth2Response
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
@@ -55,16 +59,14 @@ namespace lib\oauth2 {
         private function grantByAuthorizationCode(): Oauth2Response
         {
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
-            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, null, true) === null) {  // Require secret
+            $redirectUri = $this->body->getOne('redirect_uri');
+            $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret, null, true);
+            if ($client === null || $redirectUri !== $client->redirectUri) {  // Require secret
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $code = $this->body->getOne('code');
             if ($code === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `code`');
-            }
-            $redirectUri = $this->body->getOne('redirect_uri');
-            if ($redirectUri === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `redirect_uri`');
             }
             $authCode = $this->repo->getActiveAuthorizationDetails($this->clientId, $code, $redirectUri, null);  // No verifier
             if ($authCode === null) {

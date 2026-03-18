@@ -44,17 +44,22 @@ namespace lib\http {
          * @var string|null
          */
         public readonly ?string $ip;
-
-        /**
-         * Check whether the request comes from local machine
-         * @var string
-         */
         private ?string $raw;
         private RequestRoute $route;
         public readonly array $files;
         public readonly string $localhost;
         private ?array $acceptedType = null;
+
+        /**
+         * Represents request body
+         * @var ReadableMap
+         */
         private ReadableMap $body;
+
+        /**
+         * Represents request Query string
+         * @var ReadableMap
+         */
         public readonly ReadableMap $query;
 
         public function __construct(
