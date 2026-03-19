@@ -40,7 +40,7 @@ namespace lib\crypto {
         private const GOOD_CHARS = ['-', '_', ''];
 
         /**
-         * @param int $length Number of random bytes to generate (32–96 recommended)
+         * @param int $length Number of random bytes to generate (32–96 is recommended)
          * results in verifier length ≈ 43–128 chars after encoding
          */
         public function __construct(int $length = 72)

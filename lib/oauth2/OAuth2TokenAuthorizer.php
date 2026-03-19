@@ -44,7 +44,6 @@ namespace lib\oauth2 {
             $scope = $this->body->getOne('scope');
             $codeChallengeMethod = $this->body->getOne('code_challenge_method');
             $codeChallenge = $this->body->getOne('code_challenge');
-            $requireSecret = $codeChallenge !== null;
             if ($responseType !== 'code') {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
@@ -52,7 +51,7 @@ namespace lib\oauth2 {
             if ($client === null || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            if ($requireSecret && $codeChallengeMethod !== 'S256') {
+            if ($codeChallenge !== null && $codeChallengeMethod !== 'S256') {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Invalid code challenge method.');
             }
             $userId = $this->app->config->userPrivateId();
