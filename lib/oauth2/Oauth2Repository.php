@@ -40,12 +40,10 @@ namespace lib\oauth2 {
          * Get Authorization details by supplied code, and client id
          *
          * @param string $clientId Client ID
-         * @param string $code Current authorization code
-         * @param string $redirectUri Redirect URI to validate.
-         * @param string|null $codeVerifier PKCE verifier
+         * @param string $authorizationCode Current authorization code
          * @return AuthorizationDetailsDto|null Authorization details if exists and not expires, null otherwise.
          */
-        public function getActiveAuthorizationDetails(string $clientId, string $code, string $redirectUri, ?string $codeVerifier = null): ?AuthorizationDetailsDto;
+        public function getActiveAuthorizationDetails(string $clientId, string $authorizationCode): ?AuthorizationDetailsDto;
 
         /**
          * Get Active client device details

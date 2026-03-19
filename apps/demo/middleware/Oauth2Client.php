@@ -31,9 +31,9 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
         }
 
-        public function getActiveAuthorizationDetails(string $clientId, string $code, string $redirectUri, ?string $codeVerifier = null): ?AuthorizationDetailsDto
+        public function getActiveAuthorizationDetails(string $clientId, string $authorizationCode): ?AuthorizationDetailsDto
         {
-            return new AuthorizationDetailsDto($clientId, $code, '123', $redirectUri, 'read write', null, 'S256', 3600);
+            return new AuthorizationDetailsDto($clientId, $authorizationCode, '123', $redirectUri, 'read write', null, 'S256', 3600);
         }
 
         public function getActiveDeviceDetails(string $clientId, string $deviceCode): ?DeviceDetailsDto
