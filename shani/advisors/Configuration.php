@@ -269,7 +269,7 @@ namespace shani\advisors {
          * uploaded files.
          * @return string|null Private unique id
          */
-        public function userPrivateId(): ?string
+        public function getUserPrivateId(): ?string
         {
             return '123';
         }

@@ -60,18 +60,19 @@ namespace lib\oauth2 {
         private function grantByAuthorizationCode(): Oauth2Response
         {
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
+            $keys = $this->body->absentKeys(['redirect_uri', 'code']);
+            if ($keys !== null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameters were reqiured but missing: ' . implode(', ', $keys));
+            }
             $redirectUri = $this->body->getOne('redirect_uri');
             $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret);
             if ($client === null || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $code = $this->body->getOne('code');
-            if ($code === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `code`');
-            }
-            $authCode = $this->repo->getActiveAuthorizationDetails($this->clientId, $code, $redirectUri, null);  // No verifier
+            $authCode = $this->repo->getActiveAuthorizationDetails($this->clientId, $code);
             if ($authCode === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization grant is invalid, expired, revoked, or does not match the redirection URI.');
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization grant is invalid, expired or revoked.');
             }
             $accessToken = $this->repo->generateAccessToken($this->clientId, $authCode->scope, $authCode->userId);
             $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->userId, $authCode->userId);

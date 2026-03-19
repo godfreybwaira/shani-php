@@ -21,6 +21,8 @@ namespace apps\demo\middleware {
     final class Oauth2Client implements Oauth2Repository
     {
 
+        private const REDIRECT_URI = 'http://dev.shani.v2.local/security/0/oauth2/0';
+
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 3600): AccessTokenDto
         {
             return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
@@ -33,7 +35,7 @@ namespace apps\demo\middleware {
 
         public function getActiveAuthorizationDetails(string $clientId, string $authorizationCode): ?AuthorizationDetailsDto
         {
-            return new AuthorizationDetailsDto($clientId, $authorizationCode, '123', $redirectUri, 'read write', null, 'S256', 3600);
+            return new AuthorizationDetailsDto($clientId, $authorizationCode, '123', self::REDIRECT_URI, 'read write', null, 'S256', 3600);
         }
 
         public function getActiveDeviceDetails(string $clientId, string $deviceCode): ?DeviceDetailsDto
@@ -46,9 +48,9 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
 
-        public function getClientDetails(string $clientId, ?string $clientSecret = null, bool $requireSecret = true): ?ClientDetailsDto
+        public function getClientDetails(string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
         {
-            return new ClientDetailsDto($clientId, $clientSecret, 'http://dev.shani.v2.local/security/0/oauth2/0');
+            return new ClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI);
         }
 
         public function scopeAllowed(?string $scope): bool

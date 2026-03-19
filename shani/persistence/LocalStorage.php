@@ -90,7 +90,7 @@ namespace shani\persistence {
                 throw CustomException::forbidden($app);
             }
             $owners = self::getFileOwnership($filepath);
-            if ($owners !== null && $owners['oid'] !== $app->config->userPrivateId()) {
+            if ($owners !== null && $owners['oid'] !== $app->config->getUserPrivateId()) {
                 if (!$app->config->userGroupIdExists($owners['gid'])) {
                     throw CustomException::forbidden($app);
                 }
@@ -131,7 +131,7 @@ namespace shani\persistence {
         public function save(File $file, string $bucket = '/'): string
         {
             $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
-            $privateId = $this->app->config->userPrivateId();
+            $privateId = $this->app->config->getUserPrivateId();
             if (empty($privateId)) {
                 throw new ServerException('Client private Id cannot be empty');
             }
@@ -181,7 +181,7 @@ namespace shani\persistence {
         public function delete(string $filepath): bool
         {
             $owners = self::getFileOwnership($filepath);
-            if ($owners == null || $owners['oid'] === $this->app->config->userPrivateId()) {
+            if ($owners == null || $owners['oid'] === $this->app->config->getUserPrivateId()) {
                 return file_exists($filepath) && unlink($filepath);
             }
             return false;
@@ -190,7 +190,7 @@ namespace shani\persistence {
         #[\Override]
         public function share2protected(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->config->userPrivateId();
+            $prefix = self::PID_INITIAL . $this->app->config->getUserPrivateId();
             $prefix .= self::ID_SEPARATOR . self::GID_INITIAL;
             $bucket = $this->app->config->appProtectedStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
@@ -199,7 +199,7 @@ namespace shani\persistence {
         #[\Override]
         public function share2group(string $filepath, string $groupId): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->config->userPrivateId();
+            $prefix = self::PID_INITIAL . $this->app->config->getUserPrivateId();
             $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $groupId;
             $bucket = $this->app->config->appProtectedStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
@@ -216,7 +216,7 @@ namespace shani\persistence {
         #[\Override]
         public function share2public(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->config->userPrivateId();
+            $prefix = self::PID_INITIAL . $this->app->config->getUserPrivateId();
             $bucket = $this->app->config->appPublicStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
         }

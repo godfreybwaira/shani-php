@@ -31,10 +31,9 @@ namespace lib\oauth2 {
          *
          * @param string $clientId Client ID.
          * @param string|null $clientSecret Client secret (hashed verification).
-         * @param bool $requireSecret Whether secret is required (false for PKCE).
          * @return ClientDetailsDto|null Client data or null if invalid.
          */
-        public function getClientDetails(string $clientId, ?string $clientSecret = null, bool $requireSecret = true): ?ClientDetailsDto;
+        public function getClientDetails(string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
 
         /**
          * Get Authorization details by supplied code, and client id

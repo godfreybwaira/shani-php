@@ -54,7 +54,7 @@ namespace lib\oauth2 {
             if ($codeChallenge !== null && $codeChallengeMethod !== 'S256') {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Invalid code challenge method.');
             }
-            $userId = $this->app->config->userPrivateId();
+            $userId = $this->app->config->getUserPrivateId();
             if ($userId === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Granting user is not authenticated.');
             }
