@@ -24,6 +24,7 @@ namespace shani\advisors {
     use shani\documentation\scanners\Endpoints;
     use shani\http\App;
     use shani\http\Middleware;
+    use shani\http\RequestRoute;
     use shani\persistence\DatabaseConnection;
     use shani\persistence\LocalStorage;
     use test\TestResult;
@@ -35,7 +36,7 @@ namespace shani\advisors {
          * Whether the current user is authenticated and has at least one permission
          * @var bool
          */
-        public readonly bool $authenticated;
+        public readonly bool $isAuthenticated;
 
         /**
          * List of user permissions separated by any character out of a-z0-9
@@ -47,8 +48,19 @@ namespace shani\advisors {
         public function __construct(App &$app)
         {
             $this->app = $app;
-            $this->permissionList = $this->clientPermissions();
-            $this->authenticated = $this->permissionList !== null;
+            $this->isAuthenticated = $this->authenticate();
+        }
+
+        private function authenticate(): bool
+        {
+            $token = $this->app->request->header()->getBearerToken();
+            if ($token !== null) {
+                $accessToken = $this->getOauth2Repository()->validateAccessToken($token);
+                $this->permissionList = $accessToken?->scope;
+            } else {
+                $this->permissionList = $this->getUserPermissions();
+            }
+            return $this->permissionList !== null;
         }
 
         /**
@@ -228,22 +240,22 @@ namespace shani\advisors {
         public abstract function appStorage(): string;
 
         /**
-         * Returns client group Id shared by one or more clients e.g company unique Id.
+         * Returns user group Id shared by one or more users e.g company unique Id.
          * This Id helps accessing and protecting shared resources (e.g uploaded files)
-         * against outsiders. This ID should not be changed anyhow, otherwise client will
+         * against outsiders. This ID should not be changed anyhow, otherwise user will
          * loose access to their shared uploaded files.
          * @return string|null Shared unique id
          */
-        public function clientGroupId(): ?string
+        public function userGroupId(): ?string
         {
             return '334';
         }
 
         /**
-         * Check whether a user has a given group id. Client can have multiple
+         * Check whether a user has a given group id. user can have multiple
          * group ids
          * @param string $groupId The group Id to check
-         * @return bool True if client has the given group id, false otherwise
+         * @return bool True if user has the given group id, false otherwise
          */
         public function userGroupIdExists(string $groupId): bool
         {
@@ -253,7 +265,7 @@ namespace shani\advisors {
         /**
          * Returns user private unique Id. This Id helps accessing and protecting
          * private resources (e.g uploaded files) against outsiders. This ID should not
-         * be changed anyhow, otherwise client will loose access to their private
+         * be changed anyhow, otherwise user will loose access to their private
          * uploaded files.
          * @return string|null Private unique id
          */
@@ -264,7 +276,7 @@ namespace shani\advisors {
 
         /**
          * Get Application protected storage directory for storing static contents.
-         * This directory is accessible only by authenticated clients.
+         * This directory is accessible only by authenticated users.
          * @return string Path to storage directory relative to appStorage()
          * @see self::appStorage()
          */
@@ -309,17 +321,17 @@ namespace shani\advisors {
         }
 
         /**
-         * Get a list of authenticated client's permissions separated by a comma.
-         * Application must set permission using this function after a client
+         * Get a list of authenticated user's permissions separated by a comma.
+         * Application must set permission using this function after a user
          * is being logged in successfully.
          * @return string|null List of user permissions or null if no permission is granted
          * @see App::accessGranted()
          */
-        public abstract function clientPermissions(): ?string;
+        public abstract function getUserPermissions(): ?string;
 
         /**
          * Check whether a given resource is available to both authenticated and
-         * unauthenticated clients (guests).
+         * unauthenticated users (guests).
          * @return bool True on success, false otherwise.
          */
         public function accessibleByPublic(): bool
@@ -328,7 +340,7 @@ namespace shani\advisors {
         }
 
         /**
-         * Check whether a given resource is available only to unauthenticated clients.
+         * Check whether a given resource is available only to unauthenticated users.
          * @return bool True on success, false otherwise.
          */
         public function accessibleByGuest(): bool
@@ -427,24 +439,18 @@ namespace shani\advisors {
         }
 
         /**
-         * Check whether a client is granted access to a resource. If authorization
-         * is skipped this function will always return true.
+         * Check whether a user is granted access to a resource.
          * @param string $method Request method e.g get, post etc
-         * @param string $module Requested module
-         * @param string $controller Requested controller
-         * @param string $action A callback function
-         * @return bool True if a client is granted access, false otherwise.
+         * @param RequestRoute $route Request route object
+         * @return bool True if a user is granted access, false otherwise.
          */
-        public function accessGranted(string $method, string $module, string $controller, string $action): bool
+        public function accessGranted(string $method, RequestRoute $route): bool
         {
-            if ($this->skipAuthorization()) {
-                return true;
-            }
             if (empty($this->permissionList)) {
                 return false;
             }
-            $endpoint = Endpoints::create($method, $module, $controller, $action);
-            return str_contains($this->permissionList, $endpoint[0]);
+            $endpoint = Endpoints::digest($method, $route);
+            return str_contains($this->permissionList, $endpoint['hash']);
 //            return (preg_match('\b' . $target . '\b', $this->permissionList) === 1);
         }
 
@@ -488,7 +494,7 @@ namespace shani\advisors {
         }
 
         /**
-         * Modify response before sending to client. Example signing a response,
+         * Modify response before sending to user. Example signing a response,
          * encrypting, compressing response body etc
          * @return void
          */

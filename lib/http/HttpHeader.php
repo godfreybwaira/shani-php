@@ -123,7 +123,7 @@ namespace lib\http {
          * @param string $token the Base64 encoded token
          * @return self
          */
-        public function setBearerAuth(string $token): self
+        public function setBearerToken(string $token): self
         {
             return parent::addOne(self::AUTHORIZATION, 'Bearer ' . $token);
         }
@@ -137,7 +137,7 @@ namespace lib\http {
          *
          * @return string|null Returns the bearer token string if available, or null if no valid token exists.
          */
-        public function getBearerAuth(): ?string
+        public function getBearerToken(): ?string
         {
             $token = $this->getOne(self::AUTHORIZATION);
             if ($token !== null && str_starts_with($token, 'Bearer ')) {

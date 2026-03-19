@@ -48,14 +48,17 @@ namespace lib\oauth2 {
             if ($responseType !== 'code') {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
-            $client = $this->repo->getClientDetails($clientId, null, $redirectUri, $requireSecret);
+            $client = $this->repo->getClientDetails($clientId, null, $requireSecret);
             if ($client === null || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             if ($requireSecret && $codeChallengeMethod !== 'S256') {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Invalid code challenge method.');
             }
-            $userId = $this->app->config->userPrivateId(); //get session user id
+            $userId = $this->app->config->userPrivateId();
+            if ($userId === null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Granting user is not authenticated.');
+            }
             $accessToken = $this->repo->generateAuthorizationCode($clientId, $scope, $userId, $redirectUri, $codeChallenge, $codeChallengeMethod);
             $query = http_build_query([$responseType => $accessToken->token]);
             $this->app->response->redirect($redirectUri . '?' . $query);

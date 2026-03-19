@@ -46,9 +46,9 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
 
-        public function getClientDetails(string $clientId, ?string $clientSecret = null, ?string $redirectUri = null, bool $requireSecret = true): ?ClientDetailsDto
+        public function getClientDetails(string $clientId, ?string $clientSecret = null, bool $requireSecret = true): ?ClientDetailsDto
         {
-            return new ClientDetailsDto($clientId, $clientSecret, $redirectUri);
+            return new ClientDetailsDto($clientId, $clientSecret, 'http://dev.shani.v2.local/security/0/oauth2/0');
         }
 
         public function scopeAllowed(?string $scope): bool
@@ -64,6 +64,11 @@ namespace apps\demo\middleware {
         public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto
         {
             return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+        }
+
+        public function validateAccessToken(string $token): ?AccessTokenDto
+        {
+            return new AccessTokenDto('123', $token, 'user2', '430704a766', 100);
         }
     }
 

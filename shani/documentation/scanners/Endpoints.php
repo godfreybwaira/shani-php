@@ -11,6 +11,7 @@ namespace shani\documentation\scanners {
 
     use shani\documentation\Generator;
     use shani\http\App;
+    use shani\http\RequestRoute;
 
     final class Endpoints implements \JsonSerializable
     {
@@ -30,17 +31,17 @@ namespace shani\documentation\scanners {
             $this->name = $method->getShortName();
             $controller = $method->getDeclaringClass()->getShortName();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
-            $endpoint = self::create($reqMethod, $moduleName, $controller, $this->name);
+            $endpoint = self::digest($reqMethod, new RequestRoute($moduleName, $controller, $this->name));
             $this->target = strtolower('/' . $moduleName . '/{id0}/' . $controller . '/{id1}/' . $this->name);
-            $this->hash = $endpoint[0];
-            $this->path = $endpoint[1];
+            $this->hash = $endpoint['hash'];
+            $this->path = $endpoint['endpoint'];
         }
 
-        public static function create(string $method, string $module, string $controller, string $action): array
+        public static function digest(string $requestMethod, RequestRoute $route): array
         {
-            $target = $method . '.' . $module . '.' . $controller . '.' . $action;
+            $target = $requestMethod . '.' . $route->module . '.' . $route->controller . '.' . $route->action;
             $endpoint = strtolower($target);
-            return [App::digest($endpoint, length: 7), $endpoint];
+            return ['hash' => substr(sha1($endpoint), offset: 5, length: 10), 'endpoint' => $endpoint];
         }
 
         #[\Override]

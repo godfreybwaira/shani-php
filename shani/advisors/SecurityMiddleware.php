@@ -88,13 +88,16 @@ namespace shani\advisors {
          */
         public function authorized(): self
         {
-            if ($this->app->config->authenticated) {
+            if ($this->app->config->skipAuthorization()) {
+                return $this;
+            }
+            if ($this->app->config->isAuthenticated) {
+                $request = $this->app->request;
                 if ($this->app->config->accessibleByGuest()) {
-                    $this->app->request->changeRoute($this->app->config->home());
+                    $request->changeRoute($this->app->config->home());
                     return $this;
                 }
-                $route = $this->app->request->route();
-                if ($this->app->config->accessibleByPublic() || $this->app->config->accessGranted($this->app->request->method, $route->module, $route->controller, $route->action)) {
+                if ($this->app->config->accessibleByPublic() || $this->app->config->accessGranted($request->method, $request->route())) {
                     return $this;
                 }
                 throw CustomException::forbidden($this->app);

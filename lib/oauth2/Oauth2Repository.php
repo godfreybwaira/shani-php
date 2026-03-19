@@ -31,11 +31,10 @@ namespace lib\oauth2 {
          *
          * @param string $clientId Client ID.
          * @param string|null $clientSecret Client secret (hashed verification).
-         * @param string|null $redirectUri Redirect URI to validate.
          * @param bool $requireSecret Whether secret is required (false for PKCE).
          * @return ClientDetailsDto|null Client data or null if invalid.
          */
-        public function getClientDetails(string $clientId, ?string $clientSecret = null, ?string $redirectUri = null, bool $requireSecret = true): ?ClientDetailsDto;
+        public function getClientDetails(string $clientId, ?string $clientSecret = null, bool $requireSecret = true): ?ClientDetailsDto;
 
         /**
          * Get Authorization details by supplied code, and client id
@@ -106,6 +105,14 @@ namespace lib\oauth2 {
          * @return UserDetailsDto|null User details if exists, null otherwise
          */
         public function authenticate(string $username, string $password): ?UserDetailsDto;
+
+        /**
+         * Validates an access token.
+         *
+         * @param string $token Access token to verify.
+         * @return AccessTokenDto Access token details if the token is valid, null otherwise
+         */
+        public function validateAccessToken(string $token): ?AccessTokenDto;
     }
 
 }

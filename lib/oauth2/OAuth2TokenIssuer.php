@@ -27,8 +27,9 @@ namespace lib\oauth2 {
         {
             $this->app = $app;
             $this->body = $app->request->body();
-            $this->clientId = $this->body->getOne('client_id');
-            $this->clientSecret = $this->body->getOne('client_secret');
+            $creds = $this->app->request->header()->getBasicAuth();
+            $this->clientId = $this->body->getOne('client_id') ?? $creds[0] ?? null;
+            $this->clientSecret = $this->body->getOne('client_secret') ?? $creds[1] ?? null;
             $this->repo = $app->config->getOauth2Repository();
         }
 
@@ -39,10 +40,9 @@ namespace lib\oauth2 {
         public function handleRequest(): Oauth2Response
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $keys = $this->body->absentKeys(['client_id', 'client_secret']);
-            if ($keys !== null) {
+            if ($this->clientId === null || $this->clientSecret === null) {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameters were required but missing: ' . implode(', ', $keys));
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameter(s) were required but missing: client_id, client_secret');
             }
             $grantType = Oauth2GrantType::tryFrom($this->body->getOne('grant_type'));
             return match ($grantType) {
@@ -60,7 +60,7 @@ namespace lib\oauth2 {
         {
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             $redirectUri = $this->body->getOne('redirect_uri');
-            $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret, null, true);
+            $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret, true);
             if ($client === null || $redirectUri !== $client->redirectUri) {  // Require secret
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
@@ -88,7 +88,7 @@ namespace lib\oauth2 {
             $codeVerifier = $this->body->getOne('code_verifier');
             $code = $this->body->getOne('code');
             $redirectUri = $this->body->getOne('redirect_uri');
-            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, null, false) === null) {  // Secret optional
+            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, false) === null) {  // Secret optional
                 $this->app->response->setStatus(HttpStatus::FORBIDDEN);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
@@ -147,7 +147,7 @@ namespace lib\oauth2 {
             if ($user === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The user credentials were incorrect.');
             }
-            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, null, true) === null) {
+            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, true) === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $scope = $this->body->getOne('scope');
@@ -166,7 +166,7 @@ namespace lib\oauth2 {
             if ($deviceCode === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `device_code`');
             }
-            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, null, false) === null) {  // Secret optional for public devices
+            if ($this->repo->getClientDetails($this->clientId, $this->clientSecret, false) === null) {  // Secret optional for public devices
                 $this->app->response->setStatus(HttpStatus::FORBIDDEN);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }

@@ -67,13 +67,8 @@ namespace apps\demo\config {
             $mw->on('before', fn() => Test::m2($this->app));
         }
 
-        public function clientPermissions(): ?string
+        public function getUserPermissions(): ?string
         {
-            if ($this->app->request->header()->getBearerAuth() !== null) {
-                $route = $this->app->request->route();
-                $scope = \shani\documentation\scanners\Endpoints::create($this->app->request->method, $route->module, $route->controller, $route->action);
-                return $scope[0];
-            }
             return null;
         }
 
