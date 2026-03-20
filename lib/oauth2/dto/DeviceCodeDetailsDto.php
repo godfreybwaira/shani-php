@@ -9,7 +9,7 @@
 
 namespace lib\oauth2\dto {
 
-    final class DeviceDetailsDto
+    final class DeviceCodeDetailsDto
     {
 
         /**
@@ -53,6 +53,13 @@ namespace lib\oauth2\dto {
         public readonly string $status;
 
         /**
+         * Check if the code is expires. This is true if <code>$expiresIn</code>
+         * is less or equals to zero
+         * @var bool
+         */
+        public readonly bool $expired;
+
+        /**
          *
          * @param string   $clientId          Requesting client.
          * @param string   $deviceCode        Long opaque device code for polling.
@@ -72,6 +79,7 @@ namespace lib\oauth2\dto {
             $this->pollingInterval = $pollingInterval;
             $this->userId = $userId;
             $this->status = $userId === null ? 'PENDING' : 'OK';
+            $this->expired = $expiresIn <= 0;
         }
     }
 

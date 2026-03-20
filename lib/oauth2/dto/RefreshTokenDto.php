@@ -38,6 +38,13 @@ namespace lib\oauth2\dto {
         public readonly int $expiresIn;
 
         /**
+         * Check if the code is expires. This is true if <code>$expiresIn</code>
+         * is less or equals to zero
+         * @var bool
+         */
+        public readonly bool $expired;
+
+        /**
          * @param string      $clientId     Owning client.
          * @param string      $refreshToken The refresh token.
          * @param string|null    $userId       User ID or null.
@@ -51,6 +58,7 @@ namespace lib\oauth2\dto {
             $this->userId = $userId;
             $this->scope = $scope;
             $this->expiresIn = $expiresIn;
+            $this->expired = $expiresIn <= 0;
         }
     }
 

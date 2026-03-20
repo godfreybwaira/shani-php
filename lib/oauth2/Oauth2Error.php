@@ -65,7 +65,7 @@ namespace lib\oauth2 {
         /**
          * Access token has expired.
          */
-        CASE TOKEN_EXPIRED;
+        CASE EXPIRED_TOKEN;
 
         /**
          * Not allowed for a given scope.

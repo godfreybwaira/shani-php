@@ -62,17 +62,26 @@ namespace lib\oauth2 {
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             $keys = $this->body->absentKeys(['redirect_uri', 'code']);
             if ($keys !== null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameters were reqiured but missing: ' . implode(', ', $keys));
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
             }
             $redirectUri = $this->body->getOne('redirect_uri');
+            $code = $this->body->getOne('code');
             $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret);
-            if ($client === null || $redirectUri !== $client->redirectUri) {
+            if ($client === null) {
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            $code = $this->body->getOne('code');
-            $authCode = $this->repo->getActiveAuthorizationDetails($this->clientId, $code);
+            if ($redirectUri !== $client->redirectUri) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The redirect_uri parameter does not match the registered value.');
+            }
+            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
+            $authCode = $this->repo->getAuthorizationCodeDetails($this->clientId, $code);
             if ($authCode === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization grant is invalid, expired or revoked.');
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization code is invalid, expired or revoked.');
+            }
+            $this->repo->revokeAuthorizationCode($this->clientId, $code); // Revoke code (one-time use)
+            if ($authCode->expired) {
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The authorization code has expired.');
             }
             $accessToken = $this->repo->generateAccessToken($this->clientId, $authCode->scope, $authCode->userId);
             $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->userId, $authCode->userId);
@@ -85,58 +94,68 @@ namespace lib\oauth2 {
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             $keys = $this->body->absentKeys(['code_verifier', 'redirect_uri', 'code']);
             if ($keys !== null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameters were reqiured but missing: ' . implode(', ', $keys));
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
             }
             $codeVerifier = $this->body->getOne('code_verifier');
-            $authCode = $this->body->getOne('code');
+            $code = $this->body->getOne('code');
             $redirectUri = $this->body->getOne('redirect_uri');
             $client = $this->repo->getClientDetails($this->clientId, $this->clientSecret);
-            if ($client === null || $redirectUri !== $client->redirectUri) {
-                $this->app->response->setStatus(HttpStatus::FORBIDDEN);
+            if ($client === null) {
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            $details = $this->repo->getActiveAuthorizationDetails($this->clientId, $authCode);
-            if ($details === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization grant is invalid, expired or revoked.');
+            if ($redirectUri !== $client->redirectUri) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The redirect_uri parameter does not match the registered value.');
             }
-            if (!PKCEGenerator::validatePKCE($details->codeChallenge, $details->codeChallengeMethod, $codeVerifier)) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Code challenge failed.');
+            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
+            $authCode = $this->repo->getAuthorizationCodeDetails($this->clientId, $code);
+            if ($authCode === null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided authorization code is invalid, expired or revoked.');
             }
-            $accessToken = $this->repo->generateAccessToken($this->clientId, $details->scope, $details->userId);
-            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $details->userId, $details->scope);
+            $this->repo->revokeAuthorizationCode($this->clientId, $code); // Revoke code (one-time use)
+            if ($authCode->expired) {
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The authorization code has expired.');
+            }
+            if (!PKCEGenerator::validatePKCE($authCode->codeChallenge, $authCode->codeChallengeMethod, $codeVerifier)) {
+                $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Code challenge verification failed.');
+            }
+            $accessToken = $this->repo->generateAccessToken($this->clientId, $authCode->scope, $authCode->userId);
+            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->userId, $authCode->scope);
             $this->app->response->setStatus(HttpStatus::OK);
             return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
         }
 
         private function grantByClientCredentials(): Oauth2Response
         {
-            $this->app->response->setStatus(HttpStatus::FORBIDDEN);
             if ($this->repo->getClientDetails($this->clientId, $this->clientSecret) === null) {
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $scope = $this->body->getOne('scope');
-            if ($this->repo->scopeAllowed($scope)) {
-                $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, null);
-                $refreshToken = $this->repo->generateRefreshToken($this->clientId, $scope, null);
-                $this->app->response->setStatus(HttpStatus::OK);
-                return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
-            }
-            return Oauth2Response::error(Oauth2Error::INVALID_SCOPE, 'Not allowed for a given scope.');
+            $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, null);
+            $this->app->response->setStatus(HttpStatus::OK);
+            return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, null, $accessToken->scope);
         }
 
         private function grantByRefreshToken(): Oauth2Response
         {
             $refreshToken = $this->body->getOne('refresh_token');
-            $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             if ($refreshToken === null) {
+                $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `refresh_token`');
             }
+            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
             if ($this->repo->getClientDetails($this->clientId, $this->clientSecret) === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            $refresh = $this->repo->getActiveRefreshToken($this->clientId, $refreshToken);
+            $refresh = $this->repo->getRefreshToken($this->clientId, $refreshToken);
             if ($refresh === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The provided refresh token is invalid, expired, or revoked.');
+            }
+            $this->repo->revokeRefreshToken($this->clientId, $refresh->token); // Revoke old refresh token (rotation security)
+            if ($refresh->expired) {
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The refresh token has expired.');
             }
             $accessToken = $this->repo->generateAccessToken($this->clientId, $refresh->scope, $refresh->userId);
             $newRefreshToken = $this->repo->generateRefreshToken($this->clientId, $refresh->scope, $refresh->userId);
@@ -146,10 +165,14 @@ namespace lib\oauth2 {
 
         private function grantByPassword(): Oauth2Response
         {
+            $keys = $this->body->absentKeys(['username', 'password']);
+            if ($keys !== null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
+            }
             $username = $this->body->getOne('username');
             $password = $this->body->getOne('password');
             $user = $this->repo->authenticate($username, $password);
-            $this->app->response->setStatus(HttpStatus::FORBIDDEN);
+            $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
             if ($user === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The user credentials were incorrect.');
             }
@@ -157,33 +180,34 @@ namespace lib\oauth2 {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $scope = $this->body->getOne('scope');
-            if ($this->repo->scopeAllowed($scope)) {
-                $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, $user->id);
-                $refreshToken = $this->repo->generateRefreshToken($this->clientId, $scope, $user->id);
-                $this->app->response->setStatus(HttpStatus::OK);
-                return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
-            }
-            return Oauth2Response::error(Oauth2Error::INVALID_SCOPE, 'Not allowed for a given scope.');
+            $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, $user->id);
+            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $scope, $user->id);
+            $this->app->response->setStatus(HttpStatus::OK);
+            return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
         }
 
         private function grantByDeviceCode(): Oauth2Response
         {
+            $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             $deviceCode = $this->body->getOne('device_code');
             if ($deviceCode === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `device_code`');
             }
             if ($this->repo->getClientDetails($this->clientId, $this->clientSecret) === null) {
-                $this->app->response->setStatus(HttpStatus::FORBIDDEN);
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            $device = $this->repo->getActiveDeviceDetails($this->clientId, $deviceCode);
+            $device = $this->repo->getDeviceCodeDetails($this->clientId, $deviceCode);
             if ($device === null) {
-                $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
-                return Oauth2Response::error(Oauth2Error::TOKEN_EXPIRED, 'The device code has expired.');
+                return Oauth2Response::error(Oauth2Error::EXPIRED_TOKEN, 'The device code has expired or invalid.');
             }
             if ($device->status === 'PENDING') {
-                $this->app->response->setStatus(HttpStatus::PRECONDITION_FAILED);
                 return Oauth2Response::error(Oauth2Error::AUTHORIZATION_PENDING, 'The device authorization is pending user approval.');
+            }
+            $this->repo->revokeDeviceCode($this->clientId, $deviceCode); //One-time use
+            if ($device->expired) {
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
+                return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The device code has expired.');
             }
             $accessToken = $this->repo->generateAccessToken($this->clientId, $device->scope, $device->userId);
             $refreshToken = $this->repo->generateRefreshToken($this->clientId, $device->scope, $device->userId);

@@ -10,9 +10,9 @@
 namespace lib\oauth2 {
 
     use lib\oauth2\dto\AccessTokenDto;
-    use lib\oauth2\dto\AuthorizationDetailsDto;
+    use lib\oauth2\dto\AuthorizationCodeDetailsDto;
     use lib\oauth2\dto\ClientDetailsDto;
-    use lib\oauth2\dto\DeviceDetailsDto;
+    use lib\oauth2\dto\DeviceCodeDetailsDto;
     use lib\oauth2\dto\RefreshTokenDto;
     use lib\oauth2\dto\UserDetailsDto;
 
@@ -20,11 +20,28 @@ namespace lib\oauth2 {
     {
 
         /**
-         * Check whether a given scope (permission) is granted
-         * @param string|null $scope Scope (or permission sometimes)
-         * @return bool Return true on success, false otherwise.
+         * Delete (revoke) device code
+         * @param string $clientId Client ID
+         * @param string $deviceCode Device code
+         * @return bool True on success, false otherwise.
          */
-        public function scopeAllowed(?string $scope): bool;
+        public function revokeDeviceCode(string $clientId, string $deviceCode): bool;
+
+        /**
+         * Delete (revoke) refresh token.
+         * @param string $clientId Client ID
+         * @param string $refreshToken Refresh token
+         * @return bool True on success, false otherwise.
+         */
+        public function revokeRefreshToken(string $clientId, string $refreshToken): bool;
+
+        /**
+         * Delete (revoke) authorization code.
+         * @param string $clientId Client ID
+         * @param string $authorizationCode Authorization code
+         * @return bool True on success, false otherwise.
+         */
+        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): bool;
 
         /**
          * Get oauth2 client details by client id and secret.
@@ -40,18 +57,18 @@ namespace lib\oauth2 {
          *
          * @param string $clientId Client ID
          * @param string $authorizationCode Current authorization code
-         * @return AuthorizationDetailsDto|null Authorization details if exists and not expires, null otherwise.
+         * @return AuthorizationCodeDetailsDto|null Authorization code details if exists and not expires, null otherwise.
          */
-        public function getActiveAuthorizationDetails(string $clientId, string $authorizationCode): ?AuthorizationDetailsDto;
+        public function getAuthorizationCodeDetails(string $clientId, string $authorizationCode): ?AuthorizationCodeDetailsDto;
 
         /**
          * Get Active client device details
          *
          * @param string $clientId Client ID
          * @param string $deviceCode Current device code
-         * @return DeviceDetailsDto|null Device details if exists and not expires, null otherwise
+         * @return DeviceCodeDetailsDto|null Device details if exists and not expires, null otherwise
          */
-        public function getActiveDeviceDetails(string $clientId, string $deviceCode): ?DeviceDetailsDto;
+        public function getDeviceCodeDetails(string $clientId, string $deviceCode): ?DeviceCodeDetailsDto;
 
         /**
          * Get active client refresh token
@@ -59,17 +76,16 @@ namespace lib\oauth2 {
          * @param string $refreshToken Current refresh token
          * @return RefreshTokenDto|null Returns refresh token details if exists and not expires, null otherwise
          */
-        public function getActiveRefreshToken(string $clientId, string $refreshToken): ?RefreshTokenDto;
+        public function getRefreshToken(string $clientId, string $refreshToken): ?RefreshTokenDto;
 
         /**
          * Generate, store and return client access token
          * @param string $clientId Client ID
          * @param string|null $scope Scope (permissions)
          * @param string|null $userId User ID who's granting permission to an app (null for client credentials)
-         * @param int $expiresIn Expiration in seconds.
          * @return AccessTokenDto Access token details
          */
-        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 3600): AccessTokenDto;
+        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId): AccessTokenDto;
 
         /**
          * Generate, store and return client authorization token
@@ -104,12 +120,12 @@ namespace lib\oauth2 {
         public function authenticate(string $username, string $password): ?UserDetailsDto;
 
         /**
-         * Validates an access token.
+         * Validates an access token. If token exists and expired, delete it.
          *
-         * @param string $token Access token to verify.
+         * @param string|null $token Access token to verify.
          * @return AccessTokenDto Access token details if the token is valid, null otherwise
          */
-        public function validateAccessToken(string $token): ?AccessTokenDto;
+        public function validateAccessToken(?string $token): ?AccessTokenDto;
     }
 
 }

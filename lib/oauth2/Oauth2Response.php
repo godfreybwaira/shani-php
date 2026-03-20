@@ -23,7 +23,7 @@ namespace lib\oauth2 {
             $this->type = $type;
         }
 
-        public static function success(string $accessToken, int $expiresIn, string $refreshToken, ?string $scope): Oauth2Response
+        public static function success(string $accessToken, int $expiresIn, ?string $refreshToken, ?string $scope): Oauth2Response
         {
             return new self(Oauth2ResponseType::OK, [
                 'access_token' => $accessToken,

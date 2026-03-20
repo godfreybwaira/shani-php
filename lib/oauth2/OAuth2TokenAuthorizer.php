@@ -36,7 +36,7 @@ namespace lib\oauth2 {
             $keys = $this->body->absentKeys(['client_id', 'redirect_uri', 'response_type']);
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             if ($keys !== null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameters were required but missing: ' . implode(', ', $keys));
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
             }
             $clientId = $this->body->getOne('client_id');
             $redirectUri = $this->body->getOne('redirect_uri');
@@ -58,8 +58,8 @@ namespace lib\oauth2 {
             if ($userId === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Granting user is not authenticated.');
             }
-            $accessToken = $this->repo->generateAuthorizationCode($clientId, $scope, $userId, $redirectUri, $codeChallenge, $codeChallengeMethod);
-            $query = http_build_query([$responseType => $accessToken->token]);
+            $authCode = $this->repo->generateAuthorizationCode($clientId, $scope, $userId, $redirectUri, $codeChallenge, $codeChallengeMethod);
+            $query = http_build_query([$responseType => $authCode->token]);
             $this->app->response->setStatus(HttpStatus::OK);
             $this->app->response->redirect($redirectUri . '?' . $query);
             return null;

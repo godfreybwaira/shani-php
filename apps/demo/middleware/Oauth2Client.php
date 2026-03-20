@@ -11,9 +11,9 @@ namespace apps\demo\middleware {
 
     use lib\crypto\KeyGen;
     use lib\oauth2\dto\AccessTokenDto;
-    use lib\oauth2\dto\AuthorizationDetailsDto;
+    use lib\oauth2\dto\AuthorizationCodeDetailsDto;
     use lib\oauth2\dto\ClientDetailsDto;
-    use lib\oauth2\dto\DeviceDetailsDto;
+    use lib\oauth2\dto\DeviceCodeDetailsDto;
     use lib\oauth2\dto\RefreshTokenDto;
     use lib\oauth2\dto\UserDetailsDto;
     use lib\oauth2\Oauth2Repository;
@@ -22,10 +22,16 @@ namespace apps\demo\middleware {
     {
 
         private const REDIRECT_URI = 'http://dev.shani.v2.local/security/0/oauth2/0';
+        private const REFRESH_TOKEN = 'ac7248a057146a295c7b9628dc9be0f74f938bbb181d6806fc5f18440f0bb9c9';
+        private const ACCESS_TOKEN = 'cd8b76f03e85cb5da72fd0481b671a996641a3bb32c214a8188e31f313179f8d';
+        private const CLIENT_ID = '1c:81:25:28:94:8e';
+        private const CLIENT_SECRET = '38a79817-6f70-400b-90d4-8d1912dd8b89';
+        private const USERNAME = 'Freeda84';
+        private const PASSWORD = 'krPBoWaaqRsgQVL';
 
-        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 3600): AccessTokenDto
+        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId): AccessTokenDto
         {
-            return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+            return new AccessTokenDto($clientId, self::ACCESS_TOKEN, $userId, $scope, 3600);
         }
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto
@@ -33,17 +39,17 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
         }
 
-        public function getActiveAuthorizationDetails(string $clientId, string $authorizationCode): ?AuthorizationDetailsDto
+        public function getAuthorizationCodeDetails(string $clientId, string $authorizationCode): ?AuthorizationCodeDetailsDto
         {
-            return new AuthorizationDetailsDto($clientId, $authorizationCode, '123', self::REDIRECT_URI, 'read write', null, 'S256', 3600);
+            return new AuthorizationCodeDetailsDto($clientId, $authorizationCode, '123', 'read write', 'bKybd0Syvr9pTGvFy9P_G13jxG0_gW6Jf2TOK0vh34k', 'S256', 3600);
         }
 
-        public function getActiveDeviceDetails(string $clientId, string $deviceCode): ?DeviceDetailsDto
+        public function getDeviceCodeDetails(string $clientId, string $deviceCode): ?DeviceCodeDetailsDto
         {
-            return new DeviceDetailsDto($clientId, $deviceCode, 'usercode123', 'user123', 'read write', 3600);
+            return new DeviceCodeDetailsDto($clientId, $deviceCode, 'usercode123', 'user123', 'read write', 3600);
         }
 
-        public function getActiveRefreshToken(string $clientId, string $refreshToken): ?RefreshTokenDto
+        public function getRefreshToken(string $clientId, string $refreshToken): ?RefreshTokenDto
         {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
@@ -51,11 +57,6 @@ namespace apps\demo\middleware {
         public function getClientDetails(string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
         {
             return new ClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI);
-        }
-
-        public function scopeAllowed(?string $scope): bool
-        {
-            return true;
         }
 
         public function authenticate(string $username, string $password): ?UserDetailsDto
@@ -68,9 +69,24 @@ namespace apps\demo\middleware {
             return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
         }
 
-        public function validateAccessToken(string $token): ?AccessTokenDto
+        public function validateAccessToken(?string $token): ?AccessTokenDto
         {
             return new AccessTokenDto('123', $token, 'user2', '430704a766', 100);
+        }
+
+        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): bool
+        {
+            return true;
+        }
+
+        public function revokeRefreshToken(string $clientId, string $refreshToken): bool
+        {
+            return true;
+        }
+
+        public function revokeDeviceCode(string $clientId, string $deviceCode): bool
+        {
+            return true;
         }
     }
 

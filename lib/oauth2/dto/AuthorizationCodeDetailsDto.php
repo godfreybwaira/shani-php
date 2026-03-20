@@ -9,69 +9,77 @@
 
 namespace lib\oauth2\dto {
 
-    final class AuthorizationDetailsDto
+    final class AuthorizationCodeDetailsDto
     {
 
         /**
-         * @var string One-time authorization code
+         * One-time authorization code
+         * @var string
          */
         public readonly string $code;
 
         /**
-         *  @var string Client that requested this code
+         * Client that requested this code
+         *  @var string
          */
         public readonly string $clientId;
 
         /**
-         * @var int User who authorized the request
+         * User who authorized the request
+         * @var int
          */
         public readonly string $userId;
 
         /**
-         * @var string Redirect URI that must match exactly
-         */
-        public readonly string $redirectUri;
-
-        /**
-         *  @var string|null Requested scopes (space-separated)
+         * Requested scopes (space-separated)
+         *  @var string|null
          */
         public readonly ?string $scope;
 
         /**
-         *  @var string|null PKCE code challenge (SHA-256 hash) – null = classic flow
+         * PKCE code challenge (SHA-256 hash) – null = classic flow
+         *  @var string|null
          */
         public readonly ?string $codeChallenge;
 
         /**
-         *  @var string|null Must be 'S256'
+         * Code challenge method must be 'S256'
+         *  @var string|null
          */
         public readonly ?string $codeChallengeMethod;
 
         /**
-         * @var string Expiration timestamp
+         * Expiration in seconds
+         * @var int
          */
-        public readonly string $expiresIn;
+        public readonly int $expiresIn;
+
+        /**
+         * Check if the code is expires. This is true if <code>$expiresIn</code>
+         * is less or equals to zero
+         * @var bool
+         */
+        public readonly bool $expired;
 
         /**
          * @param string      $clientId              Client that requested the code.
          * @param string      $code                  One-time authorization code.
          * @param int         $userId                User who authorized the request.
-         * @param string      $redirectUri           Exact redirect URI (OAuth 2.1 requirement).
          * @param string|null $scope                 Space-separated scopes.
          * @param string|null $codeChallenge         PKCE challenge (SHA-256 hash). Null = no PKCE.
          * @param string|null $codeChallengeMethod   Must be 'S256' only (plain is forbidden).
          * @param string      $expiresIn               Expiration timestamp.
          */
-        public function __construct(string $clientId, string $code, string $userId, string $redirectUri, ?string $scope, ?string $codeChallenge, ?string $codeChallengeMethod, string $expiresIn)
+        public function __construct(string $clientId, string $code, string $userId, ?string $scope, ?string $codeChallenge, ?string $codeChallengeMethod, int $expiresIn)
         {
             $this->code = $code;
             $this->clientId = $clientId;
             $this->userId = $userId;
-            $this->redirectUri = $redirectUri;
             $this->scope = $scope;
             $this->codeChallenge = $codeChallenge;
             $this->codeChallengeMethod = $codeChallengeMethod;
             $this->expiresIn = $expiresIn;
+            $this->expired = $expiresIn <= 0;
         }
     }
 
