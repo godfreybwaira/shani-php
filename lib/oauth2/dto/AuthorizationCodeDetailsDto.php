@@ -49,7 +49,7 @@ namespace lib\oauth2\dto {
         public readonly ?string $codeChallengeMethod;
 
         /**
-         * Expiration in seconds
+         * Number of seconds before expiration
          * @var int
          */
         public readonly int $expiresIn;

@@ -33,7 +33,8 @@ namespace lib\oauth2\dto {
         public readonly ?string $scope;
 
         /**
-         * @var int Expiration duration (in seconds)
+         * Number of seconds before expiration
+         * @var int
          */
         public readonly int $expiresIn;
 
@@ -42,7 +43,7 @@ namespace lib\oauth2\dto {
          * @param string      $accessToken The bearer token string.
          * @param string|null    $userId      User ID or null for machine-to-machine (client_credentials).
          * @param string|null $scope       Space-separated scopes granted.
-         * @param int      $expiresIn     Expiration in seconds.
+         * @param int      $expiresIn     Number of seconds before expiration.
          */
         public function __construct(string $clientId, string $accessToken, ?string $userId, ?string $scope, int $expiresIn)
         {

@@ -33,7 +33,8 @@ namespace lib\oauth2\dto {
         public readonly ?string $scope;
 
         /**
-         * @var int Expiration duration (in seconds)
+         * Number of seconds before expiration
+         * @var int
          */
         public readonly int $expiresIn;
 
@@ -49,7 +50,7 @@ namespace lib\oauth2\dto {
          * @param string      $refreshToken The refresh token.
          * @param string|null    $userId       User ID or null.
          * @param string|null $scope        Granted scopes.
-         * @param int      $expiresIn      Expiration in seconds.
+         * @param int      $expiresIn      Number of seconds before expiration.
          */
         public function __construct(string $clientId, string $refreshToken, ?string $userId, ?string $scope, int $expiresIn)
         {

@@ -96,7 +96,7 @@ namespace lib\oauth2 {
          * @param string $redirectUri Redirect URL
          * @param string|null $codeChallenge PKCE challenge.
          * @param string|null $codeChallengeMethod PKCE method (S256).
-         * @param int $expiresIn Expiration in seconds.
+         * @param int $expiresIn Number of seconds before expiration.
          * @return AccessTokenDto Access token details
          */
         public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto;
@@ -106,7 +106,7 @@ namespace lib\oauth2 {
          * @param string $clientId Client ID
          * @param string|null $scope Scope (permissions)
          * @param string|null $userId User ID who's granting permission to an app (null for client credentials)
-         * @param int $expiresIn Expiration in seconds.
+         * @param int $expiresIn Number of seconds before expiration.
          * @return RefreshTokenDto Refresh token details
          */
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto;

@@ -33,7 +33,8 @@ namespace lib\oauth2\dto {
         public readonly ?string $scope;
 
         /**
-         * @var int Expiration duration (in seconds)
+         * Number of seconds before expiration
+         * @var int
          */
         public readonly int $expiresIn;
 
@@ -66,7 +67,7 @@ namespace lib\oauth2\dto {
          * @param string   $userCode          Short user code shown on TV/CLI.
          * @param int|null $userId  User ID once authorized (null = pending).
          * @param string|null $scope          Requested scopes.
-         * @param int   $expiresIn           Expiration in seconds.
+         * @param int   $expiresIn           Number of seconds before expiration.
          * @param int      $pollingInterval   Recommended polling interval (default 5seconds).
          */
         public function __construct(string $clientId, string $deviceCode, string $userCode, ?string $userId, ?string $scope, int $expiresIn, int $pollingInterval = 5)
