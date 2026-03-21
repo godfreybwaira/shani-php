@@ -54,9 +54,9 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
 
-        public function getClientDetails(string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
+        public function getClientDetails(string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
         {
-            return new ClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI);
+            return new ClientDetailsDto($clientIpAddress, $clientId, $clientSecret, self::REDIRECT_URI);
         }
 
         public function authenticate(string $username, string $password): ?UserDetailsDto

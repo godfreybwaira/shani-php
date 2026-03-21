@@ -46,11 +46,12 @@ namespace lib\oauth2 {
         /**
          * Get oauth2 client details by client id and secret.
          *
+         * @param string $clientIpAddress Client IP Address
          * @param string $clientId Client ID.
          * @param string|null $clientSecret Client secret (hashed verification).
          * @return ClientDetailsDto|null Client data or null if invalid.
          */
-        public function getClientDetails(string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
+        public function getClientDetails(string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
 
         /**
          * Get Authorization details by supplied code, and client id

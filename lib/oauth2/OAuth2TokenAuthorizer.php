@@ -47,7 +47,7 @@ namespace lib\oauth2 {
             if ($responseType !== 'code') {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
-            $client = $this->repo->getClientDetails($clientId);
+            $client = $this->repo->getClientDetails($this->app->request->ip, $clientId);
             if ($client === null || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
