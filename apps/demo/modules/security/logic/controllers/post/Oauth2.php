@@ -33,7 +33,7 @@ namespace apps\demo\modules\security\logic\controllers\post {
         public function authorize()
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
-            $response = $authorizer->handleRequest();
+            $response = $authorizer->handleGeneralAuthorization();
             $this->app->writer->send($response?->body);
         }
     }

@@ -31,7 +31,7 @@ namespace lib\oauth2 {
          * Handles incoming requests and routes to appropriate oauth handler method.
          * @return Oauth2Response|null Returns Oauth 2 response on failure, or null on success
          */
-        public function handleRequest(): ?Oauth2Response
+        public function handleGeneralAuthorization(): ?Oauth2Response
         {
             $keys = $this->body->absentKeys(['client_id', 'redirect_uri', 'response_type']);
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
@@ -47,7 +47,7 @@ namespace lib\oauth2 {
             if ($responseType !== 'code') {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
-            $client = $this->repo->getClientDetails($this->app->request->ip, $clientId);
+            $client = $this->repo->getClientDetails(null, $this->app->request->ip, $clientId);
             if ($client === null || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
@@ -63,6 +63,49 @@ namespace lib\oauth2 {
             $this->app->response->setStatus(HttpStatus::OK);
             $this->app->response->redirect($redirectUri . '?' . $query);
             return null;
+        }
+
+        /**
+         * Designed for devices that either lack a browser to perform a user-agent-based
+         * authorization or are input constrained to the extent that requiring the user
+         * to input text in order to authenticate during the authorization flow is impractical.
+         * It enables OAuth clients on such devices (like smart TVs, media consoles,
+         * digital picture frames, and printers) to obtain user authorization to access
+         * protected resources by using a user agent on a separate device.
+         * @return Oauth2Response|null Returns Oauth 2 response on failure, or null on success
+         */
+        public function handleDeviceAuthorization(): ?Oauth2Response
+        {
+            $clientId = $this->body->getOne('client_id');
+            $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
+            if ($clientId === null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter: client_id');
+            }
+            $scope = $this->body->getOne('scope');
+            $clientSecret = $this->body->getOne('client_secret');
+            $client = $this->repo->getClientDetails(null, $this->app->request->ip, $clientId, $clientSecret);
+            if ($client === null) {
+                return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
+            }
+            $device = $this->repo->generateDeviceCode($clientId, $scope, self::generateUserCode());
+            $this->app->response->setStatus(HttpStatus::OK);
+            return Oauth2Response::deviceSuccess($device->deviceCode, $device->userCode, $device->verificationUri, $device->expiresIn, $device->pollingInterval);
+        }
+
+        /**
+         * Generates a user-friendly user code (e.g., 8 uppercase letters/numbers).
+         *
+         * @param int $length Number of characters to generate
+         * @return string User code.
+         */
+        private static function generateUserCode(int $length = 8): string
+        {
+            $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            $code = '';
+            for ($i = 0; $i < $length; $i++) {
+                $code .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+            return $code;
         }
     }
 

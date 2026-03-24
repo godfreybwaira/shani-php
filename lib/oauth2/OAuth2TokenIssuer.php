@@ -22,6 +22,7 @@ namespace lib\oauth2 {
         private readonly App $app;
         private readonly ReadableMap $body;
         private readonly Oauth2Repository $repo;
+        private readonly ?Oauth2GrantType $grantType;
         private readonly ?string $clientId, $clientSecret;
 
         public function __construct(App $app)
@@ -29,8 +30,9 @@ namespace lib\oauth2 {
             $this->app = $app;
             $this->body = $app->request->body();
             $creds = $this->app->request->header()->getBasicAuth();
-            $this->clientId = $this->body->getOne('client_id') ?? $creds[0] ?? null;
-            $this->clientSecret = $this->body->getOne('client_secret') ?? $creds[1] ?? null;
+            $this->clientId = $creds[0] ?? $this->body->getOne('client_id');
+            $this->clientSecret = $creds[1] ?? $this->body->getOne('client_secret');
+            $this->grantType = Oauth2GrantType::tryFrom($this->body->getOne('grant_type'));
             $this->repo = $app->config->getOauth2Repository();
         }
 
@@ -45,8 +47,7 @@ namespace lib\oauth2 {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The following parameter(s) were required but missing: client_id, client_secret');
             }
-            $grantType = Oauth2GrantType::tryFrom($this->body->getOne('grant_type'));
-            return match ($grantType) {
+            return match ($this->grantType) {
                 Oauth2GrantType::AUTHORIZATION_CODE => $this->grantByAuthorizationCode(),
                 Oauth2GrantType::AUTHORIZATION_CODE_PKCE => $this->grantByAuthorizationCodePKCE(),
                 Oauth2GrantType::CLIENT_CREDENTIALS => $this->grantByClientCredentials(),
@@ -59,14 +60,9 @@ namespace lib\oauth2 {
 
         private function grantByAuthorizationCode(): Oauth2Response
         {
-            $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
-            $keys = $this->body->absentKeys(['redirect_uri', 'code']);
-            if ($keys !== null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
-            }
             $redirectUri = $this->body->getOne('redirect_uri');
             $code = $this->body->getOne('code');
-            $client = $this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret);
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
             if ($client === null) {
                 $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
@@ -83,8 +79,9 @@ namespace lib\oauth2 {
             if ($authCode->expired) {
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The authorization code has expired.');
             }
+            $this->repo->revokeAllRefreshTokens($this->clientId, $authCode->userId);
             $accessToken = $this->repo->generateAccessToken($this->clientId, $authCode->scope, $authCode->userId);
-            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->userId, $authCode->userId);
+            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->scope, $authCode->userId);
             $this->app->response->setStatus(HttpStatus::OK);
             return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
         }
@@ -99,7 +96,7 @@ namespace lib\oauth2 {
             $codeVerifier = $this->body->getOne('code_verifier');
             $code = $this->body->getOne('code');
             $redirectUri = $this->body->getOne('redirect_uri');
-            $client = $this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret);
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
             if ($client === null) {
                 $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
@@ -120,20 +117,26 @@ namespace lib\oauth2 {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Code challenge verification failed.');
             }
+            $this->repo->revokeAllRefreshTokens($this->clientId, $authCode->userId);
             $accessToken = $this->repo->generateAccessToken($this->clientId, $authCode->scope, $authCode->userId);
-            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->userId, $authCode->scope);
+            $refreshToken = $this->repo->generateRefreshToken($this->clientId, $authCode->scope, $authCode->userId);
             $this->app->response->setStatus(HttpStatus::OK);
             return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, $refreshToken->token, $accessToken->scope);
         }
 
+        /**
+         * Machine to machine communication
+         * @return Oauth2Response
+         */
         private function grantByClientCredentials(): Oauth2Response
         {
-            if ($this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret) === null) {
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
+            if ($client === null) {
                 $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $scope = $this->body->getOne('scope');
-            $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, null);
+            $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, userId: null, expiresIn: 3600);
             $this->app->response->setStatus(HttpStatus::OK);
             return Oauth2Response::success($accessToken->token, $accessToken->expiresIn, null, $accessToken->scope);
         }
@@ -146,7 +149,8 @@ namespace lib\oauth2 {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `refresh_token`');
             }
             $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
-            if ($this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret) === null) {
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
+            if ($client === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $refresh = $this->repo->getRefreshToken($this->clientId, $refreshToken);
@@ -176,10 +180,12 @@ namespace lib\oauth2 {
             if ($user === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The user credentials were incorrect.');
             }
-            if ($this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret) === null) {
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
+            if ($client === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $scope = $this->body->getOne('scope');
+            $this->repo->revokeAllRefreshTokens($this->clientId, $user->id);
             $accessToken = $this->repo->generateAccessToken($this->clientId, $scope, $user->id);
             $refreshToken = $this->repo->generateRefreshToken($this->clientId, $scope, $user->id);
             $this->app->response->setStatus(HttpStatus::OK);
@@ -193,7 +199,8 @@ namespace lib\oauth2 {
             if ($deviceCode === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'The request is missing a required parameter `device_code`');
             }
-            if ($this->repo->getClientDetails($this->app->request->ip, $this->clientId, $this->clientSecret) === null) {
+            $client = $this->repo->getClientDetails($this->grantType, $this->app->request->ip, $this->clientId, $this->clientSecret);
+            if ($client === null) {
                 $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
@@ -209,6 +216,7 @@ namespace lib\oauth2 {
                 $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
                 return Oauth2Response::error(Oauth2Error::INVALID_GRANT, 'The device code has expired.');
             }
+            $this->repo->revokeAllRefreshTokens($this->clientId, $device->userId);
             $accessToken = $this->repo->generateAccessToken($this->clientId, $device->scope, $device->userId);
             $refreshToken = $this->repo->generateRefreshToken($this->clientId, $device->scope, $device->userId);
             $this->app->response->setStatus(HttpStatus::OK);

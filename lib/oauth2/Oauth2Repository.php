@@ -20,38 +20,56 @@ namespace lib\oauth2 {
     {
 
         /**
+         * Delete (revoke) all refresh tokens
+         * @param string $clientId Client ID
+         * @param string $userId User ID
+         * @return void
+         */
+        public function revokeAllRefreshTokens(string $clientId, string $userId = null): void;
+
+        /**
+         * Generate, store and return device code
+         * @param string $clientId Client ID
+         * @param string|null $scope Scope (permissions)
+         * @param string $userCode User device code
+         * @return DeviceCodeDetailsDto|null Device details if exists and not expires, null otherwise.
+         */
+        public function generateDeviceCode(string $clientId, ?string $scope, string $userCode): DeviceCodeDetailsDto;
+
+        /**
          * Delete (revoke) device code
          * @param string $clientId Client ID
          * @param string $deviceCode Device code
-         * @return bool True on success, false otherwise.
+         * @return void
          */
-        public function revokeDeviceCode(string $clientId, string $deviceCode): bool;
+        public function revokeDeviceCode(string $clientId, string $deviceCode): void;
 
         /**
          * Delete (revoke) refresh token.
          * @param string $clientId Client ID
          * @param string $refreshToken Refresh token
-         * @return bool True on success, false otherwise.
+         * @return void
          */
-        public function revokeRefreshToken(string $clientId, string $refreshToken): bool;
+        public function revokeRefreshToken(string $clientId, string $refreshToken): void;
 
         /**
          * Delete (revoke) authorization code.
          * @param string $clientId Client ID
          * @param string $authorizationCode Authorization code
-         * @return bool True on success, false otherwise.
+         * @return void
          */
-        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): bool;
+        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): void;
 
         /**
          * Get oauth2 client details by client id and secret.
          *
+         * @param Oauth2GrantType|null $grantType Grant type a client is requesting to use
          * @param string $clientIpAddress Client IP Address
          * @param string $clientId Client ID.
          * @param string|null $clientSecret Client secret (hashed verification).
          * @return ClientDetailsDto|null Client data or null if invalid.
          */
-        public function getClientDetails(string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
+        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
 
         /**
          * Get Authorization details by supplied code, and client id
@@ -84,9 +102,10 @@ namespace lib\oauth2 {
          * @param string $clientId Client ID
          * @param string|null $scope Scope (permissions)
          * @param string|null $userId User ID who's granting permission to an app (null for client credentials)
+         * @param int $expiresIn Number of seconds before expiration.
          * @return AccessTokenDto Access token details
          */
-        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId): AccessTokenDto;
+        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 900): AccessTokenDto;
 
         /**
          * Generate, store and return client authorization token
@@ -123,10 +142,11 @@ namespace lib\oauth2 {
         /**
          * Validates an access token. If token exists and expired, delete it.
          *
-         * @param string|null $token Access token to verify.
+         * @param string $requestIp IP Address that has made a request.
+         * @param string $token Access token to verify.
          * @return AccessTokenDto Access token details if the token is valid, null otherwise
          */
-        public function validateAccessToken(?string $token): ?AccessTokenDto;
+        public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto;
     }
 
 }

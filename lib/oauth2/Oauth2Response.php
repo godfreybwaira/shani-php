@@ -34,6 +34,17 @@ namespace lib\oauth2 {
             ]);
         }
 
+        public static function deviceSuccess(string $deviceCode, string $userCode, string $verificationUri, int $expiresIn, int $interval = 5): Oauth2Response
+        {
+            return new self(Oauth2ResponseType::OK, [
+                'device_code' => $deviceCode,
+                'user_code' => $userCode,
+                'verification_uri' => $verificationUri,
+                'expires_in' => $expiresIn,
+                'interval' => $interval
+            ]);
+        }
+
         public static function error(Oauth2Error $error, ?string $description = null): Oauth2Response
         {
             return new self(Oauth2ResponseType::ERROR, [

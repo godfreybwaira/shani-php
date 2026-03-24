@@ -54,13 +54,22 @@ namespace shani\advisors {
         private function authenticate(): bool
         {
             $token = $this->app->request->header()->getBearerToken();
-            if ($token !== null) {
-                $accessToken = $this->getOauth2Repository()->validateAccessToken($token);
+            if ($token !== null && $this->enableOauth()) {
+                $accessToken = $this->getOauth2Repository()->validateAccessToken($this->app->request->ip, $token);
                 $this->permissionList = $accessToken?->scope;
             } else {
                 $this->permissionList = $this->getUserPermissions();
             }
             return $this->permissionList !== null;
+        }
+
+        /**
+         * Enable oauth authorization
+         * @return bool True to enable, false otherwise
+         */
+        public function enableOauth(): bool
+        {
+            return true;
         }
 
         /**

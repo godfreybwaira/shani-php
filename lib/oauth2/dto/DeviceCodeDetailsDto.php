@@ -13,7 +13,8 @@ namespace lib\oauth2\dto {
     {
 
         /**
-         * @var string Long device code used for polling
+         * Long device code used for polling
+         * @var string
          */
         public readonly string $deviceCode;
 
@@ -61,6 +62,12 @@ namespace lib\oauth2\dto {
         public readonly bool $expired;
 
         /**
+         * The end-user verification URI on the authorization server
+         * @var string
+         */
+        public readonly string $verificationUri;
+
+        /**
          *
          * @param string   $clientId          Requesting client.
          * @param string   $deviceCode        Long opaque device code for polling.
@@ -68,9 +75,9 @@ namespace lib\oauth2\dto {
          * @param int|null $userId  User ID once authorized (null = pending).
          * @param string|null $scope          Requested scopes.
          * @param int   $expiresIn           Number of seconds before expiration.
-         * @param int      $pollingInterval   Recommended polling interval (default 5seconds).
+         * @param int      $pollingInterval   Recommended polling interval.
          */
-        public function __construct(string $clientId, string $deviceCode, string $userCode, ?string $userId, ?string $scope, int $expiresIn, int $pollingInterval = 5)
+        public function __construct(string $clientId, string $deviceCode, string $userCode, ?string $userId, ?string $scope, int $expiresIn, int $pollingInterval)
         {
             $this->deviceCode = $deviceCode;
             $this->userCode = $userCode;

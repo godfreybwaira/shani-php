@@ -16,6 +16,7 @@ namespace apps\demo\middleware {
     use lib\oauth2\dto\DeviceCodeDetailsDto;
     use lib\oauth2\dto\RefreshTokenDto;
     use lib\oauth2\dto\UserDetailsDto;
+    use lib\oauth2\Oauth2GrantType;
     use lib\oauth2\Oauth2Repository;
 
     final class Oauth2Client implements Oauth2Repository
@@ -29,9 +30,9 @@ namespace apps\demo\middleware {
         private const USERNAME = 'Freeda84';
         private const PASSWORD = 'krPBoWaaqRsgQVL';
 
-        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId): AccessTokenDto
+        public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {
-            return new AccessTokenDto($clientId, self::ACCESS_TOKEN, $userId, $scope, 3600);
+            return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
         }
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto
@@ -54,9 +55,9 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
 
-        public function getClientDetails(string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
+        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
         {
-            return new ClientDetailsDto($clientIpAddress, $clientId, $clientSecret, self::REDIRECT_URI);
+            return new ClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI);
         }
 
         public function authenticate(string $username, string $password): ?UserDetailsDto
@@ -69,24 +70,34 @@ namespace apps\demo\middleware {
             return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
         }
 
-        public function validateAccessToken(?string $token): ?AccessTokenDto
+        public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto
         {
             return new AccessTokenDto('123', $token, 'user2', '430704a766', 100);
         }
 
-        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): bool
+        public function revokeAuthorizationCode(string $clientId, string $authorizationCode): void
         {
-            return true;
+
         }
 
-        public function revokeRefreshToken(string $clientId, string $refreshToken): bool
+        public function revokeRefreshToken(string $clientId, string $refreshToken): void
         {
-            return true;
+
         }
 
-        public function revokeDeviceCode(string $clientId, string $deviceCode): bool
+        public function revokeDeviceCode(string $clientId, string $deviceCode): void
         {
-            return true;
+
+        }
+
+        public function generateDeviceCode(string $clientId, ?string $scope, string $userCode): DeviceCodeDetailsDto
+        {
+            return new DeviceCodeDetailsDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userCode, 'user123', $scope, 3600, 5);
+        }
+
+        public function revokeAllRefreshTokens(string $clientId, string $userId = null): void
+        {
+
         }
     }
 
