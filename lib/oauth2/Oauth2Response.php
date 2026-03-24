@@ -34,7 +34,7 @@ namespace lib\oauth2 {
             ]);
         }
 
-        public static function deviceSuccess(string $deviceCode, string $userCode, string $verificationUri, int $expiresIn, int $interval = 5): Oauth2Response
+        public static function deviceSuccess(string $deviceCode, string $userCode, string $verificationUri, int $expiresIn, int $interval): Oauth2Response
         {
             return new self(Oauth2ResponseType::OK, [
                 'device_code' => $deviceCode,
@@ -45,6 +45,12 @@ namespace lib\oauth2 {
             ]);
         }
 
+        /**
+         *
+         * @param Oauth2Error $error Error code
+         * @param string|null $description Error description
+         * @return Oauth2Response
+         */
         public static function error(Oauth2Error $error, ?string $description = null): Oauth2Response
         {
             return new self(Oauth2ResponseType::ERROR, [
