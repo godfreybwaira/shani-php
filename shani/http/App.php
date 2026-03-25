@@ -23,6 +23,7 @@ namespace shani\http {
     use shani\core\log\Logger;
     use shani\core\VirtualHost;
     use shani\exceptions\CustomException;
+    use shani\FrameworkConfig;
     use shani\persistence\LocalStorage;
     use shani\persistence\session\Cart;
     use shani\persistence\session\SessionManager;
@@ -67,12 +68,19 @@ namespace shani\http {
         public readonly Configuration $config;
 
         /**
+         * Application framework configuration
+         * @var FrameworkConfig
+         */
+        public readonly FrameworkConfig $framework;
+
+        /**
          * Create an application instance
          * @param VirtualHost $vhost Virtual host
          * @param ResponseEntity $res Response entity object
          * @param ResponseWriter $writer response writer object
+         * @param FrameworkConfig $framework Framework configuration object
          */
-        public function __construct(VirtualHost $vhost, ResponseEntity $res, ResponseWriter $writer)
+        public function __construct(VirtualHost $vhost, ResponseEntity $res, ResponseWriter $writer, FrameworkConfig $framework)
         {
             $this->vhost = $vhost;
             $this->response = $res;

@@ -32,6 +32,7 @@ namespace shani\servers\swoole {
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private readonly Server $server;
+        private readonly FrameworkConfig $config;
         private readonly bool $forceRedirection;
         private readonly int $httpPort, $httpsPort;
         private readonly string $ip;
@@ -47,6 +48,7 @@ namespace shani\servers\swoole {
             $this->httpsPort = $swoole['PORTS']['HTTPS'];
             $this->ip = $swoole['IP'];
 
+            $this->config = $config;
             $this->server = new Server($this->ip, $this->httpPort);
             $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
 
@@ -96,7 +98,7 @@ namespace shani\servers\swoole {
                 $request = self::createRequest($scheme, $req);
                 if ($scheme === 'https' || !$this->forceRedirection) {
                     $writer = new SwooleHttpResponseWriter($res);
-                    $callback($request, $writer);
+                    $callback($request, $writer, $this->config);
                 } else {
                     $uri = $request->uri->withPort($this->httpsPort)->withScheme('https');
                     $res->status(HttpStatus::MOVED_PERMANENTLY->value);
@@ -109,7 +111,7 @@ namespace shani\servers\swoole {
                 if (!empty($request)) {
                     $request->withRawBody($frame->data);
                     $writer = new SwooleWebSocketResponseWriter($server, $frame->fd);
-                    $callback($request, $writer);
+                    $callback($request, $writer, $this->config);
                 }
             });
             return $this;

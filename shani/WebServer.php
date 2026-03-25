@@ -69,11 +69,11 @@ namespace shani {
         {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
-            $server->request(function (RequestEntity $request, ResponseWriter $writer) {
+            $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 try {
                     $vhost = self::host($request->uri->hostname());
-                    $app = new App($vhost, $response, $writer);
+                    $app = new App($vhost, $response, $writer, $framework);
                     $app->runApp();
                 } catch (\Throwable $ex) {
                     $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR)->header()

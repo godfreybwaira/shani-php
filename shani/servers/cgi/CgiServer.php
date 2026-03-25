@@ -33,7 +33,7 @@ namespace shani\servers\cgi {
         {
             $request = self::createRequest();
             $writer = new CgiHttpResponseWriter();
-            $callback($request, $writer);
+            $callback($request, $writer, $this->config);
             return $this;
         }
 

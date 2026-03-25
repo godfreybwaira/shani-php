@@ -16,6 +16,7 @@ namespace shani {
 
         public readonly int $payloadSize;
         public readonly bool $showErrors;
+        public readonly string $timezone;
 
         private const MB_1 = 1048576;
 
@@ -24,6 +25,7 @@ namespace shani {
             self::checkFrameworkRequirements();
             $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
             /////////////////////////////////////
+            $this->timezone = $config['TIME_ZONE'];
             $this->showErrors = $config['DISPLAY_ERRORS'];
             $this->payloadSize = $config['MAX_PAYLOAD_SIZE'] * self::MB_1;
             /////////////////////////////////////
