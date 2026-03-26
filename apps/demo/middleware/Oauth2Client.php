@@ -23,12 +23,6 @@ namespace apps\demo\middleware {
     {
 
         private const REDIRECT_URI = 'http://dev.shani.v2.local/security/0/oauth2/0';
-        private const REFRESH_TOKEN = 'ac7248a057146a295c7b9628dc9be0f74f938bbb181d6806fc5f18440f0bb9c9';
-        private const ACCESS_TOKEN = 'cd8b76f03e85cb5da72fd0481b671a996641a3bb32c214a8188e31f313179f8d';
-        private const CLIENT_ID = '1c:81:25:28:94:8e';
-        private const CLIENT_SECRET = '38a79817-6f70-400b-90d4-8d1912dd8b89';
-        private const USERNAME = 'Freeda84';
-        private const PASSWORD = 'krPBoWaaqRsgQVL';
 
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {
@@ -47,7 +41,7 @@ namespace apps\demo\middleware {
 
         public function getDeviceCodeDetails(string $clientId, string $deviceCode): ?DeviceCodeDetailsDto
         {
-            return new DeviceCodeDetailsDto($clientId, $deviceCode, 'usercode123', 'user123', 'read write', 3600);
+            return new DeviceCodeDetailsDto($clientId, $deviceCode, 'usercode123', self::REDIRECT_URI . '/device', 'user123', 'read write', 600, 5);
         }
 
         public function getRefreshToken(string $clientId, string $refreshToken): ?RefreshTokenDto
@@ -92,12 +86,17 @@ namespace apps\demo\middleware {
 
         public function generateDeviceCode(string $clientId, ?string $scope, string $userCode): DeviceCodeDetailsDto
         {
-            return new DeviceCodeDetailsDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userCode, 'user123', $scope, 3600, 5);
+            return new DeviceCodeDetailsDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userCode, self::REDIRECT_URI . '/device', 'user123', $scope, 600, 5);
         }
 
         public function revokeAllRefreshTokens(string $clientId, string $userId = null): void
         {
 
+        }
+
+        public function authorizeDeviceCode(string $userId, string $userCode, string $deviceCode): bool
+        {
+            return true;
         }
     }
 

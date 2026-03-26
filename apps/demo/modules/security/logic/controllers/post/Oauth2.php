@@ -36,6 +36,23 @@ namespace apps\demo\modules\security\logic\controllers\post {
             $response = $authorizer->handleGeneralAuthorization();
             $this->app->writer->send($response?->body);
         }
+
+        public function deviceAuthorization()
+        {
+            $authorizer = new OAuth2TokenAuthorizer($this->app);
+            $response = $authorizer->handleDeviceAuthorization();
+            $this->app->writer->send($response?->body);
+        }
+
+        public function device()
+        {
+            $authorizer = new OAuth2TokenAuthorizer($this->app);
+            $body = $this->app->request->body();
+            $userCode = $body->getOne('user_code');
+            $deviceCode = $body->getOne('device_code');
+            $response = $authorizer->handleDeviceVerification($userCode, $deviceCode);
+            $this->app->writer->send($response?->body);
+        }
     }
 
 }

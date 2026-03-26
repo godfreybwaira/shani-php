@@ -10,6 +10,7 @@
 namespace lib\oauth2 {
 
     use lib\DataConvertor;
+    use lib\oauth2\dto\DeviceCodeDetailsDto;
 
     final class Oauth2Response
     {
@@ -34,14 +35,14 @@ namespace lib\oauth2 {
             ]);
         }
 
-        public static function deviceSuccess(string $deviceCode, string $userCode, string $verificationUri, int $expiresIn, int $interval): Oauth2Response
+        public static function deviceSuccess(DeviceCodeDetailsDto $device): Oauth2Response
         {
             return new self(Oauth2ResponseType::OK, [
-                'device_code' => $deviceCode,
-                'user_code' => $userCode,
-                'verification_uri' => $verificationUri,
-                'expires_in' => $expiresIn,
-                'interval' => $interval
+                'device_code' => $device->deviceCode,
+                'user_code' => $device->userCode,
+                'verification_uri' => $device->verificationUri,
+                'expires_in' => $device->expiresIn,
+                'interval' => $device->pollingInterval
             ]);
         }
 

@@ -20,6 +20,7 @@ namespace shani\servers\swoole {
     use shani\contracts\SupportedWebServer;
     use shani\core\Framework;
     use shani\FrameworkConfig;
+    use shani\WebServer;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
@@ -27,6 +28,12 @@ namespace shani\servers\swoole {
 
     final class SwooleServer implements SupportedWebServer
     {
+
+        private static array $ipHeaders = [
+            'http_client_ip', 'http_x_forwarded_for',
+            'http_x_forwarded', 'http_x_cluster_client_ip',
+            'http_forwarded_for', 'http_forwarded', 'remote_addr'
+        ];
 
         private const SOCKET_TCP = 1, SSL = 512;
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
@@ -126,7 +133,7 @@ namespace shani\servers\swoole {
                     ->files(self::getPostedFiles($req->files))
                     ->method($req->server['request_method'])
                     ->time($req->server['request_time'])
-                    ->ip(self::getClientIP($req->server))
+                    ->ip(WebServer::getClientIP($req->server, self::$ipHeaders))
                     ->body(self::getPostedBody($req))
                     ->rawBody($req->rawcontent())
                     ->headers($req->header)
@@ -135,21 +142,6 @@ namespace shani\servers\swoole {
                     ->uri($path)
                     ->build();
             return $request;
-        }
-
-        private static function getClientIP(array &$env): ?string
-        {
-            $keys = [
-                'http_client_ip', 'http_x_forwarded_for',
-                'http_x_forwarded', 'http_x_cluster_client_ip',
-                'http_forwarded_for', 'http_forwarded', 'remote_addr'
-            ];
-            foreach ($keys as $key) {
-                if (!empty($env[$key])) {
-                    return $env[$key];
-                }
-            }
-            return null;
         }
 
         private static function getPostedBody(Request &$req): ?array

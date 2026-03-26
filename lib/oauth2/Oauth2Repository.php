@@ -147,6 +147,15 @@ namespace lib\oauth2 {
          * @return AccessTokenDto Access token details if the token is valid, null otherwise
          */
         public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto;
+
+        /**
+         * Authorize device usage by the user
+         * @param string $userId User ID from session
+         * @param string $userCode User code from device
+         * @param string $deviceCode User device code
+         * @return bool True on success, false otherwise
+         */
+        public function authorizeDeviceCode(string $userId, string $userCode, string $deviceCode): bool;
     }
 
 }

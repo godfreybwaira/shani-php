@@ -69,15 +69,16 @@ namespace lib\oauth2\dto {
 
         /**
          *
-         * @param string   $clientId          Requesting client.
-         * @param string   $deviceCode        Long opaque device code for polling.
-         * @param string   $userCode          Short user code shown on TV/CLI.
-         * @param int|null $userId  User ID once authorized (null = pending).
-         * @param string|null $scope          Requested scopes.
-         * @param int   $expiresIn           Number of seconds before expiration.
-         * @param int      $pollingInterval   Recommended polling interval.
+         * @param string    $clientId           Requesting client.
+         * @param string    $deviceCode         Long opaque device code for polling.
+         * @param string    $userCode           Short user code shown on TV/CLI.
+         * @param string    $verificationUri    The end-user verification URI on the authorization server
+         * @param int|null  $userId             User ID once authorized (null = pending).
+         * @param string|null   $scope          Requested scopes.
+         * @param int   $expiresIn              Number of seconds before expiration.
+         * @param int   $pollingInterval        Recommended polling interval.
          */
-        public function __construct(string $clientId, string $deviceCode, string $userCode, ?string $userId, ?string $scope, int $expiresIn, int $pollingInterval)
+        public function __construct(string $clientId, string $deviceCode, string $userCode, string $verificationUri, ?string $userId, ?string $scope, int $expiresIn, int $pollingInterval)
         {
             $this->deviceCode = $deviceCode;
             $this->userCode = $userCode;
@@ -85,6 +86,7 @@ namespace lib\oauth2\dto {
             $this->scope = $scope;
             $this->expiresIn = $expiresIn;
             $this->pollingInterval = $pollingInterval;
+            $this->verificationUri = $verificationUri;
             $this->userId = $userId;
             $this->status = $userId === null ? 'PENDING' : 'OK';
             $this->expired = $expiresIn <= 0;

@@ -96,6 +96,16 @@ namespace shani {
             $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
             (new Logger($file))->log($level, $message);
         }
+
+        public static function getClientIP(array &$httpHeaders, array $ipHeaders): ?string
+        {
+            foreach ($ipHeaders as $header) {
+                if (!empty($httpHeaders[$header])) {
+                    return explode(',', $httpHeaders[$header])[0];
+                }
+            }
+            return null;
+        }
     }
 
 }

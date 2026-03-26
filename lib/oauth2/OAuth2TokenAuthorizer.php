@@ -9,7 +9,6 @@
 
 namespace lib\oauth2 {
 
-    use lib\ds\map\ReadableMap;
     use lib\http\HttpStatus;
     use shani\http\App;
 
@@ -17,13 +16,11 @@ namespace lib\oauth2 {
     {
 
         private readonly App $app;
-        private readonly ReadableMap $body;
         private readonly Oauth2Repository $repo;
 
         public function __construct(App $app)
         {
             $this->app = $app;
-            $this->body = $app->request->query;
             $this->repo = $app->config->getOauth2Repository();
         }
 
@@ -33,17 +30,18 @@ namespace lib\oauth2 {
          */
         public function handleGeneralAuthorization(): ?Oauth2Response
         {
-            $keys = $this->body->absentKeys(['client_id', 'redirect_uri', 'response_type']);
+            $body = $this->app->request->query;
+            $keys = $body->absentKeys(['client_id', 'redirect_uri', 'response_type']);
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             if ($keys !== null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): ' . implode(', ', $keys));
             }
-            $clientId = $this->body->getOne('client_id');
-            $redirectUri = $this->body->getOne('redirect_uri');
-            $responseType = $this->body->getOne('response_type');
-            $scope = $this->body->getOne('scope');
-            $codeChallengeMethod = $this->body->getOne('code_challenge_method');
-            $codeChallenge = $this->body->getOne('code_challenge');
+            $clientId = $body->getOne('client_id');
+            $redirectUri = $body->getOne('redirect_uri');
+            $responseType = $body->getOne('response_type');
+            $scope = $body->getOne('scope');
+            $codeChallengeMethod = $body->getOne('code_challenge_method');
+            $codeChallenge = $body->getOne('code_challenge');
             if ($responseType !== 'code') {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
@@ -66,30 +64,52 @@ namespace lib\oauth2 {
         }
 
         /**
+         * Handles the /device endpoint for user verification.
+         * @param string $deviceCode User device code
+         * @param string $userCode User device code stored in session or some other places.
+         * @return Oauth2Response|null Oauth response on failure, or null on success
+         */
+        public function handleDeviceVerification(string $deviceCode, string $userCode): ?Oauth2Response
+        {
+            $userId = $this->app->config->getUserPrivateId();
+            if ($userId === null) {
+                $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Session expired.');
+            }
+            if (!$this->repo->authorizeDeviceCode($userId, $userCode, $deviceCode)) {
+                $this->app->response->setStatus(HttpStatus::UNAUTHORIZED);
+                return Oauth2Response::error(Oauth2Error::UNAUTHORIZED, 'Authorization failed.');
+            }
+            $this->app->response->setStatus(HttpStatus::OK);
+            return null;
+        }
+
+        /**
          * Designed for devices that either lack a browser to perform a user-agent-based
          * authorization or are input constrained to the extent that requiring the user
          * to input text in order to authenticate during the authorization flow is impractical.
          * It enables OAuth clients on such devices (like smart TVs, media consoles,
          * digital picture frames, and printers) to obtain user authorization to access
          * protected resources by using a user agent on a separate device.
-         * @return Oauth2Response|null Returns Oauth 2 response on failure, or null on success
+         * @return Oauth2Response|null Oauth 2 response
          */
         public function handleDeviceAuthorization(): ?Oauth2Response
         {
-            $clientId = $this->body->getOne('client_id');
+            $body = $this->app->request->body();
+            $clientId = $body->getOne('client_id');
             $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
             if ($clientId === null) {
-                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter: client_id');
+                return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Missing required parameter(s): client_id');
             }
-            $scope = $this->body->getOne('scope');
-            $clientSecret = $this->body->getOne('client_secret');
+            $scope = $body->getOne('scope');
+            $clientSecret = $body->getOne('client_secret');
             $client = $this->repo->getClientDetails(null, $this->app->request->ip, $clientId, $clientSecret);
             if ($client === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
-            $device = $this->repo->generateDeviceCode($clientId, $scope, self::generateUserCode());
             $this->app->response->setStatus(HttpStatus::OK);
-            return Oauth2Response::deviceSuccess($device->deviceCode, $device->userCode, $device->verificationUri, $device->expiresIn, $device->pollingInterval);
+            $device = $this->repo->generateDeviceCode($clientId, $scope, self::generateUserCode());
+            return Oauth2Response::deviceSuccess($device);
         }
 
         /**
@@ -103,6 +123,9 @@ namespace lib\oauth2 {
             $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             $code = '';
             for ($i = 0; $i < $length; $i++) {
+                if ($i * 2 === $length) {
+                    $code .= '-';
+                }
                 $code .= $chars[random_int(0, strlen($chars) - 1)];
             }
             return $code;

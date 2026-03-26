@@ -30,6 +30,15 @@ namespace apps\demo\modules\security\logic\controllers\get {
             ->attr->addOne('url', $this->app->request->uri);
             $this->app->writer->send($builder);
         }
+
+        public function device()
+        {
+            $builder = new WebUIBuilder();
+            $builder->description('Shani web framework')
+                    ->title('Oauth 2.0 implementation')
+            ->attr->addOne('url', $this->app->request->uri);
+            $this->app->writer->send($builder);
+        }
     }
 
 }
