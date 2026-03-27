@@ -17,23 +17,6 @@ namespace lib\crypto {
     {
 
         /**
-         * Generates encryption keys (key and IV) for using in symmetric encryption (e.g: AES).
-         * @param string $algorithm Any algorithm accepted by openssl. These
-         * values MUST be decoded first before using them.
-         * @return array Returns the keys Base64-encoded for easy storage
-         * @see openssl_get_cipher_methods()
-         */
-        public static function cipherKeys(string $algorithm = 'aes-256-cbc'): array
-        {
-            $keyLen = openssl_cipher_key_length($algorithm);
-            $ivLen = openssl_cipher_iv_length($algorithm);
-            return [
-                'password' => base64_encode(openssl_random_pseudo_bytes($keyLen)),
-                'initVector' => base64_encode(openssl_random_pseudo_bytes($ivLen))
-            ];
-        }
-
-        /**
          * Generates a random unique value for using in symmetric digital signature
          * @param int $length Byte length
          * @return string Encodes output using base 64 format for easier storage.

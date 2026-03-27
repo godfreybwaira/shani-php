@@ -12,17 +12,15 @@ namespace lib\crypto {
     final class AsymmetricEncryption implements Encryption
     {
 
-        public readonly string $privateKey, $publicKey;
+        public readonly KeyPair $keys;
 
         /**
          * Encrypt/decrypt data using asymmetric keys
-         * @param string $privateKey Used for decrypting payloads.
-         * @param string $publicKey Used for encrypting payloads.
+         * @param KeyPair $keys Key-pair object
          */
-        public function __construct(string $privateKey, string $publicKey)
+        public function __construct(KeyPair $keys)
         {
-            $this->privateKey = $privateKey;
-            $this->publicKey = $publicKey;
+            $this->keys = $keys;
         }
 
         /**
@@ -34,7 +32,7 @@ namespace lib\crypto {
         public function encrypt(string $payload): string
         {
             $result = null;
-            if (openssl_public_encrypt($payload, $result, $this->publicKey)) {
+            if (openssl_public_encrypt($payload, $result, $this->keys->publicKey)) {
                 return base64_encode($result);
             }
             throw new \Exception('Failed to encrypt data');
@@ -49,7 +47,7 @@ namespace lib\crypto {
         public function decrypt(string $payload): string
         {
             $result = null;
-            if (openssl_private_decrypt(base64_decode($payload), $result, $this->privateKey)) {
+            if (openssl_private_decrypt(base64_decode($payload), $result, $this->keys->privateKey)) {
                 return $result;
             }
             throw new \Exception('Failed to decrypt data');

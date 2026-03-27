@@ -12,24 +12,24 @@ namespace lib\crypto {
     final class SymmetricEncryption implements Encryption
     {
 
-        public readonly string $password, $algorithm, $initVector;
+        /**
+         * Cipher key object
+         * @var CipherKey
+         */
+        public readonly CipherKey $cipher;
 
         /**
          * Encrypt/decrypt data using symmetric keys
-         * @param string $password Password used to encrypt/decrypt data.
-         * @param string $initVector Initialization vector encoded in base 64
-         * @param string $algorithm see openssl_get_cipher_methods()
+         * @param CipherKey $cipher Cipher key object
          */
-        public function __construct(string $password, string $initVector, string $algorithm = 'aes-256-cbc')
+        public function __construct(CipherKey $cipher)
         {
-            $this->password = $password;
-            $this->algorithm = $algorithm;
-            $this->initVector = $initVector;
+            $this->cipher = $cipher;
         }
 
         public function encrypt(string $payload): string
         {
-            $result = openssl_encrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
+            $result = openssl_encrypt($payload, $this->cipher->algorithm, $this->cipher->password, 0, $this->cipher->initVector);
             if ($result !== false) {
                 return $result;
             }
@@ -38,7 +38,7 @@ namespace lib\crypto {
 
         public function decrypt(string $payload): string
         {
-            $result = openssl_decrypt($payload, $this->algorithm, $this->password, 0, $this->initVector);
+            $result = openssl_decrypt($payload, $this->cipher->algorithm, $this->cipher->password, 0, $this->cipher->initVector);
             if ($result !== false) {
                 return $result;
             }
