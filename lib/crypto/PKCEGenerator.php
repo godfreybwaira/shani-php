@@ -36,8 +36,8 @@ namespace lib\crypto {
          */
         public readonly string $codeChallenge;
 
-        private const BAD_CHARS = ['+', '/', '='];
-        private const GOOD_CHARS = ['-', '_', ''];
+        public const BAD_CHARS = ['+', '/', '='];
+        public const GOOD_CHARS = ['-', '_', ''];
 
         /**
          * @param int $length Number of random bytes to generate (32–96 is recommended)

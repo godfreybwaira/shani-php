@@ -10,6 +10,7 @@
 namespace apps\demo\middleware {
 
     use lib\crypto\KeyGen;
+    use lib\jwt\JWTClaim;
     use lib\oauth2\dto\AccessTokenDto;
     use lib\oauth2\dto\AuthorizationCodeDetailsDto;
     use lib\oauth2\dto\ClientDetailsDto;
@@ -18,6 +19,7 @@ namespace apps\demo\middleware {
     use lib\oauth2\dto\UserDetailsDto;
     use lib\oauth2\Oauth2GrantType;
     use lib\oauth2\Oauth2Repository;
+    use lib\URI;
 
     final class Oauth2Client implements Oauth2Repository
     {
@@ -26,7 +28,10 @@ namespace apps\demo\middleware {
 
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {
-            return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+            $claim = new JWTClaim(subject: 'user12331', issuer: new URI('http://dev.shani.v2.local'), audience: [
+                'http://abc.com', 'https://api.def.co.tz'
+            ]);
+            return new AccessTokenDto($clientId, $claim->asToken('mykey'), $userId, $scope, $expiresIn);
         }
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto

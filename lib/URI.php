@@ -94,7 +94,7 @@ namespace lib {
          */
         public function path(): ?string
         {
-            return $this->parts['path'];
+            return $this->parts['path'] ?? null;
         }
 
         /**
@@ -203,6 +203,15 @@ namespace lib {
         public function secure(): bool
         {
             return $this->scheme() === 'https' || $this->scheme() === 'wss';
+        }
+
+        /**
+         * Return URL as string
+         * @return string
+         */
+        public function asString(): string
+        {
+            return (string) $this;
         }
     }
 

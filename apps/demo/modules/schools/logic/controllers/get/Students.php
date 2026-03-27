@@ -12,6 +12,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\data\dto\StudentListDto;
     use apps\demo\modules\schools\logic\services\StudentService;
+    use lib\jwt\JWTClaim;
     use shani\http\App;
 
     final class Students
