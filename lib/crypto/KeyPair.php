@@ -36,7 +36,7 @@ namespace lib\crypto {
         }
 
         /**
-         * Generates asymmetric key pairs (Private & Public keys).
+         * Generates asymmetric key pairs (Private & Public keys .pem files).
          * @param array $configs
          * @return KeyPair
          */
