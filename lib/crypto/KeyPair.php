@@ -76,7 +76,7 @@ namespace lib\crypto {
         public static function rsa(int $keySize = 2048, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256): KeyPair
         {
             if ($keySize % 128 !== 0) {
-                throw new \InvalidArgumentException('Key size must me a multiple of 128.');
+                throw new \InvalidArgumentException('Key size must be a multiple of 128.');
             }
             $configs = [
                 'digest_alg' => $algorithm->value,
