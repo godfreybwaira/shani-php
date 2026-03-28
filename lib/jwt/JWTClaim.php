@@ -152,7 +152,10 @@ namespace lib\jwt {
          * @param string $secretKey Secret key for signing a JWT token
          * @param JWTAlgorithm $algorithm JWT signature algorithm
          * @return JWTClaim JWTClaim object
-         * @throws \Exception When a token has invalid format, or any other reason
+         * @throws JWTFormatException
+         * @throws JWTAlgorithmException
+         * @throws JWTSignatureException
+         * @throws \Exception
          */
         public static function createFromToken(string $token, string $secretKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
         {
