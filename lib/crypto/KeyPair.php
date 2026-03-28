@@ -26,8 +26,8 @@ namespace lib\crypto {
 
         /**
          * Create an asymmetric key-pair object
-         * @param string $privateKey Used for decrypting payloads.
-         * @param string $publicKey Used for encrypting payloads.
+         * @param string $privateKey Secret key used on decryption.
+         * @param string $publicKey Used for encryption.
          */
         public function __construct(string $privateKey, string $publicKey)
         {
