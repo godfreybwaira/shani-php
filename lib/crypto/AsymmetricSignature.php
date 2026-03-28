@@ -13,17 +13,16 @@ namespace lib\crypto {
     {
 
         public readonly KeyPair $keys;
-        public readonly string $algorithm;
+        public readonly CryptoAlgorithm $algorithm;
 
         /**
          * This class provides methods to sign and verify digital signatures
          * using OpenSSL. It uses asymmetric cryptography with a private and
          * public key pair for secure authentication.
-         * @param KeyPair   $keys key pair object.
-         * @param string    $algorithm Specifies the hashing algorithm (e.g., SHA256, SHA512, etc.).
-         * @see openssl_get_md_methods()
+         * @param KeyPair           $keys key pair object.
+         * @param CryptoAlgorithm   $algorithm Cryptographic algorithm
          */
-        public function __construct(KeyPair $keys, string $algorithm = 'sha256')
+        public function __construct(KeyPair $keys, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256)
         {
             $this->keys = $keys;
             $this->algorithm = $algorithm;
@@ -33,7 +32,7 @@ namespace lib\crypto {
         {
             $signature = null;
             $privateKey = openssl_pkey_get_private($this->keys->privateKey);
-            if (openssl_sign($payload, $signature, $privateKey, $this->algorithm)) {
+            if (openssl_sign($payload, $signature, $privateKey, $this->algorithm->value)) {
                 openssl_free_key($privateKey);
                 return base64_encode($signature);
             }
@@ -46,7 +45,7 @@ namespace lib\crypto {
                 throw new \Exception('Signature is missing or empty.');
             }
             $publicKey = openssl_pkey_get_public($this->keys->publicKey);
-            $verified = openssl_verify($payload, base64_decode($signature), $publicKey, $this->algorithm);
+            $verified = openssl_verify($payload, base64_decode($signature), $publicKey, $this->algorithm->value);
             return $verified === 1;
         }
     }

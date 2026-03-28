@@ -15,7 +15,7 @@ namespace lib\crypto {
         /**
          * Signs the provided payload using private key or password
          * @param string $payload
-         * @return string Returns a signature represents a signed payload
+         * @return string A signature represents a signed payload
          */
         public function sign(string $payload): string;
 
@@ -25,7 +25,7 @@ namespace lib\crypto {
          * @param string $payload Unsigned payload to verify
          * @param string|null $signature The previous signature used to sign a payload
          * @throws \Exception If signature is missing
-         * @return bool Return true if the signature is valid
+         * @return bool True if the signature is valid
          */
         public function verify(string $payload, ?string $signature): bool;
     }

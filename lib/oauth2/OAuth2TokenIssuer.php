@@ -9,7 +9,6 @@
 
 namespace lib\oauth2 {
 
-    use lib\crypto\PKCEGenerator;
     use lib\ds\map\ReadableMap;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;

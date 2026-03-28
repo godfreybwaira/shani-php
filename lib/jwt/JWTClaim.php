@@ -9,11 +9,11 @@
 
 namespace lib\jwt {
 
-    use lib\crypto\PKCEGenerator;
     use lib\ds\map\ReadableMap;
     use lib\jwt\exceptions\JWTAlgorithmException;
     use lib\jwt\exceptions\JWTFormatException;
     use lib\jwt\exceptions\JWTSignatureException;
+    use lib\oauth2\PKCEGenerator;
     use lib\URI;
 
     final class JWTClaim implements \JsonSerializable

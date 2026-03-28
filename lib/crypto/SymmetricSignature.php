@@ -19,20 +19,19 @@ namespace lib\crypto {
         public readonly string $password;
 
         /**
-         * The hashing algorithm used (e.g., SHA256, SHA512, etc.).
-         * @var string
+         * The hashing algorithm used.
+         * @var CryptoAlgorithm
          */
-        public readonly string $algorithm;
+        public readonly CryptoAlgorithm $algorithm;
 
         /**
          * This class provides a method to sign and verify data integrity using HMAC
          * (Hash-based Message Authentication Code). It ensures that a payload remains
          * unchanged and authenticated by using a secret key.
-         * @param string $password The private key used for generating the signature
-         * @param string $algorithm The hashing algorithm used (e.g., SHA256, SHA512, etc.).
-         * @see @see hash_hmac_algos()
+         * @param string $password  The private key used for generating the signature
+         * @param CryptoAlgorithm   $algorithm Cryptographic algorithm
          */
-        public function __construct(string $password, string $algorithm = 'sha256')
+        public function __construct(string $password, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256)
         {
             $this->password = $password;
             $this->algorithm = $algorithm;
@@ -40,7 +39,7 @@ namespace lib\crypto {
 
         public function sign(string $payload): string
         {
-            return hash_hmac($this->algorithm, $payload, $this->password);
+            return hash_hmac($this->algorithm->value, $payload, $this->password);
         }
 
         public function verify(string $payload, ?string $signature): bool
@@ -49,6 +48,16 @@ namespace lib\crypto {
                 throw new \Exception('Signature is missing or empty.');
             }
             return hash_equals($this->sign($payload), $signature);
+        }
+
+        /**
+         * Generates a unique random digital signature.
+         * @param int $length Byte length
+         * @return string Encodes signature using base 64 format.
+         */
+        public static function createSignature(int $length = 32): string
+        {
+            return base64_encode(random_bytes($length));
         }
     }
 

@@ -9,7 +9,6 @@
 
 namespace apps\demo\middleware {
 
-    use lib\crypto\KeyGen;
     use lib\jwt\JWTClaim;
     use lib\oauth2\dto\AccessTokenDto;
     use lib\oauth2\dto\AuthorizationCodeDetailsDto;
@@ -36,7 +35,7 @@ namespace apps\demo\middleware {
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto
         {
-            return new RefreshTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+            return new RefreshTokenDto($clientId, bin2hex(random_bytes(32)), $userId, $scope, $expiresIn);
         }
 
         public function getAuthorizationCodeDetails(string $clientId, string $authorizationCode): ?AuthorizationCodeDetailsDto
@@ -66,7 +65,7 @@ namespace apps\demo\middleware {
 
         public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto
         {
-            return new AccessTokenDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userId, $scope, $expiresIn);
+            return new AccessTokenDto($clientId, bin2hex(random_bytes(32)), $userId, $scope, $expiresIn);
         }
 
         public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto
@@ -91,7 +90,7 @@ namespace apps\demo\middleware {
 
         public function generateDeviceCode(string $clientId, ?string $scope, string $userCode): DeviceCodeDetailsDto
         {
-            return new DeviceCodeDetailsDto($clientId, bin2hex(base64_decode(KeyGen::signature(32))), $userCode, self::REDIRECT_URI . '/device', 'user123', $scope, 600, 5);
+            return new DeviceCodeDetailsDto($clientId, bin2hex(random_bytes(32)), $userCode, self::REDIRECT_URI . '/device', 'user123', $scope, 600, 5);
         }
 
         public function revokeAllRefreshTokens(string $clientId, string $userId = null): void
