@@ -71,9 +71,13 @@ namespace lib\crypto {
          * means more secure but slower.
          * @param CryptoAlgorithm $algorithm The hashing algorithm.
          * @return KeyPair
+         * @throws \InvalidArgumentException
          */
         public static function rsa(int $keySize = 2048, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256): KeyPair
         {
+            if ($keySize % 128 !== 0) {
+                throw new \InvalidArgumentException('Key size must me a multiple of 128.');
+            }
             $configs = [
                 'digest_alg' => $algorithm->value,
                 'private_key_bits' => $keySize,
