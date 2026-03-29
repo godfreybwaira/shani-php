@@ -12,7 +12,6 @@ namespace apps\demo\modules\schools\logic\controllers\get {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\data\dto\StudentListDto;
     use apps\demo\modules\schools\logic\services\StudentService;
-    use lib\jwt\JWTClaim;
     use shani\http\App;
 
     final class Students
@@ -34,15 +33,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             foreach ($students as $student) {
                 $dtos->put(StudentDto::toDto($student));
             }
-//            $this->app->writer->send($dtos);
-            try {
-                $token = $this->app->request->header()->getBearerToken();
-                $claim = JWTClaim::createFromToken($token, 'mykey');
-                $this->app->writer->send($claim);
-            } catch (\Exception $exc) {
-                $this->app->response->setBody($exc->getMessage());
-                $this->app->writer->send();
-            }
+            $this->app->writer->send($dtos);
         }
 
         /**
