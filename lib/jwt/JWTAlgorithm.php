@@ -43,7 +43,7 @@ namespace lib\jwt {
          */
         public function isEllipticCurve(): bool
         {
-            return $this === self::ES256;
+            return str_starts_with($this->name, 'ES');
         }
     }
 
