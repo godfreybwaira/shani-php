@@ -9,7 +9,7 @@
 
 namespace lib\crypto {
 
-    final class KeyPair
+    final class KeyPair implements \JsonSerializable
     {
 
         /**
@@ -97,6 +97,14 @@ namespace lib\crypto {
         public static function ecdsa(string $curveName = 'prime256v1'): KeyPair
         {
             return self::generate(['curve_name' => $curveName]);
+        }
+
+        public function jsonSerialize(): array
+        {
+            return [
+                'private_key' => $this->privateKey,
+                'public_key' => $this->publicKey
+            ];
         }
     }
 

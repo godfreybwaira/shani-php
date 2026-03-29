@@ -72,6 +72,11 @@ namespace lib\jwt {
          */
         public readonly ?ReadableMap $payload;
 
+        /**
+         * JWT parts
+         */
+        public const LENGTH = 3;
+
         public function __construct(
                 URI $issuer, ?ReadableMap $payload = null, ?string $subject = null,
                 array $audience = [], int $ttl = 3600, ?string $jwtId = null,
@@ -131,63 +136,85 @@ namespace lib\jwt {
          */
         public function asToken(string $secretKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): string
         {
-            // 1. Create the Header
-            $header = json_encode(['typ' => 'JWT', 'alg' => $algorithm->name]);
-            $base64Header = self::base64UrlEncode($header);
+            $header = ['typ' => 'JWT', 'alg' => $algorithm->name];
+            $segments = [
+                self::base64UrlEncode(json_encode($header)),
+                self::base64UrlEncode(json_encode($this))
+            ];
 
-            // 2. Create the Payload
-            $base64Payload = self::base64UrlEncode(json_encode($this));
-
-            // 3. Create the Signature
-            $signature = hash_hmac($algorithm->value, $base64Header . '.' . $base64Payload, $secretKey, true);
-            $base64Signature = self::base64UrlEncode($signature);
-
-            // 4. Combine them all
-            return $base64Header . '.' . $base64Payload . '.' . $base64Signature;
+            $dataToSign = implode('.', $segments);
+            $signature = null;
+            if ($algorithm->isSymmetric()) {
+                $signature = hash_hmac($algorithm->value, $dataToSign, $secretKey, true);
+            } else {
+                openssl_sign($dataToSign, $signature, $secretKey, $algorithm->value);
+                // ES256 Fix: Convert DER signature to Raw R+S
+                if ($algorithm->isEllipticCurve()) {
+                    $signature = ECDSAHelper::der2Sig($signature);
+                }
+            }
+            $segments[] = self::base64UrlEncode($signature);
+            return implode('.', $segments);
         }
 
         /**
          * Create a JWT Claim object from a valid JWT token
          * @param string $token JWT token string
-         * @param string $secretKey Secret key for signing a JWT token
+         * @param string $verificationKey Key for verifying a JWT signature. For
+         * Asymmetric algorithms, it is the public key, for Symmetric algorithms,
+         * it is the same key used to sign a JWT
          * @param JWTAlgorithm $algorithm JWT signature algorithm
          * @return JWTClaim JWTClaim object
          * @throws JWTFormatException
          * @throws JWTAlgorithmException
          * @throws JWTSignatureException
-         * @throws \Exception
          */
-        public static function createFromToken(string $token, string $secretKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
+        public static function createFromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
         {
-            $tokenParts = explode('.', $token);
-            if (count($tokenParts) !== 3) {
-                throw new JWTFormatException('Invalid JWT token format.');
+            $parts = explode('.', $token);
+            if (count($parts) !== JWTClaim::LENGTH) {
+                throw new JWTFormatException('Invalid token structure.');
             }
-            list($headerEncoded, $payloadEncoded, $signatureEncoded) = $tokenParts;
-            $header = json_decode(self::base64UrlDecode($headerEncoded), true);
-            $payload = json_decode(self::base64UrlDecode($payloadEncoded), true);
-            if (!is_array($header) || !is_array($payload)) {
-                throw new \Exception('Malformed UTF-8 characters or invalid JSON inside the token.');
-            }
+            list($headB64, $payloadB64, $sigB64) = $parts;
+            $dataToVerify = $headB64 . '.' . $payloadB64;
+            $signature = self::base64UrlDecode($sigB64);
+            $header = json_decode(self::base64UrlDecode($headB64), true);
             if (empty($header['alg']) || $header['alg'] !== $algorithm->name) {
                 throw new JWTAlgorithmException('Token algorithm does not match the expected algorithm.');
             }
-            $signature = hash_hmac($algorithm->value, $headerEncoded . '.' . $payloadEncoded, $secretKey, true);
+            if ($algorithm->isSymmetric()) {
+                $expected = hash_hmac($algorithm->value, $dataToVerify, $verificationKey, true);
+                if (!hash_equals($expected, $signature)) {
+                    throw new JWTSignatureException('Signature Verification failed.');
+                }
+            } else {
+                // ES256 Fix: Convert Raw R+S back to DER for OpenSSL
+                if ($algorithm->isEllipticCurve()) {
+                    $signature = ECDSAHelper::sig2Der($signature);
+                }
+                $result = openssl_verify($dataToVerify, $signature, $verificationKey, $algorithm->value);
+                if ($result !== 1) {
+                    throw new JWTSignatureException('Signature Verification failed.');
+                }
+            }
+            $payload = json_decode(self::base64UrlDecode($payloadB64), true);
+            return self::payload2Claim($payload);
+        }
+
+        private static function payload2Claim(array $payload): JWTClaim
+        {
             $expiresIn = $payload['exp'] ?? 0;
             $issuedAt = $payload['iat'] ?? 0;
-            if (hash_equals(self::base64UrlEncode($signature), $signatureEncoded)) {
-                return new JWTClaim(
-                        new URI($payload['iss']),
-                        !empty($payload['payload']) ? new ReadableMap($payload['payload']) : null,
-                        $payload['sub'] ?? null,
-                        (array) ($payload['aud'] ?? []),
-                        $expiresIn - $issuedAt,
-                        $payload['jti'] ?? null,
-                        !empty($payload['iat']) ? \DateTimeImmutable::createFromFormat('U', $payload['iat']) : null,
-                        !empty($payload['nbf']) ? \DateTimeImmutable::createFromFormat('U', $payload['nbf']) : null
-                );
-            }
-            throw new JWTSignatureException('Signature validation failed.');
+            return new JWTClaim(
+                    new URI($payload['iss']),
+                    !empty($payload['payload']) ? new ReadableMap($payload['payload']) : null,
+                    $payload['sub'] ?? null,
+                    (array) ($payload['aud'] ?? []),
+                    $expiresIn - $issuedAt,
+                    $payload['jti'] ?? null,
+                    !empty($payload['iat']) ? \DateTimeImmutable::createFromFormat('U', $payload['iat']) : null,
+                    !empty($payload['nbf']) ? \DateTimeImmutable::createFromFormat('U', $payload['nbf']) : null
+            );
         }
 
         /**
