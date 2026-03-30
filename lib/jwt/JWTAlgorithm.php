@@ -15,19 +15,19 @@ namespace lib\jwt {
     enum JWTAlgorithm
     {
 
-        //HMAC
+        ///////HMAC: Symmetric Algorithms
         case HS256; //Standard / Fast
         case HS384;
         case HS512;
-        //RSA
+        ////////RSA:
         case RS256;
         case RS384;
         case RS512;
-        //ECDSA: Modern / Small Keys
+        ///////ECDSA: Modern / Small Keys
         case ES256;
         case ES384;
         case ES512;
-        //ED25519: Modern, Fastest, smallest keys
+        /////ED25519: Modern, Fastest, smallest keys
         case EdDSA;
 
         public function getValue(): ?string
