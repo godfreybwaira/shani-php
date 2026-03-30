@@ -84,6 +84,7 @@ namespace shani\http {
         {
             $this->vhost = $vhost;
             $this->response = $res;
+            $this->framework = $framework;
             $this->request = $res->request;
             $this->writer = new HttpWriter($this, $writer);
             $this->config = new $vhost->classFile($this, $vhost->profile);
@@ -95,23 +96,32 @@ namespace shani\http {
          */
         public function runApp(): void
         {
-            try {
-                $this->config->requestMutator();
-                if (!$this->config->isRunning()) {
-                    throw CustomException::offline($this);
+            if ($this->framework->showErrors) {
+                $this->runApplication();
+            } else {
+                try {
+                    $this->runApplication();
+                } catch (\Throwable $ex) {
+                    $this->handleException($ex);
                 }
-                if (LocalStorage::tryServe($this)) {
-                    return;
-                }
-                if ($this->request->uri->path() === '/') {
-                    $this->request->changeRoute($this->config->home());
-                }
-                $middleware = new Middleware($this);
-                $this->config->registerMiddleware($middleware);
-                $middleware->runWith(new SecurityMiddleware($this));
-            } catch (\Throwable $ex) {
-                $this->handleException($ex);
             }
+        }
+
+        private function runApplication(): void
+        {
+            $this->config->requestMutator();
+            if (!$this->config->isRunning()) {
+                throw CustomException::offline($this);
+            }
+            if (LocalStorage::tryServe($this)) {
+                return;
+            }
+            if ($this->request->uri->path() === '/') {
+                $this->request->changeRoute($this->config->home());
+            }
+            $middleware = new Middleware($this);
+            $this->config->registerMiddleware($middleware);
+            $middleware->runWith(new SecurityMiddleware($this));
         }
 
         /**

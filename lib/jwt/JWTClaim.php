@@ -145,9 +145,9 @@ namespace lib\jwt {
             $dataToSign = implode('.', $segments);
             $signature = null;
             if ($algorithm->isSymmetric()) {
-                $signature = hash_hmac($algorithm->value, $dataToSign, $secretKey, true);
+                $signature = hash_hmac($algorithm->getValue(), $dataToSign, $secretKey, true);
             } else {
-                openssl_sign($dataToSign, $signature, $secretKey, $algorithm->value);
+                openssl_sign($dataToSign, $signature, $secretKey, $algorithm->getValue());
                 // ES256 Fix: Convert DER signature to Raw R+S
                 if ($algorithm->isEllipticCurve()) {
                     $signature = ECDSAHelper::der2Sig($signature);
@@ -169,7 +169,7 @@ namespace lib\jwt {
          * @throws JWTAlgorithmException
          * @throws JWTSignatureException
          */
-        public static function createFromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
+        public static function fromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
         {
             $parts = explode('.', $token);
             if (count($parts) !== JWTClaim::LENGTH) {
@@ -183,7 +183,7 @@ namespace lib\jwt {
                 throw new JWTAlgorithmException('Token algorithm does not match the expected algorithm.');
             }
             if ($algorithm->isSymmetric()) {
-                $expected = hash_hmac($algorithm->value, $dataToVerify, $verificationKey, true);
+                $expected = hash_hmac($algorithm->getValue(), $dataToVerify, $verificationKey, true);
                 if (!hash_equals($expected, $signature)) {
                     throw new JWTSignatureException('Signature Verification failed.');
                 }
@@ -192,7 +192,7 @@ namespace lib\jwt {
                 if ($algorithm->isEllipticCurve()) {
                     $signature = ECDSAHelper::sig2Der($signature);
                 }
-                $result = openssl_verify($dataToVerify, $signature, $verificationKey, $algorithm->value);
+                $result = openssl_verify($dataToVerify, $signature, $verificationKey, $algorithm->getValue());
                 if ($result !== 1) {
                     throw new JWTSignatureException('Signature Verification failed.');
                 }

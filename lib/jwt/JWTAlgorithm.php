@@ -12,21 +12,31 @@
 
 namespace lib\jwt {
 
-    enum JWTAlgorithm: string
+    enum JWTAlgorithm
     {
 
         //HMAC
-        case HS256 = 'sha256'; //Standard / Fast
-        case HS384 = 'sha384';
-        case HS512 = 'sha512';
+        case HS256; //Standard / Fast
+        case HS384;
+        case HS512;
         //RSA
-        case RS256 = 'sha256';
-        case RS384 = 'sha384';
-        case RS512 = 'sha512';
+        case RS256;
+        case RS384;
+        case RS512;
         //ECDSA: Modern / Small Keys
-        case ES256 = 'sha256';
-        case ES384 = 'sha384';
-        case ES512 = 'sha512';
+        case ES256;
+        case ES384;
+        case ES512;
+        //ED25519: Modern, Fastest, smallest keys
+        case EdDSA;
+
+        public function getValue(): ?string
+        {
+            if ($this === self::EdDSA) {
+                return null;
+            }
+            return 'sha' . substr($this->name, 2);
+        }
 
         /**
          * Determines if the algorithm uses a public/private key pair.

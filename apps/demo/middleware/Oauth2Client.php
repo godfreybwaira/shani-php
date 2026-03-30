@@ -9,6 +9,7 @@
 
 namespace apps\demo\middleware {
 
+    use lib\jwt\JWTAlgorithm;
     use lib\jwt\JWTClaim;
     use lib\oauth2\dto\AccessTokenDto;
     use lib\oauth2\dto\AuthorizationCodeDetailsDto;
@@ -30,7 +31,10 @@ namespace apps\demo\middleware {
             $claim = new JWTClaim(subject: 'user12331', issuer: new URI('http://dev.shani.v2.local'), audience: [
                 'http://abc.com', 'https://api.def.co.tz'
             ]);
-            return new AccessTokenDto($clientId, $claim->asToken('mykey'), $userId, $scope, $expiresIn);
+            $key = '-----BEGIN PRIVATE KEY-----' . PHP_EOL . 'MC4CAQAwBQYDK2VwBCIEIBpkBt3k+jLpRo/Tx173KqSY0DBujsL7XANV7KGW1T+x';
+            $key .= PHP_EOL . '-----END PRIVATE KEY-----';
+            $algorithm = JWTAlgorithm::EdDSA;
+            return new AccessTokenDto($clientId, $claim->asToken($key, $algorithm), $userId, $scope, $expiresIn);
         }
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto

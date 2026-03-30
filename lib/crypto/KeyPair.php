@@ -43,10 +43,9 @@ namespace lib\crypto {
         private static function generate(array $configs): KeyPair
         {
             $privateKey = null;
-            $res = openssl_pkey_new($configs);
-            openssl_pkey_export($res, $privateKey);
-            $publicKey = openssl_pkey_get_details($res)['key'];
-            openssl_free_key($res); //free memory
+            $resource = openssl_pkey_new($configs);
+            openssl_pkey_export($resource, $privateKey);
+            $publicKey = openssl_pkey_get_details($resource)['key'];
             return new KeyPair($privateKey, $publicKey);
         }
 
@@ -78,6 +77,9 @@ namespace lib\crypto {
             if ($keySize % 128 !== 0) {
                 throw new \InvalidArgumentException('Key size must be a multiple of 128.');
             }
+            if (!defined('OPENSSL_KEYTYPE_RSA')) {
+                define('OPENSSL_KEYTYPE_RSA', 0); // The integer value for OPENSSL_KEYTYPE_RSA is 0
+            }
             $configs = [
                 'digest_alg' => $algorithm->value,
                 'private_key_bits' => $keySize,
@@ -96,7 +98,14 @@ namespace lib\crypto {
          */
         public static function ecdsa(string $curveName = 'prime256v1'): KeyPair
         {
-            return self::generate(['curve_name' => $curveName]);
+            if (!defined('OPENSSL_KEYTYPE_EC')) {
+                define('OPENSSL_KEYTYPE_EC', 3); // The integer value for OPENSSL_KEYTYPE_EC is 3
+            }
+            $configs = [
+                'curve_name' => $curveName,
+                'private_key_type' => OPENSSL_KEYTYPE_EC
+            ];
+            return self::generate($configs);
         }
 
         public function jsonSerialize(): array
