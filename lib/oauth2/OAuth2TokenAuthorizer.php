@@ -46,7 +46,7 @@ namespace lib\oauth2 {
                 return Oauth2Response::error(Oauth2Error::UNSUPPORTED_RESPONSE_TYPE, 'Supported response_type is `code`.');
             }
             $client = $this->repo->getClientDetails(null, $this->app->request->ip, $clientId);
-            if ($client === null || $redirectUri !== $client->redirectUri) {
+            if ($client === null || $client->isDisabled || $redirectUri !== $client->redirectUri) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             if ($codeChallenge !== null && $codeChallengeMethod !== 'S256') {
@@ -104,7 +104,7 @@ namespace lib\oauth2 {
             $scope = $body->getOne('scope');
             $clientSecret = $body->getOne('client_secret');
             $client = $this->repo->getClientDetails(null, $this->app->request->ip, $clientId, $clientSecret);
-            if ($client === null) {
+            if ($client === null || $client->isDisabled) {
                 return Oauth2Response::error(Oauth2Error::INVALID_CLIENT, 'Client authentication failed.');
             }
             $this->app->response->setStatus(HttpStatus::OK);

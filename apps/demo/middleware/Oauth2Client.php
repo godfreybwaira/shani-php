@@ -13,13 +13,13 @@ namespace apps\demo\middleware {
     use lib\jwt\JWTClaim;
     use lib\oauth2\dto\AccessTokenDto;
     use lib\oauth2\dto\AuthorizationCodeDetailsDto;
-    use lib\oauth2\dto\ClientDetailsDto;
     use lib\oauth2\dto\DeviceCodeDetailsDto;
+    use lib\oauth2\dto\OauthClientDetailsDto;
     use lib\oauth2\dto\RefreshTokenDto;
-    use lib\oauth2\dto\UserDetailsDto;
     use lib\oauth2\Oauth2GrantType;
     use lib\oauth2\Oauth2Repository;
     use lib\URI;
+    use shani\authentication\UserDetailsDto;
 
     final class Oauth2Client implements Oauth2Repository
     {
@@ -57,14 +57,14 @@ namespace apps\demo\middleware {
             return new RefreshTokenDto($clientId, $refreshToken, 'user123', 'read write', 3600);
         }
 
-        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto
+        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?OauthClientDetailsDto
         {
-            return new ClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI);
+            return new OauthClientDetailsDto($clientId, $clientSecret, self::REDIRECT_URI, false);
         }
 
         public function authenticate(string $username, string $password): ?UserDetailsDto
         {
-            return new UserDetailsDto('123', $username, $password);
+            return new UserDetailsDto('123', $username, $password, null, false);
         }
 
         public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto

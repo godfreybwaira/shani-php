@@ -11,10 +11,10 @@ namespace lib\oauth2 {
 
     use lib\oauth2\dto\AccessTokenDto;
     use lib\oauth2\dto\AuthorizationCodeDetailsDto;
-    use lib\oauth2\dto\ClientDetailsDto;
     use lib\oauth2\dto\DeviceCodeDetailsDto;
+    use lib\oauth2\dto\OauthClientDetailsDto;
     use lib\oauth2\dto\RefreshTokenDto;
-    use lib\oauth2\dto\UserDetailsDto;
+    use shani\authentication\UserDetailsDto;
 
     interface Oauth2Repository
     {
@@ -67,9 +67,9 @@ namespace lib\oauth2 {
          * @param string $clientIpAddress Client IP Address
          * @param string $clientId Client ID.
          * @param string|null $clientSecret Client secret (hashed verification).
-         * @return ClientDetailsDto|null Client data or null if invalid.
+         * @return OauthClientDetailsDto|null Client data or null if invalid.
          */
-        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?ClientDetailsDto;
+        public function getClientDetails(?Oauth2GrantType $grantType, string $clientIpAddress, string $clientId, ?string $clientSecret = null): ?OauthClientDetailsDto;
 
         /**
          * Get Authorization details by supplied code, and client id

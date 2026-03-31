@@ -9,7 +9,7 @@
 
 namespace lib\oauth2\dto {
 
-    final class ClientDetailsDto
+    final class OauthClientDetailsDto
     {
 
         /**
@@ -31,15 +31,23 @@ namespace lib\oauth2\dto {
         public readonly ?string $redirectUri;
 
         /**
+         * Tells whether the client is disabled or not
+         * @var bool
+         */
+        public readonly bool $isDisabled;
+
+        /**
          * @param string $clientId              Unique client identifier registered in the database.
          * @param string|null $clientSecret     Hashed client secret. For public clients (PKCE), this can be an empty string.
          * @param string|null $redirectUri       Exact redirect URI.
+         * @param bool $isDisabled Tells whether the client is disabled or not
          */
-        public function __construct(string $clientId, ?string $clientSecret, ?string $redirectUri)
+        public function __construct(string $clientId, ?string $clientSecret, ?string $redirectUri, bool $isDisabled)
         {
             $this->clientId = $clientId;
             $this->clientSecret = $clientSecret;
             $this->redirectUri = $redirectUri;
+            $this->isDisabled = $isDisabled;
         }
     }
 
