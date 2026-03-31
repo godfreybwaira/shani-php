@@ -71,26 +71,10 @@ namespace shani {
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
-                if ($framework->showErrors) {
-                    return self::startApp($request, $response, $writer, $framework);
-                }
-                try {
-                    self::startApp($request, $response, $writer, $framework);
-                } catch (\Throwable $ex) {
-                    $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR)->header()
-                            ->addOne(HttpHeader::SERVER, Framework::NAME);
-                    $writer->close($response);
-                    self::log(LogLevel::EMERGENCY, $ex->getMessage());
-                }
+                $vhost = self::host($request->uri->hostname());
+                (new App($vhost, $response, $writer, $framework))->runApp();
             });
             $server->start(fn() => $params === null ? null : TestConfig::start($params));
-        }
-
-        private static function startApp(RequestEntity $request, ResponseEntity $response, ResponseWriter $writer, FrameworkConfig $framework): void
-        {
-            $vhost = self::host($request->uri->hostname());
-            $app = new App($vhost, $response, $writer, $framework);
-            $app->runApp();
         }
 
         public static function log(LogLevel $level, string $message): void
