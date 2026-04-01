@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use shani\FrameworkConfig;
-use shani\WebServer;
+use shani\ApplicationLauncher;
 
 //use test\helpers\TestParameters;
 
@@ -36,7 +36,7 @@ if (PHP_SAPI === 'cli') {
     /**
      * Production env
      */
-    WebServer::start(new \shani\servers\swoole\SwooleServer($config));
+    ApplicationLauncher::start(new \shani\servers\swoole\SwooleServer($config));
 } else {
     /**
      * **************************************************************
@@ -51,5 +51,5 @@ if (PHP_SAPI === 'cli') {
     /**
      * Production env
      */
-    WebServer::start(new shani\servers\cgi\CgiServer($config));
+    ApplicationLauncher::start(new shani\servers\cgi\CgiServer($config));
 }

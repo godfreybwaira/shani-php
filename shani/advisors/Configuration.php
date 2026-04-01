@@ -45,7 +45,7 @@ namespace shani\advisors {
         private readonly ?string $permissionList;
         protected readonly App $app;
 
-        public function __construct(App &$app)
+        protected function __construct(App &$app)
         {
             $this->app = $app;
             $this->isAuthenticated = $this->authenticate();
@@ -71,12 +71,6 @@ namespace shani\advisors {
         {
             return true;
         }
-
-        /**
-         * Create current profile configuration from a given profile name.
-         * @param string $name Profile name
-         */
-        public abstract function createProfile(string $name): void;
 
         /**
          * Get the path to application root directory.

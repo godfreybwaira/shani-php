@@ -18,7 +18,7 @@ namespace shani\servers\cgi {
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
     use shani\FrameworkConfig;
-    use shani\WebServer;
+    use shani\ApplicationLauncher;
 
     final class CgiServer implements SupportedWebServer
     {
@@ -58,7 +58,7 @@ namespace shani\servers\cgi {
                     ->files(self::getPostedFiles($_FILES))
                     ->method($_SERVER['REQUEST_METHOD'])
                     ->time($_SERVER['REQUEST_TIME'])
-                    ->ip(WebServer::getClientIP($_SERVER, self::$ipHeaders))
+                    ->ip(ApplicationLauncher::getClientIP($_SERVER, self::$ipHeaders))
                     ->body(self::getPostedBody($raw))
                     ->headers(getallheaders())
                     ->cookies($_COOKIE)

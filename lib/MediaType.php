@@ -9,7 +9,8 @@
 
 namespace lib {
 
-    use shani\WebServer;
+    use shani\ApplicationLauncher;
+    use shani\core\Framework;
 
     final class MediaType
     {
@@ -1245,6 +1246,21 @@ namespace lib {
         public const ZMM = 'application/vnd.handheld-entertainment+xml';
         public const TEXT_ZSH = 'text/x-scriptzsh';
 
+        private static array $mime = [];
+
+        public static function mime(string $extension): ?string
+        {
+            $ext = strtolower($extension);
+            if (!isset(self::$mime[$ext])) {
+                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
+                if ($mime === null) {
+                    return null;
+                }
+                self::$mime[$ext] = $mime;
+            }
+            return self::$mime[$ext];
+        }
+
         /**
          * Determines the mime type of a file by looking at its extension.
          *
@@ -1252,7 +1268,7 @@ namespace lib {
         public static function fromFilename(string $filename): ?string
         {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            return !empty($ext) ? WebServer::mime($ext) : null;
+            return !empty($ext) ? self::mime($ext) : null;
         }
 
         /**

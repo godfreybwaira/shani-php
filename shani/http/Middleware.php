@@ -14,7 +14,6 @@ namespace shani\http {
     use lib\http\HttpHeader;
     use lib\MediaType;
     use shani\advisors\SecurityMiddleware;
-    use shani\WebServer;
 
     final class Middleware
     {
@@ -55,7 +54,7 @@ namespace shani\http {
             //1. extension 2. accept 3. content_type 4. default
             $ext = $this->app->request->route()->extension;
             if ($ext !== null) {
-                $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, WebServer::mime($ext));
+                $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::mime($ext));
                 return;
             }
             $accepted = $this->app->request->header()->getOne(HttpHeader::ACCEPT, HttpHeader::CONTENT_TYPE);

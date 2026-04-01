@@ -9,14 +9,13 @@
 
 namespace shani {
 
+    use lib\ds\map\ReadableMap;
     use shani\core\Framework;
 
     final class FrameworkConfig
     {
 
-        public readonly int $payloadSize;
-        public readonly bool $showErrors;
-        public readonly string $timezone;
+        public readonly ReadableMap $config;
 
         private const MB_1 = 1048576;
 
@@ -25,13 +24,12 @@ namespace shani {
             self::checkFrameworkRequirements();
             $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
             /////////////////////////////////////
-            $this->timezone = $config['TIME_ZONE'];
-            $this->showErrors = $config['DISPLAY_ERRORS'];
-            $this->payloadSize = $config['MAX_PAYLOAD_SIZE'] * self::MB_1;
+            $config['MAX_PAYLOAD_SIZE'] *= self::MB_1;
+            $this->config = new ReadableMap($config);
             /////////////////////////////////////
-            ini_set('upload_max_filesize', $this->payloadSize);
-            ini_set('post_max_size', $this->payloadSize + self::MB_1);
-            ini_set('display_errors', $this->showErrors);
+            ini_set('upload_max_filesize', $config['MAX_PAYLOAD_SIZE']);
+            ini_set('post_max_size', $config['MAX_PAYLOAD_SIZE'] + self::MB_1);
+            ini_set('display_errors', $config['DISPLAY_ERRORS']);
             date_default_timezone_set($config['TIME_ZONE']);
         }
 

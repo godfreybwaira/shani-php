@@ -87,16 +87,16 @@ namespace shani\http {
             $this->framework = $framework;
             $this->request = $res->request;
             $this->writer = new HttpWriter($this, $writer);
-            $this->config = new $vhost->classFile($this, $vhost->profile);
+            $this->config = new $vhost->classFile($this);
         }
 
         /**
-         * Start executing user application
+         * Launching user application
          * @return void
          */
-        public function runApp(): void
+        public function launch(): void
         {
-            if ($this->framework->showErrors) {
+            if ($this->framework->config->getOne('DISPLAY_ERRORS')) {
                 $this->runApplication();
             } else {
                 try {

@@ -33,7 +33,8 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             foreach ($students as $student) {
                 $dtos->put(StudentDto::toDto($student));
             }
-            $this->app->writer->send($dtos);
+            $this->app->writer->send($this->app->framework->config);
+//            $this->app->writer->send($dtos);
         }
 
         /**

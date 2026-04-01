@@ -20,7 +20,7 @@ namespace shani\servers\swoole {
     use shani\contracts\SupportedWebServer;
     use shani\core\Framework;
     use shani\FrameworkConfig;
-    use shani\WebServer;
+    use shani\ApplicationLauncher;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
@@ -39,13 +39,13 @@ namespace shani\servers\swoole {
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private readonly Server $server;
-        private readonly FrameworkConfig $config;
+        private readonly FrameworkConfig $framework;
         private readonly bool $forceRedirection;
         private readonly int $httpPort, $httpsPort;
         private readonly string $ip;
         private array $clients = [];
 
-        public function __construct(FrameworkConfig $config)
+        public function __construct(FrameworkConfig $framework)
         {
             self::CheckRequirements();
             $swoole = yaml_parse_file(__DIR__ . '/config.yml');
@@ -55,12 +55,12 @@ namespace shani\servers\swoole {
             $this->httpsPort = $swoole['PORTS']['HTTPS'];
             $this->ip = $swoole['IP'];
 
-            $this->config = $config;
+            $this->framework = $framework;
             $this->server = new Server($this->ip, $this->httpPort);
             $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
 
             $this->server->set([
-                'package_max_length' => $config->payloadSize,
+                'package_max_length' => $framework->config->getOne('MAX_PAYLOAD_SIZE'),
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
                 'reload_async' => true, 'max_wait_time' => $swoole['MAX_WAIT_TIME'],
@@ -105,7 +105,7 @@ namespace shani\servers\swoole {
                 $request = self::createRequest($scheme, $req);
                 if ($scheme === 'https' || !$this->forceRedirection) {
                     $writer = new SwooleHttpResponseWriter($res);
-                    $callback($request, $writer, $this->config);
+                    $callback($request, $writer, $this->framework);
                 } else {
                     $uri = $request->uri->withPort($this->httpsPort)->withScheme('https');
                     $res->status(HttpStatus::MOVED_PERMANENTLY->value);
@@ -118,7 +118,7 @@ namespace shani\servers\swoole {
                 if (!empty($request)) {
                     $request->withRawBody($frame->data);
                     $writer = new SwooleWebSocketResponseWriter($server, $frame->fd);
-                    $callback($request, $writer, $this->config);
+                    $callback($request, $writer, $this->framework);
                 }
             });
             return $this;
@@ -133,7 +133,7 @@ namespace shani\servers\swoole {
                     ->files(self::getPostedFiles($req->files))
                     ->method($req->server['request_method'])
                     ->time($req->server['request_time'])
-                    ->ip(WebServer::getClientIP($req->server, self::$ipHeaders))
+                    ->ip(ApplicationLauncher::getClientIP($req->server, self::$ipHeaders))
                     ->body(self::getPostedBody($req))
                     ->rawBody($req->rawcontent())
                     ->headers($req->header)

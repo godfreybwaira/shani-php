@@ -19,11 +19,16 @@ namespace shani\core {
         public readonly string $classFile;
 
         /**
-         * Active application configuration profile name
+         * Active application configuration profile name. Use this variable to
+         * load different application environment, example development, testing, or production environment.
          * @var string
          */
         public readonly string $profile;
 
+        /**
+         * Create a virtual host
+         * @param array $config Application-specific configuration
+         */
         public function __construct(array $config)
         {
             $this->profile = $config['CONFIGURATION']['PROFILE'];

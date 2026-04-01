@@ -12,7 +12,7 @@ namespace test\helpers {
     use shani\core\Framework;
     use shani\core\log\LogLevel;
     use shani\core\VirtualHost;
-    use shani\WebServer;
+    use shani\ApplicationLauncher;
 
     final class TestConfig
     {
@@ -62,13 +62,13 @@ namespace test\helpers {
                 return null;
             }
             touch(self::TEST_FILE);
-            WebServer::log(LogLevel::INFO, 'Test is running...');
+            ApplicationLauncher::log(LogLevel::INFO, 'Test is running...');
             $result = self::config($params);
             self::stop();
             if ($result) {
-                WebServer::log(LogLevel::INFO, 'Test finished and passed.');
+                ApplicationLauncher::log(LogLevel::INFO, 'Test finished and passed.');
             } else {
-                WebServer::log(LogLevel::WARNING, 'Test finished and failed.');
+                ApplicationLauncher::log(LogLevel::WARNING, 'Test finished and failed.');
             }
             return $result;
         }

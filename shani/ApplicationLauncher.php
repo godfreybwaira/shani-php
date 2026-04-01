@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ServerConfig
+ * Description of ApplicationLauncher
  * @author coder
  *
  * Created on: Mar 6, 2024 at 4:06:33 PM
@@ -27,23 +27,8 @@ namespace shani {
     use test\helpers\TestConfig;
     use test\helpers\TestParameters;
 
-    final class WebServer
+    final class ApplicationLauncher
     {
-
-        private static array $mime = [];
-
-        public static function mime(string $extension): ?string
-        {
-            $ext = strtolower($extension);
-            if (!isset(self::$mime[$ext])) {
-                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
-                if ($mime === null) {
-                    return null;
-                }
-                self::$mime[$ext] = $mime;
-            }
-            return self::$mime[$ext];
-        }
 
         private static function host(string $name): VirtualHost
         {
@@ -72,7 +57,7 @@ namespace shani {
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 $vhost = self::host($request->uri->hostname());
-                (new App($vhost, $response, $writer, $framework))->runApp();
+                (new App($vhost, $response, $writer, $framework))->launch();
             });
             $server->start(fn() => $params === null ? null : TestConfig::start($params));
         }
