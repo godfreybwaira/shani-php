@@ -15,11 +15,6 @@ namespace lib\ds\map {
     class ReadableMap extends ReadableData
     {
 
-        /**
-         * Check if an iterable object has given item
-         * @param string|int $key Items to check
-         * @return bool
-         */
         public function exists(string|int ...$key): bool
         {
             foreach ($key as $k) {
@@ -46,11 +41,6 @@ namespace lib\ds\map {
             return !empty($absentKeys) ? $absentKeys : null;
         }
 
-        /**
-         * Check if all items mentioned exist in the current iterable object
-         * @param callable $callback List of item names
-         * @return bool Returns true if all items exists, false otherwise.
-         */
         public function existsWhere(callable $callback): bool
         {
             foreach ($this->data as $key => $value) {
@@ -94,15 +84,6 @@ namespace lib\ds\map {
             return isset($this->data[$key]) && (bool) $this->data[$key];
         }
 
-        /**
-         * Get all items which satisfies the condition provided by the callback
-         * function.
-         * @param callable $callback A callback function that receive an item name as
-         * first parameter and an item value as second parameter. This function
-         * must return a boolean value.
-         * @param int|null $limit When to stop finding
-         * @return array A list if items
-         */
         public function where(callable $callback, ?int $limit = null): array
         {
             $rows = [];
@@ -121,30 +102,16 @@ namespace lib\ds\map {
             return $rows;
         }
 
-        /**
-         * Get an iterable object as array
-         * @param array $keys Items to get from an iterable object
-         * @return array
-         */
         public function toArray(): array
         {
             return $this->data;
         }
 
-        /**
-         * Convert iterable data to CSV
-         * @param string $separator Data separator
-         * @return string
-         */
         public function toCsv(string $separator = ','): string
         {
             return DataConvertor::array2csv($this->data, $separator);
         }
 
-        /**
-         * Convert iterable data to XML
-         * @return string
-         */
         public function toXml(): string
         {
             return DataConvertor::array2xml($this->data);
@@ -158,11 +125,6 @@ namespace lib\ds\map {
             return json_encode($this->data);
         }
 
-        /**
-         * Convert iterable data to datagrid, A json with first row as headers,
-         * and second row contains a list of values corresponding to given headers
-         * @return string
-         */
         public function toDataGrid(): string
         {
             return DataConvertor::array2dataGrid($this->data);
@@ -208,15 +170,6 @@ namespace lib\ds\map {
             return $rows;
         }
 
-        /**
-         * Reduce an array to a scalar value, for example when finding sum or
-         * average of an array column
-         * @param callable $callback a callback that accepts three arguments,
-         * an array key, array value and accumulator. The type of accumulator
-         * is same as that of <code>$initialValue</code>
-         * @param type $initialValue An initial accumulator value
-         * @return type A single scalar value
-         */
         public function reduce(callable $callback, $initialValue = null)
         {
             $accumulator = $initialValue;
@@ -255,12 +208,6 @@ namespace lib\ds\map {
             }
         }
 
-        /**
-         * Apply a callback function for each value of a collection i.e array.
-         * @param callable $callback A callback function that receives an item name
-         * and value as first and second parameters.
-         * @return self
-         */
         public function each(callable $callback): self
         {
             foreach ($this->data as $key => $value) {

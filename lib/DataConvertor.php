@@ -59,7 +59,7 @@ namespace lib {
          */
         public static function array2xml(?array $data): ?string
         {
-            return $data !== null ? '<?xml version="1.0"?>' . self::toxml($data, 'data') : $data;
+            return $data !== null ? '<?xml version="1.0"?>' . self::toxml($data, 'root') : $data;
         }
 
         /**

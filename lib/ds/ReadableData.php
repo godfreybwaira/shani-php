@@ -71,7 +71,7 @@ namespace lib\ds {
 
         /**
          * Convert iterable data to CSV
-         * @param string $separator Data separator
+         * @param string $separator Column separator
          * @return string
          */
         public abstract function toCsv(string $separator = ','): string;

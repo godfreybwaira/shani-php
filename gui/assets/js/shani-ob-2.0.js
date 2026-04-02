@@ -137,7 +137,7 @@
                     }
                     return node + '</' + tag + '>';
                 };
-                return '<?xml version="1.0"?>' + convert(toJson(data), 'data');
+                return '<?xml version="1.0"?>' + convert(toJson(data), 'root');
             },
             json2yaml(data) {
                 const convert = (obj, indent) => {
