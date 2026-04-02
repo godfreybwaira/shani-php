@@ -61,24 +61,6 @@ namespace lib\ds\map {
             return false;
         }
 
-        /**
-         * Count number of items in an iterable object
-         * @return int
-         */
-        public function count(): int
-        {
-            return count($this->data);
-        }
-
-        /**
-         * Check if an iterable object is empty or not
-         * @return bool
-         */
-        public function isEmpty(): bool
-        {
-            return empty($this->data);
-        }
-
         #[\Override]
         public function jsonSerialize(): array
         {
@@ -100,6 +82,16 @@ namespace lib\ds\map {
         public function getOne(string|int $key, mixed $default = null): mixed
         {
             return $this->data[$key] ?? $default;
+        }
+
+        /**
+         * Check if an item in iterable object can be reduced to true or not
+         * @param string|int $key Item to check
+         * @return bool true if the value is truthy, false otherwise.
+         */
+        public function isTruthy(string|int $key): bool
+        {
+            return isset($this->data[$key]) && (bool) $this->data[$key];
         }
 
         /**

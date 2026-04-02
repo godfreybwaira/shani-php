@@ -23,7 +23,7 @@ namespace lib\ds {
          * Count number of items in an iterable object
          * @return int
          */
-        public function count(): int
+        public final function count(): int
         {
             return count($this->data);
         }
@@ -32,7 +32,7 @@ namespace lib\ds {
          * Check if an iterable object is empty or not
          * @return bool
          */
-        public function isEmpty(): bool
+        public final function isEmpty(): bool
         {
             return empty($this->data);
         }

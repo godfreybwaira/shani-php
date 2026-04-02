@@ -96,7 +96,7 @@ namespace shani\http {
          */
         public function launch(): void
         {
-            if ($this->framework->config->getOne('display_errors')) {
+            if ($this->framework->config->isTruthy('display_errors')) {
                 $this->runApplication();
             } else {
                 try {
