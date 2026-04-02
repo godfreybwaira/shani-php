@@ -31,7 +31,7 @@ if (PHP_SAPI === 'cli') {
     /*
      * Testing env
      */
-//    WebServer::start(new \shani\servers\swoole\SwooleServer($config), new TestParameters(host: 'localhost', profile: 'TEST'));
+//    WebServer::start(new \shani\servers\swoole\SwooleServer($config), new TestParameters(host: 'localhost', profile: 'test.yml'));
 
     /**
      * Production env
@@ -46,7 +46,7 @@ if (PHP_SAPI === 'cli') {
     /**
      * Testing env
      */
-//    WebServer::start(new shani\servers\cgi\CgiServer($config), new TestParameters(host: 'localhost', profile: 'TEST'));
+//    WebServer::start(new shani\servers\cgi\CgiServer($config), new TestParameters(host: 'localhost', profile: 'test.yml'));
 
     /**
      * Production env
