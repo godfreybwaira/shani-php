@@ -1,6 +1,0 @@
-CONFIGURATION:
-  # Must extends shani\advisors\Configuration
-  CLASSFILE: \apps\demo\config\Settings
-  # Active configuration profile. The framework does not provide any logic regarding
-  # this variable. You should handle the logic through CLASSFILE
-  PROFILE: dev.yml

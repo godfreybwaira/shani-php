@@ -21,7 +21,6 @@ namespace shani\http {
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\core\log\Logger;
-    use shani\core\VirtualHost;
     use shani\exceptions\CustomException;
     use shani\FrameworkConfig;
     use shani\persistence\LocalStorage;
@@ -45,9 +44,9 @@ namespace shani\http {
 
         /**
          * Application virtual host configuration
-         * @var VirtualHost
+         * @var ReadableMap
          */
-        public readonly VirtualHost $vhost;
+        public readonly ReadableMap $vhost;
 
         /**
          * HTTP request object
@@ -75,19 +74,20 @@ namespace shani\http {
 
         /**
          * Create an application instance
-         * @param VirtualHost $vhost Virtual host
+         * @param ReadableMap $vhost Virtual host
          * @param ResponseEntity $res Response entity object
          * @param ResponseWriter $writer response writer object
          * @param FrameworkConfig $framework Framework configuration object
          */
-        public function __construct(VirtualHost $vhost, ResponseEntity $res, ResponseWriter $writer, FrameworkConfig $framework)
+        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriter $writer, FrameworkConfig $framework)
         {
             $this->vhost = $vhost;
             $this->response = $res;
             $this->framework = $framework;
             $this->request = $res->request;
             $this->writer = new HttpWriter($this, $writer);
-            $this->config = new $vhost->classFile($this);
+            $class = $vhost->getOne('classpath');
+            $this->config = new $class($this);
         }
 
         /**
@@ -96,7 +96,7 @@ namespace shani\http {
          */
         public function launch(): void
         {
-            if ($this->framework->config->getOne('DISPLAY_ERRORS')) {
+            if ($this->framework->config->getOne('display_errors')) {
                 $this->runApplication();
             } else {
                 try {

@@ -41,7 +41,7 @@ namespace shani\core {
         /**
          * Hosts directory path
          */
-        public const DIR_HOSTS = self::DIR_CONFIG . '/hosts';
+        public const DIR_HOSTS = self::DIR_CONFIG . '/vhosts';
 
         /**
          * GUI directory path

@@ -21,7 +21,6 @@ namespace shani {
     use shani\core\Framework;
     use shani\core\log\Logger;
     use shani\core\log\LogLevel;
-    use shani\core\VirtualHost;
     use shani\http\App;
     use shani\persistence\LocalStorage;
     use test\helpers\TestConfig;
@@ -30,11 +29,11 @@ namespace shani {
     final class ApplicationLauncher
     {
 
-        private static function host(string $name): VirtualHost
+        private static function host(string $name): ReadableMap
         {
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                return new VirtualHost(yaml_parse_file($yaml));
+                return new ReadableMap(yaml_parse_file($yaml));
             }
             $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {
@@ -57,7 +56,8 @@ namespace shani {
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 $vhost = self::host($request->uri->hostname());
-                (new App($vhost, $response, $writer, $framework))->launch();
+                $app = new App($vhost, $response, $writer, $framework);
+                $app->launch();
             });
             $server->start(fn() => $params === null ? null : TestConfig::start($params));
         }

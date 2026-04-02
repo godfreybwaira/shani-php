@@ -2,7 +2,7 @@
 ---
 # Display all application errors and server errors. This variable can be
 # overridden by application.
-DISPLAY_ERRORS: true
-TIME_ZONE: Africa/Dar_Es_Salaam
+display_errors: true
+time_zone: Africa/Dar_Es_Salaam
 # Maximum payload size in MB allowed to upload.
-MAX_PAYLOAD_SIZE: 100
+max_payload_size: 100

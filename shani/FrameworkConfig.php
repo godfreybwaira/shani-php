@@ -24,13 +24,13 @@ namespace shani {
             self::checkFrameworkRequirements();
             $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
             /////////////////////////////////////
-            $config['MAX_PAYLOAD_SIZE'] *= self::MB_1;
+            $config['max_payload_size'] *= self::MB_1;
             $this->config = new ReadableMap($config);
             /////////////////////////////////////
-            ini_set('upload_max_filesize', $config['MAX_PAYLOAD_SIZE']);
-            ini_set('post_max_size', $config['MAX_PAYLOAD_SIZE'] + self::MB_1);
-            ini_set('display_errors', $config['DISPLAY_ERRORS']);
-            date_default_timezone_set($config['TIME_ZONE']);
+            ini_set('upload_max_filesize', $config['max_payload_size']);
+            ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
+            ini_set('display_errors', $config['display_errors']);
+            date_default_timezone_set($config['time_zone']);
         }
 
         private static function checkFrameworkRequirements()

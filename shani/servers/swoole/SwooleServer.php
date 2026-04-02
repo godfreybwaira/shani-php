@@ -60,7 +60,7 @@ namespace shani\servers\swoole {
             $this->forceRedirection = $swoole['REDIRECT_INSECURE_REQUEST'];
 
             $this->server->set([
-                'package_max_length' => $framework->config->getOne('MAX_PAYLOAD_SIZE'),
+                'package_max_length' => $framework->config->getOne('max_payload_size'),
                 'task_worker_num' => $cores, 'reactor_num' => $cores,
                 'worker_num' => $cores, 'enable_coroutine' => true,
                 'reload_async' => true, 'max_wait_time' => $swoole['MAX_WAIT_TIME'],

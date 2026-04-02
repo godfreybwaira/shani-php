@@ -9,10 +9,10 @@
 
 namespace test\helpers {
 
+    use lib\ds\map\ReadableMap;
+    use shani\ApplicationLauncher;
     use shani\core\Framework;
     use shani\core\log\LogLevel;
-    use shani\core\VirtualHost;
-    use shani\ApplicationLauncher;
 
     final class TestConfig
     {
@@ -30,10 +30,10 @@ namespace test\helpers {
                 self::stop();
                 throw new \Exception('Could not start a test.');
             }
-            $content['CONFIGURATION']['PROFILE'] = $params->profile;
-            $vhost = new VirtualHost($content);
+            $content['profile'] = $params->profile;
+            $vhost = new ReadableMap($content);
             self::removeBackupFile($source, $destination);
-            $test = $vhost->classFile::runTest();
+            $test = $vhost->getOne('classpath')::runTest();
             return $test->getResult();
         }
 
