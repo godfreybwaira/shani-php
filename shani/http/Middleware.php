@@ -25,7 +25,6 @@ namespace shani\http {
         {
             $this->app = $app;
             $this->listener = new Event(['before', 'after']);
-            $this->on('after', fn() => $app->session()->save());
         }
 
         /**
@@ -74,7 +73,6 @@ namespace shani\http {
             $this->setProperContentType();
             $security->setBrowsingPolicy();
             $security->preflightRequest();
-            $security->validateSession();
             $this->app->on('web', function () use (&$security) {
                 $security->addCspHeaders()->addResourceAccessPolicy()->csrfTest();
             });

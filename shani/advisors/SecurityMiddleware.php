@@ -145,19 +145,6 @@ namespace shani\advisors {
         }
 
         /**
-         * Check user session validity. If session expired, user is redirected back to /
-         * @return self
-         */
-        public function validateSession(): self
-        {
-            if ($this->app->config->sessionEnabled() && $this->app->session()->expired()) {
-                $this->app->session()->stop();
-                throw CustomException::sessionExpired($this->app);
-            }
-            return $this;
-        }
-
-        /**
          * A request sent by the browser before sending the actual request to verify
          * whether a server can process the incoming request.
          * @param int $cacheTime Tells the browser to cache the preflight response

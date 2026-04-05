@@ -59,12 +59,6 @@ namespace shani\exceptions {
             return new ServerException($message ?? HttpStatus::SERVICE_UNAVAILABLE->getMessage());
         }
 
-        public static function sessionExpired(App &$app, string $message = null): ClientException
-        {
-            $app->response->setStatus(HttpStatus::BAD_REQUEST);
-            return new ClientException($message ?? 'Session has expired');
-        }
-
         public static function forbidden(App &$app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::FORBIDDEN);

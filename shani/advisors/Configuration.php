@@ -13,7 +13,6 @@ namespace shani\advisors {
     use lib\crypto\DigitalSignature;
     use lib\crypto\Encryption;
     use lib\DataCompression;
-    use lib\Duration;
     use lib\oauth2\Oauth2Repository;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
@@ -27,6 +26,7 @@ namespace shani\advisors {
     use shani\http\RequestRoute;
     use shani\persistence\DatabaseConnection;
     use shani\persistence\LocalStorage;
+    use shani\persistence\session\SessionStorageChooser;
     use test\TestResult;
 
     abstract class Configuration
@@ -64,6 +64,15 @@ namespace shani\advisors {
         }
 
         /**
+         * Select session handling mechanism. By default, session is disabled
+         * @return SessionStorageChooser
+         */
+        public function getChoosenSessionManager(): SessionStorageChooser
+        {
+            return SessionStorageChooser::FILE;
+        }
+
+        /**
          * Enable oauth authorization
          * @return bool True to enable, false otherwise
          */
@@ -85,36 +94,6 @@ namespace shani\advisors {
         public function sessionName(): string
         {
             return 'sessionId';
-        }
-
-        /**
-         * The directory where session data will be saved. This directory must be
-         * writable and exists
-         * @return string
-         */
-        public function sessionSavePath(): string
-        {
-            return sys_get_temp_dir();
-        }
-
-        /**
-         * Whether session engine is enabled or not. If true then session data
-         * will be persisted on session storage, otherwise session object will
-         * behave just like normal object ait it's data will not be persisted.
-         * @return bool
-         */
-        public function sessionEnabled(): bool
-        {
-            return $this->app->platform() === 'web';
-        }
-
-        /**
-         * Get or set cookie max age before expiration.
-         * @return \DateTimeInterface A date/time object.
-         */
-        public function cookieMaxAge(): \DateTimeInterface
-        {
-            return Duration::of(2, Duration::HOURS);
         }
 
         /**

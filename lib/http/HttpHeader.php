@@ -77,12 +77,9 @@ namespace lib\http {
         public const X_FRAME_OPTIONS = 'X-Frame-Options';
         public const X_CONTENT_TYPE_OPTIONS = 'X-Content-Type-Options';
 
-        public function __construct(?array $headers = null)
+        public function __construct(array $headers = [])
         {
-            parent::__construct([]);
-            if (!empty($headers)) {
-                $this->addAll($headers);
-            }
+            parent::__construct($headers);
         }
 
         /**

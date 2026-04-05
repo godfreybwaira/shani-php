@@ -24,16 +24,15 @@ namespace shani\http {
     use shani\exceptions\CustomException;
     use shani\FrameworkConfig;
     use shani\persistence\LocalStorage;
-    use shani\persistence\session\Cart;
-    use shani\persistence\session\SessionManager;
+    use shani\persistence\session\SessionStorage;
+    use shani\persistence\session\SessionStorageInterface;
 
     final class App
     {
 
         private StorageMedia $storage;
         private ?Logger $logger = null;
-        private ?Cart $csrfCart = null;
-        private SessionManager $session;
+        public readonly SessionStorageInterface $session;
         private ?string $lang = null, $platform = null;
 
         /**
@@ -88,6 +87,7 @@ namespace shani\http {
             $this->writer = new HttpWriter($this, $writer);
             $class = $vhost->getOne('classpath');
             $this->config = new $class($this);
+            $this->session = $this->getSession();
         }
 
         /**
@@ -160,17 +160,20 @@ namespace shani\http {
             return $this->platform;
         }
 
-        public function csrfToken(): Cart
+        public function csrfToken(): ReadableMap
         {
-            if ($this->csrfCart === null) {
-                $this->csrfCart = $this->session()->storage->cart('_gGOd2y$oN');
-            }
-            return $this->csrfCart;
+            return $this->session->cart('_gGOd2y$oN');
+        }
+
+        private function getSession(): SessionStorageInterface
+        {
+            $choice = $this->config->getChoosenSessionManager();
+            return SessionStorage::getStorage($this, $choice);
         }
 
         /**
          * Create and return logger object.
-         * @return SessionManager
+         * @return Logger
          */
         public function logger(): Logger
         {
@@ -182,16 +185,6 @@ namespace shani\http {
                 $this->logger = new Logger($filename);
             }
             return $this->logger;
-        }
-
-        /**
-         * Create and return session object. If session is not started, it will be started,
-         * otherwise it will be resumed.
-         * @return SessionManager
-         */
-        public function session(): SessionManager
-        {
-            return $this->session ??= new SessionManager($this);
         }
 
         /**

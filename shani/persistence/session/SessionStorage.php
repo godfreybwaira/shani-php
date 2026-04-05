@@ -2,88 +2,40 @@
 
 /**
  * Description of SessionStorage
- * @author coder
+ * @author goddy
  *
- * Created on: Mar 20, 2025 at 12:59:35 PM
+ * Created on: Apr 3, 2026 at 7:27:49 PM
  */
 
 namespace shani\persistence\session {
 
     use lib\ds\map\MutableMap;
+    use shani\http\App;
 
-    final class SessionStorage extends MutableMap
+    abstract class SessionStorage implements SessionStorageInterface
     {
 
-        private int $lastActive;
-        private readonly int $createdAt;
+        protected array $carts = [];
 
-        public function __construct(int $createdAt, int $lastActive)
+        public final function cartExists(string $cartName): bool
         {
-            $this->createdAt = $createdAt;
-            $this->lastActive = $lastActive;
-            parent::__construct([]);
+            return isset($this->carts[$cartName]);
         }
 
-        /**
-         * Get the last access time on a session object
-         * @return int
-         */
-        public function getLastActive(): int
+        protected final function createCart(string $cartName, array $data): MutableMap
         {
-            return $this->lastActive;
-        }
-
-        /**
-         * Update the last active session time to a current time. This function
-         * is called every time <code>cart</code> function is called.
-         * @return self
-         */
-        public function touch(): self
-        {
-            $this->lastActive = time();
-            return $this;
-        }
-
-        /**
-         * Session cart is used for storing and retrieving session data.
-         * @param string $name Cart name, if cart does not exists, it is created
-         * otherwise the available cart object is returned.
-         * @return Cart
-         */
-        public function cart(string $name): Cart
-        {
-            $this->touch();
-            return ($this->data[$name] ??= new Cart($name));
-        }
-
-        #[\Override]
-        public function jsonSerialize(): array
-        {
-            return [
-                'createdAt' => $this->createdAt,
-                'lastActive' => $this->lastActive,
-                'carts' => $this->data
-            ];
-        }
-
-        /**
-         * Create session cart from JSON data
-         * @param string $json
-         * @return self
-         */
-        public static function fromJson(string $json): self
-        {
-            $data = json_decode($json, true);
-            $session = new self($data['createdAt'], $data['lastActive']);
-            foreach ($data['carts'] as $name => $values) {
-                $cart = new Cart($name);
-                foreach ($values as $key => $value) {
-                    $cart->addOne($key, $value);
-                }
-                $session->addOne($cart->name, $cart);
+            if (!isset($this->carts[$cartName])) {
+                $this->carts[$cartName] = new MutableMap($data);
             }
+            return $this->carts[$cartName];
+        }
 
-            return $session;
+        public static function getStorage(App $app, SessionStorageChooser $choice): SessionStorageInterface
+        {
+            return match ($choice) {
+                SessionStorageChooser::FILE => new FileSessionStorage($app),
+                default => new MemorySessionStorage()
+            };
         }
     }
 

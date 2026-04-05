@@ -13,11 +13,8 @@ namespace lib\http {
     final class HttpCookie implements \Stringable
     {
 
-        public const SAME_SITE_NONE = 'None';
-        public const SAME_SITE_LAX = 'Lax';
-        public const SAME_SITE_STRICT = 'Strict';
-
         private array $cookie;
+        private ?HttpSameSite $cookieSameSite = null;
 
         public function __construct(?string $rawCookie = null)
         {
@@ -232,22 +229,22 @@ namespace lib\http {
         /**
          * Gets the SameSite attribute.
          *
-         * @return string|null
+         * @return HttpSameSite|null
          */
-        public function sameSite(): ?string
+        public function sameSite(): ?HttpSameSite
         {
-            return $this->cookie['samesite'] ?? null;
+            return $this->cookieSameSite;
         }
 
         /**
          * Returns an instance with the specified SameSite attribute.
          *
-         * @param string|null $sameSite
+         * @param HttpSameSite $sameSite
          * @return static
          */
-        public function setSameSite(?string $sameSite): self
+        public function setSameSite(HttpSameSite $sameSite): self
         {
-            $this->cookie['samesite'] = $sameSite;
+            $this->cookieSameSite = $sameSite;
             return $this;
         }
 
@@ -269,8 +266,8 @@ namespace lib\http {
             if (!empty($this->cookie['path'])) {
                 $cookie .= '; Path=' . $this->cookie['path'];
             }
-            if (!empty($this->cookie['samesite'])) {
-                $cookie .= '; SameSite=' . $this->cookie['samesite'];
+            if (!empty($this->cookieSameSite)) {
+                $cookie .= '; SameSite=' . $this->cookieSameSite->value;
             }
             if (!empty($this->cookie['domain'])) {
                 $cookie .= '; Domain=' . $this->cookie['domain'];

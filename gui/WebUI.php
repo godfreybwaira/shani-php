@@ -12,6 +12,7 @@ namespace gui {
     use lib\ds\map\MutableMap;
     use lib\ds\map\ReadableMap;
     use lib\http\HttpCookie;
+    use lib\http\HttpSameSite;
     use shani\core\Framework;
     use shani\http\App;
     use shani\persistence\LocalStorage;
@@ -183,7 +184,7 @@ namespace gui {
                 $token = $this->app->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
                 $this->app->csrfToken()->addOne($tokenName, $token);
                 $cookie = (new HttpCookie())->setName($tokenName)
-                        ->setSameSite(HttpCookie::SAME_SITE_LAX)
+                        ->setSameSite(HttpSameSite::LAX)
                         ->setValue($token)->setHttpOnly(true)
                         ->setSecure($this->app->request->uri->secure());
                 $this->app->response->header()->setCookie($cookie);
