@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Description of FileSessionStorage
+ * Description of PersistentSessionStorage
  * @author goddy
  *
- * Created on: Apr 5, 2026 at 6:58:47 PM
+ * Created on: Apr 3, 2026 at 7:27:49 PM
  */
 
 namespace shani\persistence\session {
@@ -13,21 +13,32 @@ namespace shani\persistence\session {
     use lib\http\HttpSameSite;
     use shani\http\App;
 
-    final class FileSessionStorage extends SessionStorage
+    final class PersistentSessionStorage implements SessionStorageInterface
     {
 
         private readonly App $app;
+        private array $carts = [];
         private bool $closed = false;
+        private readonly SessionConnectionInterface $conn;
 
-        public function __construct(App $app)
+        private function __construct(App $app, SessionConnectionInterface $conn)
         {
+            $this->conn = $conn;
             $this->app = $app;
             $this->start();
         }
 
+        public function cartExists(string $cartName): bool
+        {
+            return isset($this->carts[$cartName]);
+        }
+
         public function cart(string $cartName): MutableMap
         {
-            return $this->createCart($cartName, $_SESSION[$cartName] ?? []);
+            if (!isset($this->carts[$cartName])) {
+                $this->carts[$cartName] = new MutableMap($_SESSION[$cartName] ?? []);
+            }
+            return $this->carts[$cartName];
         }
 
         public function close(): void
@@ -64,6 +75,8 @@ namespace shani\persistence\session {
         {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start([
+                    'save_handler' => $this->conn->getHandler(),
+                    'save_path' => $this->conn->getConnectionString(),
                     'name' => $this->app->config->sessionName(),
                     'use_strict_mode' => true,
                     'use_cookies' => true,
@@ -81,6 +94,14 @@ namespace shani\persistence\session {
         private function getCookieDomain(): string
         {
             return '.' . ltrim($this->app->request->uri->hostname(), 'www.');
+        }
+
+        public static function getStorage(App $app, ?SessionConnectionInterface $conn): SessionStorageInterface
+        {
+            if ($conn === null) {
+                return new MemorySessionStorage();
+            }
+            return new PersistentSessionStorage($app, $conn);
         }
     }
 

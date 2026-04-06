@@ -11,12 +11,22 @@ namespace shani\persistence\session {
 
     use lib\ds\map\MutableMap;
 
-    final class MemorySessionStorage extends SessionStorage
+    final class MemorySessionStorage implements SessionStorageInterface
     {
+
+        protected array $carts = [];
+
+        public final function cartExists(string $cartName): bool
+        {
+            return isset($this->carts[$cartName]);
+        }
 
         public function cart(string $cartName): MutableMap
         {
-            return $this->createCart($cartName, []);
+            if (!isset($this->carts[$cartName])) {
+                $this->carts[$cartName] = new MutableMap();
+            }
+            return $this->carts[$cartName];
         }
 
         public function close(): void

@@ -26,7 +26,7 @@ namespace shani\advisors {
     use shani\http\RequestRoute;
     use shani\persistence\DatabaseConnection;
     use shani\persistence\LocalStorage;
-    use shani\persistence\session\SessionStorageChooser;
+    use shani\persistence\session\SessionConnectionInterface;
     use test\TestResult;
 
     abstract class Configuration
@@ -64,12 +64,14 @@ namespace shani\advisors {
         }
 
         /**
-         * Select session handling mechanism. By default, session is disabled
-         * @return SessionStorageChooser
+         * Get session connection handler. For more information see the implementation of <code>SessionConnectionInterface</code>
+         * @return SessionConnectionInterface|null
          */
-        public function getChoosenSessionManager(): SessionStorageChooser
+        public function getSessionConnection(): ?SessionConnectionInterface
         {
-            return SessionStorageChooser::FILE;
+            return null;
+//            return new \shani\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
+//            return new \shani\persistence\session\dto\RedisConnectionDto('localhost', 6379);
         }
 
         /**

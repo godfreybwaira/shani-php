@@ -24,7 +24,7 @@ namespace shani\http {
     use shani\exceptions\CustomException;
     use shani\FrameworkConfig;
     use shani\persistence\LocalStorage;
-    use shani\persistence\session\SessionStorage;
+    use shani\persistence\session\PersistentSessionStorage;
     use shani\persistence\session\SessionStorageInterface;
 
     final class App
@@ -167,8 +167,8 @@ namespace shani\http {
 
         private function getSession(): SessionStorageInterface
         {
-            $choice = $this->config->getChoosenSessionManager();
-            return SessionStorage::getStorage($this, $choice);
+            $conn = $this->config->getSessionConnection();
+            return PersistentSessionStorage::getStorage($this, $conn);
         }
 
         /**
