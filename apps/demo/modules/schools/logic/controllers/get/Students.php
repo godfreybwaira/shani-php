@@ -28,14 +28,19 @@ namespace apps\demo\modules\schools\logic\controllers\get {
 
         public function index(): void
         {
-            $this->app->session->cart('user')->addOne('when', 'today');
-            if (!$this->app->session->cart('user')->exists('saved')) {
-                $this->app->session->cart('user')->addOne('saved', true);
-                $this->app->response->setBody('You are not saved');
-            } else {
-                $this->app->response->setBody('Now, you are saved.');
+            $students = $this->service->getAll();
+            $dtos = new StudentListDto();
+            foreach ($students as $student) {
+                $dtos->put(StudentDto::toDto($student));
             }
-            $this->app->writer->send();
+            $cart = $this->app->session->cart('user');
+            if ($cart->isEmpty()) {
+                $cart->addJson($dtos);
+                $this->app->response->setBody('Cart is empty. Come back next time.');
+                $this->app->writer->send();
+            } else {
+                $this->app->writer->send($cart);
+            }
         }
 
         /**

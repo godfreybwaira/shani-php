@@ -60,6 +60,16 @@ namespace lib\ds\map {
             return $this;
         }
 
+        public function addMap(ReadableMap $map): self
+        {
+            return $this->addAll($map->toArray());
+        }
+
+        public function addJson(\JsonSerializable $json): self
+        {
+            return $this->addAll($json->jsonSerialize());
+        }
+
         /**
          * Add an item to an iterable object if it does not exists
          * @param string|int $key Item name

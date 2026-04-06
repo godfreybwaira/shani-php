@@ -9,6 +9,8 @@
 
 namespace lib\ds {
 
+    use lib\ds\map\ReadableMap;
+
     interface MutableData
     {
 
@@ -24,6 +26,20 @@ namespace lib\ds {
          * @return self
          */
         public function addAll(array $items): self;
+
+        /**
+         * Add a key-value pairs of items
+         * @param ReadableMap $map Map items to add
+         * @return self
+         */
+        public function addMap(ReadableMap $map): self;
+
+        /**
+         * Add a Json serializable object to a map
+         * @param \JsonSerializable $json Serializable object
+         * @return self
+         */
+        public function addJson(\JsonSerializable $json): self;
 
         /**
          * Delete an item from an iterable object

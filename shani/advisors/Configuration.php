@@ -69,9 +69,9 @@ namespace shani\advisors {
          */
         public function getSessionConnection(): ?SessionConnectionInterface
         {
-            return null;
+//            return null;
 //            return new \shani\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
-//            return new \shani\persistence\session\dto\RedisConnectionDto('localhost', 6379);
+            return new \shani\persistence\session\dto\RedisConnectionDto('localhost', 6379);
         }
 
         /**
