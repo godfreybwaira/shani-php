@@ -89,7 +89,7 @@ namespace apps\demo\config {
 
         public static function runTest(): TestResult
         {
-            $result = new TestResult('UAT for my application', location: '~/Desktop');
+            $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
             $g1 = new TestGroup('MY FIRST MODULE');
             $g2 = new TestGroup('MY SECOND MODULE');
             $g3 = new TestGroup('MY THIRD MODULE');
@@ -115,14 +115,14 @@ namespace apps\demo\config {
             $caseg31->test('Test if 2+2=4', fn() => 2 + 2 === 4);
             $caseg32->test('Test if A is same as a', fn() => 'A' === 'a');
             $caseg33->test('Testing if I can make a call on this server', function () {
-                $client = new HttpClient(new URI('https://dev.shani.v2.local'));
+                $client = new HttpClient(new URI('http://dev.shani.v2.local'));
                 $client->enableAsync(false)->enableSSLVerification(false);
                 $code = null;
-                $client->get('/', function (ResponseEntity $res)use (&$code) {
+                $client->get('/schools/0/students', function (ResponseEntity $res)use (&$code) {
                     $code = $res->status();
                 });
                 return $code === HttpStatus::OK;
-            }, 7, 5);
+            }, maxExecutionTime: 7, iterations: 5);
             $g3->addCase($caseg31, $caseg32, $caseg33);
             $result->addGroup($g1, $g2, $g3);
             return $result;

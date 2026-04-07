@@ -1295,9 +1295,12 @@ namespace lib {
                 return null;
             }
             $mime = self::parse($mimeStr)[0];
-            $subtype = explode('/', $mime)[1];
-            $plusPos = strpos($subtype, '+');
-            return $plusPos === false ? $subtype : substr($subtype, $plusPos + 1);
+            $subtype = explode('/', $mime);
+            if (empty($subtype[1])) {
+                return null;
+            }
+            $plusPos = strpos($subtype[1], '+');
+            return $plusPos === false ? $subtype[1] : substr($subtype[1], $plusPos + 1);
         }
     }
 

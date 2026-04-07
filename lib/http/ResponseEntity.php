@@ -42,7 +42,7 @@ namespace lib\http {
         {
             $contentType = $this->headers->getOne(HttpHeader::CONTENT_TYPE);
             if (!empty($contentType)) {
-                return MediaType::subtype($contentType);
+                return MediaType::subtype($contentType) ?? '';
             }
             return MediaType::subtype($this->request->header()->getOne(HttpHeader::ACCEPT)) ?? '';
         }
