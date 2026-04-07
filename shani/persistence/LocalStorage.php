@@ -86,7 +86,7 @@ namespace shani\persistence {
 
         private static function serveProtected(App &$app, string $filepath): bool
         {
-            if (!$app->config->isAuthenticated) {
+            if (!$app->config->isAuthenticated()) {
                 throw CustomException::forbidden($app);
             }
             $owners = self::getFileOwnership($filepath);

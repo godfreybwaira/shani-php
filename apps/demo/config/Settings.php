@@ -62,11 +62,6 @@ namespace apps\demo\config {
             $mw->on('before', fn() => Test::m2($this->app));
         }
 
-        public function getUserPermissions(): ?string
-        {
-            return null;
-        }
-
         public function skipCsrfProtection(): bool
         {
             return true;
@@ -141,6 +136,14 @@ namespace apps\demo\config {
         public function getOauth2Repository(): Oauth2Repository
         {
             return new Oauth2Client();
+        }
+
+        public function getAuthenticationStrategies(): array
+        {
+            return [
+                new auth\PasswordAuthenticator($this->app),
+                new auth\JwtAuthenticator($this->app),
+            ];
         }
     }
 

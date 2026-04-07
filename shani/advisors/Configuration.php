@@ -17,6 +17,7 @@ namespace shani\advisors {
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
+    use shani\authentication\AuthenticationManager;
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\core\log\LogLevel;
@@ -32,35 +33,40 @@ namespace shani\advisors {
     abstract class Configuration
     {
 
-        /**
-         * Whether the current user is authenticated and has at least one permission
-         * @var bool
-         */
-        public readonly bool $isAuthenticated;
-
-        /**
-         * List of user permissions separated by any character out of a-z0-9
-         * @var string|null
-         */
-        private readonly ?string $permissionList;
+        private ?string $permissionList, $userId;
         protected readonly App $app;
 
         protected function __construct(App &$app)
         {
             $this->app = $app;
-            $this->isAuthenticated = $this->authenticate();
+            $this->userId = null;
+            $this->permissionList = null;
         }
 
-        private function authenticate(): bool
+        /**
+         * Whether the current user is authenticated and has at least one permission
+         * @var bool
+         */
+        public function isAuthenticated(): bool
         {
-            $token = $this->app->request->header()->getBearerToken();
-            if ($token !== null && $this->enableOauth()) {
-                $accessToken = $this->getOauth2Repository()->validateAccessToken($this->app->request->ip, $token);
-                $this->permissionList = $accessToken?->scope;
-            } else {
-                $this->permissionList = $this->getUserPermissions();
-            }
-            return $this->permissionList !== null;
+            $strategies = $this->getAuthenticationStrategies();
+            $manager = new AuthenticationManager($this->app, ...$strategies);
+            $loggedIn = $manager->login();
+            $this->permissionList = $manager->getPermissions();
+            $this->userId = $manager->getUserId();
+            return $loggedIn;
+        }
+
+        /**
+         * Get authentication strategies objects that implements <code>AuthenticationStrategy</code>.
+         * Developer must implement this interface to provide Authentication logic.
+         * @return array Collection of AuthenticationStrategy objects
+         *
+         * @see self::skipAuthentication()
+         */
+        public function getAuthenticationStrategies(): array
+        {
+            return [];
         }
 
         /**
@@ -72,15 +78,6 @@ namespace shani\advisors {
 //            return null;
 //            return new \shani\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
             return new \shani\persistence\session\dto\RedisConnectionDto('localhost', 6379);
-        }
-
-        /**
-         * Enable oauth authorization
-         * @return bool True to enable, false otherwise
-         */
-        public function enableOauth(): bool
-        {
-            return true;
         }
 
         /**
@@ -232,7 +229,7 @@ namespace shani\advisors {
          */
         public function userGroupId(): ?string
         {
-            return '334';
+            return null;
         }
 
         /**
@@ -255,7 +252,7 @@ namespace shani\advisors {
          */
         public function getUserPrivateId(): ?string
         {
-            return '123';
+            return $this->userId;
         }
 
         /**
@@ -303,15 +300,6 @@ namespace shani\advisors {
         {
             return '*';
         }
-
-        /**
-         * Get a list of authenticated user's permissions separated by a comma.
-         * Application must set permission using this function after a user
-         * is being logged in successfully.
-         * @return string|null List of user permissions or null if no permission is granted
-         * @see App::accessGranted()
-         */
-        public abstract function getUserPermissions(): ?string;
 
         /**
          * Check whether a given resource is available to both authenticated and
@@ -406,8 +394,9 @@ namespace shani\advisors {
          * Enable/disable user authorization on restricted resources.
          * (Permanent skipping authorization is not recommended in production environment)
          * @return bool
+         * @see self::getAuthenticationStrategies()
          */
-        public function skipAuthorization(): bool
+        public function skipAuthentication(): bool
         {
             return false;
         }

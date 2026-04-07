@@ -140,15 +140,6 @@ namespace lib\oauth2 {
         public function authenticate(string $username, string $password): ?UserDetailsDto;
 
         /**
-         * Validates an access token. If token exists and expired, delete it.
-         *
-         * @param string $requestIp IP Address that has made a request.
-         * @param string $token Access token to verify.
-         * @return AccessTokenDto Access token details if the token is valid, null otherwise
-         */
-        public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto;
-
-        /**
          * Authorize device usage by the user
          * @param string $userId User ID from session
          * @param string $userCode User code from device

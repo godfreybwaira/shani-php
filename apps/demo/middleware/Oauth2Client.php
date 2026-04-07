@@ -64,17 +64,12 @@ namespace apps\demo\middleware {
 
         public function authenticate(string $username, string $password): ?UserDetailsDto
         {
-            return new UserDetailsDto('123', $username, $password, null, false);
+            return new UserDetailsDto('123', null, false);
         }
 
         public function generateAuthorizationCode(string $clientId, ?string $scope, string $userId, string $redirectUri, ?string $codeChallenge = null, ?string $codeChallengeMethod = null, int $expiresIn = 600): AccessTokenDto
         {
             return new AccessTokenDto($clientId, bin2hex(random_bytes(32)), $userId, $scope, $expiresIn);
-        }
-
-        public function validateAccessToken(string $requestIp, string $token): ?AccessTokenDto
-        {
-            return new AccessTokenDto('123', $token, 'user2', '430704a766', 100);
         }
 
         public function revokeAuthorizationCode(string $clientId, string $authorizationCode): void

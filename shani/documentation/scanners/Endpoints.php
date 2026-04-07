@@ -10,7 +10,6 @@
 namespace shani\documentation\scanners {
 
     use shani\documentation\Generator;
-    use shani\http\App;
     use shani\http\RequestRoute;
 
     final class Endpoints implements \JsonSerializable

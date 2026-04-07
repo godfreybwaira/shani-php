@@ -88,10 +88,10 @@ namespace shani\advisors {
          */
         public function authorized(): self
         {
-            if ($this->app->config->skipAuthorization()) {
+            if ($this->app->config->skipAuthentication()) {
                 return $this;
             }
-            if ($this->app->config->isAuthenticated) {
+            if ($this->app->config->isAuthenticated()) {
                 $request = $this->app->request;
                 if ($this->app->config->accessibleByGuest()) {
                     $request->changeRoute($this->app->config->home());
