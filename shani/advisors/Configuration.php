@@ -118,8 +118,8 @@ namespace shani\advisors {
         }
 
         /**
-         * Get/set request methods that will be protected from CSRF attacks
-         * @return bool True if request Methods (in lower cases) to protect.
+         * Check if the current request method is protected from CSRF attacks
+         * @return bool True if request method is protected, false otherwise.
          */
         public function csrfProtected(): bool
         {
@@ -194,14 +194,20 @@ namespace shani\advisors {
          * Get or set user defined view directory.
          * @return string Path relative to current module directory
          */
-        public abstract function viewDir(): string;
+        public function viewDir(): string
+        {
+            return '/presentation/views';
+        }
 
         /**
          * Get or set user defined language directory. This will be folder on every
          * module where the language files will reside.
          * @return string Path relative to current module directory
          */
-        public abstract function languageDir(): string;
+        public function languageDir(): string
+        {
+            return '/presentation/lang';
+        }
 
         /**
          * Get user application name
@@ -218,7 +224,10 @@ namespace shani\advisors {
          * the web server
          * @return string Absolute path
          */
-        public abstract function appStorage(): string;
+        public function appStorage(): string
+        {
+            return $this->root() . '/.storage';
+        }
 
         /**
          * Returns user group Id shared by one or more users e.g company unique Id.
@@ -280,7 +289,7 @@ namespace shani\advisors {
         /**
          * Default path to homepage if '/' is provided by during HTTP request
          */
-        public abstract function home(): string;
+        public abstract function homePath(): string;
 
         /**
          * Returns a list of HTTP request methods supported by the application
@@ -288,7 +297,10 @@ namespace shani\advisors {
          * @see SecurityMiddleware::passedRequestMethodCheck()
          * @see SecurityMiddleware::preflightRequest()
          */
-        public abstract function allowedRequestMethods(): string;
+        public function allowedRequestMethods(): string
+        {
+            return 'get,post,head,put,delete';
+        }
 
         /**
          * Returns a list of HTTP request headers supported by the application
@@ -500,9 +512,12 @@ namespace shani\advisors {
         /**
          * Get database connection object specified by connection name. If no
          * connection name specified then default connection will be returned
-         * @return DatabaseConnection Database connection
+         * @return DatabaseConnection|null Database connection
          */
-        public abstract function database(): DatabaseConnection;
+        public function database(): ?DatabaseConnection
+        {
+            return null;
+        }
 
         /**
          * Get Oauth 2.0 repository for data exchange.

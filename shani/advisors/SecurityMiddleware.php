@@ -94,7 +94,7 @@ namespace shani\advisors {
             if ($this->app->config->isAuthenticated()) {
                 $request = $this->app->request;
                 if ($this->app->config->accessibleByGuest()) {
-                    $request->changeRoute($this->app->config->home());
+                    $request->changeRoute($this->app->config->homePath());
                     return $this;
                 }
                 if ($this->app->config->accessibleByPublic() || $this->app->config->accessGranted($request->method, $request->route())) {

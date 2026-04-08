@@ -41,14 +41,9 @@ namespace apps\demo\config {
             return Framework::DIR_APPS . '/demo';
         }
 
-        public function home(): string
+        public function homePath(): string
         {
             return '/shani/0/components/0/index';
-        }
-
-        public function appStorage(): string
-        {
-            return Framework::DIR_APPS . '/demo/storage';
         }
 
         public function allowedRequestMethods(): string
@@ -128,7 +123,7 @@ namespace apps\demo\config {
             return $result;
         }
 
-        public function database(): DatabaseConnection
+        public function database(): ?DatabaseConnection
         {
             return new DatabaseConnection(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }

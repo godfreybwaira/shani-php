@@ -117,7 +117,7 @@ namespace shani\http {
                 return;
             }
             if ($this->request->uri->path() === '/') {
-                $this->request->changeRoute($this->config->home());
+                $this->request->changeRoute($this->config->homePath());
             }
             $middleware = new Middleware($this);
             $this->config->registerMiddleware($middleware);

@@ -38,23 +38,29 @@ namespace shani\persistence {
         {
             $this->app = $app;
             $this->host = $app->request->uri->host();
-            $this->storage = self::createPath($app->config->root(), $app->config->appStorage());
+            $this->storage = self::createShortcut($app->config->appStorage());
         }
 
-        private static function createPath(string $root, string $target): string
+        private static function createShortcut(string $target): string
         {
-            $dirname = substr($root, strlen(Framework::DIR_APPS));
-            $path = Framework::DIR_STORAGE . $dirname;
-            if (is_link($path)) {
-                return $path;
+            $relativePart = substr($target, strlen(Framework::DIR_APPS));
+            $shortcut = Framework::DIR_STORAGE . $relativePart;
+            $isShortcut = is_link($shortcut);
+            if ($isShortcut || file_exists($shortcut)) {
+                if ($isShortcut && readlink($shortcut) === $target) {
+                    return $shortcut;
+                }
+                !$isShortcut && is_dir($shortcut) ? rmdir($shortcut) : unlink($shortcut);
             }
-            if (!is_dir($target)) {
-                mkdir($target, self::FILE_MODE, true);
+            foreach ([$target, dirname($shortcut)] as $path) {
+                if (!is_dir($path) && !mkdir($path, self::FILE_MODE, true)) {
+                    throw new ServerException('Failed to create directory: ' . $path);
+                }
             }
-            if (symlink($target, $path)) {
-                return $path;
+            if (symlink($target, $shortcut)) {
+                return $shortcut;
             }
-            throw new ServerException('Failed to create directory ' . $path);
+            throw new ServerException('Failed to create shortcut: ' . $shortcut);
         }
 
         private static function getPrefix(string $path): string
