@@ -22,7 +22,7 @@ namespace gui\pwa {
         {
             $this->data['name'] = $appName;
             $this->data['short_name'] = $appShortName;
-            $this->data['id'] = $appId->hostname();
+            $this->data['id'] = $appId->asString();
             $this->data['start_url'] = '/';
             $this->data['display'] = PwaDisplayMode::STANDALONE->value;
             $this->data['dir'] = PwaTextDirection::AUTO->value;
@@ -121,7 +121,7 @@ namespace gui\pwa {
             return $this;
         }
 
-        public function addShortcut(string $appName, URI $url, ?string $appShortName = null, ?string $description = null, array $icons = []): self
+        public function addShortcut(string $appName, URI $url, ?string $appShortName = null, ?string $description = null, PwaIcon ...$icons): self
         {
             $shortcut = ['name' => $appName, 'url' => $url];
             if ($appShortName) {
@@ -139,6 +139,9 @@ namespace gui\pwa {
 
         public function addProtocolHandler(string $protocol, string $url): self
         {
+            if (!str_contains($url, '%s')) {
+                throw new \InvalidArgumentException("Protocol handler URL must contain '%s' placeholder.");
+            }
             $this->data['protocol_handlers'][] = [
                 'protocol' => $protocol,
                 'url' => $url
@@ -161,7 +164,7 @@ namespace gui\pwa {
 
         public function build(): ReadableMap
         {
-            $data = array_filter($this->data, fn($value) => !empty($value) || $value === false || $value === 0);
+            $data = array_filter($this->data, fn($value) => $value !== null && $value !== []);
             return new ReadableMap($data);
         }
     }
