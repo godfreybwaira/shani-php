@@ -40,9 +40,19 @@ namespace gui {
          * @param string $path asset location relative to asset directory
          * @return string URI pointing to asset
          */
-        public function asset(string $path): string
+        public function assetUri(string $path): string
         {
             return $this->app->storage()->url(LocalStorage::ACCESS_ASSET . $path);
+        }
+
+        /**
+         * Get asset real path
+         * @param string $path asset location relative to asset directory
+         * @return string real path pointing to asset
+         */
+        public static function assetPath(string $path): string
+        {
+            return Framework::DIR_ASSETS . $path;
         }
 
         /**
@@ -112,13 +122,18 @@ namespace gui {
             foreach ($meta as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
             }
+            $pwaBuilder = $this->builder->getPwaBuilder();
+            if ($pwaBuilder !== null) {
+                $head .= '<link rel="manifest" href="' . $this->app->storage()->url($pwaBuilder->manifest) . '"/>';
+                $head .= '<script defer src="' . $this->app->storage()->url($pwaBuilder->serviceWorker) . '"></script>';
+            }
             $styles = $this->builder->getStyles();
             foreach ($styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->asset($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->assetUri($url) . '"/>';
             }
             $scripts = $this->builder->getScripts();
             foreach ($scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $this->asset($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $this->assetUri($url) . '"></script>';
             }
             return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appName()) . '</title>';
         }

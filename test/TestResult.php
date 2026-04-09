@@ -78,7 +78,7 @@ namespace test {
                 $this->performanceScore += $group->getTotalPerformanceScore();
                 $this->totalTests += $group->getTotalTests();
             }
-            $report = json_encode($this->jsonSerialize(), JSON_PRETTY_PRINT);
+            $report = json_encode($this->jsonSerialize(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             $this->save($report);
             return $this->totalTests === $this->testPassed;
         }

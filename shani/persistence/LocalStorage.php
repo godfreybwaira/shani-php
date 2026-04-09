@@ -134,17 +134,29 @@ namespace shani\persistence {
         }
 
         #[\Override]
-        public function save(File $file, string $bucket = '/'): string
+        public function save(File $file, string $bucket = '/', bool $rename = true): string
         {
-            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             $privateId = $this->app->config->getUserPrivateId();
             if (empty($privateId)) {
                 throw new ServerException('Client private Id cannot be empty');
             }
+            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
             $prefix = self::PID_INITIAL . $privateId . self::ID_SEPARATOR;
-            $filename = $prefix . substr(sha1(random_bytes(random_int(10, 70))), 0, rand(10, 15));
+            return $this->saveFile($file, $path, $prefix, $rename);
+        }
+
+        #[\Override]
+        public function savePublic(File $file, string $bucket = '/', bool $rename = true): string
+        {
+            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
+            return $this->saveFile($file, $path, null, $rename);
+        }
+
+        private function saveFile(File $file, string $path, ?string $prefix, bool $rename): string
+        {
+            $filename = $rename ? $prefix . substr(sha1(random_bytes(random_int(10, 70))), 0, rand(10, 15)) . $file->extension : $file->name;
             $directory = self::createDirectory($path . $file->type);
-            $filepath = $directory . '/' . $filename . $file->extension;
+            $filepath = $directory . '/' . $filename;
             Concurrency::parallel(function ()use ($filepath, &$file) {
                 $handle = fopen($filepath, 'a+b');
                 $size = fstat($handle)['size'];

@@ -85,9 +85,9 @@ namespace lib\ds\set {
         public function toJson(bool $pretty = false): string
         {
             if ($pretty) {
-                return json_encode($this->toArray(), JSON_PRETTY_PRINT);
+                return json_encode($this->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
-            return json_encode($this->toArray());
+            return json_encode($this->toArray(), JSON_UNESCAPED_SLASHES);
         }
 
         public function toDataGrid(): string

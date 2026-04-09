@@ -49,7 +49,7 @@ namespace lib {
                     $records[$r][] = $row[$key];
                 }
             }
-            return json_encode([$headers, $records]);
+            return json_encode([$headers, $records], JSON_UNESCAPED_SLASHES);
         }
 
         /**
@@ -176,7 +176,7 @@ namespace lib {
                 return null;
             }
             return match ($type) {
-                self::TYPE_JSON => json_encode($data),
+                self::TYPE_JSON => json_encode($data, JSON_UNESCAPED_SLASHES),
                 self::TYPE_XML => self::array2xml($data),
                 self::TYPE_CSV => self::array2csv($data),
                 self::TYPE_URL_ENCODE => http_build_query($data),

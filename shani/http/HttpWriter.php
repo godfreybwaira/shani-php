@@ -164,7 +164,7 @@ namespace shani\http {
         private function sendJsonp(?array $content, string $subtype): void
         {
             $callback = $this->app->request->query->getOne('callback', 'callback');
-            $data = $callback . '(' . json_encode($content) . ');';
+            $data = $callback . '(' . json_encode($content, JSON_UNESCAPED_SLASHES) . ');';
             $this->app->response->setBody($data, $subtype);
         }
 

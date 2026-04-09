@@ -9,6 +9,7 @@
 
 namespace gui {
 
+    use gui\pwa\PwaBuilder;
     use lib\ds\map\MutableMap;
 
     final class WebUIBuilder
@@ -23,6 +24,7 @@ namespace gui {
         private ?array $dictionary = null;
         private ?string $viewPath, $title;
         private ?\JsonSerializable $data;
+        private ?PwaBuilder $pwaBuilder = null;
         private array $scripts, $styles;
         private array $details = [];
         private string $icon;
@@ -39,6 +41,26 @@ namespace gui {
             $this->style('/css/icons/mdi.css');
             $this->script('/js/shani-ob-2.0.js', ['defer']);
             $this->script('/js/app.js', ['defer']);
+        }
+
+        /**
+         * Get Progressive Web Application (PWA) object
+         * @return PwaBuilder|null
+         */
+        public function getPwaBuilder(): ?PwaBuilder
+        {
+            return $this->pwaBuilder;
+        }
+
+        /**
+         * Convert your application to Progressive Web Application (PWA)
+         * @param PwaBuilder $builder
+         * @return self
+         */
+        public function setPwaBuilder(PwaBuilder $builder): self
+        {
+            $this->pwaBuilder = $builder;
+            return $this;
         }
 
         /**

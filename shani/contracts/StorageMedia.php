@@ -19,9 +19,19 @@ namespace shani\contracts {
          * only by a file owner
          * @param File $file A file object to save
          * @param string $bucket A destination directory
+         * @param bool $rename Whether to rename the file or not (recommended)
          * @return string|null Path to a saved file.
          */
-        public function save(File $file, string $bucket = '/'): string;
+        public function save(File $file, string $bucket = '/', bool $rename = true): string;
+
+        /**
+         * Save a file with a public access.
+         * @param File $file A file object to save
+         * @param string $bucket A destination directory
+         * @param bool $rename Whether to rename the file or not (recommended)
+         * @return string|null Path to a saved file.
+         */
+        public function savePublic(File $file, string $bucket = '/', bool $rename = true): string;
 
         /**
          * Get file URL

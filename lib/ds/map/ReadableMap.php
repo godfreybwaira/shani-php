@@ -60,7 +60,7 @@ namespace lib\ds\map {
         #[\Override]
         public function __toString()
         {
-            return json_encode($this);
+            return json_encode($this, JSON_UNESCAPED_SLASHES);
         }
 
         /**
@@ -120,9 +120,9 @@ namespace lib\ds\map {
         public function toJson(bool $pretty = false): string
         {
             if ($pretty) {
-                return json_encode($this->data, JSON_PRETTY_PRINT);
+                return json_encode($this->data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
-            return json_encode($this->data);
+            return json_encode($this->data, JSON_UNESCAPED_SLASHES);
         }
 
         public function toDataGrid(): string

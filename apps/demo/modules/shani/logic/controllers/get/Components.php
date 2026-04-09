@@ -9,6 +9,7 @@
 
 namespace apps\demo\modules\shani\logic\controllers\get {
 
+    use gui\pwa\PwaBuilder;
     use gui\WebUIBuilder;
     use lib\client\HttpClient;
     use lib\http\HttpHeader;
@@ -33,6 +34,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
+                    ->setPwaBuilder(new PwaBuilder('/sw/0/sw/0/manifest.json', '/sw.js'))
                     ->view('/body');
             $this->app->writer->send($builder);
         }

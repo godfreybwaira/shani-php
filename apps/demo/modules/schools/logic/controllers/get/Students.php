@@ -39,7 +39,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
                 $this->app->response->setBody('Cart is empty. Come back next time.');
                 $this->app->writer->send();
             } else {
-                $this->app->writer->send($cart);
+                $this->app->writer->send($this->app->framework->config);
             }
         }
 
