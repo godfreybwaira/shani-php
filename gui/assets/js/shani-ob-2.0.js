@@ -228,7 +228,12 @@
             if (body !== undefined) {
                 const isInput = ['INPUT', 'TEXTAREA'].includes(target.tagName);
                 const output = params.output || isInput ? 'value' : params.escape ? 'textContent' : 'innerHTML';
-                const content = body instanceof Element ? body.outerHTML : body;
+                let content = body instanceof Element ? body.outerHTML : typeof body === 'object' ? JSON.stringify(body, null, 4) : body;
+                if (params.wrapper) {
+                    const wrapper = doc.createElement(params.wrapper);
+                    Utils.setNodeValue(wrapper, output, content);
+                    content = wrapper.outerHTML;
+                }
                 if (params.mode === 'replace') {
                     return Utils.setNodeValue(target, output, content);
                 }

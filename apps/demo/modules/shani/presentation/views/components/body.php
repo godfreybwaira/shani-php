@@ -2,7 +2,7 @@
     <div class="tab-menu menubar" id="parent1" shani-on="ui-select->ui.select active-class:active">
         <a href="/shani/0/components/0/generator" shani-cache="age:5s"
            class="active menu-item" data-maxage="30s"
-           shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull>>#content;httpend->ui.loader.rmv name:loader-spin>>#content;
+           shani-on="click->util.trigger ui-select>>#parent1;util.trigger->http.pull wrapper:pre>>#content;httpend->ui.loader.rmv name:loader-spin>>#content;
            httpstart->ui.loader name:loader-spin&size:2.5rem>>#content;">
             <i class="mdi mdi-cog"></i>
             <span class="font-sm menu-label">Generator</span>
