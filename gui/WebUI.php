@@ -125,7 +125,7 @@ namespace gui {
             $pwaBuilder = $this->builder->getPwaBuilder();
             if ($pwaBuilder !== null) {
                 $head .= '<link rel="manifest" href="' . $this->app->storage()->url($pwaBuilder->manifest) . '"/>';
-                $head .= '<script>if ("serviceWorker" in navigator)navigator.serviceWorker.register("';
+                $head .= '<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("';
                 $head .= $this->app->storage()->url($pwaBuilder->serviceWorker) . '",{scope:"' . $pwaBuilder->scope . '"});</script>';
             }
             $styles = $this->builder->getStyles();
