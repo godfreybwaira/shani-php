@@ -23,7 +23,7 @@ namespace shani\servers\swoole {
             $this->writer = $writer;
         }
 
-        public function sendHeaders(ResponseEntity &$res): self
+        public function sendHeaders(ResponseEntity $res): self
         {
             if ($this->writer->isWritable()) {
                 $status = $res->status();
@@ -36,24 +36,24 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function send(ResponseEntity &$res): self
+        public function send(ResponseEntity $res): self
         {
             return $this->sendHeaders($res)->sendBody($res);
         }
 
-        public function sendBody(ResponseEntity &$res): self
+        public function sendBody(ResponseEntity $res): self
         {
             $this->writer->write($res->body());
             return $this;
         }
 
-        public function close(ResponseEntity &$res): self
+        public function close(ResponseEntity $res): self
         {
             $this->sendHeaders($res)->writer->end($res->body());
             return $this;
         }
 
-        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
+        public function streamFile(ResponseEntity $res, string $filepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res)->writer->sendfile($filepath, $startByte, $chunkSize);
             return $this;

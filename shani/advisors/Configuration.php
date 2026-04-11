@@ -36,7 +36,7 @@ namespace shani\advisors {
         private ?string $permissionList, $userId;
         protected readonly App $app;
 
-        protected function __construct(App &$app)
+        protected function __construct(App $app)
         {
             $this->app = $app;
             $this->userId = null;

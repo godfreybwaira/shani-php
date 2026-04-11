@@ -19,28 +19,28 @@ namespace shani\contracts {
          * @param ResponseEntity $res Response object
          * @return self
          */
-        public function send(ResponseEntity &$res): self;
+        public function send(ResponseEntity $res): self;
 
         /**
          * Send HTTP response headers to client application
          * @param ResponseEntity $res Response object
          * @return self
          */
-        public function sendHeaders(ResponseEntity &$res): self;
+        public function sendHeaders(ResponseEntity $res): self;
 
         /**
          * Send HTTP response body to client application
          * @param ResponseEntity $res Response object
          * @return self
          */
-        public function sendBody(ResponseEntity &$res): self;
+        public function sendBody(ResponseEntity $res): self;
 
         /**
          * Send the HTTP output (headers and body) to a client application and close connection
          * @param ResponseEntity $res Response object
          * @return self
          */
-        public function close(ResponseEntity &$res): self;
+        public function close(ResponseEntity $res): self;
 
         /**
          * Send a file in a small chunks to a client application. This is useful
@@ -51,7 +51,7 @@ namespace shani\contracts {
          * @param int $chunkSize Size of a chunk to send
          * @return self
          */
-        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self;
+        public function streamFile(ResponseEntity $res, string $filepath, int $startByte, int $chunkSize): self;
     }
 
 }

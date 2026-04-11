@@ -31,7 +31,7 @@ namespace apps\demo\config {
     final class Settings extends Configuration
     {
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             parent::__construct($app);
         }

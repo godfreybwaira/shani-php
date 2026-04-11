@@ -24,7 +24,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         private readonly App $app;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
         }
@@ -34,7 +34,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
-                    ->setPwaBuilder(new PwaBuilder('/sw/0/sw/0/manifest.json', '/sw.js'))
+                    ->setPwaBuilder(new PwaBuilder('/pwa/0/manifest.json', '/pwa/0/sw.js'))
                     ->view('/body');
             $this->app->writer->send($builder);
         }

@@ -42,6 +42,7 @@ namespace gui\pwa {
             $this->data['short_name'] = $appShortName;
             $this->data['id'] = $appId->asString();
             $this->data['start_url'] = '/';
+            $this->data['scope'] = '/';
             $this->data['display'] = PwaDisplayMode::STANDALONE->value;
             $this->data['dir'] = PwaTextDirection::AUTO->value;
             $this->data['lang'] = 'en-US';
@@ -112,6 +113,7 @@ namespace gui\pwa {
         /** @param string $scope The URL prefix that the browser considers "inside" the app */
         public function setScope(string $scope): self
         {
+            $this->data['start_url'] = $scope;
             $this->data['scope'] = $scope;
             return $this;
         }
@@ -149,10 +151,10 @@ namespace gui\pwa {
          * Adds an app screenshot used in the "Rich Install" UI.
          * @param string $src URL to the image.
          * @param PwaDimension $sizes Dimensions of the image.
-         * @param string|null $label Accessibility label describing the screenshot.
          * @param PwaFormFactor $formFactor Specifies if this is for 'wide' (desktop) or 'narrow' (mobile).
+         * @param string|null $label Accessibility label describing the screenshot.
          */
-        public function addScreenshot(string $src, PwaDimension $sizes, ?string $label = null, PwaFormFactor $formFactor = PwaFormFactor::NARROW): self
+        public function addScreenshot(string $src, PwaDimension $sizes, PwaFormFactor $formFactor, ?string $label = null): self
         {
             $screenshot = [
                 'src' => $src,

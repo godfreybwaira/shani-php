@@ -24,7 +24,7 @@ namespace shani\advisors {
 
         private readonly App $app;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
             $this->app->response->header()->addAll([

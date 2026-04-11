@@ -7,55 +7,45 @@
  * Created on: Jun 12, 2025 at 1:57:16 PM
  */
 
-namespace apps\demo\modules\sw\logic\controllers\get {
+namespace apps\demo\modules\pwa\logic\controllers\get {
 
-    use gui\pwa\PwaAppPlatform;
-    use gui\pwa\PwaCategory;
+    use gui\pwa\enums\PwaAppPlatform;
+    use gui\pwa\enums\PwaCategory;
+    use gui\pwa\enums\PwaDisplayMode;
+    use gui\pwa\enums\PwaFormFactor;
+    use gui\pwa\enums\PwaIconPurpose;
+    use gui\pwa\enums\PwaOrientation;
+    use gui\pwa\enums\PwaTextDirection;
     use gui\pwa\PwaDimension;
-    use gui\pwa\PwaDisplayMode;
     use gui\pwa\PwaIcon;
-    use gui\pwa\PwaIconPurpose;
     use gui\pwa\PwaManifestBuilder;
-    use gui\pwa\PwaOrientation;
     use gui\pwa\PwaRelatedApplication;
-    use gui\pwa\PwaTextDirection;
-    use gui\WebUI;
     use shani\http\App;
 
-    final class Sw
+    final class Manifest
     {
 
         private readonly App $app;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
         }
 
         public function index(): void
         {
-            $file = WebUI::assetPath('/js/pwa-sw.js');
-            $this->app->response->setBody(file_get_contents($file));
-            $this->app->writer->send();
-        }
-
-        public function manifest(): void
-        {
             $builder = new PwaManifestBuilder('Shani yangu maanani', 'Shani', $this->app->request->uri);
-            $dimension = new PwaDimension(120);
-            $icon = new PwaIcon('/img/pic.png', $dimension, [
-                PwaIconPurpose::ANY, PwaIconPurpose::MASKABLE
-            ]);
-            $icon2 = new PwaIcon('/img/pic22.png', $dimension, [
-                PwaIconPurpose::ANY
-            ]);
+            $dimension = new PwaDimension(1024);
+            $anyIcon = new PwaIcon('https://maskable.app/demo/proxx.png', $dimension, PwaIconPurpose::ANY);
+            $maskableIcon = new PwaIcon('https://maskable.app/demo/proxx.png', $dimension, PwaIconPurpose::MASKABLE);
             $apps = [
                 new PwaRelatedApplication(PwaAppPlatform::PLAY, $this->app->request->uri, 'com.app.id1'),
                 new PwaRelatedApplication(PwaAppPlatform::ITUNES, $this->app->request->uri, 'com.app.id2'),
             ];
-            $builder->addIcon($icon, $icon2)
-                    ->addProtocolHandler('web', $this->app->request->uri->asString())
-                    ->addScreenshot('/img/pic2.png', $dimension, 'No label')
+            $builder->addIcon($anyIcon, $maskableIcon)
+                    ->addProtocolHandler('web+myapp', '/app?a=%s')
+                    ->addScreenshot('https://maskable.app/demo/proxx.png', $dimension, PwaFormFactor::WIDE)
+                    ->addScreenshot('https://maskable.app/demo/proxx.png', $dimension, PwaFormFactor::NARROW)
                     ->setBackgroundColor('#938ca3')
                     ->setCategories(PwaCategory::BUSINESS, PwaCategory::FINANCE, 'other')
                     ->setDescription('My app description goes here.')
@@ -64,7 +54,7 @@ namespace apps\demo\modules\sw\logic\controllers\get {
                     ->setLanguage('sw')
                     ->setOrientation(PwaOrientation::PORTRAIT_PRIMARY)
                     ->setRelatedApplications(true, ...$apps)
-                    ->setScope('App Scope')
+                    ->setScope('/')
                     ->setTextDirection(PwaTextDirection::AUTO)
                     ->setThemeColor('#aaccbb');
             $this->app->writer->send($builder->build());

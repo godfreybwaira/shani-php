@@ -21,7 +21,7 @@ namespace shani\http {
         private readonly App $app;
         private readonly Event $listener;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
             $this->listener = new Event(['before', 'after']);

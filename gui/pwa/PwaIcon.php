@@ -17,13 +17,13 @@ namespace gui\pwa {
 
         private array $data;
 
-        public function __construct(string $src, PwaDimension $sizes, array $purposes = [PwaIconPurpose::ANY])
+        public function __construct(string $src, PwaDimension $sizes, PwaIconPurpose $purpose = PwaIconPurpose::ANY)
         {
             $this->data = [
                 'src' => $src,
                 'sizes' => $sizes->asString(),
                 'type' => MediaType::fromFilename($src),
-                'purpose' => implode(' ', array_map(fn(PwaIconPurpose $p) => $p->value, $purposes))
+                'purpose' => $purpose->value
             ];
         }
 

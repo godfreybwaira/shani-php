@@ -61,6 +61,7 @@ namespace lib\http {
         public const REFERRER_POLICY = 'Referrer-Policy';
         public const RETRY_AFTER = 'Retry-After';
         public const SERVER = 'Server';
+        public const SERVICE_WORKER_ALLOWED = 'Service-Worker-Allowed';
         public const SET_COOKIE = 'Set-Cookie';
         public const SET_COOKIE2 = 'Set-Cookie2';
         public const STRICT_TRANSPORT_SECURITY = 'Strict-Transport-Security';

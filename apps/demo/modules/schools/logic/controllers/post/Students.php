@@ -20,7 +20,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
         private readonly App $app;
         private readonly StudentService $service;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
             $this->service = StudentService::getObject();

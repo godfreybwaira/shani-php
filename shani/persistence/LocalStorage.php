@@ -34,7 +34,7 @@ namespace shani\persistence {
         private readonly App $app;
         private readonly string $host, $storage;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
             $this->host = $app->request->uri->host();
@@ -73,7 +73,7 @@ namespace shani\persistence {
          * @param App $app Application object
          * @return bool True on success, false otherwise.
          */
-        public static function tryServe(App &$app): bool
+        public static function tryServe(App $app): bool
         {
             $path = $app->request->uri->path();
             $prefix = self::getPrefix($path);
@@ -90,7 +90,7 @@ namespace shani\persistence {
             }
         }
 
-        private static function serveProtected(App &$app, string $filepath): bool
+        private static function serveProtected(App $app, string $filepath): bool
         {
             if (!$app->config->isAuthenticated()) {
                 throw CustomException::forbidden($app);
@@ -118,7 +118,7 @@ namespace shani\persistence {
             ];
         }
 
-        private static function sendFile(App &$app, string $filepath): bool
+        private static function sendFile(App $app, string $filepath): bool
         {
             $output = null;
             $etag = md5($app->request->uri->path());

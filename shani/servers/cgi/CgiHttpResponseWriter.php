@@ -15,7 +15,7 @@ namespace shani\servers\cgi {
     final class CgiHttpResponseWriter implements ResponseWriter
     {
 
-        public function sendHeaders(ResponseEntity &$res): self
+        public function sendHeaders(ResponseEntity $res): self
         {
             if (!headers_sent()) {
                 $status = $res->status();
@@ -33,24 +33,24 @@ namespace shani\servers\cgi {
             return $this;
         }
 
-        public function send(ResponseEntity &$res): self
+        public function send(ResponseEntity $res): self
         {
             return $this->sendHeaders($res)->sendBody($res);
         }
 
-        public function close(ResponseEntity &$res): self
+        public function close(ResponseEntity $res): self
         {
             return $this->send($res);
         }
 
-        public function sendBody(ResponseEntity &$res): self
+        public function sendBody(ResponseEntity $res): self
         {
             echo $res->body();
             self::flush();
             return $this;
         }
 
-        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
+        public function streamFile(ResponseEntity $res, string $filepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res);
             $stream = fopen($filepath, 'rb');

@@ -25,7 +25,7 @@ namespace shani\servers\swoole {
             $this->connectionId = $connId;
         }
 
-        public function sendHeaders(ResponseEntity &$res): self
+        public function sendHeaders(ResponseEntity $res): self
         {
             $status = $res->status();
             $firstLine = $res->protocol . ' ' . $status->value . ' ' . ($res->statusMessage() ?? $status->getMessage());
@@ -35,24 +35,24 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        public function send(ResponseEntity &$res): self
+        public function send(ResponseEntity $res): self
         {
             return $this->sendHeaders($res)->sendBody($res);
         }
 
-        public function sendBody(ResponseEntity &$res): self
+        public function sendBody(ResponseEntity $res): self
         {
             $this->writer->push($this->connectionId, $res->body());
             return $this;
         }
 
-        public function close(ResponseEntity &$res): self
+        public function close(ResponseEntity $res): self
         {
             $this->send($res)->writer->close($this->connectionId);
             return $this;
         }
 
-        public function streamFile(ResponseEntity &$res, string $filepath, int $startByte, int $chunkSize): self
+        public function streamFile(ResponseEntity $res, string $filepath, int $startByte, int $chunkSize): self
         {
             $this->sendHeaders($res);
             $stream = fopen($filepath, 'rb');

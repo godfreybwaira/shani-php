@@ -28,7 +28,7 @@ namespace gui {
         private readonly WebUIBuilder $builder;
         private readonly App $app;
 
-        private function __construct(App &$app, WebUIBuilder &$builder)
+        private function __construct(App $app, WebUIBuilder $builder)
         {
             $this->app = $app;
             $this->builder = $builder;
@@ -89,7 +89,7 @@ namespace gui {
          * @param WebUIBuilder $builder UI builder object
          * @return string The HTML string
          */
-        public static function render(App &$app, WebUIBuilder &$builder): string
+        public static function render(App $app, WebUIBuilder $builder): string
         {
             $web = new WebUI($app, $builder);
             ob_start();
@@ -125,7 +125,8 @@ namespace gui {
             $pwaBuilder = $this->builder->getPwaBuilder();
             if ($pwaBuilder !== null) {
                 $head .= '<link rel="manifest" href="' . $this->app->storage()->url($pwaBuilder->manifest) . '"/>';
-                $head .= '<script defer src="' . $this->app->storage()->url($pwaBuilder->serviceWorker) . '"></script>';
+                $head .= '<script>if ("serviceWorker" in navigator)navigator.serviceWorker.register("';
+                $head .= $this->app->storage()->url($pwaBuilder->serviceWorker) . '",{scope:"' . $pwaBuilder->scope . '"});</script>';
             }
             $styles = $this->builder->getStyles();
             foreach ($styles as $url => $attr) {
@@ -151,7 +152,7 @@ namespace gui {
             self::loadLayout($this, $navbar, $body, $id, $menu);
         }
 
-        private static function loadLayout(WebUI &$web, string $navbar_, string $body_, ?string $id_, ?string $menu_): void
+        private static function loadLayout(WebUI $web, string $navbar_, string $body_, ?string $id_, ?string $menu_): void
         {
             require Framework::DIR_GUI . '/html/layout.php';
         }
@@ -170,7 +171,7 @@ namespace gui {
             return $this;
         }
 
-        private static function load(WebUI &$web, string $loadedFile): void
+        private static function load(WebUI $web, string $loadedFile): void
         {
             require $loadedFile;
         }

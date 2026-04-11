@@ -22,7 +22,7 @@ namespace shani\documentation {
          * @param App $app Application object
          * @param array $exclusion List of modules to exclude
          */
-        public function __construct(App &$app, array $exclusion = [])
+        public function __construct(App $app, array $exclusion = [])
         {
             $moduleDir = $app->config->root() . $app->config->moduleDir();
             $moduleCollection = Modules::scan($moduleDir, $exclusion);

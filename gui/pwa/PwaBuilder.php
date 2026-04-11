@@ -14,9 +14,11 @@ namespace gui\pwa {
 
         public readonly string $manifest;
         public readonly string $serviceWorker;
+        public readonly string $scope;
 
-        public function __construct(string $manifest, string $serviceWorker)
+        public function __construct(string $manifest, string $serviceWorker, string $scope = '/')
         {
+            $this->scope = $scope;
             $this->manifest = $manifest;
             $this->serviceWorker = $serviceWorker;
         }

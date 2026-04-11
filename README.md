@@ -111,7 +111,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
     {
         private readonly App $app;
 
-        public function __construct(App &$app)
+        public function __construct(App $app)
         {
             $this->app = $app;
         }
@@ -197,7 +197,7 @@ namespace apps\demo\config {
 
     final class DevSettings extends Configuration
     {
-        public function __construct(App &$app, array &$configurations)
+        public function __construct(App $app, array &$configurations)
         {
             parent::__construct($app, $configurations);
         }

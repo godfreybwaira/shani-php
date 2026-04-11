@@ -18,7 +18,7 @@ document.addEventListener('shani:init', () => {
     Shani.define('evt-delay', 'delay:0.01s');
     Shani.define('modal-specs', 'id:mdl123&classes:modal modal-type-c width-sm-10 height-sm-10 pos-c&close-btn:pos-tr');
     Shani.define('loader-circle-specs', 'name:loader-spin&size:2.5rem');
-    Shani.define('loader-bar-specs', 'name:loader-top&color:red&size:.2rem');
+    Shani.define('loader-bar-specs', 'name:loader-top&color:red&size:.2rem&thickness:.3rem');
     Shani.define('loader-black', 'name:loader-spin&color:#000&size:2.5rem');
     Shani.define('saved-file', 'name:file.txt&type:text/plain');
     Shani.define('http-name', 'aaa');
