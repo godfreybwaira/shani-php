@@ -20,6 +20,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
     use gui\pwa\PwaIcon;
     use gui\pwa\PwaManifestBuilder;
     use gui\pwa\PwaRelatedApplication;
+    use lib\ds\map\ReadableMap;
     use shani\http\App;
 
     final class Manifest
@@ -32,7 +33,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): void
+        public function index(): ReadableMap
         {
             $builder = new PwaManifestBuilder('Shani yangu maanani', 'Shani', $this->app->request->uri);
             $dimension = new PwaDimension(1024);
@@ -57,7 +58,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
                     ->setScope('/')
                     ->setTextDirection(PwaTextDirection::AUTO)
                     ->setThemeColor('#aaccbb');
-            $this->app->writer->send($builder->build());
+            return $builder->build();
         }
     }
 
