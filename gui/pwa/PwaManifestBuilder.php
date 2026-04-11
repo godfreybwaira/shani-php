@@ -9,6 +9,12 @@
 
 namespace gui\pwa {
 
+    use gui\pwa\enums\PwaCategory;
+    use gui\pwa\enums\PwaDisplayMode;
+    use gui\pwa\enums\PwaDisplayOverride;
+    use gui\pwa\enums\PwaFormFactor;
+    use gui\pwa\enums\PwaOrientation;
+    use gui\pwa\enums\PwaTextDirection;
     use lib\ds\map\ReadableMap;
     use lib\MediaType;
     use lib\URI;

@@ -9,6 +9,7 @@
 
 namespace gui\pwa {
 
+    use gui\pwa\enums\PwaAppPlatform;
     use lib\URI;
 
     final class PwaRelatedApplication

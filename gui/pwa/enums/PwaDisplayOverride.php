@@ -7,7 +7,7 @@
  * Created on: Apr 8, 2026 at 1:37:06 PM
  */
 
-namespace gui\pwa {
+namespace gui\pwa\enums {
 
     enum PwaDisplayOverride: string
     {

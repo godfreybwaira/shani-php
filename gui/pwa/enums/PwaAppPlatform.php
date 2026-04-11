@@ -7,7 +7,7 @@
  * Created on: Apr 9, 2026 at 12:25:50 PM
  */
 
-namespace gui\pwa {
+namespace gui\pwa\enums {
 
     enum PwaAppPlatform: string
     {

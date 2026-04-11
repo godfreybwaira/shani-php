@@ -35,7 +35,7 @@ namespace shani\http {
         public readonly string $action;
         public readonly ?string $extension;
 
-        private function __construct(string $module, string $controller, string $action, array $params, ?string $extension)
+        public function __construct(string $module, string $controller, string $action, array $params = [], ?string $extension = null)
         {
             $this->params = $params;
             $this->module = $module;

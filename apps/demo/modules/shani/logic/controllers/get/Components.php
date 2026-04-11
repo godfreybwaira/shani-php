@@ -111,6 +111,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
             sleep(2);
             $doc = new Documentation($this->app);
+            $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $this->app->writer->send($doc);
         }
 

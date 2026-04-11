@@ -7,7 +7,7 @@
  * Created on: Apr 8, 2026 at 2:34:31 PM
  */
 
-namespace gui\pwa {
+namespace gui\pwa\enums {
 
     enum PwaCategory: string
     {

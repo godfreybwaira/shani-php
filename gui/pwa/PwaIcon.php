@@ -9,6 +9,7 @@
 
 namespace gui\pwa {
 
+    use gui\pwa\enums\PwaIconPurpose;
     use lib\MediaType;
 
     final class PwaIcon
