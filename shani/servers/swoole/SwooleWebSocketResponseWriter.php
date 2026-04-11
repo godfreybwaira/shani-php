@@ -18,6 +18,7 @@ namespace shani\servers\swoole {
 
         private readonly Server $writer;
         private readonly int $connectionId;
+        private bool $closed = false;
 
         public function __construct(Server &$writer, int $connId)
         {
@@ -48,7 +49,7 @@ namespace shani\servers\swoole {
 
         public function close(ResponseEntity $res): self
         {
-            $this->send($res)->writer->close($this->connectionId);
+            $this->closed = $this->send($res)->writer->close($this->connectionId);
             return $this;
         }
 
@@ -62,6 +63,11 @@ namespace shani\servers\swoole {
             }
             fclose($stream);
             return $this;
+        }
+
+        public function isClosed(): bool
+        {
+            return $this->closed;
         }
     }
 

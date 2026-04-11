@@ -14,12 +14,12 @@ namespace shani\servers\cgi {
     final class CgiConcurrency implements ConcurrencyInterface
     {
 
-        public function async(callable $callback): void
+        public function async(\Closure $callback): void
         {
             $callback();
         }
 
-        public function parallel(callable $callback): void
+        public function parallel(\Closure $callback): void
         {
             $callback();
         }

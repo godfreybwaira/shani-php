@@ -142,10 +142,10 @@ namespace gui\v2 {
 
         /**
          * Remove child element from this component.
-         * @param callable $cb A callback function with signature <code>$cb(Component $child):bool</code>
+         * @param \Closure $cb A callback function with signature <code>$cb(Component $child):bool</code>
          * @return self
          */
-        public function removeChild(callable $cb): self
+        public function removeChild(\Closure $cb): self
         {
             foreach ($this->children as $idx => $kid) {
                 if ($cb($kid)) {

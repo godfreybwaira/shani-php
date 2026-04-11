@@ -41,7 +41,7 @@ namespace lib\ds\map {
             return !empty($absentKeys) ? $absentKeys : null;
         }
 
-        public function existsWhere(callable $callback): bool
+        public function existsWhere(\Closure $callback): bool
         {
             foreach ($this->data as $key => $value) {
                 if ($callback($key, $value)) {
@@ -84,7 +84,7 @@ namespace lib\ds\map {
             return isset($this->data[$key]) && (bool) $this->data[$key];
         }
 
-        public function where(callable $callback, ?int $limit = null): array
+        public function where(\Closure $callback, ?int $limit = null): array
         {
             $rows = [];
             $count = 0;
@@ -170,7 +170,7 @@ namespace lib\ds\map {
             return $rows;
         }
 
-        public function reduce(callable $callback, $initialValue = null)
+        public function reduce(\Closure $callback, $initialValue = null)
         {
             $accumulator = $initialValue;
             foreach ($this->data as $key => $value) {
@@ -208,7 +208,7 @@ namespace lib\ds\map {
             }
         }
 
-        public function each(callable $callback): self
+        public function each(\Closure $callback): self
         {
             foreach ($this->data as $key => $value) {
                 $callback($key, $value);

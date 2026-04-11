@@ -70,6 +70,11 @@ namespace shani\servers\cgi {
                 ob_flush();
             }
         }
+
+        public function isClosed(): bool
+        {
+            return headers_sent();
+        }
     }
 
 }

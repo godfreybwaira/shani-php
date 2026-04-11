@@ -132,10 +132,10 @@ namespace shani\http {
          * depending on type of application needs. Client application can supply
          * this context via accept-version header.
          * @param string $version Application execution context.
-         * @param callable $cb A callback to execute that accept application object as an argument.
+         * @param \Closure $cb A callback to execute that accept application object as an argument.
          * @return self
          */
-        public function on(string $version, callable $cb): self
+        public function on(string $version, \Closure $cb): self
         {
             if ($this->platform() === $version) {
                 $cb($this);
@@ -253,7 +253,14 @@ namespace shani\http {
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);
             }
-            $obj->$callback();
+            $response = $obj->$callback();
+            if (!$this->writer->isClosed()) {
+                if ($response instanceof \Closure) {
+                    $this->writer->stream($response);
+                } else {
+                    $this->writer->send($response);
+                }
+            }
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string

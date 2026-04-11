@@ -31,6 +31,15 @@ namespace shani\http {
         }
 
         /**
+         * Check whether the output is already sent and the response writer is closed
+         * @return bool True on success, false otherwise.
+         */
+        public function isClosed(): bool
+        {
+            return $this->writer->isClosed();
+        }
+
+        /**
          * Send content to a client application
          * @param \JsonSerializable|WebUIBuilder|FileOutput|null $output Output
          * object to send
@@ -57,11 +66,11 @@ namespace shani\http {
 
         /**
          * Stream data to client application. To stop streaming return null on $callback
-         * @param callable $callback A callback to handle streaming. This callback
+         * @param \Closure $callback A callback to handle streaming. This callback
          * has the following signature <code>$callback():?\JsonSerializable|WebUIBuilder|string</code>
          * @return void
          */
-        public function stream(callable $callback): void
+        public function stream(\Closure $callback): void
         {
             $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
             $subtype = $this->app->response->subtype();

@@ -15,19 +15,19 @@ namespace shani\contracts {
 
         /**
          * Start a web server
-         * @param callable $callback A callback to run when a server started.
+         * @param \Closure $callback A callback to run when a server started.
          * i.e <code>$callback():void</code>
          * @return void
          */
-        public function start(callable $callback): void;
+        public function start(\Closure $callback): void;
 
         /**
          * Called when a web server receive new request
-         * @param callable $callback A callback to run when a new request is received
+         * @param \Closure $callback A callback to run when a new request is received
          * i.e <code>$callback(RequestEntity $request, ResponseWriter $writer):void</code>
          * @return self
          */
-        public function request(callable $callback): self;
+        public function request(\Closure $callback): self;
 
         /**
          * Return concurrency handler for a web server that supports concurrency

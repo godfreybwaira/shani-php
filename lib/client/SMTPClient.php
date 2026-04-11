@@ -215,11 +215,11 @@ namespace lib\client {
 
         /**
          * Send e-mail to destination(s)
-         * @param callable $callback A callback for error handling with the following
+         * @param \Closure $callback A callback for error handling with the following
          * signature <code>$callback(int|null $errorCode, string|null $errorMessage):void</code>
          * @return void
          */
-        public function send(callable $callback = null): void
+        public function send(\Closure $callback = null): void
         {
             \lib\Concurrency::parallel(function () use (&$callback) {
                 $this->conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);

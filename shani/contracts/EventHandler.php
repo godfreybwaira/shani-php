@@ -12,7 +12,7 @@ namespace shani\contracts {
     interface EventHandler
     {
 
-        public function dispatch(array $callbacks, callable $finish, ...$params): self;
+        public function dispatch(array $callbacks, \Closure $finish, ...$params): self;
     }
 
 }

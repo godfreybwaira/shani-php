@@ -43,6 +43,12 @@ namespace shani\contracts {
         public function close(ResponseEntity $res): self;
 
         /**
+         * Check whether the output is already sent and the response writer is closed
+         * @return bool True on success, false otherwise.
+         */
+        public function isClosed(): bool;
+
+        /**
          * Send a file in a small chunks to a client application. This is useful
          * when the file being sent is too large
          * @param ResponseEntity $res Response object

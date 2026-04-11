@@ -84,7 +84,7 @@ namespace shani\servers\swoole {
             }
         }
 
-        public function start(callable $callback): void
+        public function start(\Closure $callback): void
         {
             $this->server->on('start', $callback);
             $this->server->on('open', function (Server $server, Request $req) {
@@ -98,7 +98,7 @@ namespace shani\servers\swoole {
             $this->server->start();
         }
 
-        public function request(callable $callback): self
+        public function request(\Closure $callback): self
         {
             $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';

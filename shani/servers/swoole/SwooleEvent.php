@@ -14,7 +14,7 @@ namespace shani\servers\swoole {
     class SwooleEvent implements EventHandler
     {
 
-        public function dispatch(array $callbacks, callable $finish, ...$params): self
+        public function dispatch(array $callbacks, \Closure $finish, ...$params): self
         {
             $size = count($callbacks);
             $ch = new \Swoole\Coroutine\Channel($size);

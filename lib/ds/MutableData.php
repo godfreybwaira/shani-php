@@ -57,20 +57,20 @@ namespace lib\ds {
 
         /**
          * Delete all items which satisfies the condition provided by the callback function.
-         * @param callable $callback A callback function i.e <code>$callback(string|int $key, mixed $value):bool</code>
+         * @param \Closure $callback A callback function i.e <code>$callback(string|int $key, mixed $value):bool</code>
          * for a map and <code>$callback(mixed $value):bool</code> for set.
          * @return self
          */
-        public function deleteWhere(callable $callback): self;
+        public function deleteWhere(\Closure $callback): self;
 
         /**
          * Apply a callback function for each value of a collection i.e array.
          * The returned value of a function overwrites the current value.
-         * @param callable $callback A callback function i.e <code>$callback(string|int $key, mixed $value):mixed</code>
+         * @param \Closure $callback A callback function i.e <code>$callback(string|int $key, mixed $value):mixed</code>
          * for a map and <code>$callback(mixed $value):mixed</code> for set.
          * @return self A new object
          */
-        public function map(callable $callback): self;
+        public function map(\Closure $callback): self;
     }
 
 }

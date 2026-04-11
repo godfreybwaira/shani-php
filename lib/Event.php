@@ -42,10 +42,10 @@ namespace lib {
         /**
          * Register an event to be fired asynchronous
          * @param string $event Event to register
-         * @param callable $callback A callback to execute during the event execution.
+         * @param \Closure $callback A callback to execute during the event execution.
          * @return self
          */
-        public function on(string $event, callable $callback): self
+        public function on(string $event, \Closure $callback): self
         {
             if ($this->supported($event)) {
                 $this->callbacks[$event][] = $callback;
@@ -57,10 +57,10 @@ namespace lib {
          * Register an event to be fired asynchronous. Once the event is triggered, it will be
          * removed.
          * @param string $event Event to register
-         * @param callable $callback A callback to execute during the event execution.
+         * @param \Closure $callback A callback to execute during the event execution.
          * @return self
          */
-        public function once(string $event, callable $callback): self
+        public function once(string $event, \Closure $callback): self
         {
             if (empty($this->callbacks[$event]) && $this->supported($event)) {
                 $this->callbacks[$event] = $callback;
@@ -81,10 +81,10 @@ namespace lib {
 
         /**
          * Register a callback function to be triggered when an event is finished
-         * @param callable $cb A callback function
+         * @param \Closure $cb A callback function
          * @return self
          */
-        public function done(callable $cb): self
+        public function done(\Closure $cb): self
         {
             $this->onDone = $cb;
             return $this;
@@ -93,11 +93,11 @@ namespace lib {
         /**
          * Execute callback function when the event is finished.
          * @param string $event Event that was previously executed
-         * @param callable|null $cb A callback function to execute
+         * @param \Closure|null $cb A callback function to execute
          * @param type $data Data to pass on callback along with the event
          * @return void
          */
-        private static function finish(string $event, ?callable $cb, $data): void
+        private static function finish(string $event, ?\Closure $cb, $data): void
         {
             if ($cb !== null) {
                 $cb($event, $data);

@@ -219,11 +219,11 @@ namespace lib\client {
          * Send HTTP request using provided request method
          * @param string $method Request method e.g: GET, PUT, POST etc
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function send(string $method, string $endpoint, callable $callback): self
+        public function send(string $method, string $endpoint, \Closure $callback): self
         {
             if ($this->asyncMode) {
                 Concurrency::parallel(fn() => $this->sendSync($method, $endpoint, $callback));
@@ -233,7 +233,7 @@ namespace lib\client {
             return $this;
         }
 
-        private function sendSync(string $method, string $endpoint, callable &$callback): void
+        private function sendSync(string $method, string $endpoint, \Closure &$callback): void
         {
             $retry = 0;
             $uri = new URI($this->host . $endpoint);
@@ -258,7 +258,7 @@ namespace lib\client {
             }
         }
 
-        private function sendRequest(\CurlHandle &$curl, RequestEntity $request, string $method, callable &$callback): void
+        private function sendRequest(\CurlHandle &$curl, RequestEntity $request, string $method, \Closure &$callback): void
         {
             $this->createBody();
             $this->setOptions([
@@ -418,11 +418,11 @@ namespace lib\client {
         /**
          * Send HTTP GET request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function get(string $endpoint, callable $callback): self
+        public function get(string $endpoint, \Closure $callback): self
         {
             if ($this->body === null || empty($this->body)) {
                 return $this->send('GET', $endpoint, $callback);
@@ -434,11 +434,11 @@ namespace lib\client {
         /**
          * Send HTTP POST request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function post(string $endpoint, callable $callback): self
+        public function post(string $endpoint, \Closure $callback): self
         {
             return $this->send('POST', $endpoint, $callback);
         }
@@ -446,11 +446,11 @@ namespace lib\client {
         /**
          * Send HTTP PUT request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function put(string $endpoint, callable $callback): self
+        public function put(string $endpoint, \Closure $callback): self
         {
             return $this->send('PUT', $endpoint, $callback);
         }
@@ -458,11 +458,11 @@ namespace lib\client {
         /**
          * Send HTTP PATCH request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function patch(string $endpoint, callable $callback): self
+        public function patch(string $endpoint, \Closure $callback): self
         {
             return $this->send('PATCH', $endpoint, $callback);
         }
@@ -470,11 +470,11 @@ namespace lib\client {
         /**
          * Send HTTP DELETE request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function delete(string $endpoint, callable $callback): self
+        public function delete(string $endpoint, \Closure $callback): self
         {
             return $this->send('DELETE', $endpoint, $callback);
         }
@@ -482,11 +482,11 @@ namespace lib\client {
         /**
          * Send HTTP HEAD request to destination
          * @param string $endpoint Request destination endpoint
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @return self
          */
-        public function head(string $endpoint, callable $callback): self
+        public function head(string $endpoint, \Closure $callback): self
         {
             return $this->send('HEAD', $endpoint, $callback);
         }
@@ -496,13 +496,13 @@ namespace lib\client {
          * @param string $endpoint Request destination endpoint
          * @param string $destination Location on disk to save a file. If the file
          * exists, it will be appended.
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
-         * @param callable $progress A callback for showing progress during download.
+         * @param \Closure $progress A callback for showing progress during download.
          * It has the following syntax <code>$callback(int $totalSize, int $loaded):void</code>
          * @return self
          */
-        public function download(string $endpoint, string $destination, callable $callback, callable $progress = null): self
+        public function download(string $endpoint, string $destination, \Closure $callback, \Closure $progress = null): self
         {
             if (touch($destination)) {
                 $this->setOptions([
@@ -527,13 +527,13 @@ namespace lib\client {
          * Upload a file to remote server
          * @param string $endpoint Request destination endpoint
          * @param string $source A path to a source file to upload
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
-         * @param callable $progress A callback for showing progress during upload.
+         * @param \Closure $progress A callback for showing progress during upload.
          * It has the following syntax <code>$callback(int $totalSize, int $loaded):void</code>
          * @return self
          */
-        public function upload(string $endpoint, string $source, callable $callback, callable $progress = null): self
+        public function upload(string $endpoint, string $source, \Closure $callback, \Closure $progress = null): self
         {
             if (is_readable($source)) {
                 $this->setOptions([

@@ -58,7 +58,7 @@ namespace test {
         /**
          * Register a test case
          * @param string $description Test description
-         * @param callable $callback A callback with the following signature:
+         * @param \Closure $callback A callback with the following signature:
          * <code>$callback():bool</code>. True when test passes or false when a test fails
          * @param int $maxExecutionTime Maximum execution time (in milliseconds)
          * a single test case should take. When a test takes longer than this time
@@ -67,7 +67,7 @@ namespace test {
          * By default a test case is run only once.
          * @return self
          */
-        public function test(string $description, callable $callback, int $maxExecutionTime = 0, int $iterations = 1): self
+        public function test(string $description, \Closure $callback, int $maxExecutionTime = 0, int $iterations = 1): self
         {
             $this->maxExecutionTime = $maxExecutionTime * $iterations;
             $this->description = $description;

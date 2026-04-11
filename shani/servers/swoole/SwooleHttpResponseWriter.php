@@ -58,6 +58,11 @@ namespace shani\servers\swoole {
             $this->sendHeaders($res)->writer->sendfile($filepath, $startByte, $chunkSize);
             return $this;
         }
+
+        public function isClosed(): bool
+        {
+            return !$this->writer->isWritable();
+        }
     }
 
 }

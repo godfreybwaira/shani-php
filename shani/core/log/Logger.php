@@ -98,10 +98,10 @@ namespace shani\core\log {
 
         /**
          * Set a logger handler for handling logs
-         * @param callable $cb A callback for handling log i.e <code>$cb(LogStructure $s):?string</code>
+         * @param \Closure $cb A callback for handling log i.e <code>$cb(LogStructure $s):?string</code>
          * @return self
          */
-        public function setHandler(callable $cb): self
+        public function setHandler(\Closure $cb): self
         {
             $this->handler = $cb;
             return $this;

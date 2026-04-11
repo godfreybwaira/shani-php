@@ -39,10 +39,10 @@ namespace lib\tasks {
         /**
          * Set handler for given task event
          * @param TaskEvent $event Event name.
-         * @param callable $callback Function to execute when event is triggered.
+         * @param \Closure $callback Function to execute when event is triggered.
          * @return self
          */
-        public function on(TaskEvent $event, callable $callback): self
+        public function on(TaskEvent $event, \Closure $callback): self
         {
             $this->listener->on($event->name, $callback);
             return $this;

@@ -46,21 +46,21 @@ namespace lib\ds {
 
         /**
          * Check if all items mentioned exist in the current iterable object
-         * @param callable $callback Callback function i.e <code>$callback(string|int $key, mixed $value):bool</code>
+         * @param \Closure $callback Callback function i.e <code>$callback(string|int $key, mixed $value):bool</code>
          * for a map and <code>$callback(mixed $value):bool</code> fro set
          * @return bool Returns true if all items exists, false otherwise.
          */
-        public abstract function existsWhere(callable $callback): bool;
+        public abstract function existsWhere(\Closure $callback): bool;
 
         /**
          * Get all items which satisfies the condition provided by the callback
          * function.
-         * @param callable $callback A callback function i.e <code>$callback(string|int $key, mixed $val):bool</code>
+         * @param \Closure $callback A callback function i.e <code>$callback(string|int $key, mixed $val):bool</code>
          * for a map and <code>$callback(mixed $val):bool</code> for set
          * @param int|null $limit When to stop finding
          * @return array A list if items
          */
-        public abstract function where(callable $callback, ?int $limit = null): array;
+        public abstract function where(\Closure $callback, ?int $limit = null): array;
 
         /**
          * Get an iterable object as array
@@ -99,20 +99,20 @@ namespace lib\ds {
         /**
          * Reduce an array to a scalar value, for example when finding sum or
          * average of an array column
-         * @param callable $callback a callback function i.e <code>$callback(string|int $key,mixed $val,mixed $accumulator):mixed</code>
+         * @param \Closure $callback a callback function i.e <code>$callback(string|int $key,mixed $val,mixed $accumulator):mixed</code>
          * for a map, and <code>$callback(mixed $val,mixed $accumulator):mixed</code> for set.
          * @param type $initialValue An initial accumulator value
          * @return type A single scalar value
          */
-        public abstract function reduce(callable $callback, mixed $initialValue = null);
+        public abstract function reduce(\Closure $callback, mixed $initialValue = null);
 
         /**
          * Apply a callback function for each value of a collection i.e array.
-         * @param callable $callback A callback function i.e <code>$callback(string|int $key,mixed $val):void</code>
+         * @param \Closure $callback A callback function i.e <code>$callback(string|int $key,mixed $val):void</code>
          * for Map and <code>$callback(mixed $val):void</code> for set
          * @return self
          */
-        public abstract function each(callable $callback): self;
+        public abstract function each(\Closure $callback): self;
     }
 
 }

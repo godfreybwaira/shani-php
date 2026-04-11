@@ -35,7 +35,7 @@ namespace shani\servers\cgi {
             $this->config = $config;
         }
 
-        public function request(callable $callback): self
+        public function request(\Closure $callback): self
         {
             $request = self::createRequest();
             $writer = new CgiHttpResponseWriter();
@@ -43,7 +43,7 @@ namespace shani\servers\cgi {
             return $this;
         }
 
-        public function start(callable $callback): void
+        public function start(\Closure $callback): void
         {
             $callback();
         }

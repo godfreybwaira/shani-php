@@ -75,7 +75,7 @@ namespace lib\ds\set {
             return $this;
         }
 
-        public function deleteWhere(callable $callback): self
+        public function deleteWhere(\Closure $callback): self
         {
             $values = $this->toArray();
             foreach ($values as $value) {
@@ -92,7 +92,7 @@ namespace lib\ds\set {
             return $this;
         }
 
-        public function map(callable $callback): self
+        public function map(\Closure $callback): self
         {
             $set = new self();
             $values = $this->toArray();

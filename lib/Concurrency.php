@@ -26,10 +26,10 @@ namespace lib {
         /**
          * Call a callback function asynchronously which does not block the execution
          * of program
-         * @param callable $callback A callback function to execute
+         * @param \Closure $callback A callback function to execute
          * @return void
          */
-        public static function async(callable $callback): void
+        public static function async(\Closure $callback): void
         {
             if (!isset(self::$obj)) {
                 $callback();
@@ -40,10 +40,10 @@ namespace lib {
 
         /**
          * Call a callback function in a separate lightweight thread.
-         * @param callable $callback A callback function to execute
+         * @param \Closure $callback A callback function to execute
          * @return void
          */
-        public static function parallel(callable $callback): void
+        public static function parallel(\Closure $callback): void
         {
             if (!isset(self::$obj)) {
                 $callback();

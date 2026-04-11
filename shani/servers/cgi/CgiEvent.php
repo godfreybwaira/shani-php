@@ -14,7 +14,7 @@ namespace shani\servers\cgi {
     final class CgiEvent implements EventHandler
     {
 
-        public function dispatch(array $callbacks, callable $finish, ...$params): self
+        public function dispatch(array $callbacks, \Closure $finish, ...$params): self
         {
             $data = [];
             foreach ($callbacks as $cb) {

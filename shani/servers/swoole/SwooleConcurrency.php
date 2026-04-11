@@ -14,12 +14,12 @@ namespace shani\servers\swoole {
     final class SwooleConcurrency implements ConcurrencyInterface
     {
 
-        public function async(callable $callback): void
+        public function async(\Closure $callback): void
         {
             \Swoole\Event::defer($callback);
         }
 
-        public function parallel(callable $callback): void
+        public function parallel(\Closure $callback): void
         {
             \Swoole\Coroutine\go($callback);
         }

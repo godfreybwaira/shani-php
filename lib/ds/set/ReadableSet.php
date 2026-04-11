@@ -25,7 +25,7 @@ namespace lib\ds\set {
             return true;
         }
 
-        public function existsWhere(callable $callback): bool
+        public function existsWhere(\Closure $callback): bool
         {
             $values = $this->toArray();
             foreach ($values as $value) {
@@ -48,7 +48,7 @@ namespace lib\ds\set {
             return implode(',', $this->toJson());
         }
 
-        public function where(callable $callback, ?int $limit = null): array
+        public function where(\Closure $callback, ?int $limit = null): array
         {
             $rows = [];
             $count = 0;
@@ -95,7 +95,7 @@ namespace lib\ds\set {
             return DataConvertor::array2dataGrid($this->toArray());
         }
 
-        public function reduce(callable $callback, $initialValue = null)
+        public function reduce(\Closure $callback, $initialValue = null)
         {
             $accumulator = $initialValue;
             $values = $this->toArray();
@@ -105,7 +105,7 @@ namespace lib\ds\set {
             return $accumulator;
         }
 
-        public function each(callable $callback): self
+        public function each(\Closure $callback): self
         {
             $values = $this->toArray();
             foreach ($values as $value) {

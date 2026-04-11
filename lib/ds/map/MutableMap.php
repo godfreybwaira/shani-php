@@ -98,7 +98,7 @@ namespace lib\ds\map {
             return $this;
         }
 
-        public function deleteWhere(callable $callback): self
+        public function deleteWhere(\Closure $callback): self
         {
             foreach ($this->data as $key => $value) {
                 if ($callback($key, $value)) {
@@ -114,7 +114,7 @@ namespace lib\ds\map {
             return $this;
         }
 
-        public function map(callable $callback): self
+        public function map(\Closure $callback): self
         {
             $rows = [];
             foreach ($this->data as $key => $value) {

@@ -34,11 +34,11 @@ namespace shani\http {
          * to be executed before the request is processed, and use 'after event to
          * register a callback for all middlewares that have to be executed after
          * the request is processed.
-         * @param callable $callback A callback to be executed that will eventually
+         * @param \Closure $callback A callback to be executed that will eventually
          * execute user middleware(s).
          * @return self
          */
-        public function on(string $event, callable $callback): self
+        public function on(string $event, \Closure $callback): self
         {
             $this->listener->on($event, $callback);
             return $this;
