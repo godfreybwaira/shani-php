@@ -24,12 +24,11 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): void
+        public function index(): FileOutput
         {
             $file = WebUI::assetPath('/js/pwa-sw.js');
-            $output = new FileOutput($file);
             $this->app->response->header()->addOne(HttpHeader::SERVICE_WORKER_ALLOWED, '/');
-            $this->app->writer->send($output);
+            return new FileOutput($file);
         }
     }
 

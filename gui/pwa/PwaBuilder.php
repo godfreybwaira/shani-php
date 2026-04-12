@@ -9,14 +9,16 @@
 
 namespace gui\pwa {
 
+    use lib\URI;
+
     final class PwaBuilder
     {
 
-        public readonly string $manifest;
-        public readonly string $serviceWorker;
+        public readonly URI $manifest;
+        public readonly URI $serviceWorker;
         public readonly string $scope;
 
-        public function __construct(string $manifest, string $serviceWorker, string $scope = '/')
+        public function __construct(URI $manifest, URI $serviceWorker, string $scope = '/')
         {
             $this->scope = $scope;
             $this->manifest = $manifest;

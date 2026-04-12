@@ -42,7 +42,7 @@ namespace gui {
          */
         public function assetUri(string $path): string
         {
-            return $this->app->storage()->url(LocalStorage::ACCESS_ASSET . $path);
+            return $this->app->storage()->uri(LocalStorage::ACCESS_ASSET . $path)->asString();
         }
 
         /**
@@ -124,9 +124,10 @@ namespace gui {
             }
             $pwaBuilder = $this->builder->getPwaBuilder();
             if ($pwaBuilder !== null) {
-                $head .= '<link rel="manifest" href="' . $this->app->storage()->url($pwaBuilder->manifest) . '"/>';
+                $head .= '<link rel="manifest" crossorigin="use-credentials" href="';
+                $head .= $pwaBuilder->manifest->asString() . '"/>';
                 $head .= '<script>if("serviceWorker" in navigator)navigator.serviceWorker.register("';
-                $head .= $this->app->storage()->url($pwaBuilder->serviceWorker) . '",{scope:"' . $pwaBuilder->scope . '"});</script>';
+                $head .= $pwaBuilder->serviceWorker->asString() . '",{scope:"' . $pwaBuilder->scope . '"});</script>';
             }
             $styles = $this->builder->getStyles();
             foreach ($styles as $url => $attr) {

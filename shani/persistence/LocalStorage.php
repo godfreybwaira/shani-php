@@ -15,6 +15,7 @@ namespace shani\persistence {
     use lib\http\HttpCache;
     use lib\http\HttpHeader;
     use lib\http\HttpStatus;
+    use lib\URI;
     use shani\contracts\StorageMedia;
     use shani\core\Framework;
     use shani\exceptions\CustomException;
@@ -145,13 +146,6 @@ namespace shani\persistence {
             return $this->saveFile($file, $path, $prefix, $rename);
         }
 
-        #[\Override]
-        public function savePublic(File $file, string $bucket = '/', bool $rename = true): string
-        {
-            $path = $this->pathTo($this->app->config->appPublicStorage() . $bucket);
-            return $this->saveFile($file, $path, null, $rename);
-        }
-
         private function saveFile(File $file, string $path, ?string $prefix, bool $rename): string
         {
             $filename = $rename ? $prefix . substr(sha1(random_bytes(random_int(10, 70))), 0, rand(10, 15)) . $file->extension : $file->name;
@@ -184,9 +178,9 @@ namespace shani\persistence {
         }
 
         #[\Override]
-        public function url(string $filepath): string
+        public function uri(string $filepath): URI
         {
-            return $this->host . $filepath;
+            return new URI($this->host . $filepath);
         }
 
         #[\Override]

@@ -10,6 +10,7 @@
 namespace shani\contracts {
 
     use lib\File;
+    use lib\URI;
 
     interface StorageMedia
     {
@@ -25,20 +26,11 @@ namespace shani\contracts {
         public function save(File $file, string $bucket = '/', bool $rename = true): string;
 
         /**
-         * Save a file with a public access.
-         * @param File $file A file object to save
-         * @param string $bucket A destination directory
-         * @param bool $rename Whether to rename the file or not (recommended)
-         * @return string|null Path to a saved file.
-         */
-        public function savePublic(File $file, string $bucket = '/', bool $rename = true): string;
-
-        /**
-         * Get file URL
+         * Get file URI
          * @param string $filepath File path
-         * @return string URL referring to a file from a storage media
+         * @return URI A URL referring to a file from a storage media
          */
-        public function url(string $filepath): string;
+        public function uri(string $filepath): URI;
 
         /**
          * Delete a file
