@@ -82,7 +82,7 @@ namespace apps\demo\config {
             return in_array($this->app->request->route()->module, ['shani', 'security']);
         }
 
-        public static function runTest(string $profile): TestResult
+        public static function runTest(): TestResult
         {
             $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
             $g1 = new TestGroup('MY FIRST MODULE');
@@ -118,7 +118,7 @@ namespace apps\demo\config {
                 });
                 return $code === HttpStatus::OK;
             }, maxExecutionTime: 7, iterations: 5);
-            $g3->addCase($caseg31, $caseg32, $caseg33);
+            $g3->addCase($caseg31, $caseg32);
             $result->addGroup($g1, $g2, $g3);
             return $result;
         }

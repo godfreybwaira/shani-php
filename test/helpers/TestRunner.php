@@ -19,7 +19,7 @@ namespace test\helpers {
 
         private const TEST_FILE = Framework::DIR_STORAGE . '/__TEST_IS_RUNNING__';
 
-        public static function stillRunning(): bool
+        public static function isRunning(): bool
         {
             return is_file(self::TEST_FILE);
         }
@@ -27,18 +27,18 @@ namespace test\helpers {
         /**
          * Run application test
          * @param ReadableMap $vhost Host configuration
+         * @return string Test result description and status
          */
-        public static function start(ReadableMap $vhost): void
+        public static function start(ReadableMap $vhost): string
         {
             touch(self::TEST_FILE);
             ApplicationLauncher::log(LogLevel::INFO, 'Test is running...');
-            $test = $vhost->getOne('config')::runTest($vhost->getOne('profile'));
+            $test = $vhost->getOne('config')::runTest();
             self::stop();
             if ($test->getResult()) {
-                ApplicationLauncher::log(LogLevel::INFO, 'Test finished and passed.');
-            } else {
-                ApplicationLauncher::log(LogLevel::WARNING, 'Test finished and failed.');
+                return 'Test finished and passed.';
             }
+            return 'Test finished and failed.';
         }
 
         public static function stop(): void

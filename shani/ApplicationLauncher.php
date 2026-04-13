@@ -59,12 +59,13 @@ namespace shani {
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $vhost = self::host($request->uri->hostname());
-                if (!$vhost->getOne('testmode') || TestRunner::stillRunning()) {
-                    $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
+                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
+                if (!$vhost->getOne('testmode') || TestRunner::isRunning()) {
                     $app = new App($vhost, $response, $writer, $framework);
                     $app->launch();
                 } else {
-                    TestRunner::start($vhost);
+                    $response->setBody(TestRunner::start($vhost));
+                    $writer->close($response);
                 }
             });
         }

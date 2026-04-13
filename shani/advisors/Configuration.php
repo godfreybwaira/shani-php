@@ -506,9 +506,8 @@ namespace shani\advisors {
 
         /**
          * Run unit and integration test
-         * @param string $profile Test profile in which this test is running under.
          */
-        public static abstract function runTest(string $profile): TestResult;
+        public static abstract function runTest(): TestResult;
 
         /**
          * Get database connection object specified by connection name. If no
