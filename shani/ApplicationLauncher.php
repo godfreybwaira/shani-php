@@ -23,7 +23,7 @@ namespace shani {
     use shani\core\log\LogLevel;
     use shani\http\App;
     use shani\persistence\LocalStorage;
-    use test\helpers\TestConfig;
+    use test\helpers\TestRunner;
 
     final class ApplicationLauncher
     {
@@ -59,12 +59,12 @@ namespace shani {
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
                 $vhost = self::host($request->uri->hostname());
-                if (!$vhost->getOne('testmode') || TestConfig::stillRunning()) {
+                if (!$vhost->getOne('testmode') || TestRunner::stillRunning()) {
                     $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                     $app = new App($vhost, $response, $writer, $framework);
                     $app->launch();
                 } else {
-                    TestConfig::start($vhost);
+                    TestRunner::start($vhost);
                 }
             });
         }

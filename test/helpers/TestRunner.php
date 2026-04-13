@@ -14,29 +14,10 @@ namespace test\helpers {
     use shani\core\Framework;
     use shani\core\log\LogLevel;
 
-    final class TestConfig
+    final class TestRunner
     {
 
         private const TEST_FILE = Framework::DIR_STORAGE . '/__TEST_IS_RUNNING__';
-
-        public static function createBackupFile(string $source, string $destination): void
-        {
-            if (!is_file($source)) {
-                self::stop();
-                throw new \Exception('Host not available.');
-            }
-            if (!is_file($destination) && !copy($source, $destination)) {
-                self::stop();
-                throw new \Exception('Could not start a test because host file is not writable.');
-            }
-        }
-
-        public static function removeBackupFile(string $source, string $destination): void
-        {
-            if (is_file($source) && is_file($destination)) {
-                rename($destination, $source);
-            }
-        }
 
         public static function stillRunning(): bool
         {

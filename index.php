@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 use shani\ApplicationLauncher;
 use shani\FrameworkConfig;
 
@@ -26,18 +24,12 @@ if (PHP_SAPI === 'cli') {
      * to be installed, and of course UNIX family operating system           *
      * ***********************************************************************
      */
-    /**
-     * Production env
-     */
     ApplicationLauncher::start(new \shani\servers\swoole\SwooleServer($config));
 } else {
     /**
      * **************************************************************
      * Run the application using any CGI server e.g apache or nginx *
      * **************************************************************
-     */
-    /**
-     * Production env
      */
     ApplicationLauncher::start(new shani\servers\cgi\CgiServer($config));
 }
