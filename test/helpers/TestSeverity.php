@@ -12,8 +12,19 @@ namespace test\helpers {
     enum TestSeverity
     {
 
+        /**
+         * Test case is of low importance
+         */
         case LOW;
+
+        /**
+         * Test case is of medium importance
+         */
         case MEDIUM;
+
+        /**
+         * Test case is of high importance
+         */
         case HIGH;
     }
 
