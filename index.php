@@ -5,8 +5,6 @@ declare(strict_types=1);
 use shani\ApplicationLauncher;
 use shani\FrameworkConfig;
 
-//use test\helpers\TestParameters;
-
 /**
  * Server root directory
  */
@@ -28,11 +26,6 @@ if (PHP_SAPI === 'cli') {
      * to be installed, and of course UNIX family operating system           *
      * ***********************************************************************
      */
-    /*
-     * Testing env
-     */
-//    ApplicationLauncher::start(new \shani\servers\swoole\SwooleServer($config), new TestParameters(host: 'localhost', profile: 'test.yml'));
-
     /**
      * Production env
      */
@@ -43,11 +36,6 @@ if (PHP_SAPI === 'cli') {
      * Run the application using any CGI server e.g apache or nginx *
      * **************************************************************
      */
-    /**
-     * Testing env
-     */
-//    ApplicationLauncher::start(new shani\servers\cgi\CgiServer($config), new TestParameters(host: 'localhost', profile: 'test.yml'));
-
     /**
      * Production env
      */

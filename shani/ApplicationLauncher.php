@@ -24,11 +24,16 @@ namespace shani {
     use shani\http\App;
     use shani\persistence\LocalStorage;
     use test\helpers\TestConfig;
-    use test\helpers\TestParameters;
 
     final class ApplicationLauncher
     {
 
+        /**
+         * Get Virtual host configurations
+         * @param string $name Host name
+         * @return ReadableMap
+         * @throws \Exception
+         */
         private static function host(string $name): ReadableMap
         {
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
@@ -46,20 +51,22 @@ namespace shani {
         /**
          * Starting the server. When started, server becomes ready to accept requests
          * @param SupportedWebServer $server Server application capable of handling HTTP requests
-         * @param TestParameters $params Test parameters
          * @return void
          */
-        public static function start(SupportedWebServer $server, TestParameters $params = null): void
+        public static function start(SupportedWebServer $server): void
         {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
-                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 $vhost = self::host($request->uri->hostname());
-                $app = new App($vhost, $response, $writer, $framework);
-                $app->launch();
+                if (!$vhost->getOne('testmode') || TestConfig::stillRunning()) {
+                    $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
+                    $app = new App($vhost, $response, $writer, $framework);
+                    $app->launch();
+                } else {
+                    TestConfig::start($vhost);
+                }
             });
-            $server->start(fn() => $params === null ? null : TestConfig::start($params));
         }
 
         public static function log(LogLevel $level, string $message): void

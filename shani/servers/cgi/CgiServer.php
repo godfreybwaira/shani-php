@@ -35,17 +35,12 @@ namespace shani\servers\cgi {
             $this->config = $config;
         }
 
-        public function request(\Closure $callback): self
+        public function request(\Closure $callback): SupportedWebServer
         {
             $request = self::createRequest();
             $writer = new CgiHttpResponseWriter();
             $callback($request, $writer, $this->config);
             return $this;
-        }
-
-        public function start(\Closure $callback): void
-        {
-            $callback();
         }
 
         private static function createRequest(): RequestEntity

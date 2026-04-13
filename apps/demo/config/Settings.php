@@ -82,7 +82,7 @@ namespace apps\demo\config {
             return in_array($this->app->request->route()->module, ['shani', 'security']);
         }
 
-        public static function runTest(): TestResult
+        public static function runTest(string $profile): TestResult
         {
             $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
             $g1 = new TestGroup('MY FIRST MODULE');

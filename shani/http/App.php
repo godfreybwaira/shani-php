@@ -85,7 +85,7 @@ namespace shani\http {
             $this->framework = $framework;
             $this->request = $res->request;
             $this->writer = new HttpWriter($this, $writer);
-            $class = $vhost->getOne('classpath');
+            $class = $vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
         }

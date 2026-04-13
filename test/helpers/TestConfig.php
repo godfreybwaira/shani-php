@@ -19,24 +19,6 @@ namespace test\helpers {
 
         private const TEST_FILE = Framework::DIR_STORAGE . '/__TEST_IS_RUNNING__';
 
-        private static function config(TestParameters $params): bool
-        {
-            $source = Framework::DIR_HOSTS . '/' . $params->host . '.yml';
-            $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
-            self::createBackupFile($source, $destination);
-            $content = yaml_parse_file($source);
-            if (file_put_contents($source, yaml_emit($content)) === false) {
-                self::removeBackupFile($source, $destination);
-                self::stop();
-                throw new \Exception('Could not start a test.');
-            }
-            $content['profile'] = $params->profile;
-            $vhost = new ReadableMap($content);
-            self::removeBackupFile($source, $destination);
-            $test = $vhost->getOne('classpath')::runTest();
-            return $test->getResult();
-        }
-
         public static function createBackupFile(string $source, string $destination): void
         {
             if (!is_file($source)) {
@@ -56,21 +38,26 @@ namespace test\helpers {
             }
         }
 
-        public static function start(TestParameters $params): ?bool
+        public static function stillRunning(): bool
         {
-            if (is_file(self::TEST_FILE)) {
-                return null;
-            }
+            return is_file(self::TEST_FILE);
+        }
+
+        /**
+         * Run application test
+         * @param ReadableMap $vhost Host configuration
+         */
+        public static function start(ReadableMap $vhost): void
+        {
             touch(self::TEST_FILE);
             ApplicationLauncher::log(LogLevel::INFO, 'Test is running...');
-            $result = self::config($params);
+            $test = $vhost->getOne('config')::runTest($vhost->getOne('profile'));
             self::stop();
-            if ($result) {
+            if ($test->getResult()) {
                 ApplicationLauncher::log(LogLevel::INFO, 'Test finished and passed.');
             } else {
                 ApplicationLauncher::log(LogLevel::WARNING, 'Test finished and failed.');
             }
-            return $result;
         }
 
         public static function stop(): void

@@ -84,21 +84,7 @@ namespace shani\servers\swoole {
             }
         }
 
-        public function start(\Closure $callback): void
-        {
-            $this->server->on('start', $callback);
-            $this->server->on('open', function (Server $server, Request $req) {
-                $scheme = $this->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
-                $this->clients[$req->fd] = self::createRequest($scheme, $req);
-            });
-            $this->server->on('close', function (Server $server, int $fd) {
-                unset($this->clients[$fd]);
-            });
-            $this->server->on('task', fn() => null);
-            $this->server->start();
-        }
-
-        public function request(\Closure $callback): self
+        public function request(\Closure $callback): SupportedWebServer
         {
             $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';
@@ -121,6 +107,15 @@ namespace shani\servers\swoole {
                     $callback($request, $writer, $this->framework);
                 }
             });
+            $this->server->on('open', function (Server $server, Request $req) {
+                $scheme = $this->httpPort === $req->server['server_port'] ? 'ws' : 'wss';
+                $this->clients[$req->fd] = self::createRequest($scheme, $req);
+            });
+            $this->server->on('close', function (Server $server, int $fd) {
+                unset($this->clients[$fd]);
+            });
+            $this->server->on('task', fn() => null);
+            $this->server->start();
             return $this;
         }
 
