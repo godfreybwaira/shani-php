@@ -49,12 +49,15 @@ namespace shani\advisors {
          */
         public function isAuthenticated(): bool
         {
-            $strategies = $this->getAuthenticationStrategies();
-            $manager = new AuthenticationManager($this->app, ...$strategies);
-            $loggedIn = $manager->login();
-            $this->permissionList = $manager->getPermissions();
-            $this->userId = $manager->getUserId();
-            return $loggedIn;
+            if ($this->userId === null) {
+                $strategies = $this->getAuthenticationStrategies();
+                $manager = new AuthenticationManager($this->app, ...$strategies);
+                $success = $manager->login();
+                $this->permissionList = $manager->getPermissions();
+                $this->userId = $manager->getUserId();
+                return $success;
+            }
+            return false;
         }
 
         /**
