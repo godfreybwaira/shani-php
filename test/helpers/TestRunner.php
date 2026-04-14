@@ -26,18 +26,17 @@ namespace test\helpers {
 
         private static function run(ReadableMap $vhost, string $hostname): bool
         {
-//            $source = self::getHostFilePath($hostname);
-//            $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
-//            self::createBackupFile($source, $destination);
-//            $content = $vhost->toArray();
-//            $content['testmode'] = false;
-//            if (file_put_contents($source, yaml_emit($content)) === false) {
-//                self::removeBackupFile($source, $destination);
-//                throw new \Exception('Could not start a test.');
-//            }
-//            self::removeBackupFile($source, $destination);
+            $source = self::getHostFilePath($hostname);
+            $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
+            self::createBackupFile($source, $destination);
+            $content = $vhost->toArray();
+            $content['testmode'] = false;
+            if (file_put_contents($source, yaml_emit($content)) === false) {
+                self::removeBackupFile($source, $destination);
+                throw new \Exception('Could not start a test, host file is not writable.');
+            }
             $test = $vhost->getOne('config')::runTest();
-            self::stop();
+            self::removeBackupFile($source, $destination);
             return $test->getResult();
         }
 

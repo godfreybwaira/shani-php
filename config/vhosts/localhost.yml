@@ -4,4 +4,4 @@ config: \apps\demo\config\Settings
 # this variable. You should handle the logic manually
 profile: dev.yml
 # Wheter to run application test using provided profile.
-testmode: false
+testmode: true
