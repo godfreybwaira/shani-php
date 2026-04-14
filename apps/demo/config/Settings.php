@@ -110,7 +110,7 @@ namespace apps\demo\config {
             $caseg31->test('Test if 2+2=4', fn() => 2 + 2 === 4);
             $caseg32->test('Test if A is same as a', fn() => 'A' === 'a');
             $caseg33->test('Testing if I can make a call on this server', function () {
-                $client = new HttpClient(new URI('http://dev.shani.v2.local'));
+                $client = new HttpClient(new URI('https://jsonplaceholder.typicode.com'));
                 $client->enableAsync(false)->enableSSLVerification(false);
                 $code = null;
                 $client->get('/users', function (ResponseEntity $res)use (&$code) {
