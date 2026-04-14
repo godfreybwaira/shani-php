@@ -113,12 +113,12 @@ namespace apps\demo\config {
                 $client = new HttpClient(new URI('http://dev.shani.v2.local'));
                 $client->enableAsync(false)->enableSSLVerification(false);
                 $code = null;
-                $client->get('/schools/0/students', function (ResponseEntity $res)use (&$code) {
+                $client->get('/users', function (ResponseEntity $res)use (&$code) {
                     $code = $res->status();
                 });
                 return $code === HttpStatus::OK;
-            }, maxExecutionTime: 7, iterations: 5);
-            $g3->addCase($caseg31, $caseg32);
+            }, maxExecutionTime: 7, iterations: 1);
+            $g3->addCase($caseg31, $caseg32, $caseg33);
             $result->addGroup($g1, $g2, $g3);
             return $result;
         }
