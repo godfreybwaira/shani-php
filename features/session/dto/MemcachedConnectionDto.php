@@ -7,9 +7,9 @@
  * Created on: Apr 6, 2026 at 10:58:39 AM
  */
 
-namespace features\persistence\session\dto {
+namespace features\session\dto {
 
-    use features\persistence\session\SessionConnectionInterface;
+    use features\session\SessionConnectionInterface;
 
     /**
      *  Handle session using memcached. Requires memcached and php-memcached extension to be installed.

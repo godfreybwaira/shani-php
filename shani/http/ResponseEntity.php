@@ -11,10 +11,10 @@ namespace shani\http {
 
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
+    use features\ds\map\ReadableMap;
     use features\utils\DataCompression;
     use features\utils\DataConvertor;
     use features\utils\MediaType;
-    use features\ds\map\ReadableMap;
     use shani\http\enums\HttpStatus;
 
     final class ResponseEntity extends HttpEntity

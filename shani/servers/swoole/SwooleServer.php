@@ -18,9 +18,9 @@ namespace shani\servers\swoole {
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
-    use shani\Framework;
-    use shani\Framework;
-    use shani\ApplicationLauncher;
+    use shani\launcher\Framework;
+    use shani\launcher\Framework;
+    use shani\launcher\ApplicationLauncher;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;

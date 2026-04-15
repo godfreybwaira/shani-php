@@ -9,7 +9,7 @@
 
 namespace features\utils {
 
-    use shani\Framework;
+    use shani\launcher\Framework;
 
     final class MediaType
     {

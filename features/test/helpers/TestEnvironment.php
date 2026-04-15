@@ -9,7 +9,7 @@
 
 namespace features\test\helpers {
 
-    use shani\Framework;
+    use shani\launcher\Framework;
 
     final class TestEnvironment implements \JsonSerializable
     {

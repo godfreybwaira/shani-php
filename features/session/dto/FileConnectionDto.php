@@ -7,9 +7,9 @@
  * Created on: Apr 6, 2026 at 12:06:35 PM
  */
 
-namespace features\persistence\session\dto {
+namespace features\session\dto {
 
-    use features\persistence\session\SessionConnectionInterface;
+    use features\session\SessionConnectionInterface;
 
     /**
      * Handle session using session default mechanism

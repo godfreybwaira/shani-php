@@ -12,7 +12,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\data\dto\StudentListDto;
     use apps\demo\modules\schools\logic\services\StudentService;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Students
     {

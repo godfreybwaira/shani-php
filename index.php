@@ -1,7 +1,7 @@
 <?php
 
-use shani\ApplicationLauncher;
-use shani\Framework;
+use shani\launcher\ApplicationLauncher;
+use shani\launcher\Framework;
 
 /**
  * Server root directory

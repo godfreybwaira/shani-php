@@ -17,8 +17,8 @@ namespace apps\demo\config {
     use features\oauth2\Oauth2Repository;
     use features\utils\URI;
     use shani\advisors\Configuration;
-    use shani\Framework;
-    use shani\http\App;
+    use shani\launcher\Framework;
+    use shani\launcher\App;
     use shani\http\Middleware;
     use features\persistence\DatabaseConnection;
     use features\persistence\DatabaseDriver;

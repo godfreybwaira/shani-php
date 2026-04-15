@@ -18,7 +18,7 @@ namespace features\utils {
     use features\utils\RequestEntityBuilder;
     use features\utils\URI;
     use features\ds\map\ReadableMap;
-    use shani\Framework;
+    use shani\launcher\Framework;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpCookie;
     use shani\http\HttpHeader;

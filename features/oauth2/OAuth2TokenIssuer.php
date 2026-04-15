@@ -13,7 +13,7 @@ namespace features\oauth2 {
     use shani\http\HttpHeader;
     use shani\http\enums\HttpStatus;
     use features\utils\MediaType;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class OAuth2TokenIssuer
     {

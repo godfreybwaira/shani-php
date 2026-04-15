@@ -7,9 +7,9 @@
  * Created on: Apr 6, 2026 at 11:00:56 AM
  */
 
-namespace features\persistence\session\dto {
+namespace features\session\dto {
 
-    use features\persistence\session\SessionConnectionInterface;
+    use features\session\SessionConnectionInterface;
 
     /**
      * Handle session using redis Requires redis and php-redis extension to be installed.

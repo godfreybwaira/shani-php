@@ -105,7 +105,7 @@ Now, look at the following example of a resource file:
 
 namespace apps\demo\modules\schools\logic\controllers\get {
 
-	use shani\http\App;
+	use shani\launcher\App;
 
     final class Hello
     {
@@ -193,7 +193,7 @@ The next step is to create these configuration class files. We will create them 
 namespace apps\demo\config {
 
     use shani\advisors\Configuration;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class DevSettings extends Configuration
     {

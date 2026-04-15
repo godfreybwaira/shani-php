@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use shani\Framework;
+    use shani\launcher\Framework;
 
     final class FileOutputStream
     {

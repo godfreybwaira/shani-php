@@ -9,7 +9,7 @@
 
 namespace features\smtp {
 
-    use shani\Framework;
+    use shani\launcher\Framework;
 
     final class SMTPClient
     {

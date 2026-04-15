@@ -11,9 +11,10 @@
 namespace shani\http {
 
     use features\utils\Event;
-    use shani\http\HttpHeader;
     use features\utils\MediaType;
     use shani\advisors\SecurityMiddleware;
+    use shani\http\HttpHeader;
+    use shani\launcher\App;
 
     final class Middleware
     {

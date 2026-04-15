@@ -10,7 +10,7 @@
 namespace features\documentation {
 
     use features\documentation\scanners\Modules;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Generator implements \JsonSerializable
     {

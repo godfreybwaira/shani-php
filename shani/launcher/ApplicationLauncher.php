@@ -7,7 +7,7 @@
  * Created on: Mar 6, 2024 at 4:06:33 PM
  */
 
-namespace shani {
+namespace shani\launcher {
 
     use features\utils\Concurrency;
     use features\ds\map\ReadableMap;
@@ -18,10 +18,10 @@ namespace shani {
     use shani\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
-    use shani\Framework;
+    use shani\launcher\Framework;
     use features\log\Logger;
     use features\log\LogLevel;
-    use shani\http\App;
+    use shani\launcher\App;
     use features\persistence\LocalStorage;
     use features\test\helpers\TestRunner;
 

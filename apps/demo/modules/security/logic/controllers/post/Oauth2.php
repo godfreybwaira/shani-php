@@ -11,7 +11,7 @@ namespace apps\demo\modules\security\logic\controllers\post {
 
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Oauth2
     {

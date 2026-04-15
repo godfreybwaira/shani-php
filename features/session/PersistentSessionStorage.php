@@ -7,11 +7,11 @@
  * Created on: Apr 3, 2026 at 7:27:49 PM
  */
 
-namespace features\persistence\session {
+namespace features\session {
 
     use features\ds\map\MutableMap;
     use shani\http\enums\HttpSameSite;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class PersistentSessionStorage implements SessionStorageInterface
     {

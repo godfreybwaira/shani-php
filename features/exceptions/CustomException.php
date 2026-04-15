@@ -9,7 +9,7 @@
 
 namespace features\exceptions {
 
-    use shani\http\App;
+    use shani\launcher\App;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
 

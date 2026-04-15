@@ -12,7 +12,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\logic\services\StudentService;
     use features\exceptions\CustomException;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Students
     {

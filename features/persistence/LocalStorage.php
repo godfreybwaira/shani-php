@@ -17,10 +17,10 @@ namespace features\persistence {
     use shani\http\enums\HttpStatus;
     use features\utils\URI;
     use shani\contracts\StorageMedia;
-    use shani\Framework;
+    use shani\launcher\Framework;
     use features\exceptions\CustomException;
     use features\exceptions\ServerException;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class LocalStorage implements StorageMedia
     {

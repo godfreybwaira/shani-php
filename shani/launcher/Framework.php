@@ -7,7 +7,7 @@
  * Created on: Mar 6, 2024 at 4:06:33 PM
  */
 
-namespace shani {
+namespace shani\launcher {
 
     use features\ds\map\ReadableMap;
 

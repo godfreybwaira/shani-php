@@ -10,7 +10,7 @@
 namespace apps\demo\modules\security\logic\controllers\get {
 
     use gui\WebUIBuilder;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Oauth2
     {

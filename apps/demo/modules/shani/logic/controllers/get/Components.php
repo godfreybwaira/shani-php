@@ -17,7 +17,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
     use features\utils\MediaType;
     use features\utils\URI;
     use features\documentation\Generator as Documentation;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Components
     {

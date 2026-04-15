@@ -10,7 +10,7 @@
 namespace features\oauth2 {
 
     use shani\http\enums\HttpStatus;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class OAuth2TokenAuthorizer
     {

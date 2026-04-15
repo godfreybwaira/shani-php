@@ -17,8 +17,8 @@ namespace shani\servers\cgi {
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
-    use shani\Framework;
-    use shani\ApplicationLauncher;
+    use shani\launcher\Framework;
+    use shani\launcher\ApplicationLauncher;
 
     final class CgiServer implements SupportedWebServer
     {

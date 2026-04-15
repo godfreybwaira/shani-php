@@ -12,7 +12,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
     use gui\WebUI;
     use shani\http\FileOutputStream;
     use shani\http\HttpHeader;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Sw
     {

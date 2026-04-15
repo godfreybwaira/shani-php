@@ -15,9 +15,9 @@ namespace shani\advisors {
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
-    use shani\Framework;
+    use shani\launcher\Framework;
     use features\exceptions\CustomException;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class SecurityMiddleware
     {

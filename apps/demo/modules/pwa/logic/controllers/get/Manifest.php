@@ -21,7 +21,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
     use features\pwa\PwaManifestBuilder;
     use features\pwa\PwaRelatedApplication;
     use features\ds\map\ReadableMap;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Manifest
     {

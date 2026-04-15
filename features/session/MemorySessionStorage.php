@@ -7,7 +7,7 @@
  * Created on: Apr 5, 2026 at 6:58:47 PM
  */
 
-namespace features\persistence\session {
+namespace features\session {
 
     use features\ds\map\MutableMap;
 

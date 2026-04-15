@@ -9,7 +9,7 @@
 
 namespace apps\demo\middleware {
 
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class Test
     {

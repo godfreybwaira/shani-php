@@ -12,7 +12,7 @@ namespace apps\demo\config\auth {
     use features\authentication\AuthenticationStrategy;
     use features\authentication\UserDetailsDto;
     use features\documentation\scanners\Endpoints;
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class JwtAuthenticator implements AuthenticationStrategy
     {

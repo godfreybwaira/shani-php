@@ -9,7 +9,7 @@
 
 namespace features\authentication {
 
-    use shani\http\App;
+    use shani\launcher\App;
 
     final class AuthenticationManager
     {

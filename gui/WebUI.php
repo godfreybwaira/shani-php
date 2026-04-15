@@ -13,8 +13,8 @@ namespace gui {
     use features\ds\map\ReadableMap;
     use shani\http\HttpCookie;
     use shani\http\enums\HttpSameSite;
-    use shani\Framework;
-    use shani\http\App;
+    use shani\launcher\Framework;
+    use shani\launcher\App;
     use features\persistence\LocalStorage;
 
     final class WebUI

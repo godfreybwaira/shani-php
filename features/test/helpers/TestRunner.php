@@ -10,9 +10,9 @@
 namespace features\test\helpers {
 
     use features\ds\map\ReadableMap;
-    use shani\ApplicationLauncher;
-    use shani\Framework;
     use features\log\LogLevel;
+    use shani\launcher\ApplicationLauncher;
+    use shani\launcher\Framework;
 
     final class TestRunner
     {

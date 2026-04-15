@@ -1,6 +1,6 @@
 <?php
 
-namespace features\persistence\session {
+namespace features\session {
 
     use features\ds\map\MutableMap;
 
@@ -21,7 +21,7 @@ namespace features\persistence\session {
      * - Regeneration should be called explicitly on authentication changes (login/logout)
      *   rather than on every request to avoid race conditions
      *
-     * @package features\persistence\session
+     * @package features\session
      *
      * @author goddy
      *

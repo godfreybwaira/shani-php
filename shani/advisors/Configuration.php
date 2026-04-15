@@ -19,15 +19,15 @@ namespace shani\advisors {
     use shani\advisors\web\ResourceAccessPolicy;
     use features\authentication\AuthenticationManager;
     use shani\contracts\StorageMedia;
-    use shani\Framework;
+    use shani\launcher\Framework;
     use features\log\LogLevel;
     use features\documentation\scanners\Endpoints;
-    use shani\http\App;
+    use shani\launcher\App;
     use shani\http\Middleware;
     use shani\http\RequestRoute;
     use features\persistence\DatabaseConnection;
     use features\persistence\LocalStorage;
-    use features\persistence\session\SessionConnectionInterface;
+    use features\session\SessionConnectionInterface;
     use features\test\TestResult;
 
     abstract class Configuration
@@ -79,8 +79,8 @@ namespace shani\advisors {
         public function getSessionConnection(): ?SessionConnectionInterface
         {
 //            return null;
-//            return new \features\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
-            return new \features\persistence\session\dto\RedisConnectionDto('localhost', 6379);
+//            return new \features\session\dto\MemcachedConnectionDto('localhost', 11211);
+            return new \features\session\dto\RedisConnectionDto('localhost', 6379);
         }
 
         /**
