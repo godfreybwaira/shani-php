@@ -7,10 +7,10 @@
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\ds\map {
+namespace features\ds\map {
 
     use features\utils\DataConvertor;
-    use lib\ds\ReadableData;
+    use features\ds\ReadableData;
 
     class ReadableMap extends ReadableData
     {

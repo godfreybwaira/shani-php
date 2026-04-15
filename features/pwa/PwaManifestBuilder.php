@@ -15,7 +15,7 @@ namespace features\pwa {
     use features\pwa\enums\PwaFormFactor;
     use features\pwa\enums\PwaOrientation;
     use features\pwa\enums\PwaTextDirection;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use features\utils\MediaType;
     use features\utils\URI;
 

@@ -7,7 +7,7 @@
  * Created on: May 8, 2025 at 6:45:17 PM
  */
 
-namespace lib\ds {
+namespace features\ds {
 
     abstract class ReadableData implements \Stringable, \JsonSerializable
     {

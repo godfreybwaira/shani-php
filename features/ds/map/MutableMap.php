@@ -7,9 +7,9 @@
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\ds\map {
+namespace features\ds\map {
 
-    use lib\ds\MutableData;
+    use features\ds\MutableData;
 
     class MutableMap extends ReadableMap implements MutableData
     {

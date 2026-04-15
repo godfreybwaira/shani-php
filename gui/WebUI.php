@@ -9,8 +9,8 @@
 
 namespace gui {
 
-    use lib\ds\map\MutableMap;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\MutableMap;
+    use features\ds\map\ReadableMap;
     use shani\http\HttpCookie;
     use shani\http\enums\HttpSameSite;
     use shani\Framework;

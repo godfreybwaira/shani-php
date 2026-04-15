@@ -16,7 +16,7 @@ namespace shani\advisors {
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
     use shani\Framework;
-    use shani\exceptions\CustomException;
+    use features\exceptions\CustomException;
     use shani\http\App;
 
     final class SecurityMiddleware

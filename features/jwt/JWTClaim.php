@@ -9,7 +9,7 @@
 
 namespace features\jwt {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use features\jwt\exceptions\JWTAlgorithmException;
     use features\jwt\exceptions\JWTFormatException;
     use features\jwt\exceptions\JWTSignatureException;

@@ -2,7 +2,7 @@
 
 namespace features\persistence\session {
 
-    use lib\ds\map\MutableMap;
+    use features\ds\map\MutableMap;
 
     /**
      * SessionStorageInterface

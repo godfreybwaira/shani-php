@@ -7,11 +7,11 @@
  * Created on: Apr 5, 2025 at 12:53:01 PM
  */
 
-namespace shani\exceptions {
+namespace features\exceptions {
 
-    use shani\http\HttpHeader;
-    use shani\http\enums\HttpStatus;
     use shani\http\App;
+    use shani\http\enums\HttpStatus;
+    use shani\http\HttpHeader;
 
     final class CustomException
     {

@@ -9,7 +9,7 @@
 
 namespace features\oauth2 {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use shani\http\HttpHeader;
     use shani\http\enums\HttpStatus;
     use features\utils\MediaType;

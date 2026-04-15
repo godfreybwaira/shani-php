@@ -10,7 +10,7 @@
 namespace gui {
 
     use features\pwa\PwaBuilder;
-    use lib\ds\map\MutableMap;
+    use features\ds\map\MutableMap;
 
     final class WebUIBuilder
     {

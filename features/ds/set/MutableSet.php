@@ -7,9 +7,9 @@
  * Created on: Mar 26, 2025 at 9:00:14 AM
  */
 
-namespace lib\ds\set {
+namespace features\ds\set {
 
-    use lib\ds\MutableData;
+    use features\ds\MutableData;
 
     class MutableSet extends ReadableSet implements MutableData
     {

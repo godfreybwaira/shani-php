@@ -14,7 +14,7 @@ namespace shani\http {
     use features\persistence\LocalStorage;
     use features\persistence\session\PersistentSessionStorage;
     use features\persistence\session\SessionStorageInterface;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use shani\http\HttpHeader;
     use shani\http\enums\HttpStatus;
     use shani\http\RequestEntity;
@@ -23,7 +23,7 @@ namespace shani\http {
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
-    use shani\exceptions\CustomException;
+    use features\exceptions\CustomException;
     use shani\Framework;
 
     final class App

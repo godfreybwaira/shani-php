@@ -11,7 +11,7 @@ namespace apps\demo\config {
 
     use apps\demo\middleware\Oauth2Client;
     use apps\demo\middleware\Test;
-    use lib\client\HttpClient;
+    use features\utils\HttpClient;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
     use features\oauth2\Oauth2Repository;

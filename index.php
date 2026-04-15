@@ -11,7 +11,7 @@ define('SHANI_SERVER_ROOT', __DIR__);
  * Current timestamp according to RFC3339
  */
 define('SHANI_CURRENT_TIMESTAMP', date(DATE_RFC3339));
-//set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
+//set_include_path(get_include_path() . PATH_SEPARATOR . 'libs');
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });

@@ -11,7 +11,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
     use features\pwa\PwaBuilder;
     use gui\WebUIBuilder;
-    use lib\client\HttpClient;
+    use features\utils\HttpClient;
     use shani\http\HttpHeader;
     use shani\http\ResponseEntity;
     use features\utils\MediaType;

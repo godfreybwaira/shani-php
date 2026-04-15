@@ -9,7 +9,7 @@
 
 namespace gui\v2\props {
 
-    use lib\ds\set\MutableSet;
+    use features\ds\set\MutableSet;
 
     final class StyleClass extends MutableSet
     {

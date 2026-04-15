@@ -9,7 +9,7 @@
 
 namespace gui\v2\props {
 
-    use lib\ds\map\MutableMap;
+    use features\ds\map\MutableMap;
 
     final class Attribute extends MutableMap
     {

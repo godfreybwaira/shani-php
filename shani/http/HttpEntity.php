@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
 
     abstract class HttpEntity
     {

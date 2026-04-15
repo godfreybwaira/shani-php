@@ -8,7 +8,7 @@
 
 namespace features\persistence {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
 
     final class DatabaseConnection
     {

@@ -9,7 +9,7 @@
 
 namespace features\test\helpers {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use shani\ApplicationLauncher;
     use shani\Framework;
     use features\log\LogLevel;

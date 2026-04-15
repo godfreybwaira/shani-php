@@ -2,7 +2,7 @@
 
 namespace shani\http {
 
-    use lib\ds\map\MutableMap;
+    use features\ds\map\MutableMap;
 
     final class HttpHeader extends MutableMap
     {

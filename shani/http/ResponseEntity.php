@@ -14,7 +14,7 @@ namespace shani\http {
     use features\utils\DataCompression;
     use features\utils\DataConvertor;
     use features\utils\MediaType;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use shani\http\enums\HttpStatus;
 
     final class ResponseEntity extends HttpEntity

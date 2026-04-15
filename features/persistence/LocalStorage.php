@@ -18,8 +18,8 @@ namespace features\persistence {
     use features\utils\URI;
     use shani\contracts\StorageMedia;
     use shani\Framework;
-    use shani\exceptions\CustomException;
-    use shani\exceptions\ServerException;
+    use features\exceptions\CustomException;
+    use features\exceptions\ServerException;
     use shani\http\App;
 
     final class LocalStorage implements StorageMedia

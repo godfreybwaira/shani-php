@@ -9,7 +9,7 @@
 
 namespace features\persistence\session {
 
-    use lib\ds\map\MutableMap;
+    use features\ds\map\MutableMap;
 
     final class MemorySessionStorage implements SessionStorageInterface
     {

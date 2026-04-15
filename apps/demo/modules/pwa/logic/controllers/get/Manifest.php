@@ -20,7 +20,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
     use features\pwa\PwaIcon;
     use features\pwa\PwaManifestBuilder;
     use features\pwa\PwaRelatedApplication;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use shani\http\App;
 
     final class Manifest

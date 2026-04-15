@@ -13,7 +13,7 @@ namespace shani\http {
     use features\crypto\Encryption;
     use features\utils\DataCompression;
     use features\utils\File;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
     use features\utils\MediaType;
     use features\utils\URI;
     use shani\http\RequestRoute;

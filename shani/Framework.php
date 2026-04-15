@@ -9,7 +9,7 @@
 
 namespace shani {
 
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
 
     final class Framework
     {

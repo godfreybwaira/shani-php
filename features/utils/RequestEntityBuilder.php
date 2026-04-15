@@ -11,7 +11,7 @@ namespace features\utils {
 
     use shani\http\HttpHeader;
     use shani\http\RequestEntity;
-    use lib\ds\map\ReadableMap;
+    use features\ds\map\ReadableMap;
 
     final class RequestEntityBuilder
     {
