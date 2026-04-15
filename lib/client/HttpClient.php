@@ -9,21 +9,21 @@
 
 namespace lib\client {
 
-    use lib\Concurrency;
-    use lib\crypto\DigitalSignature;
-    use lib\crypto\Encryption;
-    use lib\DataCompression;
+    use features\utils\Concurrency;
+    use features\crypto\DigitalSignature;
+    use features\crypto\Encryption;
+    use features\utils\DataCompression;
     use lib\ds\map\ReadableMap;
-    use lib\File;
-    use lib\http\HttpCookie;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
-    use lib\http\RequestEntity;
-    use lib\http\ResponseEntity;
-    use lib\MediaType;
-    use lib\RequestEntityBuilder;
-    use lib\URI;
-    use shani\core\Framework;
+    use features\utils\File;
+    use shani\http\HttpCookie;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
+    use shani\http\RequestEntity;
+    use shani\http\ResponseEntity;
+    use features\utils\MediaType;
+    use features\utils\RequestEntityBuilder;
+    use features\utils\URI;
+    use shani\Framework;
 
     final class HttpClient
     {

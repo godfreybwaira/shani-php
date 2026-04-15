@@ -9,7 +9,7 @@
 
 namespace lib\ds\set {
 
-    use lib\DataConvertor;
+    use features\utils\DataConvertor;
     use lib\ds\ReadableData;
 
     class ReadableSet extends ReadableData

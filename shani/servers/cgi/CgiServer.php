@@ -9,15 +9,15 @@
 
 namespace shani\servers\cgi {
 
-    use lib\DataConvertor;
-    use lib\File;
-    use lib\http\RequestEntity;
-    use lib\MediaType;
-    use lib\RequestEntityBuilder;
+    use features\utils\DataConvertor;
+    use features\utils\File;
+    use shani\http\RequestEntity;
+    use features\utils\MediaType;
+    use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
-    use shani\FrameworkConfig;
+    use shani\Framework;
     use shani\ApplicationLauncher;
 
     final class CgiServer implements SupportedWebServer
@@ -28,9 +28,9 @@ namespace shani\servers\cgi {
             'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP',
             'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR'
         ];
-        private readonly FrameworkConfig $config;
+        private readonly Framework $config;
 
-        public function __construct(FrameworkConfig $config)
+        public function __construct(Framework $config)
         {
             $this->config = $config;
         }

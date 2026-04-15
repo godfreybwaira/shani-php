@@ -9,14 +9,14 @@
 
 namespace apps\demo\modules\shani\logic\controllers\get {
 
-    use gui\pwa\PwaBuilder;
+    use features\pwa\PwaBuilder;
     use gui\WebUIBuilder;
     use lib\client\HttpClient;
-    use lib\http\HttpHeader;
-    use lib\http\ResponseEntity;
-    use lib\MediaType;
-    use lib\URI;
-    use shani\documentation\Generator as Documentation;
+    use shani\http\HttpHeader;
+    use shani\http\ResponseEntity;
+    use features\utils\MediaType;
+    use features\utils\URI;
+    use features\documentation\Generator as Documentation;
     use shani\http\App;
 
     final class Components

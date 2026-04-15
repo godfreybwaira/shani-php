@@ -10,22 +10,21 @@
 
 namespace shani\http {
 
+    use features\log\Logger;
+    use features\persistence\LocalStorage;
+    use features\persistence\session\PersistentSessionStorage;
+    use features\persistence\session\SessionStorageInterface;
     use lib\ds\map\ReadableMap;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
-    use lib\http\RequestEntity;
-    use lib\http\ResponseEntity;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
+    use shani\http\RequestEntity;
+    use shani\http\ResponseEntity;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
-    use shani\core\Framework;
-    use shani\core\log\Logger;
     use shani\exceptions\CustomException;
-    use shani\FrameworkConfig;
-    use shani\persistence\LocalStorage;
-    use shani\persistence\session\PersistentSessionStorage;
-    use shani\persistence\session\SessionStorageInterface;
+    use shani\Framework;
 
     final class App
     {
@@ -67,18 +66,18 @@ namespace shani\http {
 
         /**
          * Application framework configuration
-         * @var FrameworkConfig
+         * @var Framework
          */
-        public readonly FrameworkConfig $framework;
+        public readonly Framework $framework;
 
         /**
          * Create an application instance
          * @param ReadableMap $vhost Virtual host
          * @param ResponseEntity $res Response entity object
          * @param ResponseWriter $writer response writer object
-         * @param FrameworkConfig $framework Framework configuration object
+         * @param Framework $framework Framework configuration object
          */
-        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriter $writer, FrameworkConfig $framework)
+        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriter $writer, Framework $framework)
         {
             $this->vhost = $vhost;
             $this->response = $res;

@@ -11,11 +11,11 @@ namespace gui {
 
     use lib\ds\map\MutableMap;
     use lib\ds\map\ReadableMap;
-    use lib\http\HttpCookie;
-    use lib\http\HttpSameSite;
-    use shani\core\Framework;
+    use shani\http\HttpCookie;
+    use shani\http\enums\HttpSameSite;
+    use shani\Framework;
     use shani\http\App;
-    use shani\persistence\LocalStorage;
+    use features\persistence\LocalStorage;
 
     final class WebUI
     {

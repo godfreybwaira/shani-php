@@ -11,11 +11,11 @@ namespace shani\http {
 
     use gui\WebUIBuilder;
     use gui\WebUI;
-    use lib\DataConvertor;
-    use lib\http\FileOutput;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
-    use lib\MediaType;
+    use features\utils\DataConvertor;
+    use shani\http\FileOutputStream;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
+    use features\utils\MediaType;
     use shani\contracts\ResponseWriter;
 
     final class HttpWriter
@@ -41,7 +41,7 @@ namespace shani\http {
 
         /**
          * Send content to a client application
-         * @param \JsonSerializable|WebUIBuilder|FileOutput|null $output Output
+         * @param \JsonSerializable|WebUIBuilder|FileOutputStream|null $output Output
          * object to send
          * @param bool|null $keepConnection Set whether to close the connection
          * after sending a response or to keep it open. By default, if the application
@@ -50,14 +50,14 @@ namespace shani\http {
          * first response is sent.
          * @return void
          */
-        public function send(\JsonSerializable|WebUIBuilder|FileOutput|null $output = null, ?bool $keepConnection = null): void
+        public function send(\JsonSerializable|WebUIBuilder|FileOutputStream|null $output = null, ?bool $keepConnection = null): void
         {
             $subtype = $this->app->response->subtype();
             if ($output instanceof \JsonSerializable) {
                 $this->handleSerializableOutput($output, $subtype);
             } elseif ($output instanceof WebUIBuilder) {
                 $this->handleUIBuilderOutput($output, $subtype);
-            } elseif ($output instanceof FileOutput) {
+            } elseif ($output instanceof FileOutputStream) {
                 $this->prepareFileStreaming($output);
                 return;
             }
@@ -118,10 +118,10 @@ namespace shani\http {
 
         /**
          * Stream a file as HTTP response
-         * @param FileOutput $output
+         * @param FileOutputStream $output
          * @return void
          */
-        private function prepareFileStreaming(FileOutput $output): void
+        private function prepareFileStreaming(FileOutputStream $output): void
         {
             if (!is_readable($output->filepath)) {
                 $this->app->response->setStatus(HttpStatus::NOT_FOUND);

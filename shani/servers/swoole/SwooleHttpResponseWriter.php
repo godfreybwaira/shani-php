@@ -9,7 +9,7 @@
 
 namespace shani\servers\swoole {
 
-    use lib\http\ResponseEntity;
+    use shani\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
     use Swoole\Http\Response as SwooleResponse;
 

@@ -9,13 +9,13 @@
 
 namespace shani\advisors {
 
-    use lib\Duration;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
+    use features\utils\Duration;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
-    use shani\core\Framework;
+    use shani\Framework;
     use shani\exceptions\CustomException;
     use shani\http\App;
 

@@ -9,21 +9,21 @@
 
 namespace shani {
 
-    use lib\Concurrency;
+    use features\utils\Concurrency;
     use lib\ds\map\ReadableMap;
-    use lib\Event;
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
-    use lib\http\RequestEntity;
-    use lib\http\ResponseEntity;
+    use features\utils\Event;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
+    use shani\http\RequestEntity;
+    use shani\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
-    use shani\core\Framework;
-    use shani\core\log\Logger;
-    use shani\core\log\LogLevel;
+    use shani\Framework;
+    use features\log\Logger;
+    use features\log\LogLevel;
     use shani\http\App;
-    use shani\persistence\LocalStorage;
-    use test\helpers\TestRunner;
+    use features\persistence\LocalStorage;
+    use features\test\helpers\TestRunner;
 
     final class ApplicationLauncher
     {
@@ -57,7 +57,7 @@ namespace shani {
         {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
-            $server->request(function (RequestEntity $request, ResponseWriter $writer, FrameworkConfig $framework) {
+            $server->request(function (RequestEntity $request, ResponseWriter $writer, Framework $framework) {
                 $hostname = $request->uri->hostname();
                 $vhost = self::host($hostname);
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());

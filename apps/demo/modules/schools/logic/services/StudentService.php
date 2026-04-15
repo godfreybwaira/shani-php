@@ -10,7 +10,7 @@
 namespace apps\demo\modules\schools\logic\services {
 
     use apps\demo\modules\schools\data\entities\StudentEntity;
-    use shani\persistence\DatabaseConnection;
+    use features\persistence\DatabaseConnection;
 
     final class StudentService
     {

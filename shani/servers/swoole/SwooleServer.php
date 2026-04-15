@@ -9,17 +9,17 @@
 
 namespace shani\servers\swoole {
 
-    use lib\DataConvertor;
-    use lib\File;
-    use lib\http\HttpStatus;
-    use lib\http\RequestEntity;
-    use lib\MediaType;
-    use lib\RequestEntityBuilder;
+    use features\utils\DataConvertor;
+    use features\utils\File;
+    use shani\http\enums\HttpStatus;
+    use shani\http\RequestEntity;
+    use features\utils\MediaType;
+    use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
     use shani\contracts\SupportedWebServer;
-    use shani\core\Framework;
-    use shani\FrameworkConfig;
+    use shani\Framework;
+    use shani\Framework;
     use shani\ApplicationLauncher;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
@@ -39,13 +39,13 @@ namespace shani\servers\swoole {
         private const SCHEDULING = ['ROUND_ROBIN' => 1, 'FIXED' => 2, 'PREEMPTIVE' => 3, 'IPMOD' => 4];
 
         private readonly Server $server;
-        private readonly FrameworkConfig $framework;
+        private readonly Framework $framework;
         private readonly bool $forceRedirection;
         private readonly int $httpPort, $httpsPort;
         private readonly string $ip;
         private array $clients = [];
 
-        public function __construct(FrameworkConfig $framework)
+        public function __construct(Framework $framework)
         {
             self::CheckRequirements();
             $swoole = yaml_parse_file(__DIR__ . '/config.yml');

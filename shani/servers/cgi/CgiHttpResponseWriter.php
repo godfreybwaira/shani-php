@@ -9,7 +9,7 @@
 
 namespace shani\servers\cgi {
 
-    use lib\http\ResponseEntity;
+    use shani\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
 
     final class CgiHttpResponseWriter implements ResponseWriter

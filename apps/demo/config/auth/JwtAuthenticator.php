@@ -9,9 +9,9 @@
 
 namespace apps\demo\config\auth {
 
-    use shani\authentication\AuthenticationStrategy;
-    use shani\authentication\UserDetailsDto;
-    use shani\documentation\scanners\Endpoints;
+    use features\authentication\AuthenticationStrategy;
+    use features\authentication\UserDetailsDto;
+    use features\documentation\scanners\Endpoints;
     use shani\http\App;
 
     final class JwtAuthenticator implements AuthenticationStrategy

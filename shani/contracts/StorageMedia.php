@@ -9,8 +9,8 @@
 
 namespace shani\contracts {
 
-    use lib\File;
-    use lib\URI;
+    use features\utils\File;
+    use features\utils\URI;
 
     interface StorageMedia
     {

@@ -1,7 +1,7 @@
 <?php
 
 use shani\ApplicationLauncher;
-use shani\FrameworkConfig;
+use shani\Framework;
 
 /**
  * Server root directory
@@ -15,7 +15,7 @@ define('SHANI_CURRENT_TIMESTAMP', date(DATE_RFC3339));
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
-$config = new FrameworkConfig();
+$config = new Framework();
 
 if (PHP_SAPI === 'cli') {
     /**

@@ -9,17 +9,17 @@
 
 namespace apps\demo\middleware {
 
-    use lib\jwt\JWTAlgorithm;
-    use lib\jwt\JWTClaim;
-    use lib\oauth2\dto\AccessTokenDto;
-    use lib\oauth2\dto\AuthorizationCodeDetailsDto;
-    use lib\oauth2\dto\DeviceCodeDetailsDto;
-    use lib\oauth2\dto\OauthClientDetailsDto;
-    use lib\oauth2\dto\RefreshTokenDto;
-    use lib\oauth2\Oauth2GrantType;
-    use lib\oauth2\Oauth2Repository;
-    use lib\URI;
-    use shani\authentication\UserDetailsDto;
+    use features\jwt\JWTAlgorithm;
+    use features\jwt\JWTClaim;
+    use features\oauth2\dto\AccessTokenDto;
+    use features\oauth2\dto\AuthorizationCodeDetailsDto;
+    use features\oauth2\dto\DeviceCodeDetailsDto;
+    use features\oauth2\dto\OauthClientDetailsDto;
+    use features\oauth2\dto\RefreshTokenDto;
+    use features\oauth2\Oauth2GrantType;
+    use features\oauth2\Oauth2Repository;
+    use features\utils\URI;
+    use features\authentication\UserDetailsDto;
 
     final class Oauth2Client implements Oauth2Repository
     {

@@ -9,8 +9,8 @@
 
 namespace apps\demo\modules\security\logic\controllers\post {
 
-    use lib\oauth2\OAuth2TokenAuthorizer;
-    use lib\oauth2\OAuth2TokenIssuer;
+    use features\oauth2\OAuth2TokenAuthorizer;
+    use features\oauth2\OAuth2TokenIssuer;
     use shani\http\App;
 
     final class Oauth2

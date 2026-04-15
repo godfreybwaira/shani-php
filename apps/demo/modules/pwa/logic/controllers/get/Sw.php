@@ -10,8 +10,8 @@
 namespace apps\demo\modules\pwa\logic\controllers\get {
 
     use gui\WebUI;
-    use lib\http\FileOutput;
-    use lib\http\HttpHeader;
+    use shani\http\FileOutputStream;
+    use shani\http\HttpHeader;
     use shani\http\App;
 
     final class Sw
@@ -24,11 +24,11 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): FileOutput
+        public function index(): FileOutputStream
         {
             $file = WebUI::assetPath('/js/pwa-sw.js');
             $this->app->response->header()->addOne(HttpHeader::SERVICE_WORKER_ALLOWED, '/');
-            return new FileOutput($file);
+            return new FileOutputStream($file);
         }
     }
 

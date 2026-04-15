@@ -9,8 +9,8 @@
 
 namespace shani\exceptions {
 
-    use lib\http\HttpHeader;
-    use lib\http\HttpStatus;
+    use shani\http\HttpHeader;
+    use shani\http\enums\HttpStatus;
     use shani\http\App;
 
     final class CustomException

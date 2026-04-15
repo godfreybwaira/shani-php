@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use shani\core\Framework;
+    use shani\Framework;
 
     final class RequestRoute
     {

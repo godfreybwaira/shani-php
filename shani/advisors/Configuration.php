@@ -10,25 +10,25 @@
 
 namespace shani\advisors {
 
-    use lib\crypto\DigitalSignature;
-    use lib\crypto\Encryption;
-    use lib\DataCompression;
-    use lib\oauth2\Oauth2Repository;
+    use features\crypto\DigitalSignature;
+    use features\crypto\Encryption;
+    use features\utils\DataCompression;
+    use features\oauth2\Oauth2Repository;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
-    use shani\authentication\AuthenticationManager;
+    use features\authentication\AuthenticationManager;
     use shani\contracts\StorageMedia;
-    use shani\core\Framework;
-    use shani\core\log\LogLevel;
-    use shani\documentation\scanners\Endpoints;
+    use shani\Framework;
+    use features\log\LogLevel;
+    use features\documentation\scanners\Endpoints;
     use shani\http\App;
     use shani\http\Middleware;
     use shani\http\RequestRoute;
-    use shani\persistence\DatabaseConnection;
-    use shani\persistence\LocalStorage;
-    use shani\persistence\session\SessionConnectionInterface;
-    use test\TestResult;
+    use features\persistence\DatabaseConnection;
+    use features\persistence\LocalStorage;
+    use features\persistence\session\SessionConnectionInterface;
+    use features\test\TestResult;
 
     abstract class Configuration
     {
@@ -79,8 +79,8 @@ namespace shani\advisors {
         public function getSessionConnection(): ?SessionConnectionInterface
         {
 //            return null;
-//            return new \shani\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
-            return new \shani\persistence\session\dto\RedisConnectionDto('localhost', 6379);
+//            return new \features\persistence\session\dto\MemcachedConnectionDto('localhost', 11211);
+            return new \features\persistence\session\dto\RedisConnectionDto('localhost', 6379);
         }
 
         /**

@@ -9,7 +9,7 @@
 
 namespace shani\contracts {
 
-    use lib\http\ResponseEntity;
+    use shani\http\ResponseEntity;
 
     interface ResponseWriter
     {

@@ -12,21 +12,21 @@ namespace apps\demo\config {
     use apps\demo\middleware\Oauth2Client;
     use apps\demo\middleware\Test;
     use lib\client\HttpClient;
-    use lib\http\HttpStatus;
-    use lib\http\ResponseEntity;
-    use lib\oauth2\Oauth2Repository;
-    use lib\URI;
+    use shani\http\enums\HttpStatus;
+    use shani\http\ResponseEntity;
+    use features\oauth2\Oauth2Repository;
+    use features\utils\URI;
     use shani\advisors\Configuration;
-    use shani\core\Framework;
+    use shani\Framework;
     use shani\http\App;
     use shani\http\Middleware;
-    use shani\persistence\DatabaseConnection;
-    use shani\persistence\DatabaseDriver;
-    use test\helpers\TestCategory;
-    use test\helpers\TestSeverity;
-    use test\TestCase;
-    use test\TestGroup;
-    use test\TestResult;
+    use features\persistence\DatabaseConnection;
+    use features\persistence\DatabaseDriver;
+    use features\test\helpers\TestCategory;
+    use features\test\helpers\TestSeverity;
+    use features\test\TestCase;
+    use features\test\TestGroup;
+    use features\test\TestResult;
 
     final class Settings extends Configuration
     {

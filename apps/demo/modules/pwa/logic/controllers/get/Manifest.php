@@ -9,17 +9,17 @@
 
 namespace apps\demo\modules\pwa\logic\controllers\get {
 
-    use gui\pwa\enums\PwaAppPlatform;
-    use gui\pwa\enums\PwaCategory;
-    use gui\pwa\enums\PwaDisplayMode;
-    use gui\pwa\enums\PwaFormFactor;
-    use gui\pwa\enums\PwaIconPurpose;
-    use gui\pwa\enums\PwaOrientation;
-    use gui\pwa\enums\PwaTextDirection;
-    use gui\pwa\PwaDimension;
-    use gui\pwa\PwaIcon;
-    use gui\pwa\PwaManifestBuilder;
-    use gui\pwa\PwaRelatedApplication;
+    use features\pwa\enums\PwaAppPlatform;
+    use features\pwa\enums\PwaCategory;
+    use features\pwa\enums\PwaDisplayMode;
+    use features\pwa\enums\PwaFormFactor;
+    use features\pwa\enums\PwaIconPurpose;
+    use features\pwa\enums\PwaOrientation;
+    use features\pwa\enums\PwaTextDirection;
+    use features\pwa\PwaDimension;
+    use features\pwa\PwaIcon;
+    use features\pwa\PwaManifestBuilder;
+    use features\pwa\PwaRelatedApplication;
     use lib\ds\map\ReadableMap;
     use shani\http\App;
 

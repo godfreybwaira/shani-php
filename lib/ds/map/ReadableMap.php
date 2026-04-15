@@ -9,7 +9,7 @@
 
 namespace lib\ds\map {
 
-    use lib\DataConvertor;
+    use features\utils\DataConvertor;
     use lib\ds\ReadableData;
 
     class ReadableMap extends ReadableData
