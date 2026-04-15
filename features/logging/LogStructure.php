@@ -7,7 +7,7 @@
  * Created on: Apr 7, 2025 at 4:40:54 PM
  */
 
-namespace features\log {
+namespace features\logging {
 
     final class LogStructure implements \Stringable
     {

@@ -19,8 +19,8 @@ namespace shani\launcher {
     use shani\contracts\ResponseWriter;
     use shani\contracts\SupportedWebServer;
     use shani\launcher\Framework;
-    use features\log\Logger;
-    use features\log\LogLevel;
+    use features\logging\Logger;
+    use features\logging\LogLevel;
     use shani\launcher\App;
     use features\persistence\LocalStorage;
     use features\test\helpers\TestRunner;

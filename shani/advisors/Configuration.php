@@ -20,7 +20,7 @@ namespace shani\advisors {
     use features\authentication\AuthenticationManager;
     use shani\contracts\StorageMedia;
     use shani\launcher\Framework;
-    use features\log\LogLevel;
+    use features\logging\LogLevel;
     use features\documentation\scanners\Endpoints;
     use shani\launcher\App;
     use shani\http\Middleware;

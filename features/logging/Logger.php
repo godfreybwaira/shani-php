@@ -7,7 +7,7 @@
  * Created on: Apr 7, 2025 at 3:14:22 PM
  */
 
-namespace features\log {
+namespace features\logging {
 
     final class Logger
     {

@@ -7,7 +7,7 @@
  * Created on: Apr 9, 2025 at 4:59:02 PM
  */
 
-namespace features\log {
+namespace features\logging {
 
     enum ConsolePrinter: int
     {

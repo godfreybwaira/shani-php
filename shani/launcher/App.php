@@ -12,7 +12,7 @@ namespace shani\launcher {
 
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
-    use features\log\Logger;
+    use features\logging\Logger;
     use features\persistence\LocalStorage;
     use features\session\PersistentSessionStorage;
     use features\session\SessionStorageInterface;
