@@ -9,18 +9,18 @@
 
 namespace features\persistence {
 
+    use features\exceptions\CustomException;
+    use features\exceptions\ServerException;
     use features\utils\Concurrency;
     use features\utils\File;
+    use features\utils\URI;
+    use shani\contracts\StorageMedia;
+    use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
     use shani\http\HttpHeader;
-    use shani\http\enums\HttpStatus;
-    use features\utils\URI;
-    use shani\contracts\StorageMedia;
-    use shani\launcher\Framework;
-    use features\exceptions\CustomException;
-    use features\exceptions\ServerException;
     use shani\launcher\App;
+    use shani\launcher\Framework;
 
     final class LocalStorage implements StorageMedia
     {
@@ -132,6 +132,16 @@ namespace features\persistence {
             }
             $app->writer->send($output);
             return true;
+        }
+
+        /**
+         * Get asset real path
+         * @param string $path asset location relative to asset directory
+         * @return string real path pointing to asset
+         */
+        public static function assetPath(string $path): string
+        {
+            return Framework::DIR_ASSETS . $path;
         }
 
         #[\Override]

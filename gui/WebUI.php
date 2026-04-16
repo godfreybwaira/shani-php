@@ -52,16 +52,6 @@ namespace gui {
         }
 
         /**
-         * Get asset real path
-         * @param string $path asset location relative to asset directory
-         * @return string real path pointing to asset
-         */
-        public static function assetPath(string $path): string
-        {
-            return Framework::DIR_ASSETS . $path;
-        }
-
-        /**
          * Set and/or get current view file to be rendered as HTML to client.
          * @param string $path Case sensitive Path to view file, if not provided then
          * the view file will be the same as current executing function name. All views
