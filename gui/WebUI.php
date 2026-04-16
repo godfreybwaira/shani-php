@@ -11,11 +11,11 @@ namespace gui {
 
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
-    use shani\http\HttpCookie;
+    use shani\contracts\StorageMedia;
     use shani\http\enums\HttpSameSite;
-    use shani\launcher\Framework;
+    use shani\http\HttpCookie;
     use shani\launcher\App;
-    use features\persistence\LocalStorage;
+    use shani\launcher\Framework;
 
     final class WebUI
     {
@@ -27,22 +27,28 @@ namespace gui {
         public readonly MutableMap $attr;
         private readonly WebUIBuilder $builder;
         private readonly App $app;
+        private readonly StorageMedia $storage;
 
         private function __construct(App $app, WebUIBuilder $builder)
         {
             $this->app = $app;
-            $this->builder = $builder;
             $this->attr = $builder->attr;
+            $this->storage = $this->app->storage();
+            $builder->style($this->storage->assetUri('/css/icons/mdi.css'));
+            $builder->style($this->storage->assetUri('/css/main.css'));
+            $builder->script($this->storage->assetUri('/js/shani-ob-2.0.js'), ['defer']);
+            $builder->script($this->storage->assetUri('/js/app.js'), ['defer']);
+            $this->builder = $builder;
         }
 
         /**
-         * Get asset URI
+         * Get asset URI as string
          * @param string $path asset location relative to asset directory
          * @return string URI pointing to asset
          */
-        public function assetUri(string $path): string
+        public function asset(string $path): string
         {
-            return $this->app->storage()->uri(LocalStorage::ACCESS_ASSET . $path)->asString();
+            return $this->storage->assetUri($path)->asString();
         }
 
         /**
@@ -131,11 +137,11 @@ namespace gui {
             }
             $styles = $this->builder->getStyles();
             foreach ($styles as $url => $attr) {
-                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $this->assetUri($url) . '"/>';
+                $head .= '<link ' . $attr . ' rel="stylesheet" href="' . $url . '"/>';
             }
             $scripts = $this->builder->getScripts();
             foreach ($scripts as $url => $attr) {
-                $head .= '<script ' . $attr . ' src="' . $this->assetUri($url) . '"></script>';
+                $head .= '<script ' . $attr . ' src="' . $url . '"></script>';
             }
             return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appName()) . '</title>';
         }

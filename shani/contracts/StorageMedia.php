@@ -26,6 +26,13 @@ namespace shani\contracts {
         public function save(File $file, string $bucket = '/', bool $rename = true): string;
 
         /**
+         * Get asset file URI
+         * @param string $filepath File path
+         * @return URI A URL referring to a file from a storage media
+         */
+        public function assetUri(string $filepath): URI;
+
+        /**
          * Get file URI
          * @param string $filepath File path
          * @return URI A URL referring to a file from a storage media

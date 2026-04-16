@@ -9,8 +9,9 @@
 
 namespace gui {
 
-    use features\pwa\PwaBuilder;
     use features\ds\map\MutableMap;
+    use features\pwa\PwaBuilder;
+    use features\utils\URI;
 
     final class WebUIBuilder
     {
@@ -26,7 +27,7 @@ namespace gui {
         private ?\JsonSerializable $data;
         private ?PwaBuilder $pwaBuilder = null;
         private array $scripts, $styles;
-        private array $details = [];
+        private array $metadata = [];
         private string $icon;
 
         public function __construct(\JsonSerializable $data = null)
@@ -37,10 +38,6 @@ namespace gui {
             $this->attr = new MutableMap();
             $this->scripts = $this->styles = [];
             $this->icon = '<link rel="icon" href="data:,">';
-            $this->style('/css/main.css');
-            $this->style('/css/icons/mdi.css');
-            $this->script('/js/shani-ob-2.0.js', ['defer']);
-            $this->script('/js/app.js', ['defer']);
         }
 
         /**
@@ -114,13 +111,13 @@ namespace gui {
 
         /**
          * Set HTML document icon (favicon)
-         * @param string $path Path to icon file
+         * @param URI $path Path to icon file
          * @param string $mediaType media type of a file
          * @return self
          */
-        public function icon(string $path, string $mediaType): self
+        public function icon(URI $path, string $mediaType): self
         {
-            $this->icon = '<link rel="icon" href="' . $path . '" type="' . $mediaType . '"/>';
+            $this->icon = '<link rel="icon" href="' . $path->asString() . '" type="' . $mediaType . '"/>';
             return $this;
         }
 
@@ -151,7 +148,7 @@ namespace gui {
          */
         public function meta(string $name, string $value): self
         {
-            $this->details[$name] = $value;
+            $this->metadata[$name] = $value;
             return $this;
         }
 
@@ -161,7 +158,7 @@ namespace gui {
          */
         public function getMeta(): array
         {
-            return $this->details;
+            return $this->metadata;
         }
 
         /**
@@ -185,15 +182,15 @@ namespace gui {
         }
 
         /**
-         * Set link to external script file for HTML document relative to asset directory.
-         * @param string $src Path to JavaScript file(s) relative to asset directory.
+         * Set link to external script file.
+         * @param URI $src Path to JavaScript.
          * @param array $attributes Script attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function script(string $src, array $attributes = []): self
+        public function script(URI $src, array $attributes = []): self
         {
-            self::createHeader($this->scripts, $src, $attributes);
+            $this->scripts[$src->asString()] = self::getAttributeString($attributes);
             return $this;
         }
 
@@ -207,15 +204,15 @@ namespace gui {
         }
 
         /**
-         * Set link to external CSS file relative to asset directory.
-         * @param string $href Path to CSS file relative to asset directory.
+         * Set css style file.
+         * @param URI $href Path to CSS file.
          * @param array $attributes Style attributes, must conform to HTML
          * attributes naming standard
          * @return self
          */
-        public function style(string $href, array $attributes = []): self
+        public function style(URI $href, array $attributes = []): self
         {
-            self::createHeader($this->styles, $href, $attributes);
+            $this->styles[$href->asString()] = self::getAttributeString($attributes);
             return $this;
         }
 
@@ -228,12 +225,13 @@ namespace gui {
             return $this->styles;
         }
 
-        private static function createHeader(array &$head, string $url, array &$attributes): void
+        private static function getAttributeString(array $attributes): string
         {
-            $head[$url] = null;
+            $str = null;
             foreach ($attributes as $key => $val) {
-                $head[$url] .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
+                $str .= is_int($key) ? $val . ' ' : $key . '="' . $val . '" ';
             }
+            return trim($str);
         }
     }
 

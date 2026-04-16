@@ -28,9 +28,9 @@ namespace features\persistence {
         /**
          * Access to public assets in an asset directory. Everyone has an access.
          */
-        public const ACCESS_ASSET = '/0';
-        public const FILE_MODE = 0700;
+        private const ACCESS_ASSET = '/0';
         private const ID_SEPARATOR = '_', GID_INITIAL = 'g', PID_INITIAL = 'u';
+        public const FILE_MODE = 0700;
 
         private readonly App $app;
         private readonly string $host, $storage;
@@ -175,6 +175,12 @@ namespace features\persistence {
                 return $destination;
             }
             throw new ServerException('Failed to create directory ' . $destination);
+        }
+
+        #[\Override]
+        public function assetUri(string $path): URI
+        {
+            return $this->uri(self::ACCESS_ASSET . $path);
         }
 
         #[\Override]
