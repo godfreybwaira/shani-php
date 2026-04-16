@@ -29,7 +29,7 @@ namespace features\logging {
             }
         }
 
-        private function writeMessage(string $message, LogLevel $level): self
+        private function writeMessage(string $message, LoggingLevel $level): self
         {
             $structure = new LogStructure($message, $level);
             if ($this->stream !== null) {
@@ -39,14 +39,14 @@ namespace features\logging {
             return $this->writeConsoleMessage($structure, $level);
         }
 
-        private function writeConsoleMessage(LogStructure $structure, LogLevel $level): self
+        private function writeConsoleMessage(LogStructure $structure, LoggingLevel $level): self
         {
             $space = str_repeat(' ', 3);
             $textColor = match ($level) {
-                LogLevel::EMERGENCY => ConsolePrinter::COLOR_MAGENTA,
-                LogLevel::WARNING => ConsolePrinter::COLOR_YELLOW,
-                LogLevel::ERROR => ConsolePrinter::COLOR_RED,
-                LogLevel::INFO => ConsolePrinter::COLOR_CYAN,
+                LoggingLevel::EMERGENCY => ConsolePrinter::COLOR_MAGENTA,
+                LoggingLevel::WARNING => ConsolePrinter::COLOR_YELLOW,
+                LoggingLevel::ERROR => ConsolePrinter::COLOR_RED,
+                LoggingLevel::INFO => ConsolePrinter::COLOR_CYAN,
             };
             $text = LogStructure::NOW . $space;
             $text .= '[ ' . ConsolePrinter::colorText($structure->level, $textColor) . ' ]';
@@ -58,31 +58,31 @@ namespace features\logging {
 
         public function warning(string $message): self
         {
-            return $this->log(LogLevel::WARNING, $message);
+            return $this->log(LoggingLevel::WARNING, $message);
         }
 
         public function error(string $message): self
         {
-            return $this->log(LogLevel::ERROR, $message);
+            return $this->log(LoggingLevel::ERROR, $message);
         }
 
         public function emergency(string $message): self
         {
-            return $this->log(LogLevel::EMERGENCY, $message);
+            return $this->log(LoggingLevel::EMERGENCY, $message);
         }
 
         public function info(string $message): self
         {
-            return $this->log(LogLevel::INFO, $message);
+            return $this->log(LoggingLevel::INFO, $message);
         }
 
         /**
          * Log exceptions to a log file/destination
-         * @param LogLevel $level Log level
+         * @param LoggingLevel $level Log level
          * @param string $message Message to log
          * @return self
          */
-        public function log(LogLevel $level, string $message): self
+        public function log(LoggingLevel $level, string $message): self
         {
             if (empty($this->handler)) {
                 return $this->writeMessage($message, $level);

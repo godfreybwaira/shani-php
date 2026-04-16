@@ -10,7 +10,7 @@
 namespace features\test\helpers {
 
     use features\ds\map\ReadableMap;
-    use features\logging\LogLevel;
+    use features\logging\LoggingLevel;
     use shani\launcher\ApplicationLauncher;
     use shani\launcher\Framework;
 
@@ -76,7 +76,7 @@ namespace features\test\helpers {
         public static function start(ReadableMap $vhost, string $hostname): string
         {
             touch(self::TEST_FILE);
-            ApplicationLauncher::log(LogLevel::INFO, 'Test is running...');
+            ApplicationLauncher::log(LoggingLevel::INFO, 'Test is running...');
             $passes = self::run($vhost, $hostname);
             if ($passes) {
                 return 'Test finished and passed.';

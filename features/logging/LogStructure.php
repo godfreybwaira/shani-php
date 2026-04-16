@@ -16,7 +16,7 @@ namespace features\logging {
 
         public const NOW = SHANI_CURRENT_TIMESTAMP;
 
-        public function __construct(string $message, LogLevel $level)
+        public function __construct(string $message, LoggingLevel $level)
         {
             $this->message = $message;
             $this->level = $level->name;

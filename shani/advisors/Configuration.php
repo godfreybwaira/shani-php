@@ -20,7 +20,7 @@ namespace shani\advisors {
     use features\authentication\AuthenticationManager;
     use shani\contracts\StorageMedia;
     use shani\launcher\Framework;
-    use features\logging\LogLevel;
+    use features\logging\LoggingLevel;
     use features\documentation\scanners\Endpoints;
     use shani\launcher\App;
     use shani\http\Middleware;
@@ -162,7 +162,7 @@ namespace shani\advisors {
          */
         public function errorHandler(\Throwable $t): ?string
         {
-            $this->app->logger()->log(LogLevel::ERROR, $t->getMessage());
+            $this->app->logger()->log(LoggingLevel::ERROR, $t->getMessage());
             return null;
         }
 

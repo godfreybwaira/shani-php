@@ -20,7 +20,7 @@ namespace shani\launcher {
     use shani\contracts\SupportedWebServer;
     use shani\launcher\Framework;
     use features\logging\Logger;
-    use features\logging\LogLevel;
+    use features\logging\LoggingLevel;
     use shani\launcher\App;
     use features\persistence\LocalStorage;
     use features\test\helpers\TestRunner;
@@ -72,7 +72,7 @@ namespace shani\launcher {
             });
         }
 
-        public static function log(LogLevel $level, string $message): void
+        public static function log(LoggingLevel $level, string $message): void
         {
             if (PHP_SAPI === 'cli') {
                 echo $message . PHP_EOL;
