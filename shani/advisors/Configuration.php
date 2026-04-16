@@ -117,16 +117,7 @@ namespace shani\advisors {
          */
         public function skipCsrfProtection(): bool
         {
-            return $this->app->platform() === 'api';
-        }
-
-        /**
-         * Check if the current request method is protected from CSRF attacks
-         * @return bool True if request method is protected, false otherwise.
-         */
-        public function csrfProtected(): bool
-        {
-            return str_contains('post,put,patch,delete', $this->app->request->method);
+            return !str_contains('post,put,patch,delete', $this->app->request->method);
         }
 
         /**

@@ -68,10 +68,7 @@ namespace shani\advisors {
          */
         public function csrfTest(): self
         {
-            if ($this->app->config->skipCsrfProtection()) {
-                return $this;
-            }
-            if ($this->app->config->csrfProtected()) {
+            if (!$this->app->config->skipCsrfProtection()) {
                 $tokenName = $this->app->config->csrfTokenName();
                 $token = $this->app->request->cookie->getOne($tokenName);
                 if ($this->app->csrfToken()->getOne($tokenName) !== $token) {
