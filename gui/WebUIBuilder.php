@@ -27,8 +27,7 @@ namespace gui {
         private ?\JsonSerializable $data;
         private ?PwaBuilder $pwaBuilder = null;
         private array $scripts, $styles;
-        private array $metadata = [];
-        private string $icon;
+        private array $metadata = [], $links = [];
 
         public function __construct(\JsonSerializable $data = null)
         {
@@ -37,7 +36,7 @@ namespace gui {
             $this->viewPath = null;
             $this->attr = new MutableMap();
             $this->scripts = $this->styles = [];
-            $this->icon = '<link rel="icon" href="data:,">';
+            $this->link('icon', 'data:,');
         }
 
         /**
@@ -117,17 +116,30 @@ namespace gui {
          */
         public function icon(URI $path, string $mediaType): self
         {
-            $this->icon = '<link rel="icon" href="' . $path->asString() . '" type="' . $mediaType . '"/>';
+            return $this->link('icon', $path->asString(), ['type' => $mediaType]);
+        }
+
+        /**
+         * Set HTML link tag
+         * @param string $rel Link relationship
+         * @param string $href Link href
+         * @param array $attributes Other attributes (key-value pair
+         * @return self
+         */
+        public function link(string $rel, string $href, array $attributes = []): self
+        {
+            $attributes['href'] = $href;
+            $this->links[$rel] = self::getAttributeString($attributes);
             return $this;
         }
 
         /**
-         * Get HTML document icon (favicon)
-         * @return string
+         * Get HTML links
+         * @return array
          */
-        public function getIcon(): string
+        public function getLinks(): array
         {
-            return $this->icon;
+            return $this->links;
         }
 
         /**

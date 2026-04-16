@@ -113,10 +113,14 @@ namespace gui {
          */
         public function head(): string
         {
-            $head = $this->builder->getIcon();
+            $head = null;
             $meta = $this->builder->getMeta();
             foreach ($meta as $name => $value) {
                 $head .= '<meta name="' . $name . '" content="' . $value . '"/>';
+            }
+            $links = $this->builder->getLinks();
+            foreach ($links as $rel => $attrbites) {
+                $head .= '<link ' . $attrbites . ' rel="' . $rel . '"/>';
             }
             $pwaBuilder = $this->builder->getPwaBuilder();
             if ($pwaBuilder !== null) {
