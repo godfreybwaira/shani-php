@@ -28,6 +28,7 @@ namespace shani\launcher {
          * @var ReadableMap
          */
         public readonly ReadableMap $vhost;
+        public readonly string $requestVersionHeader;
 
         /**
          * Content version response header.
@@ -35,10 +36,11 @@ namespace shani\launcher {
          */
         public readonly ?string $contentVersionHeader;
 
-        public function __construct(string $appVersion, ReadableMap $vhost, ?string $contentVersionHeader)
+        public function __construct(string $appVersion, ReadableMap $vhost, string $requestVersionHeader, ?string $contentVersionHeader)
         {
             $this->appVersion = $appVersion;
             $this->vhost = $vhost;
+            $this->requestVersionHeader = $requestVersionHeader;
             $this->contentVersionHeader = $contentVersionHeader;
         }
     }

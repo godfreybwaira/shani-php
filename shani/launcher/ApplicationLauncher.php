@@ -32,9 +32,9 @@ namespace shani\launcher {
         {
             $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
             $file = Framework::DIR_HOSTS . '/' . $hostname . '/' . $host['version']['supported'][$version];
-            if (is_file($file)) {
+            if (is_readable($file)) {
                 $vhost = new ReadableMap(yaml_parse_file($file));
-                return new RequestPreference($version, $vhost, $host['version']['response_header']);
+                return new RequestPreference($version, $vhost, $host['version']['request_header'], $host['version']['response_header']);
             }
             throw new \Exception('Configuration file for application version "' . $version . '" does not exists.');
         }
@@ -49,11 +49,11 @@ namespace shani\launcher {
         private static function host(string $name, HttpHeader $headers): RequestPreference
         {
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
-            if (is_file($yaml)) {
+            if (is_readable($yaml)) {
                 return self::getConfigPreference($name, yaml_parse_file($yaml), $headers);
             }
             $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
-            if (is_file($alias)) {
+            if (is_readable($alias)) {
                 $host = file_get_contents($alias);
                 return static::host(trim($host), $headers);
             }
@@ -73,6 +73,7 @@ namespace shani\launcher {
                 $hostname = $request->uri->hostname();
                 $responseHeader = new HttpHeader();
                 $preference = self::host($hostname, $request->header());
+                $responseHeader->addOne(HttpHeader::VARY, $preference->requestVersionHeader);
                 if ($preference->contentVersionHeader !== null) {
                     $responseHeader->addOne($preference->contentVersionHeader, $preference->appVersion);
                 }
