@@ -21,7 +21,7 @@ namespace features\session {
         private bool $closed = false;
         private readonly SessionConnectionInterface $conn;
 
-        private function __construct(App $app, SessionConnectionInterface $conn)
+        public function __construct(App $app, SessionConnectionInterface $conn)
         {
             $this->conn = $conn;
             $this->app = $app;
@@ -94,14 +94,6 @@ namespace features\session {
         private function getCookieDomain(): string
         {
             return '.' . ltrim($this->app->request->uri->hostname(), 'www.');
-        }
-
-        public static function getStorage(App $app, ?SessionConnectionInterface $conn): SessionStorageInterface
-        {
-            if ($conn === null) {
-                return new MemorySessionStorage();
-            }
-            return new PersistentSessionStorage($app, $conn);
         }
     }
 

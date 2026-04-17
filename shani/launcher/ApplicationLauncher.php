@@ -28,22 +28,34 @@ namespace shani\launcher {
     final class ApplicationLauncher
     {
 
+        private static function getConfigPreference(string $hostname, array $host, HttpHeader $headers): RequestPreference
+        {
+            $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
+            $file = Framework::DIR_HOSTS . '/' . $hostname . '/' . $host['version']['supported'][$version];
+            if (is_file($file)) {
+                $vhost = new ReadableMap(yaml_parse_file($file));
+                return new RequestPreference($version, $vhost, $host['version']['response_header']);
+            }
+            throw new \Exception('Configuration file for application version "' . $version . '" does not exists.');
+        }
+
         /**
          * Get Virtual host configurations
          * @param string $name Host name
-         * @return ReadableMap
+         * @param HttpHeader $headers HTTP request headers
+         * @return RequestPreference
          * @throws \Exception
          */
-        private static function host(string $name): ReadableMap
+        private static function host(string $name, HttpHeader $headers): RequestPreference
         {
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                return new ReadableMap(yaml_parse_file($yaml));
+                return self::getConfigPreference($name, yaml_parse_file($yaml), $headers);
             }
             $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {
                 $host = file_get_contents($alias);
-                return static::host(trim($host));
+                return static::host(trim($host), $headers);
             }
             throw new \Exception('Host "' . $name . '" not found');
         }
@@ -59,13 +71,17 @@ namespace shani\launcher {
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriter $writer, Framework $framework) {
                 $hostname = $request->uri->hostname();
-                $vhost = self::host($hostname);
-                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
-                if (!$vhost->getOne('testmode')) {
-                    $app = new App($vhost, $response, $writer, $framework);
+                $responseHeader = new HttpHeader();
+                $preference = self::host($hostname, $request->header());
+                if ($preference->contentVersionHeader !== null) {
+                    $responseHeader->addOne($preference->contentVersionHeader, $preference->appVersion);
+                }
+                $response = new ResponseEntity($request, HttpStatus::OK, $responseHeader, new ReadableMap());
+                if (!$preference->vhost->getOne('testmode')) {
+                    $app = new App($preference->vhost, $response, $writer, $framework);
                     $app->launch();
                 } else {
-                    $msg = TestRunner::start($vhost, $hostname);
+                    $msg = TestRunner::start($preference->vhost, $hostname);
                     $response->setBody($msg);
                     $writer->close($response);
                 }

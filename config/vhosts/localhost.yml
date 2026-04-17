@@ -1,7 +1,15 @@
-# Must extends shani\advisors\Configuration
-config: \apps\demo\config\Settings
-# Active configuration profile. The framework does not provide any logic regarding
-# this variable. You should handle the logic manually
-profile: dev.yml
-# Wheter to run application test using provided profile.
-testmode: false
+# =============================================
+# Versioning Strategy
+# =============================================
+version:
+  # HTTP request Header used to specify the requested version
+  request_header: "Accept-Version"
+  # HTTP response Header used to specify the response version (can be null)
+  response_header: "Content-Version"
+
+  # Version to use when the header is missing or invalid
+  default: v1
+
+  # Mapping of supported versions → their specific configuration files
+  supported:
+    v1: v1-config.yml

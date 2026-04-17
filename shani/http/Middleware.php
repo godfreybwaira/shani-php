@@ -59,7 +59,7 @@ namespace shani\http {
             }
             $accepted = $this->app->request->header()->getOne(HttpHeader::ACCEPT, HttpHeader::CONTENT_TYPE);
             if ($accepted === '*/*' || $accepted === null) {
-                $accepted = $this->app->platform() === 'web' ? MediaType::TEXT_HTML : MediaType::JSON;
+                $accepted = MediaType::TEXT_HTML;
             }
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::parse($accepted)[0]);
         }
@@ -74,9 +74,7 @@ namespace shani\http {
             $this->setProperContentType();
             $security->setBrowsingPolicy();
             $security->preflightRequest();
-            $this->app->on('web', function () use (&$security) {
-                $security->addCspHeaders()->addResourceAccessPolicy()->csrfTest();
-            });
+            $security->addCspHeaders()->addResourceAccessPolicy()->csrfTest();
             $security->authorized()->passedRequestMethodCheck();
             if ($this->listener->listening('before')) {
                 $this->listener->trigger('before');

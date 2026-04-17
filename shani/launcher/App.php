@@ -14,14 +14,13 @@ namespace shani\launcher {
     use features\exceptions\CustomException;
     use features\logging\Logger;
     use features\persistence\LocalStorage;
-    use features\session\PersistentSessionStorage;
+    use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
     use shani\contracts\StorageMedia;
     use shani\http\enums\HttpStatus;
-    use shani\http\HttpHeader;
     use shani\http\HttpWriter;
     use shani\http\Middleware;
     use shani\http\RequestEntity;
@@ -34,7 +33,7 @@ namespace shani\launcher {
         private StorageMedia $storage;
         private ?Logger $logger = null;
         public readonly SessionStorageInterface $session;
-        private ?string $lang = null, $platform = null;
+        private ?string $lang = null;
 
         /**
          * HTTP response writer
@@ -125,42 +124,6 @@ namespace shani\launcher {
             $middleware->runWith(new SecurityMiddleware($this));
         }
 
-        /**
-         * Execute a callback function only when a application is in a given context
-         * execution environment. Currently, 'web' and 'api' context are supported by
-         * the framework. Developer is advised to use 'web' for web application and 'api'
-         * for API application, but can define and handle different application context
-         * depending on type of application needs. Client application can supply
-         * this context via accept-version header.
-         * @param string $version Application execution context.
-         * @param \Closure $cb A callback to execute that accept application object as an argument.
-         * @return self
-         */
-        public function on(string $version, \Closure $cb): self
-        {
-            if ($this->platform() === $version) {
-                $cb($this);
-            }
-            return $this;
-        }
-
-        /**
-         * Get HTTP application platform set by client application.
-         * This value is set via HTTP accept-version header. Currently, accepted
-         * values are 'web' for web application and 'api' for api application.
-         * If none given, 'web' is assumed.
-         * @example accept-version:web
-         * @return string|null
-         */
-        public function platform(): ?string
-        {
-            if ($this->platform === null) {
-                $str = $this->request->header()->getOne(HttpHeader::ACCEPT_VERSION) ?? 'web';
-                $this->platform = strtolower($str);
-            }
-            return $this->platform;
-        }
-
         public function csrfToken(): ReadableMap
         {
             return $this->session->cart('_gGOd2y$oN');
@@ -169,7 +132,7 @@ namespace shani\launcher {
         private function getSession(): SessionStorageInterface
         {
             $conn = $this->config->getSessionConnection();
-            return PersistentSessionStorage::getStorage($this, $conn);
+            return SessionStorage::getStorage($this, $conn);
         }
 
         /**
