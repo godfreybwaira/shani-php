@@ -33,7 +33,7 @@ namespace shani\launcher {
             $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
             $filename = $host['version']['supported'][$version] ?? null;
             $filepath = Framework::DIR_HOSTS . '/' . $hostname . '/' . $filename;
-            if (is_file($filepath)) {
+            if ($filename !== null && is_file($filepath)) {
                 $vhost = new ReadableMap(yaml_parse_file($filepath));
                 return new RequestPreference($version, $vhost, $host['version']['request_header'], $host['version']['response_header']);
             }
@@ -76,13 +76,16 @@ namespace shani\launcher {
                 $hostname = $request->uri->hostname();
                 $preference = self::host($hostname, $request->header());
                 if ($preference === null) {
-                    $response->setStatus(HttpStatus::BAD_REQUEST)->setBody('Unsupported application version.');
+                    $response->setStatus(HttpStatus::BAD_REQUEST)->setBody('Unsupported application version');
                     $writer->send($response);
                     return;
                 }
                 $responseHeader->addOne(HttpHeader::VARY, $preference->requestVersionHeader);
                 if ($preference->contentVersionHeader !== null) {
-                    $responseHeader->addOne($preference->contentVersionHeader, $preference->appVersion);
+                    $responseHeader->addAll([
+                        $preference->contentVersionHeader => $preference->appVersion,
+                        HttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS => $preference->contentVersionHeader
+                    ]);
                 }
                 if (!$preference->vhost->getOne('testmode')) {
                     $app = new App($preference->vhost, $response, $writer, $framework);
