@@ -9,7 +9,7 @@ version:
   # Set to null if you don't want to return any version header
   response_header: "Content-Version"
 
-  # Fallback version when request_header is missing or invalid
+  # Fallback version when request_header is missing
   default: v1
 
   # Supported versions and their dedicated config files

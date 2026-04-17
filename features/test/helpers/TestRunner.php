@@ -9,10 +9,10 @@
 
 namespace features\test\helpers {
 
-    use features\ds\map\ReadableMap;
     use features\logging\LoggingLevel;
     use shani\launcher\ApplicationLauncher;
     use shani\launcher\Framework;
+    use shani\launcher\RequestPreference;
 
     final class TestRunner
     {
@@ -24,60 +24,51 @@ namespace features\test\helpers {
             return is_file(self::TEST_FILE);
         }
 
-        private static function run(ReadableMap $vhost, string $hostname): bool
+        private static function run(RequestPreference $preference): bool
         {
-            $source = self::getHostFilePath($hostname);
-            $destination = sys_get_temp_dir() . '/' . basename($source) . '.bak';
-            self::createBackupFile($source, $destination);
-            $content = $vhost->toArray();
+            $backupFile = sys_get_temp_dir() . '/' . bin2hex(random_bytes(20)) . '.bak';
+            self::createBackupFile($preference->configFile, $backupFile);
+            $content = $preference->vhost->toArray();
             $content['testmode'] = false;
-            if (file_put_contents($source, yaml_emit($content)) === false) {
-                self::removeBackupFile($source, $destination);
+            if (file_put_contents($preference->configFile, yaml_emit($content)) === false) {
+                self::removeBackupFile($preference->configFile, $backupFile);
                 throw new \Exception('Could not start a test, host file is not writable.');
             }
-            $test = $vhost->getOne('config')::runTest();
-            self::removeBackupFile($source, $destination);
+            $test = $preference->vhost->getOne('config')::runTest();
+            self::removeBackupFile($preference->configFile, $backupFile);
             return $test->getResult();
         }
 
-        private static function getHostFilePath(string $hostname): string
+        public static function createBackupFile(string $originalFile, string $backupFile): void
         {
-            $alias = Framework::DIR_HOSTS . '/' . $hostname . '.alias';
-            $filename = is_file($alias) ? trim(file_get_contents($alias)) : $hostname;
-            return Framework::DIR_HOSTS . '/' . $filename . '.yml';
-        }
-
-        public static function createBackupFile(string $source, string $destination): void
-        {
-            if (!is_file($source)) {
+            if (!is_file($originalFile)) {
                 self::stop();
-                throw new \Exception('Source file not found: ' . $source);
+                throw new \Exception('Source file not found: ' . $originalFile);
             }
-            if (!is_file($destination) && !copy($source, $destination)) {
+            if (!is_file($backupFile) && !copy($originalFile, $backupFile)) {
                 self::stop();
                 throw new \Exception('Could not start a test because host file is not writable.');
             }
         }
 
-        public static function removeBackupFile(string $source, string $destination): void
+        public static function removeBackupFile(string $originalFile, string $backupFile): void
         {
-            if (is_file($source) && is_file($destination)) {
-                rename($destination, $source);
+            if (is_file($originalFile) && is_file($backupFile)) {
+                rename($backupFile, $originalFile);
             }
             self::stop();
         }
 
         /**
          * Run application test
-         * @param ReadableMap $vhost Host configuration
-         * @param string $hostname Host name
+         * @param RequestPreference $preference Client request preference
          * @return string Test result description and status
          */
-        public static function start(ReadableMap $vhost, string $hostname): string
+        public static function start(RequestPreference $preference): string
         {
             touch(self::TEST_FILE);
             ApplicationLauncher::log(LoggingLevel::INFO, 'Test is running...');
-            $passes = self::run($vhost, $hostname);
+            $passes = self::run($preference);
             if ($passes) {
                 return 'Test finished and passed.';
             }

@@ -34,8 +34,7 @@ namespace shani\launcher {
             $filename = $host['version']['supported'][$version] ?? null;
             $filepath = Framework::DIR_HOSTS . '/' . $hostname . '/' . $filename;
             if ($filename !== null && is_file($filepath)) {
-                $vhost = new ReadableMap(yaml_parse_file($filepath));
-                return new RequestPreference($version, $vhost, $host['version']['request_header'], $host['version']['response_header']);
+                return new RequestPreference($version, $filepath, $host['version']['request_header'], $host['version']['response_header']);
             }
             return null;
         }
@@ -73,8 +72,7 @@ namespace shani\launcher {
             $server->request(function (RequestEntity $request, ResponseWriter $writer, Framework $framework) {
                 $responseHeader = new HttpHeader();
                 $response = new ResponseEntity($request, HttpStatus::OK, $responseHeader, new ReadableMap());
-                $hostname = $request->uri->hostname();
-                $preference = self::host($hostname, $request->header());
+                $preference = self::host($request->uri->hostname(), $request->header());
                 if ($preference === null) {
                     $response->setStatus(HttpStatus::BAD_REQUEST)->setBody('Unsupported application version');
                     $writer->send($response);
@@ -91,7 +89,8 @@ namespace shani\launcher {
                     $app = new App($preference->vhost, $response, $writer, $framework);
                     $app->launch();
                 } else {
-                    $msg = TestRunner::start($preference->vhost, $hostname);
+                    echo json_encode($preference);
+                    $msg = TestRunner::start($preference);
                     $response->setBody($msg);
                     $writer->close($response);
                 }
@@ -106,7 +105,7 @@ namespace shani\launcher {
             if (!is_dir(Framework::DIR_SERVER_STORAGE)) {
                 mkdir(Framework::DIR_SERVER_STORAGE, LocalStorage::FILE_MODE, true);
             }
-            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->value . '.log';
+            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->name . '.log';
             (new Logger($file))->log($level, $message);
         }
 
