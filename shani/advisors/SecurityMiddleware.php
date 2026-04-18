@@ -72,7 +72,7 @@ namespace shani\advisors {
                 $tokenName = $this->app->config->csrfTokenName();
                 $expectedToken = $this->app->csrfToken()->getOne($tokenName);
                 $submittedToken = $this->app->request->header()->getOne($tokenName) ?? $this->app->request->body()->getOne($tokenName);
-                if (!hash_equals($expectedToken, $submittedToken)) {
+                if (empty($submittedToken) || !hash_equals($expectedToken, $submittedToken)) {
                     throw CustomException::notAcceptable($this->app, 'Invalid or missing CSRF token');
                 }
             }
