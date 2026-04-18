@@ -61,7 +61,7 @@ namespace features\session {
         public function refresh(): SessionStorageInterface
         {
             if ($this->app->config->enableCsrfProtection()) {
-                $token = \features\crypto\SymmetricSignature::createSignature();
+                $token = bin2hex(random_bytes(32));
                 $tokenName = $this->app->config->csrfTokenName();
                 $this->app->csrfToken()->addOne($tokenName, $token);
                 $this->app->response->header()->addOne($tokenName, $token);

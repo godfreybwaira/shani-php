@@ -195,7 +195,7 @@ namespace gui {
         {
             if ($this->app->config->enableCsrfProtection()) {
                 $tokenName = $this->app->config->csrfTokenName();
-                $token = $this->app->csrfToken()->getOne($tokenName, \features\crypto\SymmetricSignature::createSignature());
+                $token = $this->app->csrfToken()->getOne($tokenName, bin2hex(random_bytes(32)));
                 $this->app->csrfToken()->addOne($tokenName, $token);
                 return '<input type="hidden" name="' . $tokenName . '" value="' . $token . '"/>';
             }
