@@ -53,7 +53,7 @@ namespace features\otp {
 
         /**
          * Generates a Time-based one time password (TOTP)
-         * @param string $password A shared secret key.
+         * @param string $password OTP password. See <code>OTP::password</code>
          * @param int $length The number of OTP digits (default 6 digits).
          * @param int $period The time step in seconds (default 30 seconds)
          * @param string $issuer The issuer or organization name.

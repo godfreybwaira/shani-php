@@ -53,7 +53,7 @@ namespace features\otp {
 
         /**
          * Generates a Count-based one time password (HOTP)
-         * @param string $password A shared secret key.
+         * @param string $password OTP password. See <code>OTP::password</code>
          * @param int $counter The starting counter for HOTP.
          * @param int $length The number of OTP digits (default 6).
          * @param string $issuer The issuer or organization name.

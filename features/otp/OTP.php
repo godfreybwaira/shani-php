@@ -23,9 +23,7 @@ namespace features\otp {
         {
             $chars = null;
             $charsLength = strlen(DataConvertor::BASE32_CHARS);
-            for ($i = 0;
-                    $i < $length;
-                    $i++) {
+            for ($i = 0; $i < $length; $i++) {
                 $chars .= DataConvertor::BASE32_CHARS[random_int(0, $charsLength - 1)];
             }
             return $chars;

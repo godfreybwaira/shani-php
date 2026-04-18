@@ -50,12 +50,12 @@ namespace features\persistence {
 
         private static function createClause(array $params, string $clause, string $join, ?string $prefix = null): ?string
         {
-            $data = [];
+            $filters = [];
             foreach ($params as $key => $value) {
-                $data[] = $key . '=:' . $prefix . $key;
+                $filters[] = $key . '=:' . $prefix . $key;
             }
-            if (!empty($data)) {
-                return " $clause " . implode($join, $data);
+            if (!empty($filters)) {
+                return " $clause " . implode($join, $filters);
             }
             return null;
         }
@@ -228,7 +228,7 @@ namespace features\persistence {
         public function count(string $collection, array $where = []): int
         {
             $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'SELECT COUNT(*) AS total FROM ' . $collection . $whereClause;
+            $sql = 'SELECT COUNT(*) AS c FROM ' . $collection . $whereClause;
             $statement = $this->processQuery($sql, $where);
             return (int) $statement->fetchColumn();
         }
