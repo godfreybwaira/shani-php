@@ -10,6 +10,7 @@
 
 namespace shani\launcher {
 
+    use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
     use features\logging\Logger;
@@ -124,7 +125,7 @@ namespace shani\launcher {
             $middleware->runWith(new SecurityMiddleware($this));
         }
 
-        public function csrfToken(): ReadableMap
+        public function csrfToken(): MutableMap
         {
             return $this->session->cart('_gGOd2y$oN');
         }

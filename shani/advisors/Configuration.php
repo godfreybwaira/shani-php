@@ -78,9 +78,7 @@ namespace shani\advisors {
          */
         public function getSessionConnection(): ?SessionConnectionInterface
         {
-//            return null;
-//            return new \features\session\dto\MemcachedConnectionDto('localhost', 11211);
-            return new \features\session\dto\RedisConnectionDto('localhost', 6379);
+            return new \features\session\dto\FileConnectionDto();
         }
 
         /**
@@ -388,12 +386,14 @@ namespace shani\advisors {
         }
 
         /**
-         * Get name of the CSRF token used in CSRF protection.
+         * Get name of the CSRF token used in CSRF protection. CSRF token is placed on
+         * HTTP request header. Every time the client make a request must provide this header,
+         * otherwise the request will be rejected.
          * @return string
          */
         public function csrfTokenName(): string
         {
-            return 'csrf_token';
+            return 'X-Csrf-Token';
         }
 
         /**

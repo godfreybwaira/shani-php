@@ -45,6 +45,10 @@ namespace features\authentication {
                         'permissions' => $user->permissions,
                         'id' => $user->id
                     ]);
+                    $token = \features\crypto\SymmetricSignature::createSignature();
+                    $tokenName = $this->app->config->csrfTokenName();
+                    $this->app->csrfToken()->addOne($tokenName, $token);
+                    $this->app->response->header()->addOne($tokenName, $token);
                     $this->app->session->refresh();
                     return true;
                 }

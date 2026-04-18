@@ -12,9 +12,10 @@ namespace apps\demo\config {
     use apps\demo\middleware\Oauth2Client;
     use apps\demo\middleware\Test;
     use features\oauth2\Oauth2Repository;
-    use features\persistence\SQLDatabase;
     use features\persistence\DatabaseDriver;
     use features\persistence\DatabaseInterface;
+    use features\persistence\SQLDatabase;
+    use features\session\SessionConnectionInterface;
     use features\test\helpers\TestCategory;
     use features\test\helpers\TestSeverity;
     use features\test\TestCase;
@@ -140,6 +141,11 @@ namespace apps\demo\config {
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
             ];
+        }
+
+        public function getSessionConnection(): ?SessionConnectionInterface
+        {
+            return new \features\session\dto\RedisConnectionDto('localhost', 6379);
         }
     }
 

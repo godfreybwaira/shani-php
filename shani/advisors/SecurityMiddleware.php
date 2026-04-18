@@ -70,9 +70,10 @@ namespace shani\advisors {
         {
             if (!$this->app->config->skipCsrfProtection()) {
                 $tokenName = $this->app->config->csrfTokenName();
-                $token = $this->app->request->cookie->getOne($tokenName);
-                if ($this->app->csrfToken()->getOne($tokenName) !== $token) {
-                    throw CustomException::notAcceptable($this->app);
+                $expectedToken = $this->app->csrfToken()->getOne($tokenName);
+                $submittedToken = $this->app->request->header()->getOne($tokenName) ?? $this->app->request->body()->getOne($tokenName);
+                if (!hash_equals($expectedToken, $submittedToken)) {
+                    throw CustomException::notAcceptable($this->app, 'Invalid or missing CSRF token');
                 }
             }
             return $this;

@@ -194,19 +194,23 @@ namespace gui {
          * then the request URI path will be used.
          * @return string URL safe from CSRF attack
          */
-        public function csrf(?string $url = null): string
+        public function csrf(): ?string
         {
-            if (!$this->app->config->skipCsrfProtection()) {
-                $tokenName = $this->app->config->csrfTokenName();
-                $token = $this->app->csrfToken()->getOne($tokenName, base64_encode(random_bytes(21)));
-                $this->app->csrfToken()->addOne($tokenName, $token);
-                $cookie = (new HttpCookie())->setName($tokenName)
-                        ->setSameSite(HttpSameSite::LAX)
-                        ->setValue($token)->setHttpOnly(true)
-                        ->setSecure($this->app->request->uri->secure());
-                $this->app->response->header()->setCookie($cookie);
-            }
-            return $url ?? $this->app->request->uri;
+            $tokenName = $this->app->config->csrfTokenName();
+            $token = $this->app->csrfToken()->getOne($tokenName, \features\crypto\SymmetricSignature::createSignature());
+            $this->app->csrfToken()->addOne($tokenName, $token);
+            return '<input type="hidden" name="' . $tokenName . '" value="' . $token . '"/>';
+        }
+
+        /**
+         * Returns currently requesting URI or $url, whichever is not null. Useful
+         * when used in HTML form action attribute.
+         * @param string|null $url URL to replace currently requesting URI
+         * @return string
+         */
+        public function url(?string $url = null): string
+        {
+            return $url ?? $this->app->request->uri->asString();
         }
     }
 
