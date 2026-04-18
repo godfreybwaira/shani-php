@@ -7,7 +7,7 @@
  * Created on: Apr 28, 2025 at 9:57:48 AM
  */
 
-namespace features\crypto\otp {
+namespace features\otp {
 
     use features\utils\DataConvertor;
 
