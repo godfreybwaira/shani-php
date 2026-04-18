@@ -14,7 +14,7 @@ namespace features\persistence {
     use features\utils\Concurrency;
     use features\utils\File;
     use features\utils\URI;
-    use shani\contracts\StorageMedia;
+    use shani\contracts\StorageMediaInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
@@ -22,7 +22,7 @@ namespace features\persistence {
     use shani\launcher\App;
     use shani\launcher\Framework;
 
-    final class LocalStorage implements StorageMedia
+    final class LocalStorage implements StorageMediaInterface
     {
 
         /**

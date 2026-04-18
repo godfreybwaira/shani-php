@@ -24,7 +24,7 @@ namespace shani\advisors {
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
-    use shani\contracts\StorageMedia;
+    use shani\contracts\StorageMediaInterface;
     use shani\http\Middleware;
     use shani\http\RequestRoute;
     use shani\launcher\App;
@@ -410,9 +410,9 @@ namespace shani\advisors {
         /**
          * Get file storage media where uploaded files will be saved and retrieved.
          * To be able to use remote storage.
-         * @return StorageMedia
+         * @return StorageMediaInterface
          */
-        public function getStorageMedia(): StorageMedia
+        public function getStorageMedia(): StorageMediaInterface
         {
             return new LocalStorage($this->app);
         }

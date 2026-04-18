@@ -11,7 +11,7 @@ namespace gui {
 
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
-    use shani\contracts\StorageMedia;
+    use shani\contracts\StorageMediaInterface;
     use shani\http\enums\HttpSameSite;
     use shani\http\HttpCookie;
     use shani\launcher\App;
@@ -27,7 +27,7 @@ namespace gui {
         public readonly MutableMap $attr;
         private readonly WebUIBuilder $builder;
         private readonly App $app;
-        private readonly StorageMedia $storage;
+        private readonly StorageMediaInterface $storage;
 
         private function __construct(App $app, WebUIBuilder $builder)
         {

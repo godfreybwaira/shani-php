@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of StorageMedia
+ * Description of StorageMediaInterface
  * @author coder
  *
  * Created on: Mar 27, 2025 at 5:29:05 PM
@@ -12,7 +12,7 @@ namespace shani\contracts {
     use features\utils\File;
     use features\utils\URI;
 
-    interface StorageMedia
+    interface StorageMediaInterface
     {
 
         /**

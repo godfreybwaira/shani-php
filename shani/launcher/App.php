@@ -19,7 +19,7 @@ namespace shani\launcher {
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
-    use shani\contracts\StorageMedia;
+    use shani\contracts\StorageMediaInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
     use shani\http\Middleware;
@@ -30,7 +30,7 @@ namespace shani\launcher {
     final class App
     {
 
-        private StorageMedia $storage;
+        private StorageMediaInterface $storage;
         private ?Logger $logger = null;
         public readonly SessionStorageInterface $session;
         private ?string $lang = null;
@@ -153,9 +153,9 @@ namespace shani\launcher {
 
         /**
          * Get storage object representing application storage directory
-         * @return StorageMedia
+         * @return StorageMediaInterface
          */
-        public function storage(): StorageMedia
+        public function storage(): StorageMediaInterface
         {
             return $this->storage ??= $this->config->getStorageMedia();
         }
