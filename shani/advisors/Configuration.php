@@ -10,25 +10,25 @@
 
 namespace shani\advisors {
 
+    use features\authentication\AuthenticationManager;
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
-    use features\utils\DataCompression;
-    use features\oauth2\Oauth2Repository;
-    use shani\advisors\web\BrowsingPrivacy;
-    use shani\advisors\web\ContentSecurityPolicy;
-    use shani\advisors\web\ResourceAccessPolicy;
-    use features\authentication\AuthenticationManager;
-    use shani\contracts\StorageMedia;
-    use shani\launcher\Framework;
-    use features\logging\LoggingLevel;
     use features\documentation\scanners\Endpoints;
-    use shani\launcher\App;
-    use shani\http\Middleware;
-    use shani\http\RequestRoute;
-    use features\persistence\DatabaseConnection;
+    use features\logging\LoggingLevel;
+    use features\oauth2\Oauth2Repository;
+    use features\persistence\DatabaseInterface;
     use features\persistence\LocalStorage;
     use features\session\SessionConnectionInterface;
     use features\test\TestResult;
+    use features\utils\DataCompression;
+    use shani\advisors\web\BrowsingPrivacy;
+    use shani\advisors\web\ContentSecurityPolicy;
+    use shani\advisors\web\ResourceAccessPolicy;
+    use shani\contracts\StorageMedia;
+    use shani\http\Middleware;
+    use shani\http\RequestRoute;
+    use shani\launcher\App;
+    use shani\launcher\Framework;
 
     abstract class Configuration
     {
@@ -506,9 +506,9 @@ namespace shani\advisors {
         /**
          * Get database connection object specified by connection name. If no
          * connection name specified then default connection will be returned
-         * @return DatabaseConnection|null Database connection
+         * @return DatabaseInterface|null Database object
          */
-        public function database(): ?DatabaseConnection
+        public function database(): ?DatabaseInterface
         {
             return null;
         }

@@ -11,22 +11,23 @@ namespace apps\demo\config {
 
     use apps\demo\middleware\Oauth2Client;
     use apps\demo\middleware\Test;
-    use features\utils\HttpClient;
-    use shani\http\enums\HttpStatus;
-    use shani\http\ResponseEntity;
     use features\oauth2\Oauth2Repository;
-    use features\utils\URI;
-    use shani\advisors\Configuration;
-    use shani\launcher\Framework;
-    use shani\launcher\App;
-    use shani\http\Middleware;
-    use features\persistence\DatabaseConnection;
+    use features\persistence\SQLDatabase;
     use features\persistence\DatabaseDriver;
+    use features\persistence\DatabaseInterface;
     use features\test\helpers\TestCategory;
     use features\test\helpers\TestSeverity;
     use features\test\TestCase;
     use features\test\TestGroup;
     use features\test\TestResult;
+    use features\utils\HttpClient;
+    use features\utils\URI;
+    use shani\advisors\Configuration;
+    use shani\http\enums\HttpStatus;
+    use shani\http\Middleware;
+    use shani\http\ResponseEntity;
+    use shani\launcher\App;
+    use shani\launcher\Framework;
 
     final class Settings extends Configuration
     {
@@ -123,9 +124,9 @@ namespace apps\demo\config {
             return $result;
         }
 
-        public function database(): ?DatabaseConnection
+        public function database(): ?DatabaseInterface
         {
-            return new DatabaseConnection(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
+            return new SQLDatabase(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }
 
         public function getOauth2Repository(): Oauth2Repository

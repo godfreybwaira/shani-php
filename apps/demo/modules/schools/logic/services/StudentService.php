@@ -10,25 +10,25 @@
 namespace apps\demo\modules\schools\logic\services {
 
     use apps\demo\modules\schools\data\entities\StudentEntity;
-    use features\persistence\DatabaseConnection;
+    use features\persistence\DatabaseInterface;
 
     final class StudentService
     {
 
         private static StudentService $object;
         private readonly SubjectService $subjectService;
-        private readonly DatabaseConnection $conn;
+        private readonly DatabaseInterface $db;
 
-        private function __construct(DatabaseConnection $connection)
+        private function __construct(DatabaseInterface $database)
         {
-            $this->conn = $connection;
-            $this->subjectService = SubjectService::getObject($connection);
+            $this->db = $database;
+            $this->subjectService = SubjectService::getObject($database);
         }
 
-        public static function getObject(DatabaseConnection $connection): StudentService
+        public static function getObject(DatabaseInterface $database): StudentService
         {
             if (!isset(self::$object)) {
-                self::$object = new self($connection);
+                self::$object = new self($database);
             }
             return self::$object;
         }
