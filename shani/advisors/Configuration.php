@@ -110,12 +110,21 @@ namespace shani\advisors {
         }
 
         /**
-         * Enable/disable CSRF protection mechanism.
+         * Enable/disable CSRF protection by checking on request method.
          * @return bool True to skip, false otherwise.
          */
-        public function skipCsrfProtection(): bool
+        public function skipCsrfTest(): bool
         {
             return !str_contains('post,put,patch,delete', $this->app->request->method);
+        }
+
+        /**
+         * Enable/disable CSRF protection.
+         * @return bool True to enable, false otherwise (not recommended on production)
+         */
+        public function enableCsrfProtection(): bool
+        {
+            return true;
         }
 
         /**

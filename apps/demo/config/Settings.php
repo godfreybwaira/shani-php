@@ -59,7 +59,7 @@ namespace apps\demo\config {
             $mw->on('before', fn() => Test::m2($this->app));
         }
 
-        public function skipCsrfProtection(): bool
+        public function skipCsrfTest(): bool
         {
             return true;
         }

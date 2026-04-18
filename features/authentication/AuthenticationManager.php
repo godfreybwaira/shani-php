@@ -40,18 +40,18 @@ namespace features\authentication {
             }
             foreach ($this->strategies as $strategy) {
                 $user = $strategy->authenticate();
-                if ($user !== null && !$user->isDisabled) {
-                    $this->app->session->cart(self::CART_NAME)->addAll([
-                        'permissions' => $user->permissions,
-                        'id' => $user->id
-                    ]);
-                    $token = \features\crypto\SymmetricSignature::createSignature();
-                    $tokenName = $this->app->config->csrfTokenName();
-                    $this->app->csrfToken()->addOne($tokenName, $token);
-                    $this->app->response->header()->addOne($tokenName, $token);
-                    $this->app->session->refresh();
-                    return true;
+                if ($user === null) {
+                    continue;
                 }
+                if ($user->isDisabled) {
+                    break;
+                }
+                $this->app->session->cart(self::CART_NAME)->addAll([
+                    'permissions' => $user->permissions,
+                    'id' => $user->id
+                ]);
+                $this->app->session->refresh();
+                return true;
             }
             return false;
         }

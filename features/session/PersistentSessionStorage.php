@@ -30,7 +30,7 @@ namespace features\session {
 
         public function cartExists(string $cartName): bool
         {
-            return isset($this->carts[$cartName]);
+            return isset($_SESSION[$cartName]);
         }
 
         public function cart(string $cartName): MutableMap
@@ -60,6 +60,12 @@ namespace features\session {
 
         public function refresh(): SessionStorageInterface
         {
+            if ($this->app->config->enableCsrfProtection()) {
+                $token = \features\crypto\SymmetricSignature::createSignature();
+                $tokenName = $this->app->config->csrfTokenName();
+                $this->app->csrfToken()->addOne($tokenName, $token);
+                $this->app->response->header()->addOne($tokenName, $token);
+            }
             if (!$this->app->config->isAsync()) {
                 session_regenerate_id(true);
             }

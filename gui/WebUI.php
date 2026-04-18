@@ -187,30 +187,30 @@ namespace gui {
         }
 
         /**
-         * Set and get URL safe from CSRF attack. if CSRF is enabled, then the
-         * application will be protected against CSRF attack and the URL will be
-         * returned, otherwise the URL will be returned but CSRF will be turned off.
-         * @param string|null $url URL to protect from CSRF. If not supplied
-         * then the request URI path will be used.
-         * @return string URL safe from CSRF attack
+         * Create HTML input element and save CSRF token in user session.
+         * @return string|null Hidden HTML input element with CSRF token
+         * if protection enabled, otherwise null is returned.
          */
         public function csrf(): ?string
         {
-            $tokenName = $this->app->config->csrfTokenName();
-            $token = $this->app->csrfToken()->getOne($tokenName, \features\crypto\SymmetricSignature::createSignature());
-            $this->app->csrfToken()->addOne($tokenName, $token);
-            return '<input type="hidden" name="' . $tokenName . '" value="' . $token . '"/>';
+            if ($this->app->config->enableCsrfProtection()) {
+                $tokenName = $this->app->config->csrfTokenName();
+                $token = $this->app->csrfToken()->getOne($tokenName, \features\crypto\SymmetricSignature::createSignature());
+                $this->app->csrfToken()->addOne($tokenName, $token);
+                return '<input type="hidden" name="' . $tokenName . '" value="' . $token . '"/>';
+            }
+            return null;
         }
 
         /**
          * Returns currently requesting URI or $url, whichever is not null. Useful
          * when used in HTML form action attribute.
-         * @param string|null $url URL to replace currently requesting URI
+         * @param string|null $newUrl URL to replace currently requesting URI
          * @return string
          */
-        public function url(?string $url = null): string
+        public function url(?string $newUrl = null): string
         {
-            return $url ?? $this->app->request->uri->asString();
+            return $newUrl ?? $this->app->request->uri->asString();
         }
     }
 
