@@ -9,7 +9,7 @@
 
 namespace apps\demo\modules\pwa\logic\controllers\get {
 
-    use features\persistence\LocalStorage;
+    use features\storage\LocalStorage;
     use shani\http\FileOutputStream;
     use shani\http\HttpHeader;
     use shani\launcher\App;

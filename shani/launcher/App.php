@@ -14,13 +14,13 @@ namespace shani\launcher {
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
     use features\logging\Logger;
-    use features\persistence\LocalStorage;
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
+    use features\storage\LocalStorage;
+    use features\storage\StorageMediaInterface;
     use shani\advisors\Configuration;
     use shani\advisors\SecurityMiddleware;
     use shani\contracts\ResponseWriter;
-    use shani\contracts\StorageMediaInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
     use shani\http\Middleware;

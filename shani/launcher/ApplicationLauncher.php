@@ -22,7 +22,7 @@ namespace shani\launcher {
     use features\logging\Logger;
     use features\logging\LoggingLevel;
     use shani\launcher\App;
-    use features\persistence\LocalStorage;
+    use features\storage\LocalStorage;
     use features\test\helpers\TestRunner;
 
     final class ApplicationLauncher

@@ -14,7 +14,7 @@ namespace shani\launcher {
     final class Framework
     {
 
-        private const MB_1 = 1048576;
+        private const MB_1 = 1_048_576;
         public const NAME = 'Shani';
         public const VERSION = '2.0';
         public const SLOGAN = 'Shani yangu maanani';
@@ -24,7 +24,7 @@ namespace shani\launcher {
         /**
          * Default buffer size
          */
-        public const BUFFER_SIZE = 1_048_576; //1MB
+        public const BUFFER_SIZE = self::MB_1;
 
         /**
          * Default home function if no function name is provided on the URL
@@ -54,7 +54,7 @@ namespace shani\launcher {
         /**
          * Storage directory path
          */
-        public const DIR_STORAGE = SHANI_SERVER_ROOT . '/storage';
+        public const DIR_STORAGE = SHANI_SERVER_ROOT . '/bucket';
 
         /**
          * Storage directory path

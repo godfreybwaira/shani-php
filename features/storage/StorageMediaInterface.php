@@ -7,7 +7,7 @@
  * Created on: Mar 27, 2025 at 5:29:05 PM
  */
 
-namespace shani\contracts {
+namespace features\storage {
 
     use features\utils\File;
     use features\utils\URI;

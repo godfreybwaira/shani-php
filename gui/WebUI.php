@@ -11,9 +11,7 @@ namespace gui {
 
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
-    use shani\contracts\StorageMediaInterface;
-    use shani\http\enums\HttpSameSite;
-    use shani\http\HttpCookie;
+    use features\storage\StorageMediaInterface;
     use shani\launcher\App;
     use shani\launcher\Framework;
 

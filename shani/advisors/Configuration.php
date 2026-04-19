@@ -17,14 +17,15 @@ namespace shani\advisors {
     use features\logging\LoggingLevel;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseInterface;
-    use features\persistence\LocalStorage;
     use features\session\SessionConnectionInterface;
+    use features\storage\LocalStorage;
+    use features\storage\StorageMediaInterface;
     use features\test\TestResult;
     use features\utils\DataCompression;
     use shani\advisors\web\BrowsingPrivacy;
     use shani\advisors\web\ContentSecurityPolicy;
     use shani\advisors\web\ResourceAccessPolicy;
-    use shani\contracts\StorageMediaInterface;
+    use shani\assets\StaticAssetServers;
     use shani\http\Middleware;
     use shani\http\RequestRoute;
     use shani\launcher\App;
@@ -529,6 +530,15 @@ namespace shani\advisors {
         public function getOauth2Repository(): ?Oauth2Repository
         {
             return null;
+        }
+
+        /**
+         * Select your preferred static asset server.
+         * @return StaticAssetServers|null
+         */
+        public function getStaticAssetServer(): ?StaticAssetServers
+        {
+            return StaticAssetServers::SHANI;
         }
     }
 

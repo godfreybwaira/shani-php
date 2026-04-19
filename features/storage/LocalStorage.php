@@ -7,14 +7,14 @@
  * Created on: Feb 11, 2024 at 6:50:02 PM
  */
 
-namespace features\persistence {
+namespace features\storage {
 
     use features\exceptions\CustomException;
     use features\exceptions\ServerException;
+    use features\storage\StorageMediaInterface;
     use features\utils\Concurrency;
     use features\utils\File;
     use features\utils\URI;
-    use shani\contracts\StorageMediaInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
