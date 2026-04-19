@@ -9,6 +9,8 @@
 
 namespace shani\servers {
 
+    use shani\contracts\ConcurrencyInterface;
+    use shani\contracts\EventHandler;
 
     interface SupportedWebServer
     {

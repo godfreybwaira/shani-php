@@ -91,15 +91,15 @@ namespace shani\advisors {
             }
             if ($this->app->config->isAuthenticated()) {
                 $request = $this->app->request;
-                if ($this->app->config->accessibleByGuest()) {
+                if ($this->app->config->accessingGuestModule()) {
                     $request->changeRoute($this->app->config->homePath());
                     return $this;
                 }
-                if ($this->app->config->accessibleByPublic() || $this->app->config->accessGranted($request->method, $request->route())) {
+                if ($this->app->config->accessingPublicModule() || $this->app->config->accessGranted($request->method, $request->route())) {
                     return $this;
                 }
                 throw CustomException::forbidden($this->app);
-            } else if ($this->app->config->accessibleByGuest() || $this->app->config->accessibleByPublic()) {
+            } else if ($this->app->config->accessingGuestModule() || $this->app->config->accessingPublicModule()) {
                 return $this;
             }
             throw CustomException::notAuthorized($this->app);

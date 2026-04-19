@@ -319,7 +319,7 @@ namespace shani\advisors {
          * unauthenticated users (guests).
          * @return bool True on success, false otherwise.
          */
-        public function accessibleByPublic(): bool
+        public function accessingPublicModule(): bool
         {
             return false;
         }
@@ -328,7 +328,7 @@ namespace shani\advisors {
          * Check whether a given resource is available only to unauthenticated users.
          * @return bool True on success, false otherwise.
          */
-        public function accessibleByGuest(): bool
+        public function accessingGuestModule(): bool
         {
             return false;
         }
