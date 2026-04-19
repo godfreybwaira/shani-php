@@ -16,7 +16,7 @@ namespace shani\servers\cgi {
     use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
-    use shani\contracts\SupportedWebServer;
+    use shani\servers\SupportedWebServer;
     use shani\launcher\Framework;
     use shani\launcher\ApplicationLauncher;
 

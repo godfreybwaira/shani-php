@@ -24,29 +24,29 @@ namespace features\persistence {
          * Insert a single document/record
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param array $data Data to insert
+         * @param \JsonSerializable $object Data to insert
          * @return string|int The inserted ID
          */
-        public function insert(string $collection, array $data): string|int;
+        public function insert(string $collection, \JsonSerializable $object): string|int;
 
         /**
          * Insert multiple documents/records. This method is transaction-aware
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param array $data A @D array of data to insert
+         * @param \JsonSerializable $object A @D array of data to insert
          * @return bool True if all data inserted, false otherwise
          */
-        public function insertAll(string $collection, array $data): bool;
+        public function insertAll(string $collection, \JsonSerializable $object): bool;
 
         /**
          * Update documents/records
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param array $data New data
+         * @param \JsonSerializable $object New data
          * @param array $where Query parameters (key => value pair)
          * @return int Number of modified documents
          */
-        public function update(string $collection, array $data, array $where): int;
+        public function update(string $collection, \JsonSerializable $object, array $where): int;
 
         /**
          * Delete documents/records

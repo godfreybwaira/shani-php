@@ -17,7 +17,7 @@ namespace shani\launcher {
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\contracts\ResponseWriter;
-    use shani\contracts\SupportedWebServer;
+    use shani\servers\SupportedWebServer;
     use shani\launcher\Framework;
     use features\logging\Logger;
     use features\logging\LoggingLevel;

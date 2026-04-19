@@ -7,7 +7,7 @@
  * Created on: May 6, 2025 at 1:41:52 PM
  */
 
-namespace shani\contracts {
+namespace shani\servers {
 
 
     interface SupportedWebServer

@@ -96,8 +96,9 @@ namespace features\persistence {
             return $this->pdo->inTransaction();
         }
 
-        public function insert(string $collection, array $data): string|int
+        public function insert(string $collection, \JsonSerializable $object): string|int
         {
+            $data = $object->jsonSerialize();
             $columns = array_keys($data);
             $sql = 'INSERT INTO ' . $collection . '(' . implode(',', $columns);
             $sql .= ')VALUES(:' . implode(',:', $columns) . ')';
@@ -106,8 +107,9 @@ namespace features\persistence {
             return $this->pdo->lastInsertId();
         }
 
-        public function insertAll(string $collection, array $data): bool
+        public function insertAll(string $collection, \JsonSerializable $object): bool
         {
+            $data = $object->jsonSerialize();
             $columns = array_keys($data[0]); //Get column names from first row (all rows must have same structure)
             $valueSets = [];
             $params = [];
@@ -205,8 +207,9 @@ namespace features\persistence {
             return null;
         }
 
-        public function update(string $collection, array $data, array $where): int
+        public function update(string $collection, \JsonSerializable $object, array $where): int
         {
+            $data = $object->jsonSerialize();
             if (empty($data)) {
                 return 0;
             }
