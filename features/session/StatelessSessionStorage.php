@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of MemorySessionStorage
+ * Description of StatelessSessionStorage
  * @author goddy
  *
  * Created on: Apr 5, 2026 at 6:58:47 PM
@@ -11,10 +11,10 @@ namespace features\session {
 
     use features\ds\map\MutableMap;
 
-    final class MemorySessionStorage implements SessionStorageInterface
+    final class StatelessSessionStorage implements SessionStorageInterface
     {
 
-        protected array $carts = [];
+        private array $carts = [];
 
         public final function cartExists(string $cartName): bool
         {

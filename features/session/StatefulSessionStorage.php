@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of PersistentSessionStorage
+ * Description of StatefulSessionStorage
  * @author goddy
  *
  * Created on: Apr 3, 2026 at 7:27:49 PM
@@ -13,7 +13,7 @@ namespace features\session {
     use shani\http\enums\HttpSameSite;
     use shani\launcher\App;
 
-    final class PersistentSessionStorage implements SessionStorageInterface
+    final class StatefulSessionStorage implements SessionStorageInterface
     {
 
         private readonly App $app;

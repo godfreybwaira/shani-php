@@ -17,9 +17,9 @@ namespace features\session {
         public static function getStorage(App $app, ?SessionConnectionInterface $conn): SessionStorageInterface
         {
             if ($conn === null) {
-                return new MemorySessionStorage();
+                return new StatelessSessionStorage();
             }
-            return new PersistentSessionStorage($app, $conn);
+            return new StatefulSessionStorage($app, $conn);
         }
     }
 
