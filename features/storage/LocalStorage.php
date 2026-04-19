@@ -14,7 +14,9 @@ namespace features\storage {
     use features\storage\StorageMediaInterface;
     use features\utils\Concurrency;
     use features\utils\File;
+    use features\utils\MediaType;
     use features\utils\URI;
+    use shani\assets\StaticAssetServers;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
@@ -121,16 +123,21 @@ namespace features\storage {
 
         private static function sendFile(App $app, string $filepath): bool
         {
-            $output = null;
-            $etag = md5($app->request->uri->path());
+            $path = $app->request->uri->path();
+            $etag = md5($path);
             if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
+                $app->writer->send();
             } else {
                 $cache = (new HttpCache())->setEtag($etag);
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-                $output = new FileOutputStream($filepath);
+                match ($app->config->getStaticAssetServer()) {
+                    StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
+                    StaticAssetServers::NGINX => self::delegateToNginx($app, $path),
+                    StaticAssetServers::SHANI => self::delegateToShani($app, $filepath),
+                    default => void
+                };
             }
-            $app->writer->send($output);
             return true;
         }
 
@@ -276,6 +283,47 @@ namespace features\storage {
                 return substr($file, $pos + strlen(self::ID_SEPARATOR));
             }
             return $file;
+        }
+
+        /**
+         * Serve static assets using this framework
+         * @param App $app Application object
+         * @param string $filepath File path
+         * @return void
+         */
+        private static function delegateToShani(App $app, string $filepath): void
+        {
+            $app->writer->send(new FileOutputStream($filepath));
+        }
+
+        /**
+         * Serve static assets using this Nginx server
+         * @param App $app Application object
+         * @param string $filepath File path
+         * @return void
+         */
+        public static function delegateToNginx(App $app, string $filepath): void
+        {
+            $app->response->header()->addAll([
+                'X-Accel-Redirect' => $filepath,
+                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
+            ]);
+            $app->writer->send();
+        }
+
+        /**
+         * Serve static assets using Apache server
+         * @param App $app Application object
+         * @param string $filepath File path
+         * @return void
+         */
+        public static function delegateToApache(App $app, string $filepath): void
+        {
+            $app->response->header()->addAll([
+                'X-Sendfile' => $app->storage()->pathTo($filepath),
+                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
+            ]);
+            $app->writer->send();
         }
     }
 

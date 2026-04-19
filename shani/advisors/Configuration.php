@@ -534,9 +534,9 @@ namespace shani\advisors {
 
         /**
          * Select your preferred static asset server.
-         * @return StaticAssetServers|null
+         * @return StaticAssetServers
          */
-        public function getStaticAssetServer(): ?StaticAssetServers
+        public function getStaticAssetServer(): StaticAssetServers
         {
             return StaticAssetServers::SHANI;
         }
