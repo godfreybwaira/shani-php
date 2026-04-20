@@ -78,22 +78,27 @@ namespace features\storage {
          */
         public static function tryServe(App $app): bool
         {
+            $assetServer = $app->config->getStaticAssetServer();
+            if ($assetServer === StaticAssetServers::DISABLE) {
+                $app->writer->send();
+                return true;
+            }
             $path = $app->request->uri->path();
             $prefix = self::getPrefix($path);
             switch ($prefix) {
                 case self::ACCESS_ASSET:
                     $filepath = substr($path, strlen($prefix));
-                    return self::sendFile($app, Framework::DIR_ASSETS . $filepath);
+                    return self::sendFile($app, $assetServer, Framework::DIR_ASSETS . $filepath);
                 case $app->config->appProtectedStorage():
-                    return self::serveProtected($app, $path);
+                    return self::serveProtected($app, $assetServer, $path);
                 case $app->config->appPublicStorage():
-                    return self::sendFile($app, $app->storage()->pathTo($path));
+                    return self::sendFile($app, $assetServer, $app->storage()->pathTo($path));
                 default:
                     return false;
             }
         }
 
-        private static function serveProtected(App $app, string $filepath): bool
+        private static function serveProtected(App $app, StaticAssetServers $assetServer, string $filepath): bool
         {
             if (!$app->config->isAuthenticated()) {
                 throw CustomException::forbidden($app);
@@ -104,7 +109,7 @@ namespace features\storage {
                     throw CustomException::forbidden($app);
                 }
             }
-            return self::sendFile($app, $app->storage()->pathTo($filepath));
+            return self::sendFile($app, $assetServer, $app->storage()->pathTo($filepath));
         }
 
         private static function getFileOwnership(string $filepath): ?array
@@ -121,7 +126,7 @@ namespace features\storage {
             ];
         }
 
-        private static function sendFile(App $app, string $filepath): bool
+        private static function sendFile(App $app, StaticAssetServers $assetServer, string $filepath): bool
         {
             $path = $app->request->uri->path();
             $etag = md5($path);
@@ -131,11 +136,11 @@ namespace features\storage {
             } else {
                 $cache = (new HttpCache())->setEtag($etag);
                 $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-                match ($app->config->getStaticAssetServer()) {
+                match ($assetServer) {
                     StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
                     StaticAssetServers::NGINX => self::delegateToNginx($app, $path),
                     StaticAssetServers::SHANI => self::delegateToShani($app, $filepath),
-                    default => void
+                    default => $app->writer->send()
                 };
             }
             return true;
