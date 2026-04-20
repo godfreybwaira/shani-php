@@ -10,7 +10,6 @@
 
 namespace shani\advisors {
 
-    use features\authentication\AuthenticationManager;
     use features\authentication\UserDetailsDto;
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
@@ -49,21 +48,8 @@ namespace shani\advisors {
          */
         public function isAuthenticated(): bool
         {
-            $cartName = '_4u7h_U53r!';
-            if ($this->app->session->cartExists($cartName)) {
-                $cart = $this->app->session->cart($cartName);
-                $this->user = new UserDetailsDto($cart->getOne('id'), $cart->getOne('permissions'), $cart->getOne('disabled'));
-                return true;
-            }
-            $this->user = (new AuthenticationManager($this->app))->login();
-            if ($this->user === null) {
-                return false;
-            }
-            $this->app->session->cart($cartName)->addAll([
-                'permissions' => $this->user->permissions, 'id' => $this->user->id,
-                'disabled' => $this->user->isDisabled
-            ]);
-            return true;
+            $this->user = $this->app->auth->getUserDetails();
+            return $this->user !== null;
         }
 
         /**

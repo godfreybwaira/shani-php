@@ -10,6 +10,7 @@
 
 namespace shani\launcher {
 
+    use features\authentication\AuthenticationService;
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
@@ -73,6 +74,12 @@ namespace shani\launcher {
         public readonly Framework $framework;
 
         /**
+         * Authentication service
+         * @var AuthenticationService
+         */
+        public readonly AuthenticationService $auth;
+
+        /**
          * Create an application instance
          * @param ReadableMap $vhost Virtual host
          * @param ResponseEntity $res Response entity object
@@ -89,6 +96,7 @@ namespace shani\launcher {
             $class = $vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
+            $this->auth = new AuthenticationService($this);
         }
 
         /**
