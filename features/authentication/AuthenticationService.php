@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of AuthenticationManager
+ * Description of AuthenticationService
  * @author goddy
  *
  * Created on: Apr 7, 2026 at 9:14:26 AM
@@ -52,6 +52,30 @@ namespace features\authentication {
             return null;
         }
 
+        public function register(): ?UserDetailsDto
+        {
+            $strategies = $this->app->config->getAuthenticationStrategies();
+            foreach ($strategies as $strategy) {
+                $user = $strategy->register();
+                if ($user !== null) {
+                    return $user;
+                }
+            }
+            return null;
+        }
+
+        public function update(): ?UserDetailsDto
+        {
+            $strategies = $this->app->config->getAuthenticationStrategies();
+            foreach ($strategies as $strategy) {
+                $user = $strategy->update();
+                if ($user !== null) {
+                    return $user;
+                }
+            }
+            return null;
+        }
+
         /**
          * Destroy user session and return to home page.
          * @return void
@@ -67,7 +91,7 @@ namespace features\authentication {
          * Get authenticated user details
          * @return UserDetailsDto|null User details if user is found, null otherwise.
          */
-        public function getUserDetails(): ?UserDetailsDto
+        public function getSessionUserDetails(): ?UserDetailsDto
         {
             if ($this->isAuthenticated()) {
                 $cart = $this->app->session->cart(self::CART_NAME);

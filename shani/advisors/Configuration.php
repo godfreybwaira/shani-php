@@ -48,7 +48,7 @@ namespace shani\advisors {
          */
         public function isAuthenticated(): bool
         {
-            $this->user = $this->app->auth->getUserDetails();
+            $this->user = $this->app->auth->getSessionUserDetails();
             return $this->user !== null;
         }
 

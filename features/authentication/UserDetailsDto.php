@@ -1,7 +1,7 @@
 <?php
 
 /**
- * End-user who can log in and authorize applications.
+ * Registered system end-user.
  * @author goddy
  *
  * Created on: Mar 16, 2026 at 2:33:41 PM
