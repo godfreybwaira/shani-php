@@ -18,7 +18,7 @@ namespace shani\servers\swoole {
 
         private readonly SwooleResponse $writer;
 
-        public function __construct(SwooleResponse &$writer)
+        public function __construct(SwooleResponse $writer)
         {
             $this->writer = $writer;
         }

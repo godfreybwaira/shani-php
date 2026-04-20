@@ -258,7 +258,7 @@ namespace features\utils {
             }
         }
 
-        private function sendRequest(\CurlHandle &$curl, RequestEntity $request, string $method, \Closure &$callback): void
+        private function sendRequest(\CurlHandle $curl, RequestEntity $request, string $method, \Closure $callback): void
         {
             $this->createBody();
             $this->setOptions([

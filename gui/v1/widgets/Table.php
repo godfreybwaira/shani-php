@@ -82,7 +82,7 @@ namespace gui\v1\widgets {
             return $this->setData('tfoot', $this->footer, ...$td);
         }
 
-        private function setData(string $tag, ?Component &$wrapper, Component ...$cells): self
+        private function setData(string $tag, ?Component $wrapper, Component ...$cells): self
         {
             if (!$wrapper) {
                 $wrapper = new Component($tag);

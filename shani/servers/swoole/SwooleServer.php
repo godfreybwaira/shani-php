@@ -119,7 +119,7 @@ namespace shani\servers\swoole {
             return $this;
         }
 
-        private static function createRequest(string $scheme, Request &$req): RequestEntity
+        private static function createRequest(string $scheme, Request $req): RequestEntity
         {
             $query = !empty($req->server['query_string']) ? '?' . $req->server['query_string'] : null;
             $path = $scheme . '://' . $req->header['host'] . $req->server['path_info'] . $query;
@@ -139,7 +139,7 @@ namespace shani\servers\swoole {
             return $request;
         }
 
-        private static function getPostedBody(Request &$req): ?array
+        private static function getPostedBody(Request $req): ?array
         {
             $contentType = $req->header['content-type'] ?? null;
             if (!empty($req->post) || empty($contentType)) {

@@ -53,7 +53,7 @@ namespace apps\demo\config {
             return 'get,post,head,put';
         }
 
-        public function registerMiddleware(Middleware &$mw): void
+        public function registerMiddleware(Middleware $mw): void
         {
             $mw->on('before', fn() => Test::m1($this->app));
             $mw->on('before', fn() => Test::m2($this->app));

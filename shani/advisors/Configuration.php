@@ -11,6 +11,7 @@
 namespace shani\advisors {
 
     use features\authentication\AuthenticationManager;
+    use features\authentication\UserDetailsDto;
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
     use features\documentation\scanners\Endpoints;
@@ -34,14 +35,12 @@ namespace shani\advisors {
     abstract class Configuration
     {
 
-        private ?string $permissionList, $userId;
         protected readonly App $app;
+        private ?UserDetailsDto $user = null;
 
         protected function __construct(App $app)
         {
             $this->app = $app;
-            $this->userId = null;
-            $this->permissionList = null;
         }
 
         /**
@@ -50,21 +49,27 @@ namespace shani\advisors {
          */
         public function isAuthenticated(): bool
         {
-            if ($this->userId === null) {
-                $strategies = $this->getAuthenticationStrategies();
-                $manager = new AuthenticationManager($this->app, ...$strategies);
-                $success = $manager->login();
-                $this->permissionList = $manager->getPermissions();
-                $this->userId = $manager->getUserId();
-                return $success;
+            $cartName = '_4u7h_U53r!';
+            if ($this->app->session->cartExists($cartName)) {
+                $cart = $this->app->session->cart($cartName);
+                $this->user = new UserDetailsDto($cart->getOne('id'), $cart->getOne('permissions'), $cart->getOne('disabled'));
+                return true;
             }
-            return false;
+            $this->user = (new AuthenticationManager($this->app))->login();
+            if ($this->user === null) {
+                return false;
+            }
+            $this->app->session->cart($cartName)->addAll([
+                'permissions' => $this->user->permissions, 'id' => $this->user->id,
+                'disabled' => $this->user->isDisabled
+            ]);
+            return true;
         }
 
         /**
          * Get authentication strategies objects that implements <code>AuthenticationStrategy</code>.
          * Developer must implement this interface to provide Authentication logic.
-         * @return array Collection of AuthenticationStrategy objects
+         * @return array of AuthenticationStrategy objects
          *
          * @see self::skipAuthentication()
          */
@@ -181,7 +186,7 @@ namespace shani\advisors {
          * @param Middleware $mw Middleware object
          * @return void
          */
-        public abstract function registerMiddleware(Middleware &$mw): void;
+        public abstract function registerMiddleware(Middleware $mw): void;
 
         /**
          * Get or set application modules directory
@@ -255,15 +260,15 @@ namespace shani\advisors {
         }
 
         /**
-         * Returns user private unique Id. This Id helps accessing and protecting
+         * Returns user unique Id. This Id helps accessing and protecting
          * private resources (e.g uploaded files) against outsiders. This ID should not
          * be changed anyhow, otherwise user will loose access to their private
          * uploaded files.
-         * @return string|null Private unique id
+         * @return string|null User unique id
          */
-        public function getUserPrivateId(): ?string
+        public function getSessionUserId(): ?string
         {
-            return $this->userId;
+            return $this->user?->id;
         }
 
         /**
@@ -435,12 +440,13 @@ namespace shani\advisors {
          */
         public function accessGranted(string $method, RequestRoute $route): bool
         {
-            if (empty($this->permissionList)) {
+            $permissions = $this->user?->permissions;
+            if (empty($permissions)) {
                 return false;
             }
             $endpoint = Endpoints::digest($method, $route);
-            return str_contains($this->permissionList, $endpoint['hash']);
-//            return (preg_match('\b' . $target . '\b', $this->permissionList) === 1);
+            return str_contains($permissions, $endpoint['hash']);
+//            return (preg_match('\b' . $target . '\b', $permissions) === 1);
         }
 
         /**

@@ -100,7 +100,7 @@ namespace gui\v2 {
          */
         public function prependChild(Component ...$children): self
         {
-            $kids = array_map(fn(Component &$child) => $child->withParent($this), $children);
+            $kids = array_map(fn(Component $child) => $child->withParent($this), $children);
             array_unshift($this->children, ...$kids);
             return $this;
         }
@@ -169,7 +169,7 @@ namespace gui\v2 {
          * @param Component $parent Parent component
          * @return self
          */
-        private function withParent(Component &$parent): self
+        private function withParent(Component $parent): self
         {
             $this->parent = $parent;
             return $this;

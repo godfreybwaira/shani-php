@@ -21,23 +21,23 @@ namespace features\authentication {
         private readonly array $strategies;
         private readonly App $app;
 
-        private const CART_NAME = '_4u7h_U53r!';
-
-        public function __construct(App $app, AuthenticationStrategy ...$strategies)
+        /**
+         *
+         * @param App $app Application object
+         */
+        public function __construct(App $app)
         {
+
             $this->app = $app;
-            $this->strategies = $strategies;
+            $this->strategies = $app->config->getAuthenticationStrategies();
         }
 
         /**
          * Let user try logging in...
-         * @return bool True on success, false otherwise.
+         * @return UserDetailsDto|null User details on success, null otherwise
          */
-        public function login(): bool
+        public function login(): ?UserDetailsDto
         {
-            if ($this->isAuthenticated()) {
-                return true;
-            }
             foreach ($this->strategies as $strategy) {
                 $user = $strategy->authenticate();
                 if ($user === null) {
@@ -46,45 +46,8 @@ namespace features\authentication {
                 if ($user->isDisabled) {
                     break;
                 }
-                $this->app->session->cart(self::CART_NAME)->addAll([
-                    'permissions' => $user->permissions,
-                    'id' => $user->id
-                ]);
                 $this->app->session->refresh();
-                return true;
-            }
-            return false;
-        }
-
-        /**
-         * Get all permissions of an authenticated user
-         * @return string|null A string of permissions or null if a user has no permission
-         */
-        public function getPermissions(): ?string
-        {
-            if ($this->isAuthenticated()) {
-                return $this->app->session->cart(self::CART_NAME)->getOne('permissions');
-            }
-            return null;
-        }
-
-        /**
-         * Check if the current user is authenticated.
-         * @return bool True if authenticated, false otherwise
-         */
-        private function isAuthenticated(): bool
-        {
-            return $this->app->session->cartExists(self::CART_NAME);
-        }
-
-        /**
-         * Get authenticated user id
-         * @return string|null User id on success, null otherwise.
-         */
-        public function getUserId(): ?string
-        {
-            if ($this->isAuthenticated()) {
-                return $this->app->session->cart(self::CART_NAME)->getOne('id');
+                return $user;
             }
             return null;
         }

@@ -376,7 +376,7 @@ namespace gui\v1 {
          * @param Component $parent Parent component
          * @return self
          */
-        public function setParent(Component &$parent): self
+        public function setParent(Component $parent): self
         {
             $parent->addExternalStyle('relative_position')->appendChildren($this);
             return $this;
@@ -388,7 +388,7 @@ namespace gui\v1 {
          * @return self
          * @see Component::moveContent();
          */
-        public function moveChildrenTo(Component &$destination): self
+        public function moveChildrenTo(Component $destination): self
         {
             $destination->appendChildren(...$this->getChildren());
             return $this->removeChildren();
@@ -400,7 +400,7 @@ namespace gui\v1 {
          * @return self
          * @see Component::moveChildren();
          */
-        public function moveContentTo(Component &$destination): self
+        public function moveContentTo(Component $destination): self
         {
             $destination->setContent($this->getContent());
             return $this->setContent(null);

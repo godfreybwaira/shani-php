@@ -20,7 +20,7 @@ namespace shani\servers\swoole {
         private readonly int $connectionId;
         private bool $closed = false;
 
-        public function __construct(Server &$writer, int $connId)
+        public function __construct(Server $writer, int $connId)
         {
             $this->writer = $writer;
             $this->connectionId = $connId;

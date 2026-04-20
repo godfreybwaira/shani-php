@@ -52,7 +52,7 @@ namespace features\oauth2 {
             if ($codeChallenge !== null && $codeChallengeMethod !== 'S256') {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Invalid code challenge method.');
             }
-            $userId = $this->app->config->getUserPrivateId();
+            $userId = $this->app->config->getSessionUserId();
             if ($userId === null) {
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Granting user is not authenticated.');
             }
@@ -71,7 +71,7 @@ namespace features\oauth2 {
          */
         public function handleDeviceVerification(string $deviceCode, string $userCode): ?Oauth2Response
         {
-            $userId = $this->app->config->getUserPrivateId();
+            $userId = $this->app->config->getSessionUserId();
             if ($userId === null) {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);
                 return Oauth2Response::error(Oauth2Error::INVALID_REQUEST, 'Session expired.');
