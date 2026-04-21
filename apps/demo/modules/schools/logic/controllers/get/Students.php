@@ -35,11 +35,11 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             }
             $cart = $this->app->session->cart('user');
             if ($cart->isEmpty()) {
-                $cart->addJson($dtos);
+                $cart->add($dtos);
                 $this->app->response->setBody('Cart is empty. Come back next time.');
                 $this->app->writer->send();
             } else {
-                $this->app->writer->send($this->app->framework->config);
+                $this->app->writer->send($dtos);
             }
         }
 

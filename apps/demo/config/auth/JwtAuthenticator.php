@@ -11,7 +11,6 @@ namespace apps\demo\config\auth {
 
     use features\authentication\AuthenticationStrategy;
     use features\authentication\UserDetailsDto;
-    use features\documentation\scanners\Endpoints;
     use shani\launcher\App;
 
     final class JwtAuthenticator implements AuthenticationStrategy
@@ -24,11 +23,10 @@ namespace apps\demo\config\auth {
             $this->app = $app;
         }
 
-        public function authenticate(): ?UserDetailsDto
+        public function login(): ?UserDetailsDto
         {
             $token = $this->app->request->header()->getBearerToken();
-            $permissions = Endpoints::digest($this->app->request->method, $this->app->request->route());
-            return new UserDetailsDto('no' . rand(10, 100), $permissions['hash'], false);
+            return new UserDetailsDto('no' . rand(10, 100), '430704a766', false);
         }
 
         public function register(): ?UserDetailsDto
@@ -39,6 +37,16 @@ namespace apps\demo\config\auth {
         public function update(): ?UserDetailsDto
         {
             return null;
+        }
+
+        public function unregister(): bool
+        {
+            return true;
+        }
+
+        public function logout(): bool
+        {
+            return true;
         }
     }
 

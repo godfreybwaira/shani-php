@@ -13,7 +13,6 @@ namespace shani\advisors {
     use features\authentication\UserDetailsDto;
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
-    use features\documentation\scanners\Endpoints;
     use features\logging\LoggingLevel;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseInterface;
@@ -27,7 +26,6 @@ namespace shani\advisors {
     use shani\advisors\web\ResourceAccessPolicy;
     use shani\assets\StaticAssetServers;
     use shani\http\Middleware;
-    use shani\http\RequestRoute;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
@@ -35,7 +33,6 @@ namespace shani\advisors {
     {
 
         protected readonly App $app;
-        private ?UserDetailsDto $user = null;
 
         protected function __construct(App $app)
         {
@@ -43,19 +40,9 @@ namespace shani\advisors {
         }
 
         /**
-         * Whether the current user is authenticated and has at least one permission
-         * @var bool
-         */
-        public function isAuthenticated(): bool
-        {
-            $this->user = $this->app->auth->getSessionUserDetails();
-            return $this->user !== null;
-        }
-
-        /**
          * Get authentication strategies objects that implements <code>AuthenticationStrategy</code>.
          * Developer must implement this interface to provide Authentication logic.
-         * @return array of AuthenticationStrategy objects
+         * @return array A list of AuthenticationStrategy objects
          *
          * @see self::skipAuthentication()
          */
@@ -219,42 +206,7 @@ namespace shani\advisors {
          */
         public function appStorage(): string
         {
-            return $this->root() . '/.storage';
-        }
-
-        /**
-         * Returns user group Id shared by one or more users e.g company unique Id.
-         * This Id helps accessing and protecting shared resources (e.g uploaded files)
-         * against outsiders. This ID should not be changed anyhow, otherwise user will
-         * loose access to their shared uploaded files.
-         * @return string|null Shared unique id
-         */
-        public function userGroupId(): ?string
-        {
-            return null;
-        }
-
-        /**
-         * Check whether a user has a given group id. user can have multiple
-         * group ids
-         * @param string $groupId The group Id to check
-         * @return bool True if user has the given group id, false otherwise
-         */
-        public function userGroupIdExists(string $groupId): bool
-        {
-            return false;
-        }
-
-        /**
-         * Returns user unique Id. This Id helps accessing and protecting
-         * private resources (e.g uploaded files) against outsiders. This ID should not
-         * be changed anyhow, otherwise user will loose access to their private
-         * uploaded files.
-         * @return string|null User unique id
-         */
-        public function getSessionUserId(): ?string
-        {
-            return $this->user?->id;
+            return $this->root() . '/.bucket';
         }
 
         /**
@@ -292,7 +244,7 @@ namespace shani\advisors {
          */
         public function allowedRequestMethods(): string
         {
-            return 'get,post,head,put,delete';
+            return 'get,post,head,put,patch,options,delete';
         }
 
         /**
@@ -416,23 +368,6 @@ namespace shani\advisors {
         public function getStorageMedia(): StorageMediaInterface
         {
             return new LocalStorage($this->app);
-        }
-
-        /**
-         * Check whether a user is granted access to a resource.
-         * @param string $method Request method e.g get, post etc
-         * @param RequestRoute $route Request route object
-         * @return bool True if a user is granted access, false otherwise.
-         */
-        public function accessGranted(string $method, RequestRoute $route): bool
-        {
-            $permissions = $this->user?->permissions;
-            if (empty($permissions)) {
-                return false;
-            }
-            $endpoint = Endpoints::digest($method, $route);
-            return str_contains($permissions, $endpoint['hash']);
-//            return (preg_match('\b' . $target . '\b', $permissions) === 1);
         }
 
         /**

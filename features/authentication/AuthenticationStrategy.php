@@ -16,13 +16,25 @@ namespace features\authentication {
          * Authenticate user with the given credentials.
          * @return UserDetailsDto|null Authenticated user details on success, null if authentication failed.
          */
-        public function authenticate(): ?UserDetailsDto;
+        public function login(): ?UserDetailsDto;
+
+        /**
+         * End user session
+         * @return bool True on success, false otherwise.
+         */
+        public function logout(): bool;
 
         /**
          * Register a new user.
          * @return UserDetailsDto|null Registered user details on success, null if registration failed.
          */
         public function register(): ?UserDetailsDto;
+
+        /**
+         * Revoke (or delete) user registration
+         * @return bool True on success, false otherwise.
+         */
+        public function unregister(): bool;
 
         /**
          * Update user details.

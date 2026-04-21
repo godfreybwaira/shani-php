@@ -89,13 +89,12 @@ namespace shani\advisors {
             if ($this->app->config->skipAuthentication()) {
                 return $this;
             }
-            if ($this->app->config->isAuthenticated()) {
-                $request = $this->app->request;
+            if ($this->app->auth->isAuthenticated()) {
                 if ($this->app->config->accessingGuestModule()) {
-                    $request->changeRoute($this->app->config->homePath());
+                    $this->app->request->changeRoute($this->app->config->homePath());
                     return $this;
                 }
-                if ($this->app->config->accessingPublicModule() || $this->app->config->accessGranted($request->method, $request->route())) {
+                if ($this->app->config->accessingPublicModule() || $this->app->auth->isAuthorized()) {
                     return $this;
                 }
                 throw CustomException::forbidden($this->app);

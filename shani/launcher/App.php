@@ -135,7 +135,7 @@ namespace shani\launcher {
 
         public function csrfToken(): MutableMap
         {
-            return $this->session->cart('_gGOd2y$oN');
+            return $this->session->cart('f91c57f35097fa6d');
         }
 
         private function getSession(): SessionStorageInterface

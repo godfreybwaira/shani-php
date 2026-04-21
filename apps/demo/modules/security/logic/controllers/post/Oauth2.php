@@ -53,6 +53,11 @@ namespace apps\demo\modules\security\logic\controllers\post {
             $response = $authorizer->handleDeviceVerification($userCode, $deviceCode);
             $this->app->writer->send($response?->body);
         }
+
+        public function login()
+        {
+            $this->app->auth->login();
+        }
     }
 
 }

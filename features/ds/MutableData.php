@@ -39,7 +39,7 @@ namespace features\ds {
          * @param \JsonSerializable $json Serializable object
          * @return self
          */
-        public function addJson(\JsonSerializable $json): self;
+        public function add(\JsonSerializable $json): self;
 
         /**
          * Delete an item from an iterable object

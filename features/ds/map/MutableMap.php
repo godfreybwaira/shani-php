@@ -65,7 +65,7 @@ namespace features\ds\map {
             return $this->addAll($map->toArray());
         }
 
-        public function addJson(\JsonSerializable $json): self
+        public function add(\JsonSerializable $json): self
         {
             return $this->addAll($json->jsonSerialize());
         }

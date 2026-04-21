@@ -39,6 +39,11 @@ namespace apps\demo\modules\security\logic\controllers\get {
             ->attr->addOne('url', $this->app->request->uri);
             $this->app->writer->send($builder);
         }
+
+        public function logout()
+        {
+            $this->app->auth->logout();
+        }
     }
 
 }
