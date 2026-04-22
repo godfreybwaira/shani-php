@@ -86,22 +86,22 @@ namespace shani\advisors {
          */
         public function authorized(): self
         {
-            if ($this->app->config->skipAuthentication()) {
+            if ($this->app->config->skipAuthentication() || $this->app->config->accessingPublicResource()) {
                 return $this;
             }
-            if ($this->app->auth->isAuthenticated()) {
-                if ($this->app->config->accessingGuestModule()) {
+            if ($this->app->config->accessingGuestResource()) {
+                if ($this->app->auth->loggedIn()) {
                     $this->app->request->changeRoute($this->app->config->homePath());
-                    return $this;
                 }
-                if ($this->app->config->accessingPublicModule() || $this->app->auth->isAuthorized()) {
-                    return $this;
-                }
-                throw CustomException::forbidden($this->app);
-            } else if ($this->app->config->accessingGuestModule() || $this->app->config->accessingPublicModule()) {
                 return $this;
             }
-            throw CustomException::notAuthorized($this->app);
+            if (!$this->app->auth->attemptAuthentication()) {
+                throw CustomException::notAuthorized($this->app);
+            }
+            if ($this->app->auth->accessGranted()) {
+                return $this;
+            }
+            throw CustomException::forbidden($this->app);
         }
 
         /**

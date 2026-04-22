@@ -42,7 +42,8 @@ namespace apps\demo\modules\security\logic\controllers\get {
 
         public function logout()
         {
-            $this->app->auth->logout();
+            $message = $this->app->auth->logout() ? 'Success' : 'Failed';
+            $this->app->writer->sendString($message);
         }
     }
 

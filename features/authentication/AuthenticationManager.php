@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of AuthenticationService
+ * Description of AuthenticationManager
  * @author goddy
  *
  * Created on: Apr 7, 2026 at 9:14:26 AM
@@ -13,7 +13,7 @@ namespace features\authentication {
     use shani\http\RequestRoute;
     use shani\launcher\App;
 
-    final class AuthenticationService implements AuthenticationStrategy
+    final class AuthenticationManager implements AuthenticationStrategy
     {
 
         private const AUTH_CART = '2d574fce7ee49c';
@@ -33,8 +33,7 @@ namespace features\authentication {
 
         public function login(): ?UserDetailsDto
         {
-            if ($this->isAuthenticated()) {
-                $this->redirect();
+            if ($this->loggedIn()) {
                 return null;
             }
             $strategies = $this->app->config->getAuthenticationStrategies();
@@ -50,17 +49,9 @@ namespace features\authentication {
                 $this->app->session->cart(self::METADATA_CART)->addOne('strategy', $index);
                 $this->app->session->cart(self::AUTH_CART)->add($user);
                 $this->app->session->refresh();
-                $this->redirect();
                 return $user;
             }
             return null;
-        }
-
-        private function redirect(): void
-        {
-            if (!$this->app->response->redirectBack()) {
-                $this->app->response->redirect('/');
-            }
         }
 
         public function register(): ?UserDetailsDto
@@ -100,13 +91,12 @@ namespace features\authentication {
 
         public function logout(): bool
         {
-            if ($this->isAuthenticated()) {
+            if ($this->loggedIn()) {
                 $index = $this->app->session->cart(self::METADATA_CART)->getOne('strategy');
                 $strategy = $this->app->config->getAuthenticationStrategies()[$index];
                 if ($strategy->logout()) {
-                    unset($this->user);
+                    $this->user = null;
                     $this->app->session->destroy();
-                    $this->app->response->redirect('/');
                     return true;
                 }
             }
@@ -127,10 +117,21 @@ namespace features\authentication {
         }
 
         /**
-         * Whether the current user is logged in and authenticated.
+         * Tries to check authenticity of a user (user is logged in). If fails,
+         * it tries to login (assuming that the current user request comes with credentials).
+         * If it also fails it return false, otherwise true.
          * @var bool True if authenticated, false otherwise
          */
-        public function isAuthenticated(): bool
+        public function attemptAuthentication(): bool
+        {
+            return $this->loggedIn() || $this->login() !== null;
+        }
+
+        /**
+         * Whether the current user is logged in and authenticated.
+         * @var bool True if a current user is logged in, false otherwise
+         */
+        public function loggedIn(): bool
         {
             return $this->user !== null || $this->app->session->cartExists(self::AUTH_CART);
         }
@@ -143,7 +144,7 @@ namespace features\authentication {
          * @param RequestRoute $route Request route object
          * @return bool True if a user is granted access, false otherwise.
          */
-        public function isAuthorized(string $method = null, RequestRoute $route = null): bool
+        public function accessGranted(string $method = null, RequestRoute $route = null): bool
         {
             $permissions = $this->getUserDetails()?->permissions;
             if (!empty($permissions)) {

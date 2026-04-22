@@ -53,7 +53,7 @@ namespace features\session {
 
         public function destroy(): void
         {
-            unset($this->carts);
+            $this->carts = [];
             session_unset();
             session_destroy();
         }

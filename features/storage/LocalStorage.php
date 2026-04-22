@@ -100,7 +100,7 @@ namespace features\storage {
 
         private static function serveProtected(App $app, StaticAssetServers $assetServer, string $filepath): bool
         {
-            if (!$app->auth->isAuthenticated()) {
+            if (!$app->auth->attemptAuthentication()) {
                 throw CustomException::forbidden($app);
             }
             $owners = self::getFileOwnership($filepath);

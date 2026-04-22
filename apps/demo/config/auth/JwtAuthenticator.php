@@ -26,6 +26,9 @@ namespace apps\demo\config\auth {
         public function login(): ?UserDetailsDto
         {
             $token = $this->app->request->header()->getBearerToken();
+            if (empty($token)) {
+                return null;
+            }
             return new UserDetailsDto('no' . rand(10, 100), '430704a766', false);
         }
 

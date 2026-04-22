@@ -10,7 +10,7 @@
 
 namespace shani\launcher {
 
-    use features\authentication\AuthenticationService;
+    use features\authentication\AuthenticationManager;
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
@@ -75,9 +75,9 @@ namespace shani\launcher {
 
         /**
          * Authentication service
-         * @var AuthenticationService
+         * @var AuthenticationManager
          */
-        public readonly AuthenticationService $auth;
+        public readonly AuthenticationManager $auth;
 
         /**
          * Create an application instance
@@ -96,7 +96,7 @@ namespace shani\launcher {
             $class = $vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
-            $this->auth = new AuthenticationService($this);
+            $this->auth = new AuthenticationManager($this);
         }
 
         /**

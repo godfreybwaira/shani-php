@@ -79,7 +79,7 @@ namespace apps\demo\config {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';
         }
 
-        public function accessingPublicModule(): bool
+        public function accessingPublicResource(): bool
         {
             return in_array($this->app->request->route()->module, ['shani', 'security']);
         }

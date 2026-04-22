@@ -42,7 +42,7 @@ namespace shani\http {
 
         /**
          * Send content to a client application
-         * @param \JsonSerializable|WebUIBuilder|FileOutputStream|null $output Output
+         * @param \JsonSerializable|WebUIBuilder|FileOutputStream|null $content Output
          * object to send
          * @param bool|null $keepConnection Set whether to close the connection
          * after sending a response or to keep it open. By default, if the application
@@ -50,18 +50,36 @@ namespace shani\http {
          * you say so, otherwise the connection will be closed as soon as the
          * first response is sent.
          * @return void
+         * @see self::sendString
          */
-        public function send(\JsonSerializable|WebUIBuilder|FileOutputStream|null $output = null, ?bool $keepConnection = null): void
+        public function send(\JsonSerializable|WebUIBuilder|FileOutputStream|null $content = null, ?bool $keepConnection = null): void
         {
             $subtype = $this->app->response->subtype();
-            if ($output instanceof \JsonSerializable) {
-                $this->handleSerializableOutput($output, $subtype);
-            } elseif ($output instanceof WebUIBuilder) {
-                $this->handleUIBuilderOutput($output, $subtype);
-            } elseif ($output instanceof FileOutputStream) {
-                $this->prepareFileStreaming($output);
+            if ($content instanceof \JsonSerializable) {
+                $this->handleSerializableOutput($content, $subtype);
+            } elseif ($content instanceof WebUIBuilder) {
+                $this->handleUIBuilderOutput($content, $subtype);
+            } elseif ($content instanceof FileOutputStream) {
+                $this->prepareFileStreaming($content);
                 return;
             }
+            $this->write($keepConnection);
+        }
+
+        /**
+         * Send string content to a client application
+         * @param string|null $content Output object to send
+         * @param bool|null $keepConnection Set whether to close the connection
+         * after sending a response or to keep it open. By default, if the application
+         * is running as a web socket, the connection will not be closed unless
+         * you say so, otherwise the connection will be closed as soon as the
+         * first response is sent.
+         * @return void
+         * @see self::send
+         */
+        public function sendString(?string $content = null, ?bool $keepConnection = null): void
+        {
+            $this->app->response->setBody($content, $this->app->response->subtype());
             $this->write($keepConnection);
         }
 

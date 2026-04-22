@@ -25,7 +25,14 @@ namespace apps\demo\config\auth {
 
         public function login(): ?UserDetailsDto
         {
-            return new UserDetailsDto('no' . rand(10, 100), '430704a766', false);
+            $credentials = $this->app->request->header()->getBasicAuth();
+            if (empty($credentials)) {
+                return null;
+            }
+            if (hash_equals('38a79817-6f70-400b-90d4-8d1912dd8b89', $credentials[1]) && hash_equals('client101', $credentials[0])) {
+                return new UserDetailsDto('no' . rand(10, 100), '430704a766', false);
+            }
+            return null;
         }
 
         public function register(): ?UserDetailsDto

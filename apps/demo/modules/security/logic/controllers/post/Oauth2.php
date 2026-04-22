@@ -56,7 +56,7 @@ namespace apps\demo\modules\security\logic\controllers\post {
 
         public function login()
         {
-            $this->app->auth->login();
+            $this->app->writer->send($this->app->auth->login());
         }
     }
 
