@@ -43,7 +43,7 @@ namespace features\authentication {
                     continue;
                 }
                 if ($user->isDisabled) {
-                    break;
+                    return null;
                 }
                 $this->user = $user;
                 $this->app->session->cart(self::METADATA_CART)->addOne('strategy', $index);
