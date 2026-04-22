@@ -164,24 +164,6 @@ namespace features\authentication {
         {
             return $this->getUserDetails()?->id;
         }
-
-        /**
-         * Get user storage bucket for storing private files.
-         * @return string|null Unique storage bucket name
-         */
-        public function getUserStorageBucket(): ?string
-        {
-            return $this->getUserDetails()?->storageBucket;
-        }
-
-        /**
-         * Get user group storage bucket for storing group (shared) files.
-         * @return string|null Unique storage bucket name
-         */
-        public function getGroupStorageBucket(): ?string
-        {
-            return $this->getUserDetails()?->groupStorageBucket;
-        }
     }
 
 }

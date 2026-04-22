@@ -103,9 +103,10 @@ namespace features\storage {
             if (!$app->auth->attemptAuthentication()) {
                 throw CustomException::forbidden($app);
             }
+            $user = $app->auth->getUserDetails();
             $owners = self::getFileOwnership($filepath);
-            if ($owners !== null && $owners['oid'] !== $app->auth->getUserStorageBucket()) {
-                if ($app->auth->getGroupStorageBucket() !== $owners['gid']) {
+            if ($owners !== null && $owners['oid'] !== $user?->storageBucket) {
+                if ($user?->groupStorageBucket !== $owners['gid']) {
                     throw CustomException::forbidden($app);
                 }
             }
@@ -159,7 +160,7 @@ namespace features\storage {
         #[\Override]
         public function save(File $file, string $bucket = '/', bool $rename = true): string
         {
-            $privateBucket = $this->app->auth->getUserStorageBucket();
+            $privateBucket = $this->app->auth->getUserDetails()?->storageBucket;
             if (empty($privateBucket)) {
                 throw new ServerException('Client private Id cannot be empty');
             }
@@ -221,7 +222,7 @@ namespace features\storage {
         public function delete(string $filepath): bool
         {
             $owners = self::getFileOwnership($filepath);
-            if ($owners == null || $owners['oid'] === $this->app->auth->getUserStorageBucket()) {
+            if ($owners == null || $owners['oid'] === $this->app->auth->getUserDetails()?->storageBucket) {
                 return file_exists($filepath) && unlink($filepath);
             }
             return false;
@@ -230,7 +231,7 @@ namespace features\storage {
         #[\Override]
         public function share2protected(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->auth->getUserStorageBucket();
+            $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
             $prefix .= self::ID_SEPARATOR . self::GID_INITIAL;
             $bucket = $this->app->config->appProtectedStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
@@ -239,8 +240,9 @@ namespace features\storage {
         #[\Override]
         public function share2group(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->auth->getUserStorageBucket();
-            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $this->app->auth->getGroupStorageBucket();
+            $user = $this->app->auth->getUserDetails();
+            $prefix = self::PID_INITIAL . $user?->storageBucket;
+            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $user?->groupStorageBucket;
             $bucket = $this->app->config->appProtectedStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
         }
@@ -256,7 +258,7 @@ namespace features\storage {
         #[\Override]
         public function share2public(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->auth->getUserStorageBucket();
+            $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
             $bucket = $this->app->config->appPublicStorage();
             return $this->shareFile($filepath, $bucket, $prefix);
         }
