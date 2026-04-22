@@ -36,7 +36,7 @@ namespace features\persistence {
          * @param \JsonSerializable $object A @D array of data to insert
          * @return bool True if all data inserted, false otherwise
          */
-        public function insertAll(string $collection, \JsonSerializable $object): bool;
+        public function insertAll(string $collection, \JsonSerializable ...$object): bool;
 
         /**
          * Update documents/records
@@ -46,7 +46,7 @@ namespace features\persistence {
          * @param array $where Query parameters (key => value pair)
          * @return int Number of modified documents
          */
-        public function update(string $collection, \JsonSerializable $object, array $where): int;
+        public function update(string $collection, \JsonSerializable $object, array $where = []): int;
 
         /**
          * Delete documents/records

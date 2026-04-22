@@ -107,18 +107,17 @@ namespace features\persistence {
             return $this->pdo->lastInsertId();
         }
 
-        public function insertAll(string $collection, \JsonSerializable $object): bool
+        public function insertAll(string $collection, \JsonSerializable ...$object): bool
         {
-            $data = $object->jsonSerialize();
-            $columns = array_keys($data[0]); //Get column names from first row (all rows must have same structure)
+            $columns = array_keys($object[0]->jsonSerialize()); //Get column names from first row (all rows must have same structure)
             $valueSets = [];
             $params = [];
-            foreach ($data as $index => $row) {
+            foreach ($object as $index => $row) {
                 $placeholders = [];
                 foreach ($columns as $col) {
                     $paramName = ':' . $col . $index;
                     $placeholders[] = $paramName;
-                    $params[$paramName] = $row[$col] ?? null;
+                    $params[$paramName] = $row->jsonSerialize()[$col] ?? null;
                 }
                 $valueSets[] = '(' . implode(',', $placeholders) . ')';
             }
@@ -129,7 +128,7 @@ namespace features\persistence {
                 $this->beginTransaction();
             }
             $statement = $this->processQuery($sql, $params);
-            $result = $statement->rowCount() === count($data);
+            $result = $statement->rowCount() === count($object);
             $statement->closeCursor();
             if ($transact) {
                 if ($result) {
@@ -194,7 +193,7 @@ namespace features\persistence {
             $rows = [];
             $results = $this->find($collection, $where, $limit, $skip);
             foreach ($results as $row) {
-                $rows[] = new ReadableMap($row);
+                $rows[] = $row;
             }
             return $rows;
         }
@@ -202,12 +201,12 @@ namespace features\persistence {
         public function findOne(string $collection, array $where = []): ?ReadableMap
         {
             foreach ($this->find($collection, $where, limit: 1) as $row) {
-                return new ReadableMap($row);
+                return $row;
             }
             return null;
         }
 
-        public function update(string $collection, \JsonSerializable $object, array $where): int
+        public function update(string $collection, \JsonSerializable $object, array $where = []): int
         {
             $data = $object->jsonSerialize();
             if (empty($data)) {
@@ -217,7 +216,7 @@ namespace features\persistence {
             $wherePrefix = 'w_';
             $set = self::createClause($data, 'SET', ',', $setPrefix);
             $whereClause = self::createClause($where, 'WHERE', ' AND ', $wherePrefix);
-            $sql = 'UPDATE ' . $collection . ' SET ' . $set . $whereClause;
+            $sql = 'UPDATE ' . $collection . $set . $whereClause;
             $filters = [];
             foreach ($where as $key => $value) {
                 $filters[$wherePrefix . $key] = $value;

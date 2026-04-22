@@ -445,7 +445,7 @@ namespace shani\advisors {
          * connection name specified then default connection will be returned
          * @return DatabaseInterface|null Database object
          */
-        public function database(): ?DatabaseInterface
+        public function getDatabase(): ?DatabaseInterface
         {
             return null;
         }

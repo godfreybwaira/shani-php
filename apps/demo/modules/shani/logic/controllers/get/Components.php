@@ -49,7 +49,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $this->app->writer->stream(function () {
-                $db = $this->app->config->database();
+                $db = $this->app->config->getDatabase();
                 $rows = $db->collect('SELECT * FROM users');
                 while (true) {
                     sleep(1);
@@ -65,7 +65,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function users(): void
         {
-            $db = $this->app->config->database();
+            $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $rows = $db->get('SELECT * FROM users');
             $this->app->writer->send($rows);

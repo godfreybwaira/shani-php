@@ -23,7 +23,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
         public function __construct(App $app)
         {
             $this->app = $app;
-            $this->service = StudentService::getObject($app->config->database());
+            $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
         public function index(): void

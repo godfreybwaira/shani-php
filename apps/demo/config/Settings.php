@@ -125,7 +125,7 @@ namespace apps\demo\config {
             return $result;
         }
 
-        public function database(): ?DatabaseInterface
+        public function getDatabase(): ?DatabaseInterface
         {
             return new SQLDatabase(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }
