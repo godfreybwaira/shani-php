@@ -10,7 +10,6 @@
 namespace apps\demo\config {
 
     use apps\demo\middleware\Oauth2Client;
-    use apps\demo\middleware\Test;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseDriver;
     use features\persistence\DatabaseInterface;
@@ -23,9 +22,8 @@ namespace apps\demo\config {
     use features\test\TestResult;
     use features\utils\HttpClient;
     use features\utils\URI;
-    use shani\advisors\Configuration;
+    use shani\contracts\Configuration;
     use shani\http\enums\HttpStatus;
-    use shani\http\Middleware;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
     use shani\launcher\Framework;
@@ -51,12 +49,6 @@ namespace apps\demo\config {
         public function allowedRequestMethods(): string
         {
             return 'get,post,head,put';
-        }
-
-        public function registerMiddleware(Middleware $mw): void
-        {
-            $mw->on('before', fn() => Test::m1($this->app));
-            $mw->on('before', fn() => Test::m2($this->app));
         }
 
         public function skipCsrfTest(): bool

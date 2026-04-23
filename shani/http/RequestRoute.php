@@ -14,6 +14,10 @@ namespace shani\http {
     final class RequestRoute
     {
 
+        /**
+         * Request parameters
+         * @var array
+         */
         public readonly array $params;
 
         /**

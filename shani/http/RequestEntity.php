@@ -70,7 +70,7 @@ namespace shani\http {
         {
             parent::__construct($headers, $cookies, $protocol);
             $this->localhost = $ip === '127.0.0.1';
-            $this->changeRoute($uri->path());
+            $this->changeRoute(RequestRoute::fromPath($uri->path()));
             $this->query = $queries;
             $this->method = $method;
             $this->raw = $rawBody;
@@ -113,12 +113,12 @@ namespace shani\http {
 
         /**
          * Change existing route to a new route
-         * @param string $path URI path
+         * @param RequestRoute $newRoute New Route
          * @return self
          */
-        public function changeRoute(string $path): self
+        public function changeRoute(RequestRoute $newRoute): self
         {
-            $this->route = RequestRoute::fromPath($path);
+            $this->route = $newRoute;
             return $this;
         }
 

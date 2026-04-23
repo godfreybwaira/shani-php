@@ -7,7 +7,10 @@
  * Created on: Mar 25, 2025 at 9:46:10 AM
  */
 
-namespace shani\advisors\web {
+namespace features\middleware\web {
+
+    use shani\http\HttpHeader;
+    use shani\launcher\App;
 
     enum BrowsingPrivacy: string
     {
@@ -38,6 +41,17 @@ namespace shani\advisors\web {
          * Disable sending Referrer-Policy header (Not recommended for browser apps)
          */
         case DISABLED = '';
+
+        /**
+         * Set browsing policy
+         * @return void
+         */
+        public function setPolicy(App $app): void
+        {
+            if ($this !== self::DISABLED) {
+                $app->response->header()->addIfAbsent(HttpHeader::REFERRER_POLICY, $this->value);
+            }
+        }
     }
 
 }

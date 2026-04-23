@@ -162,21 +162,6 @@ namespace shani\http {
         }
 
         /**
-         * Set the given, single header value under the given name only if it does not exists.
-         * @param string|int $headerName the header name
-         * @param mixed $headerValue the header value
-         * @see set(string, string)
-         * @return self
-         */
-        public function addIfAbsent(string|int $headerName, mixed $headerValue): self
-        {
-            if (!array_key_exists($headerName, $this->data)) {
-                $this->addOne($headerName, $headerValue);
-            }
-            return $this;
-        }
-
-        /**
          * Delete all HTTP cookie headers
          * @return self
          */

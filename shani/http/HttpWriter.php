@@ -206,7 +206,6 @@ namespace shani\http {
         {
             $scheme = $this->app->request->uri->scheme();
             $buffer = $keepConnection === null ? $scheme === 'ws' || $scheme === 'wss' : $keepConnection;
-            $this->app->config->responseMutator();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->app->response->bodySize());
             if ($this->app->request->method === 'head') {
                 $this->app->response->setStatus(HttpStatus::NO_CONTENT);

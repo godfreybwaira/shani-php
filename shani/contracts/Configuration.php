@@ -8,12 +8,16 @@
  * Created on: Feb 18, 2024 at 2:05:46 PM
  */
 
-namespace shani\advisors {
+namespace shani\contracts {
 
-    use features\authentication\UserDetailsDto;
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
     use features\logging\LoggingLevel;
+    use features\middleware\MiddlewareHandlerInterface;
+    use features\middleware\SecurityMiddleware;
+    use features\middleware\web\BrowsingPrivacy;
+    use features\middleware\web\ContentSecurityPolicy;
+    use features\middleware\web\ResourceAccessPolicy;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseInterface;
     use features\session\SessionConnectionInterface;
@@ -21,11 +25,8 @@ namespace shani\advisors {
     use features\storage\StorageMediaInterface;
     use features\test\TestResult;
     use features\utils\DataCompression;
-    use shani\advisors\web\BrowsingPrivacy;
-    use shani\advisors\web\ContentSecurityPolicy;
-    use shani\advisors\web\ResourceAccessPolicy;
     use shani\assets\StaticAssetServers;
-    use shani\http\Middleware;
+    use shani\http\RequestRoute;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
@@ -52,7 +53,8 @@ namespace shani\advisors {
         }
 
         /**
-         * Get session connection handler. For more information see the implementation of <code>SessionConnectionInterface</code>
+         * Get session connection handler. For more information see the
+         * implementation of <code>SessionConnectionInterface</code>
          * @return SessionConnectionInterface|null
          */
         public function getSessionConnection(): ?SessionConnectionInterface
@@ -135,9 +137,9 @@ namespace shani\advisors {
          * Handle all application errors. You can use this function to log
          * application errors to your logger.
          * @param \Throwable $t Error Object
-         * @return string|null A URI path as a fallback
+         * @return RequestRoute|null A request route object
          */
-        public function errorHandler(\Throwable $t): ?string
+        public function errorHandler(\Throwable $t): ?RequestRoute
         {
             $this->app->logger()->log(LoggingLevel::ERROR, $t->getMessage());
             return null;
@@ -154,12 +156,14 @@ namespace shani\advisors {
         }
 
         /**
-         * Register user defined middlewares. This function provide access for user
+         * Register user defined middlewares. This function provide access for a user
          * to register and execute middlewares
-         * @param Middleware $mw Middleware object
-         * @return void
+         * @return MiddlewareHandlerInterface|null Middleware handler object, or null
          */
-        public abstract function registerMiddleware(Middleware $mw): void;
+        public function getMiddlewareHandler(): ?MiddlewareHandlerInterface
+        {
+            return null;
+        }
 
         /**
          * Get or set application modules directory
@@ -240,7 +244,7 @@ namespace shani\advisors {
          * Returns a list of HTTP request methods supported by the application
          * (in lower case) separated by a comma
          * @see SecurityMiddleware::passedRequestMethodCheck()
-         * @see SecurityMiddleware::preflightRequest()
+         * @see UtilsMiddleware::preflightRequest()
          */
         public function allowedRequestMethods(): string
         {
@@ -251,7 +255,7 @@ namespace shani\advisors {
          * Returns a list of HTTP request headers supported by the application
          * (in lower case) separated by a comma
          * @see SecurityMiddleware::passedRequestMethodCheck()
-         * @see SecurityMiddleware::preflightRequest()
+         * @see UtilsMiddleware::preflightRequest()
          */
         public function allowedRequestHeaders(): string
         {
@@ -407,32 +411,6 @@ namespace shani\advisors {
         public function signatureHeaderName(): string
         {
             return 'X-Signature';
-        }
-
-        /**
-         * Modify response before sending to user. Example signing a response,
-         * encrypting, compressing response body etc
-         * @return void
-         */
-        public function responseMutator(): void
-        {
-            $this->app->response
-                    ->compress($this->compressionMinSize(), $this->compressionLevel())
-                    ->sign($this->signature(), $this->signatureHeaderName())
-                    ->encrypt($this->encryption());
-        }
-
-        /**
-         * Modify request before processing it. Example verifying signature,
-         * decrypting, decompressing request body etc
-         * @return void
-         */
-        public function requestMutator(): void
-        {
-            $this->app->request
-                    ->decrypt($this->encryption())
-                    ->verify($this->signature(), $this->signatureHeaderName())
-                    ->decompress();
         }
 
         /**

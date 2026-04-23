@@ -15,16 +15,15 @@ namespace shani\launcher {
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
     use features\logging\Logger;
+    use features\middleware\MiddlewareHandler;
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
-    use shani\advisors\Configuration;
-    use shani\advisors\SecurityMiddleware;
+    use shani\contracts\Configuration;
     use shani\contracts\ResponseWriter;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
-    use shani\http\Middleware;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\launcher\Framework;
@@ -118,19 +117,17 @@ namespace shani\launcher {
 
         private function runApplication(): void
         {
-            $this->config->requestMutator();
             if (!$this->config->isRunning()) {
                 throw CustomException::offline($this);
             }
             if (LocalStorage::tryServe($this)) {
                 return;
             }
-            if ($this->request->uri->path() === '/') {
-                $this->request->changeRoute($this->config->homePath());
-            }
-            $middleware = new Middleware($this);
-            $this->config->registerMiddleware($middleware);
-            $middleware->runWith(new SecurityMiddleware($this));
+            $userMiddleware = $this->config->getMiddlewareHandler();
+            $middleware = new MiddlewareHandler($this);
+            $middleware->preRequest();
+            $userMiddleware?->preRequest();
+            $this->processRequest();
         }
 
         public function csrfToken(): MutableMap
@@ -214,7 +211,7 @@ namespace shani\launcher {
          * always depends on HTTP method and application endpoint provided by the user.
          * @return void
          */
-        public function processRequest(): void
+        private function processRequest(): void
         {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
@@ -270,9 +267,9 @@ namespace shani\launcher {
         private function handleException(\Throwable $ex): void
         {
             if (isset($this->config)) {
-                $fallback = $this->config->errorHandler($ex);
-                if (!empty($fallback)) {
-                    $this->request->changeRoute($fallback);
+                $fallbackRoute = $this->config->errorHandler($ex);
+                if ($fallbackRoute !== null) {
+                    $this->request->changeRoute($fallbackRoute);
                     $this->processRequest();
                     return;
                 }

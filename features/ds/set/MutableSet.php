@@ -9,6 +9,7 @@
 
 namespace features\ds\set {
 
+    use features\ds\map\ReadableMap;
     use features\ds\MutableData;
 
     class MutableSet extends ReadableSet implements MutableData
@@ -100,6 +101,16 @@ namespace features\ds\set {
                 $set->addOne($callback($value));
             }
             return $set;
+        }
+
+        public function add(\JsonSerializable $json): self
+        {
+            return $this->addAll(array_values($json->jsonSerialize()));
+        }
+
+        public function addMap(ReadableMap $map): self
+        {
+            return $this->addAll($map->values());
         }
     }
 

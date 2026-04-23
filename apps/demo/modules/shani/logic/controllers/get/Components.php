@@ -29,7 +29,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): void
+        public function index(): WebUIBuilder
         {
             $storage = $this->app->storage();
             $builder = new WebUIBuilder();
@@ -37,20 +37,20 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     ->title('Home Page II')
                     ->setPwaBuilder(new PwaBuilder($storage->uri('/pwa/0/manifest.json'), $storage->uri('/pwa/0/sw.js')))
                     ->view('/body');
-            $this->app->writer->send($builder);
+            return $builder;
         }
 
-        public function all(): void
+        public function all(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function stream(): void
+        public function stream(): \Closure
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $this->app->writer->stream(function () {
+            return function () {
                 $db = $this->app->config->getDatabase();
-                $rows = $db->collect('SELECT * FROM users');
+                $rows = $db->find('users');
                 while (true) {
                     sleep(1);
                     if ($rows->valid()) {
@@ -60,88 +60,90 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                         yield; //terminate streaming
                     }
                 }
-            });
+            };
         }
 
-        public function users(): void
+        public function users(): \Closure
         {
             $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $rows = $db->get('SELECT * FROM users');
-            $this->app->writer->send($rows);
+            $rows = $db->find('users');
+            return function () use (&$rows) {
+                foreach ($rows as $row) {
+                    yield $row;
+                }
+            };
         }
 
-        public function inputs(): void
+        public function inputs(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function containers(): void
+        public function containers(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function modals(): void
+        public function modals(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            $this->app->writer->send($builder);
+            return $builder;
         }
 
-        public function toaster(): void
+        public function toaster(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function timeline(): void
+        public function timeline(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function shani(): void
+        public function shani(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function redirect(): void
+        public function redirect(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function generator(): void
+        public function generator(): Documentation
         {
-            sleep(2);
-            $doc = new Documentation($this->app);
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $this->app->writer->send($doc);
+            return new Documentation($this->app);
         }
 
-        public function card(): void
+        public function card(): WebUIBuilder
         {
-            sleep(1);
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function bindings(): void
+        public function bindings(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function nodes(): void
+        public function nodes(): WebUIBuilder
         {
-            $this->app->writer->send(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function client(): void
+        public function client(): \Closure
         {
             $client = new HttpClient(new URI('https://dev.shani.v2.local'));
             $client->enableAsync(false)->enableSSLVerification(false);
-            $client->get('/shani/0/components/0/stream', function (ResponseEntity $res) {
-                $this->app->writer->stream(function ()use (&$res) {
+            $cb = null;
+            $client->get('/shani/0/components/0/stream', function (ResponseEntity $res) use (&$cb) {
+                $cb = function ()use (&$res) {
                     yield $res->body();
-                });
+                };
             });
-            $this->app->writer->send();
+            return $cb;
         }
     }
 
