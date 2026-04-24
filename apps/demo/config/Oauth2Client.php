@@ -7,8 +7,9 @@
  * Created on: Mar 13, 2026 at 4:31:15 PM
  */
 
-namespace apps\demo\middleware {
+namespace apps\demo\config {
 
+    use features\authentication\UserDetailsDto;
     use features\jwt\JWTAlgorithm;
     use features\jwt\JWTClaim;
     use features\oauth2\dto\AccessTokenDto;
@@ -19,7 +20,6 @@ namespace apps\demo\middleware {
     use features\oauth2\Oauth2GrantType;
     use features\oauth2\Oauth2Repository;
     use features\utils\URI;
-    use features\authentication\UserDetailsDto;
 
     final class Oauth2Client implements Oauth2Repository
     {

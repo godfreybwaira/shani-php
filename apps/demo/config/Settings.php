@@ -9,7 +9,6 @@
 
 namespace apps\demo\config {
 
-    use apps\demo\middleware\Oauth2Client;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseDriver;
     use features\persistence\DatabaseInterface;
