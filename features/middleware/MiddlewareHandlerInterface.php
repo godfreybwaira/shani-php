@@ -28,7 +28,7 @@ namespace features\middleware {
 
         /**
          * Run middlewares after the response is being sent. Here you can do all
-         * your "heavy" tasks (tasks that take more than 50ms)
+         * your "heavy" tasks (tasks that take more than 100ms)
          * @return void
          */
         public function afterResponse(): void;
