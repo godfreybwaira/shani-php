@@ -25,26 +25,53 @@ namespace shani\launcher {
     use features\storage\LocalStorage;
     use features\test\helpers\TestRunner;
 
+    /**
+     * Handles application startup, virtual host resolution, and request dispatching.
+     *
+     * The ApplicationLauncher is responsible for:
+     * - Resolving virtual host configurations from YAML or alias files
+     * - Determining request preferences based on version headers
+     * - Starting the supported web server and binding request handlers
+     * - Logging server events and messages
+     * - Resolving client IP addresses from HTTP headers
+     *
+     * It acts as the entry point for launching the application server and
+     * orchestrating request routing to the App class.
+     */
     final class ApplicationLauncher
     {
 
+        /**
+         * Resolve configuration preference for a given host and request headers.
+         *
+         * @param string $hostname Hostname being requested.
+         * @param array $host Host configuration array.
+         * @param HttpHeader $headers HTTP request headers.
+         * @return RequestPreference|null Request preference object or null if unsupported.
+         */
         private static function getConfigPreference(string $hostname, array $host, HttpHeader $headers): ?RequestPreference
         {
             $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
             $filename = $host['version']['supported'][$version] ?? null;
             $filepath = Framework::DIR_HOSTS . '/' . $hostname . '/' . $filename;
             if ($filename !== null && is_file($filepath)) {
-                return new RequestPreference($version, $filepath, $host['version']['request_header'], $host['version']['response_header']);
+                return new RequestPreference(
+                        $version,
+                        $filepath,
+                        $host['version']['request_header'],
+                        $host['version']['response_header']
+                );
             }
             return null;
         }
 
         /**
-         * Get Virtual host configurations
-         * @param string $name Host name
-         * @param HttpHeader $headers HTTP request headers
-         * @return RequestPreference|null
-         * @throws \Exception
+         * Get virtual host configurations.
+         *
+         * @param string $name Host name.
+         * @param HttpHeader $headers HTTP request headers.
+         * @return RequestPreference|null Request preference object or null.
+         * @throws \Exception If host configuration cannot be found.
          */
         private static function host(string $name, HttpHeader $headers): ?RequestPreference
         {
@@ -61,8 +88,9 @@ namespace shani\launcher {
         }
 
         /**
-         * Starting the server. When started, server becomes ready to accept requests
-         * @param SupportedWebServer $server Server application capable of handling HTTP requests
+         * Start the server. When started, the server becomes ready to accept requests.
+         *
+         * @param SupportedWebServer $server Server application capable of handling HTTP requests.
          * @return void
          */
         public static function start(SupportedWebServer $server): void
@@ -97,6 +125,13 @@ namespace shani\launcher {
             });
         }
 
+        /**
+         * Log server messages to console and file.
+         *
+         * @param LoggingLevel $level Logging severity level.
+         * @param string $message Log message.
+         * @return void
+         */
         public static function log(LoggingLevel $level, string $message): void
         {
             if (PHP_SAPI === 'cli') {
@@ -109,6 +144,13 @@ namespace shani\launcher {
             (new Logger($file))->log($level, $message);
         }
 
+        /**
+         * Get client IP address from HTTP headers.
+         *
+         * @param array $httpHeaders HTTP headers array.
+         * @param array $ipHeaders List of header keys to check for IP.
+         * @return string|null Client IP address or null if not found.
+         */
         public static function getClientIP(array &$httpHeaders, array $ipHeaders): ?string
         {
             foreach ($ipHeaders as $header) {

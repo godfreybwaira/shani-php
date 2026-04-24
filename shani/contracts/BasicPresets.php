@@ -110,7 +110,7 @@ namespace shani\contracts {
          *
          * @var StorageMediaInterface|null
          */
-        protected ?StorageMediaInterface $storageMedia = null
+        protected ?StorageMediaInterface $storageMedia = null;
 
         /**
          * Constructor for BasicPresets.

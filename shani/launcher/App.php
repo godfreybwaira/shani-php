@@ -30,6 +30,27 @@ namespace shani\launcher {
     use shani\presets\AppPresets;
     use shani\presets\PathPresets;
 
+    /**
+     * Core application class that manages request handling, response writing,
+     * session management, authentication, configuration, and error handling.
+     *
+     * This class serves as the central entry point for the framework. It ties together:
+     * - Virtual host configuration
+     * - HTTP request and response entities
+     * - Application presets and framework configuration
+     * - Session storage and authentication manager
+     * - Middleware handling
+     * - Routing and controller dispatch
+     * - Logging and storage management
+     * - Language and dictionary support
+     *
+     * Responsibilities:
+     * - Launch and run the application lifecycle
+     * - Process incoming HTTP requests and route them to controllers
+     * - Handle CSRF tokens, sessions, and authentication
+     * - Provide access to storage, logging, and configuration
+     * - Manage error handling and fallback routes
+     */
     final class App
     {
 
@@ -92,11 +113,12 @@ namespace shani\launcher {
         private AppPresets $preset;
 
         /**
-         * Create an application instance
-         * @param ReadableMap $vhost Virtual host
-         * @param ResponseEntity $res Response entity object
-         * @param ResponseWriter $writer response writer object
-         * @param Framework $framework Framework configuration object
+         * Create an application instance.
+         *
+         * @param ReadableMap $vhost Virtual host configuration.
+         * @param ResponseEntity $res Response entity object.
+         * @param ResponseWriter $writer Response writer object.
+         * @param Framework $framework Framework configuration object.
          */
         public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriter $writer, Framework $framework)
         {
