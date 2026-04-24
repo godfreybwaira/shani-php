@@ -104,13 +104,13 @@ namespace shani\launcher {
          * Application paths
          * @var PathConfig
          */
-        private PathConfig $path;
+        private readonly PathConfig $path;
 
         /**
          * Application related configurations
          * @var AppConfig
          */
-        private AppConfig $preset;
+        private readonly AppConfig $preset;
 
         /**
          * Create an application instance.
