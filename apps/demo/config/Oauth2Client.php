@@ -24,7 +24,7 @@ namespace apps\demo\config {
     final class Oauth2Client implements Oauth2Repository
     {
 
-        private const REDIRECT_URI = 'http://dev.shani.v2.local/security/0/oauth2/0';
+        private const REDIRECT_URI = 'https://dev.shani.v2.local/security/0/oauth2/0';
 
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {

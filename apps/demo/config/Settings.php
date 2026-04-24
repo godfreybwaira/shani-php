@@ -25,8 +25,9 @@ namespace apps\demo\config {
     use shani\http\ResponseEntity;
     use shani\launcher\App;
     use shani\launcher\Framework;
-    use shani\presets\PathPresets;
     use shani\presets\AuthenticationPresets;
+    use shani\presets\CsrfPresets;
+    use shani\presets\PathPresets;
     use shani\presets\SessionPresets;
 
     final class Settings extends BasicPresets
@@ -37,6 +38,11 @@ namespace apps\demo\config {
         public function __construct(App $app)
         {
             parent::__construct($app);
+        }
+
+        public function csrfPresets(): CsrfPresets
+        {
+            return $this->csrfPresets ??= new CsrfPresets($this->app->request->method, false);
         }
 
         public function pathPresets(): PathPresets

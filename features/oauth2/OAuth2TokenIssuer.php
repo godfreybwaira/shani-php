@@ -10,9 +10,9 @@
 namespace features\oauth2 {
 
     use features\ds\map\ReadableMap;
-    use shani\http\HttpHeader;
-    use shani\http\enums\HttpStatus;
     use features\utils\MediaType;
+    use shani\http\enums\HttpStatus;
+    use shani\http\HttpHeader;
     use shani\launcher\App;
 
     final class OAuth2TokenIssuer

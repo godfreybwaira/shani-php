@@ -9,12 +9,12 @@
 
 namespace features\oauth2 {
 
+    use features\authentication\UserDetailsDto;
     use features\oauth2\dto\AccessTokenDto;
     use features\oauth2\dto\AuthorizationCodeDetailsDto;
     use features\oauth2\dto\DeviceCodeDetailsDto;
     use features\oauth2\dto\OauthClientDetailsDto;
     use features\oauth2\dto\RefreshTokenDto;
-    use features\authentication\UserDetailsDto;
 
     interface Oauth2Repository
     {
