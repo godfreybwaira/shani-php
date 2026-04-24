@@ -15,7 +15,7 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 spl_autoload_register(function (string $class) {
     require_once str_replace('\\', '/', $class) . '.php';
 });
-$config = new Framework();
+$framework = new Framework();
 
 if (PHP_SAPI === 'cli') {
     /**
@@ -24,12 +24,12 @@ if (PHP_SAPI === 'cli') {
      * to be installed, and of course UNIX family operating system           *
      * ***********************************************************************
      */
-    ApplicationLauncher::start(new \shani\servers\swoole\SwooleServer($config));
+    ApplicationLauncher::start(new \shani\servers\swoole\SwooleServer($framework));
 } else {
     /**
      * **************************************************************
      * Run the application using any CGI server e.g apache or nginx *
      * **************************************************************
      */
-    ApplicationLauncher::start(new shani\servers\cgi\CgiServer($config));
+    ApplicationLauncher::start(new shani\servers\cgi\CgiServer($framework));
 }
