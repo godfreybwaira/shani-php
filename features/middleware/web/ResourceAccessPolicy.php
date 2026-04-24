@@ -10,7 +10,7 @@
 namespace features\middleware\web {
 
     use features\middleware\UtilityMiddlewares;
-    use shani\contracts\Configuration;
+    use shani\contracts\BasicPresets;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 
@@ -39,8 +39,8 @@ namespace features\middleware\web {
 
         /**
          * Tells a web browser whether to allow other sites to access your resources
+         * @param App $app Application object
          * @return void
-         * @see Configuration::resourceAccessPolicy()
          */
         public function setPolicy(App $app): void
         {
@@ -49,7 +49,7 @@ namespace features\middleware\web {
             }
             $app->response->header()->addAll([
                 HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $this->value,
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $app->config->allowedRequestMethods()
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $app->config->requestPresets()->allowedMethods
             ]);
             UtilityMiddlewares::addAllowOrigin($app);
         }

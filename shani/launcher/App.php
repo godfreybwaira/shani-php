@@ -20,13 +20,15 @@ namespace shani\launcher {
     use features\session\SessionStorageInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
-    use shani\contracts\Configuration;
+    use shani\contracts\BasicPresets;
     use shani\contracts\ResponseWriter;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\launcher\Framework;
+    use shani\presets\AppPresets;
+    use shani\presets\PathPresets;
 
     final class App
     {
@@ -62,9 +64,9 @@ namespace shani\launcher {
 
         /**
          * Current loaded application configurations.
-         * @var Configuration
+         * @var BasicPresets
          */
-        public readonly Configuration $config;
+        public readonly BasicPresets $config;
 
         /**
          * Application framework configuration
@@ -77,6 +79,18 @@ namespace shani\launcher {
          * @var AuthenticationManager
          */
         public readonly AuthenticationManager $auth;
+
+        /**
+         * Application paths
+         * @var PathPresets
+         */
+        private PathPresets $path;
+
+        /**
+         * Application related configurations
+         * @var AppPresets
+         */
+        private AppPresets $preset;
 
         /**
          * Create an application instance
@@ -96,6 +110,8 @@ namespace shani\launcher {
             $this->config = new $class($this);
             $this->session = $this->getSession();
             $this->auth = new AuthenticationManager($this);
+            $this->path = $this->config->pathPresets();
+            $this->preset = $this->config->appPresets();
         }
 
         /**
@@ -117,7 +133,7 @@ namespace shani\launcher {
 
         private function runApplication(): void
         {
-            if (!$this->config->isRunning()) {
+            if (!$this->preset->isRunning) {
                 throw CustomException::offline($this);
             }
             if (LocalStorage::tryServe($this)) {
@@ -137,7 +153,7 @@ namespace shani\launcher {
 
         private function getSession(): SessionStorageInterface
         {
-            $conn = $this->config->getSessionConnection();
+            $conn = $this->config->sessionPresets()->connection;
             return SessionStorage::getStorage($this, $conn);
         }
 
@@ -148,7 +164,7 @@ namespace shani\launcher {
         public function logger(): Logger
         {
             if (!isset($this->logger)) {
-                $filename = $this->config->logFileName();
+                $filename = $this->preset->logFileName;
                 if (strpos($filename, '://') === false) {
                     $filename = $this->storage()->pathTo('/' . $filename);
                 }
@@ -178,7 +194,7 @@ namespace shani\launcher {
         public function dictionary(array $data = null, string $name = null): ReadableMap
         {
             $route = $this->request->route();
-            $file = $this->module() . $this->config->languageDir() . '/' . $route->controller;
+            $file = $this->module() . $this->path->languages . '/' . $route->controller;
             $file .= ($name ?? '/' . $route->action) . '/' . $this->language() . '.php';
             return self::getFile($file, new ReadableMap($data));
         }
@@ -195,14 +211,14 @@ namespace shani\launcher {
          */
         public function module(string $name = null): string
         {
-            return $this->config->root() . $this->config->moduleDir() . ($name ?? '/' . $this->request->route()->module);
+            return $this->path->root . $this->path->modules . ($name ?? '/' . $this->request->route()->module);
         }
 
         private function getClassPath(): string
         {
-            $class = substr($this->config->root(), strrpos(Framework::DIR_APPS, '/'));
-            $class .= $this->config->moduleDir() . '/' . $this->request->route()->module;
-            $class .= $this->config->controllers() . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
+            $class = substr($this->path->root, strrpos(Framework::DIR_APPS, '/'));
+            $class .= $this->path->modules . '/' . $this->request->route()->module;
+            $class .= $this->path->controllers . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
             return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));
         }
 
@@ -252,14 +268,13 @@ namespace shani\launcher {
         {
             if (!$this->lang) {
                 $reqLangs = $this->request->languages();
-                $supportedLangs = $this->config->supportedLanguages();
                 foreach ($reqLangs as $lang) {
-                    if (in_array($lang, $supportedLangs)) {
+                    if (in_array($lang, $this->preset->supportedLanguages)) {
                         $this->lang = $lang;
                         return $lang;
                     }
                 }
-                $this->lang = $this->config->defaultLanguage();
+                $this->lang = $this->preset->language;
             }
             return $this->lang;
         }

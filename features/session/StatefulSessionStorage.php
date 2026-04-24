@@ -60,11 +60,11 @@ namespace features\session {
 
         public function refresh(): SessionStorageInterface
         {
-            if ($this->app->config->enableCsrfProtection()) {
+            $csrf = $this->app->config->csrfPresets();
+            if ($csrf->enabled) {
                 $token = bin2hex(random_bytes(32));
-                $tokenName = $this->app->config->csrfTokenName();
-                $this->app->csrfToken()->addOne($tokenName, $token);
-                $this->app->response->header()->addOne($tokenName, $token);
+                $this->app->csrfToken()->addOne($csrf->tokenName, $token);
+                $this->app->response->header()->addOne($csrf->tokenName, $token);
             }
             if (!$this->app->config->isAsync()) {
                 session_regenerate_id(true);
@@ -80,17 +80,18 @@ namespace features\session {
         private function start(): void
         {
             if (session_status() === PHP_SESSION_NONE) {
+                $session = $this->app->config->sessionPresets();
                 session_start([
                     'save_handler' => $this->conn->getHandler(),
                     'save_path' => $this->conn->getConnectionString(),
-                    'name' => $this->app->config->sessionName(),
+                    'name' => $session->sessionName,
                     'use_strict_mode' => true,
                     'use_cookies' => true,
                     'cookie_path' => '/',
-                    'cookie_lifetime' => 0,
+                    'cookie_lifetime' => $session->sessionLifetime,
                     'cookie_httponly' => true,
                     'cookie_secure' => $this->app->request->uri->secure(),
-                    'cookie_samesite' => HttpSameSite::LAX->value,
+                    'cookie_samesite' => $session->cookieSameSite->value,
                     'cookie_domain' => $this->getCookieDomain()
                 ]);
                 register_shutdown_function([$this, 'close']);

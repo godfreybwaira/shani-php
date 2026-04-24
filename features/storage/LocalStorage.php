@@ -23,6 +23,7 @@ namespace features\storage {
     use shani\http\HttpHeader;
     use shani\launcher\App;
     use shani\launcher\Framework;
+    use shani\presets\PathPresets;
 
     final class LocalStorage implements StorageMediaInterface
     {
@@ -36,12 +37,14 @@ namespace features\storage {
 
         private readonly App $app;
         private readonly string $host, $storage;
+        private readonly PathPresets $pathPreset;
 
         public function __construct(App $app)
         {
             $this->app = $app;
+            $this->pathPreset = $app->config->pathPresets();
             $this->host = $app->request->uri->host();
-            $this->storage = self::createShortcut($app->config->appStorage());
+            $this->storage = self::createShortcut($this->pathPreset->storage);
         }
 
         private static function createShortcut(string $target): string
@@ -89,9 +92,9 @@ namespace features\storage {
                 case self::ACCESS_ASSET:
                     $filepath = substr($path, strlen($prefix));
                     return self::sendFile($app, $assetServer, Framework::DIR_ASSETS . $filepath);
-                case $app->config->appProtectedStorage():
+                case $app->config->pathPresets()->protectedStorage:
                     return self::serveProtected($app, $assetServer, $path);
-                case $app->config->appPublicStorage():
+                case $app->config->pathPresets()->publicStorage:
                     return self::sendFile($app, $assetServer, $app->storage()->pathTo($path));
                 default:
                     return false;
@@ -164,7 +167,7 @@ namespace features\storage {
             if (empty($privateBucket)) {
                 throw new ServerException('Client private Id cannot be empty');
             }
-            $path = $this->pathTo($this->app->config->appProtectedStorage() . $bucket);
+            $path = $this->pathTo($this->pathPreset->protectedStorage . $bucket);
             $prefix = self::PID_INITIAL . $privateBucket . self::ID_SEPARATOR;
             return $this->saveFile($file, $path, $prefix, $rename);
         }
@@ -233,7 +236,7 @@ namespace features\storage {
         {
             $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
             $prefix .= self::ID_SEPARATOR . self::GID_INITIAL;
-            $bucket = $this->app->config->appProtectedStorage();
+            $bucket = $this->pathPreset->protectedStorage;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
@@ -243,7 +246,7 @@ namespace features\storage {
             $user = $this->app->auth->getUserDetails();
             $prefix = self::PID_INITIAL . $user?->storageBucket;
             $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $user?->groupStorageBucket;
-            $bucket = $this->app->config->appProtectedStorage();
+            $bucket = $this->pathPreset->protectedStorage;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
@@ -251,7 +254,7 @@ namespace features\storage {
         public function share2other(string $filepath, string $otherId): ?string
         {
             $prefix = self::PID_INITIAL . $otherId;
-            $bucket = $this->app->config->appProtectedStorage();
+            $bucket = $this->pathPreset->protectedStorage;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
@@ -259,7 +262,7 @@ namespace features\storage {
         public function share2public(string $filepath): ?string
         {
             $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
-            $bucket = $this->app->config->appPublicStorage();
+            $bucket = $this->pathPreset->publicStorage;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 

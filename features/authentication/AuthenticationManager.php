@@ -13,18 +13,48 @@ namespace features\authentication {
     use shani\http\RequestRoute;
     use shani\launcher\App;
 
+    /**
+     * Manages user authentication using configured authentication strategies.
+     *
+     * This class implements the AuthenticationStrategy interface and provides
+     * centralized login, registration, update, and logout functionality.
+     *
+     * Responsibilities:
+     * - Delegates authentication operations to configured strategies
+     * - Stores authenticated user details in session carts
+     * - Handles session metadata for tracking active strategy
+     * - Provides login, register, unregister, update, and logout methods
+     *
+     * Notes:
+     * - Multiple authentication strategies can be configured (e.g., password-based, OAuth, etc.)
+     * - The first successful strategy determines the authenticated user
+     * - Disabled users cannot log in
+     * - Session carts are used to persist authentication state
+     */
     final class AuthenticationManager implements AuthenticationStrategy
     {
 
         private const AUTH_CART = '2d574fce7ee49c';
         private const METADATA_CART = '0d53b584a59b';
 
+        /**
+         * Application instance reference.
+         *
+         * @var App
+         */
         private readonly App $app;
+
+        /**
+         * Currently authenticated user details.
+         *
+         * @var UserDetailsDto|null
+         */
         private ?UserDetailsDto $user = null;
 
         /**
+         * Constructor for AuthenticationManager.
          *
-         * @param App $app Application object
+         * @param App $app Application object providing access to configuration and session.
          */
         public function __construct(App $app)
         {
@@ -36,7 +66,7 @@ namespace features\authentication {
             if ($this->loggedIn()) {
                 return null;
             }
-            $strategies = $this->app->config->getAuthenticationStrategies();
+            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
             foreach ($strategies as $index => $strategy) {
                 $user = $strategy->login();
                 if ($user === null) {
@@ -56,7 +86,7 @@ namespace features\authentication {
 
         public function register(): ?UserDetailsDto
         {
-            $strategies = $this->app->config->getAuthenticationStrategies();
+            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 $user = $strategy->register();
                 if ($user !== null) {
@@ -68,7 +98,7 @@ namespace features\authentication {
 
         public function unregister(): bool
         {
-            $strategies = $this->app->config->getAuthenticationStrategies();
+            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 if ($strategy->unregister()) {
                     return true;
@@ -79,7 +109,7 @@ namespace features\authentication {
 
         public function update(): ?UserDetailsDto
         {
-            $strategies = $this->app->config->getAuthenticationStrategies();
+            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 $user = $strategy->update();
                 if ($user !== null) {
@@ -93,7 +123,7 @@ namespace features\authentication {
         {
             if ($this->loggedIn()) {
                 $index = $this->app->session->cart(self::METADATA_CART)->getOne('strategy');
-                $strategy = $this->app->config->getAuthenticationStrategies()[$index];
+                $strategy = $this->app->config->authenticationPresets()->authenticationStrategies[$index];
                 if ($strategy->logout()) {
                     $this->user = null;
                     $this->app->session->destroy();

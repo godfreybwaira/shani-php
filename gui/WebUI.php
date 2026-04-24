@@ -62,10 +62,11 @@ namespace gui {
         {
             $route = $this->app->request->route();
             $file = ($path ?? '/' . $route->action) . '.php';
+            $appPath = $this->app->config->pathPresets();
             if ($moduleName === null) {
-                return $this->app->module() . $this->app->config->viewDir() . '/' . $route->controller . $file;
+                return $this->app->module() . $appPath->views . '/' . $route->controller . $file;
             }
-            return $this->app->module($moduleName) . $this->app->config->viewDir() . $file;
+            return $this->app->module($moduleName) . $appPath->views . $file;
         }
 
         /**
@@ -135,7 +136,7 @@ namespace gui {
             foreach ($scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $url . '"></script>';
             }
-            return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appName()) . '</title>';
+            return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appPresets()->appName) . '</title>';
         }
 
         /**
@@ -191,11 +192,11 @@ namespace gui {
          */
         public function csrf(): ?string
         {
-            if ($this->app->config->enableCsrfProtection()) {
-                $tokenName = $this->app->config->csrfTokenName();
-                $token = $this->app->csrfToken()->getOne($tokenName, bin2hex(random_bytes(32)));
-                $this->app->csrfToken()->addOne($tokenName, $token);
-                return '<input type="hidden" name="' . $tokenName . '" value="' . $token . '"/>';
+            $csrf = $this->app->config->csrfPresets();
+            if ($csrf->enabled) {
+                $token = $this->app->csrfToken()->getOne($csrf->tokenName, bin2hex(random_bytes(32)));
+                $this->app->csrfToken()->addOne($csrf->tokenName, $token);
+                return '<input type="hidden" name="' . $csrf->tokenName . '" value="' . $token . '"/>';
             }
             return null;
         }

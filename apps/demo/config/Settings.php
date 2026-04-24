@@ -14,7 +14,6 @@ namespace apps\demo\config {
     use features\persistence\DatabaseDriver;
     use features\persistence\DatabaseInterface;
     use features\persistence\SQLDatabase;
-    use features\session\SessionConnectionInterface;
     use features\test\helpers\TestCategory;
     use features\test\helpers\TestSeverity;
     use features\test\TestCase;
@@ -22,13 +21,16 @@ namespace apps\demo\config {
     use features\test\TestResult;
     use features\utils\HttpClient;
     use features\utils\URI;
-    use shani\contracts\Configuration;
+    use shani\contracts\BasicPresets;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
     use shani\launcher\Framework;
+    use shani\presets\PathPresets;
+    use shani\presets\AuthenticationPresets;
+    use shani\presets\SessionPresets;
 
-    final class Settings extends Configuration
+    final class Settings extends BasicPresets
     {
 
         public function __construct(App $app)
@@ -36,34 +38,9 @@ namespace apps\demo\config {
             parent::__construct($app);
         }
 
-        public function root(): string
+        public function pathPresets(): PathPresets
         {
-            return Framework::DIR_APPS . '/demo';
-        }
-
-        public function homePath(): string
-        {
-            return '/shani/0/components/0/index';
-        }
-
-        public function allowedRequestMethods(): string
-        {
-            return 'get,post,head,put';
-        }
-
-        public function skipCsrfTest(): bool
-        {
-            return true;
-        }
-
-        public function languageDir(): string
-        {
-            return '/presentation/lang';
-        }
-
-        public function viewDir(): string
-        {
-            return '/presentation/views';
+            return new PathPresets(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
         }
 
         public function isAsync(): bool
@@ -127,17 +104,17 @@ namespace apps\demo\config {
             return new Oauth2Client();
         }
 
-        public function getAuthenticationStrategies(): array
+        public function authenticationPresets(): AuthenticationPresets
         {
-            return [
+            return new AuthenticationPresets(authenticationStrategies: [
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
-            ];
+            ]);
         }
 
-        public function getSessionConnection(): ?SessionConnectionInterface
+        public function sessionPresets(): SessionPresets
         {
-            return new \features\session\dto\RedisConnectionDto('localhost', 6379);
+            return new SessionPresets(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
         }
     }
 

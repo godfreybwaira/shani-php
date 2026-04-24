@@ -31,7 +31,6 @@ namespace features\exceptions {
         public static function methodNotAllowed(App $app, string $message = null): ClientException
         {
             $app->response->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
-            $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $app->config->allowedRequestMethods());
             return new ClientException($message ?? 'Request Method not allowed');
         }
 

@@ -42,9 +42,10 @@ namespace features\middleware {
         public static function preflightRequest(App $app, int $cacheTime = 86400): void
         {
             if ($app->request->method === 'options') {
+                $presets = $app->config->requestPresets();
                 $app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
-                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $app->config->allowedRequestMethods(),
-                    HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $app->config->allowedRequestHeaders(),
+                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $presets->allowedMethods,
+                    HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $presets->allowedHeaders,
                     HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
                 ]);
                 UtilityMiddlewares::addAllowOrigin($app);
@@ -79,34 +80,8 @@ namespace features\middleware {
         public static function handleEmptyurlPath(App $app): void
         {
             if ($app->request->uri->path() === '/') {
-                $app->request->changeRoute(RequestRoute::fromPath($app->config->homePath()));
+                $app->request->changeRoute(RequestRoute::fromPath($app->config->pathPresets()->homePath));
             }
-        }
-
-        /**
-         * Modify response before sending to user. Example signing a response,
-         * encrypting, compressing response body etc
-         * @return void
-         */
-        public static function responseMutator(App $app): void
-        {
-            $app->response
-                    ->compress($app->config->compressionMinSize(), $app->config->compressionLevel())
-                    ->sign($app->config->signature(), $app->config->signatureHeaderName())
-                    ->encrypt($app->config->encryption());
-        }
-
-        /**
-         * Modify request before processing it. Example verifying signature,
-         * decrypting, decompressing request body etc
-         * @return void
-         */
-        public static function requestMutator(App $app): void
-        {
-            $app->request
-                    ->decrypt($app->config->encryption())
-                    ->verify($app->config->signature(), $app->config->signatureHeaderName())
-                    ->decompress();
         }
     }
 

@@ -10,7 +10,7 @@
 namespace features\middleware {
 
     use features\exceptions\CustomException;
-    use shani\contracts\Configuration;
+    use shani\http\HttpHeader;
     use shani\http\RequestRoute;
     use shani\launcher\App;
 
@@ -27,15 +27,14 @@ namespace features\middleware {
         /**
          * Check whether the client request method is allowed by the application.
          * @return void
-         * @see Configuration::allowedRequestMethods()
          */
         public function passedRequestMethodCheck(): void
         {
-            $methods = $this->app->config->allowedRequestMethods();
-            if ($methods === '*' || str_contains($methods, $this->app->request->method)) {
-                return;
+            $presets = $this->app->config->requestPresets();
+            if (!$presets->methodAllowed) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $presets->allowedMethods);
+                throw CustomException::methodNotAllowed($this->app);
             }
-            throw CustomException::methodNotAllowed($this->app);
         }
 
         /**
@@ -46,12 +45,12 @@ namespace features\middleware {
          */
         public function csrfTest(): void
         {
-            if (!$this->app->config->enableCsrfProtection() || $this->app->config->skipCsrfTest()) {
+            $csrf = $this->app->config->csrfPresets();
+            if ($csrf->skipTest) {
                 return;
             }
-            $tokenName = $this->app->config->csrfTokenName();
-            $expectedToken = $this->app->csrfToken()->getOne($tokenName);
-            $submittedToken = $this->app->request->header()->getOne($tokenName) ?? $this->app->request->body()->getOne($tokenName);
+            $expectedToken = $this->app->csrfToken()->getOne($csrf->tokenName);
+            $submittedToken = $this->app->request->header()->getOne($csrf->tokenName) ?? $this->app->request->body()->getOne($csrf->tokenName);
             if (empty($submittedToken) || !hash_equals($expectedToken, $submittedToken)) {
                 throw CustomException::notAcceptable($this->app, 'Invalid or missing CSRF token');
             }
@@ -64,12 +63,12 @@ namespace features\middleware {
          */
         public function authorized(): void
         {
-            if ($this->app->config->skipAuthentication() || $this->app->config->accessingPublicResource()) {
+            if ($this->app->config->authenticationPresets()->skipAuthentication || $this->app->config->accessingPublicResource()) {
                 return;
             }
             if ($this->app->config->accessingGuestResource()) {
                 if ($this->app->auth->loggedIn()) {
-                    $route = RequestRoute::fromPath($this->app->config->homePath());
+                    $route = RequestRoute::fromPath($this->app->config->pathPresets()->homePath);
                     $this->app->request->changeRoute($route);
                 }
                 return;

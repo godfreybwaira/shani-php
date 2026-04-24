@@ -34,7 +34,6 @@ namespace features\middleware {
 
         public function preRequest(): void
         {
-            UtilityMiddlewares::requestMutator($this->app);
             UtilityMiddlewares::handleEmptyurlPath($this->app);
             UtilityMiddlewares::setProperContentType($this->app);
             UtilityMiddlewares::preflightRequest($this->app);
@@ -46,10 +45,10 @@ namespace features\middleware {
 
         public function preResponse(): void
         {
-            $this->app->config->csp()->addCspHeaders($this->app);
-            $this->app->config->browsingPrivacy()->setPolicy($this->app);
-            $this->app->config->resourceAccessPolicy()->setPolicy($this->app);
-            UtilityMiddlewares::responseMutator($this->app);
+            $policy = $this->app->config->webPolicyPresets();
+            $policy->csp->addCspHeaders($this->app);
+            $policy->browsingPrivacy->setPolicy($this->app);
+            $policy->resourceAccess->setPolicy($this->app);
         }
     }
 

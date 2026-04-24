@@ -44,6 +44,7 @@ namespace features\middleware\web {
 
         /**
          * Set browsing policy
+         * @param App $app Application object
          * @return void
          */
         public function setPolicy(App $app): void

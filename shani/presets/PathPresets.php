@@ -1,0 +1,165 @@
+<?php
+
+/**
+ * Description of PathPresets
+ * @author goddy
+ *
+ * Created on: Apr 24, 2026 at 1:26:35 PM
+ */
+
+namespace shani\presets {
+
+    /**
+     * Defines default directory path presets for an application.
+     *
+     * This class centralizes configuration of important application paths,
+     * including root, modules, controllers, views, language files, and storage.
+     * It ensures consistent directory structure and provides sensible defaults
+     * for storage locations.
+     *
+     * Key features:
+     * - Root directory of the application
+     * - Default home path for requests to '/'
+     * - Controllers directory (for HTTP method-based controllers)
+     * - Modules directory
+     * - Views directory
+     * - Languages directory
+     * - Storage directories (general, protected, public)
+     *
+     * By default:
+     * - Controllers → /logic/controllers
+     * - Modules → /modules
+     * - Views → /presentation/views
+     * - Languages → /presentation/lang
+     * - Storage → {root}/.bucket
+     * - Protected storage → /0prt
+     * - Public storage → /1pub
+     */
+    final class PathPresets
+    {
+
+        /**
+         * Application root directory.
+         *
+         * @var string
+         */
+        public readonly string $root;
+
+        /**
+         * Default URI path to a home page if '/' is provided during HTTP request.
+         *
+         * @var string
+         */
+        public readonly string $homePath;
+
+        /**
+         * The directory inside application module where module controllers reside.
+         * This is where GET, POST, PUT, DELETE, or other HTTP method directories
+         * must be created (in lowercase).
+         *
+         * @var string
+         */
+        public readonly string $controllers;
+
+        /**
+         * Application modules directory.
+         *
+         * @var string
+         */
+        public readonly string $modules;
+
+        /**
+         * User-defined view directory.
+         *
+         * @var string
+         */
+        public readonly string $views;
+
+        /**
+         * User language directory. Each module contains its own language files here.
+         *
+         * @var string
+         */
+        public readonly string $languages;
+
+        /**
+         * Application storage directory for static files.
+         * Must be accessible and writable by the web server.
+         *
+         * @var string
+         */
+        public readonly string $storage;
+
+        /**
+         * Protected storage directory for static contents.
+         * Accessible only by authenticated users.
+         *
+         * @var string
+         */
+        public readonly string $protectedStorage;
+
+        /**
+         * Public storage directory for static contents.
+         * Accessible by everyone.
+         *
+         * @var string
+         */
+        public readonly string $publicStorage;
+
+        /**
+         * Constructor for PathPresets.
+         *
+         * Initializes application path configuration with defaults if none are provided.
+         *
+         * @param string $root
+         *     Application root directory.
+         *
+         * @param string $homePath
+         *     Default URI path to a home page if '/' is requested.
+         *
+         * @param string $controllers
+         *     Directory for controllers inside modules. Defaults to '/logic/controllers'.
+         *
+         * @param string $modules
+         *     Directory for application modules. Defaults to '/modules'.
+         *
+         * @param string $views
+         *     Directory for views. Defaults to '/presentation/views'.
+         *
+         * @param string $languages
+         *     Directory for language files. Defaults to '/presentation/lang'.
+         *
+         * @param string|null $storage
+         *     Application storage directory. Defaults to {root}/.bucket if null.
+         *
+         * @param string $protectedStorage
+         *     Protected storage directory. Defaults to '/0prt'.
+         *
+         * @param string $publicStorage
+         *     Public storage directory. Defaults to '/1pub'.
+         */
+        public function __construct(
+                string $root,
+                string $homePath,
+                string $controllers = '/logic/controllers',
+                string $modules = '/modules',
+                string $views = '/presentation/views',
+                string $languages = '/presentation/lang',
+                string $storage = null,
+                string $protectedStorage = '/0prt',
+                string $publicStorage = '/1pub'
+        )
+        {
+            $this->root = $root;
+            $this->homePath = $homePath;
+            $this->controllers = $controllers;
+            $this->modules = $modules;
+            $this->views = $views;
+            $this->languages = $languages;
+            $this->storage = $storage ?? $root . '/.bucket';
+            $this->protectedStorage = $protectedStorage;
+            $this->publicStorage = $publicStorage;
+        }
+    }
+
+}

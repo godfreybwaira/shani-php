@@ -24,11 +24,11 @@ namespace features\documentation {
          */
         public function __construct(App $app, array $exclusion = [])
         {
-            $moduleDir = $app->config->root() . $app->config->moduleDir();
+            $appPath = $app->config->pathPresets();
+            $moduleDir = $appPath->root . $appPath->modules;
             $moduleCollection = Modules::scan($moduleDir, $exclusion);
-            $controllerPath = $app->config->controllers();
             foreach ($moduleCollection as $modulePath) {
-                $this->modules[] = new Modules(basename($modulePath), $modulePath . $controllerPath);
+                $this->modules[] = new Modules(basename($modulePath), $modulePath . $appPath->controllers);
             }
         }
 

@@ -166,7 +166,7 @@ The following is the default application configuration that comes with **Shani**
 # Environment variables are customs. Create enviroment variables and give them
 # names of your choice, e.g DEV, TEST, PROD
 ENVIRONMENTS:
-  # Must extends shani\advisors\Configuration
+  # Must extends shani\contracts\BasicPresets
   DEV: \apps\demo\config\Settings
   # Active environment can be any one of the provided above.
 ACTIVE_ENVIRONMENT: DEV
@@ -192,10 +192,10 @@ The next step is to create these configuration class files. We will create them 
 
 namespace apps\demo\config {
 
-    use shani\advisors\Configuration;
+    use shani\contracts\BasicPresets;
     use shani\launcher\App;
 
-    final class DevSettings extends Configuration
+    final class DevSettings extends BasicPresets
     {
         public function __construct(App $app, array &$configurations)
         {
