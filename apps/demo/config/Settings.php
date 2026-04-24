@@ -20,7 +20,7 @@ namespace apps\demo\config {
     use features\test\TestResult;
     use features\utils\HttpClient;
     use features\utils\URI;
-    use shani\contracts\BasicConfig;
+    use shani\contracts\BasicConfiguration;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
@@ -30,7 +30,7 @@ namespace apps\demo\config {
     use shani\config\PathConfig;
     use shani\config\SessionConfig;
 
-    final class Settings extends BasicConfig
+    final class Settings extends BasicConfiguration
     {
 
         private readonly PathConfig $passConfig;

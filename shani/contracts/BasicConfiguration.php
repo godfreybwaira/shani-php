@@ -53,7 +53,7 @@ namespace shani\contracts {
      * By default, most methods return safe defaults (e.g., disabled authentication,
      * local storage, null database connection) unless overridden by subclasses.
      */
-    abstract class BasicConfig
+    abstract class BasicConfiguration
     {
 
         /**
@@ -113,7 +113,7 @@ namespace shani\contracts {
         protected ?StorageMediaInterface $storageMedia = null;
 
         /**
-         * Constructor for BasicConfig.
+         * Constructor for BasicConfiguration.
          *
          * Initializes the base configurations with the application instance.
          *

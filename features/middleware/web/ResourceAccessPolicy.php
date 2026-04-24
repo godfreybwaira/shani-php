@@ -10,7 +10,7 @@
 namespace features\middleware\web {
 
     use features\middleware\UtilityMiddlewares;
-    use shani\contracts\BasicConfig;
+    use shani\contracts\BasicConfiguration;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 

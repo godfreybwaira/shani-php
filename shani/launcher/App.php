@@ -20,7 +20,7 @@ namespace shani\launcher {
     use features\session\SessionStorageInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
-    use shani\contracts\BasicConfig;
+    use shani\contracts\BasicConfiguration;
     use shani\contracts\ResponseWriter;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
@@ -84,9 +84,9 @@ namespace shani\launcher {
 
         /**
          * Current loaded application configurations.
-         * @var BasicConfig
+         * @var BasicConfiguration
          */
-        public readonly BasicConfig $config;
+        public readonly BasicConfiguration $config;
 
         /**
          * Application framework configuration
