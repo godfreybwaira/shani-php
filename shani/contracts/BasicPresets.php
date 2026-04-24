@@ -64,6 +64,55 @@ namespace shani\contracts {
         protected readonly App $app;
 
         /**
+         * Authentication related presets.
+         *
+         * @var AuthenticationPresets|null
+         */
+        protected ?AuthenticationPresets $authenticationPresets = null;
+
+        /**
+         * Session related presets.
+         *
+         * @var SessionPresets|null
+         */
+        protected ?SessionPresets $sessionPresets = null;
+
+        /**
+         * CSRF related presets.
+         *
+         * @var CsrfPresets|null
+         */
+        protected ?CsrfPresets $csrfPresets = null;
+
+        /**
+         * Request related presets.
+         *
+         * @var RequestPresets|null
+         */
+        protected ?RequestPresets $requestPresets = null;
+
+        /**
+         * Application related presets.
+         *
+         * @var AppPresets|null
+         */
+        protected ?AppPresets $appPresets = null;
+
+        /**
+         * Web policy related presets.
+         *
+         * @var WebPolicyPresets|null
+         */
+        protected ?WebPolicyPresets $webPolicyPresets = null;
+
+        /**
+         * Storage media interface implementation.
+         *
+         * @var StorageMediaInterface|null
+         */
+        protected ?StorageMediaInterface $storageMedia = null
+
+        /**
          * Constructor for BasicPresets.
          *
          * Initializes the base presets with the application instance.
@@ -83,7 +132,7 @@ namespace shani\contracts {
          */
         public function authenticationPresets(): AuthenticationPresets
         {
-            return new AuthenticationPresets();
+            return $this->authenticationPresets ??= new AuthenticationPresets();
         }
 
         /**
@@ -93,7 +142,7 @@ namespace shani\contracts {
          */
         public function sessionPresets(): SessionPresets
         {
-            return new SessionPresets();
+            return $this->sessionPresets ??= new SessionPresets();
         }
 
         /**
@@ -103,7 +152,7 @@ namespace shani\contracts {
          */
         public function csrfPresets(): CsrfPresets
         {
-            return new CsrfPresets($this->app->request->method);
+            return $this->csrfPresets ??= new CsrfPresets($this->app->request->method);
         }
 
         /**
@@ -113,7 +162,7 @@ namespace shani\contracts {
          */
         public function requestPresets(): RequestPresets
         {
-            return new RequestPresets($this->app->request->method);
+            return $this->requestPresets ??= new RequestPresets($this->app->request->method);
         }
 
         /**
@@ -123,7 +172,7 @@ namespace shani\contracts {
          */
         public function webPolicyPresets(): WebPolicyPresets
         {
-            return new WebPolicyPresets();
+            return $this->webPolicyPresets ??= new WebPolicyPresets();
         }
 
         /**
@@ -133,7 +182,7 @@ namespace shani\contracts {
          */
         public function appPresets(): AppPresets
         {
-            return new AppPresets();
+            return $this->appPresets ??= new AppPresets();
         }
 
         /**
@@ -210,7 +259,7 @@ namespace shani\contracts {
          */
         public function getStorageMedia(): StorageMediaInterface
         {
-            return new LocalStorage($this->app);
+            return $this->storageMedia ??= new LocalStorage($this->app);
         }
 
         /**

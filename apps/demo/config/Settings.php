@@ -33,6 +33,8 @@ namespace apps\demo\config {
     final class Settings extends BasicPresets
     {
 
+        private readonly PathPresets $passPreset;
+
         public function __construct(App $app)
         {
             parent::__construct($app);
@@ -40,7 +42,7 @@ namespace apps\demo\config {
 
         public function pathPresets(): PathPresets
         {
-            return new PathPresets(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
+            return $this->passPreset ??= new PathPresets(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
         }
 
         public function isAsync(): bool
@@ -106,7 +108,7 @@ namespace apps\demo\config {
 
         public function authenticationPresets(): AuthenticationPresets
         {
-            return new AuthenticationPresets(authenticationStrategies: [
+            return $this->authenticationPresets ??= new AuthenticationPresets(authenticationStrategies: [
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
             ]);
@@ -114,7 +116,7 @@ namespace apps\demo\config {
 
         public function sessionPresets(): SessionPresets
         {
-            return new SessionPresets(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
+            return $this->sessionPresets ??= new SessionPresets(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
         }
     }
 

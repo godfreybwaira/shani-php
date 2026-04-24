@@ -33,7 +33,6 @@ namespace shani\launcher {
     final class App
     {
 
-        private StorageMediaInterface $storage;
         private ?Logger $logger = null;
         public readonly SessionStorageInterface $session;
         private ?string $lang = null;
@@ -179,7 +178,7 @@ namespace shani\launcher {
          */
         public function storage(): StorageMediaInterface
         {
-            return $this->storage ??= $this->config->getStorageMedia();
+            return $this->config->getStorageMedia();
         }
 
         /**
