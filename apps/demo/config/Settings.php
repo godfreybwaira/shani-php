@@ -57,7 +57,7 @@ namespace apps\demo\config {
 
         public function accessingPublicResource(): bool
         {
-            return in_array($this->app->request->route()->module, ['shani', 'security']);
+            return in_array($this->app->request->route()->module, ['shani', 'security', 'pwa']);
         }
 
         public static function runTest(): TestResult
