@@ -21,16 +21,16 @@ namespace shani\contracts {
     use shani\assets\StaticAssetServers;
     use shani\http\RequestRoute;
     use shani\launcher\App;
-    use shani\presets\AppPresets;
-    use shani\presets\AuthenticationPresets;
-    use shani\presets\CsrfPresets;
-    use shani\presets\PathPresets;
-    use shani\presets\RequestPresets;
-    use shani\presets\SessionPresets;
-    use shani\presets\WebPolicyPresets;
+    use shani\config\AppConfig;
+    use shani\config\AuthenticationConfig;
+    use shani\config\CsrfConfig;
+    use shani\config\PathConfig;
+    use shani\config\RequestConfig;
+    use shani\config\SessionConfig;
+    use shani\config\WebPolicyConfig;
 
     /**
-     * Abstract base class for defining application presets and configurations.
+     * Abstract base class for defining application configurations.
      *
      * This class provides a centralized way to define and access common application
      * configurations such as authentication, session handling, CSRF protection,
@@ -46,14 +46,14 @@ namespace shani\contracts {
      * - Running unit/integration tests
      *
      * Subclasses must implement:
-     * - pathPresets(): PathPresets
+     * - pathConfig(): PathConfig
      * - isAsync(): bool
      * - runTest(): TestResult
      *
      * By default, most methods return safe defaults (e.g., disabled authentication,
      * local storage, null database connection) unless overridden by subclasses.
      */
-    abstract class BasicPresets
+    abstract class BasicConfig
     {
 
         /**
@@ -64,46 +64,46 @@ namespace shani\contracts {
         protected readonly App $app;
 
         /**
-         * Authentication related presets.
+         * Authentication related configurations.
          *
-         * @var AuthenticationPresets|null
+         * @var AuthenticationConfig|null
          */
-        protected ?AuthenticationPresets $authenticationPresets = null;
+        protected ?AuthenticationConfig $authenticationConfig = null;
 
         /**
-         * Session related presets.
+         * Session related configurations.
          *
-         * @var SessionPresets|null
+         * @var SessionConfig|null
          */
-        protected ?SessionPresets $sessionPresets = null;
+        protected ?SessionConfig $sessionConfig = null;
 
         /**
-         * CSRF related presets.
+         * CSRF related configurations.
          *
-         * @var CsrfPresets|null
+         * @var CsrfConfig|null
          */
-        protected ?CsrfPresets $csrfPresets = null;
+        protected ?CsrfConfig $csrfConfig = null;
 
         /**
-         * Request related presets.
+         * Request related configurations.
          *
-         * @var RequestPresets|null
+         * @var RequestConfig|null
          */
-        protected ?RequestPresets $requestPresets = null;
+        protected ?RequestConfig $requestConfig = null;
 
         /**
-         * Application related presets.
+         * Application related configurations.
          *
-         * @var AppPresets|null
+         * @var AppConfig|null
          */
-        protected ?AppPresets $appPresets = null;
+        protected ?AppConfig $appConfig = null;
 
         /**
-         * Web policy related presets.
+         * Web policy related configurations.
          *
-         * @var WebPolicyPresets|null
+         * @var WebPolicyConfig|null
          */
-        protected ?WebPolicyPresets $webPolicyPresets = null;
+        protected ?WebPolicyConfig $webPolicyConfig = null;
 
         /**
          * Storage media interface implementation.
@@ -113,9 +113,9 @@ namespace shani\contracts {
         protected ?StorageMediaInterface $storageMedia = null;
 
         /**
-         * Constructor for BasicPresets.
+         * Constructor for BasicConfig.
          *
-         * Initializes the base presets with the application instance.
+         * Initializes the base configurations with the application instance.
          *
          * @param App $app
          *     The application object providing access to request, logger, and other components.
@@ -128,69 +128,69 @@ namespace shani\contracts {
         /**
          * Authentication related configurations.
          *
-         * @return AuthenticationPresets
+         * @return AuthenticationConfig
          */
-        public function authenticationPresets(): AuthenticationPresets
+        public function authenticationConfig(): AuthenticationConfig
         {
-            return $this->authenticationPresets ??= new AuthenticationPresets();
+            return $this->authenticationConfig ??= new AuthenticationConfig();
         }
 
         /**
          * Session related configurations.
          *
-         * @return SessionPresets
+         * @return SessionConfig
          */
-        public function sessionPresets(): SessionPresets
+        public function sessionConfig(): SessionConfig
         {
-            return $this->sessionPresets ??= new SessionPresets();
+            return $this->sessionConfig ??= new SessionConfig();
         }
 
         /**
          * CSRF related configurations.
          *
-         * @return CsrfPresets
+         * @return CsrfConfig
          */
-        public function csrfPresets(): CsrfPresets
+        public function csrfConfig(): CsrfConfig
         {
-            return $this->csrfPresets ??= new CsrfPresets($this->app->request->method);
+            return $this->csrfConfig ??= new CsrfConfig($this->app->request->method);
         }
 
         /**
          * Request related configurations.
          *
-         * @return RequestPresets
+         * @return RequestConfig
          */
-        public function requestPresets(): RequestPresets
+        public function requestConfig(): RequestConfig
         {
-            return $this->requestPresets ??= new RequestPresets($this->app->request->method);
+            return $this->requestConfig ??= new RequestConfig($this->app->request->method);
         }
 
         /**
          * Web related configurations.
          *
-         * @return WebPolicyPresets
+         * @return WebPolicyConfig
          */
-        public function webPolicyPresets(): WebPolicyPresets
+        public function webPolicyConfig(): WebPolicyConfig
         {
-            return $this->webPolicyPresets ??= new WebPolicyPresets();
+            return $this->webPolicyConfig ??= new WebPolicyConfig();
         }
 
         /**
          * Application related configurations.
          *
-         * @return AppPresets
+         * @return AppConfig
          */
-        public function appPresets(): AppPresets
+        public function appConfig(): AppConfig
         {
-            return $this->appPresets ??= new AppPresets();
+            return $this->appConfig ??= new AppConfig();
         }
 
         /**
          * Application path related configurations.
          *
-         * @return PathPresets
+         * @return PathConfig
          */
-        public abstract function pathPresets(): PathPresets;
+        public abstract function pathConfig(): PathConfig;
 
         /**
          * Check if a requesting domain (origin) is allowed to access resources.

@@ -62,7 +62,7 @@ namespace gui {
         {
             $route = $this->app->request->route();
             $file = ($path ?? '/' . $route->action) . '.php';
-            $appPath = $this->app->config->pathPresets();
+            $appPath = $this->app->config->pathConfig();
             if ($moduleName === null) {
                 return $this->app->module() . $appPath->views . '/' . $route->controller . $file;
             }
@@ -136,7 +136,7 @@ namespace gui {
             foreach ($scripts as $url => $attr) {
                 $head .= '<script ' . $attr . ' src="' . $url . '"></script>';
             }
-            return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appPresets()->appName) . '</title>';
+            return $head . '<title>' . ($this->builder->getTitle() ?? $this->app->config->appConfig()->appName) . '</title>';
         }
 
         /**
@@ -192,7 +192,7 @@ namespace gui {
          */
         public function csrf(): ?string
         {
-            $csrf = $this->app->config->csrfPresets();
+            $csrf = $this->app->config->csrfConfig();
             if ($csrf->enabled) {
                 $token = $this->app->csrfToken()->getOne($csrf->tokenName, bin2hex(random_bytes(32)));
                 $this->app->csrfToken()->addOne($csrf->tokenName, $token);

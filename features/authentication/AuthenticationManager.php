@@ -66,7 +66,7 @@ namespace features\authentication {
             if ($this->loggedIn()) {
                 return null;
             }
-            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
+            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $index => $strategy) {
                 $user = $strategy->login();
                 if ($user === null) {
@@ -86,7 +86,7 @@ namespace features\authentication {
 
         public function register(): ?UserDetailsDto
         {
-            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
+            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 $user = $strategy->register();
                 if ($user !== null) {
@@ -98,7 +98,7 @@ namespace features\authentication {
 
         public function unregister(): bool
         {
-            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
+            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 if ($strategy->unregister()) {
                     return true;
@@ -109,7 +109,7 @@ namespace features\authentication {
 
         public function update(): ?UserDetailsDto
         {
-            $strategies = $this->app->config->authenticationPresets()->authenticationStrategies;
+            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
                 $user = $strategy->update();
                 if ($user !== null) {
@@ -123,7 +123,7 @@ namespace features\authentication {
         {
             if ($this->loggedIn()) {
                 $index = $this->app->session->cart(self::METADATA_CART)->getOne('strategy');
-                $strategy = $this->app->config->authenticationPresets()->authenticationStrategies[$index];
+                $strategy = $this->app->config->authenticationConfig()->authenticationStrategies[$index];
                 if ($strategy->logout()) {
                     $this->user = null;
                     $this->app->session->destroy();

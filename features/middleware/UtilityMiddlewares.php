@@ -42,10 +42,10 @@ namespace features\middleware {
         public static function preflightRequest(App $app, int $cacheTime = 86400): void
         {
             if ($app->request->method === 'options') {
-                $presets = $app->config->requestPresets();
+                $config = $app->config->requestConfig();
                 $app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
-                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $presets->allowedMethods,
-                    HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $presets->allowedHeaders,
+                    HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $config->allowedMethods,
+                    HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $config->allowedHeaders,
                     HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
                 ]);
                 UtilityMiddlewares::addAllowOrigin($app);
@@ -80,7 +80,7 @@ namespace features\middleware {
         public static function handleEmptyurlPath(App $app): void
         {
             if ($app->request->uri->path() === '/') {
-                $app->request->changeRoute(RequestRoute::fromPath($app->config->pathPresets()->homePath));
+                $app->request->changeRoute(RequestRoute::fromPath($app->config->pathConfig()->homePath));
             }
         }
     }

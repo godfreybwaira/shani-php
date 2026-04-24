@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of RequestPresets
+ * Description of RequestConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 3:21:06 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     /**
      * Defines default request handling policies for an application.
@@ -26,7 +26,7 @@ namespace shani\presets {
      * - Allowed headers: '*' (all headers allowed)
      * - MethodAllowed is computed based on the request method and allowed methods
      */
-    final class RequestPresets
+    final class RequestConfig
     {
 
         /**
@@ -54,7 +54,7 @@ namespace shani\presets {
         public readonly bool $methodAllowed;
 
         /**
-         * Constructor for RequestPresets.
+         * Constructor for RequestConfig.
          *
          * Initializes request handling policies with defaults if none are provided.
          *

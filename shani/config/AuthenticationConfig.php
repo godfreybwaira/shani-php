@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of AuthenticationPresets
+ * Description of AuthenticationConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 12:31:28 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     /**
      * Defines default authentication policies for an application.
@@ -24,7 +24,7 @@ namespace shani\presets {
      * - Authentication is required (skipAuthentication = false)
      * - No authentication strategies are defined (empty array)
      */
-    final class AuthenticationPresets
+    final class AuthenticationConfig
     {
 
         /**
@@ -44,7 +44,7 @@ namespace shani\presets {
         public readonly array $authenticationStrategies;
 
         /**
-         * Constructor for AuthenticationPresets.
+         * Constructor for AuthenticationConfig.
          *
          * Initializes authentication configuration with defaults if none are provided.
          *

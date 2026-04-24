@@ -20,15 +20,15 @@ namespace shani\launcher {
     use features\session\SessionStorageInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
-    use shani\contracts\BasicPresets;
+    use shani\contracts\BasicConfig;
     use shani\contracts\ResponseWriter;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpWriter;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\launcher\Framework;
-    use shani\presets\AppPresets;
-    use shani\presets\PathPresets;
+    use shani\config\AppConfig;
+    use shani\config\PathConfig;
 
     /**
      * Core application class that manages request handling, response writing,
@@ -37,7 +37,7 @@ namespace shani\launcher {
      * This class serves as the central entry point for the framework. It ties together:
      * - Virtual host configuration
      * - HTTP request and response entities
-     * - Application presets and framework configuration
+     * - Application configurations and framework configuration
      * - Session storage and authentication manager
      * - Middleware handling
      * - Routing and controller dispatch
@@ -84,9 +84,9 @@ namespace shani\launcher {
 
         /**
          * Current loaded application configurations.
-         * @var BasicPresets
+         * @var BasicConfig
          */
-        public readonly BasicPresets $config;
+        public readonly BasicConfig $config;
 
         /**
          * Application framework configuration
@@ -102,15 +102,15 @@ namespace shani\launcher {
 
         /**
          * Application paths
-         * @var PathPresets
+         * @var PathConfig
          */
-        private PathPresets $path;
+        private PathConfig $path;
 
         /**
          * Application related configurations
-         * @var AppPresets
+         * @var AppConfig
          */
-        private AppPresets $preset;
+        private AppConfig $preset;
 
         /**
          * Create an application instance.
@@ -131,8 +131,8 @@ namespace shani\launcher {
             $this->config = new $class($this);
             $this->session = $this->getSession();
             $this->auth = new AuthenticationManager($this);
-            $this->path = $this->config->pathPresets();
-            $this->preset = $this->config->appPresets();
+            $this->path = $this->config->pathConfig();
+            $this->preset = $this->config->appConfig();
         }
 
         /**
@@ -174,7 +174,7 @@ namespace shani\launcher {
 
         private function getSession(): SessionStorageInterface
         {
-            $conn = $this->config->sessionPresets()->connection;
+            $conn = $this->config->sessionConfig()->connection;
             return SessionStorage::getStorage($this, $conn);
         }
 

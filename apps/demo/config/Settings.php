@@ -20,34 +20,34 @@ namespace apps\demo\config {
     use features\test\TestResult;
     use features\utils\HttpClient;
     use features\utils\URI;
-    use shani\contracts\BasicPresets;
+    use shani\contracts\BasicConfig;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
     use shani\launcher\Framework;
-    use shani\presets\AuthenticationPresets;
-    use shani\presets\CsrfPresets;
-    use shani\presets\PathPresets;
-    use shani\presets\SessionPresets;
+    use shani\config\AuthenticationConfig;
+    use shani\config\CsrfConfig;
+    use shani\config\PathConfig;
+    use shani\config\SessionConfig;
 
-    final class Settings extends BasicPresets
+    final class Settings extends BasicConfig
     {
 
-        private readonly PathPresets $passPreset;
+        private readonly PathConfig $passConfig;
 
         public function __construct(App $app)
         {
             parent::__construct($app);
         }
 
-        public function csrfPresets(): CsrfPresets
+        public function csrfConfig(): CsrfConfig
         {
-            return $this->csrfPresets ??= new CsrfPresets($this->app->request->method, false);
+            return $this->csrfConfig ??= new CsrfConfig($this->app->request->method, false);
         }
 
-        public function pathPresets(): PathPresets
+        public function pathConfig(): PathConfig
         {
-            return $this->passPreset ??= new PathPresets(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
+            return $this->passConfig ??= new PathConfig(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
         }
 
         public function isAsync(): bool
@@ -111,17 +111,17 @@ namespace apps\demo\config {
             return new Oauth2Client();
         }
 
-        public function authenticationPresets(): AuthenticationPresets
+        public function authenticationConfig(): AuthenticationConfig
         {
-            return $this->authenticationPresets ??= new AuthenticationPresets(authenticationStrategies: [
+            return $this->authenticationConfig ??= new AuthenticationConfig(authenticationStrategies: [
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
             ]);
         }
 
-        public function sessionPresets(): SessionPresets
+        public function sessionConfig(): SessionConfig
         {
-            return $this->sessionPresets ??= new SessionPresets(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
+            return $this->sessionConfig ??= new SessionConfig(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
         }
     }
 

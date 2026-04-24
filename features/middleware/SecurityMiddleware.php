@@ -30,9 +30,9 @@ namespace features\middleware {
          */
         public function passedRequestMethodCheck(): void
         {
-            $presets = $this->app->config->requestPresets();
-            if (!$presets->methodAllowed) {
-                $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $presets->allowedMethods);
+            $config = $this->app->config->requestConfig();
+            if (!$config->methodAllowed) {
+                $this->app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $config->allowedMethods);
                 throw CustomException::methodNotAllowed($this->app);
             }
         }
@@ -45,7 +45,7 @@ namespace features\middleware {
          */
         public function csrfTest(): void
         {
-            $csrf = $this->app->config->csrfPresets();
+            $csrf = $this->app->config->csrfConfig();
             if ($csrf->skipTest) {
                 return;
             }
@@ -63,12 +63,12 @@ namespace features\middleware {
          */
         public function authorized(): void
         {
-            if ($this->app->config->authenticationPresets()->skipAuthentication || $this->app->config->accessingPublicResource()) {
+            if ($this->app->config->authenticationConfig()->skipAuthentication || $this->app->config->accessingPublicResource()) {
                 return;
             }
             if ($this->app->config->accessingGuestResource()) {
                 if ($this->app->auth->loggedIn()) {
-                    $route = RequestRoute::fromPath($this->app->config->pathPresets()->homePath);
+                    $route = RequestRoute::fromPath($this->app->config->pathConfig()->homePath);
                     $this->app->request->changeRoute($route);
                 }
                 return;

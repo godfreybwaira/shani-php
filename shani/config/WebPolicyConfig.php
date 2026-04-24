@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of WebPolicyPresets
+ * Description of WebPolicyConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 4:18:38 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     use features\middleware\web\BrowsingPrivacy;
     use features\middleware\web\ContentSecurityPolicy;
@@ -27,7 +27,7 @@ namespace shani\presets {
      * - Resource access is limited to this domain and its subdomains
      * - Browsing privacy restricts referrer information to this domain
      */
-    final class WebPolicyPresets
+    final class WebPolicyConfig
     {
 
         /**
@@ -54,7 +54,7 @@ namespace shani\presets {
         public readonly BrowsingPrivacy $browsingPrivacy;
 
         /**
-         * Constructor for WebPolicyPresets.
+         * Constructor for WebPolicyConfig.
          *
          * Initializes default web security and privacy policies if none are provided.
          *

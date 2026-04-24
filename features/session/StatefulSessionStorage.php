@@ -60,7 +60,7 @@ namespace features\session {
 
         public function refresh(): SessionStorageInterface
         {
-            $csrf = $this->app->config->csrfPresets();
+            $csrf = $this->app->config->csrfConfig();
             if ($csrf->enabled) {
                 $token = bin2hex(random_bytes(32));
                 $this->app->csrfToken()->addOne($csrf->tokenName, $token);
@@ -80,7 +80,7 @@ namespace features\session {
         private function start(): void
         {
             if (session_status() === PHP_SESSION_NONE) {
-                $session = $this->app->config->sessionPresets();
+                $session = $this->app->config->sessionConfig();
                 session_start([
                     'save_handler' => $this->conn->getHandler(),
                     'save_path' => $this->conn->getConnectionString(),

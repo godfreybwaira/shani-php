@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Description of PathPresets
+ * Description of PathConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 1:26:35 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     /**
-     * Defines default directory path presets for an application.
+     * Defines default directory path configurations for an application.
      *
      * This class centralizes configuration of important application paths,
      * including root, modules, controllers, views, language files, and storage.
@@ -35,7 +35,7 @@ namespace shani\presets {
      * - Protected storage → /0prt
      * - Public storage → /1pub
      */
-    final class PathPresets
+    final class PathConfig
     {
 
         /**
@@ -107,7 +107,7 @@ namespace shani\presets {
         public readonly string $publicStorage;
 
         /**
-         * Constructor for PathPresets.
+         * Constructor for PathConfig.
          *
          * Initializes application path configuration with defaults if none are provided.
          *

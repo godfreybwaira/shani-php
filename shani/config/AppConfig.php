@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Description of AppPresets
+ * Description of AppConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 4:41:24 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     use shani\launcher\Framework;
 
     /**
-     * Defines default application presets such as language, running state,
+     * Defines default application configurations such as language, running state,
      * supported languages, application name, and log file configuration.
      *
      * This class centralizes application-level settings to ensure consistent
@@ -30,7 +30,7 @@ namespace shani\presets {
      * - Application name → Framework::NAME with Framework::VERSION
      * - Log file name → Current date in 'Y-m-d.log' format
      */
-    final class AppPresets
+    final class AppConfig
     {
 
         /**
@@ -70,7 +70,7 @@ namespace shani\presets {
         public readonly string $logFileName;
 
         /**
-         * Constructor for AppPresets.
+         * Constructor for AppConfig.
          *
          * Initializes application configuration with defaults if none are provided.
          *

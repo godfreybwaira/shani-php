@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of CsrfPresets
+ * Description of CsrfConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 2:51:54 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     /**
      * Defines default Cross-Site Request Forgery (CSRF) protection policies.
@@ -25,7 +25,7 @@ namespace shani\presets {
      * - Allowed methods are "get,head,options"
      * - SkipTest is computed based on whether CSRF is disabled or the request method is in allowed methods
      */
-    final class CsrfPresets
+    final class CsrfConfig
     {
 
         /**
@@ -57,7 +57,7 @@ namespace shani\presets {
         public readonly string $skipTest;
 
         /**
-         * Constructor for CsrfPresets.
+         * Constructor for CsrfConfig.
          *
          * Initializes CSRF protection configuration with defaults if none are provided.
          *

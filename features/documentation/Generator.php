@@ -24,7 +24,7 @@ namespace features\documentation {
          */
         public function __construct(App $app, array $exclusion = [])
         {
-            $appPath = $app->config->pathPresets();
+            $appPath = $app->config->pathConfig();
             $moduleDir = $appPath->root . $appPath->modules;
             $moduleCollection = Modules::scan($moduleDir, $exclusion);
             foreach ($moduleCollection as $modulePath) {

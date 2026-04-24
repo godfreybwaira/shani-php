@@ -45,7 +45,7 @@ namespace features\middleware {
 
         public function preResponse(): void
         {
-            $policy = $this->app->config->webPolicyPresets();
+            $policy = $this->app->config->webPolicyConfig();
             $policy->csp->addCspHeaders($this->app);
             $policy->browsingPrivacy->setPolicy($this->app);
             $policy->resourceAccess->setPolicy($this->app);

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Description of SessionPresets
+ * Description of SessionConfig
  * @author goddy
  *
  * Created on: Apr 24, 2026 at 1:12:19 PM
  */
 
-namespace shani\presets {
+namespace shani\config {
 
     use features\session\dto\FileConnectionDto;
     use features\session\SessionConnectionInterface;
@@ -29,7 +29,7 @@ namespace shani\presets {
      * - Session lifetime is 0 (ends when browser closes)
      * - Cookie SameSite policy is LAX
      */
-    final class SessionPresets
+    final class SessionConfig
     {
 
         /**
@@ -62,7 +62,7 @@ namespace shani\presets {
         public readonly HttpSameSite $cookieSameSite;
 
         /**
-         * Constructor for SessionPresets.
+         * Constructor for SessionConfig.
          *
          * Initializes session configuration with defaults if no values are provided.
          *

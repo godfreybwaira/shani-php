@@ -10,7 +10,7 @@
 namespace features\middleware\web {
 
     use features\middleware\UtilityMiddlewares;
-    use shani\contracts\BasicPresets;
+    use shani\contracts\BasicConfig;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 
@@ -49,7 +49,7 @@ namespace features\middleware\web {
             }
             $app->response->header()->addAll([
                 HttpHeader::CROSS_ORIGIN_RESOURCE_POLICY => $this->value,
-                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $app->config->requestPresets()->allowedMethods
+                HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $app->config->requestConfig()->allowedMethods
             ]);
             UtilityMiddlewares::addAllowOrigin($app);
         }
