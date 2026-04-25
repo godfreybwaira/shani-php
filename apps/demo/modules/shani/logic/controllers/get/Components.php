@@ -9,14 +9,15 @@
 
 namespace apps\demo\modules\shani\logic\controllers\get {
 
+    use features\documentation\Generator as Documentation;
     use features\pwa\PwaBuilder;
-    use gui\WebUIBuilder;
     use features\utils\HttpClient;
-    use shani\http\HttpHeader;
-    use shani\http\ResponseEntity;
     use features\utils\MediaType;
     use features\utils\URI;
-    use features\documentation\Generator as Documentation;
+    use gui\WebUIBuilder;
+    use shani\http\HttpHeader;
+    use shani\http\HttpResponse;
+    use shani\http\ResponseEntity;
     use shani\launcher\App;
 
     final class Components
@@ -29,19 +30,19 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): WebUIBuilder
+        public function index(): HttpResponse
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
                     ->setPwaBuilder(new PwaBuilder($this->app->storage->uri('/pwa/0/manifest.json'), $this->app->storage->uri('/pwa/0/sw.js')))
                     ->view('/body');
-            return $builder;
+            return new HttpResponse($builder);
         }
 
-        public function all(): WebUIBuilder
+        public function all(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
         public function stream(): \Closure
@@ -74,41 +75,41 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             };
         }
 
-        public function inputs(): WebUIBuilder
+        public function inputs(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function containers(): WebUIBuilder
+        public function containers(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function modals(): WebUIBuilder
+        public function modals(): HttpResponse
         {
             $builder = new WebUIBuilder();
             $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
             return $builder;
         }
 
-        public function toaster(): WebUIBuilder
+        public function toaster(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function timeline(): WebUIBuilder
+        public function timeline(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function shani(): WebUIBuilder
+        public function shani(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function redirect(): WebUIBuilder
+        public function redirect(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
         public function generator(): Documentation
@@ -117,22 +118,22 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             return new Documentation($this->app);
         }
 
-        public function card(): WebUIBuilder
+        public function card(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function bindings(): WebUIBuilder
+        public function bindings(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function nodes(): WebUIBuilder
+        public function nodes(): HttpResponse
         {
-            return new WebUIBuilder();
+            return new HttpResponse(new WebUIBuilder());
         }
 
-        public function client(): \Closure
+        public function client(): HttpResponse
         {
             $client = new HttpClient(new URI('https://dev.shani.v2.local'));
             $client->enableAsync(false)->enableSSLVerification(false);
@@ -142,7 +143,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     yield $res->body();
                 };
             });
-            return $cb;
+            return new HttpResponse($cb);
         }
     }
 

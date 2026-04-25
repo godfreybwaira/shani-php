@@ -184,15 +184,15 @@ namespace shani\launcher {
 
         private function handleRequest(): ?HttpResponse
         {
-            if (LocalStorage::tryServe($this)) {
-                return null;
+            if (LocalStorage::isStaticAssetRequest($this)) {
+                return LocalStorage::processRequest($this);
             }
             return $this->processRequest();
         }
 
         public function csrfToken(): MutableMap
         {
-            return $this->session->cart('f91c5k9fa6d');
+            return $this->session->cart('fiJ9Gce5osud7s');
         }
 
         private function getSession(): SessionStorageInterface
@@ -313,7 +313,7 @@ namespace shani\launcher {
                 $fallbackRoute = $this->config->errorHandler($ex);
                 if ($fallbackRoute !== null) {
                     $this->request->changeRoute($fallbackRoute);
-                    return $this->processRequest();
+                    return $this->handleRequest();
                 }
             } else {
                 $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);

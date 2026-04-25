@@ -12,6 +12,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
     use features\storage\LocalStorage;
     use shani\http\FileOutputStream;
     use shani\http\HttpHeader;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class Sw
@@ -24,11 +25,11 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): FileOutputStream
+        public function index(): HttpResponse
         {
             $file = LocalStorage::assetPath('/js/pwa-sw.js');
             $this->app->response->header()->addOne(HttpHeader::SERVICE_WORKER_ALLOWED, '/');
-            return new FileOutputStream($file);
+            return new HttpResponse(new FileOutputStream($file));
         }
     }
 

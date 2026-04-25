@@ -17,13 +17,14 @@ namespace features\storage {
     use features\utils\MediaType;
     use features\utils\URI;
     use shani\assets\StaticAssetServers;
+    use shani\config\PathConfig;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
     use shani\http\HttpHeader;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
     use shani\launcher\Framework;
-    use shani\config\PathConfig;
 
     final class LocalStorage implements StorageMediaInterface
     {
@@ -69,7 +70,7 @@ namespace features\storage {
             throw new ServerException('Failed to create shortcut: ' . $shortcut);
         }
 
-        private static function getPrefix(string $path): string
+        private static function getStaticAssetPrefix(string $path): string
         {
             return substr($path, 0, strpos($path, '/', 1));
         }
@@ -77,17 +78,16 @@ namespace features\storage {
         /**
          * Serve a static file e.g CSS, images and other static files.
          * @param App $app Application object
-         * @return bool True on success, false otherwise.
+         * @return HttpResponse|null
          */
-        public static function tryServe(App $app): bool
+        public static function processRequest(App $app): ?HttpResponse
         {
             $assetServer = $app->config->getStaticAssetServer();
             if ($assetServer === StaticAssetServers::DISABLE) {
-                $app->writer->send();
-                return true;
+                return null;
             }
             $path = $app->request->uri->path();
-            $prefix = self::getPrefix($path);
+            $prefix = self::getStaticAssetPrefix($path);
             switch ($prefix) {
                 case self::ACCESS_ASSET:
                     $filepath = substr($path, strlen($prefix));
@@ -97,19 +97,16 @@ namespace features\storage {
                 case $app->config->pathConfig()->publicStorage:
                     return self::sendFile($app, $assetServer, $app->storage->pathTo($path));
                 default:
-                    return false;
+                    return null;
             }
         }
 
-        private static function serveProtected(App $app, StaticAssetServers $assetServer, string $filepath): bool
+        private static function serveProtected(App $app, StaticAssetServers $assetServer, string $filepath): ?HttpResponse
         {
-            if (!$app->auth->attemptAuthentication()) {
-                throw CustomException::forbidden($app);
-            }
             $user = $app->auth->getUserDetails();
             $owners = self::getFileOwnership($filepath);
-            if ($owners !== null && $owners['oid'] !== $user?->storageBucket) {
-                if ($user?->groupStorageBucket !== $owners['gid']) {
+            if ($owners !== null && $owners['oid'] !== $user->storageBucket) {
+                if ($user->groupStorageBucket !== $owners['gid']) {
                     throw CustomException::forbidden($app);
                 }
             }
@@ -130,24 +127,22 @@ namespace features\storage {
             ];
         }
 
-        private static function sendFile(App $app, StaticAssetServers $assetServer, string $filepath): bool
+        private static function sendFile(App $app, StaticAssetServers $assetServer, string $filepath): ?HttpResponse
         {
             $path = $app->request->uri->path();
             $etag = md5($path);
             if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
-                $app->writer->send();
-            } else {
-                $cache = (new HttpCache())->setEtag($etag);
-                $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-                match ($assetServer) {
-                    StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
-                    StaticAssetServers::NGINX => self::delegateToNginx($app, $path),
-                    StaticAssetServers::SHANI => self::delegateToShani($app, $filepath),
-                    default => $app->writer->send()
-                };
+                return null;
             }
-            return true;
+            $cache = (new HttpCache())->setEtag($etag);
+            $app->response->setStatus(HttpStatus::OK)->setCache($cache);
+            return match ($assetServer) {
+                StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
+                StaticAssetServers::NGINX => self::delegateToNginx($app, $path),
+                StaticAssetServers::SHANI => self::delegateToShani($filepath),
+                default => null
+            };
         }
 
         /**
@@ -271,7 +266,7 @@ namespace features\storage {
             $srcFile = $this->pathTo($filepath);
             if (is_readable($srcFile)) {
                 $newName = $prefix . self::ID_SEPARATOR . self::getFilename($filepath);
-                $srcBucket = self::getPrefix($filepath);
+                $srcBucket = self::getStaticAssetPrefix($filepath);
                 $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
                 $destination = self::createDirectory($this->pathTo($savepath));
                 if (!is_link($destination . '/' . $newName) && symlink($srcFile, $destination . '/' . $newName)) {
@@ -297,41 +292,54 @@ namespace features\storage {
 
         /**
          * Serve static assets using this framework
-         * @param App $app Application object
          * @param string $filepath File path
-         * @return void
+         * @return HttpResponse
          */
-        private static function delegateToShani(App $app, string $filepath): void
+        private static function delegateToShani(string $filepath): HttpResponse
         {
-            $app->writer->send(new FileOutputStream($filepath));
+            return new HttpResponse(new FileOutputStream($filepath));
         }
 
         /**
          * Serve static assets using this Nginx server
          * @param App $app Application object
          * @param string $filepath File path
-         * @return void
+         * @return HttpResponse|null
          */
-        public static function delegateToNginx(App $app, string $filepath): void
+        public static function delegateToNginx(App $app, string $filepath): ?HttpResponse
         {
             $app->response->header()->addAll([
                 'X-Accel-Redirect' => $filepath,
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
+            return null;
         }
 
         /**
          * Serve static assets using Apache server
          * @param App $app Application object
          * @param string $filepath File path
-         * @return void
+         * @return HttpResponse|null
          */
-        public static function delegateToApache(App $app, string $filepath): void
+        public static function delegateToApache(App $app, string $filepath): ?HttpResponse
         {
             $app->response->header()->addAll([
                 'X-Sendfile' => $app->storage->pathTo($filepath),
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
+            return null;
+        }
+
+        /**
+         * Checks if the URL points to static asset
+         * @param App $app Application object
+         * @return bool True if it points, false otherwise.
+         */
+        public static function isStaticAssetRequest(App $app): bool
+        {
+            $config = $app->config->pathConfig();
+            $prefix = self::getStaticAssetPrefix($app->request->uri->path());
+            return $prefix === self::ACCESS_ASSET || $prefix === $config->protectedStorage || $prefix === $config->publicStorage;
         }
     }
 
