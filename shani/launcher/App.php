@@ -184,9 +184,6 @@ namespace shani\launcher {
 
         private function handleRequest(): ?HttpResponse
         {
-            if (!$this->preset->isRunning) {
-                throw CustomException::offline($this);
-            }
             if (LocalStorage::tryServe($this)) {
                 return null;
             }
