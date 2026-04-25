@@ -53,7 +53,7 @@ namespace shani\launcher {
         public const DESCRIPTION = 'an open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!';
 
         /** Default buffer size */
-        public const BUFFER_SIZE = self::MB_1;
+        public const BUFFER_SIZE = 524_288; //half MB
 
         /** Default home function if no function name is provided on the URL */
         public const HOME_FUNCTION = 'index';

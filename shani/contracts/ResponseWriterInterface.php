@@ -11,7 +11,7 @@ namespace shani\contracts {
 
     use shani\http\ResponseEntity;
 
-    interface ResponseWriter
+    interface ResponseWriterInterface
     {
 
         /**

@@ -12,6 +12,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\data\dto\StudentListDto;
     use apps\demo\modules\schools\logic\services\StudentService;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class Students
@@ -26,7 +27,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        public function index(): void
+        public function index(): ?HttpResponse
         {
             $students = $this->service->getAll();
             $dtos = new StudentListDto();
@@ -34,25 +35,23 @@ namespace apps\demo\modules\schools\logic\controllers\get {
                 $dtos->put(StudentDto::toDto($student));
             }
             $cart = $this->app->session->cart('user');
-            if ($cart->isEmpty()) {
-                $cart->add($dtos);
-                $this->app->response->setBody('Cart is empty. Come back next time.');
-                $this->app->writer->send();
-            } else {
-                $this->app->writer->send($dtos);
+            if (!$cart->isEmpty()) {
+                return new HttpResponse($dtos);
             }
+            $cart->add($dtos);
+            $this->app->response->setBody('Cart is empty. Come back next time.');
+            return null;
         }
 
         /**
          * My good function.
          * Returns nothing
          */
-        public function one(): void
+        public function one(): ?HttpResponse
         {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
-            $dto = $student !== null ? StudentDto::toDto($student) : null;
-            $this->app->writer->send($dto);
+            return $student !== null ? new HttpResponse(StudentDto::toDto($student)) : null;
         }
     }
 

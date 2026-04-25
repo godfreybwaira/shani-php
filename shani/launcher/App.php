@@ -20,15 +20,16 @@ namespace shani\launcher {
     use features\session\SessionStorageInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
+    use shani\config\AppConfig;
+    use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
-    use shani\contracts\ResponseWriter;
+    use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpStatus;
-    use shani\http\HttpWriter;
+    use shani\http\HttpResponse;
+    use shani\http\HttpResponseWriter;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\launcher\Framework;
-    use shani\config\AppConfig;
-    use shani\config\PathConfig;
 
     /**
      * Core application class that manages request handling, response writing,
@@ -60,9 +61,9 @@ namespace shani\launcher {
 
         /**
          * HTTP response writer
-         * @var HttpWriter
+         * @var ResponseWriterInterface
          */
-        public readonly HttpWriter $writer;
+        private readonly ResponseWriterInterface $writer;
 
         /**
          * Application virtual host configuration
@@ -123,16 +124,16 @@ namespace shani\launcher {
          *
          * @param ReadableMap $vhost Virtual host configuration.
          * @param ResponseEntity $res Response entity object.
-         * @param ResponseWriter $writer Response writer object.
+         * @param ResponseWriterInterface $writer Response writer object.
          * @param Framework $framework Framework configuration object.
          */
-        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriter $writer, Framework $framework)
+        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriterInterface $writer, Framework $framework)
         {
             $this->vhost = $vhost;
             $this->response = $res;
+            $this->writer = $writer;
             $this->framework = $framework;
             $this->request = $res->request;
-            $this->writer = new HttpWriter($this, $writer);
             $class = $vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
@@ -148,35 +149,53 @@ namespace shani\launcher {
          */
         public function launch(): void
         {
+            $userMiddleware = $this->config->getMiddlewareHandler();
+            $middleware = new MiddlewareHandler($this);
+            ///////---Step 1---////////
+            $middleware->preRequest();
+            $userMiddleware?->preRequest();
+            ///////---Step 2---////////
+            $response = $this->runApplication();
+            ///////---Step 3---////////
+            $middleware->preResponse();
+            $userMiddleware?->preResponse();
+            ///////---Step 4---////////
+            $writer = new HttpResponseWriter($this, $this->writer);
+            $writer->handleResponse($response);
+            ///////---Step 5---////////
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
+            $middleware->afterResponse();
+            $userMiddleware?->afterResponse();
+        }
+
+        private function runApplication(): ?HttpResponse
+        {
             if ($this->framework->config->isTruthy('display_errors')) {
-                $this->runApplication();
-            } else {
-                try {
-                    $this->runApplication();
-                } catch (\Throwable $ex) {
-                    $this->handleException($ex);
-                }
+                return $this->handleRequest();
+            }
+            try {
+                return $this->handleRequest();
+            } catch (\Throwable $ex) {
+                return $this->handleException($ex);
             }
         }
 
-        private function runApplication(): void
+        private function handleRequest(): ?HttpResponse
         {
             if (!$this->preset->isRunning) {
                 throw CustomException::offline($this);
             }
             if (LocalStorage::tryServe($this)) {
-                return;
+                return null;
             }
-            $userMiddleware = $this->config->getMiddlewareHandler();
-            $middleware = new MiddlewareHandler($this);
-            $middleware->preRequest();
-            $userMiddleware?->preRequest();
-            $this->processRequest();
+            return $this->processRequest();
         }
 
         public function csrfToken(): MutableMap
         {
-            return $this->session->cart('f91c57f35097fa6d');
+            return $this->session->cart('f91c5k9fa6d');
         }
 
         private function getSession(): SessionStorageInterface
@@ -244,9 +263,9 @@ namespace shani\launcher {
         /**
          * Dynamically route a user request to mapped resource. The routing mechanism
          * always depends on HTTP method and application endpoint provided by the user.
-         * @return void
+         * @return HttpResponse|null
          */
-        private function processRequest(): void
+        private function processRequest(): ?HttpResponse
         {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
@@ -258,14 +277,7 @@ namespace shani\launcher {
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound($this);
             }
-            $response = $obj->$callback();
-            if (!$this->writer->isClosed()) {
-                if ($response instanceof \Closure) {
-                    $this->writer->stream($response);
-                } else {
-                    $this->writer->send($response);
-                }
-            }
+            return $obj->$callback();
         }
 
         private static function kebab2camelCase(string $str, string $separator = '-'): string
@@ -298,20 +310,18 @@ namespace shani\launcher {
             return $this->lang;
         }
 
-        private function handleException(\Throwable $ex): void
+        private function handleException(\Throwable $ex): ?HttpResponse
         {
             if (isset($this->config)) {
                 $fallbackRoute = $this->config->errorHandler($ex);
                 if ($fallbackRoute !== null) {
                     $this->request->changeRoute($fallbackRoute);
-                    $this->processRequest();
-                    return;
+                    return $this->processRequest();
                 }
             } else {
                 $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
-                //log error
             }
-            $this->writer->send(null);
+            return null;
         }
     }
 

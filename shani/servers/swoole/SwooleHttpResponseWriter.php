@@ -10,10 +10,10 @@
 namespace shani\servers\swoole {
 
     use shani\http\ResponseEntity;
-    use shani\contracts\ResponseWriter;
+    use shani\contracts\ResponseWriterInterface;
     use Swoole\Http\Response as SwooleResponse;
 
-    final class SwooleHttpResponseWriter implements ResponseWriter
+    final class SwooleHttpResponseWriter implements ResponseWriterInterface
     {
 
         private readonly SwooleResponse $writer;

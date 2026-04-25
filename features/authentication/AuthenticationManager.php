@@ -34,8 +34,8 @@ namespace features\authentication {
     final class AuthenticationManager implements AuthenticationStrategy
     {
 
-        private const AUTH_CART = '2d574fce7ee49c';
-        private const METADATA_CART = '0d53b584a59b';
+        private const AUTH_CART = '2d574fke49c';
+        private const METADATA_CART = '0d53b5k59b';
 
         /**
          * Application instance reference.

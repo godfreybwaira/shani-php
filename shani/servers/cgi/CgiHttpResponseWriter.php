@@ -10,9 +10,9 @@
 namespace shani\servers\cgi {
 
     use shani\http\ResponseEntity;
-    use shani\contracts\ResponseWriter;
+    use shani\contracts\ResponseWriterInterface;
 
-    final class CgiHttpResponseWriter implements ResponseWriter
+    final class CgiHttpResponseWriter implements ResponseWriterInterface
     {
 
         public function sendHeaders(ResponseEntity $res): self

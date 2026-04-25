@@ -9,6 +9,7 @@
 
 namespace apps\demo\modules\security\logic\controllers\post {
 
+    use features\authentication\UserDetailsDto;
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
     use shani\launcher\App;
@@ -23,40 +24,40 @@ namespace apps\demo\modules\security\logic\controllers\post {
             $this->app = $app;
         }
 
-        public function token()
+        public function token(): \JsonSerializable
         {
             $issuer = new OAuth2TokenIssuer($this->app);
             $response = $issuer->handleRequest();
-            $this->app->writer->send($response->body);
+            return $response->body;
         }
 
-        public function authorize()
+        public function authorize(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleGeneralAuthorization();
-            $this->app->writer->send($response?->body);
+            return $response?->body;
         }
 
-        public function deviceAuthorization()
+        public function deviceAuthorization(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleDeviceAuthorization();
-            $this->app->writer->send($response?->body);
+            return $response?->body;
         }
 
-        public function device()
+        public function device(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $body = $this->app->request->body();
             $userCode = $body->getOne('user_code');
             $deviceCode = $body->getOne('device_code');
             $response = $authorizer->handleDeviceVerification($userCode, $deviceCode);
-            $this->app->writer->send($response?->body);
+            return $response?->body;
         }
 
-        public function login()
+        public function login(): ?UserDetailsDto
         {
-            $this->app->writer->send($this->app->auth->login());
+            return $this->app->auth->login();
         }
     }
 

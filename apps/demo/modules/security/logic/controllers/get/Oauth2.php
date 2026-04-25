@@ -22,28 +22,27 @@ namespace apps\demo\modules\security\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function authorize()
+        public function authorize(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            $this->app->writer->send($builder);
+            return $builder;
         }
 
-        public function device()
+        public function device(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            $this->app->writer->send($builder);
+            return $builder;
         }
 
-        public function logout()
+        public function logout(): string
         {
-            $message = $this->app->auth->logout() ? 'Success' : 'Failed';
-            $this->app->writer->sendString($message);
+            return $this->app->auth->logout() ? 'Success' : 'Failed';
         }
     }
 

@@ -16,7 +16,7 @@ namespace shani\launcher {
     use shani\http\enums\HttpStatus;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
-    use shani\contracts\ResponseWriter;
+    use shani\contracts\ResponseWriterInterface;
     use shani\servers\SupportedWebServer;
     use shani\launcher\Framework;
     use features\logging\Logger;
@@ -97,7 +97,7 @@ namespace shani\launcher {
         {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
-            $server->request(function (RequestEntity $request, ResponseWriter $writer, Framework $framework) {
+            $server->request(function (RequestEntity $request, ResponseWriterInterface $writer, Framework $framework) {
                 $responseHeader = new HttpHeader();
                 $response = new ResponseEntity($request, HttpStatus::OK, $responseHeader, new ReadableMap());
                 $preference = self::host($request->uri->hostname(), $request->header());

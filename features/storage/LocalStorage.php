@@ -318,7 +318,6 @@ namespace features\storage {
                 'X-Accel-Redirect' => $filepath,
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
-            $app->writer->send();
         }
 
         /**
@@ -333,7 +332,6 @@ namespace features\storage {
                 'X-Sendfile' => $app->storage->pathTo($filepath),
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
-            $app->writer->send();
         }
     }
 

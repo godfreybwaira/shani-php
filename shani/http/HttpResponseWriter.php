@@ -13,86 +13,28 @@ namespace shani\http {
     use features\utils\MediaType;
     use gui\WebUI;
     use gui\WebUIBuilder;
-    use shani\contracts\ResponseWriter;
+    use shani\contracts\ResponseWriterInterface;
+    use shani\http\enums\HttpConnection;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 
-    final class HttpWriter
+    final class HttpResponseWriter
     {
 
         private readonly App $app;
-        private readonly ResponseWriter $writer;
+        private readonly ResponseWriterInterface $writer;
 
-        public function __construct(App $app, ResponseWriter $writer)
+        public function __construct(App $app, ResponseWriterInterface $writer)
         {
             $this->app = $app;
             $this->writer = $writer;
         }
 
-        /**
-         * Check whether the output is already sent and the response writer is closed
-         * @return bool True on success, false otherwise.
-         */
-        public function isClosed(): bool
-        {
-            return $this->writer->isClosed();
-        }
-
-        /**
-         * Send content to a client application
-         * @param \JsonSerializable|WebUIBuilder|FileOutputStream|null $content Output
-         * object to send
-         * @param bool|null $keepConnection Set whether to close the connection
-         * after sending a response or to keep it open. By default, if the application
-         * is running as a web socket, the connection will not be closed unless
-         * you say so, otherwise the connection will be closed as soon as the
-         * first response is sent.
-         * @return void
-         * @see self::sendString
-         */
-        public function send(\JsonSerializable|WebUIBuilder|FileOutputStream|null $content = null, ?bool $keepConnection = null): void
-        {
-            $subtype = $this->app->response->subtype();
-            if ($content instanceof \JsonSerializable) {
-                $this->handleSerializableOutput($content, $subtype);
-            } elseif ($content instanceof WebUIBuilder) {
-                $this->handleUIBuilderOutput($content, $subtype);
-            } elseif ($content instanceof FileOutputStream) {
-                $this->prepareFileStreaming($content);
-                return;
-            }
-            $this->write($keepConnection);
-        }
-
-        /**
-         * Send string content to a client application
-         * @param string|null $content Output object to send
-         * @param bool|null $keepConnection Set whether to close the connection
-         * after sending a response or to keep it open. By default, if the application
-         * is running as a web socket, the connection will not be closed unless
-         * you say so, otherwise the connection will be closed as soon as the
-         * first response is sent.
-         * @return void
-         * @see self::send
-         */
-        public function sendString(?string $content = null, ?bool $keepConnection = null): void
-        {
-            $this->app->response->setBody($content, $this->app->response->subtype());
-            $this->write($keepConnection);
-        }
-
-        /**
-         * Stream data to client application. To stop streaming return null on $callback
-         * @param \Closure $callback A callback to handle streaming. This callback
-         * has the following signature <code>$callback():?\JsonSerializable|WebUIBuilder|string</code>
-         * @return void
-         */
-        public function stream(\Closure $callback): void
+        private function stream(\Closure $callback, string $subtype): void
         {
             $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
-            $subtype = $this->app->response->subtype();
             $this->app->response->header()
                     ->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
                     ->addOne('X-Accel-Buffering', 'no'); //disable buffering on nginx
@@ -101,13 +43,7 @@ namespace shani\http {
                 if ($output === null) {
                     break;
                 }
-                if ($output instanceof \JsonSerializable) {
-                    $this->handleSerializableOutput($output, $subtype);
-                } elseif ($output instanceof WebUIBuilder) {
-                    $this->handleUIBuilderOutput($output, $subtype);
-                } else {
-                    $this->app->response->setBody($output);
-                }
+                $this->decisionTree($output, $subtype);
                 $this->writer->sendBody($this->app->response);
             }
         }
@@ -140,7 +76,7 @@ namespace shani\http {
          * @param FileOutputStream $output
          * @return void
          */
-        private function prepareFileStreaming(FileOutputStream $output): void
+        private function handleFileStreaming(FileOutputStream $output): void
         {
             if (!is_readable($output->filepath)) {
                 $this->app->response->setStatus(HttpStatus::NOT_FOUND);
@@ -202,18 +138,51 @@ namespace shani\http {
                     ->header()->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache');
         }
 
-        private function write(?bool $keepConnection = false): void
+        private function write(?HttpConnection $connection): void
         {
-            $scheme = $this->app->request->uri->scheme();
-            $buffer = $keepConnection === null ? $scheme === 'ws' || $scheme === 'wss' : $keepConnection;
             $this->app->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->app->response->bodySize());
             if ($this->app->request->method === 'head') {
                 $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                 $this->writer->sendHeaders($this->app->response);
-            } else if ($buffer) {
+            } else if ($this->useBuffer($connection)) {
                 $this->writer->send($this->app->response);
             } else {
                 $this->writer->close($this->app->response);
+            }
+        }
+
+        private function useBuffer(?HttpConnection $connection): bool
+        {
+            if ($connection === null || $connection === HttpConnection::AUTO) {
+                return true;
+            }
+            $scheme = $this->app->request->uri->scheme();
+            return $scheme === 'ws' || $scheme === 'wss' || $connection === HttpConnection::KEEP;
+        }
+
+        private function decisionTree(mixed $content, string $subtype): bool
+        {
+            if ($content instanceof WebUIBuilder) {
+                $this->handleUIBuilderOutput($content, $subtype);
+            } elseif ($content instanceof \JsonSerializable) {
+                $this->handleSerializableOutput($content, $subtype);
+            } elseif (is_string($content)) {
+                $this->app->response->setBody($content, $subtype);
+            } elseif ($content instanceof FileOutputStream) {
+                $this->handleFileStreaming($content);
+                return false;
+            } elseif ($content instanceof \Closure) {
+                $this->stream($content, $subtype);
+                return false;
+            }
+            return true;
+        }
+
+        public function handleResponse(?HttpResponse $response): void
+        {
+            $subtype = $this->app->response->subtype();
+            if ($this->decisionTree($response?->body, $subtype)) {
+                $this->write($response?->connection);
             }
         }
     }
