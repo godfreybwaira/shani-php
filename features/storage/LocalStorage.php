@@ -95,7 +95,7 @@ namespace features\storage {
                 case $app->config->pathConfig()->protectedStorage:
                     return self::serveProtected($app, $assetServer, $path);
                 case $app->config->pathConfig()->publicStorage:
-                    return self::sendFile($app, $assetServer, $app->storage()->pathTo($path));
+                    return self::sendFile($app, $assetServer, $app->storage->pathTo($path));
                 default:
                     return false;
             }
@@ -113,7 +113,7 @@ namespace features\storage {
                     throw CustomException::forbidden($app);
                 }
             }
-            return self::sendFile($app, $assetServer, $app->storage()->pathTo($filepath));
+            return self::sendFile($app, $assetServer, $app->storage->pathTo($filepath));
         }
 
         private static function getFileOwnership(string $filepath): ?array
@@ -330,7 +330,7 @@ namespace features\storage {
         public static function delegateToApache(App $app, string $filepath): void
         {
             $app->response->header()->addAll([
-                'X-Sendfile' => $app->storage()->pathTo($filepath),
+                'X-Sendfile' => $app->storage->pathTo($filepath),
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
             $app->writer->send();

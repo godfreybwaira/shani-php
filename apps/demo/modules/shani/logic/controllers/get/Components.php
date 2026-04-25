@@ -31,11 +31,10 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function index(): WebUIBuilder
         {
-            $storage = $this->app->storage();
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
-                    ->setPwaBuilder(new PwaBuilder($storage->uri('/pwa/0/manifest.json'), $storage->uri('/pwa/0/sw.js')))
+                    ->setPwaBuilder(new PwaBuilder($this->app->storage->uri('/pwa/0/manifest.json'), $this->app->storage->uri('/pwa/0/sw.js')))
                     ->view('/body');
             return $builder;
         }

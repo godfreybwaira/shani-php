@@ -25,17 +25,15 @@ namespace gui {
         public readonly MutableMap $attr;
         private readonly WebUIBuilder $builder;
         private readonly App $app;
-        private readonly StorageMediaInterface $storage;
 
         private function __construct(App $app, WebUIBuilder $builder)
         {
             $this->app = $app;
             $this->attr = $builder->attr;
-            $this->storage = $this->app->storage();
-            $builder->style($this->storage->assetUri('/css/icons/mdi.css'));
-            $builder->style($this->storage->assetUri('/css/main.css'));
-            $builder->script($this->storage->assetUri('/js/shani-ob-2.0.js'), ['defer']);
-            $builder->script($this->storage->assetUri('/js/app.js'), ['defer']);
+            $builder->style($this->app->storage->assetUri('/css/icons/mdi.css'));
+            $builder->style($this->app->storage->assetUri('/css/main.css'));
+            $builder->script($this->app->storage->assetUri('/js/shani-ob-2.0.js'), ['defer']);
+            $builder->script($this->app->storage->assetUri('/js/app.js'), ['defer']);
             $this->builder = $builder;
         }
 
@@ -46,7 +44,7 @@ namespace gui {
          */
         public function asset(string $path): string
         {
-            return $this->storage->assetUri($path)->asString();
+            return $this->app->storage->assetUri($path)->asString();
         }
 
         /**

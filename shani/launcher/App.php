@@ -101,6 +101,12 @@ namespace shani\launcher {
         public readonly AuthenticationManager $auth;
 
         /**
+         * Application file storage
+         * @var StorageMediaInterface
+         */
+        public readonly StorageMediaInterface $storage;
+
+        /**
          * Application paths
          * @var PathConfig
          */
@@ -133,6 +139,7 @@ namespace shani\launcher {
             $this->auth = new AuthenticationManager($this);
             $this->path = $this->config->pathConfig();
             $this->preset = $this->config->appConfig();
+            $this->storage = $this->config->getStorageMedia();
         }
 
         /**
@@ -187,20 +194,11 @@ namespace shani\launcher {
             if (!isset($this->logger)) {
                 $filename = $this->preset->logFileName;
                 if (strpos($filename, '://') === false) {
-                    $filename = $this->storage()->pathTo('/' . $filename);
+                    $filename = $this->storage->pathTo('/' . $filename);
                 }
                 $this->logger = new Logger($filename);
             }
             return $this->logger;
-        }
-
-        /**
-         * Get storage object representing application storage directory
-         * @return StorageMediaInterface
-         */
-        public function storage(): StorageMediaInterface
-        {
-            return $this->config->getStorageMedia();
         }
 
         /**
