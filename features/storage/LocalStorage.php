@@ -61,11 +61,6 @@ namespace features\storage {
             throw new ServerException('Failed to create shortcut: ' . $shortcut);
         }
 
-        private static function getStaticAssetPrefix(string $path): string
-        {
-            return substr($path, 0, strpos($path, '/', 1));
-        }
-
         /**
          * Get asset real path
          * @param string $path asset location relative to asset directory
@@ -180,7 +175,7 @@ namespace features\storage {
             $srcFile = $this->pathTo($filepath);
             if (is_readable($srcFile)) {
                 $newName = $prefix . (new StaticAssetOwnership($filepath))->filename;
-                $srcBucket = self::getStaticAssetPrefix($filepath);
+                $srcBucket = substr($filepath, 0, strpos($filepath, '/', 1));
                 $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
                 $destination = self::createDirectory($this->pathTo($savepath));
                 if (!is_link($destination . '/' . $newName) && symlink($srcFile, $destination . '/' . $newName)) {
