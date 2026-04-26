@@ -26,11 +26,11 @@ namespace shani\assets {
         {
             $values = explode(self::ID_SEPARATOR, basename($filename));
             $this->filename = $values[count($values) - 1];
-            $this->userBucket = self::createBucket($values[0], self::UID_PREFIX);
-            $this->groupBucket = self::createBucket($values[1] ?? null, self::GID_PREFIX);
+            $this->userBucket = self::getBucket($values[0], self::UID_PREFIX);
+            $this->groupBucket = self::getBucket($values[1] ?? null, self::GID_PREFIX);
         }
 
-        private static function createBucket(?string $value, string $prefix): ?string
+        private static function getBucket(?string $value, string $prefix): ?string
         {
             return isset($value) && str_starts_with($value, $prefix) ? substr($value, strlen($prefix)) : null;
         }
@@ -63,6 +63,11 @@ namespace shani\assets {
         {
             $prefix = self::createPrivateFilePrefix($userBucket) . self::GID_PREFIX;
             return $prefix . $groupBucket . self::ID_SEPARATOR;
+        }
+
+        public static function createBucketName(int $min = 10, int $max = 15): string
+        {
+            return substr(bin2hex(random_bytes(random_int(10, 70))), 0, rand($min, $max));
         }
     }
 

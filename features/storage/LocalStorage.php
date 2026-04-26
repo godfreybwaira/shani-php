@@ -81,7 +81,7 @@ namespace features\storage {
 
         private function saveFile(File $file, string $path, ?string $prefix, bool $rename): string
         {
-            $filename = $rename ? $prefix . substr(sha1(random_bytes(random_int(10, 70))), 0, rand(10, 15)) . $file->extension : $file->name;
+            $filename = $rename ? $prefix . StaticAssetOwnership::createBucketName() . $file->extension : $file->name;
             $directory = self::createDirectory($path . $file->type);
             $filepath = $directory . '/' . $filename;
             Concurrency::parallel(function ()use ($filepath, &$file) {
