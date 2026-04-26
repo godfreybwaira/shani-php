@@ -10,6 +10,7 @@
 namespace features\middleware {
 
     use features\exceptions\CustomException;
+    use shani\assets\StaticAssetRequest;
     use shani\http\HttpHeader;
     use shani\http\RequestRoute;
     use shani\launcher\App;
@@ -63,7 +64,7 @@ namespace features\middleware {
          */
         public function authorized(): void
         {
-            if ($this->app->config->authenticationConfig()->skipAuthentication || $this->app->config->accessingPublicResource()) {
+            if ($this->app->config->authenticationConfig()->skipAuthentication || $this->app->config->accessingPublicResource() || StaticAssetRequest::isPublicResource()) {
                 return;
             }
             if ($this->app->config->accessingGuestResource()) {
@@ -75,6 +76,13 @@ namespace features\middleware {
             }
             if (!$this->app->auth->attemptAuthentication()) {
                 throw CustomException::notAuthorized($this->app);
+            }
+            if (StaticAssetRequest::isStaticResource()) {
+                $user = $this->getUserDetails();
+                if ($user !== null && StaticAssetRequest::hasAccess($user)) {
+                    return;
+                }
+                throw CustomException::forbidden($this->app);
             }
             if (!$this->app->auth->accessGranted()) {
                 throw CustomException::forbidden($this->app);

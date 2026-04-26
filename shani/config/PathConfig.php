@@ -32,8 +32,8 @@ namespace shani\config {
      * - Views → /presentation/views
      * - Languages → /presentation/lang
      * - Storage → {root}/.bucket
-     * - Protected storage → /0prt
-     * - Public storage → /1pub
+     * - Protected storage → 0prt
+     * - Public storage → 1pub
      */
     final class PathConfig
     {
@@ -91,12 +91,20 @@ namespace shani\config {
         public readonly string $storage;
 
         /**
-         * Protected storage directory for static contents.
+         * Private storage directory for static contents.
          * Accessible only by authenticated users.
          *
          * @var string
          */
-        public readonly string $protectedStorage;
+        public readonly string $privateBucket;
+
+        /**
+         * Private storage directory for static contents.
+         * Accessible only by authenticated group users.
+         *
+         * @var string
+         */
+        public readonly string $protectedBucket;
 
         /**
          * Public storage directory for static contents.
@@ -104,7 +112,7 @@ namespace shani\config {
          *
          * @var string
          */
-        public readonly string $publicStorage;
+        public readonly string $publicBucket;
 
         /**
          * Constructor for PathConfig.
@@ -132,11 +140,14 @@ namespace shani\config {
          * @param string|null $storage
          *     Application storage directory. Defaults to {root}/.bucket if null.
          *
-         * @param string $protectedStorage
-         *     Protected storage directory. Defaults to '/0prt'.
+         * @param string $privateBucket
+         *     Private storage directory. Defaults to '/0bkt'.
          *
-         * @param string $publicStorage
-         *     Public storage directory. Defaults to '/1pub'.
+         * @param string $protectedBucket
+         *     Private storage directory. Defaults to '/1bkt'.
+         *
+         * @param string $publicBucket
+         *     Public storage directory. Defaults to '/2bkt'.
          */
         public function __construct(
                 string $root,
@@ -146,8 +157,9 @@ namespace shani\config {
                 string $views = '/presentation/views',
                 string $languages = '/presentation/lang',
                 string $storage = null,
-                string $protectedStorage = '/0prt',
-                string $publicStorage = '/1pub'
+                string $privateBucket = '/0pv',
+                string $protectedBucket = '/1pr',
+                string $publicBucket = '/2pb'
         )
         {
             $this->root = $root;
@@ -157,8 +169,9 @@ namespace shani\config {
             $this->views = $views;
             $this->languages = $languages;
             $this->storage = $storage ?? $root . '/.bucket';
-            $this->protectedStorage = $protectedStorage;
-            $this->publicStorage = $publicStorage;
+            $this->privateBucket = $privateBucket;
+            $this->protectedBucket = $protectedBucket;
+            $this->publicBucket = $publicBucket;
         }
     }
 

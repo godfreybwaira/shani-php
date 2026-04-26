@@ -9,42 +9,33 @@
 
 namespace features\storage {
 
-    use features\exceptions\CustomException;
+    use features\authentication\UserDetailsDto;
     use features\exceptions\ServerException;
     use features\storage\StorageMediaInterface;
     use features\utils\Concurrency;
     use features\utils\File;
-    use features\utils\MediaType;
     use features\utils\URI;
-    use shani\assets\StaticAssetServers;
+    use shani\assets\StaticAssetOwnership;
     use shani\config\PathConfig;
-    use shani\http\enums\HttpStatus;
-    use shani\http\FileOutputStream;
-    use shani\http\HttpCache;
-    use shani\http\HttpHeader;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
     final class LocalStorage implements StorageMediaInterface
     {
 
-        /**
-         * Access to public assets in an asset directory. Everyone has an access.
-         */
-        private const ACCESS_ASSET = '/0';
-        private const ID_SEPARATOR = '_', GID_INITIAL = 'g', PID_INITIAL = 'u';
         public const FILE_MODE = 0700;
 
         private readonly App $app;
         private readonly string $host, $storage;
         private readonly PathConfig $pathConfig;
+        private readonly ?UserDetailsDto $user;
 
         public function __construct(App $app)
         {
             $this->app = $app;
-            $this->pathConfig = $app->config->pathConfig();
             $this->host = $app->request->uri->host();
+            $this->pathConfig = $app->config->pathConfig();
+            $this->user = $app->auth->getUserDetails();
             $this->storage = self::createShortcut($this->pathConfig->storage);
         }
 
@@ -76,76 +67,6 @@ namespace features\storage {
         }
 
         /**
-         * Serve a static file e.g CSS, images and other static files.
-         * @param App $app Application object
-         * @return HttpResponse|null
-         */
-        public static function processRequest(App $app): ?HttpResponse
-        {
-            $assetServer = $app->config->getStaticAssetServer();
-            if ($assetServer === StaticAssetServers::DISABLE) {
-                return null;
-            }
-            $path = $app->request->uri->path();
-            $prefix = self::getStaticAssetPrefix($path);
-            switch ($prefix) {
-                case self::ACCESS_ASSET:
-                    $filepath = substr($path, strlen($prefix));
-                    return self::sendFile($app, $assetServer, Framework::DIR_ASSETS . $filepath);
-                case $app->config->pathConfig()->protectedStorage:
-                    return self::serveProtected($app, $assetServer, $path);
-                case $app->config->pathConfig()->publicStorage:
-                    return self::sendFile($app, $assetServer, $app->storage->pathTo($path));
-                default:
-                    return null;
-            }
-        }
-
-        private static function serveProtected(App $app, StaticAssetServers $assetServer, string $filepath): ?HttpResponse
-        {
-            $user = $app->auth->getUserDetails();
-            $owners = self::getFileOwnership($filepath);
-            if ($owners !== null && $owners['oid'] !== $user->storageBucket) {
-                if ($user->groupStorageBucket !== $owners['gid']) {
-                    throw CustomException::forbidden($app);
-                }
-            }
-            return self::sendFile($app, $assetServer, $app->storage->pathTo($filepath));
-        }
-
-        private static function getFileOwnership(string $filepath): ?array
-        {
-            $filename = basename($filepath);
-            $ownership = substr($filename, 0, strrpos($filename, self::ID_SEPARATOR));
-            if (empty($ownership)) {
-                return null; //file has no owner
-            }
-            $owners = explode(self::ID_SEPARATOR, $ownership);
-            return[
-                'oid' => substr($owners[0], strlen(self::PID_INITIAL)),
-                'gid' => !empty($owners[1]) ? substr($owners[1], strlen(self::GID_INITIAL)) : null,
-            ];
-        }
-
-        private static function sendFile(App $app, StaticAssetServers $assetServer, string $filepath): ?HttpResponse
-        {
-            $path = $app->request->uri->path();
-            $etag = md5($path);
-            if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
-                $app->response->setStatus(HttpStatus::NOT_MODIFIED);
-                return null;
-            }
-            $cache = (new HttpCache())->setEtag($etag);
-            $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-            return match ($assetServer) {
-                StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
-                StaticAssetServers::NGINX => self::delegateToNginx($app, $path),
-                StaticAssetServers::SHANI => self::delegateToShani($filepath),
-                default => null
-            };
-        }
-
-        /**
          * Get asset real path
          * @param string $path asset location relative to asset directory
          * @return string real path pointing to asset
@@ -158,12 +79,8 @@ namespace features\storage {
         #[\Override]
         public function save(File $file, string $bucket = '/', bool $rename = true): string
         {
-            $privateBucket = $this->app->auth->getUserDetails()?->storageBucket;
-            if (empty($privateBucket)) {
-                throw new ServerException('Client private Id cannot be empty');
-            }
-            $path = $this->pathTo($this->pathConfig->protectedStorage . $bucket);
-            $prefix = self::PID_INITIAL . $privateBucket . self::ID_SEPARATOR;
+            $path = $this->pathTo($this->pathConfig->privateBucket . $bucket);
+            $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user?->storageBucket);
             return $this->saveFile($file, $path, $prefix, $rename);
         }
 
@@ -201,7 +118,7 @@ namespace features\storage {
         #[\Override]
         public function assetUri(string $path): URI
         {
-            return $this->uri(self::ACCESS_ASSET . $path);
+            return $this->uri($this->pathConfig->publicBucket . $path);
         }
 
         #[\Override]
@@ -219,8 +136,8 @@ namespace features\storage {
         #[\Override]
         public function delete(string $filepath): bool
         {
-            $owners = self::getFileOwnership($filepath);
-            if ($owners == null || $owners['oid'] === $this->app->auth->getUserDetails()?->storageBucket) {
+            $owner = new StaticAssetOwnership($filepath);
+            if ($this->user !== null && $owner->isOwner($this->user)) {
                 return file_exists($filepath) && unlink($filepath);
             }
             return false;
@@ -229,35 +146,32 @@ namespace features\storage {
         #[\Override]
         public function share2protected(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
-            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL;
-            $bucket = $this->pathConfig->protectedStorage;
+            $prefix = StaticAssetOwnership::createProtectedFilePrefix($this->user?->storageBucket);
+            $bucket = $this->pathConfig->privateBucket;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
         #[\Override]
         public function share2group(string $filepath): ?string
         {
-            $user = $this->app->auth->getUserDetails();
-            $prefix = self::PID_INITIAL . $user?->storageBucket;
-            $prefix .= self::ID_SEPARATOR . self::GID_INITIAL . $user?->groupStorageBucket;
-            $bucket = $this->pathConfig->protectedStorage;
+            $prefix = StaticAssetOwnership::createGroupFilePrefix($this->user?->storageBucket, $this->user?->groupStorageBucket);
+            $bucket = $this->pathConfig->privateBucket;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
         #[\Override]
-        public function share2other(string $filepath, string $otherId): ?string
+        public function share2other(string $filepath, string $otherBucket): ?string
         {
-            $prefix = self::PID_INITIAL . $otherId;
-            $bucket = $this->pathConfig->protectedStorage;
+            $prefix = StaticAssetOwnership::createPrivateFilePrefix($otherBucket);
+            $bucket = $this->pathConfig->privateBucket;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
         #[\Override]
         public function share2public(string $filepath): ?string
         {
-            $prefix = self::PID_INITIAL . $this->app->auth->getUserDetails()?->storageBucket;
-            $bucket = $this->pathConfig->publicStorage;
+            $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user->storageBucket);
+            $bucket = $this->pathConfig->publicBucket;
             return $this->shareFile($filepath, $bucket, $prefix);
         }
 
@@ -265,7 +179,7 @@ namespace features\storage {
         {
             $srcFile = $this->pathTo($filepath);
             if (is_readable($srcFile)) {
-                $newName = $prefix . self::ID_SEPARATOR . self::getFilename($filepath);
+                $newName = $prefix . (new StaticAssetOwnership($filepath))->filename;
                 $srcBucket = self::getStaticAssetPrefix($filepath);
                 $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
                 $destination = self::createDirectory($this->pathTo($savepath));
@@ -274,72 +188,6 @@ namespace features\storage {
                 }
             }
             return null;
-        }
-
-        /**
-         * Get a file name without client Id
-         * @param string $file
-         * @return string
-         */
-        private static function getFilename(string $file): string
-        {
-            $pos = strrpos($file, self::ID_SEPARATOR);
-            if ($pos !== false) {
-                return substr($file, $pos + strlen(self::ID_SEPARATOR));
-            }
-            return $file;
-        }
-
-        /**
-         * Serve static assets using this framework
-         * @param string $filepath File path
-         * @return HttpResponse
-         */
-        private static function delegateToShani(string $filepath): HttpResponse
-        {
-            return new HttpResponse(new FileOutputStream($filepath));
-        }
-
-        /**
-         * Serve static assets using this Nginx server
-         * @param App $app Application object
-         * @param string $filepath File path
-         * @return HttpResponse|null
-         */
-        public static function delegateToNginx(App $app, string $filepath): ?HttpResponse
-        {
-            $app->response->header()->addAll([
-                'X-Accel-Redirect' => $filepath,
-                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
-            ]);
-            return null;
-        }
-
-        /**
-         * Serve static assets using Apache server
-         * @param App $app Application object
-         * @param string $filepath File path
-         * @return HttpResponse|null
-         */
-        public static function delegateToApache(App $app, string $filepath): ?HttpResponse
-        {
-            $app->response->header()->addAll([
-                'X-Sendfile' => $app->storage->pathTo($filepath),
-                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
-            ]);
-            return null;
-        }
-
-        /**
-         * Checks if the URL points to static asset
-         * @param App $app Application object
-         * @return bool True if it points, false otherwise.
-         */
-        public static function isStaticAssetRequest(App $app): bool
-        {
-            $config = $app->config->pathConfig();
-            $prefix = self::getStaticAssetPrefix($app->request->uri->path());
-            return $prefix === self::ACCESS_ASSET || $prefix === $config->protectedStorage || $prefix === $config->publicStorage;
         }
     }
 

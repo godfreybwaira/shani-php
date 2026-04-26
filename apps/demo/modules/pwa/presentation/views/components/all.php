@@ -130,11 +130,11 @@
     <div class="col">
         <a href="#" title="" class="avatar color-danger" style="--size:2rem">L</a>
         <a href="#" class="avatar">
-            <img src="/0/img/pic1.jpg" alt=""/>
+            <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt=""/>
         </a>
         <a href="#" title="" class="avatar color-success" style="--size:3rem">M</a>
         <a href="#" title="" class="avatar" style="--size:3.5rem">
-            <img src="/0/img/pic2.jpg" alt=""/>
+            <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt=""/>
         </a>
         <a href="#" title="" class="avatar color-alert" style="--size:4rem">G</a>
     </div>
@@ -145,11 +145,11 @@
         <div class="avatar-group">
             <div class="avatar color-danger">L</div>
             <div class="avatar">
-                <img src="/0/img/pic1.jpg" alt=""/>
+                <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt=""/>
             </div>
             <div class="avatar color-success">M</div>
             <div class="avatar">
-                <img src="/0/img/pic2.jpg" alt=""/>
+                <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt=""/>
             </div>
             <div class="avatar color-alert">G</div>
         </div>

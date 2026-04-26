@@ -505,7 +505,7 @@
                 <div class="row row-nowrap">
                     <div class="col">
                         <div class="avatar">
-                            <img src="/0/img/pic1.jpg" alt="photo"/>
+                            <img src="<?= $web->asset('/img/pic1.jpg'); ?>" alt="photo"/>
                         </div>
                     </div>
                     <div class="col">
@@ -529,7 +529,7 @@
                 <div class="row row-nowrap">
                     <div class="col">
                         <div class="avatar">
-                            <img src="/0/img/pic2.jpg" alt="photo"/>
+                            <img src="<?= $web->asset('/img/pic2.jpg'); ?>" alt="photo"/>
                         </div>
                     </div>
                     <div class="col">

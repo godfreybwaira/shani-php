@@ -18,8 +18,9 @@ namespace shani\launcher {
     use features\middleware\MiddlewareHandler;
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
-    use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
+    use shani\assets\StaticAssetRequest;
+    use shani\assets\StaticAssetServers;
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
@@ -182,14 +183,6 @@ namespace shani\launcher {
             }
         }
 
-        private function handleRequest(): ?HttpResponse
-        {
-            if (LocalStorage::isStaticAssetRequest($this)) {
-                return LocalStorage::processRequest($this);
-            }
-            return $this->processRequest();
-        }
-
         public function csrfToken(): MutableMap
         {
             return $this->session->cart('fiJ9Gce5osud7s');
@@ -262,11 +255,18 @@ namespace shani\launcher {
          * always depends on HTTP method and application endpoint provided by the user.
          * @return HttpResponse|null
          */
-        private function processRequest(): ?HttpResponse
+        private function handleRequest(): ?HttpResponse
         {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
-                throw CustomException::notFound($this);
+                if ($this->config->getStaticAssetServer() === StaticAssetServers::DISABLE) {
+                    throw CustomException::notFound($this);
+                }
+                $properties = StaticAssetRequest::fromPath($this->path, $this->request->uri->path());
+                if ($properties === null) {
+                    throw CustomException::notFound($this);
+                }
+                return $properties->handleRequest($this);
             }
             $className = str_replace('/', '\\', $classPath);
             $callback = self::kebab2camelCase($this->request->route()->action);
