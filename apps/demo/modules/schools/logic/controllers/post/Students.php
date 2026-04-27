@@ -12,7 +12,6 @@ namespace apps\demo\modules\schools\logic\controllers\post {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\logic\services\StudentService;
     use features\exceptions\CustomException;
-    use shani\http\FileOutputStream;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
@@ -42,7 +41,8 @@ namespace apps\demo\modules\schools\logic\controllers\post {
         public function upload(): ?HttpResponse
         {
             $file = $this->app->request->file('f1');
-            return HttpResponse::withBody(FileOutputStream::fromFile($file));
+            $path = $this->app->storage->save($file);
+            return HttpResponse::withBody($this->app->storage->uri($path));
         }
     }
 

@@ -10,6 +10,7 @@
 namespace apps\demo\modules\security\logic\controllers\get {
 
     use gui\WebUIBuilder;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class Oauth2
@@ -22,27 +23,28 @@ namespace apps\demo\modules\security\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function authorize(): WebUIBuilder
+        public function authorize(): HttpResponse
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            return $builder;
+            return HttpResponse::withBody($builder);
         }
 
-        public function device(): WebUIBuilder
+        public function device(): HttpResponse
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            return $builder;
+            return HttpResponse::withBody($builder);
         }
 
-        public function logout(): string
+        public function logout(): HttpResponse
         {
-            return $this->app->auth->logout() ? 'Success' : 'Failed';
+            $msg = $this->app->auth->logout() ? 'Success' : 'Failed';
+            return HttpResponse::withBody($msg);
         }
     }
 

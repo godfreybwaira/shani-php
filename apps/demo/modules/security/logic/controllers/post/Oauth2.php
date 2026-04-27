@@ -12,6 +12,8 @@ namespace apps\demo\modules\security\logic\controllers\post {
     use features\authentication\UserDetailsDto;
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
+    use JsonSerializable;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class Oauth2
@@ -24,40 +26,41 @@ namespace apps\demo\modules\security\logic\controllers\post {
             $this->app = $app;
         }
 
-        public function token(): \JsonSerializable
+        public function token(): HttpResponse
         {
             $issuer = new OAuth2TokenIssuer($this->app);
             $response = $issuer->handleRequest();
-            return $response->body;
+            return HttpResponse::withBody($response->body);
         }
 
-        public function authorize(): ?\JsonSerializable
+        public function authorize(): HttpResponse
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleGeneralAuthorization();
-            return $response?->body;
+            return HttpResponse::withBody($response?->body);
         }
 
-        public function deviceAuthorization(): ?\JsonSerializable
+        public function deviceAuthorization(): HttpResponse
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleDeviceAuthorization();
-            return $response?->body;
+            return HttpResponse::withBody($response?->body);
         }
 
-        public function device(): ?\JsonSerializable
+        public function device(): HttpResponse
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $body = $this->app->request->body();
             $userCode = $body->getOne('user_code');
             $deviceCode = $body->getOne('device_code');
             $response = $authorizer->handleDeviceVerification($userCode, $deviceCode);
-            return $response?->body;
+            return HttpResponse::withBody($response?->body);
         }
 
-        public function login(): ?UserDetailsDto
+        public function login(): HttpResponse
         {
-            return $this->app->auth->login();
+            $user = $this->app->auth->login();
+            return HttpResponse::withBody($user);
         }
     }
 

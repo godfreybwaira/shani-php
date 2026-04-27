@@ -113,7 +113,7 @@ namespace features\assets {
         public static function createPrivateFilePrefix(?string $userBucket): string
         {
             if (empty($userBucket)) {
-                throw new ServerException('Client private bucket cannot be empty.');
+                throw new ServerException('User bucket cannot be empty.');
             }
             return self::UID_PREFIX . $userBucket . self::ID_SEPARATOR;
         }

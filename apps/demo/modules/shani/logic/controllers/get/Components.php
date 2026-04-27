@@ -45,10 +45,10 @@ namespace apps\demo\modules\shani\logic\controllers\get {
             return HttpResponse::withBody(new WebUIBuilder());
         }
 
-        public function stream(): \Closure
+        public function stream(): HttpResponse
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            return function () {
+            $cb = function () {
                 $db = $this->app->config->getDatabase();
                 $rows = $db->find('users');
                 while (true) {
@@ -61,18 +61,20 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     }
                 }
             };
+            return HttpResponse::withBody($cb);
         }
 
-        public function users(): \Closure
+        public function users(): HttpResponse
         {
             $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $rows = $db->find('users');
-            return function () use (&$rows) {
+            $cb = function () use (&$rows) {
                 foreach ($rows as $row) {
                     yield $row;
                 }
             };
+            return HttpResponse::withBody($cb);
         }
 
         public function inputs(): HttpResponse
