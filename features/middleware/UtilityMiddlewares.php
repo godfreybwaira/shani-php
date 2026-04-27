@@ -62,7 +62,7 @@ namespace features\middleware {
             //1. extension 2. accept 3. content_type 4. default
             $ext = $app->request->route()->extension;
             if ($ext !== null) {
-                $app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::mime($ext));
+                $app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::fromExtension($ext));
                 return;
             }
             $accepted = $app->request->header()->getOne(HttpHeader::ACCEPT, HttpHeader::CONTENT_TYPE);

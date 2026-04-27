@@ -78,11 +78,6 @@ namespace shani\http {
          */
         private function handleFileStreaming(FileOutputStream $output): void
         {
-            if (!is_readable($output->path)) {
-                $this->app->response->setStatus(HttpStatus::NOT_FOUND);
-                $this->write();
-                return;
-            }
             if ($output->name !== null) {
                 $this->app->response->saveAs($output->name);
             }

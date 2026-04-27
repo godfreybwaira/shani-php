@@ -9,6 +9,8 @@
 
 namespace features\utils {
 
+    use features\exceptions\ServerException;
+
     /**
      * Represents a file object with metadata and upload error handling.
      *
@@ -92,18 +94,21 @@ namespace features\utils {
          */
         public function __construct(
                 string $path,
-                string $type,
+                ?string $type = null,
                 ?int $size = null,
                 ?string $name = null,
                 ?int $error = null
         )
         {
-            $this->type = $type;
             $this->path = $path;
             $this->name = $name ?? basename($path);
             $this->size = $size ?? stat($path)['size'];
             $this->error = self::getFileErrors($error);
             $this->extension = self::getExtension($this->name);
+            $this->type = $type ?? MediaType::fromExtension($this->extension);
+            if (!is_readable($path)) {
+                throw new ServerException('File is not readable.');
+            }
         }
 
         /**

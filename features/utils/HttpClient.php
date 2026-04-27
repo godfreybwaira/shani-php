@@ -526,26 +526,22 @@ namespace features\utils {
         /**
          * Upload a file to remote server
          * @param string $endpoint Request destination endpoint
-         * @param string $source A path to a source file to upload
+         * @param File $source A source file to upload
          * @param \Closure $callback A callback with the following signature:
          * <code>$callback(ResponseEntity $resp):void</code>
          * @param \Closure $progress A callback for showing progress during upload.
          * It has the following syntax <code>$callback(int $totalSize, int $loaded):void</code>
          * @return self
          */
-        public function upload(string $endpoint, string $source, \Closure $callback, \Closure $progress = null): self
+        public function upload(string $endpoint, File $source, \Closure $callback, \Closure $progress = null): self
         {
-            if (is_readable($source)) {
-                $this->setOptions([
-                    CURLOPT_UPLOAD => true,
-                    CURLOPT_INFILE => fopen($source, 'rb'),
-                    CURLOPT_INFILESIZE => filesize($source)
-                ]);
-            } else {
-                throw new \Exception('Source file "' . $source . '" is not readable.');
-            }
-            $this->requestHeader->addIfAbsent(HttpHeader::CONTENT_TYPE, MediaType::fromFilename($source));
-            $this->requestHeader->setFilename(basename($source), false);
+            $this->setOptions([
+                CURLOPT_UPLOAD => true,
+                CURLOPT_INFILE => fopen($source->path, 'rb'),
+                CURLOPT_INFILESIZE => $source->size
+            ]);
+            $this->requestHeader->addIfAbsent(HttpHeader::CONTENT_TYPE, $source->type);
+            $this->requestHeader->setFilename($source->name, false);
             if ($progress !== null) {
                 $this->setOptions([
                     CURLOPT_NOPROGRESS => false,

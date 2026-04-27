@@ -1247,9 +1247,12 @@ namespace features\utils {
 
         private static array $mime = [];
 
-        public static function mime(string $extension): ?string
+        public static function fromExtension(?string $extension): ?string
         {
-            $ext = strtolower($extension);
+            if ($extension === null) {
+                return null;
+            }
+            $ext = strtolower(trim($extension, '.'));
             if (!isset(self::$mime[$ext])) {
                 $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
                 if ($mime === null) {
@@ -1267,7 +1270,7 @@ namespace features\utils {
         public static function fromFilename(string $filename): ?string
         {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
-            return !empty($ext) ? self::mime($ext) : null;
+            return !empty($ext) ? self::fromExtension($ext) : null;
         }
 
         /**

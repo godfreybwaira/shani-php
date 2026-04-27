@@ -10,6 +10,7 @@
 namespace features\assets {
 
     use features\authentication\UserDetailsDto;
+    use features\utils\File;
     use features\utils\MediaType;
     use shani\config\PathConfig;
     use shani\http\enums\HttpStatus;
@@ -70,7 +71,6 @@ namespace features\assets {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
                 $config->privateBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
-                $config->protectedBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PROTECTED_ACCESS),
                 $config->publicBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
@@ -89,18 +89,18 @@ namespace features\assets {
                 StaticAssetAccessType::PUBLIC_ACCESS => Framework::DIR_ASSETS . substr($this->uriPath, strlen($this->bucket) + 1),
                 default => $app->storage->pathTo($this->uriPath)
             };
-            return $this->sendFile($app, $filepath);
+            return $this->sendFile($app, new File($filepath));
         }
 
         /**
          * Sends the file to the client with appropriate headers and caching.
          *
-         * @param App    $app      The application context.
-         * @param string $filepath The resolved file path.
+         * @param App   $app    The application context.
+         * @param File  $file   File object.
          *
          * @return HttpResponse|null The HTTP response, or null if not served.
          */
-        private function sendFile(App $app, string $filepath): ?HttpResponse
+        private function sendFile(App $app, File $file): ?HttpResponse
         {
             $assetServer = $app->config->getStaticAssetServer();
             $etag = md5($this->filename);
@@ -114,9 +114,9 @@ namespace features\assets {
             $app->response->setStatus(HttpStatus::OK)->setCache($cache);
 
             return match ($assetServer) {
-                StaticAssetServers::APACHE => self::delegateToApache($app, $filepath),
+                StaticAssetServers::APACHE => self::delegateToApache($app, $file),
                 StaticAssetServers::NGINX => self::delegateToNginx($app, $this->uriPath),
-                StaticAssetServers::SHANI => self::delegateToShani($filepath),
+                StaticAssetServers::SHANI => self::delegateToShani($file),
                 default => null
             };
         }
@@ -137,13 +137,13 @@ namespace features\assets {
         /**
          * Serve static assets using this framework.
          *
-         * @param string $filepath File path.
+         * @param File $file File object.
          *
          * @return HttpResponse The HTTP response.
          */
-        private static function delegateToShani(string $filepath): HttpResponse
+        private static function delegateToShani(File $file): HttpResponse
         {
-            return HttpResponse::withBody(new FileOutputStream($filepath));
+            return HttpResponse::withBody(new FileOutputStream($file));
         }
 
         /**
@@ -166,16 +166,16 @@ namespace features\assets {
         /**
          * Serve static assets using Apache server.
          *
-         * @param App    $app      Application object.
-         * @param string $filepath File path.
+         * @param App   $app    Application object.
+         * @param File  $file   File path.
          *
          * @return HttpResponse|null The HTTP response, or null if delegated.
          */
-        private static function delegateToApache(App $app, string $filepath): ?HttpResponse
+        private static function delegateToApache(App $app, File $file): ?HttpResponse
         {
             $app->response->header()->addAll([
-                'X-Sendfile' => $app->storage->pathTo($filepath),
-                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
+                'X-Sendfile' => $file->path,
+                HttpHeader::CONTENT_TYPE => $file->type
             ]);
             return null;
         }

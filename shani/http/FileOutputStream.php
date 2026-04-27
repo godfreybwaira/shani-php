@@ -10,7 +10,6 @@
 namespace shani\http {
 
     use features\utils\File;
-    use features\utils\MediaType;
     use shani\launcher\Framework;
 
     /**
@@ -53,29 +52,18 @@ namespace shani\http {
         /**
          * Constructs a new FileOutputStream instance.
          *
-         * @param string        $path  Absolute path to an existing file.
-         * @param string|null   $type  File MIME type.
+         * @param File          $file  Absolute path to an existing file.
          * @param string|null   $name  Optional name of the file. If provided,
          *                             the client will initiate a download.
          * @param int|null      $chunkSize  Size in bytes to send/stream the file.
          *                               Defaults to Framework::BUFFER_SIZE.
          */
-        public function __construct(string $path, string $type = null, string $name = null, int $chunkSize = null)
+        public function __construct(File $file, string $name = null, int $chunkSize = null)
         {
-            $this->path = $path;
             $this->name = $name;
-            $this->type = $type ?? MediaType::fromFilename($path);
+            $this->path = $file->path;
+            $this->type = $file->type;
             $this->chunkSize = $chunkSize ?? Framework::BUFFER_SIZE;
-        }
-
-        /**
-         * Create a FileOutputStream object from File object
-         * @param File $file File Object
-         * @return FileOutputStream
-         */
-        public static function fromFile(File $file): FileOutputStream
-        {
-            return new self($file->path, $file->type, $file->name);
         }
     }
 

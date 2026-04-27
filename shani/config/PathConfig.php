@@ -99,14 +99,6 @@ namespace shani\config {
         public readonly string $privateBucket;
 
         /**
-         * Private storage directory for static contents.
-         * Accessible only by authenticated group users.
-         *
-         * @var string
-         */
-        public readonly string $protectedBucket;
-
-        /**
          * Public storage directory for static contents.
          * Accessible by everyone.
          *
@@ -158,8 +150,7 @@ namespace shani\config {
                 string $languages = '/presentation/lang',
                 string $storage = null,
                 string $privateBucket = '/0pv',
-                string $protectedBucket = '/1pr',
-                string $publicBucket = '/2pb'
+                string $publicBucket = '/1pb'
         )
         {
             $this->root = $root;
@@ -170,7 +161,6 @@ namespace shani\config {
             $this->languages = $languages;
             $this->storage = $storage ?? $root . '/.bucket';
             $this->privateBucket = $privateBucket;
-            $this->protectedBucket = $protectedBucket;
             $this->publicBucket = $publicBucket;
         }
     }

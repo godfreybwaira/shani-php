@@ -287,7 +287,7 @@ namespace shani\http {
         public function isStaticResource(PathConfig $config): bool
         {
             $prefix = '/' . $this->route->module;
-            return $prefix === $config->privateBucket || $prefix === $config->publicBucket || $prefix === $config->protectedBucket;
+            return $prefix === $config->privateBucket || $prefix === $config->publicBucket;
         }
 
         /**

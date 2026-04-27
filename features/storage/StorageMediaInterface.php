@@ -25,12 +25,12 @@ namespace features\storage {
          * Save a file with private access. A private file is accessible only by its owner.
          *
          * @param File   $file   A file object to save.
-         * @param string $bucket A destination directory.
+         * @param string $bucket A destination directory name.
          * @param bool   $rename Whether to rename the file or not (recommended).
          *
          * @return string Path to the saved file.
          */
-        public function save(File $file, string $bucket = '/', bool $rename = true): string;
+        public function save(File $file, string $bucket = null, bool $rename = true): string;
 
         /**
          * Get asset file URI.
@@ -53,48 +53,55 @@ namespace features\storage {
         /**
          * Delete a file.
          *
-         * @param string $filepath File path.
+         * @param File $file File object.
          *
          * @return bool True on success, false otherwise.
          */
-        public function delete(string $filepath): bool;
+        public function delete(File $file): bool;
 
         /**
          * Copy a file to a public directory. If already public, nothing happens.
+         * Public resources can be accessed by anyone.
          *
-         * @param string $filepath Source file to copy.
+         * @param File  $file Source file to copy.
+         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2public(string $filepath): ?string;
+        public function share2public(File $file, bool $rename = true): ?string;
 
         /**
          * Copy a file to a protected directory. If already protected, nothing happens.
+         * Protected resources can only be accessed by authenticated users.
          *
-         * @param string $filepath Source file to copy.
+         * @param File  $file Source file to copy.
+         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2protected(string $filepath): ?string;
+        public function share2protected(File $file, bool $rename = true): ?string;
 
         /**
          * Copy a file to a group-shared directory. If already private, nothing happens.
+         * Group resources can only be accessed by authenticated users or their groups.
          *
-         * @param string $filepath Source file to copy.
+         * @param File  $file Source file to copy.
+         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2group(string $filepath): ?string;
+        public function share2group(File $file, bool $rename = true): ?string;
 
         /**
          * Copy a file to another group's shared directory.
          *
-         * @param string $filepath Source file to copy.
-         * @param string $otherId  Client group ID to save in.
+         * @param File  $file Source file to copy.
+         * @param string $otherBucket  User bucket name to save in.
+         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2other(string $filepath, string $otherId): ?string;
+        public function share2other(File $file, string $otherBucket, bool $rename = true): ?string;
 
         /**
          * Get a full path to a storage destination.

@@ -9,13 +9,13 @@
 
 namespace features\storage {
 
+    use features\assets\StaticAssetOwnership;
     use features\authentication\UserDetailsDto;
     use features\exceptions\ServerException;
     use features\storage\StorageMediaInterface;
     use features\utils\Concurrency;
     use features\utils\File;
     use features\utils\URI;
-    use features\assets\StaticAssetOwnership;
     use shani\config\PathConfig;
     use shani\launcher\App;
     use shani\launcher\Framework;
@@ -97,26 +97,26 @@ namespace features\storage {
         }
 
         #[\Override]
-        public function save(File $file, string $bucket = '/', bool $rename = true): string
+        public function save(File $file, string $bucket = null, bool $rename = true): string
         {
-            $path = $this->pathTo($this->pathConfig->privateBucket . $bucket);
             $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user?->storageBucket);
-            return $this->saveFile($file, $path, $prefix, $rename);
+            $destination = $this->pathTo($this->pathConfig->privateBucket . '/' . $bucket);
+            return $this->saveFile($file, rtrim($destination, '/'), $prefix, $rename);
         }
 
         /**
          * Internal helper to save a file to a given path.
          *
          * @param File $file File object
-         * @param string $path Destination path
+         * @param string $destination Destination path
          * @param string|null $prefix Optional filename prefix
          * @param bool $rename Whether to rename the file
          * @return string Relative path of saved file
          */
-        private function saveFile(File $file, string $path, ?string $prefix, bool $rename): string
+        private function saveFile(File $file, string $destination, ?string $prefix, bool $rename): string
         {
             $filename = $rename ? $prefix . StaticAssetOwnership::createBucketName() . $file->extension : $file->name;
-            $directory = self::createDirectory($path . $file->type);
+            $directory = self::createDirectory($destination . '/' . $file->type);
             $filepath = $directory . '/' . $filename;
             Concurrency::parallel(function ()use ($filepath, &$file) {
                 $handle = fopen($filepath, 'a+b');
@@ -170,60 +170,45 @@ namespace features\storage {
         }
 
         #[\Override]
-        public function delete(string $filepath): bool
+        public function delete(File $file): bool
         {
-            $owner = new StaticAssetOwnership($filepath);
+            $owner = new StaticAssetOwnership($file->name);
             if ($this->user !== null && $owner->isOwner($this->user)) {
-                return file_exists($filepath) && unlink($filepath);
+                return unlink($file->path);
             }
             return false;
         }
 
         #[\Override]
-        public function share2protected(string $filepath): ?string
+        public function share2protected(File $file, bool $rename = true): ?string
         {
             $prefix = StaticAssetOwnership::createProtectedFilePrefix($this->user?->storageBucket);
-            $bucket = $this->pathConfig->privateBucket;
-            return $this->shareFile($filepath, $bucket, $prefix);
+            $destination = $this->pathTo($this->pathConfig->privateBucket);
+            return $this->saveFile($file, $destination, $prefix, $rename);
         }
 
         #[\Override]
-        public function share2group(string $filepath): ?string
+        public function share2group(File $file, bool $rename = true): ?string
         {
             $prefix = StaticAssetOwnership::createGroupFilePrefix($this->user?->storageBucket, $this->user?->groupStorageBucket);
-            $bucket = $this->pathConfig->privateBucket;
-            return $this->shareFile($filepath, $bucket, $prefix);
+            $destination = $this->pathTo($this->pathConfig->privateBucket);
+            return $this->saveFile($file, $destination, $prefix, $rename);
         }
 
         #[\Override]
-        public function share2other(string $filepath, string $otherBucket): ?string
+        public function share2other(File $file, string $otherBucket, bool $rename = true): ?string
         {
             $prefix = StaticAssetOwnership::createPrivateFilePrefix($otherBucket);
-            $bucket = $this->pathConfig->privateBucket;
-            return $this->shareFile($filepath, $bucket, $prefix);
+            $destination = $this->pathTo($this->pathConfig->privateBucket);
+            return $this->saveFile($file, $destination, $prefix, $rename);
         }
 
         #[\Override]
-        public function share2public(string $filepath): ?string
+        public function share2public(File $file, bool $rename = true): ?string
         {
             $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user->storageBucket);
-            $bucket = $this->pathConfig->publicBucket;
-            return $this->shareFile($filepath, $bucket, $prefix);
-        }
-
-        private function shareFile(string $filepath, string $bucket, string $prefix): ?string
-        {
-            $srcFile = $this->pathTo($filepath);
-            if (is_readable($srcFile)) {
-                $newName = $prefix . (new StaticAssetOwnership($filepath))->filename;
-                $srcBucket = substr($filepath, 0, strpos($filepath, '/', 1));
-                $savepath = $bucket . substr(dirname($filepath), strlen($srcBucket));
-                $destination = self::createDirectory($this->pathTo($savepath));
-                if (!is_link($destination . '/' . $newName) && symlink($srcFile, $destination . '/' . $newName)) {
-                    return $savepath . '/' . $newName;
-                }
-            }
-            return null;
+            $destination = $this->pathTo($this->pathConfig->publicBucket);
+            return $this->saveFile($file, $destination, $prefix, $rename);
         }
     }
 

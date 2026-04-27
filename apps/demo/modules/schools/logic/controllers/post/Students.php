@@ -41,7 +41,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
         public function upload(): ?HttpResponse
         {
             $file = $this->app->request->file('f1');
-            $path = $this->app->storage->save($file);
+            $path = $this->app->storage->save($file, 'user');
             return HttpResponse::withBody($this->app->storage->uri($path));
         }
     }
