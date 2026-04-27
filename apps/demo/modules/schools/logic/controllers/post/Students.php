@@ -12,6 +12,8 @@ namespace apps\demo\modules\schools\logic\controllers\post {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\logic\services\StudentService;
     use features\exceptions\CustomException;
+    use shani\http\FileOutputStream;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class Students
@@ -23,10 +25,10 @@ namespace apps\demo\modules\schools\logic\controllers\post {
         public function __construct(App $app)
         {
             $this->app = $app;
-            $this->service = StudentService::getObject();
+            $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        public function index(): StudentDto
+        public function index(): HttpResponse
         {
             $data = $this->app->request->body()->getAll(['firstName', 'id', 'lastName', 'age', 'subjects']);
             $dto = StudentDto::fromArray($data);
@@ -34,7 +36,13 @@ namespace apps\demo\modules\schools\logic\controllers\post {
             if ($student === null) {
                 throw CustomException::serverError($this->app, 'Could not save student');
             }
-            return StudentDto::toDto($student);
+            return HttpResponse::withBody(StudentDto::toDto($student));
+        }
+
+        public function upload(): ?HttpResponse
+        {
+            $file = $this->app->request->file('f1');
+            return HttpResponse::withBody(FileOutputStream::fromFile($file));
         }
     }
 

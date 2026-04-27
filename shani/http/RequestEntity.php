@@ -18,6 +18,13 @@ namespace shani\http {
     use features\utils\URI;
     use shani\http\RequestRoute;
 
+    /**
+     * RequestEntity represents an HTTP request entity with its URI, headers,
+     * body, cookies, files, method, IP, and other metadata.
+     *
+     * It provides helper methods to access request data, manipulate the body,
+     * verify signatures, decompress content, and check accepted media types.
+     */
     final class RequestEntity extends HttpEntity
     {
 
@@ -28,13 +35,13 @@ namespace shani\http {
         public readonly URI $uri;
 
         /**
-         * User request time
+         * User request time (Unix timestamp)
          * @var int
          */
         public readonly int $time;
 
         /**
-         * HTTP Request method
+         * HTTP Request method (GET, POST, etc.)
          * @var string
          */
         public readonly string $method;
@@ -44,10 +51,20 @@ namespace shani\http {
          * @var string|null
          */
         public readonly ?string $ip;
+
+        /** @var string|null Raw request body */
         private ?string $raw;
+
+        /** @var RequestRoute Current request route */
         private RequestRoute $route;
+
+        /** @var array[File] Uploaded files */
         public readonly array $files;
+
+        /** @var string Whether request originated from localhost */
         public readonly string $localhost;
+
+        /** @var array|null Cached accepted content types */
         private ?array $acceptedType = null;
 
         /**
@@ -62,6 +79,21 @@ namespace shani\http {
          */
         public readonly ReadableMap $query;
 
+        /**
+         * Construct a new RequestEntity
+         *
+         * @param URI $uri Request URI
+         * @param HttpHeader $headers HTTP headers
+         * @param ReadableMap $body Request body
+         * @param ReadableMap $cookies Request cookies
+         * @param array[File] $files Uploaded files
+         * @param string $method HTTP method
+         * @param string $ip Client IP address
+         * @param int $time Request timestamp
+         * @param ReadableMap $queries Query parameters
+         * @param string $protocol Protocol used (HTTP/HTTPS)
+         * @param string|null $rawBody Raw request body (optional)
+         */
         public function __construct(
                 URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
                 array $files, string $method, string $ip, int $time, ReadableMap $queries,
@@ -81,12 +113,22 @@ namespace shani\http {
             $this->ip = $ip;
         }
 
+        /**
+         * Replace raw body with new content
+         * @param string $body Raw body content
+         * @return self
+         */
         public function withRawBody(string $body): self
         {
             $this->raw = $body;
             return $this;
         }
 
+        /**
+         * Replace request body with new map
+         * @param ReadableMap $body New body
+         * @return self
+         */
         public function withBody(ReadableMap $body): self
         {
             $this->body = $body;
@@ -134,7 +176,7 @@ namespace shani\http {
         /**
          * Get user request language codes. These values will be used for selection
          * of application language if they are supported.
-         * @return array users accepted languages
+         * @return array Users accepted languages
          */
         public function languages(): array
         {
@@ -147,9 +189,9 @@ namespace shani\http {
         }
 
         /**
-         * Check if HTTP user agent accept the given content type.
+         * Check if HTTP user agent accepts the given content type.
          * @param string $type MIME type or last part of MIME before /
-         * @return bool True on success, false otherwise.
+         * @return bool True if accepted, false otherwise
          */
         public function accepted(string $type): bool
         {
@@ -173,9 +215,8 @@ namespace shani\http {
         /**
          * Get uploaded file by name and optional file index
          * @param string $name Name value as given in upload form
-         * @param int $index File index in array, default is zero
-         * @return File|null Return uploaded file object if file is valid
-         * and exists, false otherwise.
+         * @param int|null $index File index in array, default is null
+         * @return File|null Uploaded file object if exists, null otherwise
          */
         public function file(string $name, int $index = null): ?File
         {
@@ -188,7 +229,7 @@ namespace shani\http {
         /**
          * Get request parameters sent via HTTP request endpoint
          * @param int $index Index of a request parameter
-         * @return string|null
+         * @return string|null Parameter value or null
          */
         public function params(int $index): ?string
         {
@@ -211,7 +252,7 @@ namespace shani\http {
         /**
          * Verify request raw body with provided digital signature
          * @param DigitalSignature|null $signature Digital signature object
-         * @param string $headerName Header name that will hold signature
+         * @param string $headerName Header name that holds signature
          * @return self
          */
         public function verify(?DigitalSignature $signature, string $headerName): self
@@ -223,7 +264,7 @@ namespace shani\http {
         }
 
         /**
-         * Encrypt response body with the given encryption keys
+         * Decrypt request body with the given encryption keys
          * @param Encryption|null $encryption Encryption object
          * @return self
          */

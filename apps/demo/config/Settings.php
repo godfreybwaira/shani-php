@@ -116,7 +116,7 @@ namespace apps\demo\config {
             return $this->authenticationConfig ??= new AuthenticationConfig(authenticationStrategies: [
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
-            ]);
+                    ], skipAuthentication: true);
         }
 
         public function sessionConfig(): SessionConfig

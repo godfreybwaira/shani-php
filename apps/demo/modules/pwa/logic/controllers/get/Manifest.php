@@ -58,7 +58,7 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
                     ->setScope('/')
                     ->setTextDirection(PwaTextDirection::AUTO)
                     ->setThemeColor('#aaccbb');
-            return new HttpResponse($builder->build());
+            return HttpResponse::withBody($builder->build());
         }
     }
 

@@ -37,12 +37,12 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     ->title('Home Page II')
                     ->setPwaBuilder(new PwaBuilder($this->app->storage->uri('/pwa/0/manifest.json'), $this->app->storage->uri('/pwa/0/sw.js')))
                     ->view('/body');
-            return new HttpResponse($builder);
+            return HttpResponse::withBody($builder);
         }
 
         public function all(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function stream(): \Closure
@@ -77,12 +77,12 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function inputs(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function containers(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function modals(): HttpResponse
@@ -94,22 +94,22 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function toaster(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function timeline(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function shani(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function redirect(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function generator(): Documentation
@@ -120,17 +120,17 @@ namespace apps\demo\modules\shani\logic\controllers\get {
 
         public function card(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function bindings(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function nodes(): HttpResponse
         {
-            return new HttpResponse(new WebUIBuilder());
+            return HttpResponse::withBody(new WebUIBuilder());
         }
 
         public function client(): HttpResponse
@@ -143,7 +143,7 @@ namespace apps\demo\modules\shani\logic\controllers\get {
                     yield $res->body();
                 };
             });
-            return new HttpResponse($cb);
+            return HttpResponse::withBody($cb);
         }
     }
 

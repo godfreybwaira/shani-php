@@ -41,8 +41,14 @@ namespace shani\http {
          */
         public readonly HttpConnection $connection;
 
+        private function __construct(mixed $body, HttpConnection $connection)
+        {
+            $this->body = $body;
+            $this->connection = $connection;
+        }
+
         /**
-         * Constructs a new HttpResponse instance.
+         * Constructs a HttpResponse::withBody instance.
          *
          * @param \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body
          *        The response body, which may be a closure, JSON-serializable object,
@@ -50,13 +56,11 @@ namespace shani\http {
          * @param HttpConnection|null $connection
          *        The HTTP connection. If null, defaults to HttpConnection::AUTO.
          */
-        public function __construct(
+        public static function withBody(
                 \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body,
-                HttpConnection $connection = null
-        )
+                HttpConnection $connection = null): HttpResponse
         {
-            $this->body = $body;
-            $this->connection = $connection ?? HttpConnection::AUTO;
+            return new HttpResponse($body, $connection ?? HttpConnection::AUTO);
         }
     }
 

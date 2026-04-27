@@ -78,15 +78,15 @@ namespace shani\http {
          */
         private function handleFileStreaming(FileOutputStream $output): void
         {
-            if (!is_readable($output->filepath)) {
+            if (!is_readable($output->path)) {
                 $this->app->response->setStatus(HttpStatus::NOT_FOUND);
                 $this->write();
                 return;
             }
-            if ($output->filename !== null) {
-                $this->app->response->saveAs($output->filename);
+            if ($output->name !== null) {
+                $this->app->response->saveAs($output->name);
             }
-            $file = stat($output->filepath);
+            $file = stat($output->path);
             $startPos = 0;
             $endPos = $file['size'] - 1;
             $range = $this->app->request->header()->getOne(HttpHeader::RANGE) ?? '=0-';
@@ -102,22 +102,22 @@ namespace shani\http {
                 ]);
                 $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
             }
-            $this->streamFile($output->filepath, $file['size'], $startPos, $endPos);
+            $this->streamFile($output, $file['size'], $startPos, $endPos);
         }
 
-        private function streamFile(string $filepath, int $filesize, int $startPos, int $endPos): void
+        private function streamFile(FileOutputStream $file, int $filesize, int $startPos, int $endPos): void
         {
             $length = $endPos - $startPos + 1;
             if ($length > 0 && $length <= $filesize) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CONTENT_LENGTH => $length,
-                    HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
+                    HttpHeader::CONTENT_TYPE => $file->type
                 ]);
                 if ($this->app->request->method === 'head') {
                     $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->app->response);
                 } else {
-                    $this->writer->streamFile($this->app->response, $filepath, $startPos, $length);
+                    $this->writer->streamFile($this->app->response, $file->path, $startPos, $length);
                 }
             } else {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);

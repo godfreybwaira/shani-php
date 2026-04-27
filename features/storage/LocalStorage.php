@@ -20,16 +20,40 @@ namespace features\storage {
     use shani\launcher\App;
     use shani\launcher\Framework;
 
+    /**
+     * LocalStorage provides an implementation of StorageMediaInterface
+     * for managing file storage operations such as saving, deleting,
+     * and sharing files across different buckets (private, public, group, etc.).
+     *
+     * It handles directory creation, symbolic links, and ensures
+     * ownership rules are respected when performing file operations.
+     */
     final class LocalStorage implements StorageMediaInterface
     {
 
+        /** @var int Default file mode for created directories */
         public const FILE_MODE = 0700;
 
+        /** @var App Application context */
         private readonly App $app;
-        private readonly string $host, $storage;
+
+        /** @var string Hostname extracted from request URI */
+        private readonly string $host;
+
+        /** @var string Storage base path */
+        private readonly string $storage;
+
+        /** @var PathConfig Configuration object containing bucket paths */
         private readonly PathConfig $pathConfig;
+
+        /** @var UserDetailsDto|null Authenticated user details */
         private readonly ?UserDetailsDto $user;
 
+        /**
+         * Constructor initializes storage paths and user context.
+         *
+         * @param App $app Application instance providing request, config, and auth context
+         */
         public function __construct(App $app)
         {
             $this->app = $app;
@@ -39,6 +63,13 @@ namespace features\storage {
             $this->storage = self::createShortcut($this->pathConfig->storage);
         }
 
+        /**
+         * Create a symbolic link shortcut to the storage directory.
+         *
+         * @param string $target Target directory path
+         * @return string Shortcut path
+         * @throws ServerException If directory or symlink creation fails
+         */
         private static function createShortcut(string $target): string
         {
             $relativePart = substr($target, strlen(Framework::DIR_APPS));
@@ -61,16 +92,6 @@ namespace features\storage {
             throw new ServerException('Failed to create shortcut: ' . $shortcut);
         }
 
-        /**
-         * Get asset real path
-         * @param string $path asset location relative to asset directory
-         * @return string real path pointing to asset
-         */
-        public static function assetPath(string $path): string
-        {
-            return Framework::DIR_ASSETS . $path;
-        }
-
         #[\Override]
         public function save(File $file, string $bucket = '/', bool $rename = true): string
         {
@@ -79,6 +100,15 @@ namespace features\storage {
             return $this->saveFile($file, $path, $prefix, $rename);
         }
 
+        /**
+         * Internal helper to save a file to a given path.
+         *
+         * @param File $file File object
+         * @param string $path Destination path
+         * @param string|null $prefix Optional filename prefix
+         * @param bool $rename Whether to rename the file
+         * @return string Relative path of saved file
+         */
         private function saveFile(File $file, string $path, ?string $prefix, bool $rename): string
         {
             $filename = $rename ? $prefix . StaticAssetOwnership::createBucketName() . $file->extension : $file->name;
@@ -102,6 +132,13 @@ namespace features\storage {
             return substr($filepath, strlen($this->storage));
         }
 
+        /**
+         * Create a directory if it does not exist.
+         *
+         * @param string $destination Directory path
+         * @return string Created directory path
+         * @throws ServerException If directory creation fails
+         */
         private static function createDirectory(string $destination): string
         {
             if (is_dir($destination) || mkdir($destination, self::FILE_MODE, true)) {

@@ -9,7 +9,7 @@
 
 namespace apps\demo\modules\pwa\logic\controllers\get {
 
-    use features\storage\LocalStorage;
+    use features\assets\StaticAssetRequest;
     use shani\http\FileOutputStream;
     use shani\http\HttpHeader;
     use shani\http\HttpResponse;
@@ -27,9 +27,9 @@ namespace apps\demo\modules\pwa\logic\controllers\get {
 
         public function index(): HttpResponse
         {
-            $file = LocalStorage::assetPath('/js/pwa-sw.js');
+            $file = StaticAssetRequest::assetPath('/js/pwa-sw.js');
             $this->app->response->header()->addOne(HttpHeader::SERVICE_WORKER_ALLOWED, '/');
-            return new HttpResponse(new FileOutputStream($file));
+            return HttpResponse::withBody(new FileOutputStream($file));
         }
     }
 

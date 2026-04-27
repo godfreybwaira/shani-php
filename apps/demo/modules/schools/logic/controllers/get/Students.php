@@ -27,7 +27,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        public function index(): ?HttpResponse
+        public function index(): HttpResponse
         {
             $students = $this->service->getAll();
             $dtos = new StudentListDto();
@@ -36,11 +36,10 @@ namespace apps\demo\modules\schools\logic\controllers\get {
             }
             $cart = $this->app->session->cart('user');
             if (!$cart->isEmpty()) {
-                return new HttpResponse($dtos);
+                return HttpResponse::withBody($dtos);
             }
             $cart->add($dtos);
-            $this->app->response->setBody('Cart is empty. Come back next time.');
-            return null;
+            return HttpResponse::withBody('Cart is empty. Come back next time.');
         }
 
         /**
@@ -51,7 +50,7 @@ namespace apps\demo\modules\schools\logic\controllers\get {
         {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
-            return $student !== null ? new HttpResponse(StudentDto::toDto($student)) : null;
+            return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
         }
     }
 

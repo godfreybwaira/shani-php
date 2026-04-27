@@ -50,7 +50,7 @@ namespace features\utils {
         public readonly string $type;
 
         /**
-         * File path on disk.
+         * Absolute file path on disk.
          *
          * @var string
          */

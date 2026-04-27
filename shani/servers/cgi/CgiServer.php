@@ -114,12 +114,20 @@ namespace shani\servers\cgi {
                     if (is_array($value['name'])) {
                         $result[$field] = self::normalizeFileArray($value);
                     } else {
-                        $result[$field] = $value;
+                        $result[$field] = new File(
+                                path: $value['tmp_name'], type: $value['type'],
+                                size: $value['size'], name: $value['name'],
+                                error: $value['error']
+                        );
                     }
                 } elseif (is_array($value)) {
                     $result[$field] = self::getPostedFiles($value);
                 } else {
-                    $result[$field] = $value;
+                    $result[$field] = new File(
+                            path: $value['tmp_name'], type: $value['type'],
+                            size: $value['size'], name: $value['name'],
+                            error: $value['error']
+                    );
                 }
             }
             return $result;
