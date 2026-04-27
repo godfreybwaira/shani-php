@@ -33,7 +33,7 @@ namespace apps\demo\config {
     final class Settings extends BasicConfiguration
     {
 
-        private readonly PathConfig $passConfig;
+        private readonly PathConfig $pathConfig;
 
         public function __construct(App $app)
         {
@@ -47,7 +47,7 @@ namespace apps\demo\config {
 
         public function pathConfig(): PathConfig
         {
-            return $this->passConfig ??= new PathConfig(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
+            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
         }
 
         public function isAsync(): bool
@@ -55,9 +55,14 @@ namespace apps\demo\config {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';
         }
 
-        public function accessingPublicResource(): bool
+        public function publicResources(): array
         {
-            return in_array($this->app->request->route()->module, ['shani', 'security', 'pwa']);
+            return ['shani', 'security', 'pwa'];
+        }
+
+        public function guestResources(): array
+        {
+            return [];
         }
 
         public static function runTest(): TestResult
@@ -116,7 +121,7 @@ namespace apps\demo\config {
             return $this->authenticationConfig ??= new AuthenticationConfig(authenticationStrategies: [
                 new auth\PasswordAuthenticator($this->app),
                 new auth\JwtAuthenticator($this->app),
-                    ], skipAuthentication: true);
+                    ], skipAuthentication: false);
         }
 
         public function sessionConfig(): SessionConfig

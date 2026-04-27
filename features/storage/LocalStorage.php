@@ -32,7 +32,7 @@ namespace features\storage {
     {
 
         /** @var int Default file mode for created directories */
-        public const FILE_MODE = 0650;
+        public const FILE_MODE = 0755;
 
         /** @var App Application context */
         private readonly App $app;
@@ -64,7 +64,11 @@ namespace features\storage {
         }
 
         /**
-         * Create a symbolic link shortcut to the storage directory.
+         * Automates the creation of a symbolic link between an application's internal
+         * storage and the framework's global storage directory.
+         * * This method extracts the application name from the target path to create
+         * a clean shortcut. For example, a target of 'apps/demo/bucket' will
+         * result in a shortcut at 'storage/demo/bucket'.
          *
          * @param string $target Target directory path
          * @return string Shortcut path

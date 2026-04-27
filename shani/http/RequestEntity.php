@@ -16,6 +16,7 @@ namespace shani\http {
     use features\utils\File;
     use features\utils\MediaType;
     use features\utils\URI;
+    use shani\config\PathConfig;
     use shani\http\RequestRoute;
 
     /**
@@ -274,6 +275,32 @@ namespace shani\http {
                 $this->raw = $encryption->decrypt($this->raw);
             }
             return $this;
+        }
+
+        /**
+         * Checks if this is an active static asset request.
+         *
+         * @param PathConfig $config Path configuration
+         *
+         * @return bool True if it is a static asset request, false otherwise.
+         */
+        public function isStaticResource(PathConfig $config): bool
+        {
+            $prefix = '/' . $this->route->module;
+            return $prefix === $config->privateBucket || $prefix === $config->publicBucket || $prefix === $config->protectedBucket;
+        }
+
+        /**
+         * Checks if the current request is for a public resource.
+         *
+         * @param PathConfig $config Path configuration
+         *
+         * @return bool True if public, false otherwise.
+         */
+        public function isPublicResource(PathConfig $config): bool
+        {
+            $prefix = '/' . $this->route->module;
+            return $prefix === $config->publicBucket;
         }
     }
 

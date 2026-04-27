@@ -233,13 +233,31 @@ namespace shani\contracts {
         }
 
         /**
+         * Get list of all public modules accessible to public
+         * @return array
+         */
+        public function publicResources(): array
+        {
+            return [];
+        }
+
+        /**
+         * Get list of all public modules accessible to guest user
+         * @return array
+         */
+        public function guestResources(): array
+        {
+            return [];
+        }
+
+        /**
          * Check if a resource is available to both authenticated and unauthenticated users.
          *
          * @return bool True if public, false otherwise
          */
-        public function accessingPublicResource(): bool
+        public final function accessingPublicResource(): bool
         {
-            return false;
+            return $this->app->request->isPublicResource($this->pathConfig()) || $this->resourceExists($this->publicResources());
         }
 
         /**
@@ -247,9 +265,14 @@ namespace shani\contracts {
          *
          * @return bool True if guest-only, false otherwise
          */
-        public function accessingGuestResource(): bool
+        public final function accessingGuestResource(): bool
         {
-            return false;
+            return $this->resourceExists($this->guestResources());
+        }
+
+        private function resourceExists(array $resources): bool
+        {
+            return !empty($resources) && in_array($this->app->request->route()->module, $resources);
         }
 
         /**

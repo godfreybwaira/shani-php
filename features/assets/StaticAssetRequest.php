@@ -42,9 +42,6 @@ namespace features\assets {
         /** @var StaticAssetAccessType The access type of the asset */
         public readonly StaticAssetAccessType $accessType;
 
-        /** @var StaticAssetRequest|null Singleton instance of the request */
-        private static ?StaticAssetRequest $instance = null;
-
         /**
          * Constructor.
          *
@@ -72,25 +69,11 @@ namespace features\assets {
         {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
-                $config->privateBucket => self::createInstance($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
-                $config->protectedBucket => self::createInstance($uriPath, $values[0], StaticAssetAccessType::PROTECTED_ACCESS),
-                $config->publicBucket => self::createInstance($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
+                $config->privateBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
+                $config->protectedBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PROTECTED_ACCESS),
+                $config->publicBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
-        }
-
-        /**
-         * Creates or reuses a singleton instance of StaticAssetRequest.
-         *
-         * @param string                $uriPath   The URI path of the asset.
-         * @param string                $bucket    The bucket identifier.
-         * @param StaticAssetAccessType $accessType The access type of the asset.
-         *
-         * @return StaticAssetRequest The singleton instance.
-         */
-        private static function createInstance(string $uriPath, string $bucket, StaticAssetAccessType $accessType): StaticAssetRequest
-        {
-            return self::$instance ??= new StaticAssetRequest($uriPath, $bucket, $accessType);
         }
 
         /**
@@ -139,36 +122,16 @@ namespace features\assets {
         }
 
         /**
-         * Checks if the current request is for a public resource.
-         *
-         * @return bool True if public, false otherwise.
-         */
-        public static function isPublicResource(): bool
-        {
-            return self::$instance === null || self::$instance->accessType === StaticAssetAccessType::PUBLIC_ACCESS;
-        }
-
-        /**
-         * Checks if there is an active static asset request.
-         *
-         * @return bool True if a static asset request exists, false otherwise.
-         */
-        public static function isStaticesource(): bool
-        {
-            return self::$instance !== null;
-        }
-
-        /**
          * Determines if the given user has access to the requested asset.
          *
          * @param UserDetailsDto $user The user details.
+         * @param string $filename The filename of the requested asset
          *
          * @return bool True if the user has access, false otherwise.
          */
-        public static function hasAccess(UserDetailsDto $user): bool
+        public static function hasAccess(UserDetailsDto $user, string $filename): bool
         {
-            $ownership = new StaticAssetOwnership(self::$instance->filename);
-            return $ownership->hasAccess($user);
+            return (new StaticAssetOwnership($filename))->hasAccess($user);
         }
 
         /**

@@ -64,7 +64,7 @@ namespace features\middleware {
          */
         public function authorized(): void
         {
-            if ($this->app->config->authenticationConfig()->skipAuthentication || $this->app->config->accessingPublicResource() || StaticAssetRequest::isPublicResource()) {
+            if ($this->app->config->authenticationConfig()->skipAuthentication || $this->app->config->accessingPublicResource()) {
                 return;
             }
             if ($this->app->config->accessingGuestResource()) {
@@ -77,16 +77,16 @@ namespace features\middleware {
             if (!$this->app->auth->attemptAuthentication()) {
                 throw CustomException::notAuthorized($this->app);
             }
-            if (StaticAssetRequest::isStaticResource()) {
-                $user = $this->getUserDetails();
-                if ($user !== null && StaticAssetRequest::hasAccess($user)) {
+            if ($this->app->auth->accessGranted()) {
+                return;
+            }
+            if ($this->app->request->isStaticResource($this->app->config->pathConfig())) {
+                $user = $this->app->auth->getUserDetails();
+                if (StaticAssetRequest::hasAccess($user, $this->app->request->uri->path())) {
                     return;
                 }
-                throw CustomException::forbidden($this->app);
             }
-            if (!$this->app->auth->accessGranted()) {
-                throw CustomException::forbidden($this->app);
-            }
+            throw CustomException::forbidden($this->app);
         }
     }
 
