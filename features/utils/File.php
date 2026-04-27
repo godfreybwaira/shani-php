@@ -31,6 +31,12 @@ namespace features\utils {
     {
 
         /**
+         * File modified time
+         * @var int
+         */
+        public readonly int $modifiedTime;
+
+        /**
          * File size in bytes.
          *
          * @var int
@@ -100,9 +106,11 @@ namespace features\utils {
                 ?int $error = null
         )
         {
+            $stat = stat($path);
             $this->path = $path;
             $this->name = $name ?? basename($path);
-            $this->size = $size ?? stat($path)['size'];
+            $this->size = $size ?? $stat['size'];
+            $this->modifiedTime = $stat['mtime'];
             $this->error = self::getFileErrors($error);
             $this->extension = self::getExtension($this->name);
             $this->type = $type ?? MediaType::fromExtension($this->extension);

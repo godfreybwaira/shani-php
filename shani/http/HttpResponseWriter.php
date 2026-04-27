@@ -10,7 +10,6 @@
 namespace shani\http {
 
     use features\utils\DataConvertor;
-    use features\utils\MediaType;
     use gui\WebUI;
     use gui\WebUIBuilder;
     use shani\contracts\ResponseWriterInterface;
@@ -78,41 +77,40 @@ namespace shani\http {
          */
         private function handleFileStreaming(FileOutputStream $output): void
         {
-            if ($output->name !== null) {
-                $this->app->response->saveAs($output->name);
+            if ($output->downloadable) {
+                $this->app->response->saveAs($output->file->name);
             }
-            $file = stat($output->path);
             $startPos = 0;
-            $endPos = $file['size'] - 1;
+            $endPos = $output->file->size - 1;
             $range = $this->app->request->header()->getOne(HttpHeader::RANGE) ?? '=0-';
-            if ($range === '=0-' && $file['size'] <= $output->chunkSize) {
+            if ($range === '=0-' && $output->file->size <= $output->chunkSize) {
                 $this->app->response->setStatus(HttpStatus::OK);
             } else {
                 $startPos = (int) substr($range, strpos($range, '=') + 1, strpos($range, '-'));
-                $endPos = min($startPos + $output->chunkSize, $file['size']) - 1;
+                $endPos = min($startPos + $output->chunkSize, $output->file->size) - 1;
                 $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT)->header()->addAll([
-                    HttpHeader::CONTENT_RANGE => "bytes $startPos-$endPos/" . $file['size'],
+                    HttpHeader::CONTENT_RANGE => "bytes $startPos-$endPos/" . $output->file->size,
                     HttpHeader::ACCEPT_RANGES => 'bytes',
                     'X-Accel-Buffering' => 'no', //disable buffering on nginx
                 ]);
-                $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $file['mtime']));
+                $this->app->response->header()->addOne(HttpHeader::LAST_MODIFIED, gmdate(DATE_RFC7231, $output->file->modifiedTime));
             }
-            $this->streamFile($output, $file['size'], $startPos, $endPos);
+            $this->streamFile($output, $output->file->size, $startPos, $endPos);
         }
 
-        private function streamFile(FileOutputStream $file, int $filesize, int $startPos, int $endPos): void
+        private function streamFile(FileOutputStream $output, int $filesize, int $startPos, int $endPos): void
         {
             $length = $endPos - $startPos + 1;
             if ($length > 0 && $length <= $filesize) {
                 $this->app->response->header()->addAll([
                     HttpHeader::CONTENT_LENGTH => $length,
-                    HttpHeader::CONTENT_TYPE => $file->type
+                    HttpHeader::CONTENT_TYPE => $output->file->type
                 ]);
                 if ($this->app->request->method === 'head') {
                     $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                     $this->writer->close($this->app->response);
                 } else {
-                    $this->writer->streamFile($this->app->response, $file->path, $startPos, $length);
+                    $this->writer->streamFile($this->app->response, $output->file->path, $startPos, $length);
                 }
             } else {
                 $this->app->response->setStatus(HttpStatus::BAD_REQUEST);

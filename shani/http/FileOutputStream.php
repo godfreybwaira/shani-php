@@ -28,41 +28,30 @@ namespace shani\http {
         public readonly int $chunkSize;
 
         /**
-         * Name of the file to be downloaded.
-         * If not null, a download will be initiated on the client application.
+         * Whether to download a file to stream it.
          *
          * @var string|null
          */
-        public readonly ?string $name;
+        public readonly bool $downloadable;
 
         /**
-         * File MIME type.
-         *
-         * @var string
+         * File object to send as output
+         * @var File
          */
-        public readonly string $type;
-
-        /**
-         * Absolute path to an existing file.
-         *
-         * @var string
-         */
-        public readonly string $path;
+        public readonly File $file;
 
         /**
          * Constructs a new FileOutputStream instance.
          *
-         * @param File          $file  Absolute path to an existing file.
-         * @param string|null   $name  Optional name of the file. If provided,
-         *                             the client will initiate a download.
-         * @param int|null      $chunkSize  Size in bytes to send/stream the file.
-         *                               Defaults to Framework::BUFFER_SIZE.
+         * @param File      $file           Absolute path to an existing file.
+         * @param bool      $downloadable   Whether to download a file to stream it.
+         * @param int|null  $chunkSize      Size in bytes to send/stream the file.
+         *                                  Defaults to Framework::BUFFER_SIZE.
          */
-        public function __construct(File $file, string $name = null, int $chunkSize = null)
+        public function __construct(File $file, bool $downloadable = false, int $chunkSize = null)
         {
-            $this->name = $name;
-            $this->path = $file->path;
-            $this->type = $file->type;
+            $this->file = $file;
+            $this->downloadable = $downloadable;
             $this->chunkSize = $chunkSize ?? Framework::BUFFER_SIZE;
         }
     }

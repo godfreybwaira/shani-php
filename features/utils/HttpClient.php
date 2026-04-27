@@ -321,7 +321,7 @@ namespace features\utils {
             if (!empty($this->files)) {
                 $files = [];
                 foreach ($this->files as $name => $file) {
-                    $files[$name] = new \CURLFile($file->path, $file->type, basename($file->path));
+                    $files[$name] = new \CURLFile($file->path, $file->type, $file->name);
                 }
                 if (is_array($this->body)) {
                     return http_build_query(array_merge($this->body, $files));
