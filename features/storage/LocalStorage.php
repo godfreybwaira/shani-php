@@ -32,7 +32,7 @@ namespace features\storage {
     {
 
         /** @var int Default file mode for created directories */
-        public const FILE_MODE = 0700;
+        public const FILE_MODE = 0650;
 
         /** @var App Application context */
         private readonly App $app;
