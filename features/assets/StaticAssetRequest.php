@@ -7,7 +7,7 @@
  * Created on: Apr 26, 2026 at 5:06:34 PM
  */
 
-namespace shani\assets {
+namespace features\assets {
 
     use features\authentication\UserDetailsDto;
     use features\utils\MediaType;

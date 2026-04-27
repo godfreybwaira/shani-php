@@ -19,8 +19,8 @@ namespace shani\launcher {
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
     use features\storage\StorageMediaInterface;
-    use shani\assets\StaticAssetRequest;
-    use shani\assets\StaticAssetServers;
+    use features\assets\StaticAssetRequest;
+    use features\assets\StaticAssetServers;
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;

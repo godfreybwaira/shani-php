@@ -10,7 +10,7 @@
 namespace features\middleware {
 
     use features\exceptions\CustomException;
-    use shani\assets\StaticAssetRequest;
+    use features\assets\StaticAssetRequest;
     use shani\http\HttpHeader;
     use shani\http\RequestRoute;
     use shani\launcher\App;

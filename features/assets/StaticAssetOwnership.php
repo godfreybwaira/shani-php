@@ -7,7 +7,7 @@
  * Created on: Apr 26, 2026 at 8:03:15 PM
  */
 
-namespace shani\assets {
+namespace features\assets {
 
     use features\authentication\UserDetailsDto;
     use features\exceptions\ServerException;
@@ -17,12 +17,11 @@ namespace shani\assets {
 
         private const ID_SEPARATOR = '_', GID_PREFIX = 'g', UID_PREFIX = 'u';
 
-        //u122_g233_filename.png
-        public readonly string $filename; //filename.png
-        public readonly ?string $userBucket; //122
-        public readonly ?string $groupBucket; //233
+        public readonly string $filename; //fff5e770fd6ad63d9a.png
+        public readonly ?string $userBucket; //16e9a5ecb65264ebbfd
+        public readonly ?string $groupBucket; //79a7ac18440680f461b
 
-        public function __construct(string $filename)
+        public function __construct(string $filename /* u16e9a5ecb65264ebbfd_g79a7ac18440680f461b_fff5e770fd6ad63d9a.png */)
         {
             $values = explode(self::ID_SEPARATOR, basename($filename));
             $this->filename = $values[count($values) - 1];
@@ -65,7 +64,7 @@ namespace shani\assets {
             return $prefix . $groupBucket . self::ID_SEPARATOR;
         }
 
-        public static function createBucketName(int $min = 10, int $max = 15): string
+        public static function createBucketName(int $min = 10, int $max = 20): string
         {
             return substr(bin2hex(random_bytes(random_int(10, 70))), 0, rand($min, $max));
         }

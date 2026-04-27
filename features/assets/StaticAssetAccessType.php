@@ -7,7 +7,7 @@
  * Created on: Apr 26, 2026 at 6:17:13 PM
  */
 
-namespace shani\assets {
+namespace features\assets {
 
     enum StaticAssetAccessType
     {

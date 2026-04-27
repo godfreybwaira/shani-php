@@ -18,7 +18,7 @@ namespace shani\contracts {
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
     use features\test\TestResult;
-    use shani\assets\StaticAssetServers;
+    use features\assets\StaticAssetServers;
     use shani\http\RequestRoute;
     use shani\launcher\App;
     use shani\config\AppConfig;

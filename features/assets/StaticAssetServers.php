@@ -7,7 +7,7 @@
  * Created on: Apr 19, 2026 at 10:07:04 PM
  */
 
-namespace shani\assets {
+namespace features\assets {
 
     /**
      * Enum representing supported static asset servers for the application.

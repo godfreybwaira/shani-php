@@ -15,7 +15,7 @@ namespace features\storage {
     use features\utils\Concurrency;
     use features\utils\File;
     use features\utils\URI;
-    use shani\assets\StaticAssetOwnership;
+    use features\assets\StaticAssetOwnership;
     use shani\config\PathConfig;
     use shani\launcher\App;
     use shani\launcher\Framework;
