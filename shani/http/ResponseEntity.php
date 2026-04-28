@@ -123,16 +123,34 @@ namespace shani\http {
         }
 
         /**
-         * Set response status code
-         * @param HttpStatus $status Response status object
-         * @param string|null $message Optional message that will override the default status message.
-         * @return self
+         * Set the HTTP status and optional message.
+         *
+         * @param HttpStatus $status The HTTP status to set.
+         * @param string|null $message Optional status message.
+         * @return $this
          */
         public function setStatus(HttpStatus $status, ?string $message = null): self
         {
             $this->status = $status;
             $this->statusMessage = $message;
             return $this;
+        }
+
+        /**
+         * Set the HTTP status if the provided callback returns true.
+         *
+         * The callback is invoked with the current status as its only argument and
+         * should return a boolean indicating whether the status should be changed.
+         *
+         * The signature of the callback is <code>callback(HttpStatus $status):bool</code>
+         *
+         * @param HttpStatus $status The HTTP status to set when the callback returns true.
+         * @param \Closure $callback Callback invoked with the current status; must return bool.
+         * @return $this
+         */
+        public function setStatusIf(HttpStatus $status, \Closure $callback): self
+        {
+            return $callback($this->status) ? $this->setStatus($status) : $this;
         }
 
         /**

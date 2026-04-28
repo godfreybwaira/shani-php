@@ -316,7 +316,7 @@ namespace shani\launcher {
                     return $this->handleRequest();
                 }
             } else {
-                $this->response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
+                $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
             }
             return null;
         }
