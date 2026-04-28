@@ -30,7 +30,7 @@ namespace apps\demo\config\auth {
                 return null;
             }
             if (hash_equals('38a79817-6f70-400b-90d4-8d1912dd8b89', $credentials[1]) && hash_equals('client101', $credentials[0])) {
-                return new UserDetailsDto('id' . rand(10, 1000), '430704a766', false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
+                return new UserDetailsDto('id' . rand(10, 1000), '430704a766,6547316d90', false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
             }
             return null;
         }

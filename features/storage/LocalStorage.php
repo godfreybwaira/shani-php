@@ -46,9 +46,6 @@ namespace features\storage {
         /** @var PathConfig Configuration object containing bucket paths */
         private readonly PathConfig $pathConfig;
 
-        /** @var UserDetailsDto|null Authenticated user details */
-        private readonly ?UserDetailsDto $user;
-
         /**
          * Constructor initializes storage paths and user context.
          *
@@ -59,7 +56,6 @@ namespace features\storage {
             $this->app = $app;
             $this->host = $app->request->uri->host();
             $this->pathConfig = $app->config->pathConfig();
-            $this->user = $app->auth->getUserDetails();
             $this->storage = self::createShortcut($this->pathConfig->storage);
         }
 
@@ -99,7 +95,8 @@ namespace features\storage {
         #[\Override]
         public function save(File $file, string $bucket = null, bool $rename = true): string
         {
-            $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user?->storageBucket);
+            $userBucket = $this->app->auth->getUserDetails()->storageBucket;
+            $prefix = StaticAssetOwnership::createPrivateFilePrefix($userBucket);
             $destination = $this->pathTo($this->pathConfig->privateBucket . '/' . trim($bucket, '/'));
             return $this->saveFile($file, rtrim($destination, '/'), $prefix, $rename, function ($filepath)use (&$file) {
                         if (move_uploaded_file($file->path, $filepath)) {
@@ -205,7 +202,8 @@ namespace features\storage {
         public function delete(File $file): bool
         {
             $owner = new StaticAssetOwnership($file->name);
-            if ($this->user !== null && $owner->isOwner($this->user)) {
+            $user = $this->app->auth->getUserDetails();
+            if ($user !== null && $owner->isOwner($user)) {
                 return unlink($file->path);
             }
             return false;
@@ -214,7 +212,8 @@ namespace features\storage {
         #[\Override]
         public function share2protected(File $file): ?string
         {
-            $prefix = StaticAssetOwnership::createProtectedFilePrefix($this->user?->storageBucket);
+            $userBucket = $this->app->auth->getUserDetails()->storageBucket;
+            $prefix = StaticAssetOwnership::createProtectedFilePrefix($userBucket);
             $destination = $this->pathTo($this->pathConfig->privateBucket);
             return $this->shareFile($file, $destination, $prefix);
         }
@@ -222,7 +221,8 @@ namespace features\storage {
         #[\Override]
         public function share2group(File $file): ?string
         {
-            $prefix = StaticAssetOwnership::createGroupFilePrefix($this->user?->storageBucket, $this->user?->groupStorageBucket);
+            $user = $this->app->auth->getUserDetails();
+            $prefix = StaticAssetOwnership::createGroupFilePrefix($user->storageBucket, $user->groupStorageBucket);
             $destination = $this->pathTo($this->pathConfig->privateBucket);
             return $this->shareFile($file, $destination, $prefix);
         }
@@ -238,7 +238,8 @@ namespace features\storage {
         #[\Override]
         public function share2public(File $file): ?string
         {
-            $prefix = StaticAssetOwnership::createPrivateFilePrefix($this->user->storageBucket);
+            $userBucket = $this->app->auth->getUserDetails()->storageBucket;
+            $prefix = StaticAssetOwnership::createPrivateFilePrefix($userBucket);
             $destination = $this->pathTo($this->pathConfig->protectedBucket);
             return $this->shareFile($file, $destination, $prefix);
         }

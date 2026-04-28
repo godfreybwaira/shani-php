@@ -180,8 +180,8 @@ namespace features\authentication {
             if (!empty($permissions)) {
                 $reqMethod = $method ?? $this->app->request->method;
                 $reqRoute = $route ?? $this->app->request->route();
-                $target = Endpoints::digest($reqMethod, $reqRoute)['hash'];
-                return str_contains($permissions, $target); //preg_match('\b' . $target . '\b', $permissions) === 1;
+                $digestion = Endpoints::digest($reqMethod, $reqRoute);
+                return str_contains($permissions, $digestion['hash']); //preg_match('\b' . $target . '\b', $permissions) === 1;
             }
             return false;
         }
