@@ -309,15 +309,12 @@ namespace shani\launcher {
 
         private function handleException(\Throwable $ex): ?HttpResponse
         {
-            if (isset($this->config)) {
-                $fallbackRoute = $this->config->errorHandler($ex);
-                if ($fallbackRoute !== null) {
-                    $this->request->changeRoute($fallbackRoute);
-                    return $this->handleRequest();
-                }
-            } else {
-                $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
+            $fallbackRoute = $this->config->errorHandler($ex);
+            if ($fallbackRoute !== null) {
+                $this->request->changeRoute($fallbackRoute);
+                return $this->handleRequest();
             }
+            $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
             return null;
         }
     }
