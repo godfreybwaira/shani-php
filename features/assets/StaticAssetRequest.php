@@ -70,7 +70,8 @@ namespace features\assets {
         {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
-                $config->privateBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
+                $config->privateBucket,
+                $config->protectedBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
                 $config->publicBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
@@ -86,7 +87,7 @@ namespace features\assets {
         public function handleRequest(App $app): ?HttpResponse
         {
             $filepath = match ($this->accessType) {
-                StaticAssetAccessType::PUBLIC_ACCESS => Framework::DIR_ASSETS . substr($this->uriPath, strlen($this->bucket) + 1),
+                StaticAssetAccessType::PUBLIC_ACCESS => self::assetPath(substr($this->uriPath, strlen($this->bucket) + 1)),
                 default => $app->storage->pathTo($this->uriPath)
             };
             return $this->sendFile($app, new File($filepath));

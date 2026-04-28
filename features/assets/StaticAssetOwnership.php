@@ -149,13 +149,13 @@ namespace features\assets {
          * Generates a random bucket name.
          *
          * @param int $min Minimum length of the bucket name (default: 10).
-         * @param int $max Maximum length of the bucket name (default: 20).
+         * @param int $max Maximum length of the bucket name (default: 15).
          *
          * @return string A random bucket name consisting of hex characters.
          *
          * @throws Exception If random_bytes or random_int fails.
          */
-        public static function createBucketName(int $min = 10, int $max = 20): string
+        public static function createBucketName(int $min = 10, int $max = 15): string
         {
             return substr(bin2hex(random_bytes(random_int(10, 70))), 0, rand($min, $max));
         }

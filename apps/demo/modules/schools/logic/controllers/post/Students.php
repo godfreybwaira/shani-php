@@ -12,6 +12,7 @@ namespace apps\demo\modules\schools\logic\controllers\post {
     use apps\demo\modules\schools\data\dto\StudentDto;
     use apps\demo\modules\schools\logic\services\StudentService;
     use features\exceptions\CustomException;
+    use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
@@ -41,8 +42,10 @@ namespace apps\demo\modules\schools\logic\controllers\post {
         public function upload(): ?HttpResponse
         {
             $file = $this->app->request->file('f1');
-            $path = $this->app->storage->save($file, 'user');
-            return HttpResponse::withBody($this->app->storage->uri($path));
+            $path = $this->app->storage->save($file);
+            $copy = new File($this->app->storage->pathTo($path));
+            $shortcut = $this->app->storage->share2public($copy);
+            return HttpResponse::withBody($this->app->storage->uri($shortcut));
         }
     }
 

@@ -60,48 +60,45 @@ namespace features\storage {
         public function delete(File $file): bool;
 
         /**
-         * Copy a file to a public directory. If already public, nothing happens.
-         * Public resources can be accessed by anyone.
+         * Create a shortcut of a file to a public directory. If already public,
+         * nothing happens. Public resources can be accessed by anyone.
          *
          * @param File  $file Source file to copy.
-         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2public(File $file, bool $rename = true): ?string;
+        public function share2public(File $file): ?string;
 
         /**
-         * Copy a file to a protected directory. If already protected, nothing happens.
-         * Protected resources can only be accessed by authenticated users.
+         * Create a shortcut of a file to a protected directory. If already protected,
+         * nothing happens. Protected resources can only be accessed by authenticated users.
          *
          * @param File  $file Source file to copy.
-         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2protected(File $file, bool $rename = true): ?string;
+        public function share2protected(File $file): ?string;
 
         /**
-         * Copy a file to a group-shared directory. If already private, nothing happens.
-         * Group resources can only be accessed by authenticated users or their groups.
+         * Create a shortcut of a file to a group-shared directory. If already private,
+         * nothing happens. Group resources can only be accessed by authenticated users
+         * or their groups.
          *
          * @param File  $file Source file to copy.
-         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2group(File $file, bool $rename = true): ?string;
+        public function share2group(File $file): ?string;
 
         /**
-         * Copy a file to another group's shared directory.
+         * Create a shortcut of a file to another group's shared directory.
          *
          * @param File  $file Source file to copy.
          * @param string $otherBucket  User bucket name to save in.
-         * @param bool  $rename Whether to rename the file or not (recommended).
          *
          * @return string|null Path to new location, or null otherwise.
          */
-        public function share2other(File $file, string $otherBucket, bool $rename = true): ?string;
+        public function share2other(File $file, string $otherBucket): ?string;
 
         /**
          * Get a full path to a storage destination.
