@@ -9,6 +9,7 @@
 
 namespace apps\demo\config {
 
+    use features\assets\StaticAssetServers;
     use features\oauth2\Oauth2Repository;
     use features\persistence\DatabaseDriver;
     use features\persistence\DatabaseInterface;
@@ -20,15 +21,15 @@ namespace apps\demo\config {
     use features\test\TestResult;
     use features\utils\HttpClient;
     use features\utils\URI;
+    use shani\config\AuthenticationConfig;
+    use shani\config\CsrfConfig;
+    use shani\config\PathConfig;
+    use shani\config\SessionConfig;
     use shani\contracts\BasicConfiguration;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
     use shani\launcher\Framework;
-    use shani\config\AuthenticationConfig;
-    use shani\config\CsrfConfig;
-    use shani\config\PathConfig;
-    use shani\config\SessionConfig;
 
     final class Settings extends BasicConfiguration
     {
@@ -114,6 +115,11 @@ namespace apps\demo\config {
         public function getOauth2Repository(): Oauth2Repository
         {
             return new Oauth2Client();
+        }
+
+        public function getStaticAssetServer(): StaticAssetServers
+        {
+            return StaticAssetServers::SHANI;
         }
 
         public function authenticationConfig(): AuthenticationConfig

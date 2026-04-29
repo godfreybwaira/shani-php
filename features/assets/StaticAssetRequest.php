@@ -139,8 +139,9 @@ namespace features\assets {
          */
         private static function delegateToNginx(App $app, string $filepath): ?HttpResponse
         {
+            $path = '/' . $app->request->route()->module . substr($app->storage->pathTo($filepath), strlen(SHANI_SERVER_ROOT));
             $app->response->header()->addAll([
-                'X-Accel-Redirect' => $filepath,
+                'X-Accel-Redirect' => $path,
                 HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
             ]);
             return null;
