@@ -26,11 +26,10 @@ namespace features\storage {
          *
          * @param File   $file   A file object to save.
          * @param string $bucket A destination directory name.
-         * @param bool   $rename Whether to rename the file or not (recommended).
          *
          * @return string Path to the saved file.
          */
-        public function save(File $file, string $bucket = null, bool $rename = true): string;
+        public function save(File $file, string $bucket = null): string;
 
         /**
          * Get asset file URI.
@@ -60,45 +59,25 @@ namespace features\storage {
         public function delete(File $file): bool;
 
         /**
-         * Create a shortcut of a file to a public directory. If already public,
-         * nothing happens. Public resources can be accessed by anyone.
+         * Create a shortcut of a file to a specified group. If group bucket is
+         * null then the file become publicly accessible.
          *
-         * @param File  $file Source file to copy.
+         * @param File      $file           Source file to copy.
+         * @param string    $groupBucket    Group bucket to save in.
          *
-         * @return string|null Path to new location, or null otherwise.
+         * @return string   Path to new location.
          */
-        public function share2public(File $file): ?string;
+        public function share2group(File $file, string $groupBucket = null): string;
 
         /**
-         * Create a shortcut of a file to a protected directory. If already protected,
-         * nothing happens. Protected resources can only be accessed by authenticated users.
+         * Create a shortcut of a file to another user.
          *
-         * @param File  $file Source file to copy.
+         * @param File      $file           Source file to copy.
+         * @param string    $userBucket     Other user bucket name to save in.
          *
-         * @return string|null Path to new location, or null otherwise.
+         * @return string   Path to new location.
          */
-        public function share2protected(File $file): ?string;
-
-        /**
-         * Create a shortcut of a file to a group-shared directory. If already private,
-         * nothing happens. Group resources can only be accessed by authenticated users
-         * or their groups.
-         *
-         * @param File  $file Source file to copy.
-         *
-         * @return string|null Path to new location, or null otherwise.
-         */
-        public function share2group(File $file): ?string;
-
-        /**
-         * Create a shortcut of a file to another group's shared directory.
-         *
-         * @param File  $file Source file to copy.
-         * @param string $otherBucket  User bucket name to save in.
-         *
-         * @return string|null Path to new location, or null otherwise.
-         */
-        public function share2other(File $file, string $otherBucket): ?string;
+        public function share2other(File $file, string $userBucket): string;
 
         /**
          * Get a full path to a storage destination.

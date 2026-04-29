@@ -83,28 +83,21 @@ namespace shani\config {
         public readonly string $storage;
 
         /**
-         * Private storage directory for static contents.
-         * Accessible only by authenticated users.
+         * Private storage directory for static contents. Private assets
+         * can be accessed by asset owner, group or anyone if it is the group
+         * asset and no group is provided.
          *
          * @var string
          */
         public readonly string $privateBucket;
 
         /**
-         * Public storage directory for static contents.
-         * Accessible by everyone.
+         * Public storage directory for static contents. Public assets is
+         * accessible by everyone.
          *
          * @var string
          */
         public readonly string $publicBucket;
-
-        /**
-         * Protected storage directory for static contents.
-         * Accessible by everyone.
-         *
-         * @var string
-         */
-        public readonly string $protectedBucket;
 
         /**
          * Constructor for PathConfig.
@@ -132,11 +125,8 @@ namespace shani\config {
          * @param string $privateBucket
          *     Private storage directory. Defaults to '/0pv'.
          *
-         * @param string $protectedBucket
-         *     Private storage directory. Defaults to '/1pr'.
-         *
          * @param string $publicBucket
-         *     Public storage directory. Defaults to '/2pb'.
+         *     Public storage directory. Defaults to '/1pb'.
          */
         public function __construct(
                 string $root,
@@ -146,8 +136,7 @@ namespace shani\config {
                 string $views = '/presentation/views',
                 string $languages = '/presentation/lang',
                 string $privateBucket = '/0pv',
-                string $protectedBucket = '/1pr',
-                string $publicBucket = '/2pb'
+                string $publicBucket = '/1pb'
         )
         {
             $this->root = $root;
@@ -159,7 +148,6 @@ namespace shani\config {
             $this->storage = $root . '/.bucket';
             $this->privateBucket = $privateBucket;
             $this->publicBucket = $publicBucket;
-            $this->protectedBucket = $protectedBucket;
         }
     }
 

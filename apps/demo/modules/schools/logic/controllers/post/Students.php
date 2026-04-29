@@ -44,8 +44,15 @@ namespace apps\demo\modules\schools\logic\controllers\post {
             $file = $this->app->request->file('f1');
             $path = $this->app->storage->save($file);
             $copy = new File($this->app->storage->pathTo($path));
-            $shortcut = $this->app->storage->share2public($copy);
-            return HttpResponse::withBody($this->app->storage->uri($shortcut));
+            $s0 = $this->app->storage->share2group($copy);
+            $s1 = $this->app->storage->share2group($copy, 'grp001');
+            $s2 = $this->app->storage->share2other($copy, 'user02222');
+            return HttpResponse::withBody(new \features\ds\map\ReadableMap([
+                                'pa' => $this->app->storage->uri($path)->asString(),
+                                's0' => $this->app->storage->uri($s0)->asString(),
+                                's1' => $this->app->storage->uri($s1)->asString(),
+                                's2' => $this->app->storage->uri($s2)->asString(),
+            ]));
         }
     }
 

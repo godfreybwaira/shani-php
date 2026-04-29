@@ -8,7 +8,7 @@
 
 namespace features\exceptions {
 
-    final class ClientException extends \Exception
+    final class ClientException extends \RuntimeException
     {
 
     }

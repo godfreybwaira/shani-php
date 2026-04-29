@@ -9,9 +9,8 @@
 
 namespace features\exceptions {
 
-    use shani\launcher\App;
     use shani\http\enums\HttpStatus;
-    use shani\http\HttpHeader;
+    use shani\launcher\App;
 
     final class CustomException
     {

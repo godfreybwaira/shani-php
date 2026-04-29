@@ -9,8 +9,8 @@
 
 namespace features\middleware {
 
+    use features\assets\StaticAssetOwnership;
     use features\exceptions\CustomException;
-    use features\assets\StaticAssetRequest;
     use shani\http\HttpHeader;
     use shani\http\RequestRoute;
     use shani\launcher\App;
@@ -82,7 +82,7 @@ namespace features\middleware {
             }
             if ($this->app->request->isStaticResource($this->app->config->pathConfig())) {
                 $user = $this->app->auth->getUserDetails();
-                if (StaticAssetRequest::hasAccess($user, $this->app->request->uri->path())) {
+                if (StaticAssetOwnership::hasAccess($user, $this->app->request->uri->path())) {
                     return;
                 }
             }

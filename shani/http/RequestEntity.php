@@ -289,19 +289,6 @@ namespace shani\http {
             $prefix = '/' . $this->route->module;
             return $prefix === $config->privateBucket || $prefix === $config->publicBucket;
         }
-
-        /**
-         * Checks if the current request is for a public resource.
-         *
-         * @param PathConfig $config Path configuration
-         *
-         * @return bool True if public, false otherwise.
-         */
-        public function isPublicResource(PathConfig $config): bool
-        {
-            $prefix = '/' . $this->route->module;
-            return $prefix === $config->publicBucket;
-        }
     }
 
 }

@@ -10,7 +10,8 @@
 
 namespace shani\contracts {
 
-    use features\crypto\Encryption;
+    use features\assets\StaticAssetOwnership;
+    use features\assets\StaticAssetServers;
     use features\logging\LoggingLevel;
     use features\middleware\MiddlewareHandlerInterface;
     use features\oauth2\Oauth2Repository;
@@ -18,9 +19,6 @@ namespace shani\contracts {
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
     use features\test\TestResult;
-    use features\assets\StaticAssetServers;
-    use shani\http\RequestRoute;
-    use shani\launcher\App;
     use shani\config\AppConfig;
     use shani\config\AuthenticationConfig;
     use shani\config\CsrfConfig;
@@ -28,6 +26,8 @@ namespace shani\contracts {
     use shani\config\RequestConfig;
     use shani\config\SessionConfig;
     use shani\config\WebPolicyConfig;
+    use shani\http\RequestRoute;
+    use shani\launcher\App;
 
     /**
      * Abstract base class for defining application configurations.
@@ -257,7 +257,15 @@ namespace shani\contracts {
          */
         public final function accessingPublicResource(): bool
         {
-            return $this->app->request->isPublicResource($this->pathConfig()) || $this->resourceExists($this->publicResources());
+            if ($this->resourceExists($this->publicResources())) {
+                return true;
+            }
+            $config = $this->pathConfig();
+            $route = $this->app->request->route();
+            if ($config->publicBucket === '/' . $route->module) {
+                return true;
+            }
+            return StaticAssetOwnership::isPublicResource($this->app->request->uri->path(), $route, $config);
         }
 
         /**

@@ -9,7 +9,6 @@
 
 namespace features\assets {
 
-    use features\authentication\UserDetailsDto;
     use features\utils\File;
     use features\utils\MediaType;
     use shani\config\PathConfig;
@@ -32,16 +31,16 @@ namespace features\assets {
     {
 
         /** @var string The URI path of the requested asset */
-        public readonly string $uriPath;
+        private readonly string $uriPath;
 
         /** @var string The bucket identifier (private, protected, or public) */
-        public readonly string $bucket;
+        private readonly string $bucket;
 
         /** @var string The filename of the requested asset */
-        public readonly string $filename;
+        private readonly string $filename;
 
         /** @var StaticAssetAccessType The access type of the asset */
-        public readonly StaticAssetAccessType $accessType;
+        private readonly StaticAssetAccessType $accessType;
 
         /**
          * Constructor.
@@ -70,8 +69,7 @@ namespace features\assets {
         {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
-                $config->privateBucket,
-                $config->protectedBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
+                $config->privateBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
                 $config->publicBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
@@ -105,34 +103,18 @@ namespace features\assets {
         {
             $assetServer = $app->config->getStaticAssetServer();
             $etag = md5($this->filename);
-
             if ($app->request->header()->getOne(HttpHeader::IF_NONE_MATCH) === $etag) {
                 $app->response->setStatus(HttpStatus::NOT_MODIFIED);
                 return null;
             }
-
             $cache = (new HttpCache())->setEtag($etag);
             $app->response->setStatus(HttpStatus::OK)->setCache($cache);
-
             return match ($assetServer) {
                 StaticAssetServers::APACHE => self::delegateToApache($app, $file),
                 StaticAssetServers::NGINX => self::delegateToNginx($app, $this->uriPath),
                 StaticAssetServers::SHANI => self::delegateToShani($file),
                 default => null
             };
-        }
-
-        /**
-         * Determines if the given user has access to the requested asset.
-         *
-         * @param UserDetailsDto $user The user details.
-         * @param string $filename The filename of the requested asset
-         *
-         * @return bool True if the user has access, false otherwise.
-         */
-        public static function hasAccess(UserDetailsDto $user, string $filename): bool
-        {
-            return (new StaticAssetOwnership($filename))->hasAccess($user);
         }
 
         /**
