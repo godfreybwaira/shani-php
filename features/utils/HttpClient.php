@@ -11,19 +11,18 @@ namespace features\utils {
 
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
+    use features\ds\map\ReadableMap;
     use features\utils\Concurrency;
     use features\utils\DataCompression;
     use features\utils\File;
-    use features\utils\MediaType;
     use features\utils\RequestEntityBuilder;
     use features\utils\URI;
-    use features\ds\map\ReadableMap;
-    use shani\launcher\Framework;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpCookie;
     use shani\http\HttpHeader;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
+    use shani\launcher\Framework;
 
     final class HttpClient
     {

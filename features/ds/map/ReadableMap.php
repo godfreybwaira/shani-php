@@ -9,8 +9,9 @@
 
 namespace features\ds\map {
 
-    use features\utils\DataConvertor;
     use features\ds\ReadableData;
+    use features\utils\DataConvertor;
+    use features\validation\exceptions\ValidationException;
 
     class ReadableMap extends ReadableData
     {
@@ -212,6 +213,65 @@ namespace features\ds\map {
         {
             foreach ($this->data as $key => $value) {
                 $callback($key, $value);
+            }
+            return $this;
+        }
+
+        /**
+         * Validates a value retrieved by key using a custom validator.
+         *
+         * Retrieves the value associated with the given key and passes it to the
+         * provided validator closure. If the validator returns false, a
+         * ValidationException is thrown with the given error message.
+         *
+         * @param string|int $key The key used to retrieve the value for validation.
+         * 
+         * @param string     $errorMessage The error message used in the exception
+         * if validation fails.
+         *
+         * @param \Closure   $validator A callback function that accepts the value
+         * and returns true if valid, false otherwise. The signature of $validator
+         * callback is <code>$validator(mixed $value):bool</code>
+         *
+         *
+         * @throws ValidationException If the validator returns false.
+         *
+         * @return self Returns the current instance for method chaining.
+         */
+        public function validate(string|int $key, string $errorMessage, \Closure $validator): self
+        {
+            $value = $this->getOne($key);
+            if (!$validator($value)) {
+                throw new ValidationException($errorMessage);
+            }
+            return $this;
+        }
+
+        /**
+         * Validates multiple values retrieved by their keys using a custom validator.
+         *
+         * Iterates over the provided list of keys, retrieves each value, and passes
+         * it to the given validator closure. If any value fails validation, a
+         * ValidationException is thrown with the specified error message.
+         *
+         * @param array     $keys         List of keys whose values should be validated.
+         *
+         * @param string     $errorMessage The error message used in the exception
+         * if validation fails.
+         *
+         * @param \Closure   $validator A callback function that accepts the value
+         * and returns true if valid, false otherwise. The signature of $validator
+         * callback is <code>$validator(mixed $value):bool</code>
+         *
+         *
+         * @throws ValidationException If any of the values fail validation.
+         *
+         * @return self Returns the current instance for method chaining.
+         */
+        public function validateAll(array $keys, string $errorMessage, \Closure $validator): self
+        {
+            foreach ($keys as $key) {
+                $this->validate($key, $errorMessage, $validator);
             }
             return $this;
         }

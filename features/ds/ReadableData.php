@@ -97,7 +97,7 @@ namespace features\ds {
         public abstract function toDataGrid(): string;
 
         /**
-         * Reduce an array to a scalar value, for example when finding sum or
+         * Reduce an array to a single scalar value, for example when finding sum or
          * average of an array column
          * @param \Closure $callback a callback function i.e <code>$callback(string|int $key,mixed $val,mixed $accumulator):mixed</code>
          * for a map, and <code>$callback(mixed $val,mixed $accumulator):mixed</code> for set.

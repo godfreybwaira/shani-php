@@ -9,9 +9,9 @@
 
 namespace features\ds\map {
 
-    use features\ds\MutableData;
+    use features\ds\MutableDataInterface;
 
-    class MutableMap extends ReadableMap implements MutableData
+    class MutableMap extends ReadableMap implements MutableDataInterface
     {
 
         /**

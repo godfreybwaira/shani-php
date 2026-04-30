@@ -10,9 +10,9 @@
 namespace features\ds\set {
 
     use features\ds\map\ReadableMap;
-    use features\ds\MutableData;
+    use features\ds\MutableDataInterface;
 
-    class MutableSet extends ReadableSet implements MutableData
+    class MutableSet extends ReadableSet implements MutableDataInterface
     {
 
         /**
