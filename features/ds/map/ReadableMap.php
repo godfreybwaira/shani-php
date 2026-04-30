@@ -10,8 +10,8 @@
 namespace features\ds\map {
 
     use features\ds\ReadableData;
+    use features\exceptions\ValidationException;
     use features\utils\DataConvertor;
-    use features\validation\exceptions\ValidationException;
 
     class ReadableMap extends ReadableData
     {
@@ -225,7 +225,7 @@ namespace features\ds\map {
          * ValidationException is thrown with the given error message.
          *
          * @param string|int $key The key used to retrieve the value for validation.
-         * 
+         *
          * @param string     $errorMessage The error message used in the exception
          * if validation fails.
          *
