@@ -267,11 +267,11 @@ namespace shani\launcher {
                 if ($this->config->getStaticAssetServer() === StaticAssetServers::DISABLE) {
                     throw CustomException::notFound();
                 }
-                $properties = StaticAssetRequest::fromPath($this->path, $this->request->uri->path());
-                if ($properties === null) {
+                $staticRequest = StaticAssetRequest::fromPath($this->path, $this->request->uri->path());
+                if ($staticRequest === null) {
                     throw CustomException::notFound();
                 }
-                return $properties->handleRequest($this);
+                return $staticRequest->handleRequest($this);
             }
             $className = str_replace('/', '\\', $classPath);
             $callback = self::kebab2camelCase($this->request->route()->action);
