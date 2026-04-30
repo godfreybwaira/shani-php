@@ -223,7 +223,7 @@ namespace shani\launcher {
          * Get dictionary of words/sentences from current application dictionary file.
          * Current dictionary directory name must match with current executing function name
          * and the dictionary file name must be language code supported by your application.
-         * @param array $data Optional data to that will be available in the dictionary
+         * @param array $data Optional data, will be available in the dictionary
          * file using $data object
          * @param string $name Dictionary directory name
          * @return ReadableMap An object of words in the dictionary file.
