@@ -9,6 +9,8 @@
 
 namespace features\crypto {
 
+    use features\crypto\exceptions\SignatureException;
+
     final class AsymmetricSignature implements DigitalSignature
     {
 
@@ -36,13 +38,13 @@ namespace features\crypto {
                 openssl_free_key($privateKey);
                 return base64_encode($signature);
             }
-            throw new \Exception('Failed to sign a payload.');
+            throw new SignatureException('Failed to sign a payload.');
         }
 
         public function verify(string $payload, ?string $signature): bool
         {
             if (empty($signature)) {
-                throw new \Exception('Signature is missing or empty.');
+                throw new SignatureException('Signature is missing or empty.');
             }
             $publicKey = openssl_pkey_get_public($this->keys->publicKey);
             $verified = openssl_verify($payload, base64_decode($signature), $publicKey, $this->algorithm->value);

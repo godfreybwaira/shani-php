@@ -9,6 +9,8 @@
 
 namespace features\crypto {
 
+    use features\crypto\exceptions\SignatureException;
+
     final class SymmetricSignature implements DigitalSignature
     {
 
@@ -45,7 +47,7 @@ namespace features\crypto {
         public function verify(string $payload, ?string $signature): bool
         {
             if (empty($signature)) {
-                throw new \Exception('Signature is missing or empty.');
+                throw new SignatureException('Signature is missing or empty.');
             }
             return hash_equals($this->sign($payload), $signature);
         }

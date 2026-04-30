@@ -19,6 +19,8 @@
 
 namespace features\crypto {
 
+    use features\crypto\exceptions\AlgorithmException;
+
     final class CipherKey
     {
 
@@ -67,7 +69,7 @@ namespace features\crypto {
             $keyLen = openssl_cipher_key_length($algorithm);
             $ivLen = openssl_cipher_iv_length($algorithm);
             if ($keyLen === false || $ivLen === false) {
-                throw new \RuntimeException('Unsupported cipher algorithm: ' . $algorithm);
+                throw new AlgorithmException('Unsupported cipher algorithm: ' . $algorithm);
             }
             $passwordBase64 = base64_encode(openssl_random_pseudo_bytes($keyLen));
             $initVectorBase64 = base64_encode(openssl_random_pseudo_bytes($ivLen));
