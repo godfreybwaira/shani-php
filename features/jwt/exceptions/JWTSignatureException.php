@@ -9,7 +9,9 @@
 
 namespace features\jwt\exceptions {
 
-    final class JWTSignatureException extends \RuntimeException
+    use features\exceptions\BadRequestException;
+
+    final class JWTSignatureException extends BadRequestException
     {
 //put your code here
     }

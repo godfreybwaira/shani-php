@@ -15,6 +15,7 @@ namespace shani\launcher {
     use features\authentication\AuthenticationManager;
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
+    use features\exceptions\BadRequestException;
     use features\exceptions\CustomException;
     use features\exceptions\NotFoundException;
     use features\logging\Logger;
@@ -181,6 +182,9 @@ namespace shani\launcher {
                 return $this->handleRequest();
             } catch (NotFoundException $ex) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
+                return $this->handleException($ex);
+            } catch (BadRequestException $ex) {
+                $this->response->setStatus(HttpStatus::BAD_REQUEST);
                 return $this->handleException($ex);
             } catch (\Throwable $ex) {
                 $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());

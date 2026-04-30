@@ -9,7 +9,9 @@
 
 namespace features\jwt\exceptions {
 
-    final class JWTFormatException extends \RuntimeException
+    use features\exceptions\BadRequestException;
+
+    final class JWTFormatException extends BadRequestException
     {
 //put your code here
     }
