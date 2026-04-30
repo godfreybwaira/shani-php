@@ -9,7 +9,7 @@
 
 namespace features\utils {
 
-    use features\exceptions\ServerException;
+    use features\exceptions\NotFoundException;
 
     /**
      * Represents a file object with metadata and upload error handling.
@@ -49,6 +49,13 @@ namespace features\utils {
          * @var string
          */
         public readonly string $name;
+
+        /**
+         * File name without extension.
+         *
+         * @var string
+         */
+        public readonly string $shortName;
 
         /**
          * File MIME type.
@@ -106,16 +113,18 @@ namespace features\utils {
                 ?int $error = null
         )
         {
-            $stat = stat($path);
-            $this->path = $path;
-            $this->name = $name ?? basename($path);
-            $this->size = $size ?? $stat['size'];
-            $this->modifiedTime = $stat['mtime'];
-            $this->error = self::getFileErrors($error);
-            $this->extension = self::getExtension($this->name);
-            $this->type = $type ?? MediaType::fromExtension($this->extension);
-            if (!is_readable($path)) {
-                throw new ServerException('File is not readable.');
+            if (is_readable($path)) {
+                $stat = stat($path);
+                $this->path = $path;
+                $this->name = $name ?? basename($path);
+                $this->size = $size ?? $stat['size'];
+                $this->modifiedTime = $stat['mtime'];
+                $this->error = self::getFileErrors($error);
+                $this->extension = self::getExtension($this->name);
+                $this->shortName = $this->extension !== null ? substr($this->name, 0, strrpos($this->name, '.')) : $this->name;
+                $this->type = $type ?? MediaType::fromExtension($this->extension);
+            } else {
+                throw new NotFoundException('File is not readable.');
             }
         }
 

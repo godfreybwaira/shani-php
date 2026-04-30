@@ -15,10 +15,9 @@ namespace features\exceptions {
     final class CustomException
     {
 
-        public static function notFound(App $app, string $message = null): ClientException
+        public static function notFound(string $message = null): ClientException
         {
-            $app->response->setStatus(HttpStatus::NOT_FOUND);
-            return new ClientException($message ?? 'Resource not found');
+            return new NotFoundException($message ?? 'Resource not found');
         }
 
         public static function badRequest(App $app, string $message = null): ClientException

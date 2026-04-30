@@ -10,17 +10,18 @@
 
 namespace shani\launcher {
 
+    use features\assets\StaticAssetRequest;
+    use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
     use features\ds\map\MutableMap;
     use features\ds\map\ReadableMap;
     use features\exceptions\CustomException;
+    use features\exceptions\NotFoundException;
     use features\logging\Logger;
     use features\middleware\MiddlewareHandler;
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
     use features\storage\StorageMediaInterface;
-    use features\assets\StaticAssetRequest;
-    use features\assets\StaticAssetServers;
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
@@ -178,7 +179,11 @@ namespace shani\launcher {
             }
             try {
                 return $this->handleRequest();
+            } catch (NotFoundException $ex) {
+                $this->response->setStatus(HttpStatus::NOT_FOUND);
+                return $this->handleException($ex);
             } catch (\Throwable $ex) {
+                $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
                 return $this->handleException($ex);
             }
         }
@@ -260,11 +265,11 @@ namespace shani\launcher {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
                 if ($this->config->getStaticAssetServer() === StaticAssetServers::DISABLE) {
-                    throw CustomException::notFound($this);
+                    throw CustomException::notFound();
                 }
                 $properties = StaticAssetRequest::fromPath($this->path, $this->request->uri->path());
                 if ($properties === null) {
-                    throw CustomException::notFound($this);
+                    throw CustomException::notFound();
                 }
                 return $properties->handleRequest($this);
             }
@@ -272,7 +277,7 @@ namespace shani\launcher {
             $callback = self::kebab2camelCase($this->request->route()->action);
             $obj = new $className($this);
             if (!is_callable([$obj, $callback])) {
-                throw CustomException::notFound($this);
+                throw CustomException::notFound();
             }
             return $obj->$callback();
         }
@@ -314,7 +319,6 @@ namespace shani\launcher {
                 $this->request->changeRoute($fallbackRoute);
                 return $this->handleRequest();
             }
-            $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
             return null;
         }
     }
