@@ -69,8 +69,8 @@ namespace features\assets {
         {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
-                $config->privateBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PRIVATE_ACCESS),
-                $config->publicBucket => new StaticAssetRequest($uriPath, $values[0], StaticAssetAccessType::PUBLIC_ACCESS),
+                $config->privateBucket => new StaticAssetRequest($uriPath, $config->privateBucket, StaticAssetAccessType::PRIVATE_ACCESS),
+                $config->publicBucket => new StaticAssetRequest($uriPath, $config->publicBucket, StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
         }
@@ -85,7 +85,7 @@ namespace features\assets {
         public function handleRequest(App $app): ?HttpResponse
         {
             $filepath = match ($this->accessType) {
-                StaticAssetAccessType::PUBLIC_ACCESS => self::assetPath(substr($this->uriPath, strlen($this->bucket) + 1)),
+                StaticAssetAccessType::PUBLIC_ACCESS => self::assetPath(substr($this->uriPath, strlen($this->bucket))),
                 default => $app->storage->pathTo($this->uriPath)
             };
             return $this->sendFile($app, new File($filepath));
@@ -111,7 +111,7 @@ namespace features\assets {
             $app->response->setStatus(HttpStatus::OK)->setCache($cache);
             return match ($assetServer) {
                 StaticAssetServers::APACHE => self::delegateToApache($app, $file),
-                StaticAssetServers::NGINX => self::delegateToNginx($app, $this->uriPath),
+                StaticAssetServers::NGINX => self::delegateToNginx($app, $file, $this->bucket),
                 StaticAssetServers::SHANI => self::delegateToShani($file),
                 default => null
             };
@@ -132,17 +132,22 @@ namespace features\assets {
         /**
          * Serve static assets using Nginx server.
          *
-         * @param App    $app      Application object.
-         * @param string $filepath File path.
+         * @param App       $app    Application object.
+         * @param File      $file   File object.
+         * @param string    $bucket File storage area
          *
          * @return HttpResponse|null The HTTP response, or null if delegated.
          */
-        private static function delegateToNginx(App $app, string $filepath): ?HttpResponse
+        private static function delegateToNginx(App $app, File $file, string $bucket): ?HttpResponse
         {
-            $path = '/' . $app->request->route()->module . substr($app->storage->pathTo($filepath), strlen(SHANI_SERVER_ROOT));
+            $config = $app->config->pathConfig();
+            $filepath = match ($bucket) {
+                $config->publicBucket => substr($file->path, strlen(Framework::DIR_ASSETS)),
+                $config->privateBucket => substr($file->path, strlen(Framework::DIR_STORAGE)),
+            };
             $app->response->header()->addAll([
-                'X-Accel-Redirect' => $path,
-                HttpHeader::CONTENT_TYPE => MediaType::fromFilename($filepath)
+                'X-Accel-Redirect' => $bucket . $filepath,
+                HttpHeader::CONTENT_TYPE => $file->type
             ]);
             return null;
         }
@@ -151,7 +156,7 @@ namespace features\assets {
          * Serve static assets using Apache server.
          *
          * @param App   $app    Application object.
-         * @param File  $file   File path.
+         * @param File  $file   File object.
          *
          * @return HttpResponse|null The HTTP response, or null if delegated.
          */

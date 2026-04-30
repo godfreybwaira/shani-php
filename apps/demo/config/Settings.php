@@ -119,7 +119,7 @@ namespace apps\demo\config {
 
         public function getStaticAssetServer(): StaticAssetServers
         {
-            return StaticAssetServers::APACHE;
+            return StaticAssetServers::SHANI;
         }
 
         public function authenticationConfig(): AuthenticationConfig
