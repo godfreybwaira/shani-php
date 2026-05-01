@@ -46,11 +46,13 @@ namespace apps\demo\config {
             return $this->csrfConfig ??= new CsrfConfig($this->app->request->method, false);
         }
 
+        #[\Override]
         public function pathConfig(): PathConfig
         {
             return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/demo', homePath: '/shani/0/components/0/index');
         }
 
+        #[\Override]
         public function isAsync(): bool
         {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';

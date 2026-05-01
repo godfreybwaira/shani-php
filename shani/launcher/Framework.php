@@ -61,6 +61,9 @@ namespace shani\launcher {
         /** Configuration directory path */
         public const DIR_CONFIG = SHANI_SERVER_ROOT . '/config';
 
+        /** Configuration directory path */
+        public const DIR_SHANI = SHANI_SERVER_ROOT . '/shani';
+
         /** SSL files directory path */
         public const DIR_SSL = self::DIR_CONFIG . '/ssl';
 

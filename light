@@ -1,0 +1,26 @@
+<?php
+
+use shani\launcher\ShaniConstants;
+use shani\light\Create;
+use shani\light\Delete;
+
+set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
+spl_autoload_register(function (string $class) {
+    require_once str_replace('\\', '/', $class) . '.php';
+});
+ShaniConstants::define(__DIR__);
+
+if ($argc >= 3) {
+    $command = $argv[1];
+    $params = $argv[2];
+    $result = match ($command) {
+        'create:project' => Create::project($params),
+        'create:module' => Create::module($params),
+        'create:controller' => Create::controller($params),
+        'delete:project' => Delete::project($params),
+        'delete:module' => Delete::module($params),
+        'delete:controller' => Delete::controller($params),
+        default => '[ERROR] Unknown command: ' . $command
+    };
+    echo PHP_EOL;
+}

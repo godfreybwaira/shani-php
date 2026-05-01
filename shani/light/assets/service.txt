@@ -1,0 +1,11 @@
+<?php
+
+namespace {namespace}\{service_dir} {
+
+    final class {service_name}
+    {
+        //TODO
+    }
+
+}
+

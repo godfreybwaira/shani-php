@@ -1,0 +1,26 @@
+<?php
+
+namespace {namespace}\{controller_dir}\{req_method} {
+
+    use shani\http\HttpResponse;
+    use gui\WebUIBuilder;
+    use shani\launcher\App;
+
+    final class {controller_name}
+    {
+
+        private readonly App $app;
+
+        public function __construct(App $app)
+        {
+            $this->app = $app;
+        }
+
+        public function {fn_name}(): HttpResponse
+        {
+            return HttpResponse::withBody(new WebUIBuilder());
+        }
+    }
+
+}
+
