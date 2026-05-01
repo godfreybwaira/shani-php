@@ -10,6 +10,7 @@
 namespace shani\light\subcommands {
 
     use features\storage\LocalStorage;
+    use features\utils\File;
     use shani\config\PathConfig;
     use shani\launcher\Framework;
 
@@ -166,8 +167,86 @@ namespace shani\light\subcommands {
             $search = ['{app_dir}', '{project_name}', '{config_dir}'];
             $replace = [$this->appDirectory, $this->name, self::CONFIG_DIR];
             $content = str_replace($search, $replace, file_get_contents($template));
-            if (file_put_contents(Framework::DIR_HOSTS . '/' . $this->hostname . '/' . basename($template), $content)) {
+            if (file_put_contents(Framework::DIR_HOSTS . '/' . $this->hostname . '/' . basename($template), $content) !== false) {
                 echo 'Done' . PHP_EOL;
+            } else {
+                echo 'Failed' . PHP_EOL;
+            }
+        }
+
+        private function copyCGIfiles(): void
+        {
+            echo 'Copying CGI files' . PHP_EOL;
+            ///////////////////////////////////////////
+            $destination = $this->config->root . '/.cgi';
+            $source = $this->assets . '/cgi';
+            if (File::copyDirectory($source, $destination)) {
+                echo 'Done' . PHP_EOL;
+                $this->cleanApacheFiles($destination);
+                $this->cleanNginxFiles($destination);
+            } else {
+                echo 'Failed' . PHP_EOL;
+            }
+        }
+
+        private function cleanApacheFiles(string $cgi)
+        {
+            echo 'Cleaning Apache file:' . PHP_EOL;
+            ///////////////////////////////////////////
+            $shaniRoot = basename(SHANI_SERVER_ROOT);
+            $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
+            $storageDir = substr(Framework::DIR_STORAGE, strlen(SHANI_SERVER_ROOT) + 1);
+            $sslDir = substr(Framework::DIR_SSL, strlen(SHANI_SERVER_ROOT) + 1);
+
+            $search = [
+                '{{shani_root}}', '{{asset_dir}}', '{{ssl_dir}}', '{{storage_dir}}',
+                '{{domain_name}}', '{{public_bucket}}'
+            ];
+            $replace = [
+                $shaniRoot, $assetDir, $sslDir, $storageDir, $this->hostname,
+                $this->config->publicBucket
+            ];
+
+            $path = $cgi . '/apache/apache.conf';
+            $content = str_replace($search, $replace, file_get_contents($path));
+            if (file_put_contents($path, $content) !== false) {
+                echo 'Done' . PHP_EOL;
+            } else {
+                echo 'Failed' . PHP_EOL;
+            }
+        }
+
+        private function cleanNginxFiles(string $cgi)
+        {
+            echo 'Cleaning nginx files:' . PHP_EOL;
+            ///////////////////////////////////////////
+            $cgiDir = basename($cgi) . '/nginx';
+            $path = dirname($cgi) . '/' . $cgiDir;
+            $nginxFile = $path . '/nginx.conf';
+            $customFile = $path . '/custom.conf';
+            $appDirpath = substr($this->config->root, strlen(dirname(SHANI_SERVER_ROOT)) + 1);
+            $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
+            $storageDir = substr(Framework::DIR_STORAGE, strlen(SHANI_SERVER_ROOT) + 1);
+
+            $search1 = [
+                '{{app_dirpath}}', '{{asset_dir}}', '{{private_bucket}}',
+                '{{storage_dir}}', '{{public_bucket}}'
+            ];
+            $replace2 = [
+                $appDirpath . '/' . $cgiDir, $assetDir, $this->config->privateBucket,
+                $storageDir, $this->config->publicBucket
+            ];
+            $nginxContent = str_replace($search1, $replace2, file_get_contents($nginxFile));
+            if (file_put_contents($nginxFile, $nginxContent) !== false) {
+                echo 'Done 1/2' . PHP_EOL;
+            } else {
+                echo 'Failed' . PHP_EOL;
+            }
+            $search = ['{{shani_root}}', '{{domain_name}}'];
+            $replace = [basename(SHANI_SERVER_ROOT), $this->hostname];
+            $content = str_replace($search, $replace, file_get_contents($customFile));
+            if (file_put_contents($customFile, $content) !== false) {
+                echo 'Done 2/2' . PHP_EOL;
             } else {
                 echo 'Failed' . PHP_EOL;
             }
@@ -184,7 +263,7 @@ namespace shani\light\subcommands {
             $replace = [$this->appDirectory, $this->name, self::CONFIG_DIR, $this->config->homePath, $filename];
             $content = str_replace($search, $replace, file_get_contents($template));
             mkdir($path, LocalStorage::FILE_MODE, true);
-            if (file_put_contents($path . '/' . $filename . '.php', $content)) {
+            if (file_put_contents($path . '/' . $filename . '.php', $content) !== false) {
                 echo 'Done' . PHP_EOL;
             } else {
                 echo 'Failed' . PHP_EOL;
@@ -198,6 +277,7 @@ namespace shani\light\subcommands {
                 $this->createProject();
                 $this->createHost();
                 $this->copyConfigFile();
+                $this->copyCGIfiles();
                 $this->copySettings();
             } catch (\Exception $exc) {
                 echo $exc->getMessage() . PHP_EOL;
