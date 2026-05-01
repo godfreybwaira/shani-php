@@ -10,7 +10,7 @@
 namespace shani\light\subcommands {
 
     use features\storage\LocalStorage;
-    use features\utils\File;
+    use features\utils\Directory;
     use shani\config\PathConfig;
     use shani\launcher\Framework;
 
@@ -180,7 +180,7 @@ namespace shani\light\subcommands {
             ///////////////////////////////////////////
             $destination = $this->config->root . '/.cgi';
             $source = $this->assets . '/cgi';
-            if (File::copyDirectory($source, $destination)) {
+            if (Directory::copy($source, $destination)) {
                 echo 'Done' . PHP_EOL;
                 $this->cleanApacheFiles($destination);
                 $this->cleanNginxFiles($destination);
