@@ -1,5 +1,5 @@
 # Must extends shani\contracts\BasicPresets
-config: \{app_dir}\{project_name}\{config_dir}\Settings
+config: \apps\mataadb\config\Settings
 # Active configuration profile. The framework does not provide any logic regarding
 # this variable. You should handle the logic manually
 profile: dev.yml

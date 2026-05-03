@@ -1,0 +1,19 @@
+# =============================================
+# Versioning Strategy
+# =============================================
+version:
+  # Header the client sends to request a specific version
+  request_header: "Accept-Version"
+
+  # Header we send back to tell the client which version was actually used
+  # Set to null if you don't want to return any version header
+  response_header: "Content-Version"
+
+  # Fallback version when request_header is missing
+  default: v1
+
+  # Supported versions and their dedicated config files
+  # The framework will load the corresponding .yml file for the chosen version
+  supported:
+    v1: v1-config.yml
+    v2: v2-config.yml

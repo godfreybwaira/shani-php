@@ -1,12 +1,12 @@
 <?php
 
-namespace {namespace}\{controller_dir}\{req_method} {
+namespace apps\mataadb\modules\users\logic\controllers\get {
 
     use shani\http\HttpResponse;
     use gui\WebUIBuilder;
     use shani\launcher\App;
 
-    final class {controller_name}
+    final class Account
     {
 
         private readonly App $app;
@@ -16,7 +16,7 @@ namespace {namespace}\{controller_dir}\{req_method} {
             $this->app = $app;
         }
 
-        public function {fn_name}(): HttpResponse
+        public function index(): HttpResponse
         {
             return HttpResponse::withBody(new WebUIBuilder());
         }

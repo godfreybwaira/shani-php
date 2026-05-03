@@ -54,6 +54,34 @@ namespace shani\config {
         public readonly string $controllers;
 
         /**
+         * The directory inside application module where module services reside.
+         *
+         * @var string
+         */
+        public readonly string $services;
+
+        /**
+         * The directory inside application module where DTO reside.
+         *
+         * @var string
+         */
+        public readonly string $dto;
+
+        /**
+         * The directory inside application module where Entities (models) reside.
+         *
+         * @var string
+         */
+        public readonly string $entities;
+
+        /**
+         * The directory inside application module where ENUMS reside.
+         *
+         * @var string
+         */
+        public readonly string $enums;
+
+        /**
          * Application modules directory.
          *
          * @var string
@@ -113,6 +141,18 @@ namespace shani\config {
          * @param string $controllers
          *     Directory for controllers inside modules. Defaults to '/logic/controllers'.
          *
+         * @param string $services
+         *     Directory for services inside modules. Defaults to '/logic/services'.
+         *
+         * @param string $dto
+         *     Directory for DTO inside modules. Defaults to '/data/dto'.
+         *
+         * @param string $entities
+         *     Directory for entities (models) inside modules. Defaults to '/data/entities'.
+         *
+         * @param string $enums
+         *     Directory for ENUMS inside modules. Defaults to '/data/enums'.
+         *
          * @param string $modules
          *     Directory for application modules. Defaults to '/modules'.
          *
@@ -132,6 +172,10 @@ namespace shani\config {
                 string $root,
                 string $homePath,
                 string $controllers = '/logic/controllers',
+                string $services = '/logic/services',
+                string $dto = '/data/dto',
+                string $entities = '/data/entities',
+                string $enums = '/data/enums',
                 string $modules = '/modules',
                 string $views = '/presentation/views',
                 string $languages = '/presentation/lang',
@@ -142,12 +186,16 @@ namespace shani\config {
             $this->root = $root;
             $this->homePath = $homePath;
             $this->controllers = $controllers;
+            $this->services = $services;
             $this->modules = $modules;
             $this->views = $views;
             $this->languages = $languages;
             $this->storage = $root . '/.bucket';
             $this->privateBucket = $privateBucket;
             $this->publicBucket = $publicBucket;
+            $this->dto = $dto;
+            $this->entities = $entities;
+            $this->enums = $enums;
         }
     }
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace {app_dir}\{project_name}\{config_dir} {
+namespace apps\mataadb\config {
 
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
-    final class {file_name} extends BasicConfiguration
+    final class Settings extends BasicConfiguration
     {
 
         private readonly PathConfig $pathConfig;
@@ -20,7 +20,7 @@ namespace {app_dir}\{project_name}\{config_dir} {
         #[\Override]
         public function pathConfig(): PathConfig
         {
-            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/{project_name}', homePath: '{home_path}');
+            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/mataadb', homePath: '/users/0/account/0/index');
         }
 
         #[\Override]

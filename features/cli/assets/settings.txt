@@ -1,0 +1,34 @@
+<?php
+
+namespace {namespace}\{config_dir} {
+
+    use shani\config\PathConfig;
+    use shani\contracts\BasicConfiguration;
+    use shani\launcher\App;
+    use shani\launcher\Framework;
+
+    final class {file_name} extends BasicConfiguration
+    {
+
+        private readonly PathConfig $pathConfig;
+
+        public function __construct(App $app)
+        {
+            parent::__construct($app);
+        }
+
+        #[\Override]
+        public function pathConfig(): PathConfig
+        {
+            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/{project_name}', homePath: '{home_path}');
+        }
+
+        #[\Override]
+        public function isAsync(): bool
+        {
+            return $this->app->request->header()->getOne('X-Request-Mode') === 'async';
+        }
+    }
+
+}
+

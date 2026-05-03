@@ -91,6 +91,9 @@ namespace shani\launcher {
         /** Mandatory extensions required by Shani framework */
         public const REQUIRED_EXTENSIONS = ['yaml'];
 
+        /** Framework features path */
+        public const DIR_FEATURES = SHANI_SERVER_ROOT . '/features';
+
         /**
          * Framework configuration map.
          *
