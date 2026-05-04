@@ -34,70 +34,53 @@ namespace features\cli {
             }
         }
 
+        /**
+         * @return \Generator<CommandContract>
+         */
+        private function commandList(): \Generator
+        {
+            yield new commands\HelpCommand($this);
+            /////////////////////////////////////////
+            yield new commands\CreateProjectCommand();
+            yield new commands\CreateModuleCommand();
+            yield new commands\CreateControllerCommand();
+            yield new commands\CreateVHostCommand();
+            yield new commands\CreateAliasCommand();
+            yield new commands\CreateEntityCommand();
+            /////////////////////////////////////////
+            yield new commands\ListProjectCommand();
+            yield new commands\ListProjectModulesCommand();
+            yield new commands\ListProjectControllersCommand();
+            yield new commands\ListHostAliasCommand();
+            yield new commands\ListDtoCommand();
+            yield new commands\ListEntityCommand();
+            yield new commands\ListServiceCommand();
+            yield new commands\ListVhostCommand();
+            /////////////////////////////////////////
+            yield new commands\DeleteAliasCommand();
+            yield new commands\DeleteVhostCommand();
+            /////////////////////////////////////////
+            yield new commands\RenameAliasCommand();
+            yield new commands\RenameVhostCommand();
+            /////////////////////////////////////////
+            yield new commands\LocateProjectCommand();
+            yield new commands\LocateVhostCommand();
+            yield new commands\LocateAliasCommand();
+            yield new commands\LocateModuleCommand();
+            yield new commands\LocateControllerCommand();
+            yield new commands\LocateServiceCommand();
+            yield new commands\LocateEntityCommand();
+            yield new commands\LocateDtoCommand();
+        }
+
         private function registerAll(): WritableMap
         {
-            $cmd0 = new commands\HelpCommand($this);
-            /////////////////////////////////////////
-            $cmd1 = new commands\CreateProjectCommand();
-            $cmd2 = new commands\CreateModuleCommand();
-            $cmd3 = new commands\CreateControllerCommand();
-            $cmd4 = new commands\CreateVHostCommand();
-            $cmd5 = new commands\CreateAliasCommand();
-            $cmd22 = new commands\CreateEntityCommand();
-            /////////////////////////////////////////
-            $cmd6 = new commands\ListProjectCommand();
-            $cmd7 = new commands\ListProjectModulesCommand();
-            $cmd8 = new commands\ListProjectControllersCommand();
-            $cmd9 = new commands\ListHostAliasCommand();
-            $cmd23 = new commands\ListDtoCommand();
-            $cmd24 = new commands\ListEntityCommand();
-            $cmd25 = new commands\ListServiceCommand();
-            $cmd26 = new commands\ListVhostCommand();
-            /////////////////////////////////////////
-            $cmd10 = new commands\DeleteAliasCommand();
-            $cmd11 = new commands\DeleteVhostCommand();
-            /////////////////////////////////////////
-            $cmd12 = new commands\RenameAliasCommand();
-            $cmd13 = new commands\RenameVhostCommand();
-            /////////////////////////////////////////
-            $cmd14 = new commands\LocateProjectCommand();
-            $cmd15 = new commands\LocateVhostCommand();
-            $cmd16 = new commands\LocateAliasCommand();
-            $cmd17 = new commands\LocateModuleCommand();
-            $cmd18 = new commands\LocateControllerCommand();
-            $cmd19 = new commands\LocateServiceCommand();
-            $cmd20 = new commands\LocateEntityCommand();
-            $cmd21 = new commands\LocateDtoCommand();
-            /////////////////////////////////////////
-            return new WritableMap([
-                $cmd0->name => $cmd0,
-                $cmd1->name => $cmd1,
-                $cmd2->name => $cmd2,
-                $cmd3->name => $cmd3,
-                $cmd4->name => $cmd4,
-                $cmd5->name => $cmd5,
-                $cmd6->name => $cmd6,
-                $cmd7->name => $cmd7,
-                $cmd8->name => $cmd8,
-                $cmd9->name => $cmd9,
-                $cmd10->name => $cmd10,
-                $cmd11->name => $cmd11,
-                $cmd12->name => $cmd12,
-                $cmd13->name => $cmd13,
-                $cmd14->name => $cmd14,
-                $cmd15->name => $cmd15,
-                $cmd16->name => $cmd16,
-                $cmd17->name => $cmd17,
-                $cmd18->name => $cmd18,
-                $cmd19->name => $cmd19,
-                $cmd20->name => $cmd20,
-                $cmd21->name => $cmd21,
-                $cmd22->name => $cmd22,
-                $cmd23->name => $cmd23,
-                $cmd24->name => $cmd24,
-                $cmd25->name => $cmd25,
-                $cmd26->name => $cmd26,
-            ]);
+            $map = new WritableMap();
+            $commands = $this->commandList();
+            foreach ($commands as $command) {
+                $map->addOne($command->name, $command);
+            }
+            return $map;
         }
 
         public function getCommandByName(string $commandName): CommandContract
