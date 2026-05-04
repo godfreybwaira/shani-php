@@ -16,6 +16,8 @@ namespace features\cli\builders {
     final class ServiceBuilder implements LightBuilderInterface
     {
 
+        private const SUFFIX = 'Service';
+
         public readonly string $namespace;
         public readonly string $path;
         private readonly string $serviceName;
@@ -23,10 +25,10 @@ namespace features\cli\builders {
 
         public function __construct(string $serviceName, ModuleBuilder $module)
         {
-            $this->serviceName = $serviceName;
             $this->module = $module;
+            $this->serviceName = Formatter::trimSuffix($serviceName, self::SUFFIX) . self::SUFFIX;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->services);
-            $this->path = $module->path . $module->project->config->services . '/' . $serviceName . '.php';
+            $this->path = $module->path . $module->project->config->services . '/' . $this->serviceName . '.php';
         }
 
         #[\Override]

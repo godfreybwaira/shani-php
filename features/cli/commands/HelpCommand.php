@@ -22,7 +22,7 @@ namespace features\cli\commands {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given.', 'create:project');
+            parent::__construct('help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given', 'create:project');
             $this->registry = $registry;
         }
 

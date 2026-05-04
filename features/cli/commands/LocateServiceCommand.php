@@ -21,7 +21,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:service', 'module_name@project_name', 'Show the full path to an existing project services.', 'posts@blog');
+            parent::__construct('locate:service', 'module_name@project_name', 'Show the full path to an existing project services', 'posts@blog');
         }
 
         public function execute(): void

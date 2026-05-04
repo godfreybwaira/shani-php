@@ -19,7 +19,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:vhost', 'hostname', 'Show the full path to an existing virtual host.', 'blog');
+            parent::__construct('locate:vhost', 'hostname', 'Show the full path to an existing virtual host', 'blog');
         }
 
         public function execute(): void

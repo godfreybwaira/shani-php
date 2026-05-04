@@ -22,7 +22,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('list:controller', 'module_name@project_name', 'Show all available project controllers and their respective request method.', 'posts@blog');
+            parent::__construct('list:controller', 'module_name@project_name', 'Show all available project controllers and their respective request method', 'posts@blog');
         }
 
         public function execute(): void

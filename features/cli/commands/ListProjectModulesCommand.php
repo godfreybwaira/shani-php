@@ -20,7 +20,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('list:module', 'project_name', 'Show all available project modules.', 'blog');
+            parent::__construct('list:module', 'project_name', 'Show all available project modules', 'blog');
         }
 
         public function execute(): void

@@ -9,6 +9,8 @@
 
 namespace features\cli\commands {
 
+    use features\cli\builders\ControllerBuilder;
+    use features\cli\builders\ModuleBuilder;
     use features\cli\builders\ProjectBuilder;
     use features\cli\CommandContract;
 
@@ -21,13 +23,14 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('create:controller', 'controller_name@module_name@project_name', 'Creating a new project controller, view and language file', 'review@posts@blog');
+            parent::__construct('create:controller', 'controller_name@module_name@project_name', 'Create a new project controller, it\'s associated service, dto, entity, view and language file', 'Review@posts@blog');
         }
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName, $this->moduleName, $this->controllerName);
-            $project->build();
+            $module = new ModuleBuilder($this->moduleName, new ProjectBuilder($this->projectName));
+            $controller = new ControllerBuilder($this->controllerName, $module);
+            $controller->build();
         }
 
         public function parse(string ...$args): CommandContract

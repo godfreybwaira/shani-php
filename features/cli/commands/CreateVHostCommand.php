@@ -21,7 +21,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('create:vhost', 'project_name@hostname', 'Creating a new project virtual host and it\'s configuration.', 'blog@localhost');
+            parent::__construct('create:vhost', 'project_name@hostname', 'Create a new project virtual host and it\'s configuration', 'blog@localhost');
         }
 
         public function execute(): void

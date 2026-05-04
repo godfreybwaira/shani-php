@@ -20,7 +20,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('list:alias', 'hostname', 'Show all available host aliases.', 'localhost');
+            parent::__construct('list:alias', 'hostname', 'Show all available host aliases', 'localhost');
         }
 
         public function execute(): void

@@ -19,7 +19,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration.', 'localhost');
+            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration', 'localhost');
         }
 
         public function execute(): void

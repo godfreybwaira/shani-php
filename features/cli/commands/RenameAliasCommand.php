@@ -20,7 +20,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('rename:alias', 'old_name new_name', 'Rename an alias from old name to a new name.', 'blog.com blog.co.tz');
+            parent::__construct('rename:alias', 'old_name new_name', 'Rename an alias from old name to a new name', 'blog.com blog.co.tz');
         }
 
         public function execute(): void

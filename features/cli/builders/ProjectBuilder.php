@@ -162,10 +162,8 @@ namespace features\cli\builders {
             $module->build();
             ////////////////////////////////
             if ($this->defaultController !== null) {
-                $service = new ServiceBuilder($this->defaultController . 'Service', $module);
                 $controller = new ControllerBuilder($this->defaultController, $module);
                 $controller->build();
-                $service->build();
             }
             return $this;
         }

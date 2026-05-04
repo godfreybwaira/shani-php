@@ -16,6 +16,8 @@ namespace features\cli\builders {
     final class EntityBuilder implements LightBuilderInterface
     {
 
+        private const SUFFIX = 'Entity';
+
         public readonly string $namespace;
         public readonly string $path;
         private readonly string $entityName;
@@ -23,10 +25,10 @@ namespace features\cli\builders {
 
         public function __construct(string $entityName, ModuleBuilder $module)
         {
-            $this->entityName = $entityName;
             $this->module = $module;
+            $this->entityName = Formatter::trimSuffix($entityName, self::SUFFIX) . self::SUFFIX;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->entities);
-            $this->path = $module->path . $module->project->config->entities . '/' . $entityName . '.php';
+            $this->path = $module->path . $module->project->config->entities . '/' . $this->entityName . '.php';
         }
 
         #[\Override]
@@ -36,6 +38,10 @@ namespace features\cli\builders {
                 echo 'Could not create entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" does not exists.';
                 return $this;
             }
+            $dtoName = Formatter::trimSuffix($this->entityName, self::SUFFIX);
+            $dto = new DtoBuilder($dtoName, $this->module, $this->namespace);
+            $dto->build();
+            ///////////////////////////////////////////
             if (!$this->exists()) {
                 $search = ['{namespace}', '{class_name}'];
                 $replace = [$this->namespace, $this->entityName];

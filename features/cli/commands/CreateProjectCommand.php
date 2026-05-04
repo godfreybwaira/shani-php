@@ -20,7 +20,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('create:project', 'project_name@hostname', 'Creating a new project', 'demo@localhost');
+            parent::__construct('create:project', 'project_name@hostname', 'Create a new project', 'demo@localhost');
         }
 
         public function execute(): void

@@ -19,7 +19,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('delete:alias', 'alias', 'Delete an alias.', 'blog.com');
+            parent::__construct('delete:alias', 'alias', 'Delete an alias', 'blog.com');
         }
 
         public function execute(): void

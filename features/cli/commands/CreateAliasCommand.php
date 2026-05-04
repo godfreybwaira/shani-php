@@ -20,7 +20,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('create:alias', 'alias@hostname', 'Creating a host alias.', 'blog.com@localhost');
+            parent::__construct('create:alias', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
         }
 
         public function execute(): void

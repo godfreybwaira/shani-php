@@ -43,6 +43,7 @@ namespace features\cli {
             $cmd3 = new commands\CreateControllerCommand();
             $cmd4 = new commands\CreateVHostCommand();
             $cmd5 = new commands\CreateAliasCommand();
+            $cmd22 = new commands\CreateEntityCommand();
             /////////////////////////////////////////
             $cmd6 = new commands\ListProjectCommand();
             $cmd7 = new commands\ListProjectModulesCommand();
@@ -87,6 +88,7 @@ namespace features\cli {
                 $cmd19->name => $cmd19,
                 $cmd20->name => $cmd20,
                 $cmd21->name => $cmd21,
+                $cmd22->name => $cmd22,
             ]);
         }
 

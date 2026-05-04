@@ -19,7 +19,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:alias', 'alias', 'Show the full path to an existing virtual host alias.', 'blog.com');
+            parent::__construct('locate:alias', 'alias', 'Show the full path to an existing virtual host alias', 'blog.com');
         }
 
         public function execute(): void

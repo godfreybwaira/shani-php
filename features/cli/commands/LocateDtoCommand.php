@@ -21,7 +21,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:dto', 'module_name@project_name', 'Show the full path to an existing project DTOs.', 'posts@blog');
+            parent::__construct('locate:dto', 'module_name@project_name', 'Show the full path to an existing project DTOs', 'posts@blog');
         }
 
         public function execute(): void

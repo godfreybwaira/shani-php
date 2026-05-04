@@ -80,7 +80,7 @@ namespace features\cli\builders {
             if ($this->exists()) {
                 $folders = array_diff(scandir($this->path . $this->project->config->dto), ['.', '..']);
                 foreach ($folders as $dtoName) {
-                    $dtos[] = new DtoBuilder(basename($dtoName, '.php'), null, $this, '');
+                    $dtos[] = new DtoBuilder(basename($dtoName, '.php'), $this, '');
                 }
             }
             return $dtos;

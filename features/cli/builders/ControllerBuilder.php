@@ -59,16 +59,18 @@ namespace features\cli\builders {
                 echo 'Could not create controller "' . $this->controllerName . '", module "' . $this->module->moduleName . '" does not exists.' . PHP_EOL;
                 return $this;
             }
-            $entity = new EntityBuilder($this->controllerName . 'Entity', $this->module);
+            $service = new ServiceBuilder($this->controllerName, $this->module);
+            $service->build();
+            ///////////////////////////////////////////
+            $entity = new EntityBuilder($this->controllerName, $this->module);
             $entity->build();
-            $dto = new DtoBuilder($this->controllerName . 'Dto', $this->controllerName, $this->module, $entity->namespace);
-            $dto->build();
+            ///////////////////////////////////////////
             if (!$this->exists()) {
                 $this->createViews();
                 $this->createLanguage();
                 ///////////////////////////////////////////
-                $search = ['{namespace}', '{controller_name}', '{fn_name}'];
-                $replace = [$this->namespace, $this->controllerName, Framework::HOME_FUNCTION];
+                $search = ['{namespace}', '{controller_name}', '{service_ns}', '{fn_name}'];
+                $replace = [$this->namespace, $this->controllerName, $service->namespace, Framework::HOME_FUNCTION];
                 mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
                 $filecontent = file_get_contents(CommandContract::ASSETS . '/controller.txt');
                 ///////////////////////////////////////////

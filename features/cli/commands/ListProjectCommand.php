@@ -18,7 +18,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('list:project', null, 'Show all available projects.', null);
+            parent::__construct('list:project', null, 'Show all available projects', null);
         }
 
         public function execute(): void

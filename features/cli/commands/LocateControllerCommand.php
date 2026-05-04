@@ -21,7 +21,7 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:controller', 'module_name@project_name', 'Show the full path to an existing project controllers.', 'posts@blog');
+            parent::__construct('locate:controller', 'module_name@project_name', 'Show the full path to an existing project controllers', 'posts@blog');
         }
 
         public function execute(): void

@@ -58,6 +58,13 @@ namespace features\cli\helpers {
             $paddingTexts = str_repeat($separator, $multiplier);
             return $paddingTexts . ' ' . $inputText . PHP_EOL . $content;
         }
+
+        public static function trimSuffix(string $value, string $suffix): string
+        {
+            $name = strtolower($value);
+            $str = strtolower($suffix);
+            return str_ends_with($name, $str) ? substr($value, 0, strpos($name, $str)) : $value;
+        }
     }
 
 }
