@@ -45,16 +45,45 @@ namespace features\cli\builders {
             return $controllers;
         }
 
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->path : null;
+        }
+
         public function getServices(): array
         {
             $services = [];
             if ($this->exists()) {
                 $folders = array_diff(scandir($this->path . $this->project->config->services), ['.', '..']);
                 foreach ($folders as $serviceName) {
-                    $services[] = new ServiceBuilder($serviceName, $this);
+                    $services[] = new ServiceBuilder(basename($serviceName, '.php'), $this);
                 }
             }
-            return $this;
+            return $services;
+        }
+
+        public function getEntities(): array
+        {
+            $entities = [];
+            if ($this->exists()) {
+                $folders = array_diff(scandir($this->path . $this->project->config->entities), ['.', '..']);
+                foreach ($folders as $entityName) {
+                    $entities[] = new EntityBuilder(basename($entityName, '.php'), $this);
+                }
+            }
+            return $entities;
+        }
+
+        public function getDtos(): array
+        {
+            $dtos = [];
+            if ($this->exists()) {
+                $folders = array_diff(scandir($this->path . $this->project->config->dto), ['.', '..']);
+                foreach ($folders as $dtoName) {
+                    $dtos[] = new DtoBuilder(basename($dtoName, '.php'), null, $this, '');
+                }
+            }
+            return $dtos;
         }
 
         #[\Override]
@@ -76,6 +105,38 @@ namespace features\cli\builders {
         public function exists(): bool
         {
             return is_dir($this->path);
+        }
+
+        public function locateEntities(): void
+        {
+            $entities = $this->getEntities();
+            foreach ($entities as $entity) {
+                echo $entity->exists() ? $entity->path . PHP_EOL : null;
+            }
+        }
+
+        public function locateServices(): void
+        {
+            $services = $this->getServices();
+            foreach ($services as $service) {
+                echo $service->exists() ? $service->path . PHP_EOL : null;
+            }
+        }
+
+        public function locateControllers(): void
+        {
+            $controllers = $this->getControllers();
+            foreach ($controllers as $controller) {
+                echo $controller->exists() ? $controller->path . PHP_EOL : null;
+            }
+        }
+
+        public function locateDto(): void
+        {
+            $dtos = $this->getDtos();
+            foreach ($dtos as $dto) {
+                echo $dto->exists() ? $dto->path . PHP_EOL : null;
+            }
         }
     }
 

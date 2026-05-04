@@ -31,6 +31,11 @@ namespace features\cli\builders {
             $this->hostPath = $this->hostDirectory . '.yml';
         }
 
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->hostPath : null;
+        }
+
         public function delete(): void
         {
             if (!$this->exists()) {

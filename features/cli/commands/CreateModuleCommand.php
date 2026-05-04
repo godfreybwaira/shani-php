@@ -33,7 +33,7 @@ namespace features\cli\commands {
         {
             $values = explode(self::SEPARATOR, $args[0]);
             if (count($values) < 2) {
-                throw new \ArgumentCountError('Atleast two arguments is required.');
+                throw new \ArgumentCountError('Atleast two arguments are required.');
             }
             $this->validateIdentifier($values[0]);
             $this->validateIdentifier($values[1]);

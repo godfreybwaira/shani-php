@@ -53,6 +53,11 @@ namespace features\cli\builders {
             return $this;
         }
 
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->config->root : null;
+        }
+
         public function getModules(): array
         {
             $modules = [];

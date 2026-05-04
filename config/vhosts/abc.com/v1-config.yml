@@ -1,0 +1,7 @@
+# Must extends shani\contracts\BasicPresets
+config: \apps\abc\config\Settings
+# Active configuration profile. The framework does not provide any logic regarding
+# this variable. You should handle the logic manually
+profile: dev.yml
+# Wheter to run application test using provided profile.
+testmode: false

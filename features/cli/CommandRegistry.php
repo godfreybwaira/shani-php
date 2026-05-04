@@ -55,6 +55,15 @@ namespace features\cli {
             $cmd12 = new commands\RenameAliasCommand();
             $cmd13 = new commands\RenameVhostCommand();
             /////////////////////////////////////////
+            $cmd14 = new commands\LocateProjectCommand();
+            $cmd15 = new commands\LocateVhostCommand();
+            $cmd16 = new commands\LocateAliasCommand();
+            $cmd17 = new commands\LocateModuleCommand();
+            $cmd18 = new commands\LocateControllerCommand();
+            $cmd19 = new commands\LocateServiceCommand();
+            $cmd20 = new commands\LocateEntityCommand();
+            $cmd21 = new commands\LocateDtoCommand();
+            /////////////////////////////////////////
             return new WritableMap([
                 $cmd0->name => $cmd0,
                 $cmd1->name => $cmd1,
@@ -70,6 +79,14 @@ namespace features\cli {
                 $cmd11->name => $cmd11,
                 $cmd12->name => $cmd12,
                 $cmd13->name => $cmd13,
+                $cmd14->name => $cmd14,
+                $cmd15->name => $cmd15,
+                $cmd16->name => $cmd16,
+                $cmd17->name => $cmd17,
+                $cmd18->name => $cmd18,
+                $cmd19->name => $cmd19,
+                $cmd20->name => $cmd20,
+                $cmd21->name => $cmd21,
             ]);
         }
 

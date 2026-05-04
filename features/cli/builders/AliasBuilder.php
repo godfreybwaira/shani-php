@@ -28,6 +28,11 @@ namespace features\cli\builders {
             $this->hostPath = Framework::DIR_HOSTS . '/' . $this->hostname . '.yml';
         }
 
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->aliasPath : null;
+        }
+
         public function delete(): void
         {
             $intext = 'Deleting alias "' . $this->aliasName . '"';

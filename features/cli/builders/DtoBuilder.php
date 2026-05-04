@@ -23,11 +23,11 @@ namespace features\cli\builders {
         private readonly string $entityNamespace;
         private readonly ModuleBuilder $module;
 
-        public function __construct(string $dtoName, string $entityNamespace, ModuleBuilder $module)
+        public function __construct(string $longName, ?string $shortName, ModuleBuilder $module, string $entityNamespace)
         {
             $this->module = $module;
-            $this->dtoName = $dtoName;
-            $this->longDtoName = $dtoName . 'Dto';
+            $this->longDtoName = $longName;
+            $this->dtoName = $shortName ?? $longName;
             $this->entityNamespace = $entityNamespace;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->dto);
             $this->path = $module->path . $module->project->config->dto . '/' . $this->longDtoName . '.php';

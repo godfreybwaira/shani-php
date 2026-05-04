@@ -34,7 +34,7 @@ namespace features\cli\commands {
         {
             $values = explode(self::SEPARATOR, $args[0]);
             if (count($values) < 3) {
-                throw new \ArgumentCountError('Atleast three arguments is required.');
+                throw new \ArgumentCountError('Atleast three arguments are required.');
             }
             $this->validateIdentifier($values[0]);
             $this->validateIdentifier($values[1]);
