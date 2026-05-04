@@ -28,7 +28,7 @@ namespace features\cli\commands {
             echo 'Listing all project modules: ' . $this->projectName . PHP_EOL;
             $project = new ProjectBuilder($this->projectName);
             if (!$project->exists()) {
-                echo '[ERROR] Project "' . $this->projectName . '" not exists.' . PHP_EOL;
+                echo '[ERROR] Project "' . $this->projectName . '" does not exists.' . PHP_EOL;
                 return;
             }
             $modules = $project->getModules();

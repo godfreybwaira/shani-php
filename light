@@ -12,11 +12,10 @@ ShaniConstants::define(__DIR__);
 if ($argc >= 2) {
     $command = $argv[1];
     unset($argv[0], $argv[1]);
-    $params = array_values($argv);
     try {
-        $registry = new CommandRegistry();
         echo PHP_EOL;
-        $command === 'help' ? $registry->help($params[0] ?? null) : $registry->run($command, ...$params);
+        $params = array_values($argv);
+        (new CommandRegistry())->run($command, ...$params);
     } catch (\Throwable $t) {
         echo '[ERROR] ' . $t->getMessage() . PHP_EOL;
     } finally {

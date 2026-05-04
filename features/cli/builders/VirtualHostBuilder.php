@@ -20,30 +20,75 @@ namespace features\cli\builders {
 
         public readonly string $hostname;
         private readonly string $hostPath;
+        public readonly string $hostDirectory;
         private readonly ?ProjectBuilder $project;
 
         public function __construct(string $hostname, ProjectBuilder $project = null)
         {
             $this->hostname = $hostname;
             $this->project = $project;
-            $this->hostPath = Framework::DIR_HOSTS . '/' . $this->hostname . '.yml';
+            $this->hostDirectory = Framework::DIR_HOSTS . '/' . $this->hostname;
+            $this->hostPath = $this->hostDirectory . '.yml';
         }
 
         public function delete(): void
         {
             if (!$this->exists()) {
-                echo '[ERROR] Host "' . $this->hostname . '" not exists.' . PHP_EOL;
+                echo '[ERROR] Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }
+            ///////////////////////////////////////////
+            if (Directory::delete($this->hostDirectory)) {
+                $aliases = $this->getAliases();
+                foreach ($aliases as $alias) {
+                    $alias->delete();
+                }
+            }
+            ///////////////////////////////////////////
             $intext = 'Deleting host: ' . $this->hostname;
             $outtext = unlink($this->hostPath) ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
-            Directory::delete(Framework::DIR_HOSTS . '/' . $this->hostname);
+        }
+
+        public function rename(string $newName): void
+        {
+            if (!$this->exists()) {
+                echo '[ERROR] Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
+                return;
+            }
+            $newVhost = new VirtualHostBuilder($newName);
+            ///////////////////////////////////////////
+            if ($newVhost->exists()) {
+                throw new \RuntimeException('Host name "' . $newName . '" already exists.');
+            }
+            $aliases = $this->getAliases();
+            $intext = 'Renaming a host from "' . $this->hostname . '" to "' . $newVhost->hostname . '"';
+            $renamed = rename($this->hostDirectory, $newVhost->hostDirectory) && rename($this->hostPath, $newVhost->hostPath);
+            $outtext = $renamed ? 'Success' : 'Failed';
+            ///////////////////////////////////////////
+            if ($renamed) {
+                foreach ($aliases as $alias) {
+                    file_put_contents($alias->aliasPath, $newVhost->hostname);
+                }
+            }
+            echo Formatter::formatSentence($intext, $outtext);
+        }
+
+        public function getAliases(): array
+        {
+            $aliases = [];
+            $files = glob(Framework::DIR_HOSTS . '/*.alias');
+            foreach ($files as $file) {
+                if (file_get_contents($file) === $this->hostname) {
+                    $aliases[] = new AliasBuilder(basename($file, '.alias'), $this->hostname);
+                }
+            }
+            return $aliases;
         }
 
         private function createHost(): void
         {
-            mkdir(Framework::DIR_HOSTS . '/' . $this->hostname, LocalStorage::FILE_MODE, true);
+            mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
             $from = CommandContract::ASSETS . '/vhost.yml';
             ///////////////////////////////////////////
             $intext = 'Creating host: ' . $this->hostname;
@@ -53,18 +98,17 @@ namespace features\cli\builders {
 
         private function copyConfigFile(): void
         {
-            $filename = 'v1-config.yml';
-            $path = Framework::DIR_HOSTS . '/' . $this->hostname;
-            if (!is_dir($path)) {
-                mkdir($path, LocalStorage::FILE_MODE, true);
+            $configFile = 'v1-config.yml';
+            if (!is_dir($this->hostDirectory)) {
+                mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
             }
             $search = ['{namespace}', '{config_dir}'];
             $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR];
-            $template = CommandContract::ASSETS . '/' . $filename;
+            $template = CommandContract::ASSETS . '/' . $configFile;
             $content = str_replace($search, $replace, file_get_contents($template));
             ///////////////////////////////////////////
-            $intext = 'Copying configuration file: ' . $filename;
-            $outtext = file_put_contents($path . '/' . $filename, $content) !== false ? 'Success' : 'Failed';
+            $intext = 'Copying configuration file: ' . $configFile;
+            $outtext = file_put_contents($this->hostDirectory . '/' . $configFile, $content) !== false ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 

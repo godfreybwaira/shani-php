@@ -27,7 +27,7 @@ namespace features\cli\commands {
         {
             echo 'Listing all host aliases: ' . $this->hostname . PHP_EOL;
             if (!is_file(Framework::DIR_HOSTS . '/' . $this->hostname . '.yml')) {
-                echo 'Host "' . $this->hostname . '" not exists.' . PHP_EOL;
+                echo 'Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }
             $aliases = glob(Framework::DIR_HOSTS . '/*.alias');

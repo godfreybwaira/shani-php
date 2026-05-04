@@ -34,7 +34,7 @@ namespace features\cli\builders {
         {
 
             if (!$this->module->exists()) {
-                echo 'Could not create service "' . $this->serviceName . '", module "' . $this->module->moduleName . '" not exists.';
+                echo 'Could not create service "' . $this->serviceName . '", module "' . $this->module->moduleName . '" does not exists.';
                 return $this;
             }
             if ($this->exists()) {

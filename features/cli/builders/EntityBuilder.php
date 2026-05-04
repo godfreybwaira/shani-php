@@ -33,7 +33,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->module->exists()) {
-                echo 'Could not create entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" not exists.';
+                echo 'Could not create entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" does not exists.';
                 return $this;
             }
             if (!$this->exists()) {

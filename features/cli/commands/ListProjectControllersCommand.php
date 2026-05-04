@@ -31,7 +31,7 @@ namespace features\cli\commands {
             $project = new ProjectBuilder($this->projectName);
             $module = new ModuleBuilder($this->moduleName, $project);
             if (!$module->exists()) {
-                echo 'Module "' . $this->moduleName . '" not exists.' . PHP_EOL;
+                echo 'Module "' . $this->moduleName . '" does not exists.' . PHP_EOL;
                 return;
             }
             $controllers = $module->getControllers();

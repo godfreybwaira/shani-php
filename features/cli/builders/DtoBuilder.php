@@ -37,7 +37,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->module->exists()) {
-                echo 'Could not create DTO "' . $this->longDtoName . '", module "' . $this->module->moduleName . '" not exists.' . PHP_EOL;
+                echo 'Could not create DTO "' . $this->longDtoName . '", module "' . $this->module->moduleName . '" does not exists.' . PHP_EOL;
                 return $this;
             }
             if (!$this->exists()) {

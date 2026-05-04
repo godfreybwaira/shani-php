@@ -19,13 +19,13 @@ namespace features\cli\commands {
 
         public function __construct()
         {
-            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file and it\'s corresponding configuration.', 'localhost');
+            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration.', 'localhost');
         }
 
         public function execute(): void
         {
-            $alias = new VirtualHostBuilder($this->hostname);
-            $alias->delete();
+            $vhost = new VirtualHostBuilder($this->hostname);
+            $vhost->delete();
         }
 
         public function parse(string ...$args): CommandContract

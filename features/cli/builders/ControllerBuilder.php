@@ -56,7 +56,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->module->exists()) {
-                echo 'Could not create controller "' . $this->controllerName . '", module "' . $this->module->moduleName . '" not exists.' . PHP_EOL;
+                echo 'Could not create controller "' . $this->controllerName . '", module "' . $this->module->moduleName . '" does not exists.' . PHP_EOL;
                 return $this;
             }
             $entity = new EntityBuilder($this->controllerName . 'Entity', $this->module);

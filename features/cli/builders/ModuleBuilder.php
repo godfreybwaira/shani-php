@@ -61,7 +61,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->project->exists()) {
-                echo 'Could not create module "' . $this->moduleName . '", project "' . $this->project->projectName . '" not exists.' . PHP_EOL;
+                echo 'Could not create module "' . $this->moduleName . '", project "' . $this->project->projectName . '" does not exists.' . PHP_EOL;
                 return $this;
             }
             if (!$this->exists()) {

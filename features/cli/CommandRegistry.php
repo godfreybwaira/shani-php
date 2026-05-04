@@ -9,9 +9,8 @@
 
 namespace features\cli {
 
-    use features\cli\helpers\Formatter;
+    use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
-    use shani\launcher\Framework;
 
     final class CommandRegistry
     {
@@ -25,7 +24,7 @@ namespace features\cli {
 
         public function run(string $commandName, string ...$args): void
         {
-            $command = $this->getCommand($commandName);
+            $command = $this->getCommandByName($commandName);
             try {
                 $command->parse(...$args)->execute();
             } catch (\InvalidArgumentException $e) {
@@ -35,34 +34,10 @@ namespace features\cli {
             }
         }
 
-        public function help(?string $commandName): void
-        {
-            $index = 1;
-            $width = 150;
-            $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
-            echo PHP_EOL . Formatter::placeCenter($text, underline: true, sentenceWidth: $width) . PHP_EOL;
-            if ($commandName === null) {
-                echo Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' ');
-                $this->commands->each(function (string $name, CommandContract $command) use (&$index, $width) {
-                    echo Formatter::formatSentence(($index++) . '. ' . $name, $command->description, sentenceWidth: $width);
-                });
-            } else {
-                $this->singleCommandHelp($commandName, $width);
-            }
-            echo PHP_EOL;
-        }
-
-        private function singleCommandHelp(string $commandName, int $sentenceWidth): void
-        {
-            $command = $this->getCommand($commandName);
-            echo Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth);
-            echo Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth);
-            echo Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth);
-            echo 'DESCRIPTION:' . PHP_EOL . $command->description . PHP_EOL;
-        }
-
         private function registerAll(): WritableMap
         {
+            $cmd0 = new commands\HelpCommand($this);
+            /////////////////////////////////////////
             $cmd1 = new commands\CreateProjectCommand();
             $cmd2 = new commands\CreateModuleCommand();
             $cmd3 = new commands\CreateControllerCommand();
@@ -76,7 +51,12 @@ namespace features\cli {
             /////////////////////////////////////////
             $cmd10 = new commands\DeleteAliasCommand();
             $cmd11 = new commands\DeleteVhostCommand();
+            /////////////////////////////////////////
+            $cmd12 = new commands\RenameAliasCommand();
+            $cmd13 = new commands\RenameVhostCommand();
+            /////////////////////////////////////////
             return new WritableMap([
+                $cmd0->name => $cmd0,
                 $cmd1->name => $cmd1,
                 $cmd2->name => $cmd2,
                 $cmd3->name => $cmd3,
@@ -88,16 +68,23 @@ namespace features\cli {
                 $cmd9->name => $cmd9,
                 $cmd10->name => $cmd10,
                 $cmd11->name => $cmd11,
+                $cmd12->name => $cmd12,
+                $cmd13->name => $cmd13,
             ]);
         }
 
-        private function getCommand(string $commandName): CommandContract
+        public function getCommandByName(string $commandName): CommandContract
         {
             $command = $this->commands->getOne($commandName);
             if ($command !== null) {
                 return $command;
             }
             throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
+        }
+
+        public function getAllCommands(): ReadableMap
+        {
+            return $this->commands;
         }
     }
 
