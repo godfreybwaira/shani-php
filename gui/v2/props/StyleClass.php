@@ -9,9 +9,9 @@
 
 namespace gui\v2\props {
 
-    use features\ds\set\MutableSet;
+    use features\ds\set\WritableSet;
 
-    final class StyleClass extends MutableSet
+    final class StyleClass extends WritableSet
     {
 
         /**

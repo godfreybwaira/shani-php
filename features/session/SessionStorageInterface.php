@@ -2,7 +2,7 @@
 
 namespace features\session {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
 
     /**
      * SessionStorageInterface
@@ -92,9 +92,9 @@ namespace features\session {
          *
          * @param string $cartName Unique name of the cart.
          *
-         * @return MutableMap The cart instance
+         * @return WritableMap The cart instance
          */
-        public function cart(string $cartName): MutableMap;
+        public function cart(string $cartName): WritableMap;
 
         /**
          * Checks whether a cart with the given name exists in the current session.

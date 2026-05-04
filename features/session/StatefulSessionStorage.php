@@ -9,7 +9,7 @@
 
 namespace features\session {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
     use shani\http\enums\HttpSameSite;
     use shani\launcher\App;
 
@@ -33,10 +33,10 @@ namespace features\session {
             return isset($_SESSION[$cartName]);
         }
 
-        public function cart(string $cartName): MutableMap
+        public function cart(string $cartName): WritableMap
         {
             if (!isset($this->carts[$cartName])) {
-                $this->carts[$cartName] = new MutableMap($_SESSION[$cartName] ?? []);
+                $this->carts[$cartName] = new WritableMap($_SESSION[$cartName] ?? []);
             }
             return $this->carts[$cartName];
         }

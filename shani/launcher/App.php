@@ -13,7 +13,7 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
     use features\ds\map\ReadableMap;
     use features\exceptions\BadRequestException;
     use features\exceptions\CustomException;
@@ -192,7 +192,7 @@ namespace shani\launcher {
             }
         }
 
-        public function csrfToken(): MutableMap
+        public function csrfToken(): WritableMap
         {
             return $this->session->cart('fiJ9Gce5osud7s');
         }

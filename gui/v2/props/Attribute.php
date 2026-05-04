@@ -9,9 +9,9 @@
 
 namespace gui\v2\props {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
 
-    final class Attribute extends MutableMap
+    final class Attribute extends WritableMap
     {
 
         #[\Override]

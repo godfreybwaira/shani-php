@@ -1,9 +1,7 @@
 <?php
 
+use features\cli\CommandRegistry;
 use shani\launcher\ShaniConstants;
-use features\cli\Create;
-use features\cli\Delete;
-use features\cli\Listing;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 spl_autoload_register(function (string $class) {
@@ -11,35 +9,18 @@ spl_autoload_register(function (string $class) {
 });
 ShaniConstants::define(__DIR__);
 
-echo PHP_EOL;
-if ($argc >= 3) {
+if ($argc >= 2) {
     $command = $argv[1];
-    $params = $argv[2];
-    $result = match ($command) {
-        'create:project' => Create::project($params),
-        'create:module' => Create::module($params),
-        'create:alias' => Create::alias($params),
-        'create:controller' => Create::controller($params),
-        'create:vhost' => Create::vhost($params),
-        //////////////////////////////////////
-        'delete:alias' => Delete::alias($params),
-        'delete:project' => Delete::project($params),
-        'delete:module' => Delete::module($params),
-        'delete:controller' => Delete::controller($params),
-        //////////////////////////////////////
-        'list:module' => Listing::module($params),
-        'list:alias' => Listing::alias($params),
-        'list:controller' => Listing::controller($params),
-        //////////////////////////////////////
-        default => '[ERROR] Unknown command: ' . $command
-    };
-    echo PHP_EOL;
-} else if ($argc >= 2) {
-    $command = $argv[1];
-    $result = match ($command) {
-        'list:project' => Listing::project(),
-        //////////////////////////////////////
-        default => '[ERROR] Unknown command: ' . $command
-    };
+    unset($argv[0], $argv[1]);
+    $params = array_values($argv);
+    try {
+        $registry = new CommandRegistry();
+        $command === 'help' ? $registry->help($params[0] ?? null) : $registry->run($command, ...$params);
+    } catch (\Throwable $t) {
+        echo '[ERROR] ' . $t->getMessage() . PHP_EOL;
+    } finally {
+        echo PHP_EOL;
+    }
+} else {
+    echo '[ERROR] Too few arguments!' . PHP_EOL;
 }
-echo PHP_EOL;

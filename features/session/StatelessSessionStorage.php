@@ -9,7 +9,7 @@
 
 namespace features\session {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
 
     final class StatelessSessionStorage implements SessionStorageInterface
     {
@@ -21,10 +21,10 @@ namespace features\session {
             return isset($this->carts[$cartName]);
         }
 
-        public function cart(string $cartName): MutableMap
+        public function cart(string $cartName): WritableMap
         {
             if (!isset($this->carts[$cartName])) {
-                $this->carts[$cartName] = new MutableMap();
+                $this->carts[$cartName] = new WritableMap();
             }
             return $this->carts[$cartName];
         }

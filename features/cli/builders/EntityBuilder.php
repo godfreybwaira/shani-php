@@ -40,7 +40,7 @@ namespace features\cli\builders {
                 $search = ['{namespace}', '{class_name}'];
                 $replace = [$this->namespace, $this->entityName];
                 mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
-                $content = str_replace($search, $replace, file_get_contents(Create::ASSETS . '/dto.txt'));
+                $content = str_replace($search, $replace, file_get_contents(Create::ASSETS . '/entity.txt'));
                 mkdir($this->module->path . $this->module->project->config->enums, LocalStorage::FILE_MODE, true);
                 ///////////////////////////////////////////
                 $intext = 'Creating entity: ' . $this->entityName;

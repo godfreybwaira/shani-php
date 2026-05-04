@@ -1,0 +1,17 @@
+<?php
+
+namespace {namespace} {
+
+    final class {class_name}
+    {
+
+        public readonly string $id;
+
+        public function __construct(string $id)
+        {
+            $this->id = $id;
+        }
+    }
+
+}
+

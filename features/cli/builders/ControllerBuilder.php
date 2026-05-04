@@ -61,7 +61,7 @@ namespace features\cli\builders {
             }
             $entity = new EntityBuilder($this->controllerName . 'Entity', $this->module);
             $entity->build();
-            $dto = new DtoBuilder($this->controllerName . 'Dto', $this->module);
+            $dto = new DtoBuilder($this->controllerName, $entity->namespace, $this->module);
             $dto->build();
             if (!$this->exists()) {
                 $this->createViews();

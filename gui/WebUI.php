@@ -9,7 +9,7 @@
 
 namespace gui {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
     use features\ds\map\ReadableMap;
     use features\storage\StorageMediaInterface;
     use shani\launcher\App;
@@ -20,9 +20,9 @@ namespace gui {
 
         /**
          * Iterable MutableMap representing UIBilder attributes object
-         * @var MutableMap
+         * @var WritableMap
          */
-        public readonly MutableMap $attr;
+        public readonly WritableMap $attr;
         private readonly WebUIBuilder $builder;
         private readonly App $app;
 

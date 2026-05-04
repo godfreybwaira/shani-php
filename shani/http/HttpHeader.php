@@ -2,9 +2,9 @@
 
 namespace shani\http {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
 
-    final class HttpHeader extends MutableMap
+    final class HttpHeader extends WritableMap
     {
 
         public const ACCEPT = 'Accept';

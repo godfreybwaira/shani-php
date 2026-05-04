@@ -2,14 +2,47 @@
 
 namespace {namespace} {
 
-    final class {class_name}
+    use {entity_ns}\{class_name}Entity;
+
+    final class {class_name}Dto implements \JsonSerializable
     {
 
-        public readonly string|int $id;
+        public readonly string $id;
 
-        public function __construct(string|int $id)
+        public function __construct(string $id)
         {
             $this->id = $id;
+        }
+
+
+        /**
+         * Convert a given entity from {class_name}Entity to {class_name}Dto type
+         * @param {class_name}Entity $entity {class_name}Entity object
+         * @return {class_name}Dto
+         */
+        public static function entity2dto({class_name}Entity $entity): {class_name}Dto
+        {
+            $dto = new {class_name}Dto($entity->id);
+            return $dto;
+        }
+
+        /**
+         * Convert a given Dto from {class_name}Dto to {class_name}Entity type
+         * @param {class_name}Dto $dto {class_name}Dto object
+         * @return {class_name}Entity
+         */
+        public static function dto2entity({class_name}Dto $dto): {class_name}Entity
+        {
+            $entity = new {class_name}Entity($dto->id);
+            return $entity;
+        }
+
+        #[\Override]
+        public function jsonSerialize(): array
+        {
+            return [
+                'id' => $this->id
+            ];
         }
     }
 

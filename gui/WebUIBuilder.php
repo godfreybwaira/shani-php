@@ -9,7 +9,7 @@
 
 namespace gui {
 
-    use features\ds\map\MutableMap;
+    use features\ds\map\WritableMap;
     use features\pwa\PwaBuilder;
     use features\utils\URI;
 
@@ -19,9 +19,9 @@ namespace gui {
         /**
          * Application temporary data storage. This object is ideal for data
          * exchange within application web views
-         * @var MutableMap
+         * @var WritableMap
          */
-        public readonly MutableMap $attr;
+        public readonly WritableMap $attr;
         private ?array $dictionary = null;
         private ?string $viewPath, $title;
         private ?\JsonSerializable $data;
@@ -34,7 +34,7 @@ namespace gui {
             $this->data = $data;
             $this->title = null;
             $this->viewPath = null;
-            $this->attr = new MutableMap();
+            $this->attr = new WritableMap();
             $this->scripts = $this->styles = [];
             $this->link('icon', 'data:,');
         }

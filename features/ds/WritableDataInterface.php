@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of MutableDataInterface
+ * Description of WritableDataInterface
  * @author coder
  *
  * Created on: May 8, 2025 at 6:45:17 PM
@@ -11,7 +11,7 @@ namespace features\ds {
 
     use features\ds\map\ReadableMap;
 
-    interface MutableDataInterface
+    interface WritableDataInterface
     {
 
         /**

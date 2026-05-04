@@ -147,7 +147,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->exists()) {
-                echo Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
+                echo PHP_EOL . Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
                 $vhost = new VirtualHostBuilder($this->hostname, $this);
                 $vhost->build();
                 $this->copyCGIfiles();
