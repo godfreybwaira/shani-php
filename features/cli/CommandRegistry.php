@@ -49,6 +49,10 @@ namespace features\cli {
             $cmd7 = new commands\ListProjectModulesCommand();
             $cmd8 = new commands\ListProjectControllersCommand();
             $cmd9 = new commands\ListHostAliasCommand();
+            $cmd23 = new commands\ListDtoCommand();
+            $cmd24 = new commands\ListEntityCommand();
+            $cmd25 = new commands\ListServiceCommand();
+            $cmd26 = new commands\ListVhostCommand();
             /////////////////////////////////////////
             $cmd10 = new commands\DeleteAliasCommand();
             $cmd11 = new commands\DeleteVhostCommand();
@@ -89,6 +93,10 @@ namespace features\cli {
                 $cmd20->name => $cmd20,
                 $cmd21->name => $cmd21,
                 $cmd22->name => $cmd22,
+                $cmd23->name => $cmd23,
+                $cmd24->name => $cmd24,
+                $cmd25->name => $cmd25,
+                $cmd26->name => $cmd26,
             ]);
         }
 

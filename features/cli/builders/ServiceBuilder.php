@@ -20,7 +20,7 @@ namespace features\cli\builders {
 
         public readonly string $namespace;
         public readonly string $path;
-        private readonly string $serviceName;
+        public readonly string $serviceName;
         private readonly ModuleBuilder $module;
 
         public function __construct(string $serviceName, ModuleBuilder $module)

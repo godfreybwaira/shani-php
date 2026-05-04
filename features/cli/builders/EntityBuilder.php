@@ -20,7 +20,7 @@ namespace features\cli\builders {
 
         public readonly string $namespace;
         public readonly string $path;
-        private readonly string $entityName;
+        public readonly string $entityName;
         private readonly ModuleBuilder $module;
 
         public function __construct(string $entityName, ModuleBuilder $module)

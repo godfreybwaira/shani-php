@@ -20,7 +20,7 @@ namespace features\cli\builders {
 
         public readonly string $namespace;
         public readonly string $path;
-        private readonly string $dtoName;
+        public readonly string $dtoName;
         private readonly string $entityNamespace;
         private readonly ModuleBuilder $module;
 
