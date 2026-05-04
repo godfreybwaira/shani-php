@@ -40,22 +40,32 @@ namespace features\cli\commands {
             if ($this->commandName === null) {
                 echo Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' ');
                 $commands = $this->registry->getAllCommands();
-                $commands->each(function (string $name, CommandContract $command) use (&$index, $width) {
-                    echo Formatter::formatSentence(($index++) . '. ' . $name, $command->description, sentenceWidth: $width);
+                $commands->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
+                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $width);
                 });
             } else {
-                $this->singleCommandHelp($width);
+                $this->searchCommand($width);
             }
             echo PHP_EOL;
         }
 
-        private function singleCommandHelp(int $sentenceWidth): void
+        private function searchCommand(int $sentenceWidth): void
         {
-            $command = $this->registry->getCommandByName($this->commandName);
-            echo Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth);
-            echo Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth);
-            echo Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth);
-            echo 'DESCRIPTION:' . PHP_EOL . $command->description . PHP_EOL;
+            $commands = $this->registry->getAllCommands();
+            $command = $commands->getOne($this->commandName);
+            if ($command !== null) {
+                echo Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth);
+                echo Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth);
+                echo Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth);
+                echo 'DESCRIPTION:' . PHP_EOL . $command->description . PHP_EOL;
+                return;
+            }
+            $index = 1;
+            $commands->each(function (string $name, CommandContract $cmd) use (&$index, $sentenceWidth) {
+                if (str_contains($cmd->name, $this->commandName)) {
+                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);
+                }
+            });
         }
 
         public function parse(string ...$args): CommandContract
