@@ -15,11 +15,12 @@ if ($argc >= 2) {
     $params = array_values($argv);
     try {
         $registry = new CommandRegistry();
+        echo PHP_EOL;
         $command === 'help' ? $registry->help($params[0] ?? null) : $registry->run($command, ...$params);
     } catch (\Throwable $t) {
         echo '[ERROR] ' . $t->getMessage() . PHP_EOL;
     } finally {
-        echo PHP_EOL;
+        echo PHP_EOL . 'Done' . PHP_EOL . PHP_EOL;
     }
 } else {
     echo '[ERROR] Too few arguments!' . PHP_EOL;

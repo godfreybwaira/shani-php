@@ -9,6 +9,8 @@
 
 namespace features\cli {
 
+    use shani\launcher\Framework;
+
     abstract class CommandContract implements \JsonSerializable
     {
 
@@ -18,13 +20,14 @@ namespace features\cli {
         public readonly string $example;
 
         protected const SEPARATOR = '@';
+        public const ASSETS = Framework::DIR_FEATURES . '/cli/assets';
 
-        protected function __construct(string $name, string $syntax, string $description, string $example)
+        protected function __construct(string $name, ?string $syntax, string $description, ?string $example)
         {
             $this->name = $name;
-            $this->syntax = $name . ' ' . $syntax;
             $this->description = $description;
-            $this->example = $name . ' ' . $example;
+            $this->syntax = trim($name . ' ' . $syntax);
+            $this->example = trim($name . ' ' . $example);
         }
 
         public final function validateIdentifier(string $value): void

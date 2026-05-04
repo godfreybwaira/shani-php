@@ -9,7 +9,7 @@
 
 namespace features\cli\builders {
 
-    use features\cli\Create;
+    use features\cli\CommandContract;
     use features\cli\helpers\Formatter;
     use features\storage\LocalStorage;
     use features\utils\Directory;
@@ -68,7 +68,7 @@ namespace features\cli\builders {
         private function copyCGIfiles(): void
         {
             $destination = $this->config->root . '/.cgi';
-            $source = Create::ASSETS . '/cgi';
+            $source = CommandContract::ASSETS . '/cgi';
             if (Directory::copy($source, $destination)) {
                 $this->cleanApacheFiles($destination);
                 $this->cleanNginxFiles($destination);
@@ -131,7 +131,7 @@ namespace features\cli\builders {
         private function copySettings(): void
         {
             $filename = 'Settings';
-            $template = Create::ASSETS . '/settings.txt';
+            $template = CommandContract::ASSETS . '/settings.txt';
             $path = $this->config->root . '/' . self::CONFIG_DIR;
             $search = ['{namespace}', '{config_dir}', '{project_name}', '{home_path}', '{file_name}'];
             $replace = [$this->namespace, self::CONFIG_DIR, $this->projectName, $this->config->homePath, $filename];
@@ -147,7 +147,7 @@ namespace features\cli\builders {
         public function build(): self
         {
             if (!$this->exists()) {
-                echo PHP_EOL . Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
+                echo Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
                 $vhost = new VirtualHostBuilder($this->hostname, $this);
                 $vhost->build();
                 $this->copyCGIfiles();
@@ -162,7 +162,6 @@ namespace features\cli\builders {
                 $controller->build();
                 $service->build();
             }
-            echo 'Done' . PHP_EOL;
             return $this;
         }
 

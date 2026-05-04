@@ -9,7 +9,7 @@
 
 namespace features\cli\builders {
 
-    use features\cli\Create;
+    use features\cli\CommandContract;
     use features\cli\helpers\Formatter;
     use features\storage\LocalStorage;
     use shani\launcher\Framework;
@@ -37,7 +37,7 @@ namespace features\cli\builders {
             $viewPath = $this->module->path . $this->module->project->config->views . '/' . strtolower($this->controllerName);
             mkdir($viewPath, LocalStorage::FILE_MODE, true);
             $intext = 'Creating view: ' . Framework::HOME_FUNCTION;
-            $outtext = copy(Create::ASSETS . '/view.txt', $viewPath . '/' . Framework::HOME_FUNCTION . '.php') ? 'Success' : 'Failed';
+            $outtext = copy(CommandContract::ASSETS . '/view.txt', $viewPath . '/' . Framework::HOME_FUNCTION . '.php') ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 
@@ -48,7 +48,7 @@ namespace features\cli\builders {
             mkdir($languagePath, LocalStorage::FILE_MODE, true);
             ///////////////////////////////////////////
             $intext = 'Creating language directory: ' . Framework::HOME_FUNCTION;
-            $outtext = copy(Create::ASSETS . '/lang.txt', $languagePath . '/en.php') ? 'Success' : 'Failed';
+            $outtext = copy(CommandContract::ASSETS . '/lang.txt', $languagePath . '/en.php') ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 
@@ -70,7 +70,7 @@ namespace features\cli\builders {
                 $search = ['{namespace}', '{controller_name}', '{fn_name}'];
                 $replace = [$this->namespace, $this->controllerName, Framework::HOME_FUNCTION];
                 mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
-                $filecontent = file_get_contents(Create::ASSETS . '/controller.txt');
+                $filecontent = file_get_contents(CommandContract::ASSETS . '/controller.txt');
                 ///////////////////////////////////////////
                 $intext = 'Creating controller: ' . $this->controllerName;
                 $outtext = file_put_contents($this->path, str_replace($search, $replace, $filecontent)) !== false ? 'Success' : 'Failed';

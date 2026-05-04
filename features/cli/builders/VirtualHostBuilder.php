@@ -9,9 +9,10 @@
 
 namespace features\cli\builders {
 
-    use features\cli\Create;
+    use features\cli\CommandContract;
     use features\cli\helpers\Formatter;
     use features\storage\LocalStorage;
+    use features\utils\Directory;
     use shani\launcher\Framework;
 
     final class VirtualHostBuilder implements LightBuilderInterface
@@ -28,10 +29,22 @@ namespace features\cli\builders {
             $this->hostPath = Framework::DIR_HOSTS . '/' . $this->hostname . '.yml';
         }
 
+        public function delete(): void
+        {
+            if (!$this->exists()) {
+                echo '[ERROR] Host "' . $this->hostname . '" not exists.' . PHP_EOL;
+                return;
+            }
+            $intext = 'Deleting host: ' . $this->hostname;
+            $outtext = unlink($this->hostPath) ? 'Success' : 'Failed';
+            echo Formatter::formatSentence($intext, $outtext);
+            Directory::delete(Framework::DIR_HOSTS . '/' . $this->hostname);
+        }
+
         private function createHost(): void
         {
             mkdir(Framework::DIR_HOSTS . '/' . $this->hostname, LocalStorage::FILE_MODE, true);
-            $from = Create::ASSETS . '/vhost.yml';
+            $from = CommandContract::ASSETS . '/vhost.yml';
             ///////////////////////////////////////////
             $intext = 'Creating host: ' . $this->hostname;
             $outtext = copy($from, $this->hostPath) ? 'Success' : 'Failed';
@@ -47,7 +60,7 @@ namespace features\cli\builders {
             }
             $search = ['{namespace}', '{config_dir}'];
             $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR];
-            $template = Create::ASSETS . '/' . $filename;
+            $template = CommandContract::ASSETS . '/' . $filename;
             $content = str_replace($search, $replace, file_get_contents($template));
             ///////////////////////////////////////////
             $intext = 'Copying configuration file: ' . $filename;

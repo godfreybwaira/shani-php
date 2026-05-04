@@ -9,7 +9,7 @@
 
 namespace features\cli\builders {
 
-    use features\cli\Create;
+    use features\cli\CommandContract;
     use features\cli\helpers\Formatter;
     use features\storage\LocalStorage;
 
@@ -45,7 +45,7 @@ namespace features\cli\builders {
                 $search = ['{namespace}', '{class_name}', '{entity_ns}'];
                 $replace = [$this->namespace, $this->dtoName, $this->entityNamespace];
                 mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
-                $content = str_replace($search, $replace, file_get_contents(Create::ASSETS . '/dto.txt'));
+                $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/dto.txt'));
                 $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
                 $intext = 'Creating DTO: ' . $this->longDtoName;
                 echo Formatter::formatSentence($intext, $outtext);

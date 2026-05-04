@@ -50,6 +50,29 @@ namespace features\utils {
             closedir($dir);
             return true;
         }
+
+        /**
+         * Safely deletes a directory and all of its contents.
+         *
+         * @param string $directory Path to the directory.
+         * @return bool True on success, false on failure.
+         */
+        public static function delete(string $directory): bool
+        {
+            if (!file_exists($directory)) {
+                return true;
+            }
+            $it = new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS);
+            $files = new \RecursiveIteratorIterator($it, \RecursiveIteratorIterator::CHILD_FIRST);
+            foreach ($files as $file) {
+                if ($file->isDir()) {
+                    rmdir($file->getPathname());
+                } else {
+                    unlink($file->getPathname());
+                }
+            }
+            return rmdir($directory);
+        }
     }
 
 }

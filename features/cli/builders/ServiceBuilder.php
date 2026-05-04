@@ -9,7 +9,7 @@
 
 namespace features\cli\builders {
 
-    use features\cli\Create;
+    use features\cli\CommandContract;
     use features\cli\helpers\Formatter;
     use features\storage\LocalStorage;
 
@@ -44,7 +44,7 @@ namespace features\cli\builders {
             $search = ['{namespace}', '{class_name}'];
             $replace = [$this->namespace, $this->serviceName];
             mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
-            $content = str_replace($search, $replace, file_get_contents(Create::ASSETS . '/class.txt'));
+            $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
             ///////////////////////////////////////////
             $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
             $intext = 'Creating service: ' . $this->serviceName;

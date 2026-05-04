@@ -65,9 +65,29 @@ namespace features\cli {
         {
             $cmd1 = new commands\CreateProjectCommand();
             $cmd2 = new commands\CreateModuleCommand();
+            $cmd3 = new commands\CreateControllerCommand();
+            $cmd4 = new commands\CreateVHostCommand();
+            $cmd5 = new commands\CreateAliasCommand();
+            /////////////////////////////////////////
+            $cmd6 = new commands\ListProjectCommand();
+            $cmd7 = new commands\ListProjectModulesCommand();
+            $cmd8 = new commands\ListProjectControllersCommand();
+            $cmd9 = new commands\ListHostAliasCommand();
+            /////////////////////////////////////////
+            $cmd10 = new commands\DeleteAliasCommand();
+            $cmd11 = new commands\DeleteVhostCommand();
             return new WritableMap([
                 $cmd1->name => $cmd1,
-                $cmd2->name => $cmd2
+                $cmd2->name => $cmd2,
+                $cmd3->name => $cmd3,
+                $cmd4->name => $cmd4,
+                $cmd5->name => $cmd5,
+                $cmd6->name => $cmd6,
+                $cmd7->name => $cmd7,
+                $cmd8->name => $cmd8,
+                $cmd9->name => $cmd9,
+                $cmd10->name => $cmd10,
+                $cmd11->name => $cmd11,
             ]);
         }
 
