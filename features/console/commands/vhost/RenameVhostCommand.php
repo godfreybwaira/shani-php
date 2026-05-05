@@ -11,6 +11,7 @@ namespace features\console\commands\vhost {
 
     use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class RenameVhostCommand extends CommandContract
     {
@@ -31,13 +32,17 @@ namespace features\console\commands\vhost {
 
         public function parse(string ...$args): CommandContract
         {
-            if (count($args) < 2) {
+            if (empty($args)) {
+                $this->oldName = ConsoleIO::input('What is the name of the host to rename?', $this->validHostName);
+                $this->newName = ConsoleIO::input('What is the new name?', $this->validHostName);
+            } else if (count($args) < 2) {
                 throw new \ArgumentCountError('Atleast two argument is required.');
+            } else {
+                $this->validateHostName($args[0]);
+                $this->validateHostName($args[1]);
+                $this->oldName = $args[0];
+                $this->newName = $args[1];
             }
-            $this->validateHostName($args[0]);
-            $this->validateHostName($args[1]);
-            $this->oldName = $args[0];
-            $this->newName = $args[1];
             return $this;
         }
     }

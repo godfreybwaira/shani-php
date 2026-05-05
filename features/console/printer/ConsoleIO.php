@@ -26,19 +26,19 @@ namespace features\console\printer {
          * original prompt until valid input is received.
          *
          * @param string   $text     The prompt message displayed to the user.
-         * @param string|null $onError Optional error message shown when validation fails.
-         * If null, the original prompt message is reused.
          *
          * @param \Closure $validator A closure that receives the input string and returns
          * a boolean indicating whether the input is valid. The signature of validator is
          * <code>$validator(string $input):bool</code>
          *
+         * @param string $onError Optional error message shown when validation fails.
+         * If null, the original prompt message is reused.
          *
          * @return string|null The validated user input string, or null if no input was provided.
          *
          * @throws \RuntimeException If STDIN or STDOUT are unavailable.
          */
-        public static function input(string $text, ?string $onError, \Closure $validator): ?string
+        public static function input(string $text, \Closure $validator, string $onError = null): ?string
         {
             fwrite(STDOUT, $text . ' ');
             while (true) {
@@ -46,7 +46,7 @@ namespace features\console\printer {
                 if ($validator($input)) {
                     return $input;
                 }
-                fwrite(STDOUT, ($onError ?? $text) . ' ');
+                fwrite(STDOUT, ($onError ?? 'That did not work! ' . $text) . ' ');
             }
         }
 

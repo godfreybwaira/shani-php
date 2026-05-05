@@ -38,6 +38,8 @@ namespace features\console {
 
         /** Options that affect command execution (verbosity, color, etc.). */
         public readonly CommandOptions $options;
+        protected readonly \Closure $validIdentifier;
+        protected readonly \Closure $validHostName;
 
         /** Separator used internally for command parsing. */
         protected const SEPARATOR = '@';
@@ -59,32 +61,48 @@ namespace features\console {
             $this->description = $description;
             $this->syntax = trim($name . ' ' . $syntax);
             $this->example = trim($name . ' ' . $example);
+            $this->validHostName = fn(string $s) => $this->validateHostName($s, false);
+            $this->validIdentifier = fn(string $s) => $this->validateIdentifier($s, false);
         }
 
         /**
          * Validate that an identifier is alphanumeric with underscores.
          *
          * @param string $value Identifier to validate.
+         * @param bool $throw Whether to throw an exception when validation failed.
+         *
+         * @return bool True when validation passes, false otherwise
          * @throws \InvalidArgumentException If invalid.
          */
-        public final function validateIdentifier(string $value): void
+        public final function validateIdentifier(string $value, bool $throw = true): bool
         {
-            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_]+)*$/', $value) !== 1) {
+            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_]+)*$/', $value) === 1) {
+                return true;
+            }
+            if ($throw) {
                 throw new \InvalidArgumentException('Invalid identifier "' . $value . '"');
             }
+            return false;
         }
 
         /**
          * Validate that a hostname is alphanumeric with dots, hyphens, or underscores.
          *
          * @param string $value Hostname to validate.
+         * @param bool $throw Whether to throw an exception when validation failed.
+         *
+         * @return bool True when validation passes, false otherwise
          * @throws \InvalidArgumentException If invalid.
          */
-        public final function validateHostName(string $value): void
+        public final function validateHostName(string $value, bool $throw = true): bool
         {
-            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_.-]+)*$/', $value) !== 1) {
+            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_.-]+)*$/', $value) === 1) {
+                return true;
+            }
+            if ($throw) {
                 throw new \InvalidArgumentException('Invalid hostname "' . $value . '"');
             }
+            return false;
         }
 
         /**
