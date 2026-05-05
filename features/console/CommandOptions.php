@@ -28,7 +28,7 @@ namespace features\console {
      * }
      * ```
      */
-    final class CommandOptions
+    final class CommandOptions implements \JsonSerializable
     {
 
         /** Whether verbose output is enabled (extra logging and details). */
@@ -47,6 +47,20 @@ namespace features\console {
         {
             $this->verbose = $verbose;
             $this->noColor = $noColor;
+        }
+
+        /**
+         * Serialize command options to JSON.
+         *
+         * @return array<string,mixed> Command options.
+         */
+        #[\Override]
+        public final function jsonSerialize(): array
+        {
+            return [
+                'verbose' => $this->verbose,
+                'no_color' => $this->noColor,
+            ];
         }
     }
 

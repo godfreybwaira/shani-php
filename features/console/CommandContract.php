@@ -128,6 +128,7 @@ namespace features\console {
                 'syntax' => $this->syntax,
                 'description' => $this->description,
                 'example' => $this->example,
+                'options' => $this->options,
             ];
         }
 
