@@ -41,38 +41,50 @@ namespace features\console {
          */
         private function commandList(): \Generator
         {
+            // General
             yield new commands\HelpCommand($this);
-            /////////////////////////////////////////
-            yield new commands\CreateProjectCommand();
-            yield new commands\CreateModuleCommand();
-            yield new commands\CreateControllerCommand();
-            yield new commands\CreateVHostCommand();
-            yield new commands\CreateAliasCommand();
-            yield new commands\CreateEntityCommand();
-            /////////////////////////////////////////
-            yield new commands\ListProjectCommand();
-            yield new commands\ListProjectModulesCommand();
-            yield new commands\ListProjectControllersCommand();
-            yield new commands\ListHostAliasCommand();
-            yield new commands\ListDtoCommand();
-            yield new commands\ListEntityCommand();
-            yield new commands\ListServiceCommand();
-            yield new commands\ListVhostCommand();
-            /////////////////////////////////////////
-            yield new commands\DeleteAliasCommand();
-            yield new commands\DeleteVhostCommand();
-            /////////////////////////////////////////
-            yield new commands\RenameAliasCommand();
-            yield new commands\RenameVhostCommand();
-            /////////////////////////////////////////
-            yield new commands\LocateProjectCommand();
-            yield new commands\LocateVhostCommand();
-            yield new commands\LocateAliasCommand();
-            yield new commands\LocateModuleCommand();
-            yield new commands\LocateControllerCommand();
-            yield new commands\LocateServiceCommand();
-            yield new commands\LocateEntityCommand();
-            yield new commands\LocateDtoCommand();
+
+            // Project
+            yield new commands\project\CreateProjectCommand();
+            yield new commands\project\ListProjectCommand();
+            yield new commands\project\LocateProjectCommand();
+
+            // Module
+            yield new commands\module\CreateModuleCommand();
+            yield new commands\module\LocateModuleCommand();
+            yield new commands\module\ListModulesCommand();
+
+            // Controller
+            yield new commands\controller\CreateControllerCommand();
+            yield new commands\controller\LocateControllerCommand();
+            yield new commands\controller\ListControllersCommand();
+
+            // VHost
+            yield new commands\vhost\CreateVHostCommand();
+            yield new commands\vhost\ListVhostCommand();
+            yield new commands\vhost\DeleteVhostCommand();
+            yield new commands\vhost\RenameVhostCommand();
+            yield new commands\vhost\LocateVhostCommand();
+
+            // Alias
+            yield new commands\alias\CreateAliasCommand();
+            yield new commands\alias\ListHostAliasCommand();
+            yield new commands\alias\DeleteAliasCommand();
+            yield new commands\alias\RenameAliasCommand();
+            yield new commands\alias\LocateAliasCommand();
+
+            // Entity
+            yield new commands\entity\CreateEntityCommand();
+            yield new commands\entity\ListEntityCommand();
+            yield new commands\entity\LocateEntityCommand();
+
+            // DTO
+            yield new commands\dto\ListDtoCommand();
+            yield new commands\dto\LocateDtoCommand();
+
+            // Service
+            yield new commands\service\ListServiceCommand();
+            yield new commands\service\LocateServiceCommand();
         }
 
         /**

@@ -1,19 +1,18 @@
 <?php
 
 /**
- * Description of CreateVHostCommand
+ * Description of CreateProjectCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
-    use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
 
-    final class CreateVHostCommand extends CommandContract
+    final class CreateProjectCommand extends CommandContract
     {
 
         private readonly string $projectName;
@@ -21,14 +20,15 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('create:vhost', 'project_name@hostname', 'Create a new project virtual host and it\'s configuration', 'blog@localhost');
+            parent::__construct('project:create', 'project_name@hostname', 'Create a new project', 'demo@localhost');
         }
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName);
-            $vhost = new VirtualHostBuilder($this->hostname, $project);
-            $vhost->build();
+            $moduleName = 'users';
+            $controllerName = 'Account';
+            $project = new ProjectBuilder($this->projectName, $moduleName, $controllerName);
+            $project->setHostName($this->hostname)->build();
         }
 
         public function parse(string ...$args): CommandContract

@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\module {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
@@ -21,7 +21,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:module', 'module_name@project_name', 'Show the full path to an existing project module', 'posts@blog');
+            parent::__construct('module:locate', 'module_name@project_name', 'Show the full path to an existing project module', 'posts@blog');
         }
 
         public function execute(): void

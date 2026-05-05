@@ -1,34 +1,32 @@
 <?php
 
 /**
- * Description of CreateProjectCommand
+ * Description of CreateModuleCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\module {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
 
-    final class CreateProjectCommand extends CommandContract
+    final class CreateModuleCommand extends CommandContract
     {
 
         private readonly string $projectName;
-        private readonly string $hostname;
+        private readonly string $moduleName;
 
         public function __construct()
         {
-            parent::__construct('create:project', 'project_name@hostname', 'Create a new project', 'demo@localhost');
+            parent::__construct('module:create', 'module_name@project_name', 'Create a new project module', 'posts@blog');
         }
 
         public function execute(): void
         {
-            $moduleName = 'users';
-            $controllerName = 'Account';
-            $project = new ProjectBuilder($this->projectName, $moduleName, $controllerName);
-            $project->setHostName($this->hostname)->build();
+            $project = new ProjectBuilder($this->projectName, $this->moduleName);
+            $project->build();
         }
 
         public function parse(string ...$args): CommandContract
@@ -38,9 +36,9 @@ namespace features\console\commands {
                 throw new \ArgumentCountError('Atleast two arguments are required.');
             }
             $this->validateIdentifier($values[0]);
-            $this->validateHostName($values[1]);
-            $this->projectName = $values[0];
-            $this->hostname = $values[1];
+            $this->validateIdentifier($values[1]);
+            $this->moduleName = $values[0];
+            $this->projectName = $values[1];
             return $this;
         }
     }

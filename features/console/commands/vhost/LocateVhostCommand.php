@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\vhost {
 
     use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
@@ -19,7 +19,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:vhost', 'hostname', 'Show the full path to an existing virtual host', 'blog');
+            parent::__construct('vhost:locate', 'hostname', 'Show the full path to an existing virtual host', 'blog');
         }
 
         public function execute(): void

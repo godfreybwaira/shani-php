@@ -7,20 +7,20 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\module {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
 
-    final class ListProjectModulesCommand extends CommandContract
+    final class ListModulesCommand extends CommandContract
     {
 
         private readonly string $projectName;
 
         public function __construct()
         {
-            parent::__construct('list:module', 'project_name', 'Show all available project modules', 'blog');
+            parent::__construct('module:list', 'project_name', 'Show all available project modules', 'blog');
         }
 
         public function execute(): void

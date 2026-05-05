@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Description of RenameVhostCommand
+ * Description of RenameAliasCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\alias {
 
-    use features\console\builders\VirtualHostBuilder;
+    use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
 
-    final class RenameVhostCommand extends CommandContract
+    final class RenameAliasCommand extends CommandContract
     {
 
         private readonly string $oldName;
@@ -20,13 +20,13 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('rename:vhost', 'old_name new_name', 'Rename a virtual host file from old name to a new name', 'localhost blog.com');
+            parent::__construct('alias:rename', 'old_name new_name', 'Rename an alias from old name to a new name', 'blog.com blog.co.tz');
         }
 
         public function execute(): void
         {
-            $vhost = new VirtualHostBuilder($this->oldName);
-            $vhost->rename($this->newName);
+            $alias = new AliasBuilder($this->oldName);
+            $alias->rename($this->newName);
         }
 
         public function parse(string ...$args): CommandContract

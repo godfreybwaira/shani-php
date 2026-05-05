@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\vhost {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
@@ -18,7 +18,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('list:vhost', null, 'Show the list of all existing virtual hosts', null);
+            parent::__construct('vhost:list', null, 'Show the list of all existing virtual hosts', null);
         }
 
         public function execute(): void

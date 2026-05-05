@@ -1,19 +1,20 @@
 <?php
 
 /**
- * Description of LocateDtoCommand
+ * Description of ListDtoCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\dto {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\helpers\Formatter;
 
-    final class LocateDtoCommand extends CommandContract
+    final class ListDtoCommand extends CommandContract
     {
 
         private readonly string $moduleName;
@@ -21,14 +22,18 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:dto', 'module_name@project_name', 'Show the full path to an existing project DTOs', 'posts@blog');
+            parent::__construct('dto:list', 'module_name@project_name', 'Show all existing project DTOs in a given module', 'posts@blog');
         }
 
         public function execute(): void
         {
             $project = new ProjectBuilder($this->projectName);
             $module = new ModuleBuilder($this->moduleName, $project);
-            $module->locateDto();
+            $dtos = $module->getDtos();
+            echo Formatter::placeCenter('List of DTOs (in ' . $this->moduleName . ' module)', underline: true);
+            foreach ($dtos as $key => $dto) {
+                echo Formatter::formatSentence($key + 1, $dto->dtoName);
+            }
         }
 
         public function parse(string ...$args): CommandContract

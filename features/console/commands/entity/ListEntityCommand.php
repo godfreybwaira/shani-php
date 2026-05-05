@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Description of ListServiceCommand
+ * Description of ListEntityCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\entity {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
 
-    final class ListServiceCommand extends CommandContract
+    final class ListEntityCommand extends CommandContract
     {
 
         private readonly string $moduleName;
@@ -22,25 +22,26 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('list:service', 'module_name@project_name', 'Show the list of existing project services', 'posts@blog');
+            parent::__construct('entity:list', 'module_name@project_name', 'Show all the existing project entities (models) in a given module', 'posts@blog');
         }
 
         public function execute(): void
         {
             $project = new ProjectBuilder($this->projectName);
             $module = new ModuleBuilder($this->moduleName, $project);
-            $services = $module->getServices();
-            echo Formatter::placeCenter('List of Services (in ' . $this->moduleName . ' module)', underline: true);
-            foreach ($services as $key => $service) {
-                echo Formatter::formatSentence($key + 1, $service->serviceName);
+
+            $entities = $module->getEntities();
+            echo Formatter::placeCenter('List of Entities (in ' . $this->moduleName . ' module)', underline: true);
+            foreach ($entities as $key => $entity) {
+                echo Formatter::formatSentence($key + 1, $entity->entityName);
             }
         }
 
         public function parse(string ...$args): CommandContract
         {
             $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 3) {
-                throw new \ArgumentCountError('Atleast three arguments are required.');
+            if (count($values) < 2) {
+                throw new \ArgumentCountError('Atleast two arguments are required.');
             }
             $this->validateHostName($values[0]);
             $this->validateHostName($values[1]);

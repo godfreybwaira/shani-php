@@ -7,14 +7,14 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\controller {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
 
-    final class ListProjectControllersCommand extends CommandContract
+    final class ListControllersCommand extends CommandContract
     {
 
         private readonly string $projectName;
@@ -22,7 +22,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('list:controller', 'module_name@project_name', 'Show all available project controllers and their respective request method', 'posts@blog');
+            parent::__construct('controller:list', 'module_name@project_name', 'Show all available project controllers and their respective request method', 'posts@blog');
         }
 
         public function execute(): void

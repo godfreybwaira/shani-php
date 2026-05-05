@@ -1,20 +1,19 @@
 <?php
 
 /**
- * Description of ListEntityCommand
+ * Description of LocateServiceCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\service {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
-    use features\console\helpers\Formatter;
 
-    final class ListEntityCommand extends CommandContract
+    final class LocateServiceCommand extends CommandContract
     {
 
         private readonly string $moduleName;
@@ -22,19 +21,14 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('list:entity', 'module_name@project_name', 'Show all the existing project entities (models) in a given module', 'posts@blog');
+            parent::__construct('service:locate', 'module_name@project_name', 'Show the full path to an existing project services', 'posts@blog');
         }
 
         public function execute(): void
         {
             $project = new ProjectBuilder($this->projectName);
             $module = new ModuleBuilder($this->moduleName, $project);
-
-            $entities = $module->getEntities();
-            echo Formatter::placeCenter('List of Entities (in ' . $this->moduleName . ' module)', underline: true);
-            foreach ($entities as $key => $entity) {
-                echo Formatter::formatSentence($key + 1, $entity->entityName);
-            }
+            $module->locateServices();
         }
 
         public function parse(string ...$args): CommandContract

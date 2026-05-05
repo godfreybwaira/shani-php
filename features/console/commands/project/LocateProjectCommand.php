@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
@@ -19,7 +19,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:project', 'project_name', 'Show the full path to an existing project', 'blog');
+            parent::__construct('project:locate', 'project_name', 'Show the full path to an existing project', 'blog');
         }
 
         public function execute(): void

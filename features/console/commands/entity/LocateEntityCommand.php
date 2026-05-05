@@ -1,19 +1,19 @@
 <?php
 
 /**
- * Description of LocateServiceCommand
+ * Description of LocateEntityCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\entity {
 
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
 
-    final class LocateServiceCommand extends CommandContract
+    final class LocateEntityCommand extends CommandContract
     {
 
         private readonly string $moduleName;
@@ -21,14 +21,14 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('locate:service', 'module_name@project_name', 'Show the full path to an existing project services', 'posts@blog');
+            parent::__construct('entity:locate', 'module_name@project_name', 'Show the full path to an existing project entities (models)', 'posts@blog');
         }
 
         public function execute(): void
         {
             $project = new ProjectBuilder($this->projectName);
             $module = new ModuleBuilder($this->moduleName, $project);
-            $module->locateServices();
+            $module->locateEntities();
         }
 
         public function parse(string ...$args): CommandContract

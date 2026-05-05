@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\alias {
 
     use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
@@ -20,7 +20,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('create:alias', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
+            parent::__construct('alias:create', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
         }
 
         public function execute(): void

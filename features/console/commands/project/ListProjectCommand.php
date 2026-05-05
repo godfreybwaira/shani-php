@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\project {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
@@ -18,7 +18,7 @@ namespace features\console\commands {
 
         public function __construct()
         {
-            parent::__construct('list:project', null, 'Show all available projects', null);
+            parent::__construct('project:list', null, 'Show all available projects', null);
         }
 
         public function execute(): void

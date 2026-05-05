@@ -28,9 +28,9 @@ namespace features\console\commands {
 
         public function execute(): void
         {
-//            $this->help();
-            $value = \features\console\printer\ConsoleIO::input('What is your name?', 'Please use valid chars', fn($value) => $value !== 'hello');
-            echo 'Good! "' . $value . '"' . PHP_EOL;
+            $this->help();
+//            $value = \features\console\printer\ConsoleIO::input('What is your name?', 'Please use valid chars', fn($value) => $value !== 'hello');
+//            echo 'Good! "' . $value . '"' . PHP_EOL;
         }
 
         private function help(): void

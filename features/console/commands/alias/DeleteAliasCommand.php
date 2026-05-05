@@ -1,31 +1,31 @@
 <?php
 
 /**
- * Description of DeleteVhostCommand
+ * Description of DeleteAliasCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\alias {
 
-    use features\console\builders\VirtualHostBuilder;
+    use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
 
-    final class DeleteVhostCommand extends CommandContract
+    final class DeleteAliasCommand extends CommandContract
     {
 
-        private readonly string $hostname;
+        private readonly string $aliasName;
 
         public function __construct()
         {
-            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration', 'localhost');
+            parent::__construct('alias:delete', 'alias', 'Delete an alias', 'blog.com');
         }
 
         public function execute(): void
         {
-            $vhost = new VirtualHostBuilder($this->hostname);
-            $vhost->delete();
+            $alias = new AliasBuilder($this->aliasName);
+            $alias->delete();
         }
 
         public function parse(string ...$args): CommandContract
@@ -35,7 +35,7 @@ namespace features\console\commands {
                 throw new \ArgumentCountError('Atleast one argument is required.');
             }
             $this->validateHostName($values[0]);
-            $this->hostname = $values[0];
+            $this->aliasName = $values[0];
             return $this;
         }
     }
