@@ -12,17 +12,31 @@ namespace features\console {
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
 
+    /**
+     * Class CommandRegistry
+     *
+     * Maintains a registry of all available CLI commands.
+     * Responsible for registering, retrieving, and executing commands
+     * by name with their arguments. Provides access to the full command map.
+     *
+     */
     final class CommandRegistry
     {
 
+        /** Map of command names to their CommandContract instances. */
         private readonly WritableMap $commands;
 
+        /**
+         * Initialize the registry and register all commands.
+         */
         public function __construct()
         {
             $this->commands = $this->registerAll();
         }
 
         /**
+         * Generator that yields all available command instances.
+         *
          * @return \Generator<CommandContract>
          */
         private function commandList(): \Generator
@@ -61,6 +75,17 @@ namespace features\console {
             yield new commands\LocateDtoCommand();
         }
 
+        /**
+         * Run a command by name with arguments.
+         *
+         * @param string $commandName The name of the command to execute.
+         * @param string ...$args     Arguments passed to the command.
+         *
+         * @return void
+         *
+         * @throws \InvalidArgumentException If the command is not found or arguments are invalid.
+         * @throws \Throwable For any other runtime errors during execution.
+         */
         public function run(string $commandName, string ...$args): void
         {
             $command = $this->getCommandByName($commandName);
@@ -76,6 +101,11 @@ namespace features\console {
             }
         }
 
+        /**
+         * Register all commands into a writable map.
+         *
+         * @return WritableMap Map of command names to command instances.
+         */
         private function registerAll(): WritableMap
         {
             $map = new WritableMap();
@@ -86,6 +116,14 @@ namespace features\console {
             return $map;
         }
 
+        /**
+         * Retrieve a command by its name.
+         *
+         * @param string $commandName The name of the command.
+         * @return CommandContract The command instance.
+         *
+         * @throws \InvalidArgumentException If the command is not found.
+         */
         public function getCommandByName(string $commandName): CommandContract
         {
             $command = $this->commands->getOne($commandName);
@@ -95,6 +133,11 @@ namespace features\console {
             throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
         }
 
+        /**
+         * Get all registered commands.
+         *
+         * @return ReadableMap Map of all commands.
+         */
         public function getAllCommands(): ReadableMap
         {
             return $this->commands;

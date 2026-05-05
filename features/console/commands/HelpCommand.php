@@ -29,7 +29,7 @@ namespace features\console\commands {
         public function execute(): void
         {
 //            $this->help();
-            $value = \features\console\io\ConsoleIO::input('What is your name?', 'Please use valid chars', fn($value) => $value !== 'hello');
+            $value = \features\console\printer\ConsoleIO::input('What is your name?', 'Please use valid chars', fn($value) => $value !== 'hello');
             echo 'Good! "' . $value . '"' . PHP_EOL;
         }
 
