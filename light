@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use features\cli\CommandRegistry;
+use features\console\CommandRegistry;
 use shani\launcher\ShaniConstants;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
