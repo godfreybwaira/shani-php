@@ -61,8 +61,15 @@ namespace features\cli\commands {
                 return;
             }
             $index = 1;
-            $commands->each(function (string $name, CommandContract $cmd) use (&$index, $sentenceWidth) {
+            $excluded = [];
+            $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
                 if (str_contains($cmd->name, $this->commandName)) {
+                    $excluded[$cmd->name] = 1;
+                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);
+                }
+            });
+            $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
+                if (!isset($excluded[$cmd->name]) && str_contains(strtolower($cmd->description), $this->commandName)) {
                     echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);
                 }
             });
