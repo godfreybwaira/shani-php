@@ -192,7 +192,7 @@ namespace features\console\builders {
                 $versions = yaml_parse_file($file);
                 foreach ($versions['version']['supported'] as $version) {
                     if ($version['name'] === $this->projectName) {
-                        $vhosts[] = new VirtualHostBuilder(basename($file, '.yml'));
+                        $vhosts[] = new VirtualHostBuilder(basename($file, '.yml'), $this);
                     }
                 }
             }

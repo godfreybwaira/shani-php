@@ -18,6 +18,8 @@ namespace features\console\builders {
     final class VirtualHostBuilder implements LightBuilderInterface
     {
 
+        private const CONFIG_FILE = 'v1-config.yml';
+
         public readonly string $hostname;
         private readonly string $hostPath;
         public readonly string $hostDirectory;
@@ -94,26 +96,29 @@ namespace features\console\builders {
         private function createHost(): void
         {
             mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
-            $from = CommandContract::ASSETS . '/vhost.yml';
+            $fromfile = CommandContract::ASSETS . '/vhost.yml';
+            ///////////////////////////////////////////
+            $search = ['{project_name}', '{config_filename}'];
+            $replace = [$this->project->projectName, self::CONFIG_FILE];
+            $content = str_replace($search, $replace, file_get_contents($fromfile));
             ///////////////////////////////////////////
             $intext = 'Creating host: ' . $this->hostname;
-            $outtext = copy($from, $this->hostPath) ? 'Success' : 'Failed';
+            $outtext = file_put_contents($this->hostPath, $content) !== false ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 
         private function copyConfigFile(): void
         {
-            $configFile = 'v1-config.yml';
             if (!is_dir($this->hostDirectory)) {
                 mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
             }
-            $search = ['{namespace}', '{config_dir}', '{project_name}', '{config_filename}'];
-            $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR, $this->project->projectName, $configFile];
-            $template = CommandContract::ASSETS . '/' . $configFile;
+            $search = ['{namespace}', '{config_dir}'];
+            $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR];
+            $template = CommandContract::ASSETS . '/' . self::CONFIG_FILE;
             $content = str_replace($search, $replace, file_get_contents($template));
             ///////////////////////////////////////////
-            $intext = 'Copying configuration file: ' . $configFile;
-            $outtext = file_put_contents($this->hostDirectory . '/' . $configFile, $content) !== false ? 'Success' : 'Failed';
+            $intext = 'Copying configuration file: ' . self::CONFIG_FILE;
+            $outtext = file_put_contents($this->hostDirectory . '/' . self::CONFIG_FILE, $content) !== false ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 

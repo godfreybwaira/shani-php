@@ -25,13 +25,17 @@ namespace features\console\commands\vhost {
         {
             echo Formatter::placeCenter('List of Virtual Hosts', underline: true);
 
-            $hosts = glob(Framework::DIR_HOSTS . '/*.yml');
-            if (empty($hosts)) {
+            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
+            if (empty($hostfiles)) {
                 echo 'No host found.' . PHP_EOL;
                 return;
             }
-            foreach ($hosts as $key => $name) {
-                echo Formatter::formatSentence($key + 1, basename($name, '.yml'));
+            echo Formatter::formatSentence('HOST', 'PROJECT');
+            foreach ($hostfiles as $key => $file) {
+                $versions = yaml_parse_file($file);
+                foreach ($versions['version']['supported'] as $version) {
+                    echo Formatter::formatSentence(($key + 1) . '. ' . basename($file, '.yml'), $version['name']);
+                }
             }
         }
 
