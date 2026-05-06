@@ -15,6 +15,9 @@ version:
   # Supported versions and their dedicated config files
   # The framework will load the corresponding .yml file for the chosen version
   supported:
+    # Project version number
     v1:
+      # Project name
       name: {project_name}
+      # Project configuration file
       config: {config_filename}
