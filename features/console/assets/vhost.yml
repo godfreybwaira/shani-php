@@ -2,7 +2,7 @@
 # Versioning Strategy
 # =============================================
 version:
-  # Header the client sends to request a specific version
+  # Header the client sends to request a specific project version number
   request_header: "Accept-Version"
 
   # Header we send back to tell the client which version was actually used
