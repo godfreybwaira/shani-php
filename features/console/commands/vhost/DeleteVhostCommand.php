@@ -11,6 +11,7 @@ namespace features\console\commands\vhost {
 
     use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class DeleteVhostCommand extends CommandContract
     {
@@ -19,7 +20,7 @@ namespace features\console\commands\vhost {
 
         public function __construct()
         {
-            parent::__construct('vhost:delete', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration', 'localhost');
+            parent::__construct('delete:vhost', 'hostname', 'Delete a virtual host file, it\'s aliases and corresponding configuration', 'localhost');
         }
 
         public function execute(): void
@@ -30,12 +31,16 @@ namespace features\console\commands\vhost {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 1) {
-                throw new \ArgumentCountError('Atleast one argument is required.');
+            if (empty($args)) {
+                $this->hostname = ConsoleIO::input('Write the host name to delete:', $this->validHostName);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 1) {
+                    throw new \ArgumentCountError('Atleast one argument is required.');
+                }
+                $this->validateHostName($values[0]);
+                $this->hostname = ConsoleIO::input('Write again the host name to delete:', fn(string $s) => $s === $values[0]);
             }
-            $this->validateHostName($values[0]);
-            $this->hostname = $values[0];
             return $this;
         }
     }

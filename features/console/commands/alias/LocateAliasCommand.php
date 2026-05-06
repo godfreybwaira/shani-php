@@ -11,6 +11,7 @@ namespace features\console\commands\alias {
 
     use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class LocateAliasCommand extends CommandContract
     {
@@ -19,7 +20,7 @@ namespace features\console\commands\alias {
 
         public function __construct()
         {
-            parent::__construct('alias:locate', 'alias', 'Show the full path to an existing virtual host alias', 'blog.com');
+            parent::__construct('locate:alias', 'alias', 'Show the full path to an existing virtual host alias', 'blog.com');
         }
 
         public function execute(): void
@@ -30,11 +31,15 @@ namespace features\console\commands\alias {
 
         public function parse(string ...$args): CommandContract
         {
-            if (count($args) < 1) {
-                throw new \ArgumentCountError('Atleast one argument is allowed.');
+            if (empty($args)) {
+                $this->aliasName = ConsoleIO::input('What is the alias name?', $this->validHostName);
+            } else {
+                if (count($args) < 1) {
+                    throw new \ArgumentCountError('Atleast one argument is allowed.');
+                }
+                $this->validateHostName($args[0]);
+                $this->aliasName = $args[0];
             }
-            $this->validateHostName($args[0]);
-            $this->aliasName = $args[0];
             return $this;
         }
     }

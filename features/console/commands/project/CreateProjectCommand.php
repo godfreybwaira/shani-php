@@ -11,6 +11,7 @@ namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class CreateProjectCommand extends CommandContract
     {
@@ -20,7 +21,7 @@ namespace features\console\commands\project {
 
         public function __construct()
         {
-            parent::__construct('project:create', 'project_name@hostname', 'Create a new project', 'demo@localhost');
+            parent::__construct('create:project', 'project_name@hostname', 'Create a new project', 'demo@localhost');
         }
 
         public function execute(): void
@@ -33,14 +34,19 @@ namespace features\console\commands\project {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 2) {
-                throw new \ArgumentCountError('Atleast two arguments are required.');
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->hostname = ConsoleIO::input('What is the host name?', $this->validHostName);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->validateHostName($values[1]);
+                $this->projectName = $values[0];
+                $this->hostname = $values[1];
             }
-            $this->validateIdentifier($values[0]);
-            $this->validateHostName($values[1]);
-            $this->projectName = $values[0];
-            $this->hostname = $values[1];
             return $this;
         }
     }

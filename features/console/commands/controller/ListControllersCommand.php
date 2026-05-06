@@ -13,6 +13,7 @@ namespace features\console\commands\controller {
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
 
     final class ListControllersCommand extends CommandContract
     {
@@ -22,7 +23,7 @@ namespace features\console\commands\controller {
 
         public function __construct()
         {
-            parent::__construct('controller:list', 'module_name@project_name', 'Show all available project controllers and their respective request method', 'posts@blog');
+            parent::__construct('list:controller', 'module_name@project_name', 'Show all available project controllers and their respective request method', 'posts@blog');
         }
 
         public function execute(): void
@@ -43,14 +44,19 @@ namespace features\console\commands\controller {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 2) {
-                throw new \ArgumentCountError('Atleast two argument is required.');
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->moduleName = ConsoleIO::input('What is the module name?', $this->validIdentifier);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two argument is required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->validateIdentifier($values[1]);
+                $this->moduleName = $values[0];
+                $this->projectName = $values[1];
             }
-            $this->validateIdentifier($values[0]);
-            $this->validateIdentifier($values[1]);
-            $this->moduleName = $values[0];
-            $this->projectName = $values[1];
             return $this;
         }
     }

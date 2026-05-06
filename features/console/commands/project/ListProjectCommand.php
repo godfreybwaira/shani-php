@@ -18,7 +18,7 @@ namespace features\console\commands\project {
 
         public function __construct()
         {
-            parent::__construct('project:list', null, 'Show all available projects', null);
+            parent::__construct('list:project', null, 'Show all available projects', null);
         }
 
         public function execute(): void

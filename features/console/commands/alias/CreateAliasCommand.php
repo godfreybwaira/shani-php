@@ -11,6 +11,7 @@ namespace features\console\commands\alias {
 
     use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class CreateAliasCommand extends CommandContract
     {
@@ -20,7 +21,7 @@ namespace features\console\commands\alias {
 
         public function __construct()
         {
-            parent::__construct('alias:create', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
+            parent::__construct('create:alias', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
         }
 
         public function execute(): void
@@ -31,14 +32,19 @@ namespace features\console\commands\alias {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 2) {
-                throw new \ArgumentCountError('Atleast two arguments are required.');
+            if (empty($args)) {
+                $this->aliasName = ConsoleIO::input('What is the alias name?', $this->validHostName);
+                $this->hostname = ConsoleIO::input('What is the host name?', $this->validHostName);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->validateHostName($values[1]);
+                $this->aliasName = $values[0];
+                $this->hostname = $values[1];
             }
-            $this->validateIdentifier($values[0]);
-            $this->validateHostName($values[1]);
-            $this->aliasName = $values[0];
-            $this->hostname = $values[1];
             return $this;
         }
     }

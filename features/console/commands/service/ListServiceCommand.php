@@ -13,6 +13,7 @@ namespace features\console\commands\service {
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
 
     final class ListServiceCommand extends CommandContract
     {
@@ -22,7 +23,7 @@ namespace features\console\commands\service {
 
         public function __construct()
         {
-            parent::__construct('service:list', 'module_name@project_name', 'Show the list of existing project services', 'posts@blog');
+            parent::__construct('list:service', 'module_name@project_name', 'Show the list of existing project services', 'posts@blog');
         }
 
         public function execute(): void
@@ -38,14 +39,19 @@ namespace features\console\commands\service {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 3) {
-                throw new \ArgumentCountError('Atleast three arguments are required.');
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->moduleName = ConsoleIO::input('What is the module name?', $this->validIdentifier);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 3) {
+                    throw new \ArgumentCountError('Atleast three arguments are required.');
+                }
+                $this->validateHostName($values[0]);
+                $this->validateHostName($values[1]);
+                $this->moduleName = $values[0];
+                $this->projectName = $values[1];
             }
-            $this->validateHostName($values[0]);
-            $this->validateHostName($values[1]);
-            $this->moduleName = $values[0];
-            $this->projectName = $values[1];
             return $this;
         }
     }

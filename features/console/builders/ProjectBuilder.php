@@ -148,6 +148,16 @@ namespace features\console\builders {
             echo Formatter::formatSentence($intext, $outtext);
         }
 
+        public function delete(): void
+        {
+            $vhosts = $this->getVirtualHosts();
+            foreach ($vhosts as $vhost) {
+                $vhost->delete();
+            }
+            $resultText = Directory::delete($this->config->root) ? 'Success' : 'Failed';
+            echo Formatter::formatSentence('Deleting project "' . $this->projectName . '"', $resultText);
+        }
+
         #[\Override]
         public function build(): self
         {
@@ -172,6 +182,11 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_dir($this->config->root);
+        }
+
+        public function getVirtualHosts(): array
+        {
+            //TODO
         }
     }
 

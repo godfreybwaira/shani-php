@@ -18,7 +18,7 @@ namespace features\console\commands\vhost {
 
         public function __construct()
         {
-            parent::__construct('vhost:list', null, 'Show the list of all existing virtual hosts', null);
+            parent::__construct('list:vhost', null, 'Show the list of all existing virtual hosts', null);
         }
 
         public function execute(): void

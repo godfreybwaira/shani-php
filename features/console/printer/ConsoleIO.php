@@ -28,8 +28,8 @@ namespace features\console\printer {
          * @param string   $text     The prompt message displayed to the user.
          *
          * @param \Closure $validator A closure that receives the input string and returns
-         * a boolean indicating whether the input is valid. The signature of validator is
-         * <code>$validator(string $input):bool</code>
+         * a boolean indicating whether the input is valid. The signature of a validator
+         * is <code>$validator(string $input):bool</code>
          *
          * @param string $onError Optional error message shown when validation fails.
          * If null, the original prompt message is reused.

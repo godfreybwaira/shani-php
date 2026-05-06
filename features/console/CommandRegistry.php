@@ -48,6 +48,7 @@ namespace features\console {
             yield new commands\project\CreateProjectCommand();
             yield new commands\project\ListProjectCommand();
             yield new commands\project\LocateProjectCommand();
+            yield new commands\project\DeleteProjectCommand();
 
             // Module
             yield new commands\module\CreateModuleCommand();

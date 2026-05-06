@@ -11,6 +11,7 @@ namespace features\console\commands\alias {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
     use shani\launcher\Framework;
 
     final class ListHostAliasCommand extends CommandContract
@@ -20,7 +21,7 @@ namespace features\console\commands\alias {
 
         public function __construct()
         {
-            parent::__construct('alias:list', 'hostname', 'Show all available host aliases', 'localhost');
+            parent::__construct('list:alias', 'hostname', 'Show all available host aliases', 'localhost');
         }
 
         public function execute(): void
@@ -44,12 +45,16 @@ namespace features\console\commands\alias {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 1) {
-                throw new \ArgumentCountError('Atleast one argument is required.');
+            if (empty($args)) {
+                $this->hostname = ConsoleIO::input('What is the host name?', $this->validHostName);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 1) {
+                    throw new \ArgumentCountError('Atleast one argument is required.');
+                }
+                $this->validateHostName($values[0]);
+                $this->hostname = $values[0];
             }
-            $this->validateHostName($values[0]);
-            $this->hostname = $values[0];
             return $this;
         }
     }

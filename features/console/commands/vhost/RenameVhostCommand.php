@@ -21,7 +21,7 @@ namespace features\console\commands\vhost {
 
         public function __construct()
         {
-            parent::__construct('vhost:rename', 'old_name new_name', 'Rename a virtual host file from old name to a new name', 'localhost blog.com');
+            parent::__construct('rename:vhost', 'old_name new_name', 'Rename a virtual host file from old name to a new name', 'localhost blog.com');
         }
 
         public function execute(): void

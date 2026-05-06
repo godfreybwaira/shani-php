@@ -12,6 +12,7 @@ namespace features\console\commands\module {
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
 
     final class ListModulesCommand extends CommandContract
     {
@@ -20,7 +21,7 @@ namespace features\console\commands\module {
 
         public function __construct()
         {
-            parent::__construct('module:list', 'project_name', 'Show all available project modules', 'blog');
+            parent::__construct('list:module', 'project_name', 'Show all available project modules', 'blog');
         }
 
         public function execute(): void
@@ -39,12 +40,16 @@ namespace features\console\commands\module {
 
         public function parse(string ...$args): CommandContract
         {
-            $values = explode(self::SEPARATOR, $args[0]);
-            if (count($values) < 1) {
-                throw new \ArgumentCountError('Atleast one argument is required.');
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 1) {
+                    throw new \ArgumentCountError('Atleast one argument is required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->projectName = $values[0];
             }
-            $this->validateIdentifier($values[0]);
-            $this->projectName = $values[0];
             return $this;
         }
     }
