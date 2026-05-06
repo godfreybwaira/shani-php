@@ -29,6 +29,21 @@ namespace features\ds {
         }
 
         /**
+         * Sort data in order using key
+         * @param bool $asc Whether to sort in ascending or descending order.
+         * @return self
+         */
+        public function sort(bool $asc = true): self
+        {
+            if ($asc) {
+                ksort($this->data);
+            } else {
+                krsort($this->data);
+            }
+            return $this;
+        }
+
+        /**
          * Check if an iterable object is empty or not
          * @return bool
          */

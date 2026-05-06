@@ -29,8 +29,6 @@ namespace features\console\commands {
         public function execute(): void
         {
             $this->help();
-//            $value = \features\console\printer\ConsoleIO::input('What is your name?', 'Please use valid chars', fn($value) => $value !== 'hello');
-//            echo 'Good! "' . $value . '"' . PHP_EOL;
         }
 
         private function help(): void
@@ -42,7 +40,7 @@ namespace features\console\commands {
             if ($this->commandName === null) {
                 echo Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' ');
                 $commands = $this->registry->getAllCommands();
-                $commands->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
+                $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
                     echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $width);
                 });
             } else {
@@ -64,7 +62,7 @@ namespace features\console\commands {
             }
             $index = 1;
             $excluded = [];
-            $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
+            $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
                 if (str_contains($cmd->name, $this->commandName)) {
                     $excluded[$cmd->name] = 1;
                     echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);

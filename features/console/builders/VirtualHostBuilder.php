@@ -107,8 +107,8 @@ namespace features\console\builders {
             if (!is_dir($this->hostDirectory)) {
                 mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
             }
-            $search = ['{namespace}', '{config_dir}'];
-            $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR];
+            $search = ['{namespace}', '{config_dir}', '{project_name}', '{config_filename}'];
+            $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR, $this->project->projectName, $configFile];
             $template = CommandContract::ASSETS . '/' . $configFile;
             $content = str_replace($search, $replace, file_get_contents($template));
             ///////////////////////////////////////////

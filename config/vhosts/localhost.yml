@@ -15,5 +15,6 @@ version:
   # Supported versions and their dedicated config files
   # The framework will load the corresponding .yml file for the chosen version
   supported:
-    v1: v1-config.yml
-    v2: v2-config.yml
+    v1:
+      name: demo
+      config: v1-config.yml

@@ -186,7 +186,17 @@ namespace features\console\builders {
 
         public function getVirtualHosts(): array
         {
-            //TODO
+            $vhosts = [];
+            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
+            foreach ($hostfiles as $file) {
+                $versions = yaml_parse_file($file);
+                foreach ($versions['version']['supported'] as $version) {
+                    if ($version['name'] === $this->projectName) {
+                        $vhosts[] = new VirtualHostBuilder(basename($file, '.yml'));
+                    }
+                }
+            }
+            return $vhosts;
         }
     }
 
