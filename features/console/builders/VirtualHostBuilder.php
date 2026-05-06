@@ -97,9 +97,12 @@ namespace features\console\builders {
         {
             mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
             $fromfile = CommandContract::ASSETS . '/vhost.yml';
+            $defaultVersion = 'v1';
+            $versionPlaceholder = '####v1#';
+            $space = str_repeat(' ', strlen($versionPlaceholder) - 3);
             ///////////////////////////////////////////
-            $search = ['{project_name}', '{config_filename}'];
-            $replace = [$this->project->projectName, self::CONFIG_FILE];
+            $search = [$versionPlaceholder, '{project_name}', '{default_version}'];
+            $replace = [$space . $defaultVersion . ': ' . self::CONFIG_FILE . PHP_EOL . $versionPlaceholder, $this->project->projectName, $defaultVersion];
             $content = str_replace($search, $replace, file_get_contents($fromfile));
             ///////////////////////////////////////////
             $intext = 'Creating host: ' . $this->hostname;

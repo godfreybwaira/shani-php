@@ -1,6 +1,6 @@
-# =============================================
-# Versioning Strategy
-# =============================================
+# =====================================================================
+# Versioning Strategy: One Project, one virtual host, multiple versions
+# =====================================================================
 version:
   # Header the client sends to request a specific project version number
   request_header: "Accept-Version"
@@ -15,9 +15,5 @@ version:
   # Supported versions and their dedicated config files
   # The framework will load the corresponding .yml file for the chosen version
   supported:
-    # Project version number
-    v1:
-      # Project name
-      name: demo
-      # Project configuration file
-      config: v1-config.yml
+    v1: v1-config.yml
+    v2: v2-config.yml

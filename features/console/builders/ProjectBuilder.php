@@ -150,10 +150,7 @@ namespace features\console\builders {
 
         public function delete(): void
         {
-            $vhosts = $this->getVirtualHosts();
-            foreach ($vhosts as $vhost) {
-                $vhost->delete();
-            }
+            $this->getVirtualHost()?->delete();
             $resultText = Directory::delete($this->config->root) ? 'Success' : 'Failed';
             echo Formatter::formatSentence('Deleting project "' . $this->projectName . '"', $resultText);
         }
@@ -163,8 +160,7 @@ namespace features\console\builders {
         {
             if (!$this->exists()) {
                 echo Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
-                $vhost = new VirtualHostBuilder($this->hostname, $this);
-                $vhost->build();
+                $this->getVirtualHost()->build();
                 $this->copyCGIfiles();
                 $this->copySettings();
             }
@@ -184,19 +180,19 @@ namespace features\console\builders {
             return is_dir($this->config->root);
         }
 
-        public function getVirtualHosts(): array
+        public function getVirtualHost(): ?VirtualHostBuilder
         {
-            $vhosts = [];
+            if (isset($this->hostname)) {
+                return new VirtualHostBuilder($this->hostname, $this);
+            }
             $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
             foreach ($hostfiles as $file) {
-                $versions = yaml_parse_file($file);
-                foreach ($versions['version']['supported'] as $version) {
-                    if ($version['name'] === $this->projectName) {
-                        $vhosts[] = new VirtualHostBuilder(basename($file, '.yml'), $this);
-                    }
+                $config = yaml_parse_file($file);
+                if ($config['project_name'] === $this->projectName) {
+                    return new VirtualHostBuilder(basename($file, '.yml'), $this);
                 }
             }
-            return $vhosts;
+            return null;
         }
     }
 

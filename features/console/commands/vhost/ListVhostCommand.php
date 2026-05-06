@@ -32,11 +32,9 @@ namespace features\console\commands\vhost {
             }
             echo Formatter::formatSentence('HOST', 'PROJECT');
             foreach ($hostfiles as $key => $file) {
-                $versions = yaml_parse_file($file);
+                $config = yaml_parse_file($file);
                 $hostname = basename($file, '.yml');
-                foreach ($versions['version']['supported'] as $version) {
-                    echo Formatter::formatSentence(($key + 1) . '. ' . $hostname, $version['name']);
-                }
+                echo Formatter::formatSentence(($key + 1) . '. ' . $hostname, $config['project_name']);
             }
         }
 
