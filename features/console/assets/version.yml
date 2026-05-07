@@ -1,0 +1,3 @@
+    {version_number}:
+      name: {version_name}
+      config: {config_file}

@@ -2,6 +2,7 @@
 # Versioning Strategy: One Project, one virtual host, multiple versions
 # =====================================================================
 project_name: {project_name}
+
 version:
   # Header the client sends to request a specific project version number
   request_header: "Accept-Version"

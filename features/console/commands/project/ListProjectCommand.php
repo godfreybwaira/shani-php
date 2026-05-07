@@ -9,6 +9,7 @@
 
 namespace features\console\commands\project {
 
+    use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use shani\launcher\Framework;
@@ -24,9 +25,10 @@ namespace features\console\commands\project {
         public function execute(): void
         {
             echo 'Listing all projects' . PHP_EOL;
-            $projects = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
-            foreach ($projects as $key => $name) {
-                echo Formatter::formatSentence($key - 1, $name);
+            $directories = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
+            foreach ($directories as $key => $projectName) {
+                $project = new ProjectBuilder($projectName);
+                echo Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->vhost->hostname);
             }
         }
 

@@ -27,8 +27,8 @@ namespace features\console\builders {
         {
             $this->module = $module;
             $this->serviceName = Formatter::trimSuffix($serviceName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->services);
-            $this->path = $module->path . $module->project->config->services . '/' . $this->serviceName . '.php';
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->services);
+            $this->path = $module->path . $module->version->config->services . '/' . $this->serviceName . '.php';
         }
 
         #[\Override]

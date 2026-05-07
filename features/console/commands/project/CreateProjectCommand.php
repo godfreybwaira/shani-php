@@ -21,15 +21,13 @@ namespace features\console\commands\project {
 
         public function __construct()
         {
-            parent::__construct('create:project', 'project_name@hostname', 'Create a new project', 'demo@localhost');
+            parent::__construct('create:project', 'project_name@hostname', 'Create a new main project. You can add versions to main project', 'demo@localhost');
         }
 
         public function execute(): void
         {
-            $moduleName = 'users';
-            $controllerName = 'Account';
-            $project = new ProjectBuilder($this->projectName, $moduleName, $controllerName);
-            $project->setHostName($this->hostname)->build();
+            $project = new ProjectBuilder($this->projectName, $this->hostname);
+            $project->build();
         }
 
         public function parse(string ...$args): CommandContract

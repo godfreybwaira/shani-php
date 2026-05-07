@@ -18,24 +18,22 @@ namespace features\console\builders {
     final class VirtualHostBuilder implements LightBuilderInterface
     {
 
-        private const CONFIG_FILE = 'v1-config.yml';
+        private const CONFIG_FILE = 'config.yml';
 
         public readonly string $hostname;
-        private readonly string $hostPath;
-        public readonly string $hostDirectory;
-        private readonly ?ProjectBuilder $project;
+        public readonly string $path;
+        private readonly string $directory;
 
-        public function __construct(string $hostname, ProjectBuilder $project = null)
+        public function __construct(string $hostname)
         {
             $this->hostname = $hostname;
-            $this->project = $project;
-            $this->hostDirectory = Framework::DIR_HOSTS . '/' . $this->hostname;
-            $this->hostPath = $this->hostDirectory . '.yml';
+            $this->directory = Framework::DIR_HOSTS . '/' . $this->hostname;
+            $this->path = $this->directory . '.yml';
         }
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->hostPath : null;
+            echo $this->exists() ? $this->path : null;
         }
 
         public function delete(): void
@@ -44,16 +42,14 @@ namespace features\console\builders {
                 echo '[ERROR] Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }
-            ///////////////////////////////////////////
-            if (Directory::delete($this->hostDirectory)) {
+            if (Directory::delete($this->directory)) {
                 $aliases = $this->getAliases();
                 foreach ($aliases as $alias) {
                     $alias->delete();
                 }
             }
-            ///////////////////////////////////////////
             $intext = 'Deleting host: ' . $this->hostname;
-            $outtext = unlink($this->hostPath) ? 'Success' : 'Failed';
+            $outtext = unlink($this->path) ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 
@@ -64,15 +60,13 @@ namespace features\console\builders {
                 return;
             }
             $newVhost = new VirtualHostBuilder($newName);
-            ///////////////////////////////////////////
             if ($newVhost->exists()) {
                 throw new \RuntimeException('Host name "' . $newName . '" already exists.');
             }
             $aliases = $this->getAliases();
             $intext = 'Renaming a host from "' . $this->hostname . '" to "' . $newVhost->hostname . '"';
-            $renamed = rename($this->hostDirectory, $newVhost->hostDirectory) && rename($this->hostPath, $newVhost->hostPath);
+            $renamed = rename($this->directory, $newVhost->directory) && rename($this->path, $newVhost->path);
             $outtext = $renamed ? 'Success' : 'Failed';
-            ///////////////////////////////////////////
             if ($renamed) {
                 foreach ($aliases as $alias) {
                     file_put_contents($alias->aliasPath, $newVhost->hostname);
@@ -93,46 +87,56 @@ namespace features\console\builders {
             return $aliases;
         }
 
-        private function createHost(): void
+        private function cleanHostFile(ProjectVersionBuilder $version, string $versionTemplate): void
         {
-            mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
-            $fromfile = CommandContract::ASSETS . '/vhost.yml';
-            $defaultVersion = 'v1';
-            $versionPlaceholder = '####v1#';
-            $space = str_repeat(' ', strlen($versionPlaceholder) - 3);
-            ///////////////////////////////////////////
-            $search = [$versionPlaceholder, '{project_name}', '{default_version}'];
-            $replace = [$space . $defaultVersion . ': ' . self::CONFIG_FILE . PHP_EOL . $versionPlaceholder, $this->project->projectName, $defaultVersion];
-            $content = str_replace($search, $replace, file_get_contents($fromfile));
-            ///////////////////////////////////////////
-            $intext = 'Creating host: ' . $this->hostname;
-            $outtext = file_put_contents($this->hostPath, $content) !== false ? 'Success' : 'Failed';
+            $placeholder = '####v1#';
+            $search = [
+                $placeholder, '{project_name}', '{default_version}'
+            ];
+            $replace = [
+                $versionTemplate . PHP_EOL . $placeholder,
+                $version->project->projectName, $version->versionNumber
+            ];
+            $content = str_replace($search, $replace, file_get_contents($this->path));
+            $intext = 'Cleaning host file: ' . basename($this->path);
+            $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
         }
 
-        private function copyConfigFile(): void
+        public function addVersion(ProjectVersionBuilder $version): void
         {
-            if (!is_dir($this->hostDirectory)) {
-                mkdir($this->hostDirectory, LocalStorage::FILE_MODE, true);
+            if (!$this->exists()) {
+                echo 'Host name "' . $this->hostname . '" does not exists.' . PHP_EOL;
+                return;
             }
+            $filename = $version->versionName . '-' . self::CONFIG_FILE;
+            $this->cleanHostFile($version, self::getVersionTemplate($version, $filename));
             $search = ['{namespace}', '{config_dir}'];
-            $replace = [$this->project->namespace, ProjectBuilder::CONFIG_DIR];
+            $replace = [$version->namespace, ProjectVersionBuilder::CONFIG_DIR];
             $template = CommandContract::ASSETS . '/' . self::CONFIG_FILE;
             $content = str_replace($search, $replace, file_get_contents($template));
-            ///////////////////////////////////////////
-            $intext = 'Copying configuration file: ' . self::CONFIG_FILE;
-            $outtext = file_put_contents($this->hostDirectory . '/' . self::CONFIG_FILE, $content) !== false ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            $outtext = file_put_contents($this->directory . '/' . $filename, $content) !== false ? 'Success' : 'Failed';
+            echo Formatter::formatSentence('Creating configuration file: ' . $filename, $outtext);
+        }
+
+        private static function getVersionTemplate(ProjectVersionBuilder $version, string $filename): string
+        {
+            $content = file_get_contents(CommandContract::ASSETS . '/version.yml');
+            $search = ['{version_number}', '{version_name}', '{config_file}'];
+            $replace = [$version->versionNumber, $version->versionName, $filename];
+            return str_replace($search, $replace, $content);
         }
 
         #[\Override]
         public function build(): self
         {
             if (!$this->exists()) {
-                $this->createHost();
-                $this->copyConfigFile();
+                mkdir($this->directory, LocalStorage::FILE_MODE, true);
+                $content = file_get_contents(CommandContract::ASSETS . '/vhost.yml');
+                $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
+                echo Formatter::formatSentence('Creating host: ' . $this->hostname, $outtext);
             } else {
-                echo 'Host name "' . $this->hostname . '" is already taken.' . PHP_EOL;
+                echo Formatter::formatSentence('Host name "' . $this->hostname . '" already exists', 'Failed');
             }
             return $this;
         }
@@ -140,7 +144,7 @@ namespace features\console\builders {
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->hostPath);
+            return is_file($this->path);
         }
     }
 

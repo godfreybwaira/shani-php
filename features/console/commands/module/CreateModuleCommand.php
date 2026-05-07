@@ -9,6 +9,7 @@
 
 namespace features\console\commands\module {
 
+    use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
     use features\console\printer\ConsoleIO;
@@ -26,8 +27,9 @@ namespace features\console\commands\module {
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName, $this->moduleName);
-            $project->build();
+            $project = new ProjectBuilder($this->projectName);
+            $module = new ModuleBuilder($this->moduleName, $project);
+            $module->build();
         }
 
         public function parse(string ...$args): CommandContract

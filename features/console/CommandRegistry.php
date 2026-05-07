@@ -50,6 +50,12 @@ namespace features\console {
             yield new commands\project\LocateProjectCommand();
             yield new commands\project\DeleteProjectCommand();
 
+            //Version
+            yield new commands\version\CreateVersionCommand();
+            yield new commands\version\DeleteVersionCommand();
+            yield new commands\version\ListVersionCommand();
+            yield new commands\version\LocateVersionCommand();
+
             // Module
             yield new commands\module\CreateModuleCommand();
             yield new commands\module\LocateModuleCommand();
@@ -61,9 +67,7 @@ namespace features\console {
             yield new commands\controller\ListControllersCommand();
 
             // VHost
-            yield new commands\vhost\CreateVHostCommand();
             yield new commands\vhost\ListVhostCommand();
-            yield new commands\vhost\DeleteVhostCommand();
             yield new commands\vhost\RenameVhostCommand();
             yield new commands\vhost\LocateVhostCommand();
 

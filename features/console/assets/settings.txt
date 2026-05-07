@@ -20,7 +20,7 @@ namespace {namespace}\{config_dir} {
         #[\Override]
         public function pathConfig(): PathConfig
         {
-            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/{project_name}', homePath: '{home_path}');
+            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/{version_subpath}', homePath: '{home_path}');
         }
 
         #[\Override]

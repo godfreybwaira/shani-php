@@ -52,9 +52,9 @@ namespace shani\launcher {
         private static function getConfigPreference(string $hostname, array $host, HttpHeader $headers): ?RequestPreference
         {
             $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
-            $filename = $host['version']['supported'][$version] ?? null;
-            $filepath = Framework::DIR_HOSTS . '/' . $hostname . '/' . $filename;
-            if ($filename !== null && is_file($filepath)) {
+            $supportedVersion = $host['version']['supported'][$version] ?? null;
+            $filepath = $supportedVersion !== null ? Framework::DIR_HOSTS . '/' . $hostname . '/' . $supportedVersion['config'] : null;
+            if ($filepath !== null && is_file($filepath)) {
                 return new RequestPreference(
                         $version,
                         $filepath,

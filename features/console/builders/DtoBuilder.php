@@ -29,8 +29,8 @@ namespace features\console\builders {
             $this->module = $module;
             $this->entityNamespace = $entityNamespace;
             $this->dtoName = Formatter::trimSuffix($dtoName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->dto);
-            $this->path = $module->path . $module->project->config->dto . '/' . $this->dtoName . '.php';
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->dto);
+            $this->path = $module->path . $module->version->config->dto . '/' . $this->dtoName . '.php';
         }
 
         #[\Override]

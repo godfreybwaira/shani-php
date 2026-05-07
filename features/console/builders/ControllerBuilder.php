@@ -28,13 +28,13 @@ namespace features\console\builders {
             $this->controllerName = $controllerName;
             $this->requestMethod = strtolower($requestMethod);
             $this->module = $module;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->controllers . '\\' . $this->requestMethod);
-            $this->path = $module->path . $module->project->config->controllers . '/' . $this->requestMethod . '/' . $controllerName . '.php';
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->controllers . '\\' . $this->requestMethod);
+            $this->path = $module->path . $module->version->config->controllers . '/' . $this->requestMethod . '/' . $controllerName . '.php';
         }
 
         private function createViews(): void
         {
-            $viewPath = $this->module->path . $this->module->project->config->views . '/' . strtolower($this->controllerName);
+            $viewPath = $this->module->path . $this->module->version->config->views . '/' . strtolower($this->controllerName);
             mkdir($viewPath, LocalStorage::FILE_MODE, true);
             $intext = 'Creating view: ' . Framework::HOME_FUNCTION;
             $outtext = copy(CommandContract::ASSETS . '/view.txt', $viewPath . '/' . Framework::HOME_FUNCTION . '.php') ? 'Success' : 'Failed';
@@ -43,7 +43,7 @@ namespace features\console\builders {
 
         private function createLanguage(): void
         {
-            $languagePath = $this->module->path . $this->module->project->config->languages . '/';
+            $languagePath = $this->module->path . $this->module->version->config->languages . '/';
             $languagePath .= strtolower($this->controllerName) . '/' . Framework::HOME_FUNCTION;
             mkdir($languagePath, LocalStorage::FILE_MODE, true);
             ///////////////////////////////////////////

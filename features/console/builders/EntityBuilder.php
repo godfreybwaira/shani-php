@@ -27,8 +27,8 @@ namespace features\console\builders {
         {
             $this->module = $module;
             $this->entityName = Formatter::trimSuffix($entityName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->project->config->entities);
-            $this->path = $module->path . $module->project->config->entities . '/' . $this->entityName . '.php';
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->entities);
+            $this->path = $module->path . $module->version->config->entities . '/' . $this->entityName . '.php';
         }
 
         #[\Override]
@@ -47,7 +47,7 @@ namespace features\console\builders {
                 $replace = [$this->namespace, $this->entityName];
                 mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/entity.txt'));
-                mkdir($this->module->path . $this->module->project->config->enums, LocalStorage::FILE_MODE, true);
+                mkdir($this->module->path . $this->module->version->config->enums, LocalStorage::FILE_MODE, true);
                 ///////////////////////////////////////////
                 $intext = 'Creating entity: ' . $this->entityName;
                 $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';

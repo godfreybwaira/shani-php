@@ -17,15 +17,15 @@ namespace features\console\builders {
 
         public readonly string $namespace;
         public readonly string $path;
-        public readonly ProjectBuilder $project;
+        public readonly ProjectVersionBuilder $version;
         public readonly string $moduleName;
 
-        public function __construct(string $moduleName, ProjectBuilder $project)
+        public function __construct(string $moduleName, ProjectVersionBuilder $version)
         {
+            $this->version = $version;
             $this->moduleName = $moduleName;
-            $this->project = $project;
-            $this->namespace = str_replace('/', '\\', $project->namespace . $project->config->modules . '\\' . $moduleName);
-            $this->path = $project->config->root . $project->config->modules . '/' . $moduleName;
+            $this->namespace = str_replace('/', '\\', $version->namespace . $version->config->modules . '\\' . $moduleName);
+            $this->path = $version->config->root . $version->config->modules . '/' . $moduleName;
         }
 
         public function getControllers(): array
@@ -34,7 +34,7 @@ namespace features\console\builders {
             if (!$this->exists()) {
                 return $controllers;
             }
-            $controllerPath = $this->path . $this->project->config->controllers;
+            $controllerPath = $this->path . $this->version->config->controllers;
             $folders = array_diff(scandir($controllerPath), ['.', '..']);
             foreach ($folders as $method) {
                 $files = array_diff(scandir($controllerPath . '/' . $method), ['.', '..']);
@@ -54,7 +54,7 @@ namespace features\console\builders {
         {
             $services = [];
             if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->project->config->services), ['.', '..']);
+                $folders = array_diff(scandir($this->path . $this->version->config->services), ['.', '..']);
                 foreach ($folders as $serviceName) {
                     $services[] = new ServiceBuilder(basename($serviceName, '.php'), $this);
                 }
@@ -66,7 +66,7 @@ namespace features\console\builders {
         {
             $entities = [];
             if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->project->config->entities), ['.', '..']);
+                $folders = array_diff(scandir($this->path . $this->version->config->entities), ['.', '..']);
                 foreach ($folders as $entityName) {
                     $entities[] = new EntityBuilder(basename($entityName, '.php'), $this);
                 }
@@ -78,7 +78,7 @@ namespace features\console\builders {
         {
             $dtos = [];
             if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->project->config->dto), ['.', '..']);
+                $folders = array_diff(scandir($this->path . $this->version->config->dto), ['.', '..']);
                 foreach ($folders as $dtoName) {
                     $dtos[] = new DtoBuilder(basename($dtoName, '.php'), $this, '');
                 }
@@ -89,8 +89,9 @@ namespace features\console\builders {
         #[\Override]
         public function build(): self
         {
-            if (!$this->project->exists()) {
-                echo 'Could not create module "' . $this->moduleName . '", project "' . $this->project->projectName . '" does not exists.' . PHP_EOL;
+            if (!$this->version->exists()) {
+                echo 'Could not create module "' . $this->moduleName . '", project version "';
+                echo $this->version->versionName . '" does not exists.' . PHP_EOL;
                 return $this;
             }
             if (!$this->exists()) {
