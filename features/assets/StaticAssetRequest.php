@@ -10,8 +10,6 @@
 namespace features\assets {
 
     use features\utils\File;
-    use features\utils\MediaType;
-    use shani\config\PathConfig;
     use shani\http\enums\HttpStatus;
     use shani\http\FileOutputStream;
     use shani\http\HttpCache;
@@ -19,6 +17,7 @@ namespace features\assets {
     use shani\http\HttpResponse;
     use shani\launcher\App;
     use shani\launcher\Framework;
+    use shani\utils\VirtualHostMapper;
 
     /**
      * Represents a request for a static asset.
@@ -60,17 +59,17 @@ namespace features\assets {
         /**
          * Creates a StaticAssetRequest from a given URI path and configuration.
          *
-         * @param PathConfig $config   Path configuration containing bucket mappings.
+         * @param VirtualHostMapper $mapper   VirtualHostMapper object.
          * @param string     $uriPath  The URI path of the asset.
          *
          * @return StaticAssetRequest|null The created request, or null if invalid.
          */
-        public static function fromPath(PathConfig $config, string $uriPath): ?StaticAssetRequest
+        public static function fromPath(VirtualHostMapper $mapper, string $uriPath): ?StaticAssetRequest
         {
             $values = explode('/', trim($uriPath, '/'));
             return match ('/' . $values[0]) {
-                $config->privateBucket => new StaticAssetRequest($uriPath, $config->privateBucket, StaticAssetAccessType::PRIVATE_ACCESS),
-                $config->publicBucket => new StaticAssetRequest($uriPath, $config->publicBucket, StaticAssetAccessType::PUBLIC_ACCESS),
+                $mapper->privateBucket => new StaticAssetRequest($uriPath, $mapper->privateBucket, StaticAssetAccessType::PRIVATE_ACCESS),
+                $mapper->publicBucket => new StaticAssetRequest($uriPath, $mapper->publicBucket, StaticAssetAccessType::PUBLIC_ACCESS),
                 default => null
             };
         }
@@ -140,10 +139,9 @@ namespace features\assets {
          */
         private static function delegateToNginx(App $app, File $file, string $bucket): ?HttpResponse
         {
-            $config = $app->config->pathConfig();
             $filepath = match ($bucket) {
-                $config->publicBucket => substr($file->path, strlen(Framework::DIR_ASSETS)),
-                $config->privateBucket => substr($file->path, strlen(Framework::DIR_STORAGE)),
+                $app->preference->mapper->publicBucket => substr($file->path, strlen(Framework::DIR_ASSETS)),
+                $app->preference->mapper->privateBucket => substr($file->path, strlen(Framework::DIR_STORAGE)),
             };
             $app->response->header()->addAll([
                 'X-Accel-Redirect' => $bucket . $filepath,

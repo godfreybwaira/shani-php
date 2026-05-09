@@ -9,21 +9,23 @@
 
 namespace shani\launcher {
 
-    use features\utils\Concurrency;
     use features\ds\map\ReadableMap;
-    use features\utils\Event;
-    use shani\http\HttpHeader;
-    use shani\http\enums\HttpStatus;
-    use shani\http\RequestEntity;
-    use shani\http\ResponseEntity;
-    use shani\contracts\ResponseWriterInterface;
-    use shani\servers\SupportedWebServer;
-    use shani\launcher\Framework;
     use features\logging\Logger;
     use features\logging\LoggingLevel;
-    use shani\launcher\App;
     use features\storage\LocalStorage;
     use features\test\helpers\TestRunner;
+    use features\utils\Concurrency;
+    use features\utils\Event;
+    use shani\contracts\ResponseWriterInterface;
+    use shani\http\enums\HttpStatus;
+    use shani\http\HttpHeader;
+    use shani\http\RequestEntity;
+    use shani\http\ResponseEntity;
+    use shani\launcher\App;
+    use shani\launcher\Framework;
+    use shani\servers\SupportedWebServer;
+    use shani\utils\RequestPreference;
+    use shani\utils\VirtualHostMapper;
 
     /**
      * Handles application startup, virtual host resolution, and request dispatching.
@@ -45,22 +47,15 @@ namespace shani\launcher {
          * Resolve configuration preference for a given host and request headers.
          *
          * @param string $hostname Hostname being requested.
-         * @param array $host Host configuration array.
+         * @param VirtualHostMapper $mapper Virtual host configurations from host file.
          * @param HttpHeader $headers HTTP request headers.
          * @return RequestPreference|null Request preference object or null if unsupported.
          */
-        private static function getConfigPreference(string $hostname, array $host, HttpHeader $headers): ?RequestPreference
+        private static function getConfigPreference(string $hostname, VirtualHostMapper $mapper, HttpHeader $headers): ?RequestPreference
         {
-            $version = $headers->getOne($host['version']['request_header'], $host['version']['default']);
-            $supportedVersion = $host['version']['supported'][$version] ?? null;
-            $filepath = $supportedVersion !== null ? Framework::DIR_HOSTS . '/' . $hostname . '/' . $supportedVersion['config'] : null;
-            if ($filepath !== null && is_file($filepath)) {
-                return new RequestPreference(
-                        $version,
-                        $filepath,
-                        $host['version']['request_header'],
-                        $host['version']['response_header']
-                );
+            $version = $headers->getOne($mapper->requestHeader, $mapper->defaultVersion);
+            if (!empty($mapper->supportedVersions[$version])) {
+                return new RequestPreference($version, $mapper, $hostname);
             }
             return null;
         }
@@ -77,7 +72,8 @@ namespace shani\launcher {
         {
             $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
             if (is_file($yaml)) {
-                return self::getConfigPreference($name, yaml_parse_file($yaml), $headers);
+                $mapper = VirtualHostMapper::fromArray(yaml_parse_file($yaml));
+                return self::getConfigPreference($name, $mapper, $headers);
             }
             $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
             if (is_file($alias)) {
@@ -106,18 +102,17 @@ namespace shani\launcher {
                     $writer->send($response);
                     return;
                 }
-                $responseHeader->addOne(HttpHeader::VARY, $preference->requestVersionHeader);
-                if ($preference->contentVersionHeader !== null) {
+                $responseHeader->addOne(HttpHeader::VARY, $preference->mapper->requestHeader);
+                if ($preference->mapper->responseHeader !== null) {
                     $responseHeader->addAll([
-                        $preference->contentVersionHeader => $preference->appVersion,
-                        HttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS => $preference->contentVersionHeader
+                        $preference->mapper->responseHeader => $preference->versionNumber,
+                        HttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS => $preference->mapper->responseHeader
                     ]);
                 }
                 if (!$preference->vhost->getOne('testmode')) {
-                    $app = new App($preference->vhost, $response, $writer, $framework);
+                    $app = new App($preference, $response, $writer, $framework);
                     $app->launch();
                 } else {
-                    echo json_encode($preference);
                     $msg = TestRunner::start($preference);
                     $response->setBody($msg);
                     $writer->close($response);

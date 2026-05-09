@@ -80,7 +80,7 @@ namespace features\middleware {
             if ($this->app->auth->accessGranted()) {
                 return;
             }
-            if ($this->app->request->isStaticResource($this->app->config->pathConfig())) {
+            if ($this->app->request->isStaticResource($this->app->preference->mapper)) {
                 $user = $this->app->auth->getUserDetails();
                 if (StaticAssetOwnership::hasAccess($user, $this->app->request->uri->path())) {
                     return;

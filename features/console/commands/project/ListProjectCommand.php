@@ -27,8 +27,8 @@ namespace features\console\commands\project {
             echo 'Listing all projects' . PHP_EOL;
             $directories = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
             foreach ($directories as $key => $projectName) {
-                $project = new ProjectBuilder($projectName);
-                echo Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->vhost->hostname);
+                $project = ProjectBuilder::fromName($projectName);
+                echo Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->hostname);
             }
         }
 

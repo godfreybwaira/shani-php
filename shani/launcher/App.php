@@ -13,8 +13,8 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
-    use features\ds\map\WritableMap;
     use features\ds\map\ReadableMap;
+    use features\ds\map\WritableMap;
     use features\exceptions\BadRequestException;
     use features\exceptions\CustomException;
     use features\exceptions\NotFoundException;
@@ -33,6 +33,7 @@ namespace shani\launcher {
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
     use shani\launcher\Framework;
+    use shani\utils\RequestPreference;
 
     /**
      * Core application class that manages request handling, response writing,
@@ -69,10 +70,10 @@ namespace shani\launcher {
         private readonly ResponseWriterInterface $writer;
 
         /**
-         * Application virtual host configuration
-         * @var ReadableMap
+         * Request Preference
+         * @var RequestPreference
          */
-        public readonly ReadableMap $vhost;
+        public readonly RequestPreference $preference;
 
         /**
          * HTTP request object
@@ -125,19 +126,19 @@ namespace shani\launcher {
         /**
          * Create an application instance.
          *
-         * @param ReadableMap $vhost Virtual host configuration.
+         * @param RequestPreference $preference Virtual host configuration.
          * @param ResponseEntity $res Response entity object.
          * @param ResponseWriterInterface $writer Response writer object.
          * @param Framework $framework Framework configuration object.
          */
-        public function __construct(ReadableMap $vhost, ResponseEntity $res, ResponseWriterInterface $writer, Framework $framework)
+        public function __construct(RequestPreference $preference, ResponseEntity $res, ResponseWriterInterface $writer, Framework $framework)
         {
-            $this->vhost = $vhost;
+            $this->preference = $preference;
             $this->response = $res;
             $this->writer = $writer;
             $this->framework = $framework;
             $this->request = $res->request;
-            $class = $vhost->getOne('config');
+            $class = $preference->vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
             $this->auth = new AuthenticationManager($this);
@@ -271,7 +272,7 @@ namespace shani\launcher {
                 if ($this->config->getStaticAssetServer() === StaticAssetServers::DISABLE) {
                     throw CustomException::notFound();
                 }
-                $staticRequest = StaticAssetRequest::fromPath($this->path, $this->request->uri->path());
+                $staticRequest = StaticAssetRequest::fromPath($this->preference->mapper, $this->request->uri->path());
                 if ($staticRequest === null) {
                     throw CustomException::notFound();
                 }

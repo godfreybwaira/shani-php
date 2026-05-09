@@ -18,6 +18,7 @@ namespace shani\http {
     use features\utils\URI;
     use shani\config\PathConfig;
     use shani\http\RequestRoute;
+    use shani\utils\VirtualHostMapper;
 
     /**
      * RequestEntity represents an HTTP request entity with its URI, headers,
@@ -280,14 +281,14 @@ namespace shani\http {
         /**
          * Checks if this is an active static asset request.
          *
-         * @param PathConfig $config Path configuration
+         * @param VirtualHostMapper $mapper Host configuration
          *
          * @return bool True if it is a static asset request, false otherwise.
          */
-        public function isStaticResource(PathConfig $config): bool
+        public function isStaticResource(VirtualHostMapper $mapper): bool
         {
             $prefix = '/' . $this->route->module;
-            return $prefix === $config->privateBucket || $prefix === $config->publicBucket;
+            return $prefix === $mapper->privateBucket || $prefix === $mapper->publicBucket;
         }
     }
 

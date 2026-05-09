@@ -61,7 +61,9 @@ namespace features\test\helpers {
 
         /**
          * Run application test
+         *
          * @param RequestPreference $preference Client request preference
+         *         *
          * @return string Test result description and status
          */
         public static function start(RequestPreference $preference): string

@@ -25,8 +25,8 @@ namespace features\console\commands\project {
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName);
-            $project->delete();
+            $project = ProjectBuilder::fromName($this->projectName);
+            $project?->delete();
         }
 
         public function parse(string ...$args): CommandContract

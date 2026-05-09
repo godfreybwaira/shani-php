@@ -5,7 +5,6 @@ namespace {namespace}\{config_dir} {
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
     use shani\launcher\App;
-    use shani\launcher\Framework;
 
     final class {file_name} extends BasicConfiguration
     {
@@ -20,7 +19,11 @@ namespace {namespace}\{config_dir} {
         #[\Override]
         public function pathConfig(): PathConfig
         {
-            return $this->pathConfig ??= new PathConfig(root: Framework::DIR_APPS . '/{version_subpath}', homePath: '{home_path}');
+            return $this->pathConfig ??= new PathConfig(
+                    preferences: $this->app->preference,
+                    versionNumber: $this->app->preference->versionNumber,
+                    homePath: '{home_path}'
+            );
         }
 
         #[\Override]

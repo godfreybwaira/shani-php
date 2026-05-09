@@ -13,54 +13,38 @@ namespace features\console\builders {
     use features\console\helpers\Formatter;
     use features\utils\Directory;
     use shani\launcher\Framework;
+    use shani\utils\VirtualHostMapper;
 
     final class ProjectBuilder implements LightBuilderInterface
     {
 
-        private const DEFAULT_VERSION_NUMBER = 'v1';
-        private const DEFAULT_VERSION_NAME = 'main';
+        public const VERSION_NUMBER = 'v1';
 
-        public readonly string $path;
-        public ?VirtualHostBuilder $vhost;
         public readonly string $projectName;
-        private readonly ?string $hostname;
-        private ProjectVersionBuilder $version;
+        public readonly string $hostname;
+        private readonly VirtualHostBuilder $vhost;
+        private readonly string $path;
 
-        public function __construct(string $projectName, string $hostname = null)
+        public function __construct(string $projectName, string $hostname)
         {
             $this->hostname = $hostname;
             $this->projectName = $projectName;
+            $this->vhost = new VirtualHostBuilder($hostname, $this);
             $this->path = Framework::DIR_APPS . '/' . $projectName;
-            $this->version = new ProjectVersionBuilder($this, self::DEFAULT_VERSION_NUMBER, self::DEFAULT_VERSION_NAME);
-            $this->vhost = $this->getVirtualHost();
         }
 
-        private function getVirtualHost(): ?VirtualHostBuilder
+        private function copyCGIfiles(): void
         {
-            if ($this->hostname !== null) {
-                return new VirtualHostBuilder($this->hostname);
-            }
-            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
-            foreach ($hostfiles as $file) {
-                $config = yaml_parse_file($file);
-                if ($config['project_name'] === $this->projectName) {
-                    return new VirtualHostBuilder(basename($file, '.yml'));
-                }
-            }
-            return null;
-        }
-
-        private function prepareCGIfiles(): void
-        {
-            $destination = $this->version->path . '/.cgi';
+            $mapper = $this->vhost->getConfigurations();
+            $destination = $this->path . $mapper->cgiDirectory;
             $source = CommandContract::ASSETS . '/cgi';
             if (Directory::copy($source, $destination)) {
-                $this->cleanApacheFiles($destination);
-                $this->cleanNginxFiles($destination);
+                $this->cleanApacheFiles($mapper, $destination);
+                $this->cleanNginxFiles($mapper, $destination);
             }
         }
 
-        private function cleanApacheFiles(string $destination)
+        private function cleanApacheFiles(VirtualHostMapper $mapper, string $destination)
         {
             $shaniRoot = basename(SHANI_SERVER_ROOT);
             $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
@@ -73,7 +57,7 @@ namespace features\console\builders {
             ];
             $replace = [
                 $shaniRoot, $assetDir, $sslDir, $storageDir, $this->hostname,
-                $this->version->config->publicBucket
+                $mapper->publicBucket
             ];
             ///////////////////////////////////////////
             $apachePath = $destination . '/apache/apache.conf';
@@ -84,13 +68,13 @@ namespace features\console\builders {
             echo Formatter::formatSentence($intext, $outtext);
         }
 
-        private function cleanNginxFiles(string $destination)
+        private function cleanNginxFiles(VirtualHostMapper $mapper, string $destination)
         {
             $cgiDir = basename($destination) . '/nginx';
             $path = dirname($destination) . '/' . $cgiDir;
             $nginxFile = $path . '/nginx.conf';
             $customFile = $path . '/custom.conf';
-            $appDirpath = substr($this->version->config->root, strlen(dirname(SHANI_SERVER_ROOT)) + 1);
+            $appDirpath = substr($this->path, strlen(dirname(SHANI_SERVER_ROOT)) + 1);
             $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
             $storageDir = substr(Framework::DIR_STORAGE, strlen(SHANI_SERVER_ROOT) + 1);
             ///////////////////////////////////////////
@@ -99,8 +83,8 @@ namespace features\console\builders {
                 '{{storage_dir}}', '{{public_bucket}}'
             ];
             $replace1 = [
-                $appDirpath . '/' . $cgiDir, $assetDir, $this->version->config->privateBucket,
-                $storageDir, $this->version->config->publicBucket
+                $appDirpath . '/' . $cgiDir, $assetDir, $mapper->privateBucket,
+                $storageDir, $mapper->publicBucket
             ];
             $nginxContent = str_replace($search1, $replace1, file_get_contents($nginxFile));
             file_put_contents($nginxFile, $nginxContent);
@@ -115,8 +99,7 @@ namespace features\console\builders {
 
         public function delete(): void
         {
-            $this->path;
-            $this->vhost?->delete();
+            $this->vhost->delete();
             $resultText = Directory::delete($this->path) ? 'Success' : 'Failed';
             echo Formatter::formatSentence('Deleting project "' . $this->projectName . '"', $resultText);
         }
@@ -134,10 +117,11 @@ namespace features\console\builders {
             } else if ($this->vhost->exists()) {
                 echo Formatter::formatSentence('Host name "' . $this->hostname . '" already exists', 'Failed');
             } else {
-                echo Formatter::placeCenter('PROJECT: ' . $this->projectName, underline: true);
+                echo Formatter::placeCenter('Building Project "' . $this->projectName . '"', underline: true);
                 $this->vhost->build();
-                $this->version->build();
-                $this->prepareCGIfiles();
+                $this->copyCGIfiles();
+                $version = new ProjectVersionBuilder($this->vhost, self::VERSION_NUMBER);
+                $version->build();
             }
             return $this;
         }
@@ -146,6 +130,18 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_dir($this->path);
+        }
+
+        public static function fromName(string $projectName): ?ProjectBuilder
+        {
+            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
+            foreach ($hostfiles as $file) {
+                $config = yaml_parse_file($file);
+                if ($config['project_name'] === $projectName) {
+                    return new ProjectBuilder($projectName, basename($file, '.yml'));
+                }
+            }
+            return null;
         }
     }
 

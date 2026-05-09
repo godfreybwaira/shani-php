@@ -103,7 +103,7 @@ Now, look at the following example of a resource file:
 ```php
 <?php
 
-namespace apps\demo\modules\schools\logic\controllers\get {
+namespace apps\demo\main\modules\schools\logic\controllers\get {
 
 	use shani\launcher\App;
 
@@ -167,7 +167,7 @@ The following is the default application configuration that comes with **Shani**
 # names of your choice, e.g DEV, TEST, PROD
 ENVIRONMENTS:
   # Must extends shani\contracts\BasicPresets
-  DEV: \apps\demo\config\Settings
+  DEV: \apps\demo\main\config\Settings
   # Active environment can be any one of the provided above.
 ACTIVE_ENVIRONMENT: DEV
 # Whether an application is able to run or not
@@ -178,9 +178,9 @@ Let us customize this file to fit our application needs:
 
 ```yml
 ENVIRONMENTS:
-  DEV: \apps\demo\config\DevSettings
-  TEST: \apps\demo\config\TestSettings
-  PROD: \apps\demo\config\ProdSettings
+  DEV: \apps\demo\main\config\DevSettings
+  TEST: \apps\demo\main\config\TestSettings
+  PROD: \apps\demo\main\config\ProdSettings
 ACTIVE_ENVIRONMENT: DEV
 RUNNING: true
 ```
@@ -190,7 +190,7 @@ The next step is to create these configuration class files. We will create them 
 ```php
 <php
 
-namespace apps\demo\config {
+namespace apps\demo\main\config {
 
     use shani\contracts\BasicPresets;
     use shani\launcher\App;

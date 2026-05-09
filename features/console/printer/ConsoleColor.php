@@ -23,6 +23,9 @@ namespace features\console\printer {
         /** Reset to default terminal color. */
         case RESET = "\033[0m";
 
+        /** Bold text */
+        case BOLD = "\033[1m";
+
         // Regular Colors
 
         /** Black text. */

@@ -2,6 +2,19 @@
 # Versioning Strategy: One Project, one virtual host, multiple versions
 # =====================================================================
 project_name: demo
+
+# Directory for storing CGI related configurations for Web servers like Apache and Nginx
+cgi_directory: /.cgi
+
+# Application storage locations
+app_storage: /.bucket
+# Static assets storage location
+buckets:
+  # Accessible by asset owner, group or anyone if it is the group asset and no group is provided.
+  private: /0pv
+  # Public assets is accessible by everyone.
+  public: /1pb
+
 version:
   # Header the client sends to request a specific project version number
   request_header: "Accept-Version"
@@ -19,3 +32,4 @@ version:
     v1:
       name: main
       config: main-config.yml
+####v1#

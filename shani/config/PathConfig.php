@@ -9,6 +9,9 @@
 
 namespace shani\config {
 
+    use shani\launcher\Framework;
+    use shani\utils\VirtualHostMapper;
+
     /**
      * Defines default directory path configurations for an application.
      *
@@ -111,29 +114,15 @@ namespace shani\config {
         public readonly string $storage;
 
         /**
-         * Private storage directory for static contents. Private assets
-         * can be accessed by asset owner, group or anyone if it is the group
-         * asset and no group is provided.
-         *
-         * @var string
-         */
-        public readonly string $privateBucket;
-
-        /**
-         * Public storage directory for static contents. Public assets is
-         * accessible by everyone.
-         *
-         * @var string
-         */
-        public readonly string $publicBucket;
-
-        /**
          * Constructor for PathConfig.
          *
          * Initializes application path configuration with defaults if none are provided.
          *
-         * @param string $root
-         *     Application root directory.
+         * @param VirtualHostMapper $mapper
+         *     Virtual host configuration.
+         *
+         * @param string $versionNumber
+         *     Requested version number
          *
          * @param string $homePath
          *     Default URI path to a home page if '/' is requested.
@@ -161,15 +150,10 @@ namespace shani\config {
          *
          * @param string $languages
          *     Directory for language files. Defaults to '/presentation/lang'.
-         *
-         * @param string $privateBucket
-         *     Private storage directory. Defaults to '/0pv'.
-         *
-         * @param string $publicBucket
-         *     Public storage directory. Defaults to '/1pb'.
          */
         public function __construct(
-                string $root,
+                VirtualHostMapper $mapper,
+                string $versionNumber,
                 string $homePath,
                 string $controllers = '/logic/controllers',
                 string $services = '/logic/services',
@@ -179,20 +163,17 @@ namespace shani\config {
                 string $modules = '/modules',
                 string $views = '/presentation/views',
                 string $languages = '/presentation/lang',
-                string $privateBucket = '/0pv',
-                string $publicBucket = '/1pb'
         )
         {
-            $this->root = $root;
+            $projectRoot = Framework::DIR_APPS . '/' . $mapper->projectName;
+            $this->root = $projectRoot . '/' . $mapper->getVersionName($versionNumber);
             $this->homePath = $homePath;
             $this->controllers = $controllers;
             $this->services = $services;
             $this->modules = $modules;
             $this->views = $views;
             $this->languages = $languages;
-            $this->storage = $root . '/.bucket';
-            $this->privateBucket = $privateBucket;
-            $this->publicBucket = $publicBucket;
+            $this->storage = $projectRoot . $mapper->appStorage;
             $this->dto = $dto;
             $this->entities = $entities;
             $this->enums = $enums;

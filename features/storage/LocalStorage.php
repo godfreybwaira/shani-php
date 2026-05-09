@@ -95,7 +95,7 @@ namespace features\storage {
         {
             $userBucket = $this->app->auth->getUserDetails()->storageBucket;
             $prefix = StaticAssetOwnership::createUserFilePrefix($userBucket);
-            $destination = $this->pathTo($this->pathConfig->privateBucket . '/' . trim($bucket, '/'));
+            $destination = $this->pathTo($this->app->preference->mapper->privateBucket . '/' . trim($bucket, '/'));
             return $this->saveFile($file, rtrim($destination, '/'), $prefix, function ($filepath)use (&$file) {
                         if (move_uploaded_file($file->path, $filepath)) {
                             return;
@@ -178,7 +178,7 @@ namespace features\storage {
         #[\Override]
         public function assetUri(string $path): URI
         {
-            return $this->uri($this->pathConfig->publicBucket . $path);
+            return $this->uri($this->app->preference->mapper->publicBucket . $path);
         }
 
         #[\Override]
@@ -207,7 +207,7 @@ namespace features\storage {
         public function share2other(File $file, string $userBucket): string
         {
             $prefix = StaticAssetOwnership::createUserFilePrefix($userBucket);
-            $destination = $this->pathTo($this->pathConfig->privateBucket);
+            $destination = $this->pathTo($this->app->preference->mapper->privateBucket);
             return $this->shareFile($file, $destination, $prefix);
         }
 
@@ -216,7 +216,7 @@ namespace features\storage {
         {
             $userBucket = $this->app->auth->getUserDetails()->storageBucket;
             $prefix = StaticAssetOwnership::createGroupFilePrefix($userBucket, $groupBucket);
-            $destination = $this->pathTo($this->pathConfig->privateBucket);
+            $destination = $this->pathTo($this->app->preference->mapper->privateBucket);
             return $this->shareFile($file, $destination, $prefix);
         }
     }

@@ -11,8 +11,9 @@ namespace features\assets {
 
     use features\authentication\UserDetailsDto;
     use features\exceptions\ServerException;
-    use shani\config\PathConfig;
     use shani\http\RequestRoute;
+    use shani\launcher\App;
+    use shani\utils\VirtualHostMapper;
 
     /**
      * Represents ownership information for a static asset file.
@@ -78,14 +79,14 @@ namespace features\assets {
          *
          * @param string $filename File name
          * @param RequestRoute $route Request Route object
-         * @param PathConfig $config Path config object
+         * @param VirtualHostMapper $mapper VirtualHostMapper object
          *
          * @return bool True if public, false otherwise.
          */
-        public static function isPublicResource(string $filename, RequestRoute $route, PathConfig $config): bool
+        public static function isPublicResource(string $filename, RequestRoute $route, VirtualHostMapper $mapper): bool
         {
             $prefix = '/' . $route->module;
-            if ($prefix === $config->privateBucket) {
+            if ($prefix === $mapper->privateBucket) {
                 return strpos(basename($filename), self::SEPARATOR . self::SEPARATOR) > 0;
             }
             return false;

@@ -86,6 +86,17 @@ namespace features\console\printer {
         }
 
         /**
+         * Bold text.
+         *
+         * @param string $text The message text.
+         * @return PrintedText
+         */
+        public static function bold(string $text): PrintedText
+        {
+            return new PrintedText($text, ConsoleColor::BOLD);
+        }
+
+        /**
          * Create a custom colored message.
          *
          * @param string       $text  The message text.

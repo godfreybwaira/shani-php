@@ -260,12 +260,11 @@ namespace shani\contracts {
             if ($this->resourceExists($this->publicResources())) {
                 return true;
             }
-            $config = $this->pathConfig();
             $route = $this->app->request->route();
-            if ($config->publicBucket === '/' . $route->module) {
+            if ($this->app->preference->mapper->publicBucket === '/' . $route->module) {
                 return true;
             }
-            return StaticAssetOwnership::isPublicResource($this->app->request->uri->path(), $route, $config);
+            return StaticAssetOwnership::isPublicResource($this->app->request->uri->path(), $route, $this->app->preference->mapper);
         }
 
         /**
