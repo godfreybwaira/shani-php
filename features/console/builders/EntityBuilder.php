@@ -45,9 +45,14 @@ namespace features\console\builders {
             if (!$this->exists()) {
                 $search = ['{namespace}', '{class_name}'];
                 $replace = [$this->namespace, $this->entityName];
-                mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
+                $folder = dirname($this->path);
+                if (!is_dir($folder)) {
+                    mkdir($folder, LocalStorage::FILE_MODE, true);
+                }
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/entity.txt'));
-                mkdir($this->module->path . $this->module->version->config->enums, LocalStorage::FILE_MODE, true);
+                if (!is_dir($this->module->path . $this->module->version->config->enums)) {
+                    mkdir($this->module->path . $this->module->version->config->enums, LocalStorage::FILE_MODE, true);
+                }
                 ///////////////////////////////////////////
                 $intext = 'Creating entity: ' . $this->entityName;
                 $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';

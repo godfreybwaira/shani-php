@@ -10,7 +10,7 @@
 namespace features\console\commands\controller {
 
     use features\console\builders\ModuleBuilder;
-    use features\console\builders\ProjectBuilder;
+    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
     use features\console\printer\ConsoleIO;
 
@@ -18,34 +18,38 @@ namespace features\console\commands\controller {
     {
 
         private readonly string $moduleName;
+        private readonly string $projectVersion;
         private readonly string $projectName;
 
         public function __construct()
         {
-            parent::__construct('locate:controller', 'module_name@project_name', 'Show the full path to an existing project controllers', 'posts@blog');
+            parent::__construct('locate:controller', 'module_name@version_number@project_name', 'Show the full path to an existing project controllers', 'posts@v1@blog');
         }
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName);
-            $module = new ModuleBuilder($this->moduleName, $project);
+            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
+            $module = new ModuleBuilder($this->moduleName, $version);
             $module->locateControllers();
         }
 
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
                 $this->moduleName = ConsoleIO::input('What is the module name?', $this->validIdentifier);
+                $this->projectVersion = ConsoleIO::input('What is the project version number?', $this->validIdentifier);
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 2) {
-                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                if (count($values) < 3) {
+                    throw new \ArgumentCountError('Atleast three argument is required.');
                 }
-                $this->validateHostName($values[0]);
-                $this->validateHostName($values[1]);
+                $this->validateIdentifier($values[0]);
+                $this->validateIdentifier($values[1]);
+                $this->validateIdentifier($values[2]);
                 $this->moduleName = $values[0];
-                $this->projectName = $values[1];
+                $this->projectVersion = $values[1];
+                $this->projectName = $values[2];
             }
             return $this;
         }

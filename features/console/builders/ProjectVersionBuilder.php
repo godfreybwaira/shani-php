@@ -33,7 +33,8 @@ namespace features\console\builders {
             $this->vhost = $vhost;
             $this->versionNumber = $versionNumber;
             $this->versionName = $versionName ?? $versionNumber;
-            $this->config = new PathConfig($vhost->getConfigurations(), $this->versionNumber, self::getHomePath());
+            $mapper = VirtualHostBuilder::getConfigurations($vhost->path);
+            $this->config = new PathConfig($mapper, $this->versionNumber, self::getHomePath());
             $this->namespace = str_replace('/', '\\', substr($this->config->root, strlen(SHANI_SERVER_ROOT) + 1));
         }
 
@@ -100,6 +101,12 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_dir($this->config->root);
+        }
+
+        public static function fromVersion(string $versionNumber, string $projectName): ProjectVersionBuilder
+        {
+            $project = ProjectBuilder::fromName($projectName);
+            return new ProjectVersionBuilder($project->vhost, $versionNumber);
         }
     }
 

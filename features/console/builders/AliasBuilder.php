@@ -17,14 +17,14 @@ namespace features\console\builders {
 
         public readonly string $aliasPath;
         private readonly string $aliasName;
-        private readonly ?string $hostname;
+        private readonly string $hostname;
         private readonly string $hostPath;
 
-        public function __construct(string $aliasName, string $hostname = null)
+        public function __construct(string $aliasName, string $hostname)
         {
             $this->aliasName = $aliasName;
+            $this->hostname = $hostname;
             $this->aliasPath = Framework::DIR_HOSTS . '/' . $this->aliasName . '.alias';
-            $this->hostname = $hostname ?? $this->getHostName();
             $this->hostPath = Framework::DIR_HOSTS . '/' . $this->hostname . '.yml';
         }
 
@@ -54,13 +54,13 @@ namespace features\console\builders {
             echo Formatter::formatSentence($intext, $outtext);
         }
 
-        private function getHostName(): ?string
+        public static function fromName(string $aliasName): AliasBuilder
         {
-            if ($this->exists()) {
-                $content = file_get_contents($this->aliasPath);
-                return $content !== false ? $content : null;
+            $filename = Framework::DIR_HOSTS . '/' . $aliasName . '.alias';
+            if (is_file($filename)) {
+                return new AliasBuilder($aliasName, file_get_contents($filename));
             }
-            return null;
+            throw new \InvalidArgumentException('Host alias "' . $aliasName . '" does not exists');
         }
 
         #[\Override]

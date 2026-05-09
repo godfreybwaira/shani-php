@@ -44,7 +44,10 @@ namespace features\console\builders {
                 $dtoName = Formatter::trimSuffix($this->dtoName, self::SUFFIX);
                 $search = ['{namespace}', '{class_name}', '{entity_ns}'];
                 $replace = [$this->namespace, $dtoName, $this->entityNamespace];
-                mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
+                $folder = dirname($this->path);
+                if (!is_dir($folder)) {
+                    mkdir($folder, LocalStorage::FILE_MODE, true);
+                }
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/dto.txt'));
                 $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
                 $intext = 'Creating DTO: ' . $this->dtoName;

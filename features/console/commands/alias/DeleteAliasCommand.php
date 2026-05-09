@@ -25,8 +25,8 @@ namespace features\console\commands\alias {
 
         public function execute(): void
         {
-            $alias = new AliasBuilder($this->aliasName);
-            $alias->delete();
+            $alias = AliasBuilder::fromName($this->aliasName);
+            $alias?->delete();
         }
 
         public function parse(string ...$args): CommandContract

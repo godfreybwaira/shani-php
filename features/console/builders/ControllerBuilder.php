@@ -35,7 +35,9 @@ namespace features\console\builders {
         private function createViews(): void
         {
             $viewPath = $this->module->path . $this->module->version->config->views . '/' . strtolower($this->controllerName);
-            mkdir($viewPath, LocalStorage::FILE_MODE, true);
+            if (!is_dir($viewPath)) {
+                mkdir($viewPath, LocalStorage::FILE_MODE, true);
+            }
             $intext = 'Creating view: ' . Framework::HOME_FUNCTION;
             $outtext = copy(CommandContract::ASSETS . '/view.txt', $viewPath . '/' . Framework::HOME_FUNCTION . '.php') ? 'Success' : 'Failed';
             echo Formatter::formatSentence($intext, $outtext);
@@ -45,7 +47,9 @@ namespace features\console\builders {
         {
             $languagePath = $this->module->path . $this->module->version->config->languages . '/';
             $languagePath .= strtolower($this->controllerName) . '/' . Framework::HOME_FUNCTION;
-            mkdir($languagePath, LocalStorage::FILE_MODE, true);
+            if (!is_dir($languagePath)) {
+                mkdir($languagePath, LocalStorage::FILE_MODE, true);
+            }
             ///////////////////////////////////////////
             $intext = 'Creating language directory: ' . Framework::HOME_FUNCTION;
             $outtext = copy(CommandContract::ASSETS . '/lang.txt', $languagePath . '/en.php') ? 'Success' : 'Failed';
@@ -71,7 +75,10 @@ namespace features\console\builders {
                 ///////////////////////////////////////////
                 $search = ['{namespace}', '{controller_name}', '{service_ns}', '{fn_name}'];
                 $replace = [$this->namespace, $this->controllerName, $service->namespace, Framework::HOME_FUNCTION];
-                mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
+                $folder = dirname($this->path);
+                if (!is_dir($folder)) {
+                    mkdir($folder, LocalStorage::FILE_MODE, true);
+                }
                 $filecontent = file_get_contents(CommandContract::ASSETS . '/controller.txt');
                 ///////////////////////////////////////////
                 $intext = 'Creating controller: ' . $this->controllerName;

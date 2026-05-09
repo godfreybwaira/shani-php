@@ -50,7 +50,7 @@ namespace apps\demo\main\config {
         public function pathConfig(): PathConfig
         {
             return $this->pathConfig ??= new PathConfig(
-                    preferences: $this->app->preference,
+                    mapper: $this->app->preference->mapper,
                     versionNumber: $this->app->preference->versionNumber,
                     homePath: '/shani/0/components/0/index'
             );

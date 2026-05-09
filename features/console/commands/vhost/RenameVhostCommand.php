@@ -26,7 +26,7 @@ namespace features\console\commands\vhost {
 
         public function execute(): void
         {
-            $vhost = new VirtualHostBuilder($this->oldName);
+            $vhost = VirtualHostBuilder::fromHostname($this->oldName);
             $vhost->rename($this->newName);
         }
 

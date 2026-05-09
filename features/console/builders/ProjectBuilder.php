@@ -22,7 +22,7 @@ namespace features\console\builders {
 
         public readonly string $projectName;
         public readonly string $hostname;
-        private readonly VirtualHostBuilder $vhost;
+        public readonly VirtualHostBuilder $vhost;
         private readonly string $path;
 
         public function __construct(string $projectName, string $hostname)
@@ -35,7 +35,7 @@ namespace features\console\builders {
 
         private function copyCGIfiles(): void
         {
-            $mapper = $this->vhost->getConfigurations();
+            $mapper = VirtualHostBuilder::getConfigurations($this->vhost->path);
             $destination = $this->path . $mapper->cgiDirectory;
             $source = CommandContract::ASSETS . '/cgi';
             if (Directory::copy($source, $destination)) {
@@ -132,7 +132,7 @@ namespace features\console\builders {
             return is_dir($this->path);
         }
 
-        public static function fromName(string $projectName): ?ProjectBuilder
+        public static function fromName(string $projectName): ProjectBuilder
         {
             $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
             foreach ($hostfiles as $file) {
@@ -141,7 +141,7 @@ namespace features\console\builders {
                     return new ProjectBuilder($projectName, basename($file, '.yml'));
                 }
             }
-            return null;
+            throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
         }
     }
 

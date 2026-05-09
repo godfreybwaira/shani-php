@@ -23,7 +23,7 @@ namespace features\console\builders {
 
         public readonly string $directory;
         public readonly string $hostname;
-        private readonly string $path;
+        public readonly string $path;
         private readonly ProjectBuilder $project;
 
         public function __construct(string $hostname, ProjectBuilder $project)
@@ -62,7 +62,7 @@ namespace features\console\builders {
                 echo '[ERROR] Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }
-            $newVhost = new VirtualHostBuilder($newName);
+            $newVhost = new VirtualHostBuilder($newName, $this->project);
             if ($newVhost->exists()) {
                 throw new \RuntimeException('Host name "' . $newName . '" already exists.');
             }
@@ -133,10 +133,20 @@ namespace features\console\builders {
             return is_file($this->path);
         }
 
-        public function getConfigurations(): VirtualHostMapper
+        public static function getConfigurations(string $path): VirtualHostMapper
         {
-            $yaml = yaml_parse_file($this->path);
-            return VirtualHostMapper::fromArray($yaml);
+            return VirtualHostMapper::fromArray(yaml_parse_file($path));
+        }
+
+        public static function fromHostname(string $hostname): VirtualHostBuilder
+        {
+            $file = Framework::DIR_HOSTS . '/' . $hostname . '.yml';
+            if (!is_file($file)) {
+                throw new \InvalidArgumentException('Host "' . $hostname . '" does not exists');
+            }
+            $mapper = self::getConfigurations($file);
+            $project = new ProjectBuilder($mapper->projectName, $hostname);
+            return new VirtualHostBuilder($hostname, $project);
         }
     }
 

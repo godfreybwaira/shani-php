@@ -25,8 +25,8 @@ namespace features\console\commands\vhost {
 
         public function execute(): void
         {
-            $vhost = new VirtualHostBuilder($this->hostname);
-            $vhost->locate();
+            $vhost = VirtualHostBuilder::fromHostname($this->hostname);
+            $vhost?->locate();
         }
 
         public function parse(string ...$args): CommandContract

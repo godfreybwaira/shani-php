@@ -45,7 +45,10 @@ namespace features\console\builders {
             ///////////////////////////////////////////
             $search = ['{namespace}', '{class_name}'];
             $replace = [$this->namespace, $this->serviceName];
-            mkdir(dirname($this->path), LocalStorage::FILE_MODE, true);
+            $folder = dirname($this->path);
+            if (!is_dir($folder)) {
+                mkdir($folder, LocalStorage::FILE_MODE, true);
+            }
             $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
             ///////////////////////////////////////////
             $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
