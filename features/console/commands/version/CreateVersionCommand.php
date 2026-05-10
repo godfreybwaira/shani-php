@@ -9,10 +9,16 @@
 
 namespace features\console\commands\version {
 
+    use features\console\builders\ProjectBuilder;
+    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
+    use features\console\printer\ConsoleIO;
 
     final class CreateVersionCommand extends CommandContract
     {
+
+        private readonly string $projectName;
+        private readonly string $projectVersion;
 
         public function __construct()
         {
@@ -21,12 +27,28 @@ namespace features\console\commands\version {
 
         public function execute(): void
         {
-
+            $project = ProjectBuilder::fromName($this->projectName);
+            $project->vhost->registerVersion($this->projectVersion);
+            $version = new ProjectVersionBuilder($project->vhost, $this->projectVersion);
+            $version->build();
         }
 
         public function parse(string ...$args): CommandContract
         {
-
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->projectVersion = ConsoleIO::input('What is the project version number?', $this->validIdentifier);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->validateIdentifier($values[1]);
+                $this->projectVersion = $values[0];
+                $this->projectName = $values[1];
+            }
+            return $this;
         }
     }
 

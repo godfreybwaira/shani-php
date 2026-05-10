@@ -32,4 +32,7 @@ version:
     v1:
       name: v1
       config: v1-config.yml
+    v2:
+      name: v2
+      config: v2-config.yml
 ####v1#

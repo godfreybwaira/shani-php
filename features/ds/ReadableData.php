@@ -75,7 +75,7 @@ namespace features\ds {
          * @param int|null $limit When to stop finding
          * @return array A list if items
          */
-        public abstract function where(\Closure $callback, ?int $limit = null): array;
+        public abstract function getWhere(\Closure $callback, ?int $limit = null): array;
 
         /**
          * Get an iterable object as array

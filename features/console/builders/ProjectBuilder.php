@@ -143,6 +143,12 @@ namespace features\console\builders {
             }
             throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
         }
+
+        public function getVersions(): array
+        {
+            $mapper = VirtualHostBuilder::getConfigurations($this->vhost->path);
+            return $mapper->supportedVersions;
+        }
     }
 
 }

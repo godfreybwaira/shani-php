@@ -9,7 +9,7 @@
 
 namespace features\console\commands\module {
 
-    use features\console\builders\ProjectBuilder;
+    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\console\printer\ConsoleIO;
@@ -18,21 +18,22 @@ namespace features\console\commands\module {
     {
 
         private readonly string $projectName;
+        private readonly string $projectVersion;
 
         public function __construct()
         {
-            parent::__construct('list:module', 'project_name', 'Show all available project modules', 'blog');
+            parent::__construct('list:module', 'version_number@project_name', 'Show all available project modules', 'v1@blog');
         }
 
         public function execute(): void
         {
-            echo 'Listing all project modules: ' . $this->projectName . PHP_EOL;
-            $project = new ProjectBuilder($this->projectName);
-            if (!$project->exists()) {
-                echo '[ERROR] Project "' . $this->projectName . '" does not exists.' . PHP_EOL;
+            echo 'Listing all project version modules: ' . $this->projectVersion . PHP_EOL;
+            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
+            if (!$version->exists()) {
+                echo '[ERROR] Project version "' . $this->projectVersion . '" does not exists.' . PHP_EOL;
                 return;
             }
-            $modules = $project->getModules();
+            $modules = $version->getModules();
             foreach ($modules as $key => $module) {
                 echo Formatter::formatSentence($key + 1, $module->moduleName);
             }
@@ -42,13 +43,16 @@ namespace features\console\commands\module {
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->projectVersion = ConsoleIO::input('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 1) {
-                    throw new \ArgumentCountError('Atleast one argument is required.');
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
                 $this->validateIdentifier($values[0]);
-                $this->projectName = $values[0];
+                $this->validateIdentifier($values[1]);
+                $this->projectVersion = $values[0];
+                $this->projectName = $values[1];
             }
             return $this;
         }

@@ -108,35 +108,11 @@ namespace features\console\builders {
             return is_dir($this->path);
         }
 
-        public function locateEntities(): void
-        {
-            $entities = $this->getEntities();
-            foreach ($entities as $entity) {
-                echo $entity->exists() ? $entity->path . PHP_EOL : null;
-            }
-        }
-
-        public function locateServices(): void
-        {
-            $services = $this->getServices();
-            foreach ($services as $service) {
-                echo $service->exists() ? $service->path . PHP_EOL : null;
-            }
-        }
-
         public function locateControllers(): void
         {
             $controllers = $this->getControllers();
             foreach ($controllers as $controller) {
                 echo $controller->exists() ? $controller->path . PHP_EOL : null;
-            }
-        }
-
-        public function locateDto(): void
-        {
-            $dtos = $this->getDtos();
-            foreach ($dtos as $dto) {
-                echo $dto->exists() ? $dto->path . PHP_EOL : null;
             }
         }
     }

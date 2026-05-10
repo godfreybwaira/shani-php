@@ -85,7 +85,7 @@ namespace features\ds\map {
             return isset($this->data[$key]) && (bool) $this->data[$key];
         }
 
-        public function where(\Closure $callback, ?int $limit = null): array
+        public function getWhere(\Closure $callback, ?int $limit = null): array
         {
             $rows = [];
             $count = 0;

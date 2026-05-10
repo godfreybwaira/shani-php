@@ -9,7 +9,10 @@
 
 namespace features\console\commands\version {
 
+    use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
 
     final class LocateVersionCommand extends CommandContract
     {
@@ -21,12 +24,28 @@ namespace features\console\commands\version {
 
         public function execute(): void
         {
-
+            echo Formatter::placeCenter('List of Project Versions', underline: true);
+            $project = ProjectBuilder::fromName($this->projectName);
+            $versions = $project->getVersions();
+            $index = 1;
+            foreach ($versions as $key => $v) {
+                echo Formatter::formatSentence($index++, $key);
+            }
         }
 
         public function parse(string ...$args): CommandContract
         {
-
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::input('What is the project yo want to delete from?', $this->validIdentifier);
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 1) {
+                    throw new \ArgumentCountError('Atleast one argument is required.');
+                }
+                $this->validateIdentifier($values[0]);
+                $this->projectName = $values[0];
+            }
+            return $this;
         }
     }
 

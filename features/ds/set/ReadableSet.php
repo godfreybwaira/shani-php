@@ -48,7 +48,7 @@ namespace features\ds\set {
             return implode(',', $this->toJson());
         }
 
-        public function where(\Closure $callback, ?int $limit = null): array
+        public function getWhere(\Closure $callback, ?int $limit = null): array
         {
             $rows = [];
             $count = 0;

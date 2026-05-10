@@ -15,14 +15,16 @@ namespace features\ds\map {
     {
 
         /**
-         * Increment an item by a given number. A number can be negative or positive.
-         * @param string|int $key An item to increment
-         * @param float $value A value to increment
+         * Update a value using callback function. The returned value from the
+         * callback become the new value. The signature of the callback
+         * is <code>$updater(mixed $value):mixed</code>
+         * @param string|int $key An item to update
+         * @param \Closure $updater An updater callback
          * @return self
          */
-        public function increment(string|int $key, float $value = 1): self
+        public function updateValue(string|int $key, \Closure $updater): self
         {
-            $this->data[$key] = ($this->data[$key] ?? 0) + $value;
+            $this->data[$key] = $updater($this->data[$key] ?? null);
             return $this;
         }
 

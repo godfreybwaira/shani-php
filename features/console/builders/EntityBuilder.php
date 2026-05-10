@@ -66,6 +66,11 @@ namespace features\console\builders {
         {
             return is_file($this->path);
         }
+
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->path : null;
+        }
     }
 
 }

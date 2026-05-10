@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\storage\LocalStorage;
+    use features\utils\Directory;
     use shani\config\PathConfig;
     use shani\launcher\Framework;
 
@@ -24,9 +25,9 @@ namespace features\console\builders {
 
         public readonly PathConfig $config;
         public readonly string $namespace;
-        private readonly string $versionNumber;
-        private readonly string $versionName;
         private readonly VirtualHostBuilder $vhost;
+        public readonly string $versionNumber;
+        private readonly string $versionName;
 
         public function __construct(VirtualHostBuilder $vhost, string $versionNumber, string $versionName = null)
         {
@@ -103,10 +104,12 @@ namespace features\console\builders {
             return is_dir($this->config->root);
         }
 
-        public static function fromVersion(string $versionNumber, string $projectName): ProjectVersionBuilder
+        public function delete(): void
         {
-            $project = ProjectBuilder::fromName($projectName);
-            return new ProjectVersionBuilder($project->vhost, $versionNumber);
+            $intext = 'Deleting project version "' . $this->versionNumber . '"';
+            $outtext = $this->exists() && Directory::delete($this->config->root) ? 'Success' : 'Failed';
+//            $this->vhost->directory
+            echo Formatter::formatSentence($intext, $outtext);
         }
     }
 

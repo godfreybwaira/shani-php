@@ -61,6 +61,18 @@ namespace features\console\builders {
         {
             return is_file($this->path);
         }
+
+        public static function fromName(string $dtoName, ModuleBuilder $module): DtoBuilder
+        {
+            $entityName = Formatter::trimSuffix($dtoName, self::SUFFIX);
+            $entity = new EntityBuilder($entityName, $module);
+            return new DtoBuilder($dtoName, $module, $entity->namespace);
+        }
+
+        public function locate(): void
+        {
+            echo $this->exists() ? $this->path : null;
+        }
     }
 
 }
