@@ -33,7 +33,7 @@ namespace features\documentation\scanners {
             $comment = $method->getDocComment();
             $this->action = $method->getShortName();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : self::endpint2sentence($reqMethod, $moduleName, $this->action);
-            $this->digestedPermission = self::digest($reqMethod, new RequestRoute($moduleName, $this->action));
+            $this->digestedPermission = self::digest($reqMethod, RequestRoute::fromValues($moduleName, $this->action));
             $this->target = strtolower('/' . $moduleName . '/{param}/' . $this->action);
         }
 

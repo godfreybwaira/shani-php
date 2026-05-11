@@ -40,7 +40,7 @@ namespace shani\http {
         public readonly string $action;
         public readonly ?string $extension;
 
-        public function __construct(string $module, ?string $action = null, array $params = [], ?string $extension = null)
+        private function __construct(string $module, ?string $action, array $params = [], ?string $extension = null)
         {
             $this->params = $params;
             $this->module = $module;
@@ -66,6 +66,11 @@ namespace shani\http {
             $action = $params[2] ?? null;
             $extension = $parts[1] ?? null;
             return new self($params[0], $action, $params, $extension);
+        }
+
+        public static function fromValues(string $moduleName, string $functionName): RequestRoute
+        {
+            return new RequestRoute($moduleName, $functionName);
         }
     }
 
