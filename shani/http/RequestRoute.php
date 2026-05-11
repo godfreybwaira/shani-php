@@ -10,6 +10,7 @@
 namespace shani\http {
 
     use shani\launcher\Framework;
+    use shani\launcher\ShaniUtils;
 
     final class RequestRoute
     {
@@ -39,19 +40,19 @@ namespace shani\http {
         public readonly string $action;
         public readonly ?string $extension;
 
-        public function __construct(string $module, string $controller, string $action, array $params = [], ?string $extension = null)
+        public function __construct(string $module, ?string $action = null, array $params = [], ?string $extension = null)
         {
             $this->params = $params;
             $this->module = $module;
-            $this->action = $action;
             $this->extension = $extension;
-            $this->controller = $controller;
+            $this->action = ShaniUtils::kebab2camelCase($action ?? Framework::HOME_FUNCTION);
+            $this->controller = ShaniUtils::kebab2PascalCase($module . '-' . Framework::SUFFIX_CONTROLLER);
         }
 
         /**
          * Create a new Request Rout object from path while the query string is ignored.
          * Normally the path can be request uri or any other similar structure.
-         * @param string $path Request uri path e.g /users/0/profile
+         * @param string $path Request uri path e.g /users/1/profile/2
          */
         public static function fromPath(string $path): self
         {
@@ -60,13 +61,11 @@ namespace shani\http {
             if ($idx !== false) {
                 $cleanPath = substr($cleanPath, 0, $idx);
             }
-            $url = explode('.', $cleanPath);
-            $params = explode('/', $url[0]);
-            $module = $params[0];
-            $controller = $params[2] ?? $module;
-            $action = $params[4] ?? Framework::HOME_FUNCTION;
-            $extension = $url[1] ?? null;
-            return new self($module, $controller, $action, $params, $extension);
+            $parts = explode('.', $cleanPath);
+            $params = explode('/', $parts[0]);
+            $action = $params[2] ?? null;
+            $extension = $parts[1] ?? null;
+            return new self($params[0], $action, $params, $extension);
         }
     }
 

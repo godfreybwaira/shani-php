@@ -9,9 +9,8 @@
 
 namespace gui {
 
-    use features\ds\map\WritableMap;
     use features\ds\map\ReadableMap;
-    use features\storage\StorageMediaInterface;
+    use features\ds\map\WritableMap;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
@@ -62,7 +61,7 @@ namespace gui {
             $file = ($path ?? '/' . $route->action) . '.php';
             $appPath = $this->app->config->pathConfig();
             if ($moduleName === null) {
-                return $this->app->module() . $appPath->views . '/' . $route->controller . $file;
+                return $this->app->module() . $appPath->views . '/' . $file;
             }
             return $this->app->module($moduleName) . $appPath->views . $file;
         }

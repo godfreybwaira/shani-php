@@ -58,6 +58,34 @@ namespace shani\launcher {
         /** Default home function if no function name is provided on the URL */
         public const HOME_FUNCTION = 'index';
 
+        /**
+         * Suffix applied to controller classes.
+         *
+         * Example: UserController
+         */
+        public const SUFFIX_CONTROLLER = 'Controller';
+
+        /**
+         * Suffix applied to service classes.
+         *
+         * Example: PaymentService
+         */
+        public const SUFFIX_SERVICE = 'Service';
+
+        /**
+         * Suffix applied to Data Transfer Object (DTO) classes.
+         *
+         * Example: UserDto
+         */
+        public const SUFFIX_DTO = 'Dto';
+
+        /**
+         * Suffix applied to entity classes, typically representing database records.
+         *
+         * Example: ProductEntity
+         */
+        public const SUFFIX_ENTITY = 'Entity';
+
         /** Configuration directory path */
         public const DIR_CONFIG = SHANI_SERVER_ROOT . '/config';
 

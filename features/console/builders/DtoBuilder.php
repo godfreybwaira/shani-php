@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\storage\LocalStorage;
+    use shani\launcher\ShaniUtils;
 
     final class DtoBuilder implements LightBuilderInterface
     {
@@ -28,7 +29,7 @@ namespace features\console\builders {
         {
             $this->module = $module;
             $this->entityNamespace = $entityNamespace;
-            $this->dtoName = Formatter::trimSuffix($dtoName, self::SUFFIX) . self::SUFFIX;
+            $this->dtoName = ShaniUtils::trimSuffix($dtoName, self::SUFFIX) . self::SUFFIX;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->dto);
             $this->path = $module->path . $module->version->config->dto . '/' . $this->dtoName . '.php';
         }
@@ -41,7 +42,7 @@ namespace features\console\builders {
                 return $this;
             }
             if (!$this->exists()) {
-                $dtoName = Formatter::trimSuffix($this->dtoName, self::SUFFIX);
+                $dtoName = ShaniUtils::trimSuffix($this->dtoName, self::SUFFIX);
                 $search = ['{namespace}', '{class_name}', '{entity_ns}'];
                 $replace = [$this->namespace, $dtoName, $this->entityNamespace];
                 $folder = dirname($this->path);
@@ -64,7 +65,7 @@ namespace features\console\builders {
 
         public static function fromName(string $dtoName, ModuleBuilder $module): DtoBuilder
         {
-            $entityName = Formatter::trimSuffix($dtoName, self::SUFFIX);
+            $entityName = ShaniUtils::trimSuffix($dtoName, self::SUFFIX);
             $entity = new EntityBuilder($entityName, $module);
             return new DtoBuilder($dtoName, $module, $entity->namespace);
         }

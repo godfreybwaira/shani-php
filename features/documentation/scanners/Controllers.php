@@ -14,7 +14,7 @@ namespace features\documentation\scanners {
     final class Controllers implements \JsonSerializable
     {
 
-        private readonly string $path, $name, $module, $method;
+        private readonly string $path, $name, $module, $requestMethod;
         private readonly ?string $details;
         private array $endpoints = [];
 
@@ -22,17 +22,17 @@ namespace features\documentation\scanners {
          * Scan for controllers in a module
          * @param string $moduleName Module name
          * @param string $requestNethod Request method
-         * @param string $classPath Controller file path
+         * @param string $controllerPath Controller file path
          */
-        public function __construct(string $moduleName, string $requestNethod, string $classPath)
+        public function __construct(string $moduleName, string $requestNethod, string $controllerPath)
         {
-            $class = str_replace('/', '\\', $classPath);
+            $class = str_replace('/', '\\', $controllerPath);
             $reflection = new \ReflectionClass(substr($class, 0, strpos($class, '.')));
             $this->module = $moduleName;
             $this->name = $reflection->getShortName();
             $this->path = str_replace('\\', '.', $reflection->getNamespaceName());
 
-            $this->method = $requestNethod;
+            $this->requestMethod = $requestNethod;
             $comment = $reflection->getDocComment();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
 
@@ -43,7 +43,7 @@ namespace features\documentation\scanners {
         {
             foreach ($methods as $method) {
                 if (substr($method->getShortName(), 0, 2) !== '__') {
-                    $this->endpoints[] = new Endpoints($this->method, $this->module, $method);
+                    $this->endpoints[] = new Endpoints($this->requestMethod, $this->module, $method);
                 }
             }
         }
@@ -55,7 +55,7 @@ namespace features\documentation\scanners {
                 'details' => $this->details,
                 'path' => $this->path,
                 'name' => $this->name,
-                'method' => $this->method,
+                'method' => $this->requestMethod,
                 'endpoints' => $this->endpoints
             ];
         }

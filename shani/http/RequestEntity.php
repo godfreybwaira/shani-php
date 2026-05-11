@@ -16,7 +16,6 @@ namespace shani\http {
     use features\utils\File;
     use features\utils\MediaType;
     use features\utils\URI;
-    use shani\config\PathConfig;
     use shani\http\RequestRoute;
     use shani\utils\VirtualHostMapper;
 

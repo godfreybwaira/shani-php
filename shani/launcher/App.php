@@ -232,8 +232,8 @@ namespace shani\launcher {
         public function dictionary(array $data = null, string $name = null): ReadableMap
         {
             $route = $this->request->route();
-            $file = $this->module() . $this->path->languages . '/' . $route->controller;
-            $file .= ($name ?? '/' . $route->action) . '/' . $this->language() . '.php';
+            $file = $this->module() . $this->path->languages . '/';
+            $file .= ($name ?? $route->action) . '/' . $this->language() . '.php';
             return self::getFile($file, new ReadableMap($data));
         }
 
@@ -279,22 +279,12 @@ namespace shani\launcher {
                 return $staticRequest->handleRequest($this);
             }
             $className = str_replace('/', '\\', $classPath);
-            $callback = self::kebab2camelCase($this->request->route()->action);
+            $callback = $this->request->route()->action;
             $obj = new $className($this);
             if (!is_callable([$obj, $callback])) {
                 throw CustomException::notFound();
             }
             return $obj->$callback();
-        }
-
-        private static function kebab2camelCase(string $str, string $separator = '-'): string
-        {
-            if (str_contains($str, $separator)) {
-//                $str = preg_replace_callback('/(?<=-)[a-z]/', fn($ch) => mb_strtoupper($ch[0]), $str);
-                $str = lcfirst(ucwords($str, $separator));
-                return str_replace($separator, '', $str);
-            }
-            return $str;
         }
 
         /**

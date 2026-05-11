@@ -27,12 +27,12 @@ namespace features\documentation\scanners {
             foreach ($reqMethods as $method) {
                 $path = $controllerPath . '/' . $method;
                 if (is_dir($path)) {
-                    $this->scanClasses($method, $path);
+                    $this->scanControllers($method, $path);
                 }
             }
         }
 
-        private function scanClasses(string $reqMethod, string $path)
+        private function scanControllers(string $reqMethod, string $path): void
         {
             $classes = array_diff(scandir($path), ['.', '..']);
             foreach ($classes as $class) {

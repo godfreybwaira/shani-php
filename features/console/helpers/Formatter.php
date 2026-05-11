@@ -22,7 +22,6 @@ namespace features\console\helpers {
      * echo Formatter::placeCenter("Welcome", underline: true);
      * echo Formatter::placeLeft("Error", underline: true);
      * echo Formatter::placeRight("Success");
-     * echo Formatter::trimSuffix("ControllerService", "Service");
      * ```
      */
     final class Formatter
@@ -121,26 +120,6 @@ namespace features\console\helpers {
             }
             $paddingTexts = str_repeat($separator, $multiplier);
             return $paddingTexts . ' ' . $inputText . PHP_EOL . $content;
-        }
-
-        /**
-         * Trim a suffix from a string if present (case-insensitive).
-         *
-         * @param string $value  The input string.
-         * @param string $suffix The suffix to remove.
-         *
-         * @return string The string without the suffix, or unchanged if not present.
-         *
-         * @example
-         * ```php
-         * echo Formatter::trimSuffix("ControllerService", "Service"); // "Controller"
-         * ```
-         */
-        public static function trimSuffix(string $value, string $suffix): string
-        {
-            $name = strtolower($value);
-            $str = strtolower($suffix);
-            return str_ends_with($name, $str) ? substr($value, 0, strpos($name, $str)) : $value;
         }
 
         /**

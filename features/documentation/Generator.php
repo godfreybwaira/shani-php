@@ -10,7 +10,7 @@
 namespace features\documentation {
 
     use features\documentation\scanners\Modules;
-    use shani\launcher\App;
+    use shani\config\PathConfig;
 
     final class Generator implements \JsonSerializable
     {
@@ -19,28 +19,29 @@ namespace features\documentation {
 
         /**
          * Generate documentation for user application
-         * @param App $app Application object
-         * @param array $exclusion List of modules to exclude
+         * @param PathConfig $config Path configuration object
+         * @param array $exclusiveModules List of modules to exclude
          */
-        public function __construct(App $app, array $exclusion = [])
+        public function __construct(PathConfig $config, array $exclusiveModules = [])
         {
-            $appPath = $app->config->pathConfig();
-            $moduleDir = $appPath->root . $appPath->modules;
-            $moduleCollection = Modules::scan($moduleDir, $exclusion);
+            $moduleDir = $config->root . $config->modules;
+            $moduleCollection = Modules::scan($moduleDir, $exclusiveModules);
             foreach ($moduleCollection as $modulePath) {
-                $this->modules[] = new Modules(basename($modulePath), $modulePath . $appPath->controllers);
+                $this->modules[] = new Modules(basename($modulePath), $modulePath . $config->controllers);
             }
         }
 
-        public static function cleanComment(string $str): ?string
+        public static function cleanComment(string $docblock): ?string
         {
-            $comments = explode(PHP_EOL, $str);
-            $size = count($comments) - 1;
-            $result = ltrim($comments[1], " *\t\v\x00");
-            for ($i = 2; $i < $size; $i++) {
-                $result .= PHP_EOL . ltrim($comments[$i], " *\t\v\x00");
+            // 1. Match from the first character after the opening '/**'
+            //    up until the first '@' tag or the closing '*/'.
+            if (preg_match('/(?:\/\*\*[\s\*]*)(.*?)(?=\s*\*?\s*@|\*\/)/s', $docblock, $matches)) {
+                $content = $matches[1];
+                // 2. Remove leading asterisks and whitespace from each line
+                $clean = preg_replace('/^\s*\* ?/m', '', $content);
+                return trim($clean);
             }
-            return $result;
+            return null;
         }
 
         #[\Override]

@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\storage\LocalStorage;
+    use shani\launcher\ShaniUtils;
 
     final class ServiceBuilder implements LightBuilderInterface
     {
@@ -26,7 +27,7 @@ namespace features\console\builders {
         public function __construct(string $serviceName, ModuleBuilder $module)
         {
             $this->module = $module;
-            $this->serviceName = Formatter::trimSuffix($serviceName, self::SUFFIX) . self::SUFFIX;
+            $this->serviceName = ShaniUtils::trimSuffix($serviceName, self::SUFFIX) . self::SUFFIX;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->services);
             $this->path = $module->path . $module->version->config->services . '/' . $this->serviceName . '.php';
         }

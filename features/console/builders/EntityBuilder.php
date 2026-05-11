@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\storage\LocalStorage;
+    use shani\launcher\ShaniUtils;
 
     final class EntityBuilder implements LightBuilderInterface
     {
@@ -26,7 +27,7 @@ namespace features\console\builders {
         public function __construct(string $entityName, ModuleBuilder $module)
         {
             $this->module = $module;
-            $this->entityName = Formatter::trimSuffix($entityName, self::SUFFIX) . self::SUFFIX;
+            $this->entityName = ShaniUtils::trimSuffix($entityName, self::SUFFIX) . self::SUFFIX;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->entities);
             $this->path = $module->path . $module->version->config->entities . '/' . $this->entityName . '.php';
         }
@@ -38,7 +39,7 @@ namespace features\console\builders {
                 echo 'Could not create entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" does not exists.';
                 return $this;
             }
-            $dtoName = Formatter::trimSuffix($this->entityName, self::SUFFIX);
+            $dtoName = ShaniUtils::trimSuffix($this->entityName, self::SUFFIX);
             $dto = new DtoBuilder($dtoName, $this->module, $this->namespace);
             $dto->build();
             ///////////////////////////////////////////

@@ -9,13 +9,17 @@
 
 namespace features\documentation\scanners {
 
+    use features\documentation\DigestedEndpoint;
     use features\documentation\Generator;
     use shani\http\RequestRoute;
+    use shani\launcher\Framework;
+    use shani\launcher\ShaniUtils;
 
     final class Endpoints implements \JsonSerializable
     {
 
-        private readonly string $hash, $path, $action, $target;
+        private readonly string $action, $target;
+        private readonly DigestedEndpoint $digestedPermission;
         private readonly ?string $details;
 
         /**
@@ -28,19 +32,28 @@ namespace features\documentation\scanners {
         {
             $comment = $method->getDocComment();
             $this->action = $method->getShortName();
-            $controller = $method->getDeclaringClass()->getShortName();
-            $this->details = !empty($comment) ? Generator::cleanComment($comment) : null;
-            $endpoint = self::digest($reqMethod, new RequestRoute($moduleName, $controller, $this->action));
-            $this->target = strtolower('/' . $moduleName . '/{param0}/' . $controller . '/{param1}/' . $this->action);
-            $this->hash = $endpoint['hash'];
-            $this->path = $endpoint['endpoint'];
+            $this->details = !empty($comment) ? Generator::cleanComment($comment) : self::endpint2sentence($reqMethod, $moduleName, $this->action);
+            $this->digestedPermission = self::digest($reqMethod, new RequestRoute($moduleName, $this->action));
+            $this->target = strtolower('/' . $moduleName . '/{param}/' . $this->action);
         }
 
-        public static function digest(string $requestMethod, RequestRoute $route): array
+        public static function digest(string $requestMethod, RequestRoute $route): DigestedEndpoint
         {
-            $target = $requestMethod . '.' . $route->module . '.' . $route->controller . '.' . $route->action;
-            $endpoint = strtolower($target);
-            return ['hash' => substr(sha1($endpoint), offset: 5, length: 10), 'endpoint' => $endpoint];
+            $endpoint = strtolower($requestMethod . '.' . $route->module . '.' . $route->action);
+            return new DigestedEndpoint(substr(sha1($endpoint), offset: 5, length: 10), $endpoint);
+        }
+
+        public static function endpint2sentence(string $requestMethod, string $moduleName, string $functionName): string
+        {
+            $suffix = $functionName === Framework::HOME_FUNCTION ? null : ' ' . ShaniUtils::camel2Words($functionName);
+            $verb = strtolower($requestMethod);
+            $action = match ($verb) {
+                'get' => 'View',
+                'post' => 'Create new',
+                'put', 'patch' => 'Update existing',
+                default => $verb
+            };
+            return ucwords($action . ' ' . ShaniUtils::camel2Words($moduleName) . $suffix);
         }
 
         #[\Override]
@@ -48,10 +61,8 @@ namespace features\documentation\scanners {
         {
             return [
                 'details' => $this->details,
-                'name' => $this->action,
                 'target' => $this->target,
-                'path' => $this->path,
-                'hash' => $this->hash
+                'permission' => $this->digestedPermission
             ];
         }
     }

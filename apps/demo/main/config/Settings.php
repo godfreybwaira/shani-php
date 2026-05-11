@@ -52,7 +52,7 @@ namespace apps\demo\main\config {
             return $this->pathConfig ??= new PathConfig(
                     mapper: $this->app->preference->mapper,
                     versionNumber: $this->app->preference->versionNumber,
-                    homePath: '/shani/0/components/0/index'
+                    homePath: '/components'
             );
         }
 
@@ -64,7 +64,7 @@ namespace apps\demo\main\config {
 
         public function publicResources(): array
         {
-            return ['shani', 'security', 'pwa'];
+            return ['components', 'oauth2', 'pwa'];
         }
 
         public function guestResources(): array
