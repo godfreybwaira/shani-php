@@ -44,7 +44,7 @@ namespace features\console\commands\version {
                 if (count($values) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is required.');
                 }
-                $this->validateIdentifier($values[0]);
+                self::validateIdentifier($values[0]);
                 $this->projectName = $values[0];
             }
             return $this;

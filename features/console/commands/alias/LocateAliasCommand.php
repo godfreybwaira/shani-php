@@ -37,7 +37,7 @@ namespace features\console\commands\alias {
                 if (count($args) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is allowed.');
                 }
-                $this->validateHostName($args[0]);
+                self::validateHostName($args[0]);
                 $this->aliasName = $args[0];
             }
             return $this;

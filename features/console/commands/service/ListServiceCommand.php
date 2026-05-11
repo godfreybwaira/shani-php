@@ -49,9 +49,9 @@ namespace features\console\commands\service {
                 if (count($values) < 3) {
                     throw new \ArgumentCountError('Atleast three arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateIdentifier($values[1]);
-                $this->validateIdentifier($values[2]);
+                self::validateIdentifier($values[0]);
+                self::validateIdentifier($values[1]);
+                self::validateIdentifier($values[2]);
                 $this->moduleName = $values[0];
                 $this->projectVersion = $values[1];
                 $this->projectName = $values[2];

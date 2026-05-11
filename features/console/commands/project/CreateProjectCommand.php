@@ -40,8 +40,8 @@ namespace features\console\commands\project {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateHostName($values[1]);
+                self::validateIdentifier($values[0]);
+                self::validateHostName($values[1]);
                 $this->projectName = $values[0];
                 $this->hostname = $values[1];
             }

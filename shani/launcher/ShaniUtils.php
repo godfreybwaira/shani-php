@@ -65,15 +65,16 @@ namespace shani\launcher {
          * with special handling for acronyms like "NASA".
          *
          * @param string $str The string to convert (e.g., "NASAComponentsController").
+         * @param string $separator The character separating words. Defaults to ' '.
          *
          * @return string The converted string (e.g., "NASA Components Controller").
          */
-        public static function camel2Words(string $str): string
+        public static function camel2Words(string $str, string $separator = ' '): string
         {
             // Insert space before any uppercase letter that follows a lowercase or digit
             $str2 = preg_replace('/(?<=[a-z0-9])([A-Z])/', ' $1', $str);
             // Handle acronyms: split when multiple uppercase letters are followed by lowercase
-            return preg_replace('/([A-Z])([A-Z][a-z])/', '$1 $2', $str2);
+            return preg_replace('/([A-Z])([A-Z][a-z])/', '$1' . $separator . '$2', $str2);
         }
     }
 

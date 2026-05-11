@@ -52,7 +52,7 @@ namespace features\console\commands\alias {
                 if (count($values) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is required.');
                 }
-                $this->validateHostName($values[0]);
+                self::validateHostName($values[0]);
                 $this->hostname = $values[0];
             }
             return $this;

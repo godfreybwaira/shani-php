@@ -47,10 +47,10 @@ namespace features\console\commands\entity {
                 if (count($values) < 3) {
                     throw new \ArgumentCountError('Atleast three arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateIdentifier($values[1]);
-                $this->validateIdentifier($values[2]);
-                $this->validateIdentifier($values[3]);
+                self::validateIdentifier($values[0]);
+                self::validateIdentifier($values[1]);
+                self::validateIdentifier($values[2]);
+                self::validateIdentifier($values[3]);
                 $this->entityName = $values[0];
                 $this->moduleName = $values[1];
                 $this->projectVersion = $values[2];

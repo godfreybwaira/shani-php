@@ -40,8 +40,8 @@ namespace features\console\commands\alias {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->validateHostName($values[0]);
-                $this->validateHostName($values[1]);
+                self::validateHostName($values[0]);
+                self::validateHostName($values[1]);
                 $this->aliasName = $values[0];
                 $this->hostname = $values[1];
             }

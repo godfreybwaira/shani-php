@@ -42,8 +42,8 @@ namespace features\console\commands\version {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateIdentifier($values[1]);
+                self::validateIdentifier($values[0]);
+                self::validateIdentifier($values[1]);
                 $this->versionNumber = ConsoleIO::input('Write again the project version number to delete', fn(string $s) => $s === $values[0]);
                 $this->projectName = $values[1];
             }

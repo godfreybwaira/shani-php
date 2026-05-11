@@ -48,10 +48,10 @@ namespace features\console\commands\dto {
                 if (count($values) < 4) {
                     throw new \ArgumentCountError('Atleast four arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateIdentifier($values[1]);
-                $this->validateIdentifier($values[2]);
-                $this->validateIdentifier($values[3]);
+                self::validateIdentifier($values[0]);
+                self::validateIdentifier($values[1]);
+                self::validateIdentifier($values[2]);
+                self::validateIdentifier($values[3]);
                 $this->dtoName = $values[0];
                 $this->moduleName = $values[1];
                 $this->projectVersion = $values[2];

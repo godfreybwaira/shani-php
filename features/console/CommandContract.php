@@ -61,8 +61,8 @@ namespace features\console {
             $this->description = $description;
             $this->syntax = trim($name . ' ' . $syntax);
             $this->example = trim($name . ' ' . $example);
-            $this->validHostName = fn(string $s) => $this->validateHostName($s, false);
-            $this->validIdentifier = fn(string $s) => $this->validateIdentifier($s, false);
+            $this->validHostName = fn(string $s) => self::validateHostName($s, false);
+            $this->validIdentifier = fn(string $s) => self::validateIdentifier($s, false);
         }
 
         /**
@@ -74,7 +74,7 @@ namespace features\console {
          * @return bool True when validation passes, false otherwise
          * @throws \InvalidArgumentException If invalid.
          */
-        public final function validateIdentifier(string $value, bool $throw = true): bool
+        public static final function validateIdentifier(string $value, bool $throw = true): bool
         {
             if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_]+)*$/', $value) === 1) {
                 return true;
@@ -94,7 +94,7 @@ namespace features\console {
          * @return bool True when validation passes, false otherwise
          * @throws \InvalidArgumentException If invalid.
          */
-        public final function validateHostName(string $value, bool $throw = true): bool
+        public static final function validateHostName(string $value, bool $throw = true): bool
         {
             if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_.-]+)*$/', $value) === 1) {
                 return true;

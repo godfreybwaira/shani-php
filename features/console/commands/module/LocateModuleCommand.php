@@ -44,9 +44,9 @@ namespace features\console\commands\module {
                 if (count($values) < 3) {
                     throw new \ArgumentCountError('Atleast three arguments are required.');
                 }
-                $this->validateHostName($values[0]);
-                $this->validateHostName($values[1]);
-                $this->validateHostName($values[2]);
+                self::validateHostName($values[0]);
+                self::validateHostName($values[1]);
+                self::validateHostName($values[2]);
                 $this->moduleName = $values[0];
                 $this->projectVersion = $values[1];
                 $this->projectName = $values[2];

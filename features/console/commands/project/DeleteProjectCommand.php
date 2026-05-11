@@ -34,7 +34,7 @@ namespace features\console\commands\project {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::input('What is the project name to delete?', $this->validIdentifier);
             } else {
-                $this->validateIdentifier($args[0]);
+                self::validateIdentifier($args[0]);
                 $this->projectName = ConsoleIO::input('Write again the project name to delete', fn(string $s) => $s === $args[0]);
             }
             return $this;

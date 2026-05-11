@@ -36,7 +36,7 @@ namespace features\console\commands\project {
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {
-                $this->validateIdentifier($args[0]);
+                self::validateIdentifier($args[0]);
                 $this->projectName = $args[0];
             }
             return $this;

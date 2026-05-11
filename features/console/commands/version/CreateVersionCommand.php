@@ -43,8 +43,8 @@ namespace features\console\commands\version {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->validateIdentifier($values[0]);
-                $this->validateIdentifier($values[1]);
+                self::validateIdentifier($values[0]);
+                self::validateIdentifier($values[1]);
                 $this->projectVersion = $values[0];
                 $this->projectName = $values[1];
             }
