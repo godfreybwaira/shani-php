@@ -50,8 +50,8 @@ namespace features\console\builders {
                     mkdir($folder, LocalStorage::FILE_MODE, true);
                 }
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/entity.txt'));
-                if (!is_dir($this->module->path . $this->module->version->config->enums)) {
-                    mkdir($this->module->path . $this->module->version->config->enums, LocalStorage::FILE_MODE, true);
+                if (!is_dir($this->module->path . $this->module->version->config->values)) {
+                    mkdir($this->module->path . $this->module->version->config->values, LocalStorage::FILE_MODE, true);
                 }
                 ///////////////////////////////////////////
                 $intext = 'Creating entity: ' . $this->entityName;

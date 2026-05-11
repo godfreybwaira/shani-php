@@ -82,7 +82,7 @@ namespace shani\config {
          *
          * @var string
          */
-        public readonly string $enums;
+        public readonly string $values;
 
         /**
          * Application modules directory.
@@ -139,8 +139,8 @@ namespace shani\config {
          * @param string $entities
          *     Directory for entities (models) inside modules. Defaults to '/data/entities'.
          *
-         * @param string $enums
-         *     Directory for ENUMS inside modules. Defaults to '/data/enums'.
+         * @param string $values
+         *     Directory for Value objects inside modules. Defaults to '/data/values'.
          *
          * @param string $modules
          *     Directory for application modules. Defaults to '/modules'.
@@ -159,7 +159,7 @@ namespace shani\config {
                 string $services = '/logic/services',
                 string $dto = '/data/dto',
                 string $entities = '/data/entities',
-                string $enums = '/data/enums',
+                string $values = '/data/values',
                 string $modules = '/modules',
                 string $views = '/presentation/views',
                 string $languages = '/presentation/lang',
@@ -176,7 +176,7 @@ namespace shani\config {
             $this->storage = $projectRoot . $mapper->appStorage;
             $this->dto = $dto;
             $this->entities = $entities;
-            $this->enums = $enums;
+            $this->values = $values;
         }
     }
 

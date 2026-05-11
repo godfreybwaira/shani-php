@@ -2,7 +2,7 @@
 
 namespace shani\launcher {
 
-    final class ShaniConstants
+    final class ShaniUtils
     {
 
         public static function define(string $root): void
