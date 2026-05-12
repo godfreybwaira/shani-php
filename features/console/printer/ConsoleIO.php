@@ -38,15 +38,15 @@ namespace features\console\printer {
          *
          * @throws \RuntimeException If STDIN or STDOUT are unavailable.
          */
-        public static function input(string $text, \Closure $validator, string $onError = null): ?string
+        public static function read(string $text, \Closure $validator, string $onError = null): ?string
         {
-            fwrite(STDOUT, $text . ' ');
+            self::output($text . ' ', newLine: false);
             while (true) {
                 $input = trim(fgets(STDIN), PHP_EOL);
                 if ($validator($input)) {
                     return $input;
                 }
-                fwrite(STDOUT, ($onError ?? 'That did not work! ' . $text) . ' ');
+                self::output(($onError ?? 'That did not work! ' . $text) . ' ', newLine: false);
             }
         }
 
@@ -58,18 +58,74 @@ namespace features\console\printer {
          * output stream.
          *
          * @param string $text   The message to output.
+         * @param resource $stream The target stream to write to.
          * @param bool   $newLine Whether to append a newline character (default true).
-         * @param PrintStream $stream The target stream to write to. Defaults to
-         *                            PrintStream::OUTPUT_STREAM.
          *
          * @return void
          *
          * @throws \RuntimeException If the stream resource is invalid or unavailable.
          *
          */
-        public static function output(string $text, bool $newLine = true, PrintStream $stream = PrintStream::OUTPUT_STREAM): void
+        private static function write(string $text, $stream, bool $newLine = true): void
         {
-            fwrite($stream->getStream(), $text . ($newLine ? PHP_EOL : ''));
+            fwrite($stream, $text . ($newLine ? PHP_EOL : ''));
+        }
+
+        /**
+         * Write a message to the standard output stream.
+         *
+         * This method writes the given text to the STDOUT stream, optionally
+         * appending a newline at the end.
+         *
+         * @param string $text   The message to output.
+         * @param bool   $newLine Whether to append a newline character (default true).
+         *
+         * @return void
+         *
+         * @throws \RuntimeException If the stream resource is invalid or unavailable.
+         *
+         */
+        public static function output(string $text, bool $newLine = true): void
+        {
+            self::write($text, STDOUT, $newLine);
+        }
+
+        /**
+         * Write a message to the standard error stream.
+         *
+         * This method writes the given text to the STDERR stream, optionally
+         * appending a newline at the end.
+         *
+         * @param string $text   The message to output.
+         * @param bool   $newLine Whether to append a newline character (default true).
+         *
+         * @return void
+         *
+         * @throws \RuntimeException If the stream resource is invalid or unavailable.
+         *
+         */
+        public static function error(string $text, bool $newLine = true): void
+        {
+            self::write($text, STDERR, $newLine);
+        }
+
+        /**
+         * Write a message to the standard input stream.
+         *
+         * This method writes the given text to the STDIN stream, optionally
+         * appending a newline at the end.
+         *
+         * @param string $text   The message to output.
+         * @param bool   $newLine Whether to append a newline character (default true).
+         *
+         * @return void
+         *
+         * @throws \RuntimeException If the stream resource is invalid or unavailable.
+         *
+         */
+        public static function input(string $text, bool $newLine = true): void
+        {
+            self::write($text, STDIN, $newLine);
         }
     }
 

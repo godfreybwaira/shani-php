@@ -32,10 +32,10 @@ namespace features\console\commands\project {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::input('What is the project name to delete?', $this->validIdentifier);
+                $this->projectName = ConsoleIO::read('What is the project name to delete?', $this->validIdentifier);
             } else {
                 self::validateIdentifier($args[0]);
-                $this->projectName = ConsoleIO::input('Write again the project name to delete', fn(string $s) => $s === $args[0]);
+                $this->projectName = ConsoleIO::read('Write again the project name to delete', fn(string $s) => $s === $args[0]);
             }
             return $this;
         }

@@ -2,6 +2,8 @@
 <?php
 
 use features\console\CommandRegistry;
+use features\console\printer\ConsoleIO;
+use features\console\printer\PrintedText;
 use shani\launcher\ShaniUtils;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
@@ -10,18 +12,21 @@ spl_autoload_register(function (string $class) {
 });
 ShaniUtils::define(__DIR__);
 
-if ($argc >= 2) {
-    $command = $argv[1];
-    unset($argv[0], $argv[1]);
-    try {
-        echo PHP_EOL;
-        $params = array_values($argv);
-        (new CommandRegistry())->run($command, ...$params);
-    } catch (\Throwable $t) {
-        echo '[ERROR] ' . $t->getMessage() . PHP_EOL;
-    } finally {
-        echo PHP_EOL . 'Done' . PHP_EOL . PHP_EOL;
+(function (array $arguments) {
+    $error = PrintedText::error('[ ERROR ] ');
+    if (count($arguments) < 2) {
+        $helpCommand = PrintedText::bold('php light help');
+        ConsoleIO::error($error->coloredText . 'Too few arguments! For help type ' . $helpCommand->coloredText);
+        exit(1);
     }
-} else {
-    echo '[ERROR] Too few arguments!' . PHP_EOL;
-}
+    try {
+        $command = $arguments[1];
+        unset($arguments[0], $arguments[1]);
+        $registry = new CommandRegistry($command, array_values($arguments));
+        $registry->run();
+        exit(0);
+    } catch (Throwable $t) {
+        ConsoleIO::error($error->coloredText . $t->getMessage());
+        exit(1);
+    }
+})($argv);

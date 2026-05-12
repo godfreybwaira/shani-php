@@ -34,11 +34,22 @@ namespace features\console\printer {
          * @param string       $text  The plain text message.
          * @param ConsoleColor $color The console color to apply.
          */
-        private function __construct(string $text, ConsoleColor $color)
+        private function __construct(string $text, ConsoleColor $color, bool $plain = false)
         {
             $this->plainText = $text;
             $this->color = $color;
-            $this->coloredText = $color->value . $text . ConsoleColor::RESET->value;
+            $this->coloredText = $plain ? $text : $color->value . $text . ConsoleColor::RESET->value;
+        }
+
+        /**
+         * Create a message with no color at all.
+         *
+         * @param string $text The message text.
+         * @return PrintedText
+         */
+        public static function plain(string $text): PrintedText
+        {
+            return new PrintedText($text, ConsoleColor::NONE, true);
         }
 
         /**

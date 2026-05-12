@@ -15,24 +15,12 @@ namespace features\console {
      * Represents global options that affect command execution behavior.
      * Used to configure verbosity and color output in CLI applications.
      *
-     * @example
-     * ```php
-     * $options = new CommandOptions(verbose: true, noColor: false);
-     *
-     * if ($options->verbose) {
-     *     echo "Detailed logs enabled\n";
-     * }
-     *
-     * if ($options->noColor) {
-     *     echo "Plain text output only\n";
-     * }
-     * ```
      */
     final class CommandOptions implements \JsonSerializable
     {
 
         /** Whether verbose output is enabled (extra logging and details). */
-        public readonly bool $verbose;
+        public readonly bool $quiet;
 
         /** Whether colored output should be disabled (plain text only). */
         public readonly bool $noColor;
@@ -40,12 +28,12 @@ namespace features\console {
         /**
          * Create a new CommandOptions instance.
          *
-         * @param bool $verbose Enable verbose output (default false).
+         * @param bool $quiet Enable verbose output (default false).
          * @param bool $noColor Disable colored output (default false).
          */
-        public function __construct(bool $verbose, bool $noColor)
+        public function __construct(bool $quiet, bool $noColor)
         {
-            $this->verbose = $verbose;
+            $this->quiet = $quiet;
             $this->noColor = $noColor;
         }
 
@@ -58,7 +46,7 @@ namespace features\console {
         public final function jsonSerialize(): array
         {
             return [
-                'verbose' => $this->verbose,
+                'quiet' => $this->quiet,
                 'no_color' => $this->noColor,
             ];
         }

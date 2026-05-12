@@ -36,7 +36,7 @@ namespace features\console\commands\version {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::input('What is the project yo want to delete from?', $this->validIdentifier);
+                $this->projectName = ConsoleIO::read('What is the project yo want to delete from?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {

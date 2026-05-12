@@ -33,8 +33,8 @@ namespace features\console\commands\project {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
-                $this->hostname = ConsoleIO::input('What is the host name?', $this->validHostName);
+                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->hostname = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

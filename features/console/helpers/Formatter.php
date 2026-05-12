@@ -44,7 +44,7 @@ namespace features\console\helpers {
             $inputLength = mb_strlen($inputText);
             $resultLength = mb_strlen($resultText);
             $multiplier = $sentenceWidth - ($inputLength + $resultLength + 2);
-            return $inputText . ' ' . str_repeat($separator, $multiplier) . ' ' . $resultText . PHP_EOL;
+            return $inputText . ' ' . str_repeat($separator, $multiplier) . ' ' . $resultText;
         }
 
         /**
@@ -66,10 +66,10 @@ namespace features\console\helpers {
             $content = null;
             if ($underline) {
                 $padding = str_repeat(' ', $multiplier);
-                $content = $padding . ' ' . str_repeat('-', $inputSize) . ' ' . $padding . PHP_EOL;
+                $content = PHP_EOL . $padding . ' ' . str_repeat('-', $inputSize) . ' ' . $padding;
             }
             $paddingTexts = str_repeat($separator, $multiplier);
-            return $paddingTexts . ' ' . $inputText . ' ' . $paddingTexts . PHP_EOL . $content;
+            return $paddingTexts . ' ' . $inputText . ' ' . $paddingTexts . $content;
         }
 
         /**
@@ -91,10 +91,10 @@ namespace features\console\helpers {
             $content = null;
             if ($underline) {
                 $padding = str_repeat(' ', $multiplier);
-                $content = str_repeat('-', $inputSize) . ' ' . $padding . PHP_EOL;
+                $content = PHP_EOL . str_repeat('-', $inputSize) . ' ' . $padding;
             }
             $paddingTexts = str_repeat($separator, $multiplier);
-            return $inputText . ' ' . $paddingTexts . PHP_EOL . $content;
+            return $inputText . ' ' . $paddingTexts . $content;
         }
 
         /**
@@ -116,10 +116,10 @@ namespace features\console\helpers {
             $content = null;
             if ($underline) {
                 $padding = str_repeat(' ', $multiplier);
-                $content = $padding . ' ' . str_repeat('-', $inputSize) . PHP_EOL;
+                $content = PHP_EOL . $padding . ' ' . str_repeat('-', $inputSize);
             }
             $paddingTexts = str_repeat($separator, $multiplier);
-            return $paddingTexts . ' ' . $inputText . PHP_EOL . $content;
+            return $paddingTexts . ' ' . $inputText . $content;
         }
 
         /**

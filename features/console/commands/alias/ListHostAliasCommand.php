@@ -46,7 +46,7 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->hostname = ConsoleIO::input('What is the host name?', $this->validHostName);
+                $this->hostname = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {

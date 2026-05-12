@@ -32,7 +32,7 @@ namespace features\console\commands\vhost {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->hostname = ConsoleIO::input('Virtual host name to locate:', $this->validHostName);
+                $this->hostname = ConsoleIO::read('Virtual host name to locate:', $this->validHostName);
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {

@@ -32,7 +32,7 @@ namespace features\console\commands\project {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::input('What is the project name?', $this->validIdentifier);
+                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {

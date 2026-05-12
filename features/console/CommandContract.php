@@ -35,9 +35,6 @@ namespace features\console {
 
         /** An example usage string for documentation. */
         public readonly string $example;
-
-        /** Options that affect command execution (verbosity, color, etc.). */
-        public readonly CommandOptions $options;
         protected readonly \Closure $validIdentifier;
         protected readonly \Closure $validHostName;
 
@@ -106,16 +103,6 @@ namespace features\console {
         }
 
         /**
-         * Attach command options (verbosity, color, etc.).
-         *
-         * @param CommandOptions $options Command options.
-         */
-        public final function setOptions(CommandOptions $options): void
-        {
-            $this->options = $options;
-        }
-
-        /**
          * Serialize command metadata to JSON.
          *
          * @return array<string,string> Command metadata.
@@ -128,7 +115,6 @@ namespace features\console {
                 'syntax' => $this->syntax,
                 'description' => $this->description,
                 'example' => $this->example,
-                'options' => $this->options,
             ];
         }
 

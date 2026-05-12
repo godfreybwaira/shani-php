@@ -33,8 +33,8 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->oldName = ConsoleIO::input('What is the old alias name?', $this->validHostName);
-                $this->newName = ConsoleIO::input('What is the new alias name?', $this->validHostName);
+                $this->oldName = ConsoleIO::read('What is the old alias name?', $this->validHostName);
+                $this->newName = ConsoleIO::read('What is the new alias name?', $this->validHostName);
             } else {
                 if (count($args) < 2) {
                     throw new \ArgumentCountError('Atleast two argument is required.');

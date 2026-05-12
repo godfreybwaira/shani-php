@@ -22,8 +22,9 @@ namespace features\console\commands {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given', 'create:project');
+            parent::__construct('help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given', 'help create:project');
             $this->registry = $registry;
+            $this->registry->showBanner = true;
         }
 
         public function execute(): void
@@ -36,17 +37,16 @@ namespace features\console\commands {
             $index = 1;
             $width = 150;
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
-            echo PHP_EOL . Formatter::placeCenter($text, underline: true, sentenceWidth: $width) . PHP_EOL;
+            $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width));
             if ($this->commandName === null) {
-                echo Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' ');
+                $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
                 $commands = $this->registry->getAllCommands();
                 $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
-                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $width);
+                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $width));
                 });
             } else {
                 $this->searchCommand($width);
             }
-            echo PHP_EOL;
         }
 
         private function searchCommand(int $sentenceWidth): void
@@ -54,10 +54,10 @@ namespace features\console\commands {
             $commands = $this->registry->getAllCommands();
             $command = $commands->getOne($this->commandName);
             if ($command !== null) {
-                echo Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth);
-                echo Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth);
-                echo Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth);
-                echo 'DESCRIPTION:' . PHP_EOL . $command->description . PHP_EOL;
+                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult(Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult('DESCRIPTION:' . PHP_EOL . $command->description);
                 return;
             }
             $index = 1;
@@ -65,14 +65,17 @@ namespace features\console\commands {
             $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
                 if (str_contains($cmd->name, $this->commandName)) {
                     $excluded[$cmd->name] = 1;
-                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);
+                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
             });
             $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
                 if (!isset($excluded[$cmd->name]) && str_contains(strtolower($cmd->description), $this->commandName)) {
-                    echo Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth);
+                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
             });
+            if ($index === 1) {
+                throw new \InvalidArgumentException('Command "' . $this->commandName . '" not found.');
+            }
         }
 
         public function parse(string ...$args): CommandContract

@@ -32,7 +32,7 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): CommandContract
         {
             if (empty($args)) {
-                $this->aliasName = ConsoleIO::input('What is the alias name?', $this->validHostName);
+                $this->aliasName = ConsoleIO::read('What is the alias name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {

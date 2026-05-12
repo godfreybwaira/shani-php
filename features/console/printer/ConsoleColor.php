@@ -20,6 +20,9 @@ namespace features\console\printer {
     enum ConsoleColor: string
     {
 
+        /** No color at all */
+        case NONE = '';
+
         /** Reset to default terminal color. */
         case RESET = "\033[0m";
 

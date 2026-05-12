@@ -9,8 +9,11 @@
 
 namespace features\console {
 
+    use features\console\printer\ConsoleIO;
+    use features\console\printer\PrintedText;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
+    use shani\launcher\Framework;
 
     /**
      * Class CommandRegistry
@@ -26,11 +29,38 @@ namespace features\console {
         /** Map of command names to their CommandContract instances. */
         private readonly WritableMap $commands;
 
+        /** User command options */
+        private readonly CommandOptions $options;
+
+        /** Command arguments */
+        private readonly array $arguments;
+
+        /** Command name to execute */
+        private readonly string $commandName;
+
+        /**
+         * Command results
+         * @var array
+         */
+        private array $commandResults = [];
+
+        /** Whether to display a banner */
+        public bool $showBanner = false;
+
         /**
          * Initialize the registry and register all commands.
+         *
+         * @param string $commandName A command name to execute
+         *
+         * @param array $arguments Command arguments
          */
-        public function __construct()
+        public function __construct(string $commandName, array $arguments)
         {
+            $this->commandName = $commandName;
+            $this->arguments = $arguments;
+            $quiet = in_array('--quiet', $arguments);
+            $noColor = in_array('--no-color', $arguments);
+            $this->options = new CommandOptions($quiet, $noColor);
             $this->commands = $this->registerAll();
         }
 
@@ -43,79 +73,16 @@ namespace features\console {
         {
             // General
             yield new commands\HelpCommand($this);
-
-            // Project
-            yield new commands\project\CreateProjectCommand();
-            yield new commands\project\ListProjectCommand();
-            yield new commands\project\LocateProjectCommand();
-            yield new commands\project\DeleteProjectCommand();
-
-            //Version
-            yield new commands\version\CreateVersionCommand();
-            yield new commands\version\DeleteVersionCommand();
-            yield new commands\version\ListVersionCommand();
-            yield new commands\version\LocateVersionCommand();
-
-            // Module
-            yield new commands\module\CreateModuleCommand();
-            yield new commands\module\LocateModuleCommand();
-            yield new commands\module\ListModulesCommand();
-
-            // Controller
-            yield new commands\controller\CreateControllerCommand();
-            yield new commands\controller\LocateControllerCommand();
-            yield new commands\controller\ListControllersCommand();
-
-            // VHost
-            yield new commands\vhost\ListVhostCommand();
-            yield new commands\vhost\RenameVhostCommand();
-            yield new commands\vhost\LocateVhostCommand();
-
-            // Alias
-            yield new commands\alias\CreateAliasCommand();
-            yield new commands\alias\ListHostAliasCommand();
-            yield new commands\alias\DeleteAliasCommand();
-            yield new commands\alias\RenameAliasCommand();
-            yield new commands\alias\LocateAliasCommand();
-
-            // Entity
-            yield new commands\entity\CreateEntityCommand();
-            yield new commands\entity\ListEntityCommand();
-            yield new commands\entity\LocateEntityCommand();
-
-            // DTO
-            yield new commands\dto\ListDtoCommand();
-            yield new commands\dto\LocateDtoCommand();
-
-            // Service
-            yield new commands\service\ListServiceCommand();
-            yield new commands\service\LocateServiceCommand();
         }
 
         /**
-         * Run a command by name with arguments.
-         *
-         * @param string $commandName The name of the command to execute.
-         * @param string ...$args     Arguments passed to the command.
-         *
-         * @return void
-         *
-         * @throws \InvalidArgumentException If the command is not found or arguments are invalid.
-         * @throws \Throwable For any other runtime errors during execution.
+         * Run a command by name.
          */
-        public function run(string $commandName, string ...$args): void
+        public function run(): void
         {
-            $command = $this->getCommandByName($commandName);
-            try {
-                $verbose = in_array('--verbose', $args);
-                $noColor = in_array('--no-color', $args);
-                $command->setOptions(new CommandOptions($verbose, $noColor));
-                $command->parse(...$args)->execute();
-            } catch (\InvalidArgumentException $e) {
-                echo '[INFO] ' . $e->getMessage() . '. The syntax for this command is: ' . $command->syntax . PHP_EOL;
-            } catch (\Throwable $t) {
-                echo $t->getMessage() . PHP_EOL;
-            }
+            $command = $this->getCommandByName($this->commandName);
+            $command->parse(...$this->arguments)->execute();
+            $this->showResults();
         }
 
         /**
@@ -158,6 +125,50 @@ namespace features\console {
         public function getAllCommands(): ReadableMap
         {
             return $this->commands;
+        }
+
+        private static function printBanner(): void
+        {
+            $banner = fopen(CommandContract::ASSETS . '/banner.txt', 'rb');
+            ConsoleIO::output(PHP_EOL);
+            while (($line = fgets($banner)) !== false) {
+                ConsoleIO::output(PrintedText::info($line)->coloredText, false);
+            }
+            ConsoleIO::output(PrintedText::bold('v' . Framework::VERSION) . PHP_EOL . PHP_EOL);
+            fclose($banner);
+        }
+
+        /**
+         * Add command result to display when command finishes execution.
+         * @param PrintedText|string $message Result Message
+         * @return self
+         */
+        public function addResult(PrintedText|string $message): self
+        {
+            if (!$this->options->quiet) {
+                $this->commandResults[] = $message instanceof PrintedText ? $message : PrintedText::plain($message);
+            }
+            return $this;
+        }
+
+        private function showResults(): void
+        {
+            if ($this->options->quiet) {
+                return;
+            }
+            if ($this->showBanner) {
+                self::printBanner();
+            }
+            if ($this->options->noColor) {
+                foreach ($this->commandResults as $message) {
+                    ConsoleIO::output($message->plainText);
+                }
+            } else {
+                foreach ($this->commandResults as $message) {
+                    ConsoleIO::output($message->coloredText);
+                }
+            }
+            ConsoleIO::output('Done' . PHP_EOL);
         }
     }
 
