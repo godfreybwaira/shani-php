@@ -19,7 +19,7 @@ namespace features\console\commands\version {
     {
 
         private readonly string $projectName;
-        private readonly string $projectVersion;
+        private readonly string $versionNumber;
 
         public function __construct(CommandRegistry $registry)
         {
@@ -28,7 +28,7 @@ namespace features\console\commands\version {
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->projectVersion);
+            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
             $version->build(fn($s) => $this->registry->addResult($s));
         }
 
@@ -36,16 +36,16 @@ namespace features\console\commands\version {
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->projectVersion = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[0])->shortName;
                 $this->projectName = ResourceName::create($values[1])->shortName;
             }
-            return $this->projectVersion . self::SEPARATOR . $this->projectName;
+            return $this->versionNumber . self::SEPARATOR . $this->projectName;
         }
     }
 

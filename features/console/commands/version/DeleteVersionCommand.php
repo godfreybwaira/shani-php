@@ -28,7 +28,7 @@ namespace features\console\commands\version {
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->projectVersion);
+            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
             $version->delete(fn($s) => $this->registry->addResult($s));
         }
 
