@@ -7,7 +7,7 @@
  * Created on: Feb 22, 2025 at 10:29:03 AM
  */
 
-namespace apps\demo\main\modules\schools\data\entities {
+namespace apps\demo\main\modules\students\data\entities {
 
     final class SubjectEntity
     {

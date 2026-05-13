@@ -9,6 +9,8 @@
 
 namespace features\console {
 
+    use features\console\helpers\HostName;
+    use features\console\helpers\ResourceName;
     use shani\launcher\Framework;
 
     /**
@@ -25,7 +27,7 @@ namespace features\console {
     {
 
         /** The command name (e.g., "create:project"). */
-        public readonly string $name;
+        public readonly string $commandName;
 
         /** The full syntax string including arguments. */
         public readonly string $syntax;
@@ -38,6 +40,9 @@ namespace features\console {
         protected readonly \Closure $validIdentifier;
         protected readonly \Closure $validHostName;
 
+        /** Command registry object */
+        protected readonly CommandRegistry $registry;
+
         /** Separator used internally for command parsing. */
         protected const SEPARATOR = '@';
 
@@ -47,59 +52,21 @@ namespace features\console {
         /**
          * Construct a new command contract.
          *
+         * @param CommandRegistry $registry Command registry object
          * @param string      $name        Command name.
          * @param string|null $syntax      Command syntax (arguments).
          * @param string      $description Command description.
          * @param string|null $example     Example usage.
          */
-        protected function __construct(string $name, ?string $syntax, string $description, ?string $example)
+        protected function __construct(CommandRegistry $registry, string $name, ?string $syntax, string $description, ?string $example)
         {
-            $this->name = $name;
+            $this->registry = $registry;
+            $this->commandName = $name;
             $this->description = $description;
             $this->syntax = trim($name . ' ' . $syntax);
             $this->example = trim($name . ' ' . $example);
-            $this->validHostName = fn(string $s) => self::validateHostName($s, false);
-            $this->validIdentifier = fn(string $s) => self::validateIdentifier($s, false);
-        }
-
-        /**
-         * Validate that an identifier is alphanumeric with underscores.
-         *
-         * @param string $value Identifier to validate.
-         * @param bool $throw Whether to throw an exception when validation failed.
-         *
-         * @return bool True when validation passes, false otherwise
-         * @throws \InvalidArgumentException If invalid.
-         */
-        public static final function validateIdentifier(string $value, bool $throw = true): bool
-        {
-            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_]+)*$/', $value) === 1) {
-                return true;
-            }
-            if ($throw) {
-                throw new \InvalidArgumentException('Invalid identifier "' . $value . '"');
-            }
-            return false;
-        }
-
-        /**
-         * Validate that a hostname is alphanumeric with dots, hyphens, or underscores.
-         *
-         * @param string $value Hostname to validate.
-         * @param bool $throw Whether to throw an exception when validation failed.
-         *
-         * @return bool True when validation passes, false otherwise
-         * @throws \InvalidArgumentException If invalid.
-         */
-        public static final function validateHostName(string $value, bool $throw = true): bool
-        {
-            if (preg_match('/^[a-zA-Z]+([0-9a-zA-Z_.-]+)*$/', $value) === 1) {
-                return true;
-            }
-            if ($throw) {
-                throw new \InvalidArgumentException('Invalid hostname "' . $value . '"');
-            }
-            return false;
+            $this->validHostName = fn(string $s) => HostName::validate($s, false);
+            $this->validIdentifier = fn(string $s) => ResourceName::validate($s, false);
         }
 
         /**
@@ -111,7 +78,7 @@ namespace features\console {
         public final function jsonSerialize(): array
         {
             return [
-                'command_name' => $this->name,
+                'command_name' => $this->commandName,
                 'syntax' => $this->syntax,
                 'description' => $this->description,
                 'example' => $this->example,
@@ -121,11 +88,11 @@ namespace features\console {
         /**
          * Inspect and parse command arguments.
          *
-         * @param string ...$args Arguments expected by the command.
-         * @return CommandContract Returns the command instance for chaining.
+         * @param string ...$args   Arguments expected by the command.
+         * @return string|null      Command being executed
          * @throws \InvalidArgumentException If arguments are invalid.
          */
-        public abstract function parse(string ...$args): CommandContract;
+        public abstract function parse(string ...$args): string;
 
         /**
          * Execute the command logic.

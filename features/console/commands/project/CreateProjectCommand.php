@@ -11,6 +11,9 @@ namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\HostName;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class CreateProjectCommand extends CommandContract
@@ -19,18 +22,18 @@ namespace features\console\commands\project {
         private readonly string $projectName;
         private readonly string $hostname;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('create:project', 'project_name@hostname', 'Create a new main project. You can add versions to main project', 'demo@localhost');
+            parent::__construct($registry, 'create:project', 'project_name@hostname', 'Create a new main project', 'demo@localhost');
         }
 
         public function execute(): void
         {
             $project = new ProjectBuilder($this->projectName, $this->hostname);
-            $project->build();
+            $project->build(fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
@@ -40,12 +43,10 @@ namespace features\console\commands\project {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateHostName($values[1]);
-                $this->projectName = $values[0];
-                $this->hostname = $values[1];
+                $this->projectName = ResourceName::create($values[0])->value;
+                $this->hostname = HostName::create($values[1]);
             }
-            return $this;
+            return $this->projectName . self::SEPARATOR . $this->hostname;
         }
     }
 

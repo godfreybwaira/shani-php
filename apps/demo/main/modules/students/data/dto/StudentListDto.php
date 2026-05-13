@@ -7,7 +7,7 @@
  * Created on: Oct 20, 2025 at 7:13:29 PM
  */
 
-namespace apps\demo\main\modules\schools\data\dto {
+namespace apps\demo\main\modules\students\data\dto {
 
     final class StudentListDto implements \JsonSerializable
     {

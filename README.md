@@ -103,7 +103,7 @@ Now, look at the following example of a resource file:
 ```php
 <?php
 
-namespace apps\demo\main\modules\schools\logic\controllers\get {
+namespace apps\demo\main\modules\students\logic\controllers\get {
 
 	use shani\launcher\App;
 

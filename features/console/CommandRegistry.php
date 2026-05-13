@@ -45,7 +45,7 @@ namespace features\console {
         private array $commandResults = [];
 
         /** Whether to display a banner */
-        public bool $showBanner = false;
+        public bool $showBanner = true;
 
         /**
          * Initialize the registry and register all commands.
@@ -73,6 +73,53 @@ namespace features\console {
         {
             // General
             yield new commands\HelpCommand($this);
+
+            // Project
+            yield new commands\project\CreateProjectCommand($this);
+//            yield new commands\project\ListProjectCommand($this);
+//            yield new commands\project\LocateProjectCommand($this);
+//            yield new commands\project\DeleteProjectCommand($this);
+//
+            //Version
+//            yield new commands\version\CreateVersionCommand($this);
+//            yield new commands\version\DeleteVersionCommand($this);
+//            yield new commands\version\ListVersionCommand($this);
+//            yield new commands\version\LocateVersionCommand($this);
+//
+//            // Module
+//            yield new commands\module\CreateModuleCommand($this);
+//            yield new commands\module\LocateModuleCommand($this);
+//            yield new commands\module\ListModulesCommand($this);
+//
+//            // Controller
+//            yield new commands\controller\CreateControllerCommand($this);
+//            yield new commands\controller\LocateControllerCommand($this);
+//            yield new commands\controller\ListControllersCommand($this);
+//
+//            // VHost
+//            yield new commands\vhost\ListVhostCommand($this);
+//            yield new commands\vhost\RenameVhostCommand($this);
+//            yield new commands\vhost\LocateVhostCommand($this);
+//
+//            // Alias
+//            yield new commands\alias\CreateAliasCommand($this);
+//            yield new commands\alias\ListHostAliasCommand($this);
+//            yield new commands\alias\DeleteAliasCommand($this);
+//            yield new commands\alias\RenameAliasCommand($this);
+//            yield new commands\alias\LocateAliasCommand($this);
+//
+//            // Entity
+//            yield new commands\entity\CreateEntityCommand($this);
+//            yield new commands\entity\ListEntityCommand($this);
+//            yield new commands\entity\LocateEntityCommand($this);
+//
+//            // DTO
+//            yield new commands\dto\ListDtoCommand($this);
+//            yield new commands\dto\LocateDtoCommand($this);
+//
+//            // Service
+//            yield new commands\service\ListServiceCommand($this);
+//            yield new commands\service\LocateServiceCommand($this);
         }
 
         /**
@@ -81,7 +128,9 @@ namespace features\console {
         public function run(): void
         {
             $command = $this->getCommandByName($this->commandName);
-            $command->parse(...$this->arguments)->execute();
+            $commandName = $command->parse(...$this->arguments);
+            $this->addResult(PrintedText::plain('> Executing command ' . PrintedText::bold($commandName)->coloredText));
+            $command->execute();
             $this->showResults();
         }
 
@@ -95,7 +144,7 @@ namespace features\console {
             $map = new WritableMap();
             $commands = $this->commandList();
             foreach ($commands as $command) {
-                $map->addOne($command->name, $command);
+                $map->addOne($command->commandName, $command);
             }
             return $map;
         }
@@ -132,7 +181,7 @@ namespace features\console {
             $banner = fopen(CommandContract::ASSETS . '/banner.txt', 'rb');
             ConsoleIO::output(PHP_EOL);
             while (($line = fgets($banner)) !== false) {
-                ConsoleIO::output(PrintedText::info($line)->coloredText, false);
+                ConsoleIO::output(PrintedText::info(' ' . $line)->coloredText, false);
             }
             ConsoleIO::output(PrintedText::bold('v' . Framework::VERSION) . PHP_EOL . PHP_EOL);
             fclose($banner);

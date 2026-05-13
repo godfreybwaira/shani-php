@@ -7,9 +7,9 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace apps\demo\main\modules\schools\logic\services {
+namespace apps\demo\main\modules\students\logic\services {
 
-    use apps\demo\main\modules\schools\data\entities\StudentEntity;
+    use apps\demo\main\modules\students\data\entities\StudentEntity;
     use features\persistence\DatabaseInterface;
 
     final class StudentService

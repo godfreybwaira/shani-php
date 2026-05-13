@@ -7,9 +7,9 @@
  * Created on: May 8, 2025 at 9:14:04 AM
  */
 
-namespace apps\demo\main\modules\schools\logic\services {
+namespace apps\demo\main\modules\students\logic\services {
 
-    use apps\demo\main\modules\schools\data\entities\SubjectEntity;
+    use apps\demo\main\modules\students\data\entities\SubjectEntity;
     use features\persistence\DatabaseInterface;
 
     final class SubjectService

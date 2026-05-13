@@ -24,12 +24,12 @@ namespace features\console\builders {
         public readonly string $directory;
         public readonly string $hostname;
         public readonly string $path;
-        private readonly ProjectBuilder $project;
+        private readonly string $projectName;
 
-        public function __construct(string $hostname, ProjectBuilder $project)
+        public function __construct(string $projectName, string $hostname)
         {
             $this->hostname = $hostname;
-            $this->project = $project;
+            $this->projectName = $projectName;
             $this->directory = Framework::DIR_HOSTS . '/' . $this->hostname;
             $this->path = $this->directory . '.yml';
         }
@@ -62,7 +62,7 @@ namespace features\console\builders {
                 echo '[ERROR] Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }
-            $newVhost = new VirtualHostBuilder($newName, $this->project);
+            $newVhost = new VirtualHostBuilder($this->projectName, $newName);
             if ($newVhost->exists()) {
                 throw new \RuntimeException('Host name "' . $newName . '" already exists.');
             }
@@ -110,13 +110,13 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if (!$this->exists()) {
                 mkdir($this->directory, LocalStorage::FILE_MODE, true);
                 $template = file_get_contents(CommandContract::ASSETS . '/vhost.yml');
                 $search = ['{project_name}', '{default_version}'];
-                $replace = [$this->project->projectName, ProjectBuilder::VERSION_NUMBER];
+                $replace = [$this->projectName, ProjectBuilder::VERSION_NUMBER];
                 $content = str_replace($search, $replace, $template);
                 $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
                 $this->registerVersion(ProjectBuilder::VERSION_NUMBER);
@@ -133,20 +133,9 @@ namespace features\console\builders {
             return is_file($this->path);
         }
 
-        public static function getConfigurations(string $path): VirtualHostMapper
+        public function getConfigurations(): VirtualHostMapper
         {
-            return VirtualHostMapper::fromArray(yaml_parse_file($path));
-        }
-
-        public static function fromHostname(string $hostname): VirtualHostBuilder
-        {
-            $file = Framework::DIR_HOSTS . '/' . $hostname . '.yml';
-            if (!is_file($file)) {
-                throw new \InvalidArgumentException('Host "' . $hostname . '" does not exists');
-            }
-            $mapper = self::getConfigurations($file);
-            $project = new ProjectBuilder($mapper->projectName, $hostname);
-            return new VirtualHostBuilder($hostname, $project);
+            return VirtualHostMapper::fromArray(yaml_parse_file($this->path));
         }
     }
 

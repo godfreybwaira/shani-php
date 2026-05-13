@@ -7,15 +7,15 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace apps\demo\main\modules\schools\logic\controllers\get {
+namespace apps\demo\main\modules\students\logic\controllers\get {
 
-    use apps\demo\main\modules\schools\data\dto\StudentDto;
-    use apps\demo\main\modules\schools\data\dto\StudentListDto;
-    use apps\demo\main\modules\schools\logic\services\StudentService;
+    use apps\demo\main\modules\students\data\dto\StudentDto;
+    use apps\demo\main\modules\students\data\dto\StudentListDto;
+    use apps\demo\main\modules\students\logic\services\StudentService;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
-    final class Students
+    final class StudentsController
     {
 
         private readonly App $app;

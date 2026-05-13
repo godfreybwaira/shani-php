@@ -43,16 +43,16 @@ namespace shani\http {
         private function __construct(string $module, ?string $action, array $params = [], ?string $extension = null)
         {
             $this->params = $params;
-            $this->module = $module;
             $this->extension = $extension;
+            $this->module = str_replace('-', '_', $module);
             $this->action = ShaniUtils::kebab2camelCase($action ?? Framework::HOME_FUNCTION);
             $this->controller = ShaniUtils::kebab2PascalCase($module . '-' . Framework::SUFFIX_CONTROLLER);
         }
 
         /**
          * Create a new Request Rout object from path while the query string is ignored.
-         * Normally the path can be request uri or any other similar structure.
-         * @param string $path Request uri path e.g /users/1/profile/2
+         * Normally the path can be request URI or any other similar structure.
+         * @param string $path Request URI path e.g /users/1/profile/2
          */
         public static function fromPath(string $path): self
         {

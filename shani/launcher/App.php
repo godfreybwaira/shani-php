@@ -257,7 +257,7 @@ namespace shani\launcher {
             $class = substr($this->path->root, strrpos(Framework::DIR_APPS, '/'));
             $class .= $this->path->modules . '/' . $this->request->route()->module;
             $class .= $this->path->controllers . '/' . ($this->request->method !== 'head' ? $this->request->method : 'get');
-            return $class . '/' . str_replace('-', '', ucwords($this->request->route()->controller, '-'));
+            return $class . '/' . $this->request->route()->controller;
         }
 
         /**

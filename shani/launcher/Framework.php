@@ -58,6 +58,9 @@ namespace shani\launcher {
         /** Default home function if no function name is provided on the URL */
         public const HOME_FUNCTION = 'index';
 
+        /** Permission code length. Increase it ONLY if there is collision */
+        public const PERMISSION_CODE_LENGTH = 8;
+
         /**
          * Suffix applied to controller classes.
          *

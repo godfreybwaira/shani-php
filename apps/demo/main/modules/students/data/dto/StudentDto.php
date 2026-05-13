@@ -7,9 +7,9 @@
  * Created on: Feb 22, 2025 at 10:29:03 AM
  */
 
-namespace apps\demo\main\modules\schools\data\dto {
+namespace apps\demo\main\modules\students\data\dto {
 
-    use apps\demo\main\modules\schools\data\entities\StudentEntity;
+    use apps\demo\main\modules\students\data\entities\StudentEntity;
 
     final class StudentDto implements \JsonSerializable
     {

@@ -61,20 +61,36 @@ namespace shani\launcher {
         }
 
         /**
-         * Converts camelCase or PascalCase strings into space-separated lowercase words,
-         * with special handling for acronyms like "NASA".
+         * Converts a camelCase or PascalCase string to kebab-case.
+         * Example: "NASAComponents" -> "nasa-components"
          *
-         * @param string $str The string to convert (e.g., "NASAComponentsController").
-         * @param string $separator The character separating words. Defaults to ' '.
+         * @param string $str       The string to convert.
+         * @param string $separator The character used to separate words. Defaults to '-'.
          *
-         * @return string The converted string (e.g., "NASA Components Controller").
+         * @return string   The lower-case-kebab-string
          */
-        public static function camel2Words(string $str, string $separator = ' '): string
+        public static function camelCase2kebab(string $str, string $separator = '-'): string
         {
-            // Insert space before any uppercase letter that follows a lowercase or digit
-            $str2 = preg_replace('/(?<=[a-z0-9])([A-Z])/', ' $1', $str);
-            // Handle acronyms: split when multiple uppercase letters are followed by lowercase
-            return preg_replace('/([A-Z])([A-Z][a-z])/', '$1' . $separator . '$2', $str2);
+            return strtolower(self::splitByCase($str, $separator));
+        }
+
+        /**
+         * Handle case-splitting logic using Regex.
+         * Identifies boundaries between lowercase/uppercase and acronyms/words.
+         *
+         * @param string $str       The string to convert.
+         * @param string $separator The separator to inject at boundaries.
+         *
+         * @return string
+         */
+        public static function splitByCase(string $str, string $separator = ' '): string
+        {
+            // 1. Lowercase followed by Uppercase (e.g., 'userGroup' -> 'user-Group')
+            $str2 = preg_replace('/([a-z])([A-Z])/', "$1$separator$2", $str);
+
+            // 2. Acronym followed by a new word (e.g., 'NASAComponents' -> 'NASA-Components')
+            $result = preg_replace('/([A-Z]+)([A-Z][a-z])/', "$1$separator$2", $str2);
+            return trim($result, $separator);
         }
     }
 

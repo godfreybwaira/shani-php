@@ -20,9 +20,12 @@ namespace features\console\builders {
 
         /**
          * Build the resource if it does not exists. If it does, nothing will be done.
+         *
+         * @param \Closure $progressTracker A callback that will track the status of each operation
+         * 
          * @return self
          */
-        public function build(): self;
+        public function build(\Closure $progressTracker): self;
     }
 
 }

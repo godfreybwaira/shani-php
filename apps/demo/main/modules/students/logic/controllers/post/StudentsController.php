@@ -7,16 +7,16 @@
  * Created on: Feb 13, 2024 at 1:50:50 PM
  */
 
-namespace apps\demo\main\modules\schools\logic\controllers\post {
+namespace apps\demo\main\modules\students\logic\controllers\post {
 
-    use apps\demo\main\modules\schools\data\dto\StudentDto;
-    use apps\demo\main\modules\schools\logic\services\StudentService;
+    use apps\demo\main\modules\students\data\dto\StudentDto;
+    use apps\demo\main\modules\students\logic\services\StudentService;
     use features\exceptions\CustomException;
     use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
-    final class Students
+    final class StudentsController
     {
 
         private readonly App $app;

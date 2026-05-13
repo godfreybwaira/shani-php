@@ -39,13 +39,15 @@ namespace features\documentation\scanners {
 
         public static function digest(string $requestMethod, RequestRoute $route): DigestedEndpoint
         {
-            $endpoint = strtolower($requestMethod . '.' . $route->module . '.' . $route->action);
-            return new DigestedEndpoint(substr(sha1($endpoint), offset: 5, length: 10), $endpoint);
+            $callback = $route->action === Framework::HOME_FUNCTION ? null : '.' . $route->action;
+            $endpoint = strtolower($requestMethod . '.' . $route->module . $callback);
+            $digestion = substr(hash('sha256', $endpoint), offset: strlen($requestMethod), length: Framework::PERMISSION_CODE_LENGTH);
+            return new DigestedEndpoint($digestion, $endpoint);
         }
 
         public static function endpint2sentence(string $requestMethod, string $moduleName, string $functionName): string
         {
-            $suffix = $functionName === Framework::HOME_FUNCTION ? null : ' ' . ShaniUtils::camel2Words($functionName);
+            $suffix = $functionName === Framework::HOME_FUNCTION ? null : ' ' . ShaniUtils::splitByCase($functionName);
             $verb = strtolower($requestMethod);
             $action = match ($verb) {
                 'get' => 'View',
@@ -53,7 +55,7 @@ namespace features\documentation\scanners {
                 'put', 'patch' => 'Update existing',
                 default => $verb
             };
-            return ucwords($action . ' ' . ShaniUtils::camel2Words($moduleName) . $suffix);
+            return ucwords($action . ' ' . ShaniUtils::splitByCase($moduleName) . $suffix);
         }
 
         #[\Override]

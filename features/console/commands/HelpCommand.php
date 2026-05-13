@@ -17,14 +17,11 @@ namespace features\console\commands {
     final class HelpCommand extends CommandContract
     {
 
-        private ?string $commandName = null;
-        private readonly CommandRegistry $registry;
+        private ?string $userCommand = null;
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given', 'help create:project');
-            $this->registry = $registry;
-            $this->registry->showBanner = true;
+            parent::__construct($registry, 'help', '[COMMAND]', 'View help for a given command, or all commands if no argument is given', 'help create:project');
         }
 
         public function execute(): void
@@ -38,7 +35,7 @@ namespace features\console\commands {
             $width = 150;
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
             $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width));
-            if ($this->commandName === null) {
+            if ($this->userCommand === null) {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
                 $commands = $this->registry->getAllCommands();
                 $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
@@ -52,9 +49,9 @@ namespace features\console\commands {
         private function searchCommand(int $sentenceWidth): void
         {
             $commands = $this->registry->getAllCommands();
-            $command = $commands->getOne($this->commandName);
+            $command = $commands->getOne($this->userCommand);
             if ($command !== null) {
-                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->name, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->userCommand, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult(Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult('DESCRIPTION:' . PHP_EOL . $command->description);
@@ -63,25 +60,25 @@ namespace features\console\commands {
             $index = 1;
             $excluded = [];
             $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
-                if (str_contains($cmd->name, $this->commandName)) {
-                    $excluded[$cmd->name] = 1;
+                if (str_contains($cmd->commandName, $this->userCommand)) {
+                    $excluded[$cmd->commandName] = 1;
                     $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
             });
             $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
-                if (!isset($excluded[$cmd->name]) && str_contains(strtolower($cmd->description), $this->commandName)) {
+                if (!isset($excluded[$cmd->commandName]) && str_contains(strtolower($cmd->description), $this->userCommand)) {
                     $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
             });
             if ($index === 1) {
-                throw new \InvalidArgumentException('Command "' . $this->commandName . '" not found.');
+                throw new \InvalidArgumentException('Command "' . $this->userCommand . '" not found.');
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): string
         {
-            $this->commandName = $args[0] ?? null;
-            return $this;
+            $this->userCommand = $args[0] ?? null;
+            return $this->commandName;
         }
     }
 

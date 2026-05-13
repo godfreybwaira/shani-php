@@ -9,42 +9,37 @@
 
 namespace features\console\builders {
 
-    use features\console\CommandContract;
     use features\console\helpers\Formatter;
-    use features\utils\Directory;
     use shani\launcher\Framework;
     use shani\utils\VirtualHostMapper;
 
     final class ProjectBuilder implements LightBuilderInterface
     {
 
-        public const VERSION_NUMBER = 'v1';
-
         public readonly string $projectName;
         public readonly string $hostname;
+        private readonly string $projectPath;
         public readonly VirtualHostBuilder $vhost;
-        private readonly string $path;
 
         public function __construct(string $projectName, string $hostname)
         {
             $this->hostname = $hostname;
             $this->projectName = $projectName;
-            $this->vhost = new VirtualHostBuilder($hostname, $this);
-            $this->path = Framework::DIR_APPS . '/' . $projectName;
+            $this->vhost = new VirtualHostBuilder($projectName, $hostname);
+            $this->projectPath = Framework::DIR_APPS . DIRECTORY_SEPARATOR . $projectName;
         }
 
-        private function copyCGIfiles(): void
+        private function copyCGIfiles(\Closure $tracker): void
         {
-            $mapper = VirtualHostBuilder::getConfigurations($this->vhost->path);
-            $destination = $this->path . $mapper->cgiDirectory;
-            $source = CommandContract::ASSETS . '/cgi';
-            if (Directory::copy($source, $destination)) {
-                $this->cleanApacheFiles($mapper, $destination);
-                $this->cleanNginxFiles($mapper, $destination);
-            }
+//            $destination = $this->path . $mapper->cgiDirectory;
+//            $source = CommandContract::ASSETS . '/cgi';
+//            if (Directory::copy($source, $destination)) {
+//                $tracker($this->cleanApacheFiles($mapper, $destination));
+//                $tracker($this->cleanNginxFiles($mapper, $destination));
+//            }
         }
 
-        private function cleanApacheFiles(VirtualHostMapper $mapper, string $destination)
+        private function cleanApacheFiles(VirtualHostMapper $mapper, string $destination): string
         {
             $shaniRoot = basename(SHANI_SERVER_ROOT);
             $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
@@ -63,12 +58,11 @@ namespace features\console\builders {
             $apachePath = $destination . '/apache/apache.conf';
             $content = str_replace($search, $replace, file_get_contents($apachePath));
             ///////////////////////////////////////////
-            $intext = 'Cleaning Apache file:';
             $outtext = file_put_contents($apachePath, $content) !== false ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            return Formatter::formatSentence('Cleaning Apache file:', $outtext);
         }
 
-        private function cleanNginxFiles(VirtualHostMapper $mapper, string $destination)
+        private function cleanNginxFiles(VirtualHostMapper $mapper, string $destination): string
         {
             $cgiDir = basename($destination) . '/nginx';
             $path = dirname($destination) . '/' . $cgiDir;
@@ -93,61 +87,29 @@ namespace features\console\builders {
             $content = str_replace($search, $replace, file_get_contents($customFile));
             ///////////////////////////////////////////
             $outtext = file_put_contents($customFile, $content) !== false ? 'Success' : 'Failed';
-            $intext = 'Cleaning nginx files:';
-            echo Formatter::formatSentence($intext, $outtext);
-        }
-
-        public function delete(): void
-        {
-            $this->vhost->delete();
-            $resultText = Directory::delete($this->path) ? 'Success' : 'Failed';
-            echo Formatter::formatSentence('Deleting project "' . $this->projectName . '"', $resultText);
-        }
-
-        public function locate(): void
-        {
-            echo $this->exists() ? $this->path : null;
+            return Formatter::formatSentence('Cleaning nginx files:', $outtext);
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if ($this->exists()) {
-                echo Formatter::formatSentence('Project "' . $this->projectName . '" already exists', 'Failed');
-            } else if ($this->vhost->exists()) {
-                echo Formatter::formatSentence('Host name "' . $this->hostname . '" already exists', 'Failed');
-            } else {
-                echo Formatter::placeCenter('Building Project "' . $this->projectName . '"', underline: true);
-                $this->vhost->build();
-                $this->copyCGIfiles();
-                $version = new ProjectVersionBuilder($this->vhost, self::VERSION_NUMBER);
-                $version->build();
+                throw new \RuntimeException('Project "' . $this->projectName . '" already exists');
             }
+            if ($this->vhost->exists()) {
+                throw new \RuntimeException('Project could not be created. Host "' . $this->hostname . '" already exists');
+            }
+            $this->vhost->build($progressTracker);
+            $this->copyCGIfiles($progressTracker);
+//            $version = new ProjectVersionBuilder($this->vhost, self::VERSION_NUMBER);
+//            $version->build();
             return $this;
         }
 
         #[\Override]
         public function exists(): bool
         {
-            return is_dir($this->path);
-        }
-
-        public static function fromName(string $projectName): ProjectBuilder
-        {
-            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
-            foreach ($hostfiles as $file) {
-                $config = yaml_parse_file($file);
-                if ($config['project_name'] === $projectName) {
-                    return new ProjectBuilder($projectName, basename($file, '.yml'));
-                }
-            }
-            throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
-        }
-
-        public function getVersions(): array
-        {
-            $mapper = VirtualHostBuilder::getConfigurations($this->vhost->path);
-            return $mapper->supportedVersions;
+            return is_dir($this->projectPath);
         }
     }
 
