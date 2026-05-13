@@ -11,30 +11,30 @@ namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
     use shani\launcher\Framework;
 
     final class ListProjectCommand extends CommandContract
     {
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('list:project', null, 'Show all available projects', null);
+            parent::__construct($registry, 'list:project', null, 'Show all available projects', null);
         }
 
         public function execute(): void
         {
-            echo 'Listing all projects' . PHP_EOL;
             $directories = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
             foreach ($directories as $key => $projectName) {
                 $project = ProjectBuilder::fromName($projectName);
-                echo Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->hostname);
+                $this->registry->addResult(Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->metadata->hostName));
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
-            return $this;
+            return null;
         }
     }
 

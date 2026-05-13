@@ -77,7 +77,7 @@ namespace features\console {
 
             // Project
             yield new commands\project\CreateProjectCommand($this);
-//            yield new commands\project\ListProjectCommand($this);
+            yield new commands\project\ListProjectCommand($this);
             yield new commands\project\LocateProjectCommand($this);
 //            yield new commands\project\DeleteProjectCommand($this);
 //
@@ -133,7 +133,7 @@ namespace features\console {
             $info = PrintedText::info('[ INFO ] ');
             $infoMsg = $this->options->noColor ? $info->plainText : $info->coloredText;
             $message = PrintedText::bold($this->commandName . ' ' . $parameters)->coloredText;
-            $this->addResult(PrintedText::plain($infoMsg . 'Executing command ' . $message));
+            $this->addResult(PrintedText::plain($infoMsg . 'Executing command ' . $message . PHP_EOL));
             $command->execute();
             $this->showResults();
         }
@@ -221,7 +221,7 @@ namespace features\console {
                     ConsoleIO::output($message->coloredText);
                 }
             }
-            ConsoleIO::output('Done' . PHP_EOL);
+            ConsoleIO::output(PHP_EOL . 'Done' . PHP_EOL);
         }
     }
 

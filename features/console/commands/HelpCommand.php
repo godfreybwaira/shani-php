@@ -75,7 +75,7 @@ namespace features\console\commands {
             }
         }
 
-        public function parse(string ...$args): string
+        public function parse(string ...$args): ?string
         {
             $this->userCommand = $args[0] ?? null;
             return $this->userCommand ?? '';

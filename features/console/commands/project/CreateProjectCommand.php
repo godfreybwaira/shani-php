@@ -33,7 +33,7 @@ namespace features\console\commands\project {
             $project->build(fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): string
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);

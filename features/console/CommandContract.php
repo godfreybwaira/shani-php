@@ -92,7 +92,7 @@ namespace features\console {
          * @return string|null      Command being executed
          * @throws \InvalidArgumentException If arguments are invalid.
          */
-        public abstract function parse(string ...$args): string;
+        public abstract function parse(string ...$args): ?string;
 
         /**
          * Execute the command logic.
