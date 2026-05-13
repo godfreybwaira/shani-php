@@ -2,6 +2,7 @@
 <?php
 
 use features\console\CommandRegistry;
+use features\console\printer\ConsoleColor;
 use features\console\printer\ConsoleIO;
 use features\console\printer\PrintedText;
 use shani\utils\ShaniUtils;
@@ -19,13 +20,16 @@ ShaniUtils::define(__DIR__);
         ConsoleIO::error($error->coloredText . 'Too few arguments! For help type ' . $helpCommand->coloredText);
         exit(1);
     }
+    $command = $arguments[1];
+    unset($arguments[0], $arguments[1]);
+    $registry = new CommandRegistry($command, array_values($arguments));
     try {
-        $command = $arguments[1];
-        unset($arguments[0], $arguments[1]);
-        $registry = new CommandRegistry($command, array_values($arguments));
         $registry->run();
         exit(0);
     } catch (Throwable $t) {
+        if (!$registry->options->quiet) {
+            CommandRegistry::printBanner(ConsoleColor::RED);
+        }
         ConsoleIO::error($error->coloredText . $t->getMessage());
         exit(1);
     }

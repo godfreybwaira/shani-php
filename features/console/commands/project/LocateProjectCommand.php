@@ -11,6 +11,8 @@ namespace features\console\commands\project {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class LocateProjectCommand extends CommandContract
@@ -18,28 +20,27 @@ namespace features\console\commands\project {
 
         private readonly string $projectName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('locate:project', 'project_name', 'Show the full path to an existing project', 'blog');
+            parent::__construct($registry, 'locate:project', 'project_name', 'Show the full path to an existing project', 'blog');
         }
 
         public function execute(): void
         {
             $project = ProjectBuilder::fromName($this->projectName);
-            $project?->locate();
+            $project->locate();
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {
-                self::validateIdentifier($args[0]);
-                $this->projectName = $args[0];
+                $this->projectName = ResourceName::create($args[0])->longName;
             }
-            return $this;
+            return $this->projectName;
         }
     }
 

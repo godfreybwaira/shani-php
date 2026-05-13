@@ -125,6 +125,18 @@ namespace features\console\builders {
                 ConsoleIO::output($this->metadata->projectDirectory);
             }
         }
+
+        public static function fromName(string $projectName): ProjectBuilder
+        {
+            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
+            foreach ($hostfiles as $file) {
+                $config = yaml_parse_file($file);
+                if ($config['project_name'] === $projectName) {
+                    return ProjectBuilder::fromMetaData($projectName, basename($file, '.yml'));
+                }
+            }
+            throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
+        }
     }
 
 }

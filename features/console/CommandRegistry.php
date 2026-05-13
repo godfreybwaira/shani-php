@@ -9,6 +9,7 @@
 
 namespace features\console {
 
+    use features\console\printer\ConsoleColor;
     use features\console\printer\ConsoleIO;
     use features\console\printer\PrintedText;
     use features\ds\map\ReadableMap;
@@ -30,7 +31,7 @@ namespace features\console {
         private readonly WritableMap $commands;
 
         /** User command options */
-        private readonly CommandOptions $options;
+        public readonly CommandOptions $options;
 
         /** Command arguments */
         private readonly array $arguments;
@@ -58,7 +59,7 @@ namespace features\console {
         {
             $this->commandName = $commandName;
             $this->arguments = $arguments;
-            $quiet = in_array('--quiet', $arguments);
+            $quiet = in_array('--quiet', $arguments) || str_starts_with($commandName, 'locate:');
             $noColor = in_array('--no-color', $arguments);
             $this->options = new CommandOptions($quiet, $noColor);
             $this->commands = $this->registerAll();
@@ -77,7 +78,7 @@ namespace features\console {
             // Project
             yield new commands\project\CreateProjectCommand($this);
 //            yield new commands\project\ListProjectCommand($this);
-//            yield new commands\project\LocateProjectCommand($this);
+            yield new commands\project\LocateProjectCommand($this);
 //            yield new commands\project\DeleteProjectCommand($this);
 //
             //Version
@@ -129,7 +130,10 @@ namespace features\console {
         {
             $command = $this->getCommandByName($this->commandName);
             $parameters = $command->parse(...$this->arguments);
-            $this->addResult(PrintedText::plain('> Executing command ' . PrintedText::bold($this->commandName . ' ' . $parameters)->coloredText));
+            $info = PrintedText::info('[ INFO ] ');
+            $infoMsg = $this->options->noColor ? $info->plainText : $info->coloredText;
+            $message = PrintedText::bold($this->commandName . ' ' . $parameters)->coloredText;
+            $this->addResult(PrintedText::plain($infoMsg . 'Executing command ' . $message));
             $command->execute();
             $this->showResults();
         }
@@ -176,12 +180,12 @@ namespace features\console {
             return $this->commands;
         }
 
-        private static function printBanner(): void
+        public static function printBanner(ConsoleColor $color = ConsoleColor::GREEN): void
         {
             $banner = fopen(CommandContract::ASSETS . '/banner.txt', 'rb');
             ConsoleIO::output(PHP_EOL);
             while (($line = fgets($banner)) !== false) {
-                ConsoleIO::output(PrintedText::info(' ' . $line)->coloredText, false);
+                ConsoleIO::output(PrintedText::color(' ' . $line, $color)->coloredText, false);
             }
             ConsoleIO::output(PrintedText::bold('v' . Framework::VERSION) . PHP_EOL . PHP_EOL);
             fclose($banner);
