@@ -79,7 +79,7 @@ namespace features\console\builders {
                 }
             }
             $intext = 'Deleting host: ' . $this->metadata->hostName;
-            $outtext = unlink($this->path) ? 'Success' : 'Failed';
+            $outtext = unlink($this->metadata->hostPath) ? 'Success' : 'Failed';
             $progressTracker(Formatter::formatSentence($intext, $outtext));
         }
 
