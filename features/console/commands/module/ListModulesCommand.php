@@ -11,50 +11,48 @@ namespace features\console\commands\module {
 
     use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class ListModulesCommand extends CommandContract
     {
 
         private readonly string $projectName;
-        private readonly string $projectVersion;
+        private readonly string $versionNumber;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('list:module', 'version_number@project_name', 'Show all available project modules', 'v1@blog');
+            parent::__construct($registry, 'list:module', 'project_name@version_number', 'Show all available project modules', 'blog@v1');
         }
 
         public function execute(): void
         {
-            echo 'Listing all project version modules: ' . $this->projectVersion . PHP_EOL;
-            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
-            if (!$version->exists()) {
-                echo '[ERROR] Project version "' . $this->projectVersion . '" does not exists.' . PHP_EOL;
-                return;
-            }
+            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
             $modules = $version->getModules();
+            if (!$modules->valid()) {
+                throw new \InvalidArgumentException('No module found for version "' . $this->versionNumber . '"');
+            }
             foreach ($modules as $key => $module) {
-                echo Formatter::formatSentence($key + 1, $module->moduleName);
+                $this->registry->addResult(Formatter::formatSentence($key + 1, $module->moduleName->directoryName));
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateIdentifier($values[1]);
-                $this->projectVersion = $values[0];
-                $this->projectName = $values[1];
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
             }
-            return $this;
+            return $this->projectName . self::SEPARATOR . $this->versionNumber;
         }
     }
 

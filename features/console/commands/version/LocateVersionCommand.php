@@ -23,7 +23,7 @@ namespace features\console\commands\version {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'locate:version', 'version_number@project_name', 'Show the location of the given project version', 'v1@blog');
+            parent::__construct($registry, 'locate:version', 'project_name@version_number', 'Show the location of the given project version', 'blog@v1');
         }
 
         public function execute(): void
@@ -41,10 +41,10 @@ namespace features\console\commands\version {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->versionNumber = ResourceName::create($values[0])->shortName;
-                $this->projectName = ResourceName::create($values[1])->shortName;
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
             }
-            return $this->versionNumber . self::SEPARATOR . $this->projectName;
+            return $this->projectName . self::SEPARATOR . $this->versionNumber;
         }
     }
 

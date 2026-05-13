@@ -15,6 +15,7 @@ namespace features\console\builders {
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
     use features\utils\Directory;
+    use shani\config\PathConfig;
 
     final class ProjectVersionBuilder implements LightBuilderInterface
     {
@@ -24,9 +25,10 @@ namespace features\console\builders {
         public const DEFAULT_MODULE = 'users';
 
         public readonly VirtualHostBuilder $vhost;
-        public readonly ModuleName $defaultModule;
         public readonly string $namespace;
         public readonly string $versionNumber;
+        private readonly PathConfig $config;
+        private readonly ModuleName $defaultModule;
         private readonly string $versionName;
         private readonly string $rootPath;
         private readonly string $configFilepath;
@@ -144,6 +146,25 @@ namespace features\console\builders {
         {
             $project = ProjectBuilder::fromName($projectName);
             return new ProjectVersionBuilder($project->vhost, $versionNumber);
+        }
+
+        public function getPathConfig(): PathConfig
+        {
+            if (!isset($this->config)) {
+                $this->config = new PathConfig($this->vhost->getConfigurations(), $this->versionNumber, $this->defaultModule->pathName);
+            }
+            return $this->config;
+        }
+
+        public function getModules(): \Generator
+        {
+            if ($this->exists()) {
+                $config = $this->getPathConfig();
+                $folders = array_diff(scandir($this->rootPath . $config->modules), ['.', '..']);
+                foreach ($folders as $moduleName) {
+                    yield new ModuleBuilder(ModuleName::create($moduleName), $this);
+                }
+            }
         }
     }
 

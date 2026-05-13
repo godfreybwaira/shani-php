@@ -9,49 +9,54 @@
 
 namespace features\console\commands\controller {
 
+    use features\console\builders\ControllerBuilder;
     use features\console\builders\ModuleBuilder;
-    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class LocateControllerCommand extends CommandContract
     {
 
-        private readonly string $moduleName;
-        private readonly string $projectVersion;
+        private readonly ModuleName $moduleName;
+        private readonly string $versionNumber;
         private readonly string $projectName;
+        private readonly string $requestMethod;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('locate:controller', 'module_name@version_number@project_name', 'Show the full path to an existing project controllers', 'posts@v1@blog');
+            parent::__construct($registry, 'locate:controller', 'project_name@version_number@module_name@request_method', 'Show the full path to an existing project controllers', 'blog@v1@posts@get');
         }
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
-            $module = new ModuleBuilder($this->moduleName, $version);
-            $module->locateControllers();
+            $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
+            $controller = new ControllerBuilder($module, $this->requestMethod);
+            $controller->locate();
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
+                $this->requestMethod = ConsoleIO::read('What is the request method?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 3) {
-                    throw new \ArgumentCountError('Atleast three argument is required.');
+                if (count($values) < 4) {
+                    throw new \ArgumentCountError('Atleast four argument are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateIdentifier($values[1]);
-                self::validateIdentifier($values[2]);
-                $this->moduleName = $values[0];
-                $this->projectVersion = $values[1];
-                $this->projectName = $values[2];
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
+                $this->moduleName = ModuleName::create($values[2]);
+                $this->requestMethod = ResourceName::create($values[3])->shortName;
             }
-            return $this;
+            $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
+            $parameters .= self::SEPARATOR . $this->moduleName->className . self::SEPARATOR;
+            return $parameters . $this->requestMethod;
         }
     }
 

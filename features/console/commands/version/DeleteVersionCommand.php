@@ -23,7 +23,7 @@ namespace features\console\commands\version {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'delete:version', 'version_number@project_name', 'Delete a project version from an existing project', 'v1@blog');
+            parent::__construct($registry, 'delete:version', 'project_name@version_number', 'Delete a project version from an existing project', 'blog@v1');
         }
 
         public function execute(): void
@@ -42,10 +42,10 @@ namespace features\console\commands\version {
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->versionNumber = ConsoleIO::read('Write again the project version number to delete', fn(string $s) => $s === $values[0]);
-                $this->projectName = ResourceName::create($values[1])->shortName;
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ConsoleIO::read('Write again the project version number to delete', fn(string $s) => $s === $values[1]);
             }
-            return $this->versionNumber . self::SEPARATOR . $this->projectName;
+            return $this->projectName . self::SEPARATOR . $this->versionNumber;
         }
     }
 

@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\console\helpers\ResourceName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
     use shani\launcher\Framework;
 
@@ -20,15 +21,15 @@ namespace features\console\builders {
 
         private readonly string $namespace;
         private readonly string $rootPath;
-        private readonly string $controllerName;
-        private readonly string $requestMethod;
+        public readonly string $controllerName;
+        public readonly string $requestMethod;
         private readonly ModuleBuilder $module;
 
-        public function __construct(ModuleBuilder $module, string $controllerName = null, string $requestMethod = 'GET')
+        public function __construct(ModuleBuilder $module, string $requestMethod = 'GET')
         {
             $this->module = $module;
             $this->requestMethod = strtolower($requestMethod);
-            $this->controllerName = ResourceName::create($controllerName ?? $module->moduleName->className, 'Controller')->longName;
+            $this->controllerName = ResourceName::create($module->moduleName->className, 'Controller')->longName;
             $this->namespace = str_replace('/', '\\', $module->namespace . $module->config->controllers . '\\' . $this->requestMethod);
             $path = $module->rootPath . $module->config->controllers . DIRECTORY_SEPARATOR;
             $path .= $this->requestMethod . DIRECTORY_SEPARATOR . $this->controllerName . '.php';
@@ -90,6 +91,13 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_file($this->rootPath);
+        }
+
+        public function locate(): void
+        {
+            if ($this->exists()) {
+                ConsoleIO::output($this->rootPath);
+            }
         }
     }
 

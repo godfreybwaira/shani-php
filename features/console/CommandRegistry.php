@@ -88,14 +88,14 @@ namespace features\console {
             yield new commands\version\LocateVersionCommand($this);
 //
 //            // Module
-//            yield new commands\module\CreateModuleCommand($this);
-//            yield new commands\module\LocateModuleCommand($this);
-//            yield new commands\module\ListModulesCommand($this);
+            yield new commands\module\CreateModuleCommand($this);
+            yield new commands\module\LocateModuleCommand($this);
+            yield new commands\module\ListModulesCommand($this);
 //
 //            // Controller
-//            yield new commands\controller\CreateControllerCommand($this);
-//            yield new commands\controller\LocateControllerCommand($this);
-//            yield new commands\controller\ListControllersCommand($this);
+            yield new commands\controller\CreateControllerCommand($this);
+            yield new commands\controller\LocateControllerCommand($this);
+            yield new commands\controller\ListControllersCommand($this);
 //
 //            // VHost
 //            yield new commands\vhost\ListVhostCommand($this);

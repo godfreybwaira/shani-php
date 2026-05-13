@@ -11,53 +11,52 @@ namespace features\console\commands\controller {
 
     use features\console\builders\ControllerBuilder;
     use features\console\builders\ModuleBuilder;
-    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class CreateControllerCommand extends CommandContract
     {
 
         private readonly string $projectName;
-        private readonly string $projectVersion;
-        private readonly string $moduleName;
-        private readonly string $controllerName;
+        private readonly string $versionNumber;
+        private readonly ModuleName $moduleName;
+        private readonly string $requestMethod;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('create:controller', 'controller_name@module_name@version_number@project_name', 'Create a new project controller, it\'s associated service, dto, entity, view and language file', 'Review@posts@v1@blog');
+            parent::__construct($registry, 'create:controller', 'project_name@version_number@module_name@request_method', 'Create a new project controller, it\'s associated service, dto, entity, view and language file', 'blog@v1@posts@get');
         }
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
-            $module = new ModuleBuilder($this->moduleName, $version);
-            $controller = new ControllerBuilder($this->controllerName, $module);
-            $controller->build();
+            $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
+            $controller = new ControllerBuilder($module, $this->requestMethod);
+            $controller->build(fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->controllerName = ConsoleIO::read('What is the controller name?', $this->validIdentifier);
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
+                $this->requestMethod = ConsoleIO::read('What is the request method?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 4) {
                     throw new \ArgumentCountError('Atleast four arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateIdentifier($values[1]);
-                self::validateIdentifier($values[2]);
-                self::validateIdentifier($values[3]);
-                $this->controllerName = $values[0];
-                $this->moduleName = $values[1];
-                $this->projectVersion = $values[2];
-                $this->projectName = $values[3];
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
+                $this->moduleName = ModuleName::create($values[2]);
+                $this->requestMethod = ResourceName::create($values[3])->shortName;
             }
-            return $this;
+            $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
+            $parameters .= self::SEPARATOR . $this->moduleName->className . self::SEPARATOR;
+            return $parameters . $this->requestMethod;
         }
     }
 

@@ -28,7 +28,7 @@ namespace features\console\builders {
         {
             $this->version = $version;
             $this->moduleName = $moduleName;
-            $this->config = new PathConfig($version->vhost->getConfigurations(), $version->versionNumber, $version->defaultModule->pathName);
+            $this->config = $version->getPathConfig();
             $this->namespace = str_replace('/', '\\', $version->namespace . $this->config->modules . '\\' . $moduleName->directoryName);
             $this->rootPath = $this->config->root . $this->config->modules . DIRECTORY_SEPARATOR . $moduleName->directoryName;
         }
@@ -69,6 +69,27 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_dir($this->rootPath);
+        }
+
+        public function getControllers(): \Generator
+        {
+            $controllerPath = $this->rootPath . $this->config->controllers;
+            if (!is_dir($controllerPath)) {
+                return null;
+            }
+            $folders = array_diff(scandir($controllerPath), ['.', '..']);
+            foreach ($folders as $method) {
+                $files = array_diff(scandir($controllerPath . DIRECTORY_SEPARATOR . $method), ['.', '..']);
+                foreach ($files as $v) {
+                    yield new ControllerBuilder($this, $method);
+                }
+            }
+        }
+
+        public static function fromModuleName(ModuleName $moduleName, string $projectName, string $versionNumber): self
+        {
+            $version = ProjectVersionBuilder::fromProjectName($projectName, $versionNumber);
+            return new ModuleBuilder($moduleName, $version);
         }
     }
 

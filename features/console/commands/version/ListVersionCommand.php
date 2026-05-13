@@ -30,6 +30,9 @@ namespace features\console\commands\version {
         {
             $project = ProjectBuilder::fromName($this->projectName);
             $versions = $project->getVersions();
+            if (!$versions->valid()) {
+                throw new \InvalidArgumentException('No version found for project "' . $this->projectName . '"');
+            }
             $this->registry->addResult(Formatter::formatSentence('PROJECT', 'STATUS', separator: ' '));
             foreach ($versions as $key => $version) {
                 $status = $version->configExists() ? 'OK' : 'No config file';
