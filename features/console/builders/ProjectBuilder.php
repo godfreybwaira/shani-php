@@ -126,6 +126,14 @@ namespace features\console\builders {
             }
         }
 
+        public function delete(\Closure $progressTracker): void
+        {
+            $this->vhost->delete($progressTracker);
+            $resultText = Directory::delete($this->metadata->projectDirectory) ? 'Success' : 'Failed';
+            $intext = 'Deleting project "' . $this->metadata->projectName . '"';
+            $progressTracker(Formatter::formatSentence($intext, $resultText));
+        }
+
         public static function fromName(string $projectName): ProjectBuilder
         {
             $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');

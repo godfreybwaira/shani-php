@@ -79,7 +79,7 @@ namespace features\console {
             yield new commands\project\CreateProjectCommand($this);
             yield new commands\project\ListProjectCommand($this);
             yield new commands\project\LocateProjectCommand($this);
-//            yield new commands\project\DeleteProjectCommand($this);
+            yield new commands\project\DeleteProjectCommand($this);
 //
             //Version
 //            yield new commands\version\CreateVersionCommand($this);

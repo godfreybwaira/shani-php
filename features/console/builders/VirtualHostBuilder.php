@@ -14,6 +14,8 @@ namespace features\console\builders {
     use features\console\helpers\ProjectMetaData;
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
+    use features\utils\Directory;
+    use shani\launcher\Framework;
     use shani\utils\VirtualHostMapper;
 
     final class VirtualHostBuilder implements LightBuilderInterface
@@ -64,11 +66,50 @@ namespace features\console\builders {
             return $this->hostConfig;
         }
 
+        public function delete(\Closure $progressTracker): void
+        {
+            if (!$this->exists()) {
+                $progressTracker(Formatter::formatSentence('Host "' . $this->metadata->hostName . '" does not exists', 'Failed'));
+                return;
+            }
+            if (Directory::delete($this->metadata->hostDirectory)) {
+                $aliases = $this->getAliases();
+                foreach ($aliases as $alias) {
+                    $alias->delete($progressTracker);
+                }
+            }
+            $intext = 'Deleting host: ' . $this->metadata->hostName;
+            $outtext = unlink($this->path) ? 'Success' : 'Failed';
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
+        }
+
         public function locate(): void
         {
             if ($this->exists()) {
                 ConsoleIO::output($this->metadata->hostPath);
             }
+        }
+
+        public function getAliases(): array
+        {
+            $aliases = [];
+            $files = glob(Framework::DIR_HOSTS . '/*.alias');
+            foreach ($files as $file) {
+                if (file_get_contents($file) === $this->metadata->hostName) {
+                    $aliases[] = new AliasBuilder($this, basename($file, '.alias'));
+                }
+            }
+            return $aliases;
+        }
+
+        public static function fromHostName(string $hostName): self
+        {
+            $file = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
+            if (!is_file($file)) {
+                throw new \InvalidArgumentException('Host "' . $hostName . '" does not exists');
+            }
+            $config = yaml_parse_file($file);
+            return VirtualHostBuilder::fromMetaData($config['project_name'], $hostName);
         }
     }
 

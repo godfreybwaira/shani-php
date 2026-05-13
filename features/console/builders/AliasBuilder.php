@@ -17,15 +17,13 @@ namespace features\console\builders {
 
         public readonly string $aliasPath;
         private readonly string $aliasName;
-        private readonly string $hostname;
-        private readonly string $hostPath;
+        private readonly VirtualHostBuilder $vhost;
 
-        public function __construct(string $aliasName, string $hostname)
+        public function __construct(VirtualHostBuilder $vhost, string $aliasName)
         {
+            $this->vhost = $vhost;
             $this->aliasName = $aliasName;
-            $this->hostname = $hostname;
-            $this->aliasPath = Framework::DIR_HOSTS . '/' . $this->aliasName . '.alias';
-            $this->hostPath = Framework::DIR_HOSTS . '/' . $this->hostname . '.yml';
+            $this->aliasPath = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $this->aliasName . '.alias';
         }
 
         public function locate(): void
@@ -33,21 +31,21 @@ namespace features\console\builders {
             echo $this->exists() ? $this->aliasPath : null;
         }
 
-        public function delete(): void
+        public function delete(\Closure $progressTracker): void
         {
             $intext = 'Deleting alias "' . $this->aliasName . '"';
             $outtext = $this->exists() && unlink($this->aliasPath) ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
         }
 
         public function rename(string $newName): void
         {
             if (!$this->exists()) {
-                throw new \RuntimeException('Alias "' . $this->aliasName . '" does not exists.');
+                throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" does not exists.');
             }
-            $newAlias = new AliasBuilder($newName, $this->hostname);
+            $newAlias = new AliasBuilder($this, $newName);
             if ($newAlias->exists()) {
-                throw new \RuntimeException('Alias name "' . $newName . '" already exists.');
+                throw new \InvalidArgumentException('Alias name "' . $newName . '" already exists.');
             }
             $intext = 'Renaming alias from "' . $this->aliasName . '" to "' . $newAlias->aliasName . '"';
             $outtext = rename($this->aliasPath, $newAlias->aliasPath) ? 'Success' : 'Failed';
@@ -56,27 +54,28 @@ namespace features\console\builders {
 
         public static function fromName(string $aliasName): AliasBuilder
         {
-            $filename = Framework::DIR_HOSTS . '/' . $aliasName . '.alias';
+            $filename = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $aliasName . '.alias';
             if (is_file($filename)) {
-                return new AliasBuilder($aliasName, file_get_contents($filename));
+                $vhost = VirtualHostBuilder::fromHostName(file_get_contents($filename));
+                return new AliasBuilder($vhost, $aliasName);
             }
             throw new \InvalidArgumentException('Host alias "' . $aliasName . '" does not exists');
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
-            if (!is_file($this->hostPath)) {
-                echo 'Could not create alias "' . $this->aliasName . '", host "' . $this->hostname . '" does not exists.';
-                return $this;
+            if (!$this->vhost->exists()) {
+                $errorMsg = 'Could not create alias "' . $this->aliasName . '", host "';
+                $errorMsg .= $this->vhost->metadata->hostName . '" does not exists.';
+                throw new \RuntimeException($errorMsg);
             }
-            if (!$this->exists()) {
-                $intext = 'Creating alias "' . $this->aliasName . '" for host "' . $this->hostname . '"';
-                $outtext = file_put_contents($this->aliasPath, $this->hostname) !== false ? 'Success' : 'Failed';
-                echo Formatter::formatSentence($intext, $outtext);
-            } else {
-                echo 'Alias "' . $this->aliasName . '" already exists.' . PHP_EOL;
+            if ($this->exists()) {
+                throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" already exists.');
             }
+            $intext = 'Creating alias "' . $this->aliasName . '"';
+            $outtext = file_put_contents($this->aliasPath, $this->vhost->metadata->hostName) !== false ? 'Success' : 'Failed';
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
             return $this;
         }
 
