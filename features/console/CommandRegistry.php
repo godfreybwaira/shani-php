@@ -82,10 +82,10 @@ namespace features\console {
             yield new commands\project\DeleteProjectCommand($this);
 //
             //Version
-//            yield new commands\version\CreateVersionCommand($this);
-//            yield new commands\version\DeleteVersionCommand($this);
-//            yield new commands\version\ListVersionCommand($this);
-//            yield new commands\version\LocateVersionCommand($this);
+            yield new commands\version\CreateVersionCommand($this);
+            yield new commands\version\DeleteVersionCommand($this);
+            yield new commands\version\ListVersionCommand($this);
+            yield new commands\version\LocateVersionCommand($this);
 //
 //            // Module
 //            yield new commands\module\CreateModuleCommand($this);

@@ -9,43 +9,42 @@
 
 namespace features\console\commands\version {
 
-    use features\console\builders\ProjectBuilder;
+    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
-    use features\console\helpers\Formatter;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class LocateVersionCommand extends CommandContract
     {
 
-        public function __construct()
+        private readonly string $projectName;
+        private readonly string $projectVersion;
+
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('locate:version', 'version_number@project_name', 'Show the location of the given project version', 'v1@blog');
+            parent::__construct($registry, 'locate:version', 'version_number@project_name', 'Show the location of the given project version', 'v1@blog');
         }
 
         public function execute(): void
         {
-            echo Formatter::placeCenter('List of Project Versions', underline: true);
-            $project = ProjectBuilder::fromName($this->projectName);
-            $versions = $project->getVersions();
-            $index = 1;
-            foreach ($versions as $key => $v) {
-                echo Formatter::formatSentence($index++, $key);
-            }
+            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->projectVersion);
+            $version->locate();
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project yo want to delete from?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 1) {
-                    throw new \ArgumentCountError('Atleast one argument is required.');
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                $this->projectName = $values[0];
+                $this->projectVersion = ResourceName::create($values[0])->shortName;
+                $this->projectName = ResourceName::create($values[1])->shortName;
             }
-            return $this;
+            return $this->projectVersion . self::SEPARATOR . $this->projectName;
         }
     }
 

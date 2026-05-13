@@ -14,6 +14,7 @@ namespace features\console\builders {
     use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
+    use features\utils\Directory;
 
     final class ProjectVersionBuilder implements LightBuilderInterface
     {
@@ -28,6 +29,7 @@ namespace features\console\builders {
         public readonly string $versionNumber;
         private readonly string $versionName;
         private readonly string $rootPath;
+        private readonly string $configFilepath;
 
         public function __construct(VirtualHostBuilder $vhost, string $versionNumber, string $versionName = null)
         {
@@ -36,42 +38,41 @@ namespace features\console\builders {
             $this->versionName = $versionName ?? $versionNumber;
             $this->rootPath = $vhost->metadata->projectDirectory . DIRECTORY_SEPARATOR . $versionNumber;
             $this->namespace = str_replace('/', '\\', trim(substr($this->rootPath, strlen(SHANI_SERVER_ROOT)), DIRECTORY_SEPARATOR));
+            $this->configFilepath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $this->versionNumber . '-' . self::CONFIG_FILE;
+
             $this->defaultModule = ModuleName::create('users');
         }
 
-        private function registerVersion(): string
+        private function registerVersion(): void
         {
-            $name = $this->versionName ?? $this->versionNumber;
-            $configFile = $this->versionNumber . '-' . self::CONFIG_FILE;
-            $filepath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $configFile;
-            if (is_file($filepath)) {
+            if ($this->configExists()) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
             }
 
+            $name = $this->versionName ?? $this->versionNumber;
             $versionTemplate = file_get_contents(CommandContract::ASSETS . '/version.yml');
             $search = ['{version_number}', '{version_name}', '{config_file}'];
-            $replace = [$this->versionNumber, $name, $configFile];
+            $replace = [$this->versionNumber, $name, basename($this->configFilepath)];
             $versionContent = str_replace($search, $replace, $versionTemplate);
 
             $placeholder = '####v1#';
             $hostTemplate = file_get_contents($this->vhost->metadata->hostPath);
             $hostContent = str_replace($placeholder, $versionContent . PHP_EOL . $placeholder, $hostTemplate);
 
-            if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) !== false) {
-                return $filepath;
+            if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) === false) {
+                throw new \RuntimeException('Project version "' . $name . '" could not be created.');
             }
-            throw new \RuntimeException('Project version "' . $name . '" could not be created.');
         }
 
-        private function createConfigFile(string $filepath): string
+        private function createConfigFile(): string
         {
             $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
             $search = ['{namespace}', '{config_dir}'];
             $replace = [$this->namespace, self::CONFIG_DIR];
             $templateContent = str_replace($search, $replace, file_get_contents($template));
 
-            $outtext = file_put_contents($filepath, $templateContent) !== false ? 'Success' : 'Failed';
-            return Formatter::formatSentence('Creating configuration file: ' . basename($filepath), $outtext);
+            $outtext = file_put_contents($this->configFilepath, $templateContent) !== false ? 'Success' : 'Failed';
+            return Formatter::formatSentence('Creating configuration file: ' . basename($this->configFilepath), $outtext);
         }
 
         private function prepareSettings(): string
@@ -97,8 +98,8 @@ namespace features\console\builders {
             if ($this->exists()) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already exists');
             }
-            $filepath = $this->registerVersion();
-            $progressTracker($this->createConfigFile($filepath));
+            $this->registerVersion();
+            $progressTracker($this->createConfigFile());
             $progressTracker($this->prepareSettings());
 
             $module = new ModuleBuilder($this->defaultModule, $this);
@@ -117,6 +118,32 @@ namespace features\console\builders {
             if ($this->exists()) {
                 ConsoleIO::output($this->rootPath);
             }
+        }
+
+        public function delete(\Closure $progressTracker): void
+        {
+            if (!$this->exists()) {
+                throw new \InvalidArgumentException('Project version "' . $this->versionNumber . '" does not exists.');
+            }
+            $intext = 'Deleting project version "' . $this->versionNumber . '"';
+            $outtext = Directory::delete($this->rootPath) ? 'Success' : 'Failed';
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
+            if ($this->configExists()) {
+                $outtext = unlink($this->configFilepath) ? 'Success' : 'Failed';
+                $intext = 'Deleting configuration file "' . basename($this->configFilepath) . '"';
+                $progressTracker(Formatter::formatSentence($intext, $outtext));
+            }
+        }
+
+        public function configExists(): bool
+        {
+            return is_file($this->configFilepath);
+        }
+
+        public static function fromProjectName(string $projectName, string $versionNumber): self
+        {
+            $project = ProjectBuilder::fromName($projectName);
+            return new ProjectVersionBuilder($project->vhost, $versionNumber);
         }
     }
 

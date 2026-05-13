@@ -126,6 +126,14 @@ namespace features\console\builders {
             }
         }
 
+        public function getVersions(): \Generator
+        {
+            $supportedVersions = $this->vhost->getConfigurations()->supportedVersions;
+            foreach ($supportedVersions as $vnum => $v) {
+                yield new ProjectVersionBuilder($this->vhost, $vnum);
+            }
+        }
+
         public function delete(\Closure $progressTracker): void
         {
             $this->vhost->delete($progressTracker);

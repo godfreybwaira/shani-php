@@ -11,7 +11,9 @@ namespace features\console\commands\version {
 
     use features\console\builders\ProjectBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class ListVersionCommand extends CommandContract
@@ -19,23 +21,24 @@ namespace features\console\commands\version {
 
         private readonly string $projectName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('list:version', 'project_name', 'Show all project versions from an existing project', 'blog');
+            parent::__construct($registry, 'list:version', 'project_name', 'Show all project versions from an existing project', 'blog');
         }
 
         public function execute(): void
         {
-            echo Formatter::placeCenter('List of Project Versions', underline: true);
             $project = ProjectBuilder::fromName($this->projectName);
             $versions = $project->getVersions();
-            $index = 1;
-            foreach ($versions as $key => $v) {
-                echo Formatter::formatSentence($index++, $key);
+            $this->registry->addResult(Formatter::formatSentence('PROJECT', 'STATUS', separator: ' '));
+            foreach ($versions as $key => $version) {
+                $status = $version->configExists() ? 'OK' : 'No config file';
+                $message = ($key + 1) . '. ' . $this->projectName . '[' . $version->versionNumber . ']';
+                $this->registry->addResult(Formatter::formatSentence($message, $status));
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project yo want to delete from?', $this->validIdentifier);
@@ -44,10 +47,9 @@ namespace features\console\commands\version {
                 if (count($values) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is required.');
                 }
-                self::validateIdentifier($values[0]);
-                $this->projectName = $values[0];
+                $this->projectName = ResourceName::create($args[0])->shortName;
             }
-            return $this;
+            return $this->projectName;
         }
     }
 
