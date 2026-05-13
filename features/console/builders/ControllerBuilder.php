@@ -11,79 +11,77 @@ namespace features\console\builders {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
     use features\storage\LocalStorage;
     use shani\launcher\Framework;
 
     final class ControllerBuilder implements LightBuilderInterface
     {
 
-        public readonly string $namespace;
-        public readonly string $path;
-        public readonly string $controllerName;
-        public readonly string $requestMethod;
+        private readonly string $namespace;
+        private readonly string $rootPath;
+        private readonly string $controllerName;
+        private readonly string $requestMethod;
         private readonly ModuleBuilder $module;
 
-        public function __construct(string $controllerName, ModuleBuilder $module, string $requestMethod = 'GET')
+        public function __construct(ModuleBuilder $module, string $controllerName = null, string $requestMethod = 'GET')
         {
-            $this->controllerName = $controllerName;
-            $this->requestMethod = strtolower($requestMethod);
             $this->module = $module;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->controllers . '\\' . $this->requestMethod);
-            $this->path = $module->path . $module->version->config->controllers . '/' . $this->requestMethod . '/' . $controllerName . '.php';
+            $this->requestMethod = strtolower($requestMethod);
+            $this->controllerName = ResourceName::create($controllerName ?? $module->moduleName->className, 'Controller')->longName;
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->config->controllers . '\\' . $this->requestMethod);
+            $path = $module->rootPath . $module->config->controllers . DIRECTORY_SEPARATOR;
+            $path .= $this->requestMethod . DIRECTORY_SEPARATOR . $this->controllerName . '.php';
+            $this->rootPath = $path;
         }
 
-        private function createViews(): void
+        private function createViews(): ?string
         {
-            $viewPath = $this->module->path . $this->module->version->config->views . '/' . strtolower($this->controllerName);
-            if (!is_dir($viewPath)) {
-                mkdir($viewPath, LocalStorage::FILE_MODE, true);
+            $viewPath = $this->module->rootPath . $this->module->config->views;
+            if (is_dir($viewPath)) {
+                return null;
             }
+            mkdir($viewPath, LocalStorage::FILE_MODE, true);
+            $destination = $viewPath . DIRECTORY_SEPARATOR . Framework::HOME_FUNCTION . '.php';
             $intext = 'Creating view: ' . Framework::HOME_FUNCTION;
-            $outtext = copy(CommandContract::ASSETS . '/view.txt', $viewPath . '/' . Framework::HOME_FUNCTION . '.php') ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            $outtext = copy(CommandContract::ASSETS . '/view.txt', $destination) ? 'Success' : 'Failed';
+            return Formatter::formatSentence($intext, $outtext);
         }
 
-        private function createLanguage(): void
+        private function createLanguage(): ?string
         {
-            $languagePath = $this->module->path . $this->module->version->config->languages . '/';
-            $languagePath .= strtolower($this->controllerName) . '/' . Framework::HOME_FUNCTION;
-            if (!is_dir($languagePath)) {
-                mkdir($languagePath, LocalStorage::FILE_MODE, true);
+            $languagePath = $this->module->rootPath . $this->module->config->languages;
+            $languagePath .= DIRECTORY_SEPARATOR . Framework::HOME_FUNCTION;
+            if (is_dir($languagePath)) {
+                return null;
             }
-            ///////////////////////////////////////////
+            mkdir($languagePath, LocalStorage::FILE_MODE, true);
             $intext = 'Creating language directory: ' . Framework::HOME_FUNCTION;
             $outtext = copy(CommandContract::ASSETS . '/lang.txt', $languagePath . '/en.php') ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            return Formatter::formatSentence($intext, $outtext);
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if (!$this->module->exists()) {
-                echo 'Could not create controller "' . $this->controllerName . '", module "' . $this->module->moduleName . '" does not exists.' . PHP_EOL;
-                return $this;
+                throw new \RuntimeException('Could not create Controller class "' . $this->controllerName . '", module "' . $this->module->moduleName . '" does not exists.');
             }
-            $service = new ServiceBuilder($this->controllerName, $this->module);
-            $service->build();
-            ///////////////////////////////////////////
-            $entity = new EntityBuilder($this->controllerName, $this->module);
-            $entity->build();
-            ///////////////////////////////////////////
             if (!$this->exists()) {
-                $this->createViews();
-                $this->createLanguage();
+                $progressTracker($this->createViews());
+                $progressTracker($this->createLanguage());
                 ///////////////////////////////////////////
-                $search = ['{namespace}', '{controller_name}', '{service_ns}', '{fn_name}'];
-                $replace = [$this->namespace, $this->controllerName, $service->namespace, Framework::HOME_FUNCTION];
-                $folder = dirname($this->path);
+                $search = ['{namespace}', '{controller_name}', '{fn_name}'];
+                $replace = [$this->namespace, $this->controllerName, Framework::HOME_FUNCTION];
+                $folder = dirname($this->rootPath);
                 if (!is_dir($folder)) {
                     mkdir($folder, LocalStorage::FILE_MODE, true);
                 }
                 $filecontent = file_get_contents(CommandContract::ASSETS . '/controller.txt');
                 ///////////////////////////////////////////
                 $intext = 'Creating controller: ' . $this->controllerName;
-                $outtext = file_put_contents($this->path, str_replace($search, $replace, $filecontent)) !== false ? 'Success' : 'Failed';
-                echo Formatter::formatSentence($intext, $outtext);
+                $outtext = file_put_contents($this->rootPath, str_replace($search, $replace, $filecontent)) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence($intext, $outtext));
             }
             return $this;
         }
@@ -91,7 +89,7 @@ namespace features\console\builders {
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->path);
+            return is_file($this->rootPath);
         }
     }
 

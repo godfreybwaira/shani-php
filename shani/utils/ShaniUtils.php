@@ -1,6 +1,6 @@
 <?php
 
-namespace shani\launcher {
+namespace shani\utils {
 
     final class ShaniUtils
     {

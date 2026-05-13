@@ -2,9 +2,9 @@
 
 namespace {namespace} {
 
-    use {entity_ns}\{class_name}Entity;
+    use {entity_ns}\{entity_name};
 
-    final class {class_name}Dto implements \JsonSerializable
+    final class {dto_name} implements \JsonSerializable
     {
 
         public readonly string $id;
@@ -16,24 +16,24 @@ namespace {namespace} {
 
 
         /**
-         * Convert a given entity from {class_name}Entity to {class_name}Dto type
-         * @param {class_name}Entity $entity {class_name}Entity object
-         * @return {class_name}Dto
+         * Convert a given entity from {entity_name} to {dto_name} type
+         * @param {entity_name} $entity {entity_name} object
+         * @return {dto_name}
          */
-        public static function entity2dto({class_name}Entity $entity): {class_name}Dto
+        public static function entity2dto({entity_name} $entity): {dto_name}
         {
-            $dto = new {class_name}Dto($entity->id);
+            $dto = new {dto_name}($entity->id);
             return $dto;
         }
 
         /**
-         * Convert a given Dto from {class_name}Dto to {class_name}Entity type
-         * @param {class_name}Dto $dto {class_name}Dto object
-         * @return {class_name}Entity
+         * Convert a given Dto from {dto_name} to {entity_name} type
+         * @param {dto_name} $dto {dto_name} object
+         * @return {entity_name}
          */
-        public static function dto2entity({class_name}Dto $dto): {class_name}Entity
+        public static function dto2entity({dto_name} $dto): {entity_name}
         {
-            $entity = new {class_name}Entity($dto->id);
+            $entity = new {entity_name}($dto->id);
             return $entity;
         }
 

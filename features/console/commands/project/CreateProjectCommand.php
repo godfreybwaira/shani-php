@@ -20,7 +20,7 @@ namespace features\console\commands\project {
     {
 
         private readonly string $projectName;
-        private readonly string $hostname;
+        private readonly string $hostName;
 
         public function __construct(CommandRegistry $registry)
         {
@@ -29,7 +29,7 @@ namespace features\console\commands\project {
 
         public function execute(): void
         {
-            $project = new ProjectBuilder($this->projectName, $this->hostname);
+            $project = ProjectBuilder::fromMetaData($this->projectName, $this->hostName);
             $project->build(fn($s) => $this->registry->addResult($s));
         }
 
@@ -37,16 +37,16 @@ namespace features\console\commands\project {
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->hostname = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->projectName = ResourceName::create($values[0])->value;
-                $this->hostname = HostName::create($values[1]);
+                $this->projectName = ResourceName::create($values[0])->longName;
+                $this->hostName = HostName::create($values[1]);
             }
-            return $this->projectName . self::SEPARATOR . $this->hostname;
+            return $this->projectName . self::SEPARATOR . $this->hostName;
         }
     }
 

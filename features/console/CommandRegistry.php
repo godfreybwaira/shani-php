@@ -128,8 +128,8 @@ namespace features\console {
         public function run(): void
         {
             $command = $this->getCommandByName($this->commandName);
-            $commandName = $command->parse(...$this->arguments);
-            $this->addResult(PrintedText::plain('> Executing command ' . PrintedText::bold($commandName)->coloredText));
+            $parameters = $command->parse(...$this->arguments);
+            $this->addResult(PrintedText::plain('> Executing command ' . PrintedText::bold($this->commandName . ' ' . $parameters)->coloredText));
             $command->execute();
             $this->showResults();
         }
@@ -189,12 +189,12 @@ namespace features\console {
 
         /**
          * Add command result to display when command finishes execution.
-         * @param PrintedText|string $message Result Message
+         * @param PrintedText|string|null $message Result Message
          * @return self
          */
-        public function addResult(PrintedText|string $message): self
+        public function addResult(PrintedText|string|null $message): self
         {
-            if (!$this->options->quiet) {
+            if (!$this->options->quiet && !empty($message)) {
                 $this->commandResults[] = $message instanceof PrintedText ? $message : PrintedText::plain($message);
             }
             return $this;

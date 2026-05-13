@@ -27,7 +27,7 @@ namespace features\console\commands\alias {
         public function execute(): void
         {
             echo 'Listing all host aliases: ' . $this->hostname . PHP_EOL;
-            if (!is_file(Framework::DIR_HOSTS . '/' . $this->hostname . '.yml')) {
+            if (!is_file(Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $this->hostname . '.yml')) {
                 echo 'Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
                 return;
             }

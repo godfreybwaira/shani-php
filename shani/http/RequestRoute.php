@@ -10,7 +10,7 @@
 namespace shani\http {
 
     use shani\launcher\Framework;
-    use shani\launcher\ShaniUtils;
+    use shani\utils\ShaniUtils;
 
     final class RequestRoute
     {

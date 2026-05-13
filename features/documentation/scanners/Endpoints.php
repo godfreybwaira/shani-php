@@ -13,7 +13,7 @@ namespace features\documentation\scanners {
     use features\documentation\Generator;
     use shani\http\RequestRoute;
     use shani\launcher\Framework;
-    use shani\launcher\ShaniUtils;
+    use shani\utils\ShaniUtils;
 
     final class Endpoints implements \JsonSerializable
     {

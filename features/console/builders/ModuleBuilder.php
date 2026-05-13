@@ -10,110 +10,65 @@
 namespace features\console\builders {
 
     use features\console\helpers\Formatter;
+    use features\console\helpers\ModuleName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
+    use shani\config\PathConfig;
 
     final class ModuleBuilder implements LightBuilderInterface
     {
 
+        private readonly ProjectVersionBuilder $version;
         public readonly string $namespace;
-        public readonly string $path;
-        public readonly ProjectVersionBuilder $version;
-        public readonly string $moduleName;
+        public readonly ModuleName $moduleName;
+        public readonly string $rootPath;
+        public readonly PathConfig $config;
 
-        public function __construct(string $moduleName, ProjectVersionBuilder $version)
+        public function __construct(ModuleName $moduleName, ProjectVersionBuilder $version)
         {
             $this->version = $version;
             $this->moduleName = $moduleName;
-            $this->namespace = str_replace('/', '\\', $version->namespace . $version->config->modules . '\\' . $moduleName);
-            $this->path = $version->config->root . $version->config->modules . '/' . $moduleName;
-        }
-
-        public function getControllers(): array
-        {
-            $controllers = [];
-            if (!$this->exists()) {
-                return $controllers;
-            }
-            $controllerPath = $this->path . $this->version->config->controllers;
-            $folders = array_diff(scandir($controllerPath), ['.', '..']);
-            foreach ($folders as $method) {
-                $files = array_diff(scandir($controllerPath . '/' . $method), ['.', '..']);
-                foreach ($files as $controllerName) {
-                    $controllers[] = new ControllerBuilder(basename($controllerName, '.php'), $this, $method);
-                }
-            }
-            return $controllers;
+            $this->config = new PathConfig($version->vhost->getConfigurations(), $version->versionNumber, $version->defaultModule->pathName);
+            $this->namespace = str_replace('/', '\\', $version->namespace . $this->config->modules . '\\' . $moduleName->directoryName);
+            $this->rootPath = $this->config->root . $this->config->modules . DIRECTORY_SEPARATOR . $moduleName->directoryName;
         }
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->path : null;
-        }
-
-        public function getServices(): array
-        {
-            $services = [];
             if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->version->config->services), ['.', '..']);
-                foreach ($folders as $serviceName) {
-                    $services[] = new ServiceBuilder(basename($serviceName, '.php'), $this);
-                }
+                ConsoleIO::output($this->rootPath);
             }
-            return $services;
-        }
-
-        public function getEntities(): array
-        {
-            $entities = [];
-            if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->version->config->entities), ['.', '..']);
-                foreach ($folders as $entityName) {
-                    $entities[] = new EntityBuilder(basename($entityName, '.php'), $this);
-                }
-            }
-            return $entities;
-        }
-
-        public function getDtos(): array
-        {
-            $dtos = [];
-            if ($this->exists()) {
-                $folders = array_diff(scandir($this->path . $this->version->config->dto), ['.', '..']);
-                foreach ($folders as $dtoName) {
-                    $dtos[] = new DtoBuilder(basename($dtoName, '.php'), $this, '');
-                }
-            }
-            return $dtos;
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if (!$this->version->exists()) {
-                echo 'Could not create module "' . $this->moduleName . '", project version "';
-                echo $this->version->versionName . '" does not exists.' . PHP_EOL;
-                return $this;
+                $text = 'Could not create module "' . $this->moduleName->originalValue . '", project version "';
+                $text .= $this->version->versionName . '" does not exists.';
+                throw new \RuntimeException($text);
             }
             if (!$this->exists()) {
-                $intext = 'Creating module "' . $this->moduleName . '"';
-                $outtext = mkdir($this->path, LocalStorage::FILE_MODE, true) ? 'Success' : 'Failed';
-                echo Formatter::formatSentence($intext, $outtext);
+                $intext = 'Creating module directory "' . $this->moduleName->directoryName . '"';
+                $outtext = mkdir($this->rootPath, LocalStorage::FILE_MODE, true) ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence($intext, $outtext));
             }
+            $controller = new ControllerBuilder($this);
+            $controller->build($progressTracker);
+
+            $service = new ServiceBuilder($this);
+            $service->build($progressTracker);
+
+            $entity = new EntityBuilder($this);
+            $entity->build($progressTracker);
+
             return $this;
         }
 
         #[\Override]
         public function exists(): bool
         {
-            return is_dir($this->path);
-        }
-
-        public function locateControllers(): void
-        {
-            $controllers = $this->getControllers();
-            foreach ($controllers as $controller) {
-                echo $controller->exists() ? $controller->path . PHP_EOL : null;
-            }
+            return is_dir($this->rootPath);
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace {namespace} {
 
-    use {service_ns}\{controller_name}Service;
     use shani\http\HttpResponse;
     use gui\WebUIBuilder;
     use shani\launcher\App;
@@ -11,12 +10,10 @@ namespace {namespace} {
     {
 
         private readonly App $app;
-        private readonly {controller_name}Service $service;
 
         public function __construct(App $app)
         {
             $this->app = $app;
-            $this->service = new {controller_name}Service();
         }
 
         public function {fn_name}(): HttpResponse

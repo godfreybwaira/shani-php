@@ -11,53 +11,48 @@ namespace features\console\builders {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
     use features\storage\LocalStorage;
-    use shani\launcher\ShaniUtils;
 
     final class EntityBuilder implements LightBuilderInterface
     {
 
-        private const SUFFIX = 'Entity';
-
-        public readonly string $namespace;
-        public readonly string $path;
+        private readonly string $rootPath;
         public readonly string $entityName;
-        private readonly ModuleBuilder $module;
+        public readonly string $namespace;
+        public readonly ModuleBuilder $module;
 
-        public function __construct(string $entityName, ModuleBuilder $module)
+        public function __construct(ModuleBuilder $module, string $entityName = null)
         {
             $this->module = $module;
-            $this->entityName = ShaniUtils::trimSuffix($entityName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->entities);
-            $this->path = $module->path . $module->version->config->entities . '/' . $this->entityName . '.php';
+            $this->entityName = ResourceName::create($entityName ?? $module->moduleName->className, 'Entity')->longName;
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->config->entities);
+            $this->rootPath = $module->rootPath . $module->config->entities . '/' . $this->entityName . '.php';
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if (!$this->module->exists()) {
-                echo 'Could not create entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" does not exists.';
-                return $this;
+                throw new \RuntimeException('Could not create Entity "' . $this->entityName . '", module "' . $this->module->moduleName . '" does not exists.');
             }
-            $dtoName = ShaniUtils::trimSuffix($this->entityName, self::SUFFIX);
-            $dto = new DtoBuilder($dtoName, $this->module, $this->namespace);
-            $dto->build();
+            $dto = new DtoBuilder($this);
+            $dto->build($progressTracker);
             ///////////////////////////////////////////
             if (!$this->exists()) {
                 $search = ['{namespace}', '{class_name}'];
                 $replace = [$this->namespace, $this->entityName];
-                $folder = dirname($this->path);
+                $folder = dirname($this->rootPath);
                 if (!is_dir($folder)) {
                     mkdir($folder, LocalStorage::FILE_MODE, true);
                 }
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/entity.txt'));
-                if (!is_dir($this->module->path . $this->module->version->config->values)) {
-                    mkdir($this->module->path . $this->module->version->config->values, LocalStorage::FILE_MODE, true);
+                if (!is_dir($this->module->rootPath . $this->module->config->values)) {
+                    mkdir($this->module->rootPath . $this->module->config->values, LocalStorage::FILE_MODE, true);
                 }
-                ///////////////////////////////////////////
                 $intext = 'Creating entity: ' . $this->entityName;
-                $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
-                echo Formatter::formatSentence($intext, $outtext);
+                $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence($intext, $outtext));
             }
             return $this;
         }
@@ -65,12 +60,12 @@ namespace features\console\builders {
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->path);
+            return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->path : null;
+            echo $this->exists() ? $this->rootPath : null;
         }
     }
 

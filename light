@@ -4,7 +4,7 @@
 use features\console\CommandRegistry;
 use features\console\printer\ConsoleIO;
 use features\console\printer\PrintedText;
-use shani\launcher\ShaniUtils;
+use shani\utils\ShaniUtils;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 spl_autoload_register(function (string $class) {

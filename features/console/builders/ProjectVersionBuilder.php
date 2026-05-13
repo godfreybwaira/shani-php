@@ -11,105 +11,112 @@ namespace features\console\builders {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ModuleName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
-    use features\utils\Directory;
-    use shani\config\PathConfig;
-    use shani\launcher\Framework;
 
     final class ProjectVersionBuilder implements LightBuilderInterface
     {
 
-        public const CONFIG_DIR = 'config';
-        private const DEFAULT_MODULE = 'users';
-        private const DEFAULT_CONTROLLER = 'Account';
+        private const CONFIG_DIR = 'config';
+        private const CONFIG_FILE = 'config.yml';
+        public const DEFAULT_MODULE = 'users';
 
-        public readonly PathConfig $config;
+        public readonly VirtualHostBuilder $vhost;
+        public readonly ModuleName $defaultModule;
         public readonly string $namespace;
-        private readonly VirtualHostBuilder $vhost;
         public readonly string $versionNumber;
         private readonly string $versionName;
+        private readonly string $rootPath;
 
         public function __construct(VirtualHostBuilder $vhost, string $versionNumber, string $versionName = null)
         {
             $this->vhost = $vhost;
             $this->versionNumber = $versionNumber;
             $this->versionName = $versionName ?? $versionNumber;
-            $mapper = VirtualHostBuilder::getConfigurations($vhost->path);
-            $this->config = new PathConfig($mapper, $this->versionNumber, self::getHomePath());
-            $this->namespace = str_replace('/', '\\', substr($this->config->root, strlen(SHANI_SERVER_ROOT) + 1));
+            $this->rootPath = $vhost->metadata->projectDirectory . DIRECTORY_SEPARATOR . $versionNumber;
+            $this->namespace = str_replace('/', '\\', trim(substr($this->rootPath, strlen(SHANI_SERVER_ROOT)), DIRECTORY_SEPARATOR));
+            $this->defaultModule = ModuleName::create('users');
         }
 
-        private static function getHomePath(): string
+        private function registerVersion(): string
         {
-            return strtolower('/' . self::DEFAULT_MODULE . '/0/' . self::DEFAULT_CONTROLLER . '/1/' . Framework::HOME_FUNCTION);
+            $name = $this->versionName ?? $this->versionNumber;
+            $configFile = $this->versionNumber . '-' . self::CONFIG_FILE;
+            $filepath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $configFile;
+            if (is_file($filepath)) {
+                throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
+            }
+
+            $versionTemplate = file_get_contents(CommandContract::ASSETS . '/version.yml');
+            $search = ['{version_number}', '{version_name}', '{config_file}'];
+            $replace = [$this->versionNumber, $name, $configFile];
+            $versionContent = str_replace($search, $replace, $versionTemplate);
+
+            $placeholder = '####v1#';
+            $hostTemplate = file_get_contents($this->vhost->metadata->hostPath);
+            $hostContent = str_replace($placeholder, $versionContent . PHP_EOL . $placeholder, $hostTemplate);
+
+            if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) !== false) {
+                return $filepath;
+            }
+            throw new \RuntimeException('Project version "' . $name . '" could not be created.');
         }
 
-        private function prepareSettings(): void
+        private function createConfigFile(string $filepath): string
+        {
+            $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
+            $search = ['{namespace}', '{config_dir}'];
+            $replace = [$this->namespace, self::CONFIG_DIR];
+            $templateContent = str_replace($search, $replace, file_get_contents($template));
+
+            $outtext = file_put_contents($filepath, $templateContent) !== false ? 'Success' : 'Failed';
+            return Formatter::formatSentence('Creating configuration file: ' . basename($filepath), $outtext);
+        }
+
+        private function prepareSettings(): string
         {
             $filename = 'Settings';
-            $template = CommandContract::ASSETS . '/settings.txt';
-            $configPath = $this->config->root . '/' . self::CONFIG_DIR;
+            $settingTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'settings.txt';
+
             $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}'];
-            $replace = [$this->namespace, self::CONFIG_DIR, $this->config->homePath, $filename];
-            $content = str_replace($search, $replace, file_get_contents($template));
-            mkdir($configPath, LocalStorage::FILE_MODE, true);
-            ///////////////////////////////////////////
-            $outtext = file_put_contents($configPath . '/' . $filename . '.php', $content) !== false ? 'Success' : 'Failed';
-            $intext = 'Creating setting class: ' . $filename;
-            echo Formatter::formatSentence($intext, $outtext);
-        }
+            $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename];
+            $settingContent = str_replace($search, $replace, file_get_contents($settingTemplate));
 
-        private function createConfigFile(): void
-        {
-            $file = VirtualHostBuilder::getConfigFilename($this->versionNumber, $this->versionName);
-            $search = ['{namespace}', '{config_dir}'];
-            $replace = [$this->namespace, ProjectVersionBuilder::CONFIG_DIR];
-            $template = CommandContract::ASSETS . '/' . VirtualHostBuilder::CONFIG_FILE;
-            $content = str_replace($search, $replace, file_get_contents($template));
-            $outtext = file_put_contents($this->vhost->directory . '/' . $file, $content) !== false ? 'Success' : 'Failed';
-            echo Formatter::formatSentence('Creating configuration file: ' . $file, $outtext);
-        }
+            $configDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::CONFIG_DIR;
+            mkdir($configDirectory, LocalStorage::FILE_MODE, true);
+            $filepath = $configDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
 
-        public function getModules(): array
-        {
-            $modules = [];
-            if ($this->exists()) {
-                $folders = array_diff(scandir($this->config->root . $this->config->modules), ['.', '..']);
-                foreach ($folders as $moduleName) {
-                    $modules[] = new ModuleBuilder($moduleName, $this);
-                }
-            }
-            return $modules;
+            $outtext = file_put_contents($filepath, $settingContent) !== false ? 'Success' : 'Failed';
+            return Formatter::formatSentence('Creating setting class: ' . $filename, $outtext);
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
             if ($this->exists()) {
-                echo Formatter::formatSentence('Project version "' . $this->versionName . '" already exists', 'Failed');
-            } else {
-                $this->createConfigFile();
-                $this->prepareSettings();
-                $module = new ModuleBuilder(self::DEFAULT_MODULE, $this);
-                $module->build();
-                $controller = new ControllerBuilder(self::DEFAULT_CONTROLLER, $module);
-                $controller->build();
+                throw new \RuntimeException('Project version "' . $this->versionName . '" already exists');
             }
+            $filepath = $this->registerVersion();
+            $progressTracker($this->createConfigFile($filepath));
+            $progressTracker($this->prepareSettings());
+
+            $module = new ModuleBuilder($this->defaultModule, $this);
+            $module->build($progressTracker);
             return $this;
         }
 
         #[\Override]
         public function exists(): bool
         {
-            return is_dir($this->config->root);
+            return is_dir($this->rootPath);
         }
 
-        public function delete(): void
+        public function locate(): void
         {
-            $intext = 'Deleting project version "' . $this->versionNumber . '"';
-            $outtext = $this->exists() && Directory::delete($this->config->root) ? 'Success' : 'Failed';
-//            $this->vhost->directory
-            echo Formatter::formatSentence($intext, $outtext);
+            if ($this->exists()) {
+                ConsoleIO::output($this->rootPath);
+            }
         }
     }
 

@@ -9,21 +9,23 @@
 
 namespace features\console\helpers {
 
-    use shani\launcher\ShaniUtils;
+    use shani\utils\ShaniUtils;
 
     final class ResourceName implements \Stringable
     {
 
-        public readonly string $name;
+        public readonly string $shortName;
         public readonly string $suffix;
-        public readonly string $value;
+        public readonly string $longName;
+        public readonly string $originalName;
 
         private function __construct(string $name, string $suffix)
         {
             $this->suffix = $suffix;
-            $this->name = ShaniUtils::trimSuffix($name, $suffix);
-            $this->value = $this->name . $suffix;
-            self::validate($this->value);
+            $this->shortName = ShaniUtils::trimSuffix($name, $suffix);
+            $this->longName = $this->shortName . $suffix;
+            $this->originalName = $name;
+            self::validate($this->longName);
         }
 
         /**

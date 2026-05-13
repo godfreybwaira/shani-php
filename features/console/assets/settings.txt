@@ -22,7 +22,7 @@ namespace {namespace}\{config_dir} {
             return $this->pathConfig ??= new PathConfig(
                     mapper: $this->app->preference->mapper,
                     versionNumber: $this->app->preference->versionNumber,
-                    homePath: '{home_path}'
+                    homePath: '/{home_path}'
             );
         }
 

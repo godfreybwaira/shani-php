@@ -11,48 +11,45 @@ namespace features\console\builders {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
-    use shani\launcher\ShaniUtils;
+    use shani\utils\ShaniUtils;
 
     final class DtoBuilder implements LightBuilderInterface
     {
 
         private const SUFFIX = 'Dto';
 
-        public readonly string $namespace;
-        public readonly string $path;
-        public readonly string $dtoName;
-        private readonly string $entityNamespace;
-        private readonly ModuleBuilder $module;
+        private readonly string $namespace;
+        private readonly string $rootPath;
+        private readonly string $dtoName;
+        private readonly EntityBuilder $entity;
 
-        public function __construct(string $dtoName, ModuleBuilder $module, string $entityNamespace)
+        public function __construct(EntityBuilder $entity, string $dtoName = null)
         {
-            $this->module = $module;
-            $this->entityNamespace = $entityNamespace;
-            $this->dtoName = ShaniUtils::trimSuffix($dtoName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->dto);
-            $this->path = $module->path . $module->version->config->dto . '/' . $this->dtoName . '.php';
+            $this->entity = $entity;
+            $this->dtoName = ResourceName::create($dtoName ?? $entity->module->moduleName->className, 'Dto')->longName;
+            $this->namespace = str_replace('/', '\\', $entity->module->namespace . $entity->module->config->dto);
+            $this->rootPath = $entity->module->rootPath . $entity->module->config->dto . DIRECTORY_SEPARATOR . $this->dtoName . '.php';
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
-            if (!$this->module->exists()) {
-                echo 'Could not create DTO "' . $this->dtoName . '", module "' . $this->module->moduleName . '" does not exists.' . PHP_EOL;
-                return $this;
+            if (!$this->entity->module->exists()) {
+                throw new \RuntimeException('Could not create DTO "' . $this->dtoName . '", module "' . $this->entity->module->moduleName . '" does not exists.');
             }
             if (!$this->exists()) {
-                $dtoName = ShaniUtils::trimSuffix($this->dtoName, self::SUFFIX);
-                $search = ['{namespace}', '{class_name}', '{entity_ns}'];
-                $replace = [$this->namespace, $dtoName, $this->entityNamespace];
-                $folder = dirname($this->path);
+                $search = ['{namespace}', '{dto_name}', '{entity_name}', '{entity_ns}'];
+                $replace = [$this->namespace, $this->dtoName, $this->entity->entityName, $this->entity->namespace];
+                $folder = dirname($this->rootPath);
                 if (!is_dir($folder)) {
                     mkdir($folder, LocalStorage::FILE_MODE, true);
                 }
                 $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/dto.txt'));
-                $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
-                $intext = 'Creating DTO: ' . $this->dtoName;
-                echo Formatter::formatSentence($intext, $outtext);
+                $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating DTO: ' . $this->dtoName, $outtext));
             }
             return $this;
         }
@@ -60,19 +57,14 @@ namespace features\console\builders {
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->path);
-        }
-
-        public static function fromName(string $dtoName, ModuleBuilder $module): DtoBuilder
-        {
-            $entityName = ShaniUtils::trimSuffix($dtoName, self::SUFFIX);
-            $entity = new EntityBuilder($entityName, $module);
-            return new DtoBuilder($dtoName, $module, $entity->namespace);
+            return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->path : null;
+            if ($this->exists()) {
+                ConsoleIO::output($this->rootPath);
+            }
         }
     }
 

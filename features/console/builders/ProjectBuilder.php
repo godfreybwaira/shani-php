@@ -9,34 +9,42 @@
 
 namespace features\console\builders {
 
+    use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ProjectMetaData;
+    use features\console\printer\ConsoleIO;
+    use features\utils\Directory;
     use shani\launcher\Framework;
     use shani\utils\VirtualHostMapper;
 
     final class ProjectBuilder implements LightBuilderInterface
     {
 
-        public readonly string $projectName;
-        public readonly string $hostname;
-        private readonly string $projectPath;
+        public const DEFAULT_VERSION_NUMBER = 'v1';
+
+        public readonly ProjectMetaData $metadata;
         public readonly VirtualHostBuilder $vhost;
 
-        public function __construct(string $projectName, string $hostname)
+        private function __construct(ProjectMetaData $metadata)
         {
-            $this->hostname = $hostname;
-            $this->projectName = $projectName;
-            $this->vhost = new VirtualHostBuilder($projectName, $hostname);
-            $this->projectPath = Framework::DIR_APPS . DIRECTORY_SEPARATOR . $projectName;
+            $this->metadata = $metadata;
+            $this->vhost = VirtualHostBuilder::fromMetaData($metadata->projectName, $metadata->hostName);
+        }
+
+        public static function fromMetaData(string $projectName, string $hostName): self
+        {
+            return new self(new ProjectMetaData($projectName, $hostName));
         }
 
         private function copyCGIfiles(\Closure $tracker): void
         {
-//            $destination = $this->path . $mapper->cgiDirectory;
-//            $source = CommandContract::ASSETS . '/cgi';
-//            if (Directory::copy($source, $destination)) {
-//                $tracker($this->cleanApacheFiles($mapper, $destination));
-//                $tracker($this->cleanNginxFiles($mapper, $destination));
-//            }
+            $mapper = $this->vhost->getConfigurations();
+            $destination = $this->metadata->projectDirectory . $mapper->cgiDirectory;
+            $source = CommandContract::ASSETS . '/cgi';
+            if (Directory::copy($source, $destination)) {
+                $tracker($this->cleanApacheFiles($mapper, $destination));
+                $tracker($this->cleanNginxFiles($mapper, $destination));
+            }
         }
 
         private function cleanApacheFiles(VirtualHostMapper $mapper, string $destination): string
@@ -51,7 +59,7 @@ namespace features\console\builders {
                 '{{domain_name}}', '{{public_bucket}}'
             ];
             $replace = [
-                $shaniRoot, $assetDir, $sslDir, $storageDir, $this->hostname,
+                $shaniRoot, $assetDir, $sslDir, $storageDir, $this->metadata->hostName,
                 $mapper->publicBucket
             ];
             ///////////////////////////////////////////
@@ -65,10 +73,10 @@ namespace features\console\builders {
         private function cleanNginxFiles(VirtualHostMapper $mapper, string $destination): string
         {
             $cgiDir = basename($destination) . '/nginx';
-            $path = dirname($destination) . '/' . $cgiDir;
+            $path = dirname($destination) . DIRECTORY_SEPARATOR . $cgiDir;
             $nginxFile = $path . '/nginx.conf';
             $customFile = $path . '/custom.conf';
-            $appDirpath = substr($this->path, strlen(dirname(SHANI_SERVER_ROOT)) + 1);
+            $appDirpath = substr($this->metadata->projectDirectory, strlen(dirname(SHANI_SERVER_ROOT)) + 1);
             $assetDir = substr(Framework::DIR_ASSETS, strlen(SHANI_SERVER_ROOT) + 1);
             $storageDir = substr(Framework::DIR_STORAGE, strlen(SHANI_SERVER_ROOT) + 1);
             ///////////////////////////////////////////
@@ -83,7 +91,7 @@ namespace features\console\builders {
             $nginxContent = str_replace($search1, $replace1, file_get_contents($nginxFile));
             file_put_contents($nginxFile, $nginxContent);
             $search = ['{{shani_root}}', '{{domain_name}}'];
-            $replace = [basename(SHANI_SERVER_ROOT), $this->hostname];
+            $replace = [basename(SHANI_SERVER_ROOT), $this->metadata->hostName];
             $content = str_replace($search, $replace, file_get_contents($customFile));
             ///////////////////////////////////////////
             $outtext = file_put_contents($customFile, $content) !== false ? 'Success' : 'Failed';
@@ -94,22 +102,28 @@ namespace features\console\builders {
         public function build(\Closure $progressTracker): self
         {
             if ($this->exists()) {
-                throw new \RuntimeException('Project "' . $this->projectName . '" already exists');
-            }
-            if ($this->vhost->exists()) {
-                throw new \RuntimeException('Project could not be created. Host "' . $this->hostname . '" already exists');
+                throw new \RuntimeException('Project "' . $this->metadata->projectName . '" already exists');
             }
             $this->vhost->build($progressTracker);
+
+            $version = new ProjectVersionBuilder($this->vhost, self::DEFAULT_VERSION_NUMBER);
+            $version->build($progressTracker);
+
             $this->copyCGIfiles($progressTracker);
-//            $version = new ProjectVersionBuilder($this->vhost, self::VERSION_NUMBER);
-//            $version->build();
             return $this;
         }
 
         #[\Override]
         public function exists(): bool
         {
-            return is_dir($this->projectPath);
+            return $this->metadata->projectExists();
+        }
+
+        public function locate(): void
+        {
+            if ($this->exists()) {
+                ConsoleIO::output($this->metadata->projectDirectory);
+            }
         }
     }
 

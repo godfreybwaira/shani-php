@@ -2,7 +2,7 @@
 
 use shani\launcher\ApplicationLauncher;
 use shani\launcher\Framework;
-use shani\launcher\ShaniUtils;
+use shani\utils\ShaniUtils;
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
 spl_autoload_register(function (string $class) {

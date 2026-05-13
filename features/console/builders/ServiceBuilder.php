@@ -11,62 +11,57 @@ namespace features\console\builders {
 
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
+    use features\console\helpers\ResourceName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
-    use shani\launcher\ShaniUtils;
 
     final class ServiceBuilder implements LightBuilderInterface
     {
 
-        private const SUFFIX = 'Service';
-
-        public readonly string $namespace;
-        public readonly string $path;
-        public readonly string $serviceName;
+        private readonly string $namespace;
+        private readonly string $rootPath;
+        private readonly string $serviceName;
         private readonly ModuleBuilder $module;
 
-        public function __construct(string $serviceName, ModuleBuilder $module)
+        public function __construct(ModuleBuilder $module, string $serviceName = null)
         {
             $this->module = $module;
-            $this->serviceName = ShaniUtils::trimSuffix($serviceName, self::SUFFIX) . self::SUFFIX;
-            $this->namespace = str_replace('/', '\\', $module->namespace . $module->version->config->services);
-            $this->path = $module->path . $module->version->config->services . '/' . $this->serviceName . '.php';
+            $this->serviceName = ResourceName::create($serviceName ?? $module->moduleName->className, 'Service')->longName;
+            $this->namespace = str_replace('/', '\\', $module->namespace . $module->config->services);
+            $this->rootPath = $module->rootPath . $module->config->services . DIRECTORY_SEPARATOR . $this->serviceName . '.php';
         }
 
         #[\Override]
-        public function build(): self
+        public function build(\Closure $progressTracker): self
         {
-
             if (!$this->module->exists()) {
-                echo 'Could not create service "' . $this->serviceName . '", module "' . $this->module->moduleName . '" does not exists.';
-                return $this;
+                throw new \RuntimeException('Could not create Service class "' . $this->serviceName . '", module "' . $this->module->moduleName . '" does not exists.');
             }
-            if ($this->exists()) {
-                return $this;
+            if (!$this->exists()) {
+                $search = ['{namespace}', '{class_name}'];
+                $replace = [$this->namespace, $this->serviceName];
+                $folder = dirname($this->rootPath);
+                if (!is_dir($folder)) {
+                    mkdir($folder, LocalStorage::FILE_MODE, true);
+                }
+                $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
+                $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating service: ' . $this->serviceName, $outtext));
             }
-            ///////////////////////////////////////////
-            $search = ['{namespace}', '{class_name}'];
-            $replace = [$this->namespace, $this->serviceName];
-            $folder = dirname($this->path);
-            if (!is_dir($folder)) {
-                mkdir($folder, LocalStorage::FILE_MODE, true);
-            }
-            $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
-            ///////////////////////////////////////////
-            $outtext = file_put_contents($this->path, $content) !== false ? 'Success' : 'Failed';
-            $intext = 'Creating service: ' . $this->serviceName;
-            echo Formatter::formatSentence($intext, $outtext);
             return $this;
         }
 
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->path);
+            return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->path : null;
+            if ($this->exists()) {
+                ConsoleIO::output($this->rootPath);
+            }
         }
     }
 
