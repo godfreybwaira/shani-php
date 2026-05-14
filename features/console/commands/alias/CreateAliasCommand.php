@@ -10,42 +10,44 @@
 namespace features\console\commands\alias {
 
     use features\console\builders\AliasBuilder;
+    use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
 
     final class CreateAliasCommand extends CommandContract
     {
 
         private readonly string $aliasName;
-        private readonly string $hostname;
+        private readonly string $hostName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('create:alias', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
+            parent::__construct($registry, 'create:alias', 'alias@hostname', 'Create a host alias', 'blog.com@localhost');
         }
 
         public function execute(): void
         {
-            $alias = new AliasBuilder($this->aliasName, $this->hostname);
-            $alias->build();
+            $vhost = VirtualHostBuilder::fromHostName($this->hostName);
+            $alias = new AliasBuilder($vhost, $this->aliasName);
+            $alias->build(fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->aliasName = ConsoleIO::read('What is the alias name?', $this->validHostName);
-                $this->hostname = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                self::validateHostName($values[0]);
-                self::validateHostName($values[1]);
-                $this->aliasName = $values[0];
-                $this->hostname = $values[1];
+                $this->aliasName = HostName::create($values[0]);
+                $this->hostName = HostName::create($values[1]);
             }
-            return $this;
+            return $this->aliasName . self::SEPARATOR . $this->hostName;
         }
     }
 

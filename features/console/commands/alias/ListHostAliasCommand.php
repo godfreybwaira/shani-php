@@ -9,53 +9,48 @@
 
 namespace features\console\commands\alias {
 
+    use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
+    use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
-    use shani\launcher\Framework;
 
     final class ListHostAliasCommand extends CommandContract
     {
 
-        private readonly string $hostname;
+        private readonly string $hostName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('list:alias', 'hostname', 'Show all available host aliases', 'localhost');
+            parent::__construct($registry, 'list:alias', 'hostname', 'Show all available host aliases', 'localhost');
         }
 
         public function execute(): void
         {
-            echo 'Listing all host aliases: ' . $this->hostname . PHP_EOL;
-            if (!is_file(Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $this->hostname . '.yml')) {
-                echo 'Host "' . $this->hostname . '" does not exists.' . PHP_EOL;
-                return;
+            $aliases = AliasBuilder::getAllByHostName($this->hostName);
+            if (!$aliases->valid()) {
+                throw new \InvalidArgumentException('No alias found for host "' . $this->hostName . '"');
             }
-            $aliases = glob(Framework::DIR_HOSTS . '/*.alias');
-            if (empty($aliases)) {
-                echo 'No alias found for host "' . $this->hostname . '"' . PHP_EOL;
-                return;
-            }
-            foreach ($aliases as $key => $name) {
-                if (file_get_contents($name) === $this->hostname) {
-                    echo Formatter::formatSentence($key + 1, basename($name, '.alias'));
-                }
+            $this->registry->addResult(Formatter::formatSentence('#. ALIAS', 'HOST', separator: ' '));
+            foreach ($aliases as $idx => $alias) {
+                $message = ($idx + 1) . '. ' . $alias->aliasName;
+                $this->registry->addResult(Formatter::formatSentence($message, $alias->vhost->metadata->hostName));
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->hostname = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is required.');
                 }
-                self::validateHostName($values[0]);
-                $this->hostname = $values[0];
+                $this->hostName = HostName::create($values[0]);
             }
-            return $this;
+            return $this->hostName;
         }
     }
 

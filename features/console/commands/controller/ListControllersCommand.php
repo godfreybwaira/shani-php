@@ -33,11 +33,8 @@ namespace features\console\commands\controller {
         {
             $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
             $controllers = $module->getControllers();
-            if (!$controllers->valid()) {
-                throw new \InvalidArgumentException('No controller available for "' . $this->moduleName->originalValue . '" module');
-            }
             foreach ($controllers as $key => $controller) {
-                $outtext = '[' . strtoupper($controller->requestMethod) . '] ' . $controller->controllerName;
+                $outtext = '[ ' . strtoupper($controller->requestMethod) . ' ] ' . $controller->controllerName;
                 $this->registry->addResult(Formatter::formatSentence($key + 1, $outtext));
             }
         }

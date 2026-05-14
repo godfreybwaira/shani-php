@@ -98,16 +98,16 @@ namespace features\console {
             yield new commands\controller\ListControllersCommand($this);
 //
 //            // VHost
-//            yield new commands\vhost\ListVhostCommand($this);
-//            yield new commands\vhost\RenameVhostCommand($this);
-//            yield new commands\vhost\LocateVhostCommand($this);
+            yield new commands\vhost\ListVhostCommand($this);
+            yield new commands\vhost\RenameVhostCommand($this);
+            yield new commands\vhost\LocateVhostCommand($this);
 //
 //            // Alias
-//            yield new commands\alias\CreateAliasCommand($this);
-//            yield new commands\alias\ListHostAliasCommand($this);
-//            yield new commands\alias\DeleteAliasCommand($this);
-//            yield new commands\alias\RenameAliasCommand($this);
-//            yield new commands\alias\LocateAliasCommand($this);
+            yield new commands\alias\CreateAliasCommand($this);
+            yield new commands\alias\ListHostAliasCommand($this);
+            yield new commands\alias\DeleteAliasCommand($this);
+            yield new commands\alias\RenameAliasCommand($this);
+            yield new commands\alias\LocateAliasCommand($this);
 //
 //            // Entity
 //            yield new commands\entity\CreateEntityCommand($this);
@@ -115,10 +115,12 @@ namespace features\console {
 //            yield new commands\entity\LocateEntityCommand($this);
 //
 //            // DTO
+//            yield new commands\dto\CreateDtoCommand($this);
 //            yield new commands\dto\ListDtoCommand($this);
 //            yield new commands\dto\LocateDtoCommand($this);
 //
 //            // Service
+//            yield new commands\service\CreateServiceCommand($this);
 //            yield new commands\service\ListServiceCommand($this);
 //            yield new commands\service\LocateServiceCommand($this);
         }

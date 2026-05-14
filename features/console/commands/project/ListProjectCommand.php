@@ -13,7 +13,6 @@ namespace features\console\commands\project {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
-    use shani\launcher\Framework;
 
     final class ListProjectCommand extends CommandContract
     {
@@ -25,10 +24,12 @@ namespace features\console\commands\project {
 
         public function execute(): void
         {
-            $directories = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
-            foreach ($directories as $key => $projectName) {
-                $project = ProjectBuilder::fromName($projectName);
-                $this->registry->addResult(Formatter::formatSentence($key - 1, $projectName . self::SEPARATOR . $project->metadata->hostName));
+            $projects = ProjectBuilder::getAll();
+            $this->registry->addResult(Formatter::formatSentence('#. PROJECT[ HOST ]', 'STATUS', separator: ' '));
+            foreach ($projects as $key => $project) {
+                $status = $project->metadata->hostExists() ? 'OK' : 'No Host';
+                $message = ($key + 1) . '. ' . $project->metadata->projectName . '[ ' . $project->metadata->hostName . ' ]';
+                $this->registry->addResult(Formatter::formatSentence($message, $status));
             }
         }
 

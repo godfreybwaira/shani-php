@@ -11,6 +11,8 @@ namespace features\console\commands\alias {
 
     use features\console\builders\AliasBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
 
     final class DeleteAliasCommand extends CommandContract
@@ -18,18 +20,18 @@ namespace features\console\commands\alias {
 
         private readonly string $aliasName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('delete:alias', 'alias', 'Delete an alias', 'blog.com');
+            parent::__construct($registry, 'delete:alias', 'alias_name', 'Delete an alias', 'blog.com');
         }
 
         public function execute(): void
         {
-            $alias = AliasBuilder::fromName($this->aliasName);
-            $alias?->delete();
+            $alias = AliasBuilder::fromAliasName($this->aliasName);
+            $alias->delete(fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->aliasName = ConsoleIO::read('What is the alias name?', $this->validHostName);
@@ -38,10 +40,9 @@ namespace features\console\commands\alias {
                 if (count($values) < 1) {
                     throw new \ArgumentCountError('Atleast one argument is required.');
                 }
-                self::validateHostName($values[0]);
-                $this->aliasName = $values[0];
+                $this->aliasName = HostName::create($values[0]);
             }
-            return $this;
+            return $this->aliasName;
         }
     }
 

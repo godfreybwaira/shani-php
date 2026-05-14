@@ -129,6 +129,9 @@ namespace features\console\builders {
         public function getVersions(): \Generator
         {
             $supportedVersions = $this->vhost->getConfigurations()->supportedVersions;
+            if (empty($supportedVersions)) {
+                throw new \InvalidArgumentException('No version found for project "' . $this->metadata->projectName . '"');
+            }
             foreach ($supportedVersions as $vnum => $v) {
                 yield new ProjectVersionBuilder($this->vhost, $vnum);
             }
@@ -152,6 +155,17 @@ namespace features\console\builders {
                 }
             }
             throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
+        }
+
+        public static function getAll(): \Generator
+        {
+            $directories = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
+            if (empty($directories)) {
+                throw new \RuntimeException('No project found.');
+            }
+            foreach ($directories as $projectName) {
+                yield ProjectBuilder::fromName($projectName);
+            }
         }
     }
 

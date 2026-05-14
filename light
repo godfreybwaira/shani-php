@@ -30,7 +30,7 @@ ShaniUtils::define(__DIR__);
         if (!$registry->options->quiet) {
             CommandRegistry::printBanner(ConsoleColor::RED);
         }
-        ConsoleIO::error($error->coloredText . $t->getMessage());
+        ConsoleIO::error($error->coloredText . $t->getMessage() . PHP_EOL);
         exit(1);
     }
 })($argv);

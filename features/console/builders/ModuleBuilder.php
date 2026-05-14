@@ -75,7 +75,7 @@ namespace features\console\builders {
         {
             $controllerPath = $this->rootPath . $this->config->controllers;
             if (!is_dir($controllerPath)) {
-                return null;
+                throw new \InvalidArgumentException('No controller available for "' . $this->moduleName->originalValue . '" module');
             }
             $folders = array_diff(scandir($controllerPath), ['.', '..']);
             foreach ($folders as $method) {

@@ -11,6 +11,8 @@ namespace features\console\commands\vhost {
 
     use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
 
     final class RenameVhostCommand extends CommandContract
@@ -19,31 +21,29 @@ namespace features\console\commands\vhost {
         private readonly string $oldName;
         private readonly string $newName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('rename:vhost', 'old_name new_name', 'Rename a virtual host file from old name to a new name', 'localhost blog.com');
+            parent::__construct($registry, 'rename:vhost', 'old_name new_name', 'Rename a virtual host file from old name to a new name', 'localhost blog.com');
         }
 
         public function execute(): void
         {
             $vhost = VirtualHostBuilder::fromHostname($this->oldName);
-            $vhost->rename($this->newName);
+            $vhost->rename($this->newName, fn($s) => $this->registry->addResult($s));
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->oldName = ConsoleIO::read('What is the name of the host to rename?', $this->validHostName);
                 $this->newName = ConsoleIO::read('What is the new name?', $this->validHostName);
             } else if (count($args) < 2) {
-                throw new \ArgumentCountError('Atleast two argument is required.');
+                throw new \ArgumentCountError('Atleast two arguments are required.');
             } else {
-                self::validateHostName($args[0]);
-                self::validateHostName($args[1]);
-                $this->oldName = $args[0];
-                $this->newName = $args[1];
+                $this->oldName = HostName::create($args[0]);
+                $this->newName = HostName::create($args[1]);
             }
-            return $this;
+            return $this->oldName . ' ' . $this->newName;
         }
     }
 

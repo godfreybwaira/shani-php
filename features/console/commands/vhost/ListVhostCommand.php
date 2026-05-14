@@ -9,38 +9,33 @@
 
 namespace features\console\commands\vhost {
 
+    use features\console\builders\VirtualHostBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
-    use shani\launcher\Framework;
 
     final class ListVhostCommand extends CommandContract
     {
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('list:vhost', null, 'Show the list of all existing virtual hosts', null);
+            parent::__construct($registry, 'list:vhost', null, 'Show the list of all existing virtual hosts', null);
         }
 
         public function execute(): void
         {
-            echo Formatter::placeCenter('List of Virtual Hosts', underline: true);
-
-            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
-            if (empty($hostfiles)) {
-                echo 'No host found.' . PHP_EOL;
-                return;
-            }
-            echo Formatter::formatSentence('HOST', 'PROJECT');
-            foreach ($hostfiles as $key => $file) {
-                $config = yaml_parse_file($file);
-                $hostname = basename($file, '.yml');
-                echo Formatter::formatSentence(($key + 1) . '. ' . $hostname, $config['project_name']);
+            $hosts = VirtualHostBuilder::getAll();
+            $this->registry->addResult(Formatter::formatSentence('#. HOST[ PROJECT ]', 'STATUS', separator: ' '));
+            foreach ($hosts as $key => $host) {
+                $status = $host->metadata->projectExists() ? 'OK' : 'No Project';
+                $message = ($key + 1) . '. ' . $host->metadata->hostName . '[ ' . $host->metadata->projectName . ' ]';
+                $this->registry->addResult(Formatter::formatSentence($message, $status));
             }
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
-            return $this;
+            return null;
         }
     }
 

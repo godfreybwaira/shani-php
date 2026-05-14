@@ -10,14 +10,15 @@
 namespace features\console\builders {
 
     use features\console\helpers\Formatter;
+    use features\console\printer\ConsoleIO;
     use shani\launcher\Framework;
 
     final class AliasBuilder implements LightBuilderInterface
     {
 
-        public readonly string $aliasPath;
-        private readonly string $aliasName;
-        private readonly VirtualHostBuilder $vhost;
+        private readonly string $aliasPath;
+        public readonly string $aliasName;
+        public readonly VirtualHostBuilder $vhost;
 
         public function __construct(VirtualHostBuilder $vhost, string $aliasName)
         {
@@ -28,7 +29,9 @@ namespace features\console\builders {
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->aliasPath : null;
+            if ($this->exists()) {
+                ConsoleIO::output($this->aliasPath);
+            }
         }
 
         public function delete(\Closure $progressTracker): void
@@ -38,21 +41,21 @@ namespace features\console\builders {
             $progressTracker(Formatter::formatSentence($intext, $outtext));
         }
 
-        public function rename(string $newName): void
+        public function rename(string $newName, \Closure $progressTracker): void
         {
             if (!$this->exists()) {
                 throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" does not exists.');
             }
-            $newAlias = new AliasBuilder($this, $newName);
+            $newAlias = new AliasBuilder($this->vhost, $newName);
             if ($newAlias->exists()) {
                 throw new \InvalidArgumentException('Alias name "' . $newName . '" already exists.');
             }
             $intext = 'Renaming alias from "' . $this->aliasName . '" to "' . $newAlias->aliasName . '"';
             $outtext = rename($this->aliasPath, $newAlias->aliasPath) ? 'Success' : 'Failed';
-            echo Formatter::formatSentence($intext, $outtext);
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
         }
 
-        public static function fromName(string $aliasName): AliasBuilder
+        public static function fromAliasName(string $aliasName): AliasBuilder
         {
             $filename = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $aliasName . '.alias';
             if (is_file($filename)) {
@@ -83,6 +86,17 @@ namespace features\console\builders {
         public function exists(): bool
         {
             return is_file($this->aliasPath);
+        }
+
+        public static function getAllByHostName(string $hostName): \Generator
+        {
+            $aliases = glob(Framework::DIR_HOSTS . '/*.alias');
+            $vhost = VirtualHostBuilder::fromHostName($hostName);
+            foreach ($aliases as $aliasName) {
+                if (file_get_contents($aliasName) === $hostName) {
+                    yield new AliasBuilder($vhost, basename($aliasName, '.alias'));
+                }
+            }
         }
     }
 

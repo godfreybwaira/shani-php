@@ -90,16 +90,35 @@ namespace features\console\builders {
             }
         }
 
-        public function getAliases(): array
+        public function rename(string $newName, \Closure $progressTracker): void
         {
-            $aliases = [];
+            if (!$this->exists()) {
+                throw new \InvalidArgumentException('Host "' . $this->metadata->hostName . '" does not exists.');
+            }
+            $newVhost = self::fromMetaData($this->metadata->projectName, $newName);
+            if ($newVhost->exists()) {
+                throw new \InvalidArgumentException('Host name "' . $newName . '" already exists.');
+            }
+            $aliases = $this->getAliases();
+            $intext = 'Renaming a host from "' . $this->metadata->hostName . '" to "' . $newVhost->metadata->hostName . '"';
+            $renamed = rename($this->metadata->hostDirectory, $newVhost->metadata->hostDirectory) && rename($this->metadata->hostPath, $newVhost->metadata->hostPath);
+            $outtext = $renamed ? 'Success' : 'Failed';
+            if ($renamed) {
+                foreach ($aliases as $alias) {
+                    file_put_contents($alias->aliasPath, $newVhost->metadata->hostName);
+                }
+            }
+            $progressTracker(Formatter::formatSentence($intext, $outtext));
+        }
+
+        public function getAliases(): \Generator
+        {
             $files = glob(Framework::DIR_HOSTS . '/*.alias');
             foreach ($files as $file) {
                 if (file_get_contents($file) === $this->metadata->hostName) {
-                    $aliases[] = new AliasBuilder($this, basename($file, '.alias'));
+                    yield new AliasBuilder($this, basename($file, '.alias'));
                 }
             }
-            return $aliases;
         }
 
         public static function fromHostName(string $hostName): self
@@ -110,6 +129,18 @@ namespace features\console\builders {
             }
             $config = yaml_parse_file($file);
             return VirtualHostBuilder::fromMetaData($config['project_name'], $hostName);
+        }
+
+        public static function getAll(): \Generator
+        {
+            $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
+            if (empty($hostfiles)) {
+                throw new \RuntimeException('No host found.');
+            }
+            foreach ($hostfiles as $file) {
+                $config = yaml_parse_file($file);
+                yield VirtualHostBuilder::fromMetaData($config['project_name'], basename($file, '.yml'));
+            }
         }
     }
 
