@@ -31,5 +31,5 @@ version:
   supported:
     v1:
       name: main
-      config: main-config.yml
+      config: v1-config.yml
 ####v1#
