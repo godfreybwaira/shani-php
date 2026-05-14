@@ -126,7 +126,7 @@ namespace features\console {
          */
         public function run(): void
         {
-            $command = $this->getCommandByName($this->commandName);
+            $command = $this->findCommandByName($this->commandName);
             $parameters = $command->parse(...$this->arguments);
             $info = PrintedText::info('[ INFO ] ');
             $infoMsg = $this->options->noColor ? $info->plainText : $info->coloredText;
@@ -141,13 +141,28 @@ namespace features\console {
          *
          * @param string $commandName The name of the command.
          *
-         * @param bool $throw Whether to throw exception or not
-         *
-         * @return CommandContract|null The command instance or null if <code>$comandName</code> not found.
+         * @return CommandContract The command instance.
          *
          * @throws \InvalidArgumentException If the command is not found.
          */
-        public function getCommandByName(string $commandName, bool $throw = true): ?CommandContract
+        private function findCommandByName(string $commandName): CommandContract
+        {
+
+            $command = $this->getCommandByName($commandName);
+            if ($command === null) {
+                throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
+            }
+            return $command;
+        }
+
+        /**
+         * Retrieve a command by its name.
+         *
+         * @param string $commandName The name of the command.
+         *
+         * @return CommandContract|null The command instance or null if <code>$comandName</code> not found.
+         */
+        public function getCommandByName(string $commandName): ?CommandContract
         {
 
             $commands = $this->commandList();
@@ -155,9 +170,6 @@ namespace features\console {
                 if ($command->commandName === $commandName) {
                     return $command;
                 }
-            }
-            if ($throw) {
-                throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
             }
             return null;
         }

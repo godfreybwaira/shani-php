@@ -47,9 +47,9 @@ namespace features\console\commands {
 
         private function searchCommand(int $sentenceWidth): void
         {
-            $command = $this->registry->getCommandByName($this->userCommand, false);
+            $command = $this->registry->getCommandByName($this->userCommand);
             if ($command !== null) {
-                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->userCommand, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->commandName, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult(Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult('DESCRIPTION:' . PHP_EOL . $command->description);
