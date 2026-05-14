@@ -27,9 +27,6 @@ namespace features\console {
     final class CommandRegistry
     {
 
-        /** Map of command names to their CommandContract instances. */
-        private readonly WritableMap $commands;
-
         /** User command options */
         public readonly CommandOptions $options;
 
@@ -62,7 +59,6 @@ namespace features\console {
             $quiet = in_array('--quiet', $arguments) || str_starts_with($commandName, 'locate:');
             $noColor = in_array('--no-color', $arguments);
             $this->options = new CommandOptions($quiet, $noColor);
-            $this->commands = $this->registerAll();
         }
 
         /**
@@ -70,7 +66,7 @@ namespace features\console {
          *
          * @return \Generator<CommandContract>
          */
-        private function commandList(): \Generator
+        public function commandList(): \Generator
         {
             // General
             yield new commands\HelpCommand($this);
@@ -141,45 +137,29 @@ namespace features\console {
         }
 
         /**
-         * Register all commands into a writable map.
-         *
-         * @return WritableMap Map of command names to command instances.
-         */
-        private function registerAll(): WritableMap
-        {
-            $map = new WritableMap();
-            $commands = $this->commandList();
-            foreach ($commands as $command) {
-                $map->addOne($command->commandName, $command);
-            }
-            return $map;
-        }
-
-        /**
          * Retrieve a command by its name.
          *
          * @param string $commandName The name of the command.
-         * @return CommandContract The command instance.
+         *
+         * @param bool $throw Whether to throw exception or not
+         *
+         * @return CommandContract|null The command instance or null if <code>$comandName</code> not found.
          *
          * @throws \InvalidArgumentException If the command is not found.
          */
-        public function getCommandByName(string $commandName): CommandContract
+        public function getCommandByName(string $commandName, bool $throw = true): ?CommandContract
         {
-            $command = $this->commands->getOne($commandName);
-            if ($command !== null) {
-                return $command;
-            }
-            throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
-        }
 
-        /**
-         * Get all registered commands.
-         *
-         * @return ReadableMap Map of all commands.
-         */
-        public function getAllCommands(): ReadableMap
-        {
-            return $this->commands;
+            $commands = $this->commandList();
+            foreach ($commands as $command) {
+                if ($command->commandName === $commandName) {
+                    return $command;
+                }
+            }
+            if ($throw) {
+                throw new \InvalidArgumentException('Command "' . $commandName . '" not found.');
+            }
+            return null;
         }
 
         public static function printBanner(ConsoleColor $color = ConsoleColor::GREEN): void

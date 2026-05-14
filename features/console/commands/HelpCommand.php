@@ -31,16 +31,15 @@ namespace features\console\commands {
 
         private function help(): void
         {
-            $index = 1;
             $width = 150;
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
-            $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width));
+            $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width) . PHP_EOL);
             if ($this->userCommand === null) {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
-                $commands = $this->registry->getAllCommands();
-                $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, $width) {
-                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $width));
-                });
+                $commands = $this->registry->commandList();
+                foreach ($commands as $index => $cmd) {
+                    $this->registry->addResult(Formatter::formatSentence($index . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $width));
+                }
             } else {
                 $this->searchCommand($width);
             }
@@ -48,8 +47,7 @@ namespace features\console\commands {
 
         private function searchCommand(int $sentenceWidth): void
         {
-            $commands = $this->registry->getAllCommands();
-            $command = $commands->getOne($this->userCommand);
+            $command = $this->registry->getCommandByName($this->userCommand, false);
             if ($command !== null) {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->userCommand, sentenceWidth: $sentenceWidth));
                 $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth));
@@ -59,17 +57,19 @@ namespace features\console\commands {
             }
             $index = 1;
             $excluded = [];
-            $commands->sort()->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
+            $commands = $this->registry->commandList();
+            foreach ($commands as $cmd) {
                 if (str_contains($cmd->commandName, $this->userCommand)) {
                     $excluded[$cmd->commandName] = 1;
-                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
+                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
-            });
-            $commands->each(function (string $name, CommandContract $cmd) use (&$index, &$excluded, $sentenceWidth) {
+            }
+            $commands2 = $this->registry->commandList();
+            foreach ($commands2 as $cmd) {
                 if (!isset($excluded[$cmd->commandName]) && str_contains(strtolower($cmd->description), $this->userCommand)) {
-                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $name, $cmd->description, sentenceWidth: $sentenceWidth));
+                    $this->registry->addResult(Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $sentenceWidth));
                 }
-            });
+            }
             if ($index === 1) {
                 throw new \InvalidArgumentException('Command "' . $this->userCommand . '" not found.');
             }
