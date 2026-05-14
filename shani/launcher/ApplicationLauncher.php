@@ -70,12 +70,12 @@ namespace shani\launcher {
          */
         private static function host(string $name, HttpHeader $headers): ?RequestPreference
         {
-            $yaml = Framework::DIR_HOSTS . '/' . $name . '.yml';
+            $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $name . '.yml';
             if (is_file($yaml)) {
                 $mapper = VirtualHostMapper::fromArray(yaml_parse_file($yaml));
                 return self::getConfigPreference($name, $mapper, $headers);
             }
-            $alias = Framework::DIR_HOSTS . '/' . $name . '.alias';
+            $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $name . '.alias';
             if (is_file($alias)) {
                 $host = file_get_contents($alias);
                 return static::host(trim($host), $headers);

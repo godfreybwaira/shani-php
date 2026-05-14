@@ -45,7 +45,7 @@ namespace features\console\builders {
             $this->defaultModule = ModuleName::create('users');
         }
 
-        private function registerVersion(): void
+        public function registerVersion(\Closure $progressTracker): void
         {
             if ($this->configExists()) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
@@ -64,6 +64,7 @@ namespace features\console\builders {
             if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) === false) {
                 throw new \RuntimeException('Project version "' . $name . '" could not be created.');
             }
+            $progressTracker($this->createConfigFile());
         }
 
         private function createConfigFile(): string
@@ -72,6 +73,10 @@ namespace features\console\builders {
             $search = ['{namespace}', '{config_dir}'];
             $replace = [$this->namespace, self::CONFIG_DIR];
             $templateContent = str_replace($search, $replace, file_get_contents($template));
+
+            if (!is_dir($this->vhost->metadata->hostDirectory)) {
+                mkdir($this->vhost->metadata->hostDirectory, LocalStorage::FILE_MODE, true);
+            }
 
             $outtext = file_put_contents($this->configFilepath, $templateContent) !== false ? 'Success' : 'Failed';
             return Formatter::formatSentence('Creating configuration file: ' . basename($this->configFilepath), $outtext);
@@ -100,8 +105,7 @@ namespace features\console\builders {
             if ($this->exists()) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already exists');
             }
-            $this->registerVersion();
-            $progressTracker($this->createConfigFile());
+            $this->registerVersion($progressTracker);
             $progressTracker($this->prepareSettings());
 
             $module = new ModuleBuilder($this->defaultModule, $this);

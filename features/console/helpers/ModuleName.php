@@ -27,6 +27,7 @@ namespace features\console\helpers {
             $this->directoryName = strtolower(ShaniUtils::splitByCase($tmpValue, $separator));
             $this->className = ShaniUtils::kebab2PascalCase($tmpValue, $separator);
             $this->pathName = str_replace($separator, '-', $this->directoryName);
+            ResourceName::validate($this->className);
         }
 
         public static function create($value): ModuleName

@@ -24,7 +24,7 @@ namespace features\console\builders {
         {
             $this->vhost = $vhost;
             $this->aliasName = $aliasName;
-            $this->aliasPath = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $this->aliasName . '.alias';
+            $this->aliasPath = self::getPath($aliasName);
         }
 
         public function locate(): void
@@ -57,9 +57,9 @@ namespace features\console\builders {
 
         public static function fromAliasName(string $aliasName): AliasBuilder
         {
-            $filename = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $aliasName . '.alias';
-            if (is_file($filename)) {
-                $vhost = VirtualHostBuilder::fromHostName(file_get_contents($filename));
+            $filepath = self::getPath($aliasName);
+            if (is_file($filepath)) {
+                $vhost = VirtualHostBuilder::fromHostName(file_get_contents($filepath));
                 return new AliasBuilder($vhost, $aliasName);
             }
             throw new \InvalidArgumentException('Host alias "' . $aliasName . '" does not exists');
@@ -76,6 +76,9 @@ namespace features\console\builders {
             if ($this->exists()) {
                 throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" already exists.');
             }
+            if (VirtualHostBuilder::existsByName($this->aliasName)) {
+                throw new \InvalidArgumentException('Host with name "' . $this->aliasName . '" already exists.');
+            }
             $intext = 'Creating alias "' . $this->aliasName . '"';
             $outtext = file_put_contents($this->aliasPath, $this->vhost->metadata->hostName) !== false ? 'Success' : 'Failed';
             $progressTracker(Formatter::formatSentence($intext, $outtext));
@@ -85,7 +88,17 @@ namespace features\console\builders {
         #[\Override]
         public function exists(): bool
         {
-            return is_file($this->aliasPath);
+            return self::existsByName($this->aliasName);
+        }
+
+        public static function existsByName(string $aliasName): bool
+        {
+            return is_file(self::getPath($aliasName));
+        }
+
+        private static function getPath(string $aliasName): string
+        {
+            return Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $aliasName . '.alias';
         }
 
         public static function getAllByHostName(string $hostName): \Generator

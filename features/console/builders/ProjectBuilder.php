@@ -13,6 +13,7 @@ namespace features\console\builders {
     use features\console\helpers\Formatter;
     use features\console\helpers\ProjectMetaData;
     use features\console\printer\ConsoleIO;
+    use features\storage\LocalStorage;
     use features\utils\Directory;
     use shani\launcher\Framework;
     use shani\utils\VirtualHostMapper;
@@ -104,6 +105,7 @@ namespace features\console\builders {
             if ($this->exists()) {
                 throw new \RuntimeException('Project "' . $this->metadata->projectName . '" already exists');
             }
+            mkdir($this->metadata->projectDirectory, LocalStorage::FILE_MODE, true);
             $this->vhost->build($progressTracker);
 
             $version = new ProjectVersionBuilder($this->vhost, self::DEFAULT_VERSION_NUMBER);
@@ -145,6 +147,15 @@ namespace features\console\builders {
             $progressTracker(Formatter::formatSentence($intext, $resultText));
         }
 
+        public function getActiveHost(): ?VirtualHostBuilder
+        {
+            try {
+                return self::fromName($this->metadata->projectName)->vhost;
+            } catch (\Exception) {
+                return null;
+            }
+        }
+
         public static function fromName(string $projectName): ProjectBuilder
         {
             $hostfiles = glob(Framework::DIR_HOSTS . '/*.yml');
@@ -154,7 +165,7 @@ namespace features\console\builders {
                     return ProjectBuilder::fromMetaData($projectName, basename($file, '.yml'));
                 }
             }
-            throw new \InvalidArgumentException('Project "' . $projectName . '" does not exists');
+            throw new \InvalidArgumentException('Project "' . $projectName . '" has no host');
         }
 
         public static function getAll(): \Generator

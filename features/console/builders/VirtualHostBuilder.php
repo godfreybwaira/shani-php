@@ -34,11 +34,27 @@ namespace features\console\builders {
             return new self(new ProjectMetaData($projectName, $hostName));
         }
 
+        public static function existsByName(string $hostName): bool
+        {
+            return is_file(self::getPath($hostName));
+        }
+
+        private static function getPath(string $hostName): string
+        {
+            return Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
+        }
+
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
             if ($this->exists()) {
                 throw new \RuntimeException('Host name "' . $this->metadata->hostName . '" already exists');
+            }
+            if (AliasBuilder::existsByName($this->metadata->hostName)) {
+                throw new \RuntimeException('Alias name "' . $this->metadata->hostName . '" already exists');
+            }
+            if (!$this->metadata->projectExists()) {
+                throw new \RuntimeException('Project "' . $this->metadata->projectName . '" does not exists');
             }
             mkdir($this->metadata->hostDirectory, LocalStorage::FILE_MODE, true);
 
@@ -123,7 +139,7 @@ namespace features\console\builders {
 
         public static function fromHostName(string $hostName): VirtualHostBuilder
         {
-            $file = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
+            $file = self::getPath($hostName);
             if (!is_file($file)) {
                 throw new \InvalidArgumentException('Host "' . $hostName . '" does not exists');
             }

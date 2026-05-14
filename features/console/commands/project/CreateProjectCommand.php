@@ -13,7 +13,7 @@ namespace features\console\commands\project {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
-    use features\console\helpers\ResourceName;
+    use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
 
     final class CreateProjectCommand extends CommandContract
@@ -36,14 +36,14 @@ namespace features\console\commands\project {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->projectName = ModuleName::create(ConsoleIO::read('What is the project name?', $this->validIdentifier))->directoryName;
                 $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
-                $this->projectName = ResourceName::create($values[0])->longName;
+                $this->projectName = ModuleName::create($values[0])->directoryName;
                 $this->hostName = HostName::create($values[1]);
             }
             return $this->projectName . self::SEPARATOR . $this->hostName;

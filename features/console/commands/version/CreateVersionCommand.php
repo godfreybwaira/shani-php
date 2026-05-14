@@ -12,6 +12,7 @@ namespace features\console\commands\version {
     use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
     use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
@@ -36,14 +37,14 @@ namespace features\console\commands\version {
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->versionNumber = ModuleName::create(ConsoleIO::read('What is the project version number?', $this->validIdentifier))->directoryName;
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
                     throw new \ArgumentCountError('Atleast two arguments are required.');
                 }
                 $this->projectName = ResourceName::create($values[0])->shortName;
-                $this->versionNumber = ResourceName::create($values[1])->shortName;
+                $this->versionNumber = ModuleName::create($values[1])->directoryName;
             }
             return $this->projectName . self::SEPARATOR . $this->versionNumber;
         }

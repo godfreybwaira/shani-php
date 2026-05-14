@@ -37,9 +37,9 @@ namespace features\console\commands\module {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 3) {

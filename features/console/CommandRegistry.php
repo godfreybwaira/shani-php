@@ -12,8 +12,6 @@ namespace features\console {
     use features\console\printer\ConsoleColor;
     use features\console\printer\ConsoleIO;
     use features\console\printer\PrintedText;
-    use features\ds\map\ReadableMap;
-    use features\ds\map\WritableMap;
     use shani\launcher\Framework;
 
     /**
@@ -97,6 +95,7 @@ namespace features\console {
             yield new commands\vhost\ListVhostCommand($this);
             yield new commands\vhost\RenameVhostCommand($this);
             yield new commands\vhost\LocateVhostCommand($this);
+            yield new commands\vhost\CreateVhostCommand($this);
 //
 //            // Alias
             yield new commands\alias\CreateAliasCommand($this);
