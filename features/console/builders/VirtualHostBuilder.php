@@ -115,11 +115,12 @@ namespace features\console\builders {
             if ($newVhost->exists()) {
                 throw new \InvalidArgumentException('Host name "' . $newName . '" already exists.');
             }
-            $aliases = $this->getAliases();
             $intext = 'Renaming a host from "' . $this->metadata->hostName . '" to "' . $newVhost->metadata->hostName . '"';
-            $renamed = rename($this->metadata->hostDirectory, $newVhost->metadata->hostDirectory) && rename($this->metadata->hostPath, $newVhost->metadata->hostPath);
+            $renamed = rename($this->metadata->hostDirectory, $newVhost->metadata->hostDirectory) &&
+                    rename($this->metadata->hostPath, $newVhost->metadata->hostPath);
             $outtext = $renamed ? 'Success' : 'Failed';
             if ($renamed) {
+                $aliases = $this->getAliases();
                 foreach ($aliases as $alias) {
                     file_put_contents($alias->aliasPath, $newVhost->metadata->hostName);
                 }
