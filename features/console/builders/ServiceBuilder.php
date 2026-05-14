@@ -20,8 +20,8 @@ namespace features\console\builders {
 
         private readonly string $namespace;
         private readonly string $rootPath;
-        private readonly string $serviceName;
         private readonly ModuleBuilder $module;
+        public readonly string $serviceName;
 
         public function __construct(ModuleBuilder $module, string $serviceName = null)
         {
@@ -37,17 +37,18 @@ namespace features\console\builders {
             if (!$this->module->exists()) {
                 throw new \RuntimeException('Could not create Service class "' . $this->serviceName . '", module "' . $this->module->moduleName . '" does not exists.');
             }
-            if (!$this->exists()) {
-                $search = ['{namespace}', '{class_name}'];
-                $replace = [$this->namespace, $this->serviceName];
-                $folder = dirname($this->rootPath);
-                if (!is_dir($folder)) {
-                    mkdir($folder, LocalStorage::FILE_MODE, true);
-                }
-                $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
-                $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
-                $progressTracker(Formatter::formatSentence('Creating service: ' . $this->serviceName, $outtext));
+            if ($this->exists()) {
+                throw new \RuntimeException('Could not create Service class "' . $this->serviceName . '", it exists already.');
             }
+            $search = ['{namespace}', '{class_name}'];
+            $replace = [$this->namespace, $this->serviceName];
+            $folder = dirname($this->rootPath);
+            if (!is_dir($folder)) {
+                mkdir($folder, LocalStorage::FILE_MODE, true);
+            }
+            $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/class.txt'));
+            $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
+            $progressTracker(Formatter::formatSentence('Creating service: ' . $this->serviceName, $outtext));
             return $this;
         }
 

@@ -1,41 +1,39 @@
 <?php
 
 /**
- * Description of ListDtoCommand
+ * Description of CreateServiceCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands\dto {
+namespace features\console\commands\service {
 
     use features\console\builders\ModuleBuilder;
+    use features\console\builders\ServiceBuilder;
     use features\console\CommandContract;
     use features\console\CommandRegistry;
-    use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
-    final class ListDtoCommand extends CommandContract
+    final class CreateServiceCommand extends CommandContract
     {
 
-        private readonly ModuleName $moduleName;
         private readonly string $projectName;
         private readonly string $versionNumber;
+        private readonly ModuleName $moduleName;
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'list:dto', 'project_name@version_number@module_name', 'Show all existing project DTOs in a given module', 'blog@v1@posts');
+            parent::__construct($registry, 'create:service', 'project_name@version_number@module_name', 'Create new module service class', 'blog@v1@posts');
         }
 
         public function execute(): void
         {
             $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
-            $dtos = $module->getDtos();
-            foreach ($dtos as $key => $dto) {
-                $this->registry->addResult(Formatter::formatSentence($key + 1, $dto->dtoName));
-            }
+            $service = new ServiceBuilder($module);
+            $service->build(fn($s) => $this->registry->addResult($s));
         }
 
         public function parse(string ...$args): ?string

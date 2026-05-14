@@ -86,7 +86,40 @@ namespace features\console\builders {
             }
         }
 
-        public static function fromModuleName(ModuleName $moduleName, string $projectName, string $versionNumber): self
+        public function getEntities(): \Generator
+        {
+            $folders = array_diff(scandir($this->rootPath . $this->config->entities), ['.', '..']);
+            if (empty($folders)) {
+                throw new \InvalidArgumentException('No entity available for "' . $this->moduleName->originalValue . '" module');
+            }
+            foreach ($folders as $entityName) {
+                yield new EntityBuilder($this, basename($entityName, '.php'));
+            }
+        }
+
+        public function getDtos(): \Generator
+        {
+            $folders = array_diff(scandir($this->rootPath . $this->config->dto), ['.', '..']);
+            if (empty($folders)) {
+                throw new \InvalidArgumentException('No DTO available for "' . $this->moduleName->originalValue . '" module');
+            }
+            foreach ($folders as $dtoName) {
+                yield new DtoBuilder(new EntityBuilder($this), basename($dtoName, '.php'));
+            }
+        }
+
+        public function getServices(): \Generator
+        {
+            $folders = array_diff(scandir($this->rootPath . $this->config->services), ['.', '..']);
+            if (empty($folders)) {
+                throw new \InvalidArgumentException('No Service class available for "' . $this->moduleName->originalValue . '" module');
+            }
+            foreach ($folders as $serviceName) {
+                yield new ServiceBuilder($this, basename($serviceName, '.php'));
+            }
+        }
+
+        public static function fromModuleName(ModuleName $moduleName, string $projectName, string $versionNumber): ModuleBuilder
         {
             $version = ProjectVersionBuilder::fromProjectName($projectName, $versionNumber);
             return new ModuleBuilder($moduleName, $version);

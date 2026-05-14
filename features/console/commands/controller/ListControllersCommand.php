@@ -44,7 +44,7 @@ namespace features\console\commands\controller {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
                 $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
+                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 3) {
@@ -55,7 +55,7 @@ namespace features\console\commands\controller {
                 $this->moduleName = ModuleName::create($values[2]);
             }
             $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
-            return $parameters . self::SEPARATOR . $this->moduleName->className;
+            return $parameters . self::SEPARATOR . $this->moduleName->originalValue;
         }
     }
 

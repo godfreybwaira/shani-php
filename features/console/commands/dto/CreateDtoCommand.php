@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ListDtoCommand
+ * Description of CreateDtoCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
@@ -9,15 +9,16 @@
 
 namespace features\console\commands\dto {
 
+    use features\console\builders\DtoBuilder;
+    use features\console\builders\EntityBuilder;
     use features\console\builders\ModuleBuilder;
     use features\console\CommandContract;
     use features\console\CommandRegistry;
-    use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
-    final class ListDtoCommand extends CommandContract
+    final class CreateDtoCommand extends CommandContract
     {
 
         private readonly ModuleName $moduleName;
@@ -26,16 +27,14 @@ namespace features\console\commands\dto {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'list:dto', 'project_name@version_number@module_name', 'Show all existing project DTOs in a given module', 'blog@v1@posts');
+            parent::__construct($registry, 'create:dto', 'project_name@version_number@module_name', 'Create a Data Transfer Object (DTO)', 'blog@v1@posts');
         }
 
         public function execute(): void
         {
             $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
-            $dtos = $module->getDtos();
-            foreach ($dtos as $key => $dto) {
-                $this->registry->addResult(Formatter::formatSentence($key + 1, $dto->dtoName));
-            }
+            $dto = new DtoBuilder(new EntityBuilder($module));
+            $dto->build(fn($s) => $this->registry->addResult($s));
         }
 
         public function parse(string ...$args): ?string

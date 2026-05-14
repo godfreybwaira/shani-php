@@ -31,7 +31,7 @@ namespace features\console\builders {
             $this->vhost = VirtualHostBuilder::fromMetaData($metadata->projectName, $metadata->hostName);
         }
 
-        public static function fromMetaData(string $projectName, string $hostName): self
+        public static function fromMetaData(string $projectName, string $hostName): ProjectBuilder
         {
             return new self(new ProjectMetaData($projectName, $hostName));
         }

@@ -11,52 +11,48 @@ namespace features\console\commands\entity {
 
     use features\console\builders\EntityBuilder;
     use features\console\builders\ModuleBuilder;
-    use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class LocateEntityCommand extends CommandContract
     {
 
-        private readonly string $moduleName;
+        private readonly ModuleName $moduleName;
         private readonly string $projectName;
-        private readonly string $entityName;
-        private readonly string $projectVersion;
+        private readonly string $versionNumber;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('locate:entity', 'entity_name@module_name@version_number@project_name', 'Show the full path to an existing project entities (models)', 'ReviewEntity@posts@v1@blog');
+            parent::__construct($registry, 'locate:entity', 'project_name@version_number@module_name', 'Show the full path to an existing project entities (models)', 'blog@v1@posts');
         }
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
-            $entity = new EntityBuilder($this->entityName, new ModuleBuilder($this->moduleName, $version));
+            $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
+            $entity = new EntityBuilder($module);
             $entity->locate();
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
-                $this->entityName = ConsoleIO::read('What is the entity name?', $this->validIdentifier);
+                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 4) {
-                    throw new \ArgumentCountError('Atleast four arguments are required.');
+                if (count($values) < 3) {
+                    throw new \ArgumentCountError('Atleast three arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateIdentifier($values[1]);
-                self::validateIdentifier($values[2]);
-                self::validateIdentifier($values[3]);
-                $this->entityName = $values[0];
-                $this->moduleName = $values[1];
-                $this->projectVersion = $values[2];
-                $this->projectName = $values[3];
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
+                $this->moduleName = ModuleName::create($values[2]);
             }
-            return $this;
+            $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
+            return $parameters . self::SEPARATOR . $this->moduleName->originalValue;
         }
     }
 

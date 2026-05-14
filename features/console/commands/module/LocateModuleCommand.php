@@ -38,7 +38,7 @@ namespace features\console\commands\module {
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
+                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
                 $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);

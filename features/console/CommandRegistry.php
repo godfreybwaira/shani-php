@@ -110,19 +110,19 @@ namespace features\console {
             yield new commands\alias\LocateAliasCommand($this);
 //
 //            // Entity
-//            yield new commands\entity\CreateEntityCommand($this);
-//            yield new commands\entity\ListEntityCommand($this);
-//            yield new commands\entity\LocateEntityCommand($this);
+            yield new commands\entity\CreateEntityCommand($this);
+            yield new commands\entity\ListEntityCommand($this);
+            yield new commands\entity\LocateEntityCommand($this);
 //
 //            // DTO
-//            yield new commands\dto\CreateDtoCommand($this);
-//            yield new commands\dto\ListDtoCommand($this);
-//            yield new commands\dto\LocateDtoCommand($this);
+            yield new commands\dto\CreateDtoCommand($this);
+            yield new commands\dto\ListDtoCommand($this);
+            yield new commands\dto\LocateDtoCommand($this);
 //
 //            // Service
-//            yield new commands\service\CreateServiceCommand($this);
-//            yield new commands\service\ListServiceCommand($this);
-//            yield new commands\service\LocateServiceCommand($this);
+            yield new commands\service\CreateServiceCommand($this);
+            yield new commands\service\ListServiceCommand($this);
+            yield new commands\service\LocateServiceCommand($this);
         }
 
         /**

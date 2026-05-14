@@ -29,7 +29,7 @@ namespace features\console\helpers {
             $this->pathName = str_replace($separator, '-', $this->directoryName);
         }
 
-        public static function create($value): self
+        public static function create($value): ModuleName
         {
             return new self($value);
         }

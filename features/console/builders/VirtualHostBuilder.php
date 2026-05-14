@@ -29,7 +29,7 @@ namespace features\console\builders {
             $this->metadata = $metadata;
         }
 
-        public static function fromMetaData(string $projectName, string $hostName): self
+        public static function fromMetaData(string $projectName, string $hostName): VirtualHostBuilder
         {
             return new self(new ProjectMetaData($projectName, $hostName));
         }
@@ -121,7 +121,7 @@ namespace features\console\builders {
             }
         }
 
-        public static function fromHostName(string $hostName): self
+        public static function fromHostName(string $hostName): VirtualHostBuilder
         {
             $file = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
             if (!is_file($file)) {

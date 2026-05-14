@@ -142,7 +142,7 @@ namespace features\console\builders {
             return is_file($this->configFilepath);
         }
 
-        public static function fromProjectName(string $projectName, string $versionNumber): self
+        public static function fromProjectName(string $projectName, string $versionNumber): ProjectVersionBuilder
         {
             $project = ProjectBuilder::fromName($projectName);
             return new ProjectVersionBuilder($project->vhost, $versionNumber);

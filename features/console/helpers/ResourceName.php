@@ -54,7 +54,7 @@ namespace features\console\helpers {
             return $this->value;
         }
 
-        public static function create(string $name, string $suffix = ''): self
+        public static function create(string $name, string $suffix = ''): ResourceName
         {
             return new self($name, $suffix);
         }

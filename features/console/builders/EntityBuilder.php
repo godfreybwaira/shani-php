@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\CommandContract;
     use features\console\helpers\Formatter;
     use features\console\helpers\ResourceName;
+    use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
 
     final class EntityBuilder implements LightBuilderInterface
@@ -65,7 +66,9 @@ namespace features\console\builders {
 
         public function locate(): void
         {
-            echo $this->exists() ? $this->rootPath : null;
+            if ($this->exists()) {
+                ConsoleIO::output($this->rootPath);
+            }
         }
     }
 

@@ -14,17 +14,14 @@ namespace features\console\builders {
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
-    use shani\utils\ShaniUtils;
 
     final class DtoBuilder implements LightBuilderInterface
     {
 
-        private const SUFFIX = 'Dto';
-
         private readonly string $namespace;
         private readonly string $rootPath;
-        private readonly string $dtoName;
         private readonly EntityBuilder $entity;
+        public readonly string $dtoName;
 
         public function __construct(EntityBuilder $entity, string $dtoName = null)
         {
@@ -40,17 +37,18 @@ namespace features\console\builders {
             if (!$this->entity->module->exists()) {
                 throw new \RuntimeException('Could not create DTO "' . $this->dtoName . '", module "' . $this->entity->module->moduleName . '" does not exists.');
             }
-            if (!$this->exists()) {
-                $search = ['{namespace}', '{dto_name}', '{entity_name}', '{entity_ns}'];
-                $replace = [$this->namespace, $this->dtoName, $this->entity->entityName, $this->entity->namespace];
-                $folder = dirname($this->rootPath);
-                if (!is_dir($folder)) {
-                    mkdir($folder, LocalStorage::FILE_MODE, true);
-                }
-                $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/dto.txt'));
-                $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
-                $progressTracker(Formatter::formatSentence('Creating DTO: ' . $this->dtoName, $outtext));
+            if ($this->exists()) {
+                throw new \RuntimeException('Could not create DTO "' . $this->dtoName . '", it exists already.');
             }
+            $search = ['{namespace}', '{dto_name}', '{entity_name}', '{entity_ns}'];
+            $replace = [$this->namespace, $this->dtoName, $this->entity->entityName, $this->entity->namespace];
+            $folder = dirname($this->rootPath);
+            if (!is_dir($folder)) {
+                mkdir($folder, LocalStorage::FILE_MODE, true);
+            }
+            $content = str_replace($search, $replace, file_get_contents(CommandContract::ASSETS . '/dto.txt'));
+            $outtext = file_put_contents($this->rootPath, $content) !== false ? 'Success' : 'Failed';
+            $progressTracker(Formatter::formatSentence('Creating DTO: ' . $this->dtoName, $outtext));
             return $this;
         }
 

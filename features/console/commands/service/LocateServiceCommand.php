@@ -10,53 +10,49 @@
 namespace features\console\commands\service {
 
     use features\console\builders\ModuleBuilder;
-    use features\console\builders\ProjectVersionBuilder;
     use features\console\builders\ServiceBuilder;
     use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
+    use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
 
     final class LocateServiceCommand extends CommandContract
     {
 
-        private readonly string $moduleName;
         private readonly string $projectName;
-        private readonly string $serviceName;
-        private readonly string $projectVersion;
+        private readonly string $versionNumber;
+        private readonly ModuleName $moduleName;
 
-        public function __construct()
+        public function __construct(CommandRegistry $registry)
         {
-            parent::__construct('locate:service', 'service_name@module_name@version_number@project_name', 'Show the full path to an existing project services', 'AuthorService@posts@v1@blog');
+            parent::__construct($registry, 'locate:service', 'project_name@version_number@module_name', 'Show the full path to an existing project services', 'blog@v1@posts');
         }
 
         public function execute(): void
         {
-            $version = ProjectVersionBuilder::fromVersion($this->projectVersion, $this->projectName);
-            $service = new ServiceBuilder($this->serviceName, new ModuleBuilder($this->moduleName, $version));
+            $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
+            $service = new ServiceBuilder($module);
             $service->locate();
         }
 
-        public function parse(string ...$args): CommandContract
+        public function parse(string ...$args): ?string
         {
             if (empty($args)) {
                 $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->moduleName = ConsoleIO::read('What is the module name?', $this->validIdentifier);
-                $this->serviceName = ConsoleIO::read('What is the service name?', $this->validIdentifier);
-                $this->projectVersion = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
+                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 4) {
-                    throw new \ArgumentCountError('Atleast four arguments are required.');
+                if (count($values) < 3) {
+                    throw new \ArgumentCountError('Atleast three arguments are required.');
                 }
-                self::validateIdentifier($values[0]);
-                self::validateIdentifier($values[1]);
-                self::validateIdentifier($values[2]);
-                self::validateIdentifier($values[3]);
-                $this->serviceName = $values[0];
-                $this->moduleName = $values[1];
-                $this->projectVersion = $values[2];
-                $this->projectName = $values[3];
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ResourceName::create($values[1])->shortName;
+                $this->moduleName = ModuleName::create($values[2]);
             }
-            return $this;
+            $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
+            return $parameters . self::SEPARATOR . $this->moduleName->originalValue;
         }
     }
 
