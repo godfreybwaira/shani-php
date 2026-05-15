@@ -47,7 +47,7 @@ namespace features\console\builders {
 
         public function registerVersion(\Closure $progressTracker): void
         {
-            if ($this->configExists()) {
+            if ($this->configExists() || $this->vhost->hasVersion($this)) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
             }
 
