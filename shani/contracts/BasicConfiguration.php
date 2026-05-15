@@ -18,7 +18,6 @@ namespace shani\contracts {
     use features\persistence\DatabaseInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
-    use features\test\TestResult;
     use shani\config\AppConfig;
     use shani\config\AuthenticationConfig;
     use shani\config\CsrfConfig;
@@ -291,13 +290,6 @@ namespace shani\contracts {
         {
             return $this->storageMedia ??= new LocalStorage($this->app);
         }
-
-        /**
-         * Run unit and integration tests.
-         *
-         * @return TestResult
-         */
-        public static abstract function runTest(): TestResult;
 
         /**
          * Get database connection object.

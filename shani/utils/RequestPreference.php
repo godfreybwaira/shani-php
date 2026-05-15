@@ -36,13 +36,6 @@ namespace shani\utils {
         public readonly string $versionNumber;
 
         /**
-         * Loaded configuration file path.
-         *
-         * @var string
-         */
-        public readonly string $configFile;
-
-        /**
          * Virtual host configurations parsed from YAML.
          *
          * @var ReadableMap
@@ -68,9 +61,9 @@ namespace shani\utils {
          */
         public function __construct(string $selectedVersion, VirtualHostMapper $mapper, string $hostname)
         {
-            $this->configFile = Framework::DIR_HOSTS . '/' . $hostname . '/' . $mapper->supportedVersions[$selectedVersion]['config'];
+            $configFile = Framework::DIR_HOSTS . '/' . $hostname . '/' . $mapper->supportedVersions[$selectedVersion]['config'];
             $this->versionNumber = $selectedVersion;
-            $this->vhost = new ReadableMap(yaml_parse_file($this->configFile));
+            $this->vhost = new ReadableMap(yaml_parse_file($configFile));
             $this->mapper = $mapper;
         }
     }

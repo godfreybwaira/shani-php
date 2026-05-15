@@ -175,10 +175,10 @@ namespace features\console\builders {
             }
         }
 
-        public function hasVersion(ProjectVersionBuilder $version): bool
+        public function hasVersion(string $versionNumber): bool
         {
             $configs = $this->getConfigurations();
-            return !empty($configs->supportedVersions[$version->versionNumber]);
+            return !empty($configs->supportedVersions[$versionNumber]);
         }
     }
 

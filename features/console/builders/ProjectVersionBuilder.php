@@ -14,6 +14,7 @@ namespace features\console\builders {
     use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
+    use features\test\TestRunnerInterface;
     use features\utils\Directory;
     use shani\config\PathConfig;
 
@@ -22,6 +23,7 @@ namespace features\console\builders {
 
         private const CONFIG_DIR = 'config';
         private const CONFIG_FILE = 'config.yml';
+        private const TEST_DIR = 'tests';
         public const DEFAULT_MODULE = 'users';
 
         public readonly VirtualHostBuilder $vhost;
@@ -47,7 +49,7 @@ namespace features\console\builders {
 
         public function registerVersion(\Closure $progressTracker): void
         {
-            if ($this->vhost->hasVersion($this)) {
+            if ($this->configExists()) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
             }
 
@@ -67,12 +69,34 @@ namespace features\console\builders {
             $this->createConfigFile($progressTracker);
         }
 
+        private function createTestFile(\Closure $progressTracker): void
+        {
+            $filename = 'TestRunner';
+            $testDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::TEST_DIR;
+            $filepath = $testDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
+
+            if (!is_file($filepath)) {
+
+                $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'test.txt';
+                $search = ['{namespace}', '{test_dir}', '{class_name}'];
+                $replace = [$this->namespace, self::TEST_DIR, $filename];
+                $testContent = str_replace($search, $replace, file_get_contents($testTemplate));
+
+                if (!is_dir($testDirectory)) {
+                    mkdir($testDirectory, LocalStorage::FILE_MODE, true);
+                }
+
+                $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating Test class: ' . $filename, $outtext));
+            }
+        }
+
         private function createConfigFile(\Closure $progressTracker): void
         {
             if (!$this->configExists()) {
                 $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
-                $search = ['{namespace}', '{config_dir}'];
-                $replace = [$this->namespace, self::CONFIG_DIR];
+                $search = ['{namespace}', '{config_dir}', '{test_dir}'];
+                $replace = [$this->namespace, self::CONFIG_DIR, self::TEST_DIR];
                 $templateContent = str_replace($search, $replace, file_get_contents($template));
 
                 if (!is_dir($this->vhost->metadata->hostDirectory)) {
@@ -114,6 +138,7 @@ namespace features\console\builders {
             }
             $this->registerVersion($progressTracker);
             $this->prepareSettings($progressTracker);
+            $this->createTestFile($progressTracker);
 
             $module = new ModuleBuilder($this->defaultModule, $this);
             $module->build($progressTracker);
@@ -176,6 +201,24 @@ namespace features\console\builders {
                     yield new ModuleBuilder(ModuleName::create($moduleName), $this);
                 }
             }
+        }
+
+        public function runTest(): bool
+        {
+            $filename = $this->vhost->getConfigurations()->getConfigFileName($this->versionNumber);
+            $filePath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $filename;
+            if (!is_file($filePath)) {
+                throw new \RuntimeException('Test could not start because Test runner file could not be not found.');
+            }
+            $config = yaml_parse_file($filePath);
+            if (empty($config['test'])) {
+                throw new \RuntimeException('Your project version does not support test.');
+            }
+            $test = new $config['test']();
+            if ($test instanceof TestRunnerInterface) {
+                return $test->runTest()->getResult();
+            }
+            throw new \RuntimeException($config['test'] . ' must implements features\test\TestRunnerInterface');
         }
     }
 

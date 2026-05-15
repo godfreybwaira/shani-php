@@ -1,0 +1,57 @@
+<?php
+
+/**
+ * Description of RunTestCommand
+ * @author goddy
+ *
+ * Created on: May 15, 2026 at 3:24:05 PM
+ */
+
+namespace features\console\commands\tests {
+
+    use features\console\builders\ProjectVersionBuilder;
+    use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use features\console\helpers\ModuleName;
+    use features\console\helpers\ResourceName;
+    use features\console\printer\ConsoleIO;
+    use features\console\printer\PrintedText;
+
+    final class RunTestCommand extends CommandContract
+    {
+
+        private readonly string $projectName;
+        private readonly string $versionNumber;
+
+        public function __construct(CommandRegistry $registry)
+        {
+            parent::__construct($registry, 'run:test', 'project_name@version_number', 'Run application test', 'blog@v1');
+        }
+
+        public function execute(): void
+        {
+            $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
+            if (!$version->runTest()) {
+                throw new \Exception('Test Failed');
+            }
+            $this->registry->addResult(PrintedText::success('Test Passed'));
+        }
+
+        public function parse(string ...$args): ?string
+        {
+            if (empty($args)) {
+                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $this->versionNumber = ModuleName::create(ConsoleIO::read('What is the project version number?', $this->validIdentifier))->directoryName;
+            } else {
+                $values = explode(self::SEPARATOR, $args[0]);
+                if (count($values) < 2) {
+                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                }
+                $this->projectName = ResourceName::create($values[0])->shortName;
+                $this->versionNumber = ModuleName::create($values[1])->directoryName;
+            }
+            return $this->projectName . self::SEPARATOR . $this->versionNumber;
+        }
+    }
+
+}

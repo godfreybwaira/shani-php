@@ -1,8 +1,8 @@
 # Must extends shani\contracts\BasicConfiguration
-config: \{namespace}\{config_dir}\Settings
+config: \apps\shop\v1\config\Settings
 
 # Test file runner
-test: \{namespace}\{test_dir}\TestRunner
+test: \apps\shop\v1\tests\TestRunner
 
 # Active configuration profile. The framework does not provide any logic regarding
 # this variable. You should handle the logic manually

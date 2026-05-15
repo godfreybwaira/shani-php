@@ -123,6 +123,9 @@ namespace features\console {
             // Broken objects
             yield new commands\broken\DeleteBrokenCommand($this);
             yield new commands\broken\ListBrokenCommand($this);
+
+            //Application testing
+            yield new commands\tests\RunTestCommand($this);
         }
 
         /**

@@ -1,7 +1,7 @@
 # =====================================================================
 # Versioning Strategy: One Project, one virtual host, multiple versions
 # =====================================================================
-project_name: demo
+project_name: shop
 
 # Directory for storing CGI related configurations for Web servers like Apache and Nginx
 cgi_directory: /.cgi
@@ -30,9 +30,6 @@ version:
   # The framework will load the corresponding .yml file for the chosen version
   supported:
     v1:
-      name: main
+      name: v1
       config: v1-config.yml
-    v2:
-      name: v2
-      config: v2-config.yml
 ####v1#

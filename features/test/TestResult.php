@@ -83,6 +83,15 @@ namespace features\test {
             return $this->totalTests === $this->testPassed;
         }
 
+        /**
+         * Get the total number of tests done
+         * @return int
+         */
+        public function getTotalTests(): int
+        {
+            return $this->totalTests;
+        }
+
         private function save(string $data): self
         {
             if ($this->location !== null) {

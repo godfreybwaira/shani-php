@@ -44,7 +44,7 @@ namespace features\test\helpers {
                 'total_tests' => $this->totalTests,
                 'test_passed' => $this->testPassed,
                 'test_failed' => ($this->totalTests - $this->testPassed),
-                'success_rate' => round(($this->testPassed / $this->totalTests) * 100, 2),
+                'success_rate' => $this->totalTests > 0 ? round(($this->testPassed / $this->totalTests) * 100, 2) : 0,
                 'execution_time_ms' => $this->executionTime,
                 'performance' => TestPerformanceScore::check($this->performanceScore)->name,
                 'performance_score' => $this->performanceScore,
