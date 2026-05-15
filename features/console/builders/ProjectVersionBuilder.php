@@ -47,7 +47,7 @@ namespace features\console\builders {
 
         public function registerVersion(\Closure $progressTracker): void
         {
-            if ($this->configExists() || $this->vhost->hasVersion($this)) {
+            if ($this->vhost->hasVersion($this)) {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
             }
 
@@ -64,39 +64,46 @@ namespace features\console\builders {
             if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) === false) {
                 throw new \RuntimeException('Project version "' . $name . '" could not be created.');
             }
-            $progressTracker($this->createConfigFile());
+            $this->createConfigFile($progressTracker);
         }
 
-        private function createConfigFile(): string
+        private function createConfigFile(\Closure $progressTracker): void
         {
-            $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
-            $search = ['{namespace}', '{config_dir}'];
-            $replace = [$this->namespace, self::CONFIG_DIR];
-            $templateContent = str_replace($search, $replace, file_get_contents($template));
+            if (!$this->configExists()) {
+                $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
+                $search = ['{namespace}', '{config_dir}'];
+                $replace = [$this->namespace, self::CONFIG_DIR];
+                $templateContent = str_replace($search, $replace, file_get_contents($template));
 
-            if (!is_dir($this->vhost->metadata->hostDirectory)) {
-                mkdir($this->vhost->metadata->hostDirectory, LocalStorage::FILE_MODE, true);
+                if (!is_dir($this->vhost->metadata->hostDirectory)) {
+                    mkdir($this->vhost->metadata->hostDirectory, LocalStorage::FILE_MODE, true);
+                }
+
+                $outtext = file_put_contents($this->configFilepath, $templateContent) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating configuration file: ' . basename($this->configFilepath), $outtext));
             }
-
-            $outtext = file_put_contents($this->configFilepath, $templateContent) !== false ? 'Success' : 'Failed';
-            return Formatter::formatSentence('Creating configuration file: ' . basename($this->configFilepath), $outtext);
         }
 
-        private function prepareSettings(): string
+        private function prepareSettings(\Closure $progressTracker): void
         {
             $filename = 'Settings';
-            $settingTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'settings.txt';
-
-            $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}'];
-            $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename];
-            $settingContent = str_replace($search, $replace, file_get_contents($settingTemplate));
-
             $configDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::CONFIG_DIR;
-            mkdir($configDirectory, LocalStorage::FILE_MODE, true);
             $filepath = $configDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
 
-            $outtext = file_put_contents($filepath, $settingContent) !== false ? 'Success' : 'Failed';
-            return Formatter::formatSentence('Creating setting class: ' . $filename, $outtext);
+            if (!is_file($filepath)) {
+
+                $settingTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'settings.txt';
+                $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}'];
+                $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename];
+                $settingContent = str_replace($search, $replace, file_get_contents($settingTemplate));
+
+                if (!is_dir($configDirectory)) {
+                    mkdir($configDirectory, LocalStorage::FILE_MODE, true);
+                }
+
+                $outtext = file_put_contents($filepath, $settingContent) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating setting class: ' . $filename, $outtext));
+            }
         }
 
         #[\Override]
@@ -106,7 +113,7 @@ namespace features\console\builders {
                 throw new \RuntimeException('Project version "' . $this->versionName . '" already exists');
             }
             $this->registerVersion($progressTracker);
-            $progressTracker($this->prepareSettings());
+            $this->prepareSettings($progressTracker);
 
             $module = new ModuleBuilder($this->defaultModule, $this);
             $module->build($progressTracker);
