@@ -91,6 +91,11 @@ namespace features\console\builders {
             return self::existsByName($this->aliasName);
         }
 
+        public function isBroken(): bool
+        {
+            return !$this->vhost->metadata->hostExists();
+        }
+
         public static function existsByName(string $aliasName): bool
         {
             return is_file(self::getPath($aliasName));
@@ -99,6 +104,26 @@ namespace features\console\builders {
         private static function getPath(string $aliasName): string
         {
             return Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $aliasName . '.alias';
+        }
+
+        public static function getAll(): \Generator
+        {
+            $aliases = glob(Framework::DIR_HOSTS . '/*.alias');
+            foreach ($aliases as $aliasPath) {
+                $vhost = VirtualHostBuilder::fromHostName(file_get_contents($aliasPath));
+                yield new AliasBuilder($vhost, basename($aliasPath, '.alias'));
+            }
+        }
+
+        public static function getAllBroken(): \Generator
+        {
+            $aliases = glob(Framework::DIR_HOSTS . '/*.alias');
+            foreach ($aliases as $aliasPath) {
+                $hostName = file_get_contents($aliasPath);
+                if (!VirtualHostBuilder::existsByName($hostName)) {
+                    yield $aliasPath;
+                }
+            }
         }
 
         public static function getAllByHostName(string $hostName): \Generator

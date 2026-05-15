@@ -96,6 +96,7 @@ namespace features\console {
             yield new commands\vhost\RenameVhostCommand($this);
             yield new commands\vhost\LocateVhostCommand($this);
             yield new commands\vhost\CreateVhostCommand($this);
+            yield new commands\vhost\DeleteVhostCommand($this);
 //
 //            // Alias
             yield new commands\alias\CreateAliasCommand($this);
@@ -118,6 +119,10 @@ namespace features\console {
             yield new commands\service\CreateServiceCommand($this);
             yield new commands\service\ListServiceCommand($this);
             yield new commands\service\LocateServiceCommand($this);
+
+            // Broken objects
+            yield new commands\broken\DeleteBrokenCommand($this);
+            yield new commands\broken\ListBrokenCommand($this);
         }
 
         /**

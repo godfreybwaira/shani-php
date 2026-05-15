@@ -138,6 +138,11 @@ namespace features\console\builders {
             }
         }
 
+        public function isBroken(): bool
+        {
+            return !$this->metadata->projectExists();
+        }
+
         public static function fromHostName(string $hostName): VirtualHostBuilder
         {
             $file = self::getPath($hostName);
@@ -158,6 +163,22 @@ namespace features\console\builders {
                 $config = yaml_parse_file($file);
                 yield VirtualHostBuilder::fromMetaData($config['project_name'], basename($file, '.yml'));
             }
+        }
+
+        public static function getAllBroken(): \Generator
+        {
+            $vhosts = self::getAll();
+            foreach ($vhosts as $vhost) {
+                if ($vhost->isBroken()) {
+                    yield $vhost;
+                }
+            }
+        }
+
+        public function hasVersion(ProjectVersionBuilder $version): bool
+        {
+            $configs = $this->getConfigurations();
+            return !empty($configs->supportedVersions[$version->versionNumber]);
         }
     }
 

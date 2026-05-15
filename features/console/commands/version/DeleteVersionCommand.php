@@ -29,6 +29,11 @@ namespace features\console\commands\version {
         public function execute(): void
         {
             $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
+            if ($version->vhost->hasVersion($version)) {
+                $message = 'Project version number "' . $version->versionNumber . '" is registered to a host "';
+                $message .= $version->vhost->metadata->hostName . '", so cannot be deleted. Please unregister it first.';
+                throw new \RuntimeException($message);
+            }
             $version->delete(fn($s) => $this->registry->addResult($s));
         }
 
