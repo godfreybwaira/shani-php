@@ -13,7 +13,6 @@ namespace shani\launcher {
     use features\logging\Logger;
     use features\logging\LoggingLevel;
     use features\storage\LocalStorage;
-    use features\test\helpers\TestRunner;
     use features\utils\Concurrency;
     use features\utils\Event;
     use shani\contracts\ResponseWriterInterface;
@@ -109,14 +108,8 @@ namespace shani\launcher {
                         HttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS => $preference->mapper->responseHeader
                     ]);
                 }
-                if (!$preference->vhost->getOne('testmode')) {
-                    $app = new App($preference, $response, $writer, $framework);
-                    $app->launch();
-                } else {
-                    $msg = TestRunner::start($preference);
-                    $response->setBody($msg);
-                    $writer->close($response);
-                }
+                $app = new App($preference, $response, $writer, $framework);
+                $app->launch();
             });
         }
 
