@@ -1,9 +1,0 @@
-# Must extends shani\contracts\BasicConfiguration
-config: \apps\demo\v2\config\Settings
-
-# Test file runner
-test: \apps\demo\v2\_test\TestRunner
-
-# Active configuration profile. The framework does not provide any logic regarding
-# this variable. You should handle the logic manually
-profile: dev.yml

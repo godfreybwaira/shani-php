@@ -80,6 +80,7 @@ namespace features\console {
             yield new commands\version\DeleteVersionCommand($this);
             yield new commands\version\ListVersionCommand($this);
             yield new commands\version\LocateVersionCommand($this);
+            yield new commands\version\VersionTestCommand($this);
 //
 //            // Module
             yield new commands\module\CreateModuleCommand($this);
@@ -123,9 +124,6 @@ namespace features\console {
             // Broken objects
             yield new commands\broken\DeleteBrokenCommand($this);
             yield new commands\broken\ListBrokenCommand($this);
-
-            //Application testing
-            yield new commands\tests\RunTestCommand($this);
         }
 
         /**

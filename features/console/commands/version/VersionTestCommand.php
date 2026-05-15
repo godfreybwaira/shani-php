@@ -7,7 +7,7 @@
  * Created on: May 15, 2026 at 3:24:05 PM
  */
 
-namespace features\console\commands\tests {
+namespace features\console\commands\version {
 
     use features\console\builders\ProjectVersionBuilder;
     use features\console\CommandContract;
@@ -17,7 +17,7 @@ namespace features\console\commands\tests {
     use features\console\printer\ConsoleIO;
     use features\console\printer\PrintedText;
 
-    final class RunTestCommand extends CommandContract
+    final class VersionTestCommand extends CommandContract
     {
 
         private readonly string $projectName;
@@ -25,7 +25,7 @@ namespace features\console\commands\tests {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'run:test', 'project_name@version_number', 'Run application test', 'blog@v1');
+            parent::__construct($registry, 'test:version', 'project_name@version_number', 'Run application version test', 'blog@v1');
         }
 
         public function execute(): void

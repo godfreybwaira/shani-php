@@ -1,5 +1,9 @@
-# Must extends shani\advisors\Configuration
+# Must extends shani\contracts\BasicPresets
 config: \apps\demo\main\config\Settings
+
+# Test file runner
+test: \apps\demo\main\tests\TestRunner
+
 # Active configuration profile. The framework does not provide any logic regarding
 # this variable. You should handle the logic manually
 profile: dev.yml
