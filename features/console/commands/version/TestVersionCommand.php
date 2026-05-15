@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RunTestCommand
+ * Description of TestVersionCommand
  * @author goddy
  *
  * Created on: May 15, 2026 at 3:24:05 PM
@@ -17,7 +17,7 @@ namespace features\console\commands\version {
     use features\console\printer\ConsoleIO;
     use features\console\printer\PrintedText;
 
-    final class VersionTestCommand extends CommandContract
+    final class TestVersionCommand extends CommandContract
     {
 
         private readonly string $projectName;

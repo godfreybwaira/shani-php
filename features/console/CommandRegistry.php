@@ -80,7 +80,7 @@ namespace features\console {
             yield new commands\version\DeleteVersionCommand($this);
             yield new commands\version\ListVersionCommand($this);
             yield new commands\version\LocateVersionCommand($this);
-            yield new commands\version\VersionTestCommand($this);
+            yield new commands\version\TestVersionCommand($this);
 //
 //            // Module
             yield new commands\module\CreateModuleCommand($this);
