@@ -20,6 +20,7 @@ namespace shani\launcher {
     use features\exceptions\NotFoundException;
     use features\logging\Logger;
     use features\middleware\MiddlewareHandler;
+    use features\middleware\MiddlewareHandlerInterface;
     use features\session\SessionStorage;
     use features\session\SessionStorageInterface;
     use features\storage\StorageMediaInterface;
@@ -155,14 +156,7 @@ namespace shani\launcher {
         {
             $userMiddleware = $this->config->getMiddlewareHandler();
             $middleware = new MiddlewareHandler($this);
-            ///////---Step 1---////////
-            $middleware->preRequest();
-            $userMiddleware?->preRequest();
-            ///////---Step 2---////////
-            $response = $this->runApplication();
-            ///////---Step 3---////////
-            $middleware->preResponse();
-            $userMiddleware?->preResponse();
+            $response = $this->runWithErrorHandling($middleware, $userMiddleware);
             ///////---Step 4---////////
             $writer = new HttpResponseWriter($this, $this->writer);
             $writer->handleResponse($response);
@@ -174,13 +168,13 @@ namespace shani\launcher {
             $userMiddleware?->afterResponse();
         }
 
-        private function runApplication(): ?HttpResponse
+        private function runWithErrorHandling(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): ?HttpResponse
         {
             if ($this->framework->config->isTruthy('display_errors')) {
-                return $this->handleRequest();
+                return $this->handleRequestFlow($middleware, $userMiddleware);
             }
             try {
-                return $this->handleRequest();
+                return $this->handleRequestFlow($middleware, $userMiddleware);
             } catch (NotFoundException $ex) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
                 return $this->handleException($ex);
@@ -191,6 +185,22 @@ namespace shani\launcher {
                 $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
                 return $this->handleException($ex);
             }
+        }
+
+        private function handleRequestFlow(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): ?HttpResponse
+        {
+            // Step 1: pre-request hooks
+            $middleware->preRequest();
+            $userMiddleware?->preRequest();
+
+            // Step 2: main request handling
+            $response = $this->handleRequest();
+
+            // Step 3: pre-response hooks
+            $middleware->preResponse();
+            $userMiddleware?->preResponse();
+
+            return $response;
         }
 
         public function csrfToken(): WritableMap
