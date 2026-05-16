@@ -18,7 +18,8 @@ namespace features\documentation\scanners {
     final class Endpoints implements \JsonSerializable
     {
 
-        private readonly string $action, $target;
+        public readonly string $target;
+        private readonly string $action;
         private readonly DigestedEndpoint $digestedPermission;
         private readonly ?string $details;
 
@@ -34,7 +35,8 @@ namespace features\documentation\scanners {
             $this->action = $method->getShortName();
             $this->details = !empty($comment) ? Generator::cleanComment($comment) : self::endpint2sentence($reqMethod, $moduleName, $this->action);
             $this->digestedPermission = self::digest($reqMethod, RequestRoute::fromValues($moduleName, $this->action));
-            $this->target = strtolower('/' . $moduleName . '/{param}/' . $this->action);
+            $suffix = $this->action === Framework::HOME_FUNCTION ? null : '/{param}/' . ShaniUtils::camelCase2kebab($this->action);
+            $this->target = strtolower('/' . $moduleName . $suffix);
         }
 
         public static function digest(string $requestMethod, RequestRoute $route): DigestedEndpoint

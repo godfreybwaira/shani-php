@@ -27,7 +27,7 @@ namespace features\console\commands\controller {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'create:controller', 'project_name@version_number@module_name@request_method', 'Create a new project controller, it\'s associated service, dto, entity, view and language file', 'blog@v1@posts@get');
+            parent::__construct($registry, 'create:controller', 'project_name@version_number@module_name@request_method', 'Create a new project controller, its associated service, dto, entity, view and language file', 'blog@v1@posts@get');
         }
 
         public function execute(): void

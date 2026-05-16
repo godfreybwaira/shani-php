@@ -50,11 +50,6 @@ namespace shani\utils {
             );
         }
 
-        public function getVersionName(string $versionNumber): ?string
-        {
-            return $this->supportedVersions[$versionNumber]['name'] ?? null;
-        }
-
         public function getConfigFileName(string $versionNumber): ?string
         {
             return $this->supportedVersions[$versionNumber]['config'] ?? null;

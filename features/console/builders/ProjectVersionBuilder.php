@@ -31,15 +31,13 @@ namespace features\console\builders {
         public readonly string $versionNumber;
         private readonly PathConfig $config;
         private readonly ModuleName $defaultModule;
-        private readonly string $versionName;
         private readonly string $rootPath;
         private readonly string $configFilepath;
 
-        public function __construct(VirtualHostBuilder $vhost, string $versionNumber, string $versionName = null)
+        public function __construct(VirtualHostBuilder $vhost, string $versionNumber)
         {
             $this->vhost = $vhost;
             $this->versionNumber = $versionNumber;
-            $this->versionName = $versionName ?? $versionNumber;
             $this->rootPath = $vhost->metadata->projectDirectory . DIRECTORY_SEPARATOR . $versionNumber;
             $this->namespace = str_replace('/', '\\', trim(substr($this->rootPath, strlen(SHANI_SERVER_ROOT)), DIRECTORY_SEPARATOR));
             $this->configFilepath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $this->versionNumber . '-' . self::CONFIG_FILE;
@@ -50,13 +48,12 @@ namespace features\console\builders {
         public function registerVersion(\Closure $progressTracker): void
         {
             if ($this->configExists()) {
-                throw new \RuntimeException('Project version "' . $this->versionName . '" already registered.');
+                throw new \RuntimeException('Project version "' . $this->versionNumber . '" already registered.');
             }
 
-            $name = $this->versionName ?? $this->versionNumber;
             $versionTemplate = file_get_contents(CommandContract::ASSETS . '/version.yml');
             $search = ['{version_number}', '{version_name}', '{config_file}'];
-            $replace = [$this->versionNumber, $name, basename($this->configFilepath)];
+            $replace = [$this->versionNumber, $this->versionNumber, basename($this->configFilepath)];
             $versionContent = str_replace($search, $replace, $versionTemplate);
 
             $placeholder = '####v1#';
@@ -64,7 +61,7 @@ namespace features\console\builders {
             $hostContent = str_replace($placeholder, $versionContent . PHP_EOL . $placeholder, $hostTemplate);
 
             if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) === false) {
-                throw new \RuntimeException('Project version "' . $name . '" could not be created.');
+                throw new \RuntimeException('Project version "' . $this->versionNumber . '" could not be created.');
             }
             $this->createConfigFile($progressTracker);
         }
@@ -134,7 +131,7 @@ namespace features\console\builders {
         public function build(\Closure $progressTracker): self
         {
             if ($this->exists()) {
-                throw new \RuntimeException('Project version "' . $this->versionName . '" already exists');
+                throw new \RuntimeException('Project version "' . $this->versionNumber . '" already exists');
             }
             $this->registerVersion($progressTracker);
             $this->prepareSettings($progressTracker);
@@ -194,12 +191,13 @@ namespace features\console\builders {
 
         public function getModules(): \Generator
         {
-            if ($this->exists()) {
-                $config = $this->getPathConfig();
-                $folders = array_diff(scandir($this->rootPath . $config->modules), ['.', '..']);
-                foreach ($folders as $moduleName) {
-                    yield new ModuleBuilder(ModuleName::create($moduleName), $this);
-                }
+            if (!$this->exists()) {
+                throw new \InvalidArgumentException('No module found for version "' . $this->versionNumber . '"');
+            }
+            $config = $this->getPathConfig();
+            $folders = array_diff(scandir($this->rootPath . $config->modules), ['.', '..']);
+            foreach ($folders as $moduleName) {
+                yield new ModuleBuilder(ModuleName::create($moduleName), $this);
             }
         }
 

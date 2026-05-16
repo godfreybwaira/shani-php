@@ -26,6 +26,7 @@ namespace {namespace} {
 
             $builder = new WebUIBuilder($data);
             $builder->title('{module_name}')
+            ->description('Description of {module_name}')
             ->attr->addOne('name', $data->getOne('name'));
 
             return HttpResponse::withBody($builder);

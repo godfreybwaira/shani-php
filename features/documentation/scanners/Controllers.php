@@ -14,7 +14,8 @@ namespace features\documentation\scanners {
     final class Controllers implements \JsonSerializable
     {
 
-        private readonly string $path, $name, $module, $requestMethod;
+        public readonly string $requestMethod;
+        private readonly string $path, $name, $module;
         private readonly ?string $details;
         private array $endpoints = [];
 
@@ -46,6 +47,11 @@ namespace features\documentation\scanners {
                     $this->endpoints[] = new Endpoints($this->requestMethod, $this->module, $method);
                 }
             }
+        }
+
+        public function getEndpoints(): array
+        {
+            return $this->endpoints;
         }
 
         #[\Override]

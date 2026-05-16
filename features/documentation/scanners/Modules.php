@@ -43,6 +43,11 @@ namespace features\documentation\scanners {
             }
         }
 
+        public function getClassList(): array
+        {
+            return $this->classList;
+        }
+
         public static function scan(string $modulesRootPath, array $exclusion = []): array
         {
             $folders = [];

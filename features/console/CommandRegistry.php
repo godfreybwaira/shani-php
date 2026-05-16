@@ -124,6 +124,8 @@ namespace features\console {
             // Broken objects
             yield new commands\broken\DeleteBrokenCommand($this);
             yield new commands\broken\ListBrokenCommand($this);
+
+            yield new commands\routes\ListModuleRoutesCommand($this);
         }
 
         /**

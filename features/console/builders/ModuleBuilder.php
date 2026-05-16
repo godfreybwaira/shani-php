@@ -12,6 +12,7 @@ namespace features\console\builders {
     use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
+    use features\documentation\scanners\Modules;
     use features\storage\LocalStorage;
     use shani\config\PathConfig;
 
@@ -45,7 +46,7 @@ namespace features\console\builders {
         {
             if (!$this->version->exists()) {
                 $text = 'Could not create module "' . $this->moduleName->originalValue . '", project version "';
-                $text .= $this->version->versionName . '" does not exists.';
+                $text .= $this->version->versionNumber . '" does not exists.';
                 throw new \RuntimeException($text);
             }
             if (!$this->exists()) {
@@ -123,6 +124,24 @@ namespace features\console\builders {
         {
             $version = ProjectVersionBuilder::fromProjectName($projectName, $versionNumber);
             return new ModuleBuilder($moduleName, $version);
+        }
+
+        public function getRoutes(): \Generator
+        {
+            if (!$this->exists()) {
+                throw new \InvalidArgumentException('Module "' . $this->moduleName->originalValue . '" does not exists.');
+            }
+            $controllerPath = $this->rootPath . $this->config->controllers;
+            $module = new Modules($this->moduleName->directoryName, $controllerPath);
+            $classLists = $module->getClassList();
+            $host = 'http://' . $this->version->vhost->metadata->hostName;
+            foreach ($classLists as $controller) {
+                $requestMethod = strtoupper($controller->requestMethod);
+                $endpoints = $controller->getEndpoints();
+                foreach ($endpoints as $endpoint) {
+                    yield $host . $endpoint->target => $requestMethod;
+                }
+            }
         }
     }
 

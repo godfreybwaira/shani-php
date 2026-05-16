@@ -22,7 +22,7 @@ namespace features\console\commands\vhost {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'delete:vhost', 'hostname', 'Delete existing broken virtual host and it\'s associated configurations', 'localhost');
+            parent::__construct($registry, 'delete:vhost', 'hostname', 'Delete existing broken virtual host and its associated configurations', 'localhost');
         }
 
         public function execute(): void

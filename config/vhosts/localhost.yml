@@ -30,6 +30,6 @@ version:
   # The framework will load the corresponding .yml file for the chosen version
   supported:
     v1:
-      name: main
+      name: v1
       config: v1-config.yml
 ####v1#

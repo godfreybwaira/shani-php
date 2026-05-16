@@ -26,7 +26,7 @@ namespace features\console\commands\entity {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'create:entity', 'project_name@version_number@module_name', 'Create a custom entity and it\'s associated DTO', 'blog@v1@posts');
+            parent::__construct($registry, 'create:entity', 'project_name@version_number@module_name', 'Create a custom entity and its associated DTO', 'blog@v1@posts');
         }
 
         public function execute(): void

@@ -165,8 +165,8 @@ namespace shani\config {
                 string $languages = '/presentation/lang',
         )
         {
-            $projectRoot = Framework::DIR_APPS . '/' . $mapper->projectName;
-            $this->root = $projectRoot . '/' . $mapper->getVersionName($versionNumber);
+            $projectRoot = Framework::DIR_APPS . DIRECTORY_SEPARATOR . $mapper->projectName;
+            $this->root = $projectRoot . DIRECTORY_SEPARATOR . $versionNumber;
             $this->homePath = $homePath;
             $this->controllers = $controllers;
             $this->services = $services;

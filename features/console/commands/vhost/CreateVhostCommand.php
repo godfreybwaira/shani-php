@@ -25,7 +25,7 @@ namespace features\console\commands\vhost {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'create:vhost', 'project_name@hostname', 'Create new virtual host to an existing peroject with no virtual host', 'demo@localhost');
+            parent::__construct($registry, 'create:vhost', 'project_name@hostname', 'Create new virtual host to an existing project with no virtual host', 'demo@localhost');
         }
 
         public function execute(): void

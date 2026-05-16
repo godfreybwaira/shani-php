@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of ListProjectModulesCommand
+ * Description of ListModulesCommand
  * @author goddy
  *
  * Created on: May 3, 2026 at 8:59:28 PM
