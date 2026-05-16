@@ -66,9 +66,6 @@ namespace features\console {
          */
         public function commandList(): \Generator
         {
-            // General
-            yield new commands\HelpCommand($this);
-
             // Project
             yield new commands\project\CreateProjectCommand($this);
             yield new commands\project\ListProjectCommand($this);
@@ -129,7 +126,9 @@ namespace features\console {
             yield new commands\routes\ListModuleRoutesCommand($this);
 
             //Misc
-            yield new commands\VersionCommand($this);
+            yield new commands\misc\VersionCommand($this);
+            yield new commands\misc\StartServerCommand($this);
+            yield new commands\misc\HelpCommand($this);
         }
 
         /**

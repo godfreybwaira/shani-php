@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\misc {
 
     use features\console\CommandContract;
     use features\console\CommandRegistry;
@@ -78,7 +78,7 @@ namespace features\console\commands {
         public function parse(string ...$args): ?string
         {
             $this->userCommand = $args[0] ?? null;
-            return $this->userCommand ?? '';
+            return $this->userCommand;
         }
     }
 

@@ -7,7 +7,7 @@
  * Created on: May 3, 2026 at 8:59:28 PM
  */
 
-namespace features\console\commands {
+namespace features\console\commands\misc {
 
     use features\console\CommandContract;
     use features\console\CommandRegistry;
