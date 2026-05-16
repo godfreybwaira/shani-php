@@ -38,7 +38,7 @@ namespace features\console\commands {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
                 $commands = $this->registry->commandList();
                 foreach ($commands as $index => $cmd) {
-                    $this->registry->addResult(Formatter::formatSentence($index . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $width));
+                    $this->registry->addResult(Formatter::formatSentence(($index + 1) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $width));
                 }
             } else {
                 $this->searchCommand($width);

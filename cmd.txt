@@ -1,0 +1,38 @@
+COMMAND                                                                                                                                    DESCRIPTION
+0. help ....................................................................... View help for a given command, or all commands if no argument is given
+1. create:project .......................................................................................................... Create a new main project
+2. list:project .......................................................................................................... Show all available projects
+3. locate:project .......................................................................................... Show the full path to an existing project
+4. delete:project ........................................................ Delete a project and its associated metadata. All project data will be lost
+5. create:version .............................................................................. Create a new project version from an existing project
+6. delete:version .................................................................................. Delete a project version from an existing project
+7. list:version ................................................................................... Show all project versions from an existing project
+8. locate:version ..................................................................................... Show the location of the given project version
+9. test:version ......................................................................................................... Run application version test
+10. create:module ........................................................................................................ Create a new project module
+11. locate:module ................................................................................... Show the full path to an existing project module
+12. list:module ................................................................................................... Show all available project modules
+13. create:controller .................................. Create a new project controller, it's associated service, dto, entity, view and language file
+14. locate:controller .......................................................................... Show the full path to an existing project controllers
+15. list:controller ....................................................... Show all available project controllers and their respective request method
+16. list:vhost ........................................................................................... Show the list of all existing virtual hosts
+17. rename:vhost .............................................................................. Rename a virtual host file from old name to a new name
+18. locate:vhost ...................................................................................... Show the full path to an existing virtual host
+19. create:vhost ................................................................ Create new virtual host to an existing peroject with no virtual host
+20. delete:vhost .............................................................. Delete existing broken virtual host and it's associated configurations
+21. create:alias ................................................................................................................. Create a host alias
+22. list:alias ....................................................................................................... Show all available host aliases
+23. delete:alias ..................................................................................................................... Delete an alias
+24. rename:alias ......................................................................................... Rename an alias from old name to a new name
+25. locate:alias ................................................................................ Show the full path to an existing virtual host alias
+26. create:entity ..................................................................................... Create a custom entity and it's associated DTO
+27. list:entity .................................................................... Show all the existing project entities (models) in a given module
+28. locate:entity ........................................................................ Show the full path to an existing project entities (models)
+29. create:dto ................................................................................................... Create a Data Transfer Object (DTO)
+30. list:dto ........................................................................................ Show all existing project DTOs in a given module
+31. locate:dto ........................................................................................ Show the full path to an existing project DTOs
+32. create:service ................................................................................................... Create new module service class
+33. list:service .......................................................................................... Show the list of existing project services
+34. locate:service ................................................................................ Show the full path to an existing project services
+35. delete:broken ................................................................... Delete broken objects that has not connedted to their dependants
+36. list:broken ....................................................................... List broken objects that has not connedted to their dependants
