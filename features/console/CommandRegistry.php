@@ -54,7 +54,9 @@ namespace features\console {
         {
             $this->commandName = $commandName;
             $this->arguments = $arguments;
-            $quiet = in_array('--quiet', $arguments) || str_starts_with($commandName, 'locate:');
+            $quiet = in_array('--quiet', $arguments) ||
+                    in_array('-q', $arguments) ||
+                    str_starts_with($commandName, 'locate:');
             $noColor = in_array('--no-color', $arguments);
             $this->options = new CommandOptions($quiet, $noColor);
         }
@@ -184,7 +186,7 @@ namespace features\console {
             return null;
         }
 
-        public static function printBanner(ConsoleColor $color = ConsoleColor::GREEN): void
+        public static function printBanner(ConsoleColor $color): void
         {
             $banner = fopen(CommandContract::ASSETS . '/banner.txt', 'rb');
             ConsoleIO::output(PHP_EOL);
@@ -214,7 +216,7 @@ namespace features\console {
                 return;
             }
             if ($this->showBanner) {
-                self::printBanner();
+                self::printBanner($this->options->noColor ? ConsoleColor::NONE : ConsoleColor::GREEN);
             }
             if ($this->options->noColor) {
                 foreach ($this->commandResults as $message) {
