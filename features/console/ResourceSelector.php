@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Description of ResourceSelector
- * @author goddy
- *
- * Created on: May 16, 2026 at 7:08:15 PM
- */
-
 namespace features\console {
 
     use features\console\builders\ModuleBuilder;
@@ -16,6 +9,15 @@ namespace features\console {
     use features\console\printer\ConsoleIO;
     use shani\launcher\Framework;
 
+    /**
+     * Handles interactive resource selection for console operations.
+     *
+     * Provides methods to select projects, hosts, aliases, versions, modules,
+     * and HTTP request methods through console prompts.
+     *
+     * @author goddy
+     * @created May 16, 2026 at 7:08:15 PM
+     */
     final class ResourceSelector
     {
 
@@ -26,6 +28,15 @@ namespace features\console {
         private readonly ?string $hostName;
         private readonly ?string $aliasName;
 
+        /**
+         * Displays a list of resources and prompts the user to choose one.
+         *
+         * @param array   $availableResources List of resources to choose from.
+         * @param bool    $required           Whether selection is mandatory.
+         * @param \Closure $cleaner           Function to clean/format resource names.
+         *
+         * @return string|null The selected resource name or null if skipped.
+         */
         private static function chooser(array $availableResources, bool $required, \Closure $cleaner): ?string
         {
             $id = 0;
@@ -45,6 +56,13 @@ namespace features\console {
             return empty($choice) ? null : $resources[(int) $choice - 1];
         }
 
+        /**
+         * Prompts the user to select a project.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return string|null The selected project name or null if skipped.
+         */
         public function selectProject(bool $required = true): ?string
         {
             if ($required) {
@@ -57,6 +75,13 @@ namespace features\console {
             return $this->projectName;
         }
 
+        /**
+         * Prompts the user to select a host configuration.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return string|null The selected host name or null if skipped.
+         */
         public function selectHost(bool $required = true): ?string
         {
             if ($required) {
@@ -69,6 +94,13 @@ namespace features\console {
             return $this->hostName;
         }
 
+        /**
+         * Prompts the user to select a host alias.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return string|null The selected alias name or null if skipped.
+         */
         public function selectAlias(bool $required = true): ?string
         {
             if ($required) {
@@ -81,6 +113,13 @@ namespace features\console {
             return $this->aliasName;
         }
 
+        /**
+         * Prompts the user to select a project version.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return string|null The selected version number or null if skipped.
+         */
         public function selectProjectVersion(bool $required = true): ?string
         {
             if ($required) {
@@ -97,6 +136,13 @@ namespace features\console {
             return $this->versionNumber;
         }
 
+        /**
+         * Prompts the user to select a module within the project version.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return ModuleName|null The selected module name or null if skipped.
+         */
         public function selectModule(bool $required = true): ?ModuleName
         {
             if ($required) {
@@ -115,6 +161,13 @@ namespace features\console {
             return $this->moduleName;
         }
 
+        /**
+         * Prompts the user to select an HTTP request method.
+         *
+         * @param bool $required Whether selection is mandatory.
+         *
+         * @return string|null The selected request method or null if skipped.
+         */
         public function selectRequestMethod(bool $required = true): ?string
         {
             if ($required) {

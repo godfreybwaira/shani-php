@@ -1,10 +1,14 @@
 <?php
 
 /**
- * Description of CreateVersionCommand
- * @author goddy
+ * Command to create a new project version.
  *
- * Created on: May 7, 2026 at 9:04:41 AM
+ * This command creates a new version for an existing project.
+ * It can be executed interactively (via console prompts) or by passing
+ * arguments directly in the format "project@version".
+ *
+ * @author goddy
+ * @created May 7, 2026 at 9:04:41 AM
  */
 
 namespace features\console\commands\version {
@@ -19,20 +23,64 @@ namespace features\console\commands\version {
     final class CreateVersionCommand extends CommandContract
     {
 
+        /**
+         * The name of the project for which the version is being created.
+         *
+         * @var string
+         */
         private readonly string $projectName;
+
+        /**
+         * The version number to create for the project.
+         *
+         * @var string
+         */
         private readonly string $versionNumber;
 
+        /**
+         * Initializes the command with its registry and metadata.
+         *
+         * @param CommandRegistry $registry The command registry instance.
+         */
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'create:version', 'project_name@version_number', 'Create a new project version from an existing project', 'blog@v1');
+            parent::__construct(
+                    $registry,
+                    'create:version',
+                    'project_name@version_number',
+                    'Create a new project version from an existing project',
+                    'blog@v1'
+            );
         }
 
+        /**
+         * Executes the create operation.
+         *
+         * Builds a new project version using {@see ProjectVersionBuilder}
+         * and logs the result in the registry.
+         *
+         * @return void
+         */
         public function execute(): void
         {
             $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
             $version->build(fn($s) => $this->registry->addResult($s));
         }
 
+        /**
+         * Parses command arguments or prompts the user interactively.
+         *
+         * - If no arguments are provided, prompts the user to select a project
+         *   and version interactively.
+         * - If arguments are provided, expects the format "project@version".
+         *   Splits the string into project name and version number.
+         *
+         * @param string ...$args The command arguments (project@version).
+         *
+         * @return string|null A string containing "project@version" or null if skipped.
+         *
+         * @throws \ArgumentCountError If fewer than two arguments are provided.
+         */
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
@@ -42,7 +90,7 @@ namespace features\console\commands\version {
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {
-                    throw new \ArgumentCountError('Atleast two arguments are required.');
+                    throw new \ArgumentCountError('At least two arguments are required.');
                 }
                 $this->projectName = ResourceName::create($values[0])->shortName;
                 $this->versionNumber = ModuleName::create($values[1])->directoryName;

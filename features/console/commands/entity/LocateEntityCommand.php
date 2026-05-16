@@ -1,10 +1,15 @@
 <?php
 
 /**
- * Description of LocateEntityCommand
- * @author goddy
+ * Command to locate project entities (models).
  *
- * Created on: May 3, 2026 at 8:59:28 PM
+ * This command shows the filesystem path to the entities (models)
+ * of a specific module within a given project version. It can be executed
+ * interactively (via console prompts) or by passing arguments directly
+ * in the format "project@version@module".
+ *
+ * @author goddy
+ * @created May 3, 2026 at 8:59:28 PM
  */
 
 namespace features\console\commands\entity {
@@ -20,15 +25,51 @@ namespace features\console\commands\entity {
     final class LocateEntityCommand extends CommandContract
     {
 
+        /**
+         * The module name within the project version.
+         *
+         * @var ModuleName
+         */
         private readonly ModuleName $moduleName;
+
+        /**
+         * The name of the project containing the module.
+         *
+         * @var string
+         */
         private readonly string $projectName;
+
+        /**
+         * The version number of the project.
+         *
+         * @var string
+         */
         private readonly string $versionNumber;
 
+        /**
+         * Initializes the command with its registry and metadata.
+         *
+         * @param CommandRegistry $registry The command registry instance.
+         */
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'locate:entity', 'project_name@version_number@module_name', 'Show the full path to an existing project entities (models)', 'blog@v1@posts');
+            parent::__construct(
+                    $registry,
+                    'locate:entity',
+                    'project_name@version_number@module_name',
+                    'Show the full path to an existing project entities (models)',
+                    'blog@v1@posts'
+            );
         }
 
+        /**
+         * Executes the entity locate operation.
+         *
+         * Uses the {@see ModuleBuilder} to build the module and
+         * {@see EntityBuilder} to display the filesystem location of its entities.
+         *
+         * @return void
+         */
         public function execute(): void
         {
             $module = ModuleBuilder::fromModuleName($this->moduleName, $this->projectName, $this->versionNumber);
@@ -36,6 +77,20 @@ namespace features\console\commands\entity {
             $entity->locate();
         }
 
+        /**
+         * Parses command arguments or prompts the user interactively.
+         *
+         * - If no arguments are provided, prompts the user to select a project,
+         *   version, and module interactively.
+         * - If arguments are provided, expects the format "project@version@module".
+         *   Splits the string into project name, version number, and module name.
+         *
+         * @param string ...$args The command arguments (project@version@module).
+         *
+         * @return string|null A string containing "project@version@module" or null if skipped.
+         *
+         * @throws \ArgumentCountError If fewer than three arguments are provided.
+         */
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
@@ -46,7 +101,7 @@ namespace features\console\commands\entity {
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 3) {
-                    throw new \ArgumentCountError('Atleast three arguments are required.');
+                    throw new \ArgumentCountError('At least three arguments are required.');
                 }
                 $this->projectName = ResourceName::create($values[0])->shortName;
                 $this->versionNumber = ResourceName::create($values[1])->shortName;
