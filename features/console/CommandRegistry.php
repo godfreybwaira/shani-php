@@ -125,7 +125,11 @@ namespace features\console {
             yield new commands\broken\DeleteBrokenCommand($this);
             yield new commands\broken\ListBrokenCommand($this);
 
+            //Routes
             yield new commands\routes\ListModuleRoutesCommand($this);
+
+            //Misc
+            yield new commands\VersionCommand($this);
         }
 
         /**

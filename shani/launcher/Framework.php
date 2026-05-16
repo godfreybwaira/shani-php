@@ -44,13 +44,13 @@ namespace shani\launcher {
         public const VERSION = '2.0';
 
         /** Framework slogan */
-        public const SLOGAN = 'Shani yangu maanani';
+        public const SLOGAN = 'Shani Yangu Maanani';
 
         /** Framework developer */
         public const DEVELOPER = 'Godfrey Alphaxard Bwaira (Dr. Mbasi)';
 
         /** Framework description */
-        public const DESCRIPTION = 'an open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!';
+        public const DESCRIPTION = 'An open source web framework created with &hearts; for you and I so that we can develop a fast, robust, scalable, secure web application with no hustles. Try It!';
 
         /** Default buffer size */
         public const BUFFER_SIZE = self::MB_1;

@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Description of VersionCommand
+ * @author goddy
+ *
+ * Created on: May 3, 2026 at 8:59:28 PM
+ */
+
+namespace features\console\commands {
+
+    use features\console\CommandContract;
+    use features\console\CommandRegistry;
+    use shani\launcher\Framework;
+
+    final class VersionCommand extends CommandContract
+    {
+
+        public function __construct(CommandRegistry $registry)
+        {
+            parent::__construct($registry, 'version', null, 'Show this framework version', null);
+        }
+
+        public function execute(): void
+        {
+            $this->registry->addResult('NAME: ' . Framework::NAME . ' v' . Framework::VERSION);
+            $this->registry->addResult('SLOGAN: ' . Framework::SLOGAN);
+            $this->registry->addResult('DESCRIPTION: ' . Framework::DESCRIPTION);
+            $this->registry->addResult('DEVELOPER: ' . Framework::DEVELOPER);
+        }
+
+        public function parse(string ...$args): ?string
+        {
+            return null;
+        }
+    }
+
+}
