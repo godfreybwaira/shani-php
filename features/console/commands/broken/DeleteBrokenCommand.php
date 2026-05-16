@@ -26,7 +26,7 @@ namespace features\console\commands\broken {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'delete:broken', implode('|', self::BROKEN_OBJECTS), 'Delete broken objects that has not connedted to their dependants', 'alias');
+            parent::__construct($registry, 'delete:broken', implode('|', self::BROKEN_OBJECTS), 'Delete broken objects that has not connected to their dependents', 'alias');
         }
 
         public function execute(): void

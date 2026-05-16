@@ -20,7 +20,7 @@ namespace features\console\commands\broken {
 
         public function __construct(CommandRegistry $registry)
         {
-            parent::__construct($registry, 'list:broken', null, 'List broken objects that has not connedted to their dependants', null);
+            parent::__construct($registry, 'list:broken', null, 'List broken objects that has not connected to their dependents', null);
         }
 
         public function execute(): void
