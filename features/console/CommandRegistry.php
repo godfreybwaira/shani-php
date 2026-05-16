@@ -126,7 +126,7 @@ namespace features\console {
             yield new commands\routes\ListModuleRoutesCommand($this);
 
             //Misc
-            yield new commands\misc\VersionCommand($this);
+            yield new commands\misc\FrameworkVersionCommand($this);
             yield new commands\misc\StartServerCommand($this);
             yield new commands\misc\HelpCommand($this);
         }
