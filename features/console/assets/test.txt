@@ -2,6 +2,9 @@
 
 namespace {namespace}\{test_dir} {
 
+    use features\test\helpers\TestSeverity;
+    use features\test\TestCase;
+    use features\test\TestGroup;
     use features\test\TestResult;
     use features\test\TestRunnerInterface;
     use shani\launcher\Framework;
@@ -9,11 +12,20 @@ namespace {namespace}\{test_dir} {
     final class {class_name} implements TestRunnerInterface
     {
 
+
         #[\Override]
         public function runTest(): TestResult
         {
             $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
-            //TODO
+            $user = new TestGroup('User Module');
+            $username = new TestCase(TestSeverity::LOW, '001');
+
+            $me = 'goddy';
+            $username->test('Check if the current user is me', fn() => get_current_user() === $me);
+
+            $user->addCase($username);
+            $result->addGroup($user);
+
             return $result;
         }
     }

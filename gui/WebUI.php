@@ -174,7 +174,7 @@ namespace gui {
         }
 
         /**
-         * Get data passed via UIBuilder constructor
+         * Get data passed via WebUIBuilder constructor
          * @return \JsonSerializable|null
          */
         public function data(): ?\JsonSerializable

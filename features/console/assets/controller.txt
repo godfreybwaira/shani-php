@@ -2,8 +2,9 @@
 
 namespace {namespace} {
 
-    use shani\http\HttpResponse;
+    use features\ds\map\ReadableMap;
     use gui\WebUIBuilder;
+    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class {controller_name}
@@ -18,7 +19,16 @@ namespace {namespace} {
 
         public function {fn_name}(): HttpResponse
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            $data = new ReadableMap([
+                'name' => get_current_user(),
+                'title' => 'developer'
+            ]);
+
+            $builder = new WebUIBuilder($data);
+            $builder->title('{module_name}')
+            ->attr->addOne('name', $data->getOne('name'));
+
+            return HttpResponse::withBody($builder);
         }
     }
 

@@ -117,8 +117,8 @@ namespace features\console\builders {
             if (!is_file($filepath)) {
 
                 $settingTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'settings.txt';
-                $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}'];
-                $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename];
+                $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}', '{default_module}'];
+                $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename, self::DEFAULT_MODULE];
                 $settingContent = str_replace($search, $replace, file_get_contents($settingTemplate));
 
                 if (!is_dir($configDirectory)) {

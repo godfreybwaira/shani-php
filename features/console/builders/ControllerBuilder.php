@@ -66,14 +66,16 @@ namespace features\console\builders {
         public function build(\Closure $progressTracker): self
         {
             if (!$this->module->exists()) {
-                throw new \RuntimeException('Could not create Controller class "' . $this->controllerName . '", module "' . $this->module->moduleName . '" does not exists.');
+                $message = 'Could not create Controller class "' . $this->controllerName;
+                $message .= '", module "' . $this->module->moduleName->originalValue . '" does not exists.';
+                throw new \RuntimeException($message);
             }
             if (!$this->exists()) {
                 $progressTracker($this->createViews());
                 $progressTracker($this->createLanguage());
                 ///////////////////////////////////////////
-                $search = ['{namespace}', '{controller_name}', '{fn_name}'];
-                $replace = [$this->namespace, $this->controllerName, Framework::HOME_FUNCTION];
+                $search = ['{namespace}', '{controller_name}', '{fn_name}', '{module_name}'];
+                $replace = [$this->namespace, $this->controllerName, Framework::HOME_FUNCTION, $this->module->moduleName->className];
                 $folder = dirname($this->rootPath);
                 if (!is_dir($folder)) {
                     mkdir($folder, LocalStorage::FILE_MODE, true);
