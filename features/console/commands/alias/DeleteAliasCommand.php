@@ -13,7 +13,7 @@ namespace features\console\commands\alias {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class DeleteAliasCommand extends CommandContract
     {
@@ -34,7 +34,7 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->aliasName = ConsoleIO::read('What is the alias name?', $this->validHostName);
+                $this->aliasName = (new ResourceSelector())->selectAlias();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {

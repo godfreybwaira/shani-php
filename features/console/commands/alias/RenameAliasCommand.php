@@ -14,6 +14,7 @@ namespace features\console\commands\alias {
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class RenameAliasCommand extends CommandContract
     {
@@ -35,7 +36,7 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->oldName = ConsoleIO::read('What is the old alias name?', $this->validHostName);
+                $this->oldName = (new ResourceSelector())->selectAlias();
                 $this->newName = ConsoleIO::read('What is the new alias name?', $this->validHostName);
             } else {
                 if (count($args) < 2) {

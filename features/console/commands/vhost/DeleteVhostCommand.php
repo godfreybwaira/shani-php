@@ -14,6 +14,7 @@ namespace features\console\commands\vhost {
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class DeleteVhostCommand extends CommandContract
     {
@@ -39,7 +40,8 @@ namespace features\console\commands\vhost {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->hostName = HostName::create(ConsoleIO::read('Virtual host name to delete:'));
+                $selector = new ResourceSelector();
+                $this->hostName = $selector->selectHost();
             } else {
                 $this->hostName = HostName::create(ConsoleIO::read('Write again the host name to delete', fn(string $s) => $s === $args[0]));
             }

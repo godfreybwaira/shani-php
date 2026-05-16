@@ -13,7 +13,7 @@ namespace features\console\commands\project {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\helpers\ResourceName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class LocateProjectCommand extends CommandContract
     {
@@ -34,7 +34,8 @@ namespace features\console\commands\project {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {

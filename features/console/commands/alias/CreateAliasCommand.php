@@ -15,6 +15,7 @@ namespace features\console\commands\alias {
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class CreateAliasCommand extends CommandContract
     {
@@ -38,7 +39,7 @@ namespace features\console\commands\alias {
         {
             if (empty($args)) {
                 $this->aliasName = ConsoleIO::read('What is the alias name?', $this->validHostName);
-                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->hostName = (new ResourceSelector())->selectHost();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

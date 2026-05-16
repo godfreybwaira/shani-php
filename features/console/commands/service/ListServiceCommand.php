@@ -15,7 +15,7 @@ namespace features\console\commands\service {
     use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class ListServiceCommand extends CommandContract
     {
@@ -41,9 +41,10 @@ namespace features\console\commands\service {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
+                $this->moduleName = $selector->selectModule();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 3) {

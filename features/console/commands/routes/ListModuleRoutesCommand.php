@@ -16,7 +16,7 @@ namespace features\console\commands\routes {
     use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class ListModuleRoutesCommand extends CommandContract
     {
@@ -66,10 +66,10 @@ namespace features\console\commands\routes {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
-                $name = ConsoleIO::read('Enter a module name or press enter to ignore', fn(string $s) => empty($s) || ($this->validIdentifier)($s));
-                $this->moduleName = !empty($name) ? ModuleName::create($name) : null;
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
+                $this->moduleName = $selector->selectModule(false);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

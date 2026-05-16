@@ -13,6 +13,7 @@ namespace features\console\commands\project {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class DeleteProjectCommand extends CommandContract
     {
@@ -32,11 +33,8 @@ namespace features\console\commands\project {
 
         public function parse(string ...$args): ?string
         {
-            if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name to delete?', $this->validIdentifier);
-            } else {
-                $this->projectName = ConsoleIO::read('Write again the project name to delete', fn(string $s) => $s === $args[0]);
-            }
+            $expectedName = !empty($args[0]) ? $args[0] : (new ResourceSelector())->selectProject();
+            $this->projectName = ConsoleIO::read('Write again the project name to delete:', fn(string $s) => $s === $expectedName);
             return $this->projectName;
         }
     }

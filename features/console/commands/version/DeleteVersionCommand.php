@@ -14,6 +14,7 @@ namespace features\console\commands\version {
     use features\console\CommandRegistry;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class DeleteVersionCommand extends CommandContract
     {
@@ -40,8 +41,9 @@ namespace features\console\commands\version {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->versionNumber = ConsoleIO::read('What is the project version number to delete?', $this->validIdentifier);
-                $this->projectName = ConsoleIO::read('What is the project yo want to delete from?', $this->validIdentifier);
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

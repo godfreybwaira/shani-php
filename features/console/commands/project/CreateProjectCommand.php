@@ -36,8 +36,8 @@ namespace features\console\commands\project {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ModuleName::create(ConsoleIO::read('What is the project name?', $this->validIdentifier))->directoryName;
-                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->projectName = ModuleName::create(ConsoleIO::read('Enter the project name:', $this->validIdentifier))->directoryName;
+                $this->hostName = ConsoleIO::read('Enter the host name:', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

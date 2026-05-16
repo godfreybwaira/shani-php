@@ -16,6 +16,7 @@ namespace features\console\commands\controller {
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class CreateControllerCommand extends CommandContract
     {
@@ -40,9 +41,10 @@ namespace features\console\commands\controller {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
-                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
+                $this->moduleName = $selector->selectModule();
                 $this->requestMethod = ConsoleIO::read('What is the request method?', $this->validIdentifier);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);

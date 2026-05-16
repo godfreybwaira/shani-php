@@ -14,7 +14,7 @@ namespace features\console\commands\version {
     use features\console\CommandRegistry;
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class CreateVersionCommand extends CommandContract
     {
@@ -36,8 +36,9 @@ namespace features\console\commands\version {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->versionNumber = ModuleName::create(ConsoleIO::read('What is the project version number?', $this->validIdentifier))->directoryName;
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

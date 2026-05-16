@@ -16,6 +16,7 @@ namespace features\console\commands\vhost {
     use features\console\helpers\HostName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class CreateVhostCommand extends CommandContract
     {
@@ -46,8 +47,9 @@ namespace features\console\commands\vhost {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->hostName = ConsoleIO::read('Virtual host name to locate:', $this->validHostName);
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->hostName = ConsoleIO::read('Enter a host name:', $this->validHostName);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 2) {

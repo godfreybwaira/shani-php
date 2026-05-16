@@ -17,6 +17,7 @@ namespace features\console\commands\dto {
     use features\console\helpers\ModuleName;
     use features\console\helpers\ResourceName;
     use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class CreateDtoCommand extends CommandContract
     {
@@ -41,10 +42,11 @@ namespace features\console\commands\dto {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->projectName = ConsoleIO::read('What is the project name?', $this->validIdentifier);
-                $this->moduleName = ModuleName::create(ConsoleIO::read('What is the module name?', $this->validIdentifier));
-                $this->versionNumber = ConsoleIO::read('What is the project version number?', $this->validIdentifier);
-                $this->dtoName = ModuleName::create(ConsoleIO::read('What is the name of the DTO?', $this->validIdentifier))->className;
+                $selector = new ResourceSelector();
+                $this->projectName = $selector->selectProject();
+                $this->versionNumber = $selector->selectProjectVersion();
+                $this->moduleName = $selector->selectModule();
+                $this->dtoName = ModuleName::create(ConsoleIO::read('Enter the DTO name:', $this->validIdentifier))->className;
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 4) {

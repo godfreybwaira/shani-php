@@ -14,7 +14,7 @@ namespace features\console\commands\alias {
     use features\console\CommandRegistry;
     use features\console\helpers\Formatter;
     use features\console\helpers\HostName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class ListHostAliasCommand extends CommandContract
     {
@@ -42,7 +42,7 @@ namespace features\console\commands\alias {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->hostName = ConsoleIO::read('What is the host name?', $this->validHostName);
+                $this->hostName = (new ResourceSelector())->selectHost();
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 1) {

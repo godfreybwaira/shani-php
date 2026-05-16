@@ -35,7 +35,8 @@ namespace features\console\commands\vhost {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->oldName = ConsoleIO::read('What is the name of the host to rename?', $this->validHostName);
+                $selector = new ResourceSelector();
+                $this->oldName = $selector->selectHost();
                 $this->newName = ConsoleIO::read('What is the new name?', $this->validHostName);
             } else if (count($args) < 2) {
                 throw new \ArgumentCountError('Atleast two arguments are required.');

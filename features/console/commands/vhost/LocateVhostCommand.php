@@ -13,7 +13,7 @@ namespace features\console\commands\vhost {
     use features\console\CommandContract;
     use features\console\CommandRegistry;
     use features\console\helpers\HostName;
-    use features\console\printer\ConsoleIO;
+    use features\console\ResourceSelector;
 
     final class LocateVhostCommand extends CommandContract
     {
@@ -34,7 +34,8 @@ namespace features\console\commands\vhost {
         public function parse(string ...$args): ?string
         {
             if (empty($args)) {
-                $this->hostName = ConsoleIO::read('Virtual host name to locate:', $this->validHostName);
+                $selector = new ResourceSelector();
+                $this->hostName = $selector->selectHost();
             } else if (count($args) < 1) {
                 throw new \ArgumentCountError('Atleast one argument is allowed.');
             } else {
