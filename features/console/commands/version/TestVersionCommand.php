@@ -20,6 +20,7 @@ namespace features\console\commands\version {
     use features\console\helpers\ResourceName;
     use features\console\printer\PrintedText;
     use features\console\ResourceSelector;
+    use features\test\TestResult;
 
     final class TestVersionCommand extends CommandContract
     {
@@ -69,11 +70,13 @@ namespace features\console\commands\version {
         {
             $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
 
+            $message = 'Go to "' . TestResult::REPORTS_STORAGE . '" to view the results.';
             if (!$version->runTest()) {
-                throw new \Exception('Test Failed');
+                throw new \Exception('Test Failed. ' . $message);
             }
 
             $this->registry->addResult(PrintedText::success('Test Passed'));
+            $this->registry->addResult($message);
         }
 
         /**

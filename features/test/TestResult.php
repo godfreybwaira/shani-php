@@ -9,29 +9,31 @@
 
 namespace features\test {
 
+    use features\storage\LocalStorage;
     use features\test\helpers\TestEnvironment;
     use features\test\helpers\TestSummary;
+    use shani\launcher\Framework;
 
     final class TestResult implements \JsonSerializable
     {
+
+        /** Location on disk where test report will be saved */
+        public const REPORTS_STORAGE = Framework::DIR_SERVER_STORAGE . DIRECTORY_SEPARATOR . 'tests';
 
         private float $executionTime = 0, $performanceScore = 0;
         private int $testPassed = 0, $totalTests = 0;
         private readonly TestEnvironment $env;
         private readonly string $description;
-        private readonly ?string $location;
         private array $testGroups;
 
         /**
          * Create general test result for your application
          * @param string $description Description about this Test or result name
-         * @param string|null $location Location on disk where test report will be saved
          */
-        public function __construct(string $description, string $location = null)
+        public function __construct(string $description)
         {
             $this->env = new TestEnvironment();
             $this->description = $description;
-            $this->location = $location;
             $this->testGroups = [];
         }
 
@@ -94,12 +96,11 @@ namespace features\test {
 
         private function save(string $data): self
         {
-            if ($this->location !== null) {
-                $filename = date('Y-m-d.Hi') . '_test_report.json';
-                file_put_contents($this->location . '/' . $filename, $data);
-            } else {
-                echo $data;
+            $filename = date('Y-m-d.Hi') . '_test_report.json';
+            if (!is_dir(self::REPORTS_STORAGE)) {
+                mkdir(self::REPORTS_STORAGE, LocalStorage::FILE_MODE, true);
             }
+            file_put_contents(self::REPORTS_STORAGE . DIRECTORY_SEPARATOR . $filename, $data);
             return $this;
         }
     }

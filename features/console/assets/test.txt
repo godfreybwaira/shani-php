@@ -7,7 +7,6 @@ namespace {namespace}\{test_dir} {
     use features\test\TestGroup;
     use features\test\TestResult;
     use features\test\TestRunnerInterface;
-    use shani\launcher\Framework;
 
     final class {class_name} implements TestRunnerInterface
     {
@@ -16,7 +15,7 @@ namespace {namespace}\{test_dir} {
         #[\Override]
         public function runTest(): TestResult
         {
-            $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
+            $result = new TestResult('UAT for my application');
             $user = new TestGroup('User Module');
             $username = new TestCase(TestSeverity::LOW, '001');
 

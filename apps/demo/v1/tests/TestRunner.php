@@ -12,7 +12,6 @@ namespace apps\demo\v1\tests {
     use features\utils\URI;
     use shani\http\enums\HttpStatus;
     use shani\http\ResponseEntity;
-    use shani\launcher\Framework;
 
     final class TestRunner implements TestRunnerInterface
     {
@@ -20,7 +19,7 @@ namespace apps\demo\v1\tests {
         #[\Override]
         public function runTest(): TestResult
         {
-            $result = new TestResult('UAT for my application', location: Framework::DIR_SERVER_STORAGE);
+            $result = new TestResult('UAT for my application');
             $g1 = new TestGroup('MY FIRST MODULE');
             $g2 = new TestGroup('MY SECOND MODULE');
             $g3 = new TestGroup('MY THIRD MODULE');
