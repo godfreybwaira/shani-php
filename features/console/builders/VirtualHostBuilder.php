@@ -180,6 +180,22 @@ namespace features\console\builders {
             $configs = $this->getConfigurations();
             return !empty($configs->supportedVersions[$versionNumber]);
         }
+
+        public function setDefaultVersion(string $versionNumber): string
+        {
+            if (!$this->hasVersion($versionNumber)) {
+                throw new \InvalidArgumentException('Project version "' . $versionNumber . '" not registered on host file');
+            }
+            $defaultVersion = $this->getConfigurations()->defaultVersion;
+            if ($defaultVersion === $versionNumber) {
+                throw new \InvalidArgumentException('Project version "' . $versionNumber . '" is already the default version');
+            }
+
+            $oldContent = file_get_contents($this->metadata->hostPath);
+            $newContent = str_replace('default: ' . $defaultVersion, 'default: ' . $versionNumber, $oldContent);
+            $resultText = file_put_contents($this->metadata->hostPath, $newContent) !== false ? 'Success' : 'Failed';
+            return Formatter::formatSentence('Changing default version to ' . $versionNumber, $resultText);
+        }
     }
 
 }

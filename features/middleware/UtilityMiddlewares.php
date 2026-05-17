@@ -9,6 +9,7 @@
 
 namespace features\middleware {
 
+    use features\exceptions\ServiceUnavailableException;
     use features\utils\MediaType;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
@@ -81,6 +82,14 @@ namespace features\middleware {
         {
             if ($app->request->uri->path() === '/') {
                 $app->request->changeRoute(RequestRoute::fromPath($app->config->pathConfig()->homePath));
+            }
+        }
+
+        public static function checkRunningStatus(App $app): void
+        {
+            if (!$app->preference->vhost->getOne('running')) {
+                $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
+                throw new ServiceUnavailableException();
             }
         }
     }

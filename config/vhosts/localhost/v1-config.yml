@@ -7,3 +7,6 @@ test: \apps\demo\v1\tests\TestRunner
 # Active configuration profile. The framework does not provide any logic regarding
 # this variable. You should handle the logic manually
 profile: dev.yml
+
+# Tell whether the application is running or is in maintenance mode
+running: true

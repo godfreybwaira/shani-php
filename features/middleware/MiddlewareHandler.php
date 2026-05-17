@@ -34,6 +34,7 @@ namespace features\middleware {
 
         public function preRequest(): void
         {
+            UtilityMiddlewares::checkRunningStatus($this->app);
             UtilityMiddlewares::handleEmptyurlPath($this->app);
             UtilityMiddlewares::setProperContentType($this->app);
             UtilityMiddlewares::preflightRequest($this->app);

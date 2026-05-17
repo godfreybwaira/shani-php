@@ -8,7 +8,7 @@
 
 namespace features\exceptions {
 
-    final class ServerException extends \RuntimeException
+    class ServerException extends \RuntimeException
     {
 
     }

@@ -218,6 +218,29 @@ namespace features\console\builders {
             }
             throw new \RuntimeException($config['test'] . ' must implements features\test\TestRunnerInterface');
         }
+
+        public function stop(\Closure $progressTracker): void
+        {
+            $resultText = $this->changeStatus(false) ? 'Success' : 'Failed';
+            $intext = 'Stopping the application "' . $this->versionNumber . '"';
+            $progressTracker(Formatter::formatSentence($intext, $resultText));
+        }
+
+        public function start(\Closure $progressTracker): void
+        {
+            $resultText = $this->changeStatus(true) ? 'Success' : 'Failed';
+            $intext = 'Starting the application "' . $this->versionNumber . '"';
+            $progressTracker(Formatter::formatSentence($intext, $resultText));
+        }
+
+        private function changeStatus(bool $running): bool
+        {
+            $newStatus = $running ? 'true' : 'false';
+            $oldStatus = $running ? 'false' : 'true';
+            $oldContent = file_get_contents($this->configFilepath);
+            $newContent = str_replace('running: ' . $oldStatus, 'running: ' . $newStatus, $oldContent);
+            return file_put_contents($this->configFilepath, $newContent) !== false;
+        }
     }
 
 }
