@@ -14,13 +14,7 @@ spl_autoload_register(function (string $class) {
 ShaniUtils::define(__DIR__);
 
 (function (array $arguments) {
-    $error = PrintedText::error('[ ERROR ] ');
-    if (count($arguments) < 2) {
-        $helpCommand = PrintedText::bold('php light help');
-        ConsoleIO::error($error->coloredText . 'Too few arguments! For help type ' . $helpCommand->coloredText);
-        exit(1);
-    }
-    $command = $arguments[1];
+    $command = !isset($arguments[1]) ? 'help' : $arguments[1];
     unset($arguments[0], $arguments[1]);
     $registry = new CommandRegistry($command, array_values($arguments));
     try {
@@ -30,7 +24,7 @@ ShaniUtils::define(__DIR__);
         if (!$registry->options->quiet) {
             CommandRegistry::printBanner(ConsoleColor::RED);
         }
-        ConsoleIO::error($error->coloredText . $t->getMessage() . PHP_EOL);
+        ConsoleIO::error(PrintedText::error('[ ERROR ] ')->coloredText . $t->getMessage() . PHP_EOL);
         exit(1);
     }
 })($argv);

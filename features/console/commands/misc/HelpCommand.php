@@ -42,7 +42,7 @@ namespace features\console\commands\misc {
                     'help',
                     '[COMMAND]',
                     'View help for a given command, or all commands if no argument is given',
-                    'help create:project'
+                    'create:project'
             );
         }
 
@@ -72,6 +72,7 @@ namespace features\console\commands\misc {
             $width = 150;
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
             $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width) . PHP_EOL);
+            $this->registry->addResult('For help type help COMMAND' . PHP_EOL);
             if ($this->userCommand === null) {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
                 $commands = $this->registry->commandList();
