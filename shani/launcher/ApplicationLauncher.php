@@ -10,9 +10,6 @@
 namespace shani\launcher {
 
     use features\ds\map\ReadableMap;
-    use features\logging\Logger;
-    use features\logging\LoggingLevel;
-    use features\storage\LocalStorage;
     use features\utils\Concurrency;
     use features\utils\Event;
     use shani\contracts\ResponseWriterInterface;
@@ -45,7 +42,7 @@ namespace shani\launcher {
         /**
          * Resolve configuration preference for a given host and request headers.
          *
-         * @param string $hostname Hostname being requested.
+         * @param string $hostname Host name being requested.
          * @param VirtualHostMapper $mapper Virtual host configurations from host file.
          * @param HttpHeader $headers HTTP request headers.
          * @return RequestPreference|null Request preference object or null if unsupported.
@@ -111,25 +108,6 @@ namespace shani\launcher {
                 $app = new App($preference, $response, $writer, $framework);
                 $app->launch();
             });
-        }
-
-        /**
-         * Log server messages to console and file.
-         *
-         * @param LoggingLevel $level Logging severity level.
-         * @param string $message Log message.
-         * @return void
-         */
-        public static function log(LoggingLevel $level, string $message): void
-        {
-            if (PHP_SAPI === 'cli') {
-                echo $message . PHP_EOL;
-            }
-            if (!is_dir(Framework::DIR_SERVER_STORAGE)) {
-                mkdir(Framework::DIR_SERVER_STORAGE, LocalStorage::FILE_MODE, true);
-            }
-            $file = Framework::DIR_SERVER_STORAGE . '/' . date('Y-m-d') . '_' . $level->name . '.log';
-            (new Logger($file))->log($level, $message);
         }
 
         /**
