@@ -10,6 +10,10 @@ namespace shani\contracts {
      * Standard interface for caching operations, primarily used for
      * attribute metadata caching but can be used elsewhere.
      *
+     * Note:
+     *   Ensure APCu is enabled (`apc.enabled=1` and `apc.enable_cli=1`)
+     *   and PHP-FPM is restarted for APCu cache clearing to work properly.
+     * 
      * @author Goddy
      * @created May 18, 2026 at 12:26:20 PM
      */

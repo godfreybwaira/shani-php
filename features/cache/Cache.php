@@ -7,6 +7,11 @@
  * This class is intended to be used as a shortcut for retrieving
  * the active cache driver instance.
  *
+ * Note:
+ *   Ensure php extension is installed and enabled APCu is enabled
+ *  (`apc.enabled=1` and `apc.enable_cli=1`) and PHP-FPM is restarted for
+ *  APCu cache clearing to work properly.
+ * 
  * @author goddy
  * @created May 18, 2026 at 3:22:50 PM
  */

@@ -133,6 +133,7 @@ namespace features\console {
             //Misc
             yield new commands\misc\FrameworkVersionCommand($this);
             yield new commands\misc\StartServerCommand($this);
+            yield new commands\misc\DeleteCacheCommand($this);
             yield new commands\misc\HelpCommand($this);
         }
 

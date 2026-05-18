@@ -2,6 +2,7 @@
 
 namespace features\cache {
 
+    use features\utils\Duration;
     use shani\contracts\CacheInterface;
 
     /**
@@ -39,15 +40,15 @@ namespace features\cache {
         /**
          * Generate the full file path for a given cache key.
          *
-         * @param string $key The cache key.
+         * @param string|int $key The cache key.
          * @return string The corresponding file path.
          */
-        private function getFilePath(string $key): string
+        private function getFilePath(string|int $key): string
         {
             return $this->path . DIRECTORY_SEPARATOR . md5($key) . '.cache';
         }
 
-        public function getOne(string $key, mixed $default = null): mixed
+        public function getOne(string|int $key, mixed $default = null): mixed
         {
             $file = $this->getFilePath($key);
             if (!file_exists($file)) {
@@ -63,7 +64,7 @@ namespace features\cache {
             return $default;
         }
 
-        public function addOne(string $key, mixed $value, int $ttl = 3600): bool
+        public function addOne(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
         {
             $file = $this->getFilePath($key);
             $data = [
@@ -74,12 +75,12 @@ namespace features\cache {
             return file_put_contents($file, serialize($data)) !== false;
         }
 
-        public function has(string $key): bool
+        public function has(string|int $key): bool
         {
             return $this->getOne($key, '__NOT_FOUND__') !== '__NOT_FOUND__';
         }
 
-        public function delete(string $key): bool
+        public function delete(string|int $key): bool
         {
             if ($this->has($key)) {
                 return unlink($this->getFilePath($key));
@@ -87,16 +88,24 @@ namespace features\cache {
             return true;
         }
 
-        public function clear(): bool
+        public function clear(): CacheInterface
         {
             $files = glob($this->path . '/*.cache');
             foreach ($files as $file) {
                 unlink($file);
             }
-            return true;
+            return $this;
         }
 
-        public function remember(string $key, \Closure $callback, int $ttl = 3600): mixed
+        public function addIfAbsent(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
+        {
+            if (!$this->has($key)) {
+                $this->addOne($key, $value, $ttl);
+            }
+            return $this;
+        }
+
+        public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed
         {
             if ($this->has($key)) {
                 return $this->getOne($key);
