@@ -21,7 +21,7 @@ namespace shani\http {
 
         public function __construct(bool $reuse = false)
         {
-            $this->maxAge = Duration::of(6, Duration::MONTHS);
+            $this->maxAge = Duration::of(6, Duration::MONTHS)->toDateTime();
             $this->setReuse($reuse);
             $this->stale = null;
             $this->etag = null;

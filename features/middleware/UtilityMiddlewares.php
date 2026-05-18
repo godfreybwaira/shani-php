@@ -9,6 +9,7 @@
 
 namespace features\middleware {
 
+    use features\exceptions\CustomException;
     use features\exceptions\ServiceUnavailableException;
     use features\utils\MediaType;
     use shani\http\enums\HttpStatus;
@@ -85,11 +86,31 @@ namespace features\middleware {
             }
         }
 
+        /**
+         * Check Application running status. If the application is not running, error is thrown
+         * @param App $app Application object
+         * @return void
+         * @throws ServiceUnavailableException
+         */
         public static function checkRunningStatus(App $app): void
         {
             if (!$app->preference->vhost->getOne('running')) {
                 $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
                 throw new ServiceUnavailableException();
+            }
+        }
+
+        /**
+         * Check whether the client request method is allowed by the application.
+         * @param App $app Application object
+         * @return void
+         */
+        public static function passedRequestMethodCheck(App $app): void
+        {
+            $config = $app->config->requestConfig();
+            if (!$config->methodAllowed) {
+                $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $config->allowedMethods);
+                throw CustomException::methodNotAllowed($app);
             }
         }
     }

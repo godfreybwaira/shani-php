@@ -52,11 +52,6 @@ namespace apps\demo\v1\config {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';
         }
 
-        public function publicResources(): array
-        {
-            return ['components', 'oauth2', 'pwa'];
-        }
-
         public function guestResources(): array
         {
             return [];

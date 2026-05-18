@@ -232,15 +232,6 @@ namespace shani\contracts {
         }
 
         /**
-         * Get list of all public modules accessible to public
-         * @return array
-         */
-        public function publicResources(): array
-        {
-            return [];
-        }
-
-        /**
          * Get list of all public modules accessible to guest user
          * @return array
          */
@@ -256,9 +247,6 @@ namespace shani\contracts {
          */
         public final function accessingPublicResource(): bool
         {
-            if ($this->resourceExists($this->publicResources())) {
-                return true;
-            }
             $route = $this->app->request->route();
             if ($this->app->preference->mapper->publicBucket === '/' . $route->module) {
                 return true;

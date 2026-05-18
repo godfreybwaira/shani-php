@@ -9,6 +9,7 @@
 
 namespace features\utils {
 
+    use features\cache\Cache;
     use shani\launcher\Framework;
 
     final class MediaType
@@ -1245,22 +1246,16 @@ namespace features\utils {
         public const ZMM = 'application/vnd.handheld-entertainment+xml';
         public const TEXT_ZSH = 'text/x-scriptzsh';
 
-        private static array $mime = [];
-
         public static function fromExtension(?string $extension): ?string
         {
             if ($extension === null) {
                 return null;
             }
-            $ext = strtolower(trim($extension, '.'));
-            if (!isset(self::$mime[$ext])) {
-                $mime = yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
-                if ($mime === null) {
-                    return null;
-                }
-                self::$mime[$ext] = $mime;
-            }
-            return self::$mime[$ext];
+            $mime = Cache::instance()->remember('mime.' . $extension, null, function () use (&$extension) {
+                $ext = strtolower(trim($extension, '.'));
+                return yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
+            });
+            return $mime;
         }
 
         /**

@@ -27,12 +27,6 @@ namespace {namespace}\{config_dir} {
         }
 
         #[\Override]
-        public function publicResources(): array
-        {
-            return ['{default_module}'];
-        }
-
-        #[\Override]
         public function isAsync(): bool
         {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';

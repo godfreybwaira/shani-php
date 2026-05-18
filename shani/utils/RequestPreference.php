@@ -9,6 +9,7 @@
 
 namespace shani\utils {
 
+    use features\cache\Cache;
     use features\ds\map\ReadableMap;
     use shani\launcher\Framework;
 
@@ -56,14 +57,16 @@ namespace shani\utils {
          *
          * @param VirtualHostMapper $mapper Host configuration from host file.
          *
-         * @param string $hostname Host name.
+         * @param string $hostName Host name.
          *
          */
-        public function __construct(string $selectedVersion, VirtualHostMapper $mapper, string $hostname)
+        public function __construct(string $selectedVersion, VirtualHostMapper $mapper, string $hostName)
         {
-            $configFile = Framework::DIR_HOSTS . '/' . $hostname . '/' . $mapper->supportedVersions[$selectedVersion]['config'];
+            $configFile = Framework::DIR_HOSTS . '/' . $hostName . '/' . $mapper->supportedVersions[$selectedVersion]['config'];
             $this->versionNumber = $selectedVersion;
-            $this->vhost = new ReadableMap(yaml_parse_file($configFile));
+            $cacheKey = $hostName . $selectedVersion;
+            $configs = Cache::instance()->remember($cacheKey, null, fn() => yaml_parse_file($configFile));
+            $this->vhost = new ReadableMap($configs);
             $this->mapper = $mapper;
         }
     }

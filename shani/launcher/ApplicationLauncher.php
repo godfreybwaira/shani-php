@@ -9,6 +9,7 @@
 
 namespace shani\launcher {
 
+    use features\cache\Cache;
     use features\ds\map\ReadableMap;
     use features\utils\Concurrency;
     use features\utils\Event;
@@ -42,16 +43,16 @@ namespace shani\launcher {
         /**
          * Resolve configuration preference for a given host and request headers.
          *
-         * @param string $hostname Host name being requested.
+         * @param string $hostName Host name being requested.
          * @param VirtualHostMapper $mapper Virtual host configurations from host file.
          * @param HttpHeader $headers HTTP request headers.
          * @return RequestPreference|null Request preference object or null if unsupported.
          */
-        private static function getConfigPreference(string $hostname, VirtualHostMapper $mapper, HttpHeader $headers): ?RequestPreference
+        private static function getConfigPreference(string $hostName, VirtualHostMapper $mapper, HttpHeader $headers): ?RequestPreference
         {
             $version = $headers->getOne($mapper->requestHeader, $mapper->defaultVersion);
             if (!empty($mapper->supportedVersions[$version])) {
-                return new RequestPreference($version, $mapper, $hostname);
+                return new RequestPreference($version, $mapper, $hostName);
             }
             return null;
         }
@@ -59,24 +60,41 @@ namespace shani\launcher {
         /**
          * Get virtual host configurations.
          *
-         * @param string $name Host name.
+         * @param string $hostName Host name.
+         * @param HttpHeader $headers HTTP request headers.
+         * @return array Host Configurations.
+         * @throws \Exception If host configuration cannot be found.
+         */
+        private static function getHostConfirutations(string $hostName, HttpHeader $headers): array
+        {
+            $configs = Cache::instance()->remember($hostName, null, function ()use (&$hostName, &$headers) {
+                $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
+                if (is_file($yaml)) {
+                    return ['host' => $hostName, 'data' => yaml_parse_file($yaml)];
+                }
+                $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';
+                if (is_file($alias)) {
+                    $host = file_get_contents($alias);
+                    return static::getHostConfirutations(trim($host), $headers);
+                }
+                throw new \Exception('Host "' . $hostName . '" not found');
+            });
+            return $configs;
+        }
+
+        /**
+         * Get virtual host configurations.
+         *
+         * @param string $hostName Host name.
          * @param HttpHeader $headers HTTP request headers.
          * @return RequestPreference|null Request preference object or null.
          * @throws \Exception If host configuration cannot be found.
          */
-        private static function host(string $name, HttpHeader $headers): ?RequestPreference
+        private static function host(string $hostName, HttpHeader $headers): ?RequestPreference
         {
-            $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $name . '.yml';
-            if (is_file($yaml)) {
-                $mapper = VirtualHostMapper::fromArray(yaml_parse_file($yaml));
-                return self::getConfigPreference($name, $mapper, $headers);
-            }
-            $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $name . '.alias';
-            if (is_file($alias)) {
-                $host = file_get_contents($alias);
-                return static::host(trim($host), $headers);
-            }
-            throw new \Exception('Host "' . $name . '" not found');
+            $configs = self::getHostConfirutations($hostName, $headers);
+            $mapper = VirtualHostMapper::fromArray($configs['data']);
+            return self::getConfigPreference($configs['host'], $mapper, $headers);
         }
 
         /**

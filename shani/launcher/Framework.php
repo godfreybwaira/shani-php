@@ -9,6 +9,7 @@
 
 namespace shani\launcher {
 
+    use features\cache\Cache;
     use features\ds\map\ReadableMap;
 
     /**
@@ -139,18 +140,19 @@ namespace shani\launcher {
          */
         public function __construct()
         {
-            self::checkFrameworkRequirements();
-            $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
 
+            $config = Cache::instance()->remember('framework.settings', null, function () {
+                self::checkFrameworkRequirements();
+                $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
+                // Apply runtime settings
+                ini_set('upload_max_filesize', $config['max_payload_size']);
+                ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
+                ini_set('display_errors', $config['display_errors']);
+                date_default_timezone_set($config['time_zone']);
+            });
             // Convert payload size to bytes
             $config['max_payload_size'] *= self::MB_1;
             $this->config = new ReadableMap($config);
-
-            // Apply runtime settings
-            ini_set('upload_max_filesize', $config['max_payload_size']);
-            ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
-            ini_set('display_errors', $config['display_errors']);
-            date_default_timezone_set($config['time_zone']);
         }
 
         /**

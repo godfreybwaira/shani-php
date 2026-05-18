@@ -9,26 +9,45 @@
 
 namespace features\utils {
 
-    enum Duration
+    final class Duration
     {
 
-        case SECONDS;
-        case MINUTES;
-        case HOURS;
-        case DAYS;
-        case WEEKS;
-        case MONTHS;
-        case YEARS;
+        public readonly int $value;
+        public readonly DurationUnit $unit;
+
+        private function __construct(int $value, DurationUnit $unit)
+        {
+            $this->value = $value;
+            $this->unit = $unit;
+        }
+
+        /**
+         * Create a Duration object
+         * @param int $value Duration value
+         * @param DurationUnit $unit Duration unit
+         * @return Duration
+         */
+        public static function of(int $value, DurationUnit $unit): Duration
+        {
+            return new Duration($value, $unit);
+        }
+
+        /**
+         * return number of seconds from now
+         * @return int
+         */
+        public function fromNow(): int
+        {
+            return $this->toDateTime() - time();
+        }
 
         /**
          * Convert Duration object into DatetimeInterface
-         * @param int $value Duration value
-         * @param Duration $duration Duration unit
-         * @return \DateTimeInterface
+         * @return \DateTimeImmutable
          */
-        public static function of(int $value, Duration $duration): \DateTimeInterface
+        public function toDateTime(): \DateTimeImmutable
         {
-            return new \DateTimeImmutable($value . ' ' . $duration->name);
+            return new \DateTimeImmutable($this->value . ' ' . $this->unit->name);
         }
     }
 

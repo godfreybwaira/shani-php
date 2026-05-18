@@ -10,6 +10,7 @@
 namespace features\middleware\web {
 
     use features\utils\Duration;
+    use features\utils\DurationUnit;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 
@@ -39,7 +40,7 @@ namespace features\middleware\web {
             $app->response->header()->addIfAbsent(HttpHeader::X_FRAME_OPTIONS, 'sameorigin');
             $app->response->header()->addIfAbsent(HttpHeader::CONTENT_SECURITY_POLICY, $this->value);
             if ($app->request->uri->secure()) {
-                $duration = Duration::of(2, Duration::YEARS)->getTimestamp() - time();
+                $duration = Duration::of(2, DurationUnit::YEARS)->fromNow();
                 $hsts = 'max-age=' . $duration . ';includeSubDomains;preload';
                 $app->response->header()->addIfAbsent(HttpHeader::STRICT_TRANSPORT_SECURITY, $hsts);
             }

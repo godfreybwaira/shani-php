@@ -13,6 +13,7 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
+    use features\cache\CacheManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
     use features\exceptions\BadRequestException;
@@ -27,6 +28,7 @@ namespace shani\launcher {
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
+    use shani\contracts\CacheInterface;
     use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpResponse;
@@ -113,6 +115,12 @@ namespace shani\launcher {
         public readonly StorageMediaInterface $storage;
 
         /**
+         * Application cache
+         * @var CacheInterface
+         */
+        public readonly CacheInterface $cache;
+
+        /**
          * Application paths
          * @var PathConfig
          */
@@ -139,6 +147,7 @@ namespace shani\launcher {
             $this->writer = $writer;
             $this->framework = $framework;
             $this->request = $res->request;
+            $this->cache = CacheManager::getInstance($preference->mapper->projectName . $preference->versionNumber);
             $class = $preference->vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();
@@ -177,13 +186,13 @@ namespace shani\launcher {
                 return $this->handleRequestFlow($middleware, $userMiddleware);
             } catch (NotFoundException $ex) {
                 $this->response->setStatus(HttpStatus::NOT_FOUND);
-                return $this->handleException($ex);
+                return $this->handleException($ex, $middleware);
             } catch (BadRequestException $ex) {
                 $this->response->setStatus(HttpStatus::BAD_REQUEST);
-                return $this->handleException($ex);
+                return $this->handleException($ex, $middleware);
             } catch (\Throwable $ex) {
                 $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
-                return $this->handleException($ex);
+                return $this->handleException($ex, $middleware);
             }
         }
 
@@ -194,7 +203,7 @@ namespace shani\launcher {
             $userMiddleware?->preRequest();
 
             // Step 2: main request handling
-            $response = $this->handleRequest();
+            $response = $this->handleRequest($middleware);
 
             // Step 3: pre-response hooks
             $middleware->preResponse();
@@ -273,9 +282,12 @@ namespace shani\launcher {
         /**
          * Dynamically route a user request to mapped resource. The routing mechanism
          * always depends on HTTP method and application endpoint provided by the user.
+         *
+         * @param MiddlewareHandler $middleware Middleware handler object
+         *
          * @return HttpResponse|null
          */
-        private function handleRequest(): ?HttpResponse
+        private function handleRequest(MiddlewareHandler $middleware): ?HttpResponse
         {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
@@ -289,12 +301,13 @@ namespace shani\launcher {
                 return $staticRequest->handleRequest($this);
             }
             $className = str_replace('/', '\\', $classPath);
-            $callback = $this->request->route()->action;
+            $methodName = $this->request->route()->action;
             $obj = new $className($this);
-            if (!is_callable([$obj, $callback])) {
+            if (!is_callable([$obj, $methodName])) {
                 throw CustomException::notFound();
             }
-            return $obj->$callback();
+            $middleware->handleAttributes($obj, $methodName);
+            return $obj->$methodName();
         }
 
         /**
@@ -317,12 +330,12 @@ namespace shani\launcher {
             return $this->lang;
         }
 
-        private function handleException(\Throwable $ex): ?HttpResponse
+        private function handleException(\Throwable $ex, MiddlewareHandler $middleware): ?HttpResponse
         {
             $fallbackRoute = $this->config->errorHandler($ex);
             if ($fallbackRoute !== null) {
                 $this->request->changeRoute($fallbackRoute);
-                return $this->handleRequest();
+                return $this->handleRequest($middleware);
             }
             return null;
         }

@@ -54,7 +54,7 @@ namespace features\tasks {
          */
         public function startNow(): self
         {
-            return $this->startAfter(Duration::of(0, Duration::SECONDS));
+            return $this->startAfter(Duration::of(0, DurationUnit::SECONDS)->toDateTime());
         }
 
         /**

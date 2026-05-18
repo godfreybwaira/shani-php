@@ -10,7 +10,6 @@
 namespace features\session {
 
     use features\ds\map\WritableMap;
-    use shani\http\enums\HttpSameSite;
     use shani\launcher\App;
 
     final class StatefulSessionStorage implements SessionStorageInterface
