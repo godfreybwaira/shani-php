@@ -1251,7 +1251,7 @@ namespace features\utils {
             if ($extension === null) {
                 return null;
             }
-            $mime = Cache::instance()->remember('mime.' . $extension, null, function () use ($extension) {
+            $mime = Cache::instance()->fetch('mime-' . $extension, null, function () use ($extension) {
                 $ext = strtolower(trim($extension, '.'));
                 return yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
             });

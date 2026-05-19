@@ -105,7 +105,7 @@ namespace features\cache {
             return $this;
         }
 
-        public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed
+        public function fetch(string|int $key, ?Duration $ttl, \Closure $callback): mixed
         {
             if ($this->has($key)) {
                 return $this->getOne($key);

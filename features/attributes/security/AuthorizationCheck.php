@@ -48,11 +48,6 @@ namespace features\attributes\security {
                 throw CustomException::notAuthorized($app);
             }
         }
-
-        public static function protect(App $app): void
-        {
-            (new self(exempted: false))->execute($app);
-        }
     }
 
 }

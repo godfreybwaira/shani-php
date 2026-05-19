@@ -67,7 +67,7 @@ namespace shani\launcher {
          */
         private static function getHostConfigurations(string $hostName): array
         {
-            $configs = Cache::instance()->remember('host.' . $hostName, Duration::ofDays(3), function ()use ($hostName) {
+            $configs = Cache::instance()->fetch('host-' . $hostName, Duration::ofDays(3), function ()use ($hostName) {
                 $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
                 if (is_file($yaml)) {
                     return ['host' => $hostName, 'data' => yaml_parse_file($yaml)];

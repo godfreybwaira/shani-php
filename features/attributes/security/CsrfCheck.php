@@ -44,11 +44,6 @@ namespace features\attributes\security {
                 throw CustomException::notAcceptable($app, 'Invalid or missing CSRF token');
             }
         }
-
-        public static function protect(App $app): void
-        {
-            (new self(exempted: false))->execute($app);
-        }
     }
 
 }

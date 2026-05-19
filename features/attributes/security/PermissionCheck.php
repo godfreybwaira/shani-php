@@ -60,21 +60,6 @@ namespace features\attributes\security {
 
             throw CustomException::forbidden($app);
         }
-
-        /**
-         * Static helper to manually protect a route/action
-         *
-         * Useful when you want to enforce permission check programmatically
-         * without using the attribute.
-         *
-         * @param App $app The application instance
-         * @return void
-         * @throws CustomException When access is denied
-         */
-        public static function protect(App $app): void
-        {
-            (new self(exempted: false))->execute($app);
-        }
     }
 
 }

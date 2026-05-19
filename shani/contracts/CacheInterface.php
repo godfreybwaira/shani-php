@@ -84,7 +84,7 @@ namespace shani\contracts {
          *
          * @return mixed The cached or newly computed value.
          */
-        public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed;
+        public function fetch(string|int $key, ?Duration $ttl, \Closure $callback): mixed;
 
         /**
          * Update a value using callback function. The returned value from the

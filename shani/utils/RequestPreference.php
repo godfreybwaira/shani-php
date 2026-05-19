@@ -9,7 +9,6 @@
 
 namespace shani\utils {
 
-    use features\cache\Cache;
     use features\ds\map\ReadableMap;
     use shani\launcher\Framework;
 

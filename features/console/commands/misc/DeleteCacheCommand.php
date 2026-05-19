@@ -2,9 +2,9 @@
 
 namespace features\console\commands\misc {
 
-    use features\cache\Cache;
     use features\console\CommandContract;
     use features\console\CommandRegistry;
+    use shani\launcher\Framework;
 
     /**
      * DeleteCacheCommand
@@ -46,8 +46,8 @@ namespace features\console\commands\misc {
          */
         public function execute(): void
         {
-            Cache::instance()->clear();
-            $this->registry->addResult('Application cache cleared');
+            touch(Framework::FRAMEWORK_FILE);
+            $this->registry->addResult('Application cache will be cleared on next request.');
         }
 
         /**

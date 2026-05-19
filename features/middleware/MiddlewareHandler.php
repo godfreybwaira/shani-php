@@ -57,8 +57,8 @@ namespace features\middleware {
 
         public function handleAttributes(object $instance, string $methodName): void
         {
-            $cacheKey = $instance::class . ':' . $methodName;
-            $attributes = Cache::instance()->remember($cacheKey, Duration::ofDays(3), function ()use ($instance, $methodName) {
+            $cacheKey = $instance::class . '-' . $methodName;
+            $attributes = Cache::instance()->fetch($cacheKey, Duration::ofDays(3), function ()use ($instance, $methodName) {
                 // 1. Get method attributes (higher priority)
                 $refMethod = new \ReflectionMethod($instance, $methodName);
                 $methodAttributes = $refMethod->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
@@ -66,7 +66,7 @@ namespace features\middleware {
                 $refClass = new \ReflectionClass($instance);
                 $classAttributes = $refClass->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
                 // 3. Merge them: Method overrides Class
-                $attributesMap = [];
+                $attributesMap = self::getRegisteredAttributes();
                 foreach ($classAttributes as $attr) {
                     $attributesMap[$attr->getName()] = $attr->getArguments();
                 }
@@ -78,14 +78,17 @@ namespace features\middleware {
             $this->execute($attributes);
         }
 
+        private static function getRegisteredAttributes(): array
+        {
+            return [
+                CsrfCheck::class => [],
+                AuthorizationCheck::class => [],
+                PermissionCheck::class => [],
+            ];
+        }
+
         private function execute(array &$attributes): void
         {
-            if (empty($attributes)) {
-                CsrfCheck::protect($this->app);
-                AuthorizationCheck::protect($this->app);
-                PermissionCheck::protect($this->app);
-                return;
-            }
             foreach ($attributes as $class => $args) {
                 $obj = new $class(...$args);
                 $obj->execute($this->app);

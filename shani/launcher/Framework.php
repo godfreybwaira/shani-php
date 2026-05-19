@@ -127,6 +127,9 @@ namespace shani\launcher {
         /** Framework features path */
         public const DIR_FEATURES = SHANI_SERVER_ROOT . '/features';
 
+        /** Framework file */
+        public const FRAMEWORK_FILE = self::DIR_CONFIG . '/framework.yml';
+
         /**
          * Framework configuration map.
          *
@@ -142,17 +145,20 @@ namespace shani\launcher {
         public function __construct()
         {
 
-            $config = Cache::instance()->remember('framework.settings', Duration::ofDays(3), function () {
-                self::checkFrameworkRequirements();
-                $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
-                // Apply runtime settings
-                ini_set('upload_max_filesize', $config['max_payload_size']);
-                ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
-                ini_set('display_errors', $config['display_errors']);
-                date_default_timezone_set($config['time_zone']);
-                return $config;
-            });
-            // Convert payload size to bytes
+            $cache = Cache::instance();
+            $key = 'settings-' . filemtime(self::FRAMEWORK_FILE);
+            if (!$cache->has($key)) {
+                $cache->clear();
+            }
+            $config = $cache->fetch($key, Duration::ofWeeks(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
+
+            self::checkFrameworkRequirements();
+
+            ini_set('upload_max_filesize', $config['max_payload_size']);
+            ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
+            ini_set('display_errors', $config['display_errors']);
+            date_default_timezone_set($config['time_zone']);
+
             $config['max_payload_size'] *= self::MB_1;
             $this->config = new ReadableMap($config);
         }
@@ -166,11 +172,11 @@ namespace shani\launcher {
          */
         private static function checkFrameworkRequirements(): void
         {
-            if (version_compare(Framework::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
-                echo 'PHP version ' . Framework::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL;
+            if (version_compare(self::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
+                echo 'PHP version ' . self::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL;
                 exit(1);
             }
-            foreach (Framework::REQUIRED_EXTENSIONS as $extension) {
+            foreach (self::REQUIRED_EXTENSIONS as $extension) {
                 if (!extension_loaded($extension)) {
                     echo 'Please install PHP ' . $extension . ' extension' . PHP_EOL;
                     exit(1);

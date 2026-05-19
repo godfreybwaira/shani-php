@@ -13,7 +13,6 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
-    use features\cache\CacheDriverManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
     use features\exceptions\BadRequestException;
@@ -28,7 +27,6 @@ namespace shani\launcher {
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
-    use shani\contracts\CacheInterface;
     use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpResponse;
