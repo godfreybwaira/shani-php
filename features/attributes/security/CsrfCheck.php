@@ -7,7 +7,7 @@
  * Created on: May 18, 2026 at 9:11:41 AM
  */
 
-namespace features\attributes {
+namespace features\attributes\security {
 
     use features\exceptions\CustomException;
     use shani\contracts\AttributeInterface;
@@ -25,7 +25,7 @@ namespace features\attributes {
 
         public readonly bool $exempted;
 
-        public function __construct(bool $exempted)
+        public function __construct(bool $exempted = false)
         {
             $this->exempted = $exempted;
         }

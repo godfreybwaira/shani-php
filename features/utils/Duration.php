@@ -139,6 +139,16 @@ namespace features\utils {
         {
             return new \DateTimeImmutable('+' . $this->value . ' ' . $this->unit);
         }
+
+        /**
+         * Check if the given timestamp is behind the current time (expired)
+         * @param int $timestamp The timestamp to check
+         * @return bool True if expired, false otherwise
+         */
+        public static function expired(int $timestamp): bool
+        {
+            return $timestamp < time();
+        }
     }
 
 }

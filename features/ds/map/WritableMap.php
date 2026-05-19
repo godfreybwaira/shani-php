@@ -10,6 +10,7 @@
 namespace features\ds\map {
 
     use features\ds\WritableDataInterface;
+    use features\utils\Duration;
 
     class WritableMap extends ReadableMap implements WritableDataInterface
     {
@@ -70,6 +71,37 @@ namespace features\ds\map {
         public function add(\JsonSerializable $json): self
         {
             return $this->addAll($json->jsonSerialize());
+        }
+
+        /**
+         * Retrieve a cached value or compute and store it if missing.
+         *
+         * @param string|int $key The cache key.
+         * @param Duration|null $ttl The time-to-live duration for the cache entry
+         * @param \Closure $callback Callback to compute the value if not cached.
+         * The signature is <code>$callback():mixed</code>
+         * or null to store forever
+         *
+         * @return mixed The cached or newly computed value.
+         */
+        public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed
+        {
+            if ($this->exists($key)) {
+                $value = $this->getOne($key);
+                if (!isset($value['_value_'])) {
+                    return $value;
+                }
+                if (Duration::expired($value['_expires_'])) {
+                    $this->delete($key);
+                    return $this->remember($key, $ttl, $callback);
+                }
+                return $value['_value_'];
+            }
+            $value = [];
+            $value['_value_'] = $callback();
+            $value['_expires_'] = $ttl?->toDateTime()->getTimestamp() ?? PHP_INT_MAX;
+            $this->addOne($key, $value);
+            return $value['_value_'];
         }
 
         /**

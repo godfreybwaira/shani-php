@@ -9,9 +9,9 @@
 
 namespace features\middleware {
 
-    use features\attributes\AuthorizationCheck;
-    use features\attributes\CsrfCheck;
-    use features\attributes\PermissionCheck;
+    use features\attributes\security\AuthorizationCheck;
+    use features\attributes\security\CsrfCheck;
+    use features\attributes\security\PermissionCheck;
     use features\cache\Cache;
     use features\utils\Duration;
     use shani\contracts\AttributeInterface;
@@ -68,10 +68,10 @@ namespace features\middleware {
                 // 3. Merge them: Method overrides Class
                 $attributesMap = [];
                 foreach ($classAttributes as $attr) {
-                    $attributesMap['\\' . $attr->getName()] = $attr->getArguments();
+                    $attributesMap[$attr->getName()] = $attr->getArguments();
                 }
                 foreach ($methodAttributes as $attr) {
-                    $attributesMap['\\' . $attr->getName()] = $attr->getArguments();
+                    $attributesMap[$attr->getName()] = $attr->getArguments();
                 }
                 return $attributesMap;
             });

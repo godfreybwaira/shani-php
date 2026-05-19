@@ -1,6 +1,6 @@
 <?php
 
-namespace features\attributes {
+namespace features\attributes\security {
 
     use features\assets\StaticAssetOwnership;
     use features\exceptions\CustomException;
