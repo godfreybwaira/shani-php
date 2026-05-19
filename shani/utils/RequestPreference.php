@@ -62,10 +62,10 @@ namespace shani\utils {
          */
         public function __construct(string $selectedVersion, VirtualHostMapper $mapper, string $hostName)
         {
-            $configFile = Framework::DIR_HOSTS . '/' . $hostName . '/' . $mapper->supportedVersions[$selectedVersion]['config'];
+            $configFile = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName;
+            $configFile .= DIRECTORY_SEPARATOR . $mapper->supportedVersions[$selectedVersion]['config'];
             $this->versionNumber = $selectedVersion;
-            $cacheKey = $hostName . $selectedVersion;
-            $configs = Cache::instance()->remember($cacheKey, null, fn() => yaml_parse_file($configFile));
+            $configs = yaml_parse_file($configFile);
             $this->vhost = new ReadableMap($configs);
             $this->mapper = $mapper;
         }

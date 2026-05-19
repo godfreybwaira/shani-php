@@ -11,6 +11,7 @@ namespace shani\launcher {
 
     use features\cache\Cache;
     use features\ds\map\ReadableMap;
+    use features\utils\Duration;
 
     /**
      * Core configuration class for the Shani framework.
@@ -141,7 +142,7 @@ namespace shani\launcher {
         public function __construct()
         {
 
-            $config = Cache::instance()->remember('framework.settings', null, function () {
+            $config = Cache::instance()->remember('framework.settings', Duration::ofDays(3), function () {
                 self::checkFrameworkRequirements();
                 $config = yaml_parse_file(Framework::DIR_CONFIG . '/framework.yml');
                 // Apply runtime settings
