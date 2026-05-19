@@ -7,7 +7,7 @@ namespace features\cache {
     use shani\launcher\Framework;
 
     /**
-     * Cache Manager
+     * Cache Driver Manager
      *
      * Automatically selects the best available cache driver
      * (APCu > File > Array fallback).
@@ -15,7 +15,7 @@ namespace features\cache {
      * @author Goddy
      * @created May 18, 2026 at 1:09:51 PM
      */
-    final class CacheManager
+    final class CacheDriverManager
     {
 
         /**

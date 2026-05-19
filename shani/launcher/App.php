@@ -13,7 +13,7 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
-    use features\cache\CacheManager;
+    use features\cache\CacheDriverManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
     use features\exceptions\BadRequestException;

@@ -77,9 +77,9 @@ namespace shani\contracts {
          * Retrieve a cached value or compute and store it if missing.
          *
          * @param string|int $key The cache key.
+         * @param Duration|null $ttl The time-to-live duration for the cache entry
          * @param \Closure $callback Callback to compute the value if not cached.
          * The signature is <code>$callback():mixed</code>
-         * @param Duration|null $ttl The time-to-live duration for the cache entry
          * or null to store forever
          *
          * @return mixed The cached or newly computed value.

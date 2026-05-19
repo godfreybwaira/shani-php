@@ -39,7 +39,7 @@ namespace features\cache {
          */
         public static function instance(): CacheInterface
         {
-            return CacheManager::getInstance('075b62e8c7be');
+            return CacheDriverManager::getInstance('075b62e8c7be');
         }
     }
 
