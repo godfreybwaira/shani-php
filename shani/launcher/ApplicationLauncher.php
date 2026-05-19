@@ -61,13 +61,12 @@ namespace shani\launcher {
          * Get virtual host configurations.
          *
          * @param string $hostName Host name.
-         * @param HttpHeader $headers HTTP request headers.
          * @return array Host Configurations.
          * @throws \Exception If host configuration cannot be found.
          */
-        private static function getHostConfirutations(string $hostName, HttpHeader $headers): array
+        private static function getHostConfigurations(string $hostName): array
         {
-            $configs = Cache::instance()->remember($hostName, null, function ()use (&$hostName, &$headers) {
+            $configs = Cache::instance()->remember('host.' . $hostName, null, function ()use ($hostName) {
                 $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
                 if (is_file($yaml)) {
                     return ['host' => $hostName, 'data' => yaml_parse_file($yaml)];
@@ -75,7 +74,7 @@ namespace shani\launcher {
                 $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';
                 if (is_file($alias)) {
                     $host = file_get_contents($alias);
-                    return static::getHostConfirutations(trim($host), $headers);
+                    return static::getHostConfigurations(trim($host));
                 }
                 throw new \Exception('Host "' . $hostName . '" not found');
             });
@@ -92,7 +91,7 @@ namespace shani\launcher {
          */
         private static function host(string $hostName, HttpHeader $headers): ?RequestPreference
         {
-            $configs = self::getHostConfirutations($hostName, $headers);
+            $configs = self::getHostConfigurations($hostName);
             $mapper = VirtualHostMapper::fromArray($configs['data']);
             return self::getConfigPreference($configs['host'], $mapper, $headers);
         }

@@ -50,19 +50,9 @@ namespace shani\config {
         public readonly string $allowedMethods;
 
         /**
-         * Whether to continue with CSRF test by checking on request method or to stop.
-         *
-         * @var string
-         */
-        public readonly string $skipTest;
-
-        /**
          * Constructor for CsrfConfig.
          *
          * Initializes CSRF protection configuration with defaults if none are provided.
-         *
-         * @param string $requestMethod
-         *     The HTTP request method being checked (e.g., 'post', 'get').
          *
          * @param bool $enabled
          *     Whether CSRF protection is enabled. Defaults to true.
@@ -75,7 +65,6 @@ namespace shani\config {
          *     Defaults to 'get,head,options'.
          */
         public function __construct(
-                string $requestMethod,
                 bool $enabled = true,
                 string $tokenName = 'X-Csrf-Token',
                 string $allowedMethods = 'get,head,options'
@@ -84,7 +73,6 @@ namespace shani\config {
             $this->enabled = $enabled;
             $this->tokenName = $tokenName;
             $this->allowedMethods = $allowedMethods;
-            $this->skipTest = !$enabled || str_contains($allowedMethods, $requestMethod);
         }
     }
 

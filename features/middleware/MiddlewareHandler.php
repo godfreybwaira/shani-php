@@ -13,6 +13,7 @@ namespace features\middleware {
     use features\attributes\CsrfCheck;
     use features\attributes\PermissionCheck;
     use features\cache\Cache;
+    use features\utils\Duration;
     use shani\contracts\AttributeInterface;
     use shani\http\HttpHeader;
     use shani\launcher\App;
@@ -56,25 +57,38 @@ namespace features\middleware {
 
         public function handleAttributes(object $instance, string $methodName): void
         {
-            $cacheKey = md5($instance::class . $methodName);
-            $attributes = Cache::instance()->remember($cacheKey, null, function ()use (&$instance, &$methodName) {
-                $methods = new \ReflectionMethod($instance, $methodName);
-                $attributes = $methods->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
-                if (empty($attributes)) {
-                    $classes = new \ReflectionClass($instance);
-                    $attributes = $classes->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+            $cacheKey = $instance::class . ':' . $methodName;
+            $attributes = Cache::instance()->remember($cacheKey, Duration::ofMonths(2), function ()use ($instance, $methodName) {
+                // 1. Get method attributes (higher priority)
+                $refMethod = new \ReflectionMethod($instance, $methodName);
+                $methodAttributes = $refMethod->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+                // 2. Get class attributes
+                $refClass = new \ReflectionClass($instance);
+                $classAttributes = $refClass->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
+                // 3. Merge them: Method overrides Class
+                $attributesMap = [];
+                foreach ($classAttributes as $attr) {
+                    $attributesMap['\\' . $attr->getName()] = $attr->getArguments();
                 }
-                return $attributes;
+                foreach ($methodAttributes as $attr) {
+                    $attributesMap['\\' . $attr->getName()] = $attr->getArguments();
+                }
+                return $attributesMap;
             });
+            $this->execute($attributes);
+        }
+
+        private function execute(array &$attributes): void
+        {
             if (empty($attributes)) {
                 CsrfCheck::protect($this->app);
                 AuthorizationCheck::protect($this->app);
                 PermissionCheck::protect($this->app);
-            } else {
-                foreach ($attributes as $reflection) {
-                    $obj = $reflection->newInstance();
-                    $obj->execute($this->app);
-                }
+                return;
+            }
+            foreach ($attributes as $class => $args) {
+                $obj = new $class(...$args);
+                $obj->execute($this->app);
             }
         }
     }

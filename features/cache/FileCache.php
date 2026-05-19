@@ -69,10 +69,10 @@ namespace features\cache {
             $file = $this->getFilePath($key);
             $data = [
                 'value' => $value,
-                'expires' => time() + $ttl
+                'expires' => time() + ($ttl ? $ttl->fromNow() : 0)
             ];
-
-            return file_put_contents($file, serialize($data)) !== false;
+            file_put_contents($file, serialize($data));
+            return $this;
         }
 
         public function has(string|int $key): bool
@@ -114,6 +114,12 @@ namespace features\cache {
             $value = $callback();
             $this->addOne($key, $value, $ttl);
             return $value;
+        }
+
+        public function updateValue(string|int $key, ?Duration $ttl, \Closure $updater): CacheInterface
+        {
+            $value = $updater($this->getOne($key));
+            return $this->addOne($key, $value, $ttl);
         }
     }
 

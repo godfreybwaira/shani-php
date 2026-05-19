@@ -115,12 +115,6 @@ namespace shani\launcher {
         public readonly StorageMediaInterface $storage;
 
         /**
-         * Application cache
-         * @var CacheInterface
-         */
-        public readonly CacheInterface $cache;
-
-        /**
          * Application paths
          * @var PathConfig
          */
@@ -147,7 +141,6 @@ namespace shani\launcher {
             $this->writer = $writer;
             $this->framework = $framework;
             $this->request = $res->request;
-            $this->cache = CacheManager::getInstance($preference->mapper->projectName . $preference->versionNumber);
             $class = $preference->vhost->getOne('config');
             $this->config = new $class($this);
             $this->session = $this->getSession();

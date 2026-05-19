@@ -46,7 +46,7 @@ namespace features\console {
                 ConsoleIO::output(($id + 1) . '. ' . $resources[$id]);
                 $id++;
             }
-            $choice = ConsoleIO::read('Enter your choice:', function (string $id) use (&$resources, &$required) {
+            $choice = ConsoleIO::read('Enter your choice:', function (string $id) use ($resources, &$required) {
                 if ($required || !empty($id)) {
                     $value = preg_match('/^[0-9]+$/', $id) === 1 ? (int) $id : null;
                     return $value !== null && isset($resources[$value - 1]);

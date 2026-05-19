@@ -69,7 +69,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
             $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $rows = $db->find('users');
-            $cb = function () use (&$rows) {
+            $cb = function () use ($rows) {
                 foreach ($rows as $row) {
                     yield $row;
                 }
@@ -142,7 +142,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
             $client->enableAsync(false)->enableSSLVerification(false);
             $cb = null;
             $client->get('/components/0/stream', function (ResponseEntity $res) use (&$cb) {
-                $cb = function ()use (&$res) {
+                $cb = function ()use ($res) {
                     yield $res->body();
                 };
             });

@@ -13,7 +13,7 @@ namespace shani\contracts {
      * Note:
      *   Ensure APCu is enabled (`apc.enabled=1` and `apc.enable_cli=1`)
      *   and PHP-FPM is restarted for APCu cache clearing to work properly.
-     * 
+     *
      * @author Goddy
      * @created May 18, 2026 at 12:26:20 PM
      */
@@ -36,7 +36,7 @@ namespace shani\contracts {
          * @param mixed $value The value to store.
          * @param Duration|null $ttl The time-to-live duration for the cache entry.
          * or null to store forever
-         * @return bool True if stored successfully, false otherwise.
+         * @return CacheInterface
          */
         public function addOne(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface;
 
@@ -81,9 +81,24 @@ namespace shani\contracts {
          * The signature is <code>$callback():mixed</code>
          * @param Duration|null $ttl The time-to-live duration for the cache entry
          * or null to store forever
+         *
          * @return mixed The cached or newly computed value.
          */
         public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed;
+
+        /**
+         * Update a value using callback function. The returned value from the
+         * callback become the new value. The signature of the callback
+         * is <code>$updater(mixed $value):mixed</code>
+         *
+         * @param string|int $key An item to update
+         * @param Duration|null $ttl The time-to-live duration for the cache entry
+         * or null to store forever
+         * @param \Closure $updater An updater callback
+         *
+         * @return self
+         */
+        public function updateValue(string|int $key, ?Duration $ttl, \Closure $updater): CacheInterface;
     }
 
 }

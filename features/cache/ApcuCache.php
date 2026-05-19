@@ -83,6 +83,12 @@ namespace features\cache {
             }
             return $this;
         }
+
+        public function updateValue(string|int $key, ?Duration $ttl, \Closure $updater): CacheInterface
+        {
+            $value = $updater($this->getOne($key));
+            return $this->addOne($key, $value, $ttl);
+        }
     }
 
 }

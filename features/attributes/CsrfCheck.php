@@ -34,9 +34,13 @@ namespace features\attributes {
         public function execute(App $app): void
         {
             $csrf = $app->config->csrfConfig();
-            if ($this->exempted || $csrf->skipTest) {
+            if ($this->exempted || !$csrf->enabled) {
                 return;
             }
+            if (str_contains($csrf->allowedMethods, $app->request->method)) {
+                throw new \RuntimeException('The request method "' . $app->request->method . '" does not support CSRF protection.');
+            }
+
             $expectedToken = $app->csrfToken()->getOne($csrf->tokenName);
             $submittedToken = $app->request->header()->getOne($csrf->tokenName) ?? $app->request->body()->getOne($csrf->tokenName);
             if (empty($submittedToken) || !hash_equals($expectedToken, $submittedToken)) {

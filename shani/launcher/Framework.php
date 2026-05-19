@@ -117,10 +117,10 @@ namespace shani\launcher {
         /** Application directory path */
         public const DIR_APPS = SHANI_SERVER_ROOT . '/apps';
 
-        /** Minimum PHP version supported by Shani framework */
+        /** Minimum PHP version supported by this framework */
         public const MIN_PHP_VERSION = '8.1';
 
-        /** Mandatory extensions required by Shani framework */
+        /** Mandatory extensions required by this framework */
         public const REQUIRED_EXTENSIONS = ['yaml'];
 
         /** Framework features path */
@@ -149,6 +149,7 @@ namespace shani\launcher {
                 ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
                 ini_set('display_errors', $config['display_errors']);
                 date_default_timezone_set($config['time_zone']);
+                return $config;
             });
             // Convert payload size to bytes
             $config['max_payload_size'] *= self::MB_1;

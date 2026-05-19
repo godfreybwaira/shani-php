@@ -151,7 +151,7 @@ namespace shani\contracts {
          */
         public function csrfConfig(): CsrfConfig
         {
-            return $this->csrfConfig ??= new CsrfConfig($this->app->request->method);
+            return $this->csrfConfig ??= new CsrfConfig();
         }
 
         /**

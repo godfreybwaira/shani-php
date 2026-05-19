@@ -263,7 +263,7 @@ namespace features\utils {
             $this->setOptions([
                 CURLOPT_CUSTOMREQUEST => $method,
                 CURLOPT_HTTPHEADER => $this->requestHeader->map(fn($name, $value) => $name . ':' . implode(',', $value))->toArray(),
-                CURLOPT_WRITEFUNCTION => function (\CurlHandle $curl, string $content) use (&$request, &$callback) {
+                CURLOPT_WRITEFUNCTION => function (\CurlHandle $curl, string $content) use ($request, $callback) {
                     $status = HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
                     $cookies = new ReadableMap($this->responseHeader->cookies());
                     $response = new ResponseEntity($request, $status, $this->responseHeader, $cookies);
@@ -514,7 +514,7 @@ namespace features\utils {
             if ($progress !== null) {
                 $this->setOptions([
                     CURLOPT_NOPROGRESS => false,
-                    CURLOPT_PROGRESSFUNCTION => function (&$curl, $total, $loaded) use (&$progress) {
+                    CURLOPT_PROGRESSFUNCTION => function (&$curl, $total, $loaded) use ($progress) {
                         $progress($total, $loaded);
                     }
                 ]);
@@ -544,7 +544,7 @@ namespace features\utils {
             if ($progress !== null) {
                 $this->setOptions([
                     CURLOPT_NOPROGRESS => false,
-                    CURLOPT_PROGRESSFUNCTION => function (&$curl, $dt, $dl, $total, $loaded) use (&$progress) {
+                    CURLOPT_PROGRESSFUNCTION => function (&$curl, $dt, $dl, $total, $loaded) use ($progress) {
                         $progress($total, $loaded);
                     }
                 ]);

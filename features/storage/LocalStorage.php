@@ -96,19 +96,20 @@ namespace features\storage {
             $userBucket = $this->app->auth->getUserDetails()->storageBucket;
             $prefix = StaticAssetOwnership::createUserFilePrefix($userBucket);
             $destination = $this->pathTo($this->app->preference->mapper->privateBucket . '/' . trim($bucket, '/'));
-            return $this->saveFile($file, rtrim($destination, '/'), $prefix, function ($filepath)use (&$file) {
-                        if (move_uploaded_file($file->path, $filepath)) {
-                            return;
-                        }
-                        $to = fopen($filepath, 'wb');
-                        $from = fopen($file->path, 'rb');
-                        $chunk = min($file->size, Framework::BUFFER_SIZE);
-                        while (!feof($from)) {
-                            fwrite($to, fread($from, $chunk));
-                        }
-                        fclose($from);
-                        fclose($to);
-                    });
+            $path = $this->saveFile($file, rtrim($destination, '/'), $prefix, function ($filepath)use ($file) {
+                if (move_uploaded_file($file->path, $filepath)) {
+                    return;
+                }
+                $to = fopen($filepath, 'wb');
+                $from = fopen($file->path, 'rb');
+                $chunk = min($file->size, Framework::BUFFER_SIZE);
+                while (!feof($from)) {
+                    fwrite($to, fread($from, $chunk));
+                }
+                fclose($from);
+                fclose($to);
+            });
+            return $path;
         }
 
         /**

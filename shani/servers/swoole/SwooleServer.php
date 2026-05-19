@@ -86,7 +86,7 @@ namespace shani\servers\swoole {
 
         public function request(\Closure $callback): SupportedWebServer
         {
-            $this->server->on('request', function (Request $req, Response $res) use (&$callback) {
+            $this->server->on('request', function (Request $req, Response $res) use ($callback) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';
                 $request = self::createRequest($scheme, $req);
                 if ($scheme === 'https' || !$this->forceRedirection) {
@@ -99,7 +99,7 @@ namespace shani\servers\swoole {
                     $res->end();
                 }
             });
-            $this->server->on('message', function (Server $server, Frame $frame) use (&$callback) {
+            $this->server->on('message', function (Server $server, Frame $frame) use ($callback) {
                 $request = $this->clients[$frame->fd] ?? null;
                 if (!empty($request)) {
                     $request->withRawBody($frame->data);

@@ -4,6 +4,7 @@ namespace features\cache {
 
     use features\storage\LocalStorage;
     use shani\contracts\CacheInterface;
+    use shani\launcher\Framework;
 
     /**
      * Cache Manager
@@ -57,8 +58,8 @@ namespace features\cache {
             }
 
             // 2. File Cache - Good fallback
-            $fileCachePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $prefix . 'cache';
-            if (is_dir($fileCachePath)) {
+            $fileCachePath = Framework::DIR_SERVER_STORAGE . '/cache/' . $prefix;
+            if (!is_dir($fileCachePath)) {
                 mkdir($fileCachePath, LocalStorage::FILE_MODE, true);
             }
             return new FileCache($fileCachePath);

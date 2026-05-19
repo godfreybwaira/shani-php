@@ -33,7 +33,7 @@ namespace apps\demo\v1\config {
 
         public function csrfConfig(): CsrfConfig
         {
-            return $this->csrfConfig ??= new CsrfConfig($this->app->request->method, false);
+            return $this->csrfConfig ??= new CsrfConfig(enabled: false);
         }
 
         #[\Override]

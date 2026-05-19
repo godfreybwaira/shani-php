@@ -54,7 +54,7 @@ namespace features\tasks {
          */
         public function startNow(): self
         {
-            return $this->startAfter(Duration::of(0, DurationUnit::SECONDS)->toDateTime());
+            return $this->startAfter(Duration::ofSeconds(0)->toDateTime());
         }
 
         /**
@@ -65,7 +65,7 @@ namespace features\tasks {
         public function startAfter(\DateTimeInterface $duration): self
         {
             $seconds = $duration->getTimestamp() - time();
-            Concurrency::parallel(function ()use (&$seconds) {
+            Concurrency::parallel(function ()use ($seconds) {
                 $this->listener->trigger(TaskEvent::START->name);
                 $counter = 0;
                 do {
