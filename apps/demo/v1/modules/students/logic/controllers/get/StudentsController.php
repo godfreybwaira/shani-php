@@ -12,12 +12,9 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
     use apps\demo\v1\modules\students\data\dto\StudentDto;
     use apps\demo\v1\modules\students\data\dto\StudentListDto;
     use apps\demo\v1\modules\students\logic\services\StudentService;
-    use features\attributes\security\AuthorizationCheck;
-    use features\attributes\security\CsrfCheck;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
-    #[CsrfCheck(exempted: true)]
     final class StudentsController
     {
 
@@ -30,8 +27,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        #[AuthorizationCheck(true)]
-        #[CsrfCheck(exempted: true)]
         public function index(): HttpResponse
         {
             $students = $this->service->getAll();

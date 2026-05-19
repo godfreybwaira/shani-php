@@ -34,11 +34,8 @@ namespace features\attributes\security {
         public function execute(App $app): void
         {
             $csrf = $app->config->csrfConfig();
-            if ($this->exempted || !$csrf->enabled) {
+            if ($this->exempted || !$csrf->enabled || str_contains($csrf->allowedMethods, $app->request->method)) {
                 return;
-            }
-            if (str_contains($csrf->allowedMethods, $app->request->method)) {
-                throw new \RuntimeException('The request method "' . $app->request->method . '" does not support CSRF protection.');
             }
 
             $expectedToken = $app->csrfToken()->getOne($csrf->tokenName);
