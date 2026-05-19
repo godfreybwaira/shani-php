@@ -58,7 +58,7 @@ namespace features\middleware {
         public function handleAttributes(object $instance, string $methodName): void
         {
             $cacheKey = $instance::class . '-' . $methodName;
-            $attributes = Cache::instance()->fetch($cacheKey, Duration::ofDays(3), function ()use ($instance, $methodName) {
+            $attributes = Cache::instance()->fetch($cacheKey, Duration::ofMonths(3), function ()use ($instance, $methodName) {
                 // 1. Get method attributes (higher priority)
                 $refMethod = new \ReflectionMethod($instance, $methodName);
                 $methodAttributes = $refMethod->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);

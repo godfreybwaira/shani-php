@@ -67,19 +67,18 @@ namespace shani\launcher {
          */
         private static function getHostConfigurations(string $hostName): array
         {
-            $configs = Cache::instance()->fetch('host-' . $hostName, Duration::ofDays(3), function ()use ($hostName) {
-                $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
-                if (is_file($yaml)) {
-                    return ['host' => $hostName, 'data' => yaml_parse_file($yaml)];
-                }
-                $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';
-                if (is_file($alias)) {
-                    $host = file_get_contents($alias);
-                    return static::getHostConfigurations(trim($host));
-                }
-                throw new \Exception('Host "' . $hostName . '" not found');
-            });
-            return $configs;
+
+            $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
+            if (is_file($yaml)) {
+                $config = Cache::instance()->fetch($hostName . filemtime($yaml), Duration::ofMonths(3), fn() => yaml_parse_file($yaml));
+                return ['host' => $hostName, 'data' => $config];
+            }
+            $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';
+            if (is_file($alias)) {
+                $host = file_get_contents($alias);
+                return static::getHostConfigurations(trim($host));
+            }
+            throw new \Exception('Host "' . $hostName . '" not found');
         }
 
         /**

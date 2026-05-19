@@ -150,7 +150,7 @@ namespace shani\launcher {
             if (!$cache->has($key)) {
                 $cache->clear();
             }
-            $config = $cache->fetch($key, Duration::ofWeeks(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
+            $config = $cache->fetch($key, Duration::ofMonths(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
 
             self::checkFrameworkRequirements();
 
