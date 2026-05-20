@@ -2,9 +2,7 @@
 
 namespace features\cache {
 
-    use features\storage\LocalStorage;
-    use shani\contracts\CacheInterface;
-    use shani\launcher\Framework;
+    use features\storage\StorageInterface;
 
     /**
      * Cache Driver Manager
@@ -21,9 +19,9 @@ namespace features\cache {
         /**
          * Singleton instance of the selected cache driver.
          *
-         * @var CacheInterface
+         * @var StorageInterface
          */
-        private static CacheInterface $instance;
+        private static StorageInterface $instance;
 
         /**
          * Get the best available cache driver instance.
@@ -31,9 +29,9 @@ namespace features\cache {
          * This method ensures that only one cache driver is instantiated
          * and reused throughout the application lifecycle.
          *
-         * @return CacheInterface The resolved cache driver instance.
+         * @return StorageInterface The resolved cache driver instance.
          */
-        public static function getInstance(string $prefix): CacheInterface
+        public static function getInstance(string $prefix): StorageInterface
         {
             if (!isset(self::$instance)) {
                 self::$instance = self::resolveDriver($prefix);
@@ -48,21 +46,15 @@ namespace features\cache {
          * 1. APCu (shared memory, best for production)
          * 2. File Cache (fallback if APCu unavailable)
          *
-         * @return CacheInterface The resolved cache driver.
+         * @return StorageInterface The resolved cache driver.
          */
-        private static function resolveDriver(string $prefix): CacheInterface
+        private static function resolveDriver(string $prefix): StorageInterface
         {
             // 1. APCu - Best for production (shared memory)
             if (function_exists('apcu_enabled') && apcu_enabled()) {
                 return new ApcuCache($prefix);
             }
-
-            // 2. File Cache - Good fallback
-            $fileCachePath = Framework::DIR_SERVER_STORAGE . '/cache/' . $prefix;
-            if (!is_dir($fileCachePath)) {
-                mkdir($fileCachePath, LocalStorage::FILE_MODE, true);
-            }
-            return new FileCache($fileCachePath);
+            return new FileCache($prefix);
         }
     }
 

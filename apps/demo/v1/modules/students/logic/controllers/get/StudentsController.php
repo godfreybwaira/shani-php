@@ -34,7 +34,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             foreach ($students as $student) {
                 $dtos->put(StudentDto::toDto($student));
             }
-            $cart = $this->app->session->cart('user');
+            $cart = $this->app->session->container('user');
             if (!$cart->isEmpty()) {
                 return HttpResponse::withBody($dtos);
             }

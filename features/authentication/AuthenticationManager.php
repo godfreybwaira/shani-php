@@ -76,8 +76,8 @@ namespace features\authentication {
                     return null;
                 }
                 $this->user = $user;
-                $this->app->session->cart(self::METADATA_CART)->addOne('strategy', $index);
-                $this->app->session->cart(self::AUTH_CART)->add($user);
+                $this->app->session->container(self::METADATA_CART)->addOne('strategy', $index);
+                $this->app->session->container(self::AUTH_CART)->add($user);
                 $this->app->session->refresh();
                 return $user;
             }
@@ -122,7 +122,7 @@ namespace features\authentication {
         public function logout(): bool
         {
             if ($this->loggedIn()) {
-                $index = $this->app->session->cart(self::METADATA_CART)->getOne('strategy');
+                $index = $this->app->session->container(self::METADATA_CART)->getOne('strategy');
                 $strategy = $this->app->config->authenticationConfig()->authenticationStrategies[$index];
                 if ($strategy->logout()) {
                     $this->user = null;
@@ -139,8 +139,8 @@ namespace features\authentication {
          */
         public function getUserDetails(): ?UserDetailsDto
         {
-            if ($this->user === null && $this->app->session->cartExists(self::AUTH_CART)) {
-                $cart = $this->app->session->cart(self::AUTH_CART);
+            if ($this->user === null && $this->app->session->containerExists(self::AUTH_CART)) {
+                $cart = $this->app->session->container(self::AUTH_CART);
                 $this->user = UserDetailsDto::fromArray($cart->toArray());
             }
             return $this->user;
@@ -163,7 +163,7 @@ namespace features\authentication {
          */
         public function loggedIn(): bool
         {
-            return $this->user !== null || $this->app->session->cartExists(self::AUTH_CART);
+            return $this->user !== null || $this->app->session->containerExists(self::AUTH_CART);
         }
 
         /**

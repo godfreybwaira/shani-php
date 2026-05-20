@@ -84,24 +84,24 @@ namespace features\ds\map {
          *
          * @return mixed The cached or newly computed value.
          */
-        public function remember(string|int $key, ?Duration $ttl, \Closure $callback): mixed
+        public function fetch(string|int $key, ?Duration $ttl, \Closure $callback): mixed
         {
             if ($this->exists($key)) {
-                $value = $this->getOne($key);
-                if (!isset($value['_value_'])) {
-                    return $value;
+                $stored = $this->getOne($key);
+                if (!isset($stored['_value_'])) {
+                    return $stored;
                 }
-                if (Duration::expired($value['_expires_'])) {
-                    $this->delete($key);
-                    return $this->remember($key, $ttl, $callback);
+                if (!Duration::expired($stored['_expires_'])) {
+                    return $stored['_value_'];
                 }
-                return $value['_value_'];
+                $this->delete($key);
             }
-            $value = [];
-            $value['_value_'] = $callback();
-            $value['_expires_'] = $ttl?->toDateTime()->getTimestamp() ?? PHP_INT_MAX;
-            $this->addOne($key, $value);
-            return $value['_value_'];
+            $result = $callback();
+            $this->addOne($key, [
+                '_value_' => $result,
+                '_expires_' => $ttl?->toDateTime()->getTimestamp() ?? PHP_INT_MAX,
+            ]);
+            return $result;
         }
 
         /**

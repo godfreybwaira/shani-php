@@ -9,12 +9,13 @@
 
 namespace features\session {
 
+    use features\storage\StorageInterface;
     use shani\launcher\App;
 
     final class SessionStorage
     {
 
-        public static function getStorage(App $app, ?SessionConnectionInterface $conn): SessionStorageInterface
+        public static function getStorage(App $app, ?SessionConnectionInterface $conn): StorageInterface
         {
             if ($conn === null) {
                 return new StatelessSessionStorage();

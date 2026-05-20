@@ -10,18 +10,19 @@
 namespace features\session {
 
     use features\ds\map\WritableMap;
+    use features\storage\StorageInterface;
 
-    final class StatelessSessionStorage implements SessionStorageInterface
+    final class StatelessSessionStorage implements StorageInterface
     {
 
         private array $carts = [];
 
-        public final function cartExists(string $cartName): bool
+        public final function containerExists(string $cartName): bool
         {
             return isset($this->carts[$cartName]);
         }
 
-        public function cart(string $cartName): WritableMap
+        public function container(string $cartName): WritableMap
         {
             if (!isset($this->carts[$cartName])) {
                 $this->carts[$cartName] = new WritableMap();
@@ -39,7 +40,12 @@ namespace features\session {
             return;
         }
 
-        public function refresh(): SessionStorageInterface
+        public function clear(): StorageInterface
+        {
+            return;
+        }
+
+        public function refresh(): StorageInterface
         {
             return $this;
         }

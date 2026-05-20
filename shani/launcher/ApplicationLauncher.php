@@ -70,7 +70,7 @@ namespace shani\launcher {
 
             $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
             if (is_file($yaml)) {
-                $config = Cache::instance()->fetch($hostName . filemtime($yaml), Duration::ofMonths(3), fn() => yaml_parse_file($yaml));
+                $config = Cache::container()->fetch($hostName . filemtime($yaml), Duration::ofMonths(3), fn() => yaml_parse_file($yaml));
                 return ['host' => $hostName, 'data' => $config];
             }
             $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';

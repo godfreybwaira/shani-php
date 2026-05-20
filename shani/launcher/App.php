@@ -22,7 +22,7 @@ namespace shani\launcher {
     use features\middleware\MiddlewareHandler;
     use features\middleware\MiddlewareHandlerInterface;
     use features\session\SessionStorage;
-    use features\session\SessionStorageInterface;
+    use features\storage\StorageInterface;
     use features\storage\StorageMediaInterface;
     use shani\config\AppConfig;
     use shani\config\PathConfig;
@@ -61,7 +61,7 @@ namespace shani\launcher {
     {
 
         private ?Logger $logger = null;
-        public readonly SessionStorageInterface $session;
+        public readonly StorageInterface $session;
         private ?string $lang = null;
 
         /**
@@ -205,10 +205,10 @@ namespace shani\launcher {
 
         public function csrfToken(): WritableMap
         {
-            return $this->session->cart('fiJ9Gce5osud7s');
+            return $this->session->container('fiJ9Gce5osud7s');
         }
 
-        private function getSession(): SessionStorageInterface
+        private function getSession(): StorageInterface
         {
             $conn = $this->config->sessionConfig()->connection;
             return SessionStorage::getStorage($this, $conn);

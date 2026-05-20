@@ -2,124 +2,138 @@
 
 namespace features\cache {
 
-    use features\utils\Duration;
-    use shani\contracts\CacheInterface;
+    use features\ds\map\WritableMap;
+    use features\storage\LocalStorage;
+    use features\storage\StorageInterface;
+    use features\utils\Directory;
+    use shani\launcher\Framework;
 
     /**
      * File-based Cache Driver
      *
      * Provides a cache implementation using the local filesystem.
-     * Each cache entry is stored as a serialized file with an expiration timestamp.
+     * Each container is stored as a serialized file with optional TTL.
      *
      * This driver is useful as a fallback when APCu is not available,
      * or for environments where persistent cache storage is required.
      *
      * @author goddy
-     * @created May 18, 2026 at 1:18:11 PM
+     * @created May 20, 2026 at 9:30 AM
      */
-    final class FileCache implements CacheInterface
+    final class FileCache implements StorageInterface
     {
 
         /**
+         * Flag indicating whether the cache has already been closed.
+         *
+         * Used to prevent multiple flushes of in‑memory containers
+         * to the underlying storage during shutdown.
+         *
+         * @var bool
+         */
+        private bool $closed = false;
+
+        /**
+         * In‑memory collection of named containers.
+         *
+         * Each entry is a WritableMap instance representing a
+         * logical cache bucket (e.g., cart, wishlist, comparison).
+         * These are lazily initialized and persisted to storage
+         * when close() is invoked.
+         *
+         * @var array<string, WritableMap>
+         */
+        private array $carts = [];
+
+        /**
          * Directory path where cache files are stored.
+         */
+        private readonly string $directory;
+
+        /**
+         * Prefix applied to all cache keys to avoid collisions.
          *
          * @var string
          */
-        private readonly string $path;
+        private readonly string $prefix;
 
         /**
-         * Constructor.
+         * Create a file cache storage
          *
-         * @param string $path Directory path for storing cache files.
+         * @param string $prefix Prefix applied to all cache keys to avoid collisions.
          */
-        public function __construct(string $path)
+        public function __construct(string $prefix)
         {
-            $this->path = rtrim($path, DIRECTORY_SEPARATOR);
+            $this->prefix = $prefix;
+            $this->directory = Framework::DIR_SERVER_STORAGE . '/cache/' . bin2hex($prefix);
+            if (!is_dir($this->directory)) {
+                mkdir($this->directory, LocalStorage::FILE_MODE, true);
+            }
+            register_shutdown_function([$this, 'close']);
+        }
+
+        public function container(string $name): WritableMap
+        {
+            if (!isset($this->carts[$name])) {
+                $value = $this->getValue($name);
+                $this->carts[$name] = new WritableMap($value ?? []);
+            }
+            return $this->carts[$name];
         }
 
         /**
-         * Generate the full file path for a given cache key.
-         *
-         * @param string|int $key The cache key.
-         * @return string The corresponding file path.
+         * Fetches a container value from a file.
          */
-        private function getFilePath(string|int $key): string
+        private function getValue(string $name): mixed
         {
-            return $this->path . DIRECTORY_SEPARATOR . md5($key) . '.cache';
-        }
-
-        public function getOne(string|int $key, mixed $default = null): mixed
-        {
-            $file = $this->getFilePath($key);
+            $file = $this->makeKey($name);
             if (!file_exists($file)) {
-                return $default;
+                return null;
             }
-
-            $data = unserialize(file_get_contents($file));
-            if (!empty($data) && $data['expires'] > time()) {
-                return $data['value'];
-            }
-
-            unlink($file);
-            return $default;
+            return unserialize(file_get_contents($file));
         }
 
-        public function addOne(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
+        public function containerExists(string $name): bool
         {
-            $file = $this->getFilePath($key);
-            $data = [
-                'value' => $value,
-                'expires' => time() + ($ttl ? $ttl->fromNow() : 0)
-            ];
-            file_put_contents($file, serialize($data));
+            return $this->getValue($name) !== null;
+        }
+
+        public function destroy(): void
+        {
+            Directory::delete($this->directory);
+            $this->carts = [];
+        }
+
+        public function clear(): StorageInterface
+        {
+            $this->destroy();
+            mkdir($this->directory, LocalStorage::FILE_MODE, true);
             return $this;
         }
 
-        public function has(string|int $key): bool
+        public function refresh(): StorageInterface
         {
-            return $this->getOne($key, '__NOT_FOUND__') !== '__NOT_FOUND__';
-        }
-
-        public function delete(string|int $key): bool
-        {
-            if ($this->has($key)) {
-                return unlink($this->getFilePath($key));
-            }
-            return true;
-        }
-
-        public function clear(): CacheInterface
-        {
-            $files = glob($this->path . '/*.cache');
-            foreach ($files as $file) {
-                unlink($file);
-            }
             return $this;
         }
 
-        public function addIfAbsent(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
+        public function started(): bool
         {
-            if (!$this->has($key)) {
-                $this->addOne($key, $value, $ttl);
-            }
-            return $this;
+            return is_writable($this->directory);
         }
 
-        public function fetch(string|int $key, ?Duration $ttl, \Closure $callback): mixed
+        public function close(): void
         {
-            if ($this->has($key)) {
-                return $this->getOne($key);
+            if (!$this->closed) {
+                foreach ($this->carts as $name => $cart) {
+                    file_put_contents($this->makeKey($name), serialize($cart->toArray()));
+                }
+                $this->closed = true;
             }
-
-            $value = $callback();
-            $this->addOne($key, $value, $ttl);
-            return $value;
         }
 
-        public function updateValue(string|int $key, ?Duration $ttl, \Closure $updater): CacheInterface
+        private function makeKey(string $name): string
         {
-            $value = $updater($this->getOne($key));
-            return $this->addOne($key, $value, $ttl);
+            return $this->directory . DIRECTORY_SEPARATOR . bin2hex($name) . '.cache';
         }
     }
 

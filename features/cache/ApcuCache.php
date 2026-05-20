@@ -13,8 +13,8 @@
 
 namespace features\cache {
 
-    use features\utils\Duration;
-    use shani\contracts\CacheInterface;
+    use features\ds\map\WritableMap;
+    use features\storage\StorageInterface;
 
     /**
      * APCu-based cache implementation.
@@ -22,8 +22,30 @@ namespace features\cache {
      * Stores and retrieves values from APCu shared memory with
      * optional TTL (time-to-live) expiration.
      */
-    final class ApcuCache implements CacheInterface
+    final class ApcuCache implements StorageInterface
     {
+
+        /**
+         * Flag indicating whether the cache has already been closed.
+         *
+         * Used to prevent multiple flushes of in‑memory containers
+         * to the underlying storage during shutdown.
+         *
+         * @var bool
+         */
+        private bool $closed = false;
+
+        /**
+         * In‑memory collection of named containers.
+         *
+         * Each entry is a WritableMap instance representing a
+         * logical cache bucket (e.g., cart, wishlist, comparison).
+         * These are lazily initialized and persisted to storage
+         * when close() is invoked.
+         *
+         * @var array<string, WritableMap>
+         */
+        private array $carts = [];
 
         /**
          * Prefix applied to all cache keys to avoid collisions.
@@ -32,62 +54,81 @@ namespace features\cache {
          */
         private readonly string $prefix;
 
+        /**
+         * Prefix applied to all cache keys to avoid collisions.
+         *
+         * @param string $prefix
+         */
         public function __construct(string $prefix)
         {
             $this->prefix = $prefix;
+            register_shutdown_function([$this, 'close']);
         }
 
-        public function getOne(string|int $key, mixed $default = null): mixed
+        public function container(string $name): WritableMap
         {
-            $value = apcu_fetch($this->prefix . $key);
-            return $value !== false ? $value : $default;
-        }
-
-        public function addOne(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
-        {
-            apcu_store($this->prefix . $key, $value, $ttl ? $ttl->fromNow() : 0);
-            return $this;
-        }
-
-        public function has(string|int $key): bool
-        {
-            return apcu_exists($this->prefix . $key);
-        }
-
-        public function delete(string|int $key): bool
-        {
-            return apcu_delete($this->prefix . $key);
-        }
-
-        public function clear(): CacheInterface
-        {
-            apcu_clear_cache();
-            return $this;
-        }
-
-        public function fetch(string|int $key, ?Duration $ttl, \Closure $callback): mixed
-        {
-            if ($this->has($key)) {
-                return $this->getOne($key);
+            if (!isset($this->carts[$name])) {
+                $value = $this->getValue($name);
+                $this->carts[$name] = new WritableMap($value ?? []);
             }
-
-            $value = $callback();
-            $this->addOne($key, $value, $ttl);
-            return $value;
+            return $this->carts[$name];
         }
 
-        public function addIfAbsent(string|int $key, mixed $value, ?Duration $ttl = null): CacheInterface
+        /**
+         * Fetches a container value from APCu.
+         */
+        private function getValue(string $name): mixed
         {
-            if (!$this->has($key)) {
-                return $this->addOne($key, $value, $ttl);
+            $key = $this->makeKey($name);
+            $value = apcu_fetch($key);
+            return is_array($value) ? $value : null;
+        }
+
+        public function containerExists(string $name): bool
+        {
+            return apcu_exists($this->makeKey($name));
+        }
+
+        public function destroy(): void
+        {
+            $this->clear();
+        }
+
+        public function clear(): StorageInterface
+        {
+            foreach ($this->carts as $name => $v) {
+                apcu_delete($this->makeKey($name));
             }
+            $this->carts = [];
             return $this;
         }
 
-        public function updateValue(string|int $key, ?Duration $ttl, \Closure $updater): CacheInterface
+        public function refresh(): StorageInterface
         {
-            $value = $updater($this->getOne($key));
-            return $this->addOne($key, $value, $ttl);
+            return $this;
+        }
+
+        public function started(): bool
+        {
+            return function_exists('apcu_enabled') && apcu_enabled();
+        }
+
+        public function close(): void
+        {
+            if (!$this->closed) {
+                foreach ($this->carts as $name => $cart) {
+                    apcu_store($this->makeKey($name), $cart->toArray());
+                }
+                $this->closed = true;
+            }
+        }
+
+        /**
+         * Builds a unique APCu key for a container.
+         */
+        private function makeKey(string $name): string
+        {
+            return $this->prefix . '-' . $name;
         }
     }
 

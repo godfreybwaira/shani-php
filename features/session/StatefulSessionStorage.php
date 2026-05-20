@@ -10,9 +10,10 @@
 namespace features\session {
 
     use features\ds\map\WritableMap;
+    use features\storage\StorageInterface;
     use shani\launcher\App;
 
-    final class StatefulSessionStorage implements SessionStorageInterface
+    final class StatefulSessionStorage implements StorageInterface
     {
 
         private readonly App $app;
@@ -27,12 +28,12 @@ namespace features\session {
             $this->start();
         }
 
-        public function cartExists(string $cartName): bool
+        public function containerExists(string $cartName): bool
         {
             return isset($_SESSION[$cartName]);
         }
 
-        public function cart(string $cartName): WritableMap
+        public function container(string $cartName): WritableMap
         {
             if (!isset($this->carts[$cartName])) {
                 $this->carts[$cartName] = new WritableMap($_SESSION[$cartName] ?? []);
@@ -52,12 +53,18 @@ namespace features\session {
 
         public function destroy(): void
         {
-            $this->carts = [];
+            $this->clear();
             session_unset();
             session_destroy();
         }
 
-        public function refresh(): SessionStorageInterface
+        public function clear(): StorageInterface
+        {
+            $this->carts = [];
+            return $this;
+        }
+
+        public function refresh(): StorageInterface
         {
             $csrf = $this->app->config->csrfConfig();
             if ($csrf->enabled) {

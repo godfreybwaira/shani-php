@@ -145,13 +145,12 @@ namespace shani\launcher {
         public function __construct()
         {
 
-            $cache = Cache::instance();
-            $key = 'settings-' . filemtime(self::FRAMEWORK_FILE);
-            if (!$cache->has($key)) {
+            $cache = Cache::container();
+            $name = 'settings' . filemtime(self::FRAMEWORK_FILE);
+            if (!$cache->exists($name)) {
                 $cache->clear();
             }
-            $config = $cache->fetch($key, Duration::ofMonths(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
-
+            $config = $cache->fetch($name, Duration::ofMonths(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
             self::checkFrameworkRequirements();
 
             ini_set('upload_max_filesize', $config['max_payload_size']);
@@ -173,12 +172,12 @@ namespace shani\launcher {
         private static function checkFrameworkRequirements(): void
         {
             if (version_compare(self::MIN_PHP_VERSION, PHP_VERSION) >= 0) {
-                echo 'PHP version ' . self::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL;
+                fwrite(STDERR, 'PHP version ' . self::MIN_PHP_VERSION . ' or higher is required' . PHP_EOL);
                 exit(1);
             }
             foreach (self::REQUIRED_EXTENSIONS as $extension) {
                 if (!extension_loaded($extension)) {
-                    echo 'Please install PHP ' . $extension . ' extension' . PHP_EOL;
+                    fwrite(STDERR, 'Please install PHP ' . $extension . ' extension' . PHP_EOL);
                     exit(1);
                 }
             }
