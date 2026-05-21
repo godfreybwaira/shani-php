@@ -29,7 +29,7 @@ namespace apps\demo\v1\config\auth {
             if (empty($token)) {
                 return null;
             }
-            return new UserDetailsDto('id' . rand(10, 1000), '24354fe-d,5ca2536-e', false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
+            return new UserDetailsDto('id' . rand(10, 1000), '24354fed,5ca2536e', false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
         }
 
         public function register(): ?UserDetailsDto

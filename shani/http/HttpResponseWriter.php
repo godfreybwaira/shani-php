@@ -135,7 +135,6 @@ namespace shani\http {
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_LENGTH, $this->app->response->bodySize());
             if ($this->app->request->method === 'head') {
-                $this->app->response->setStatus(HttpStatus::NO_CONTENT);
                 $this->writer->sendHeaders($this->app->response);
             } else if ($this->useBuffer($connection)) {
                 $this->writer->send($this->app->response);

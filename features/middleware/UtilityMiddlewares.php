@@ -45,10 +45,11 @@ namespace features\middleware {
         {
             if ($app->request->method === 'options') {
                 $config = $app->config->requestConfig();
-                $app->response->setStatus(HttpStatus::NO_CONTENT)->header()->addAll([
+                $app->response->setStatus(HttpStatus::OK)->header()->addAll([
                     HttpHeader::ACCESS_CONTROL_ALLOW_METHODS => $config->allowedMethods,
                     HttpHeader::ACCESS_CONTROL_ALLOW_HEADERS => $config->allowedHeaders,
-                    HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime
+                    HttpHeader::ACCESS_CONTROL_MAX_AGE => $cacheTime,
+                    HttpHeader::ALLOW => $config->allowedMethods,
                 ]);
                 UtilityMiddlewares::addAllowOrigin($app);
             }
