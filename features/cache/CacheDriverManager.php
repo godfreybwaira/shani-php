@@ -2,6 +2,7 @@
 
 namespace features\cache {
 
+    use features\cache\clients\ApcuCache;
     use features\cache\clients\FileCache;
     use features\cache\clients\MemcachedCache;
     use features\storage\StorageInterface;
