@@ -18,10 +18,10 @@ namespace shani\servers {
         /**
          * Called when a web server receive new request
          * @param \Closure $callback A callback to run when a new request is received
-         * i.e <code>$callback(RequestEntity $request, ResponseWriter $writer):void</code>
-         * @return SupportedWebServer
+         * i.e <code>$callback(RequestEntity $request, ResponseWriterInterface $writer):void</code>
+         * @return void
          */
-        public function request(\Closure $callback): SupportedWebServer;
+        public function request(\Closure $callback): void;
 
         /**
          * Return concurrency handler for a web server that supports concurrency

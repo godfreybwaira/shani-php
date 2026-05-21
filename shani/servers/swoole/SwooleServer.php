@@ -84,7 +84,7 @@ namespace shani\servers\swoole {
             }
         }
 
-        public function request(\Closure $callback): SupportedWebServer
+        public function request(\Closure $callback): void
         {
             $this->server->on('request', function (Request $req, Response $res) use ($callback) {
                 $scheme = $this->httpPort === $req->server['server_port'] ? 'http' : 'https';
@@ -116,7 +116,6 @@ namespace shani\servers\swoole {
             });
             $this->server->on('task', fn() => null);
             $this->server->start();
-            return $this;
         }
 
         private static function createRequest(string $scheme, Request $req): RequestEntity
