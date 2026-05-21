@@ -9,7 +9,7 @@
 
 namespace features\utils {
 
-    use features\cache\Cache;
+    use features\cache\CacheFactory;
     use shani\launcher\Framework;
 
     final class MediaType
@@ -1251,7 +1251,7 @@ namespace features\utils {
             if ($extension === null) {
                 return null;
             }
-            $mime = Cache::container()->fetch('mime-' . $extension, null, function () use ($extension) {
+            $mime = CacheFactory::container()->fetch('mime-' . $extension, null, function () use ($extension) {
                 $ext = strtolower(trim($extension, '.'));
                 return yaml_parse_file(Framework::DIR_CONFIG . '/mime.yml')[$ext] ?? null;
             });

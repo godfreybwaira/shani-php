@@ -2,7 +2,7 @@
 ---
 # Display all application errors and server errors. This variable can be
 # overridden by application.
-display_errors: false
+display_errors: true
 time_zone: Africa/Dar_Es_Salaam
 # Maximum payload size in MB allowed to upload.
 max_payload_size: 100
@@ -10,17 +10,16 @@ max_payload_size: 100
 # Framweork Cache Management
 cache:
   # Default cache driver used by the application
-  default_driver: memcached
+  default_driver: apcu
   drivers:
     memcached:
       host: localhost
       port: 11211
-    redis:
-      host: localhost
-      port: 6379
-    apcu: {}
+    apcu:
       # APCu is an in‑process cache (no host/port needed).
       # Best for single‑server PHP setups.
-    file: {}
+    file:
       # File cache stores data on disk.
       # Useful for small apps or development environments.
+    auto:
+      # Let the framework choose the best available driver.

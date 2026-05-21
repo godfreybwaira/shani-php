@@ -9,7 +9,7 @@
 
 namespace shani\launcher {
 
-    use features\cache\Cache;
+    use features\cache\CacheFactory;
     use features\ds\map\ReadableMap;
     use features\utils\Concurrency;
     use features\utils\Duration;
@@ -70,7 +70,7 @@ namespace shani\launcher {
 
             $yaml = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.yml';
             if (is_file($yaml)) {
-                $config = Cache::container()->fetch($hostName . filemtime($yaml), Duration::ofMonths(3), fn() => yaml_parse_file($yaml));
+                $config = CacheFactory::container()->fetch($hostName . filemtime($yaml), Duration::ofMonths(3), fn() => yaml_parse_file($yaml));
                 return ['host' => $hostName, 'data' => $config];
             }
             $alias = Framework::DIR_HOSTS . DIRECTORY_SEPARATOR . $hostName . '.alias';

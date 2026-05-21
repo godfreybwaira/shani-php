@@ -9,7 +9,8 @@
 
 namespace shani\launcher {
 
-    use features\cache\Cache;
+    use features\cache\CacheFactory;
+    use features\cache\CacheDriverManager;
     use features\ds\map\ReadableMap;
     use features\utils\Duration;
 
@@ -145,13 +146,9 @@ namespace shani\launcher {
         public function __construct()
         {
 
-            $cache = Cache::container();
-            $name = 'settings' . filemtime(self::FRAMEWORK_FILE);
-            if (!$cache->exists($name)) {
-                $cache->clear();
-            }
-            $config = $cache->fetch($name, Duration::ofMonths(1), fn() => yaml_parse_file(self::FRAMEWORK_FILE));
+            $config = yaml_parse_file(self::FRAMEWORK_FILE);
             self::checkFrameworkRequirements();
+            self::initializeCacheManager($config['cache']);
 
             ini_set('upload_max_filesize', $config['max_payload_size']);
             ini_set('post_max_size', $config['max_payload_size'] + self::MB_1);
@@ -160,6 +157,17 @@ namespace shani\launcher {
 
             $config['max_payload_size'] *= self::MB_1;
             $this->config = new ReadableMap($config);
+        }
+
+        private static function initializeCacheManager(array $config): void
+        {
+            $driver = $config['drivers'][$config['default_driver']];
+            CacheDriverManager::setDriver($config['default_driver'], $driver['host'] ?? null, $driver['port'] ?? null);
+            $name = 'cnf' . filemtime(self::FRAMEWORK_FILE);
+            $container = CacheFactory::container();
+            if (!$container->exists($name)) {
+                $container->clear()->addOne($name, 1);
+            }
         }
 
         /**

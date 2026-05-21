@@ -61,6 +61,9 @@ namespace features\cache {
          */
         public function __construct(string $prefix)
         {
+            if (!function_exists('apcu_enabled') || !apcu_enabled()) {
+                throw new \RuntimeException('Please enable APCU cache or choose another cache driver.');
+            }
             $this->prefix = $prefix;
             register_shutdown_function([$this, 'close']);
         }

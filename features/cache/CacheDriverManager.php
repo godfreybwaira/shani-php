@@ -16,45 +16,55 @@ namespace features\cache {
     final class CacheDriverManager
     {
 
-        /**
-         * Singleton instance of the selected cache driver.
-         *
-         * @var StorageInterface
-         */
-        private static StorageInterface $instance;
+        public readonly string $driverName;
+        private readonly ?string $host;
+        private readonly ?int $port;
+        private array $cache = [];
+        private static CacheDriverManager $driver;
 
-        /**
-         * Get the best available cache driver instance.
-         *
-         * This method ensures that only one cache driver is instantiated
-         * and reused throughout the application lifecycle.
-         *
-         * @return StorageInterface The resolved cache driver instance.
-         */
-        public static function getInstance(string $prefix): StorageInterface
+        private function __construct(string $driverName, ?string $host, ?int $port)
         {
-            if (!isset(self::$instance)) {
-                self::$instance = self::resolveDriver($prefix);
-            }
-            return self::$instance;
+            $this->driverName = $driverName;
+            $this->host = $host;
+            $this->port = $port;
         }
 
-        /**
-         * Resolve the best cache driver based on environment availability.
-         *
-         * Priority:
-         * 1. APCu (shared memory, best for production)
-         * 2. File Cache (fallback if APCu unavailable)
-         *
-         * @return StorageInterface The resolved cache driver.
-         */
+        public static function setDriver(string $driverName, ?string $host, ?int $port): CacheDriverManager
+        {
+            if (!isset(self::$driver)) {
+                self::$driver = new CacheDriverManager($driverName, $host, $port);
+            } else {
+                throw new \RuntimeException('Could not change cache driver at this moment.');
+            }
+            return self::$driver;
+        }
+
+        public static function getDriver(): CacheDriverManager
+        {
+            return self::$driver;
+        }
+
+        public function createInstance(string $prefix): StorageInterface
+        {
+            if (!isset($this->cache[$prefix])) {
+                $this->cache[$prefix] = match ($this->driverName) {
+                    'memcached' => new MemcachedCache($prefix, $this->host, $this->port),
+                    'apcu' => new ApcuCache($prefix),
+                    'file' => new FileCache($prefix),
+                    'auto' => self::resolveDriver($prefix),
+                    default => throw new \InvalidArgumentException('Unsupported cache driver "' . $this->driverName . '"')
+                };
+            }
+            return $this->cache[$prefix];
+        }
+
         private static function resolveDriver(string $prefix): StorageInterface
         {
-            // 1. APCu - Best for production (shared memory)
-            if (function_exists('apcu_enabled') && apcu_enabled()) {
+            try {
                 return new ApcuCache($prefix);
+            } catch (\RuntimeException) {
+                return new FileCache($prefix);
             }
-            return new FileCache($prefix);
         }
     }
 
