@@ -11,7 +11,7 @@
  * @created May 18, 2026 at 1:28:14 PM
  */
 
-namespace features\cache {
+namespace features\cache\clients {
 
     use features\ds\map\WritableMap;
     use features\storage\StorageInterface;

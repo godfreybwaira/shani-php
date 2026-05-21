@@ -1,6 +1,6 @@
 <?php
 
-namespace features\cache {
+namespace features\cache\clients {
 
     use features\ds\map\WritableMap;
     use features\storage\LocalStorage;
