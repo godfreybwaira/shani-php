@@ -13,7 +13,7 @@ namespace features\utils {
      * @author coder
      * @created Mar 12, 2025 at 11:32:07 AM
      */
-    final class Duration
+    final class Duration implements \Stringable
     {
 
         /**
@@ -138,6 +138,78 @@ namespace features\utils {
         public function toDateTime(): \DateTimeImmutable
         {
             return new \DateTimeImmutable('+' . $this->value . ' ' . $this->unit);
+        }
+
+        /**
+         * Adds another Duration to this one.
+         *
+         * @param Duration $other The other duration to add.
+         * @return Duration A new Duration representing the sum of both durations.
+         */
+        public function add(Duration $other): Duration
+        {
+            $totalSeconds = $this->fromNow() + $other->fromNow();
+            return Duration::ofSeconds($totalSeconds);
+        }
+
+        /**
+         * Subtracts another Duration from this one.
+         *
+         * @param Duration $other The other duration to subtract.
+         * @return Duration A new Duration representing the difference (never negative).
+         *
+         * @example
+         * Duration::ofMinutes(5)->subtract(Duration::ofMinutes(2)); // 180 seconds
+         */
+        public function subtract(Duration $other): Duration
+        {
+            $totalSeconds = $this->fromNow() - $other->fromNow();
+            return Duration::ofSeconds($totalSeconds);
+        }
+
+        /**
+         * Returns a human-readable string representation of the duration.
+         *
+         * @return string A string like "5 MINUTES" or "2 HOURS".
+         *
+         */
+        #[\Override]
+        public function __toString(): string
+        {
+            return $this->value . ' ' . $this->unit;
+        }
+
+        /**
+         * Checks if this duration is equal to another.
+         *
+         * @param Duration $other The duration to compare against.
+         * @return bool True if they are equal, false otherwise.
+         */
+        public function equals(Duration $other): bool
+        {
+            return $this->fromNow() === $other->fromNow();
+        }
+
+        /**
+         * Checks if this duration is longer than another.
+         *
+         * @param Duration $other The duration to compare against.
+         * @return bool True if this duration is longer, false otherwise.
+         */
+        public function isLongerThan(Duration $other): bool
+        {
+            return $this->fromNow() > $other->fromNow();
+        }
+
+        /**
+         * Checks if this duration is shorter than another.
+         *
+         * @param Duration $other The duration to compare against.
+         * @return bool True if this duration is shorter, false otherwise.
+         */
+        public function isShorterThan(Duration $other): bool
+        {
+            return $this->fromNow() < $other->fromNow();
         }
 
         /**
