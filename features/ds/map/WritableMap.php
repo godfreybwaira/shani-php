@@ -96,12 +96,12 @@ namespace features\ds\map {
                 }
                 $this->delete($key);
             }
-            $result = $callback();
+            $value = $callback();
             $this->addOne($key, [
-                '_value_' => $result,
+                '_value_' => $value,
                 '_expires_' => $ttl?->toDateTime()->getTimestamp() ?? PHP_INT_MAX,
             ]);
-            return $result;
+            return $value;
         }
 
         /**

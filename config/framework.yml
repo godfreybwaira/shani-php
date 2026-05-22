@@ -10,7 +10,7 @@ max_payload_size: 100
 # Framweork Cache Management
 cache:
   # Default cache driver used by the application
-  default_driver: apcu
+  default_driver: file
   drivers:
     memcached:
       host: localhost

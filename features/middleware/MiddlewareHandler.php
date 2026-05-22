@@ -58,7 +58,7 @@ namespace features\middleware {
         public function handleAttributes(object $instance, string $methodName): void
         {
             $cacheKey = md5($instance::class . $methodName);
-            $attributes = CacheFactory::container()->fetch($cacheKey, Duration::ofMonths(3), function ()use ($instance, $methodName) {
+            $attributes = CacheFactory::container()->fetch($cacheKey, Duration::ofSeconds(10), function ()use ($instance, $methodName) {
                 // 1. Get method attributes (higher priority)
                 $refMethod = new \ReflectionMethod($instance, $methodName);
                 $methodAttributes = $refMethod->getAttributes(AttributeInterface::class, \ReflectionAttribute::IS_INSTANCEOF);
@@ -73,6 +73,7 @@ namespace features\middleware {
                 foreach ($methodAttributes as $attr) {
                     $attributesMap[$attr->getName()] = $attr->getArguments();
                 }
+                sleep(3);
                 return $attributesMap;
             });
             $this->execute($attributes);
