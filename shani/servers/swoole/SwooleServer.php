@@ -11,16 +11,17 @@ namespace shani\servers\swoole {
 
     use features\utils\DataConvertor;
     use features\utils\File;
-    use shani\http\enums\HttpStatus;
-    use shani\http\RequestEntity;
     use features\utils\MediaType;
     use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
     use shani\contracts\EventHandler;
-    use shani\servers\SupportedWebServer;
-    use shani\launcher\Framework;
-    use shani\launcher\Framework;
+    use shani\http\enums\HttpStatus;
+    use shani\http\HttpHeader;
+    use shani\http\RequestEntity;
     use shani\launcher\ApplicationLauncher;
+    use shani\launcher\Framework;
+    use shani\launcher\Framework;
+    use shani\servers\SupportedWebServer;
     use Swoole\Http\Request;
     use Swoole\Http\Response;
     use Swoole\WebSocket\Frame;
@@ -95,7 +96,7 @@ namespace shani\servers\swoole {
                 } else {
                     $uri = $request->uri->withPort($this->httpsPort)->withScheme('https');
                     $res->status(HttpStatus::MOVED_PERMANENTLY->value);
-                    $res->header('location', $uri);
+                    $res->header(HttpHeader::LOCATION, $uri);
                     $res->end();
                 }
             });
