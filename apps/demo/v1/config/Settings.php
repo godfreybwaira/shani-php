@@ -19,6 +19,7 @@ namespace apps\demo\v1\config {
     use shani\config\PathConfig;
     use shani\config\SessionConfig;
     use shani\contracts\BasicConfiguration;
+    use shani\http\RequestRoute;
     use shani\launcher\App;
 
     final class Settings extends BasicConfiguration
@@ -83,6 +84,16 @@ namespace apps\demo\v1\config {
         public function sessionConfig(): SessionConfig
         {
             return $this->sessionConfig ??= new SessionConfig(connection: new \features\session\dto\RedisConnectionDto('localhost', 6379));
+        }
+
+        public function errorHandler(\Throwable $t): ?RequestRoute
+        {
+            if ($t instanceof \features\exceptions\client\ValidationException) {
+                $data = json_decode($t->getMessage(), true);
+                $message = \features\utils\DataConvertor::convertTo($data, $this->app->response->subtype());
+                $this->app->response->setBody($message);
+            }
+            return null;
         }
     }
 

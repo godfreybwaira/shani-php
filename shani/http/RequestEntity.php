@@ -219,7 +219,7 @@ namespace shani\http {
          * @param int|null $index File index in array, default is null
          * @return File|null Uploaded file object if exists, null otherwise
          */
-        public function file(string $name, int $index = null): ?File
+        public function file(string $name, ?int $index = null): ?File
         {
             if ($index === null) {
                 return $this->files[$name] ?? null;

@@ -15,6 +15,7 @@ namespace features\exceptions {
     use features\exceptions\client\ClientException;
     use features\exceptions\client\CsrfException;
     use features\exceptions\client\NotFoundException;
+    use features\exceptions\client\ValidationException;
     use features\exceptions\server\ServerException;
     use features\exceptions\server\ServiceUnavailableException;
     use shani\http\enums\HttpStatus;
@@ -74,6 +75,12 @@ namespace features\exceptions {
         {
             $app->response->setStatus(HttpStatus::BAD_REQUEST);
             return new CsrfException($message ?? 'Malformed request');
+        }
+
+        public static function validation(App $app, string $message = null): ValidationException
+        {
+            $app->response->setStatus(HttpStatus::BAD_REQUEST);
+            return new ValidationException($message ?? 'Malformed request');
         }
     }
 
