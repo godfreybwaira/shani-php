@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Description of MultiFileValidator
- * @author goddy
- *
- * Created on: May 23, 2026 at 2:06:57 PM
- */
-
 namespace features\attributes\validation {
 
     use features\exceptions\client\NotFoundException;
