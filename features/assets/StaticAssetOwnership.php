@@ -10,9 +10,8 @@
 namespace features\assets {
 
     use features\authentication\UserDetailsDto;
-    use features\exceptions\ServerException;
+    use features\exceptions\server\ServerException;
     use shani\http\RequestRoute;
-    use shani\launcher\App;
     use shani\utils\VirtualHostMapper;
 
     /**

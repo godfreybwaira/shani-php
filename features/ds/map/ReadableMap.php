@@ -10,7 +10,7 @@
 namespace features\ds\map {
 
     use features\ds\ReadableData;
-    use features\exceptions\ValidationException;
+    use features\exceptions\client\ValidationException;
     use features\utils\DataConvertor;
 
     class ReadableMap extends ReadableData

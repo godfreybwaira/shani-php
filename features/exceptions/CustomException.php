@@ -9,21 +9,29 @@
 
 namespace features\exceptions {
 
+    use features\exceptions\client\AccessGrantException;
+    use features\exceptions\client\AuthorizationException;
+    use features\exceptions\client\BadRequestException;
+    use features\exceptions\client\ClientException;
+    use features\exceptions\client\CsrfException;
+    use features\exceptions\client\NotFoundException;
+    use features\exceptions\server\ServerException;
+    use features\exceptions\server\ServiceUnavailableException;
     use shani\http\enums\HttpStatus;
     use shani\launcher\App;
 
     final class CustomException
     {
 
-        public static function notFound(string $message = null): ClientException
+        public static function notFound(string $message = null): NotFoundException
         {
             return new NotFoundException($message ?? 'Resource not found');
         }
 
-        public static function badRequest(App $app, string $message = null): ClientException
+        public static function badRequest(App $app, string $message = null): BadRequestException
         {
             $app->response->setStatus(HttpStatus::BAD_REQUEST);
-            return new ClientException($message ?? 'Malformed request');
+            return new BadRequestException($message ?? 'Malformed request');
         }
 
         public static function methodNotAllowed(App $app, string $message = null): ClientException
@@ -44,22 +52,28 @@ namespace features\exceptions {
             return new ServerException($message ?? 'Could not process the request');
         }
 
-        public static function notAuthorized(App $app, string $message = null): ClientException
+        public static function authorization(App $app, string $message = null): AuthorizationException
         {
             $app->response->setStatus(HttpStatus::UNAUTHORIZED);
-            return new ClientException($message ?? 'Not authorized to access the resource');
+            return new AuthorizationException($message ?? 'Not authorized to access the resource');
         }
 
-        public static function offline(App $app, string $message = null): ServerException
+        public static function offline(App $app, string $message = null): ServiceUnavailableException
         {
             $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-            return new ServerException($message ?? HttpStatus::SERVICE_UNAVAILABLE->getMessage());
+            return new ServiceUnavailableException($message ?? HttpStatus::SERVICE_UNAVAILABLE->getMessage());
         }
 
-        public static function forbidden(App $app, string $message = null): ClientException
+        public static function forbidden(App $app, string $message = null): AccessGrantException
         {
             $app->response->setStatus(HttpStatus::FORBIDDEN);
-            return new ClientException($message ?? 'Access denied');
+            return new AccessGrantException($message ?? 'Access denied');
+        }
+
+        public static function csrf(App $app, string $message = null): CsrfException
+        {
+            $app->response->setStatus(HttpStatus::BAD_REQUEST);
+            return new CsrfException($message ?? 'Malformed request');
         }
     }
 

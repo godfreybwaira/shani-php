@@ -9,6 +9,8 @@
 
 namespace apps\demo\v1\modules\components\logic\controllers\get {
 
+    use features\attributes\security\AuthorizationCheck;
+    use features\attributes\security\PermissionCheck;
     use features\documentation\Generator as Documentation;
     use features\pwa\PwaBuilder;
     use features\utils\HttpClient;
@@ -20,6 +22,8 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
     use shani\http\ResponseEntity;
     use shani\launcher\App;
 
+    #[AuthorizationCheck(exempted: true)]
+    #[PermissionCheck(exempted: true)]
     final class ComponentsController
     {
 

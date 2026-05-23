@@ -25,7 +25,7 @@ namespace features\attributes\security {
          *
          * @var bool
          */
-        public readonly bool $exempted;
+        private readonly bool $exempted;
 
         /**
          * Constructor

@@ -9,7 +9,7 @@
 
 namespace features\crypto\exceptions {
 
-    use features\exceptions\BadRequestException;
+    use features\exceptions\client\BadRequestException;
 
     final class SignatureException extends BadRequestException
     {

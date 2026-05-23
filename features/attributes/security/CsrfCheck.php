@@ -23,7 +23,7 @@ namespace features\attributes\security {
     final class CsrfCheck implements AttributeInterface
     {
 
-        public readonly bool $exempted;
+        private readonly bool $exempted;
 
         public function __construct(bool $exempted = false)
         {
@@ -41,7 +41,7 @@ namespace features\attributes\security {
             $expectedToken = $app->csrfToken()->getOne($csrf->tokenName);
             $submittedToken = $app->request->header()->getOne($csrf->tokenName) ?? $app->request->body()->getOne($csrf->tokenName);
             if (empty($submittedToken) || !hash_equals($expectedToken, $submittedToken)) {
-                throw CustomException::notAcceptable($app, 'Invalid or missing CSRF token');
+                throw CustomException::csrf($app, 'Invalid or missing CSRF token');
             }
         }
     }

@@ -10,7 +10,7 @@
 namespace features\middleware {
 
     use features\exceptions\CustomException;
-    use features\exceptions\ServiceUnavailableException;
+    use features\exceptions\server\ServiceUnavailableException;
     use features\utils\MediaType;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
@@ -96,8 +96,7 @@ namespace features\middleware {
         public static function checkRunningStatus(App $app): void
         {
             if (!$app->preference->vhost->getOne('running')) {
-                $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
-                throw new ServiceUnavailableException();
+                throw CustomException::offline($app);
             }
         }
 

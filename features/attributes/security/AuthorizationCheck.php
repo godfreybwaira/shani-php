@@ -24,7 +24,7 @@ namespace features\attributes\security {
     final class AuthorizationCheck implements AttributeInterface
     {
 
-        public readonly bool $exempted;
+        private readonly bool $exempted;
 
         public function __construct(bool $exempted = false)
         {
@@ -45,7 +45,7 @@ namespace features\attributes\security {
                 return;
             }
             if (!$app->auth->attemptAuthentication()) {
-                throw CustomException::notAuthorized($app);
+                throw CustomException::authorization($app);
             }
         }
     }

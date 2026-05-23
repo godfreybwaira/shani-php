@@ -9,7 +9,7 @@
 
 namespace features\utils {
 
-    use features\exceptions\NotFoundException;
+    use features\exceptions\client\NotFoundException;
 
     /**
      * Represents a file object with metadata and upload error handling.

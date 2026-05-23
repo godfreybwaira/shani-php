@@ -10,7 +10,7 @@
 namespace features\storage {
 
     use features\assets\StaticAssetOwnership;
-    use features\exceptions\ServerException;
+    use features\exceptions\server\ServerException;
     use features\storage\StorageMediaInterface;
     use features\utils\File;
     use features\utils\URI;

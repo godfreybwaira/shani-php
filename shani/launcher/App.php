@@ -15,9 +15,9 @@ namespace shani\launcher {
     use features\authentication\AuthenticationManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
-    use features\exceptions\BadRequestException;
+    use features\exceptions\client\BadRequestException;
     use features\exceptions\CustomException;
-    use features\exceptions\NotFoundException;
+    use features\exceptions\client\NotFoundException;
     use features\logging\Logger;
     use features\middleware\MiddlewareHandler;
     use features\middleware\MiddlewareHandlerInterface;
