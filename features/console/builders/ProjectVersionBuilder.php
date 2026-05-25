@@ -214,7 +214,10 @@ namespace features\console\builders {
             }
             $test = new $config['test']();
             if ($test instanceof TestRunnerInterface) {
-                return $test->runTest()->getResult();
+                $test->beforeTest();
+                $result = $test->runTest();
+                $test->afterTest($result);
+                return $result->getResult();
             }
             throw new \RuntimeException($config['test'] . ' must implements features\test\TestRunnerInterface');
         }

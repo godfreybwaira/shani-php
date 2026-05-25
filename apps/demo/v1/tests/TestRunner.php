@@ -57,6 +57,18 @@ namespace apps\demo\v1\tests {
             $result->addGroup($g1, $g2, $g3);
             return $result;
         }
+
+        #[\Override]
+        public function afterTest(TestResult $result): void
+        {
+            //TODO
+        }
+
+        #[\Override]
+        public function beforeTest(): void
+        {
+            //TODO
+        }
     }
 
 }

@@ -27,6 +27,18 @@ namespace {namespace}\{test_dir} {
 
             return $result;
         }
+
+        #[\Override]
+        public function afterTest(TestResult $result): void
+        {
+            //TODO
+        }
+
+        #[\Override]
+        public function beforeTest(): void
+        {
+            //TODO
+        }
     }
 
 }
