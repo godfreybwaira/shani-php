@@ -10,7 +10,7 @@ namespace features\validation {
      * a ValidationError object describing the failure, or null if validation passes.
      *
      * This interface is designed to be used by validators such as MultiFileValidator
-     * or RequestBodyValidator to enforce consistent validation rules.
+     * or RequestBody to enforce consistent validation rules.
      *
      * @author goddy
      * @created May 23, 2026 at 2:13:04 PM

@@ -9,7 +9,7 @@ namespace features\attributes\validation {
     use shani\launcher\App;
 
     /**
-     * RequestBodyValidator
+     * RequestBody
      *
      * Attribute-based validator for request body content. This validator
      * applies a custom `ValidationInterface` implementation to each key/value
@@ -23,7 +23,7 @@ namespace features\attributes\validation {
      * @created May 23, 2026 at 2:06:57 PM
      */
     #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS)]
-    final class RequestBodyValidator implements AttributeInterface
+    final class RequestBody implements AttributeInterface
     {
 
         /**
@@ -38,7 +38,7 @@ namespace features\attributes\validation {
         private readonly bool $required;
 
         /**
-         * Constructs a new RequestBodyValidator attribute.
+         * Constructs a new RequestBody attribute.
          *
          * @param string $validator Fully qualified class name of a validator
          *                          implementing ValidationInterface.

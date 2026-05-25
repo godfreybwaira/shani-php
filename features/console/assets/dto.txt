@@ -37,6 +37,17 @@ namespace {namespace} {
             return $entity;
         }
 
+        /**
+         * Create a {dto_name} from a given key-value pair array.
+         * @param array $data A key-value pair array
+         * @return {dto_name} object
+         */
+        public static function fromArray(array $data): {dto_name}
+        {
+            $dto = new {dto_name}($data['id']);
+            return $dto;
+        }
+
         #[\Override]
         public function jsonSerialize(): array
         {

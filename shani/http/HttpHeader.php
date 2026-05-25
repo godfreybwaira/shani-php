@@ -108,9 +108,10 @@ namespace shani\http {
          */
         public function getBasicAuth(): ?array
         {
+            $keyword = 'Basic ';
             $str = $this->getOne(self::AUTHORIZATION);
-            if ($str !== null && str_starts_with($str, 'Basic ')) {
-                $creds = ltrim(substr($str, strlen('Basic ')));
+            if ($str !== null && str_starts_with($str, $keyword)) {
+                $creds = ltrim(substr($str, strlen($keyword)));
                 return explode(':', base64_decode($creds));
             }
             return null;
@@ -137,9 +138,10 @@ namespace shani\http {
          */
         public function getBearerToken(): ?string
         {
+            $keyword = 'Bearer ';
             $token = $this->getOne(self::AUTHORIZATION);
-            if ($token !== null && str_starts_with($token, 'Bearer ')) {
-                return ltrim(substr($token, strlen('Bearer ')));
+            if ($token !== null && str_starts_with($token, $keyword)) {
+                return ltrim(substr($token, strlen($keyword)));
             }
             return null;
         }
@@ -152,13 +154,13 @@ namespace shani\http {
          */
         public function clearContentHeaders(): self
         {
-            parent::delete(self::CONTENT_DISPOSITION);
-            parent::delete(self::CONTENT_ENCODING);
-            parent::delete(self::CONTENT_LANGUAGE);
-            parent::delete(self::CONTENT_LENGTH);
-            parent::delete(self::CONTENT_LOCATION);
-            parent::delete(self::CONTENT_RANGE);
-            return parent::delete(self::CONTENT_TYPE);
+            parent::deleteAll([
+                self::CONTENT_DISPOSITION, self::CONTENT_ENCODING,
+                self::CONTENT_LANGUAGE, self::CONTENT_LENGTH,
+                self::CONTENT_LOCATION, self::CONTENT_RANGE,
+                self::CONTENT_TYPE
+            ]);
+            return $this;
         }
 
         /**
