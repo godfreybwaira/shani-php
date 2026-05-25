@@ -219,7 +219,7 @@ namespace features\console\builders {
                 $test->afterTest($result);
                 return $result->getResult();
             }
-            throw new \RuntimeException($config['test'] . ' must implements features\test\TestRunnerInterface');
+            throw new \RuntimeException($config['test'] . ' must implements ' . TestRunnerInterface::class);
         }
 
         public function stop(\Closure $progressTracker): void
