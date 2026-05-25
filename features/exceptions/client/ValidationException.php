@@ -10,7 +10,7 @@
 namespace features\exceptions\client {
 
 
-    final class ValidationException extends BadRequestException
+    final class ValidationException extends ClientException
     {
 //put your code here
     }

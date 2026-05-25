@@ -9,7 +9,7 @@
 
 namespace features\attributes\security {
 
-    use features\exceptions\CustomException;
+    use features\exceptions\client\AuthorizationException;
     use shani\contracts\AttributeInterface;
     use shani\http\RequestRoute;
     use shani\launcher\App;
@@ -45,7 +45,7 @@ namespace features\attributes\security {
                 return;
             }
             if (!$app->auth->attemptAuthentication()) {
-                throw CustomException::authorization($app);
+                throw new AuthorizationException('Not authorized to access the resource');
             }
         }
     }

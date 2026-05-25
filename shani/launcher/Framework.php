@@ -9,10 +9,9 @@
 
 namespace shani\launcher {
 
-    use features\cache\CacheFactory;
     use features\cache\CacheDriverManager;
+    use features\cache\CacheFactory;
     use features\ds\map\ReadableMap;
-    use features\utils\Duration;
 
     /**
      * Core configuration class for the Shani framework.
@@ -44,7 +43,7 @@ namespace shani\launcher {
         public const NAME = 'Shani';
 
         /** Framework version */
-        public const VERSION = '2.0';
+        public const VERSION = '1.0';
 
         /** Framework slogan */
         public const SLOGAN = 'Shani Yangu Maanani';

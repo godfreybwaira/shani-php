@@ -15,9 +15,11 @@ namespace shani\launcher {
     use features\authentication\AuthenticationManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
+    use features\exceptions\client\AccessGrantException;
+    use features\exceptions\client\AuthorizationException;
     use features\exceptions\client\BadRequestException;
-    use features\exceptions\CustomException;
     use features\exceptions\client\NotFoundException;
+    use features\exceptions\client\ValidationException;
     use features\logging\Logger;
     use features\middleware\MiddlewareHandler;
     use features\middleware\MiddlewareHandlerInterface;
@@ -181,6 +183,15 @@ namespace shani\launcher {
             } catch (BadRequestException $ex) {
                 $this->response->setStatus(HttpStatus::BAD_REQUEST);
                 return $this->handleException($ex, $middleware);
+            } catch (ValidationException $ex) {
+                $this->response->setStatus(HttpStatus::UNPROCESSABLE_ENTITY);
+                return $this->handleException($ex, $middleware);
+            } catch (AccessGrantException $ex) {
+                $this->response->setStatus(HttpStatus::FORBIDDEN);
+                return $this->handleException($ex, $middleware);
+            } catch (AuthorizationException $ex) {
+                $this->response->setStatus(HttpStatus::UNAUTHORIZED);
+                return $this->handleException($ex, $middleware);
             } catch (\Throwable $ex) {
                 $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
                 return $this->handleException($ex, $middleware);
@@ -283,11 +294,11 @@ namespace shani\launcher {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
                 if ($this->config->getStaticAssetServer() === StaticAssetServers::DISABLE) {
-                    throw CustomException::notFound();
+                    throw new NotFoundException('Resource Not Found!');
                 }
                 $staticRequest = StaticAssetRequest::fromPath($this->preference->mapper, $this->request->uri->path());
                 if ($staticRequest === null) {
-                    throw CustomException::notFound();
+                    throw new NotFoundException('Resource Not Found!');
                 }
                 return $staticRequest->handleRequest($this);
             }
@@ -295,7 +306,7 @@ namespace shani\launcher {
             $methodName = $this->request->route()->action;
             $obj = new $className($this);
             if (!is_callable([$obj, $methodName])) {
-                throw CustomException::notFound();
+                throw new NotFoundException('Resource Not Found!');
             }
             $middleware->handleAttributes($obj, $methodName);
             return $obj->$methodName();

@@ -9,7 +9,7 @@
 
 namespace features\middleware {
 
-    use features\exceptions\CustomException;
+    use features\exceptions\client\ClientException;
     use features\exceptions\server\ServiceUnavailableException;
     use features\utils\MediaType;
     use shani\http\enums\HttpStatus;
@@ -96,7 +96,8 @@ namespace features\middleware {
         public static function checkRunningStatus(App $app): void
         {
             if (!$app->preference->vhost->getOne('running')) {
-                throw CustomException::offline($app);
+                $app->response->setStatus(HttpStatus::SERVICE_UNAVAILABLE);
+                throw new ServiceUnavailableException(HttpStatus::SERVICE_UNAVAILABLE->getMessage());
             }
         }
 
@@ -110,7 +111,8 @@ namespace features\middleware {
             $config = $app->config->requestConfig();
             if (!$config->methodAllowed) {
                 $app->response->header()->addIfAbsent(HttpHeader::ACCESS_CONTROL_ALLOW_METHODS, $config->allowedMethods);
-                throw CustomException::methodNotAllowed($app);
+                $app->response->setStatus(HttpStatus::METHOD_NOT_ALLOWED);
+                throw new ClientException('Request Method not allowed');
             }
         }
     }

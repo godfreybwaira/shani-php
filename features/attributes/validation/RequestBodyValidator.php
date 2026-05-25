@@ -2,7 +2,8 @@
 
 namespace features\attributes\validation {
 
-    use features\exceptions\CustomException;
+    use features\exceptions\client\BadRequestException;
+    use features\exceptions\client\ValidationException;
     use features\validation\ValidationInterface;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
@@ -57,11 +58,11 @@ namespace features\attributes\validation {
          *
          * Iterates over the request body and applies the configured validator
          * to each key/value pair. Collects validation errors and throws a
-         * CustomException if any field fails validation.
+         * ValidationException if any field fails validation.
          *
          * @param App $app The application context providing the request object.
          *
-         * @throws CustomException If required body is missing or validation fails.
+         * @throws BadRequestException If required body is missing.
          *
          * @return void
          */
@@ -70,7 +71,7 @@ namespace features\attributes\validation {
             $body = $app->request->body();
             if ($body->isEmpty()) {
                 if ($this->required) {
-                    throw CustomException::notFound('Request body cannot be empty');
+                    throw new BadRequestException('Request body cannot be empty');
                 }
                 return;
             }
@@ -84,7 +85,7 @@ namespace features\attributes\validation {
             });
 
             if (!empty($errors)) {
-                throw CustomException::validation($app, json_encode(['errors' => $errors]));
+                throw new ValidationException(json_encode(['errors' => $errors]));
             }
         }
     }

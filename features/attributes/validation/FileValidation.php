@@ -11,7 +11,6 @@ namespace features\attributes\validation {
 
     use features\exceptions\client\NotFoundException;
     use features\exceptions\client\ValidationException;
-    use features\exceptions\CustomException;
     use features\validation\ValidationError;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
@@ -111,7 +110,7 @@ namespace features\attributes\validation {
                 if ($this->optional) {
                     return;
                 }
-                throw CustomException::notFound('File name "' . $this->name . '" is required but missing');
+                throw new NotFoundException('File name "' . $this->name . '" is required but missing');
             }
             $errors = [];
             if ($file->size > $this->maxSize) {
@@ -123,7 +122,7 @@ namespace features\attributes\validation {
                 $errors[] = new ValidationError($this->name, null, $this->types, $file->type, $description);
             }
             if (!empty($errors)) {
-                throw CustomException::validation($app, json_encode(['errors' => $errors]));
+                throw new ValidationException(json_encode(['errors' => $errors]));
             }
         }
     }

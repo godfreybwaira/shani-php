@@ -9,7 +9,7 @@
 
 namespace features\attributes\security {
 
-    use features\exceptions\CustomException;
+    use features\exceptions\client\CsrfException;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
 
@@ -41,7 +41,7 @@ namespace features\attributes\security {
             $expectedToken = $app->csrfToken()->getOne($csrf->tokenName);
             $submittedToken = $app->request->header()->getOne($csrf->tokenName) ?? $app->request->body()->getOne($csrf->tokenName);
             if (empty($submittedToken) || !hash_equals($expectedToken, $submittedToken)) {
-                throw CustomException::csrf($app, 'Invalid or missing CSRF token');
+                throw new CsrfException('Invalid or missing CSRF token');
             }
         }
     }

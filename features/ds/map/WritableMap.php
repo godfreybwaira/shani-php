@@ -150,11 +150,10 @@ namespace features\ds\map {
 
         public function map(\Closure $callback): self
         {
-            $rows = [];
             foreach ($this->data as $key => $value) {
-                $rows[$key] = $callback($key, $value);
+                $this->data[$key] = $callback($key, $value);
             }
-            return new self($rows);
+            return $this;
         }
     }
 

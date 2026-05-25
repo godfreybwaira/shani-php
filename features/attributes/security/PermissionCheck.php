@@ -3,7 +3,7 @@
 namespace features\attributes\security {
 
     use features\assets\StaticAssetOwnership;
-    use features\exceptions\CustomException;
+    use features\exceptions\client\AccessGrantException;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
 
@@ -42,7 +42,7 @@ namespace features\attributes\security {
          *
          * @param App $app The application instance
          * @return void
-         * @throws CustomException When access is denied
+         * @throws AccessGrantException When access is denied
          */
         #[\Override]
         public function execute(App $app): void
@@ -58,7 +58,7 @@ namespace features\attributes\security {
                 }
             }
 
-            throw CustomException::forbidden($app);
+            throw new AccessGrantException('Access Denied');
         }
     }
 

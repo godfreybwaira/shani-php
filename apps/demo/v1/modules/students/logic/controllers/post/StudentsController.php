@@ -14,7 +14,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
     use features\attributes\security\CsrfCheck;
     use features\attributes\validation\FileValidation;
     use features\ds\map\ReadableMap;
-    use features\exceptions\CustomException;
+    use features\exceptions\server\ServerException;
     use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
@@ -37,7 +37,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
             $dto = StudentDto::fromArray($data);
             $student = $this->service->save(StudentDto::toEntity($dto));
             if ($student === null) {
-                throw CustomException::serverError($this->app, 'Could not save student');
+                throw new ServerException('Could not save student');
             }
             return HttpResponse::withBody(StudentDto::toDto($student));
         }

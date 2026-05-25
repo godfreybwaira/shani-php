@@ -4,7 +4,6 @@ namespace features\attributes\validation {
 
     use features\exceptions\client\NotFoundException;
     use features\exceptions\client\ValidationException;
-    use features\exceptions\CustomException;
     use features\validation\ValidationInterface;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
@@ -72,7 +71,7 @@ namespace features\attributes\validation {
         {
             if (empty($app->request->files)) {
                 if ($this->required) {
-                    throw CustomException::notFound('Files cannot be empty');
+                    throw new NotFoundException('Files cannot be empty');
                 }
                 return;
             }
@@ -86,7 +85,7 @@ namespace features\attributes\validation {
             }
 
             if (!empty($errors)) {
-                throw CustomException::validation($app, json_encode(['errors' => $errors]));
+                throw new ValidationException(json_encode(['errors' => $errors]));
             }
         }
     }
