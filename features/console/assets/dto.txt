@@ -3,6 +3,7 @@
 namespace {namespace} {
 
     use {entity_ns}\{entity_name};
+    use shani\http\RequestEntity;
 
     final class {dto_name} implements \JsonSerializable
     {
@@ -38,7 +39,7 @@ namespace {namespace} {
         }
 
         /**
-         * Create a {dto_name} from a given key-value pair array.
+         * Create a {dto_name} object from a given key-value pair array.
          * @param array $data A key-value pair array
          * @return {dto_name} object
          */
@@ -46,6 +47,16 @@ namespace {namespace} {
         {
             $dto = new {dto_name}($data['id']);
             return $dto;
+        }
+
+        /**
+         * Create a {dto_name} object from a given request object.
+         * @param RequestEntity $request request object
+         * @return {dto_name} object
+         */
+        public static function fromRequest(RequestEntity $request): {dto_name}
+        {
+            return self::fromArray($request->body()->toArray());
         }
 
         #[\Override]
