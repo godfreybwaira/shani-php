@@ -38,7 +38,13 @@ namespace shani\http {
          * @var string
          */
         public readonly string $action;
+
+        /**
+         * Path extension e.g json, xml etc...
+         * @var string|null
+         */
         public readonly ?string $extension;
+        public readonly string $path;
 
         private function __construct(string $module, ?string $action, array $params = [], ?string $extension = null)
         {
@@ -47,6 +53,7 @@ namespace shani\http {
             $this->module = str_replace('-', '_', $module);
             $this->action = ShaniUtils::kebab2camelCase($action ?? Framework::HOME_FUNCTION);
             $this->controller = ShaniUtils::kebab2PascalCase($module . '-' . Framework::SUFFIX_CONTROLLER);
+            $this->path = $this->module . ($action !== null ? '.' . $action : null);
         }
 
         /**

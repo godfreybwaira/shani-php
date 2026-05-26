@@ -57,7 +57,7 @@ namespace features\middleware {
 
         public function handleAttributes(object $instance, string $methodName): void
         {
-            $cacheKey = md5($instance::class . $methodName);
+            $cacheKey = $this->app->request->method . '.' . $this->app->request->route()->path;
             $attributes = CacheFactory::container()->fetch($cacheKey, Duration::ofMonths(3), function ()use ($instance, $methodName) {
                 // 1. Get method attributes (higher priority)
                 $refMethod = new \ReflectionMethod($instance, $methodName);
