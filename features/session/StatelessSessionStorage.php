@@ -37,12 +37,14 @@ namespace features\session {
 
         public function destroy(): void
         {
+            $this->clear();
             return;
         }
 
         public function clear(): StorageInterface
         {
-            return;
+            $this->carts = [];
+            return $this;
         }
 
         public function refresh(): StorageInterface

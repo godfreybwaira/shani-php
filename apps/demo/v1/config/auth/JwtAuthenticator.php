@@ -9,8 +9,12 @@
 
 namespace apps\demo\v1\config\auth {
 
+    use features\authentication\AuthenticationResult;
     use features\authentication\AuthenticationStrategy;
     use features\authentication\UserDetailsDto;
+    use features\jwt\JWTClaim;
+    use features\utils\Duration;
+    use features\utils\URI;
     use shani\launcher\App;
 
     final class JwtAuthenticator implements AuthenticationStrategy
@@ -23,13 +27,22 @@ namespace apps\demo\v1\config\auth {
             $this->app = $app;
         }
 
-        public function login(): ?UserDetailsDto
+        public function login(): ?AuthenticationResult
         {
+            $subject = 'id' . rand(10, 1000);
+//            $jwt = new JWTClaim(new URI('http://localhost'), ttl: Duration::ofMinutes(2), subject: $subject, payload: [
+//                'access' => '24354fed,5ca2536e'
+//            ]);
+//            echo $jwt->asToken('key123');
+//            exit;
             $token = $this->app->request->header()->getBearerToken();
             if (empty($token)) {
                 return null;
             }
-            return new UserDetailsDto('id' . rand(10, 1000), '24354fed,5ca2536e', false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
+            $claim = JWTClaim::fromToken($token, 'key123');
+            $access = $claim->payload?->getOne('access');
+            $user = new UserDetailsDto($subject, $access, false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
+            return new AuthenticationResult($user, rememberUser: false);
         }
 
         public function register(): ?UserDetailsDto

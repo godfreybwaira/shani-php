@@ -221,6 +221,16 @@ namespace features\utils {
         {
             return $timestamp < time();
         }
+
+        /**
+         * Create duration object from timestamp
+         * @param int $timestamp Timestamp to compute from
+         * @return Duration Duration object
+         */
+        public static function fromTimestamp(int $timestamp): Duration
+        {
+            return Duration::ofSeconds($timestamp - time());
+        }
     }
 
 }

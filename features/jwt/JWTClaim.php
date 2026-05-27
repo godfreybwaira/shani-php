@@ -11,9 +11,11 @@ namespace features\jwt {
 
     use features\ds\map\ReadableMap;
     use features\jwt\exceptions\JWTAlgorithmException;
+    use features\jwt\exceptions\JWTExpirationException;
     use features\jwt\exceptions\JWTFormatException;
     use features\jwt\exceptions\JWTSignatureException;
     use features\oauth2\PKCEGenerator;
+    use features\utils\Duration;
     use features\utils\URI;
 
     final class JWTClaim implements \JsonSerializable
@@ -77,21 +79,38 @@ namespace features\jwt {
          */
         public const LENGTH = 3;
 
+        /**
+         *
+         * @param URI $issuer Identifies the principal that issued, and sign (if applicable) the JWT.
+         * @param array|null $payload JWT data
+         * @param string|null $subject Identifies the principal that is the subject of the JWT.
+         * MUST be locally or globally unique in issuer context. Example: "userId123"
+         * @param array $audience Identifies the recipients that the JWT is intended for.
+         * If present, processor MUST match one of the values or reject the JWT.
+         * @param Duration $ttl Time after which the JWT MUST NOT be accepted. Current time MUST be
+         * before exp
+         * @param string|null $jwtId Unique identifier for the JWT (useful for preventing replay attacks).
+         * MUST be unique with negligible collision probability
+         * @param \DateTimeInterface|null $issuedAt  Time at which the JWT was issued. Can be used to calculate token age.
+         * @param \DateTimeInterface|null $notBefore  Time before which the JWT MUST NOT be accepted.
+         * Current time MUST be after or equal to this value
+         */
         public function __construct(
-                URI $issuer, ?ReadableMap $payload = null, ?string $subject = null,
-                array $audience = [], int $ttl = 3600, ?string $jwtId = null,
-                ?\DateTimeInterface $issueAt = null,
-                ?\DateTimeInterface $notBefore = null
+                URI $issuer, ?array $payload = null, ?string $subject = null,
+                array $audience = [], Duration $ttl = null, ?string $jwtId = null,
+                ?\DateTimeInterface $issuedAt = null, ?\DateTimeInterface $notBefore = null
         )
         {
-            $this->issuedAt = $issueAt ?? new \DateTimeImmutable();
+
+            $duration = $ttl ?? Duration::ofMinutes(15);
+            $this->issuedAt = $issuedAt ?? new \DateTimeImmutable();
             $this->jwtId = $jwtId ?? bin2hex(random_bytes(16));
-            $this->expiresIn = \DateTimeImmutable::createFromFormat('U', $this->issuedAt->getTimestamp() + $ttl);
+            $this->expiresIn = Duration::fromTimestamp($this->issuedAt->getTimestamp() + $duration->fromNow())->toDateTime();
             $this->notBefore = $notBefore ?? $this->issuedAt;
             $this->issuer = $issuer;
             $this->subject = $subject;
             $this->audience = $audience;
-            $this->payload = $payload;
+            $this->payload = $payload !== null ? new ReadableMap($payload) : null;
         }
 
         #[\Override]
@@ -168,6 +187,7 @@ namespace features\jwt {
          * @throws JWTFormatException
          * @throws JWTAlgorithmException
          * @throws JWTSignatureException
+         * @throws JWTExpirationException
          */
         public static function fromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
         {
@@ -198,6 +218,9 @@ namespace features\jwt {
                 }
             }
             $payload = json_decode(self::base64UrlDecode($payloadB64), true);
+            if (Duration::expired($payload['exp'] ?? 0)) {
+                throw new JWTExpirationException('Token expired');
+            }
             return self::payload2Claim($payload);
         }
 
@@ -207,10 +230,10 @@ namespace features\jwt {
             $issuedAt = $payload['iat'] ?? 0;
             return new JWTClaim(
                     new URI($payload['iss']),
-                    !empty($payload['payload']) ? new ReadableMap($payload['payload']) : null,
+                    !empty($payload['payload']) ? $payload['payload'] : null,
                     $payload['sub'] ?? null,
                     (array) ($payload['aud'] ?? []),
-                    $expiresIn - $issuedAt,
+                    Duration::ofSeconds($expiresIn - $issuedAt),
                     $payload['jti'] ?? null,
                     !empty($payload['iat']) ? \DateTimeImmutable::createFromFormat('U', $payload['iat']) : null,
                     !empty($payload['nbf']) ? \DateTimeImmutable::createFromFormat('U', $payload['nbf']) : null

@@ -61,25 +61,27 @@ namespace features\authentication {
             $this->app = $app;
         }
 
-        public function login(): ?UserDetailsDto
+        public function login(): ?AuthenticationResult
         {
             if ($this->loggedIn()) {
                 return null;
             }
             $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $index => $strategy) {
-                $user = $strategy->login();
-                if ($user === null) {
+                $result = $strategy->login();
+                if ($result === null) {
                     continue;
                 }
-                if ($user->isDisabled) {
+                if ($result->user->isDisabled) {
                     return null;
                 }
-                $this->user = $user;
-                $this->app->session->container(self::METADATA_CART)->addOne('strategy', $index);
-                $this->app->session->container(self::AUTH_CART)->add($user);
+                $this->user = $result->user;
+                if ($result->rememberUser) {
+                    $this->app->session->container(self::METADATA_CART)->addOne('strategy', $index);
+                    $this->app->session->container(self::AUTH_CART)->add($result->user);
+                }
                 $this->app->session->refresh();
-                return $user;
+                return $result;
             }
             return null;
         }

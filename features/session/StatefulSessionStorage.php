@@ -54,13 +54,13 @@ namespace features\session {
         public function destroy(): void
         {
             $this->clear();
-            session_unset();
             session_destroy();
         }
 
         public function clear(): StorageInterface
         {
             $this->carts = [];
+            session_unset();
             return $this;
         }
 

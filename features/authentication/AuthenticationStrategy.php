@@ -14,9 +14,9 @@ namespace features\authentication {
 
         /**
          * Authenticate user with the given credentials.
-         * @return UserDetailsDto|null Authenticated user details on success, null if authentication failed.
+         * @return AuthenticationResult|null Authentication result on success, null if authentication failed.
          */
-        public function login(): ?UserDetailsDto;
+        public function login(): ?AuthenticationResult;
 
         /**
          * End user session

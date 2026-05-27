@@ -17,6 +17,7 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
     use shani\launcher\App;
 
     #[AuthorizationCheck(exempted: true)]
+    #[PermissionCheck(exempted: true)]
     final class Oauth2Controller
     {
 
@@ -58,11 +59,10 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
             return HttpResponse::withBody($response?->body);
         }
 
-        #[PermissionCheck(exempted: true)]
         public function login(): HttpResponse
         {
-            $user = $this->app->auth->login();
-            return HttpResponse::withBody($user);
+            $result = $this->app->auth->login();
+            return HttpResponse::withBody($result->user);
         }
     }
 

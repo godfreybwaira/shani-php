@@ -107,17 +107,16 @@ namespace shani\launcher {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriterInterface $writer, Framework $framework) {
-                $responseHeader = new HttpHeader();
-                $response = new ResponseEntity($request, HttpStatus::OK, $responseHeader, new ReadableMap());
+                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
                 $preference = self::host($request->uri->hostname(), $request->header());
                 if ($preference === null) {
                     $response->setStatus(HttpStatus::BAD_REQUEST)->setBody('Unsupported application version');
                     $writer->send($response);
                     return;
                 }
-                $responseHeader->addOne(HttpHeader::VARY, $preference->mapper->requestHeader);
+                $response->header()->addOne(HttpHeader::VARY, $preference->mapper->requestHeader);
                 if ($preference->mapper->responseHeader !== null) {
-                    $responseHeader->addAll([
+                    $response->header()->addAll([
                         $preference->mapper->responseHeader => $preference->versionNumber,
                         HttpHeader::ACCESS_CONTROL_EXPOSE_HEADERS => $preference->mapper->responseHeader
                     ]);
