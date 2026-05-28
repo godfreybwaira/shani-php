@@ -85,7 +85,7 @@ namespace features\attributes\validation {
             }
 
             if (!empty($errors)) {
-                throw new ValidationException(json_encode(['errors' => $errors]));
+                throw new ValidationException(implode(PHP_EOL, $errors));
             }
         }
     }

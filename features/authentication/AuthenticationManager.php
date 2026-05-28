@@ -76,8 +76,8 @@ namespace features\authentication {
                     return null;
                 }
                 $this->user = $result->user;
+                $this->app->session->container(self::METADATA_CART)->addOne('strategy', $index);
                 if ($result->rememberUser) {
-                    $this->app->session->container(self::METADATA_CART)->addOne('strategy', $index);
                     $this->app->session->container(self::AUTH_CART)->add($result->user);
                 }
                 $this->app->session->refresh();
@@ -123,7 +123,7 @@ namespace features\authentication {
 
         public function logout(): bool
         {
-            if ($this->loggedIn()) {
+            if ($this->loggedIn() || $this->app->session->containerExists(self::METADATA_CART)) {
                 $index = $this->app->session->container(self::METADATA_CART)->getOne('strategy');
                 $strategy = $this->app->config->authenticationConfig()->authenticationStrategies[$index];
                 if ($strategy->logout()) {

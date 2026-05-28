@@ -9,6 +9,7 @@
 
 namespace features\session {
 
+    use features\storage\InMemoryDataStorage;
     use features\storage\StorageInterface;
     use shani\launcher\App;
 
@@ -18,7 +19,7 @@ namespace features\session {
         public static function getStorage(App $app, ?SessionConnectionInterface $conn): StorageInterface
         {
             if ($conn === null) {
-                return new StatelessSessionStorage();
+                return new InMemoryDataStorage('4b6f96760ca17d1');
             }
             return new StatefulSessionStorage($app, $conn);
         }

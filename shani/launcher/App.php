@@ -15,11 +15,13 @@ namespace shani\launcher {
     use features\authentication\AuthenticationManager;
     use features\ds\map\ReadableMap;
     use features\ds\map\WritableMap;
-    use features\exceptions\client\AccessGrantException;
+    use features\exceptions\client\AuthenticationException;
     use features\exceptions\client\AuthorizationException;
     use features\exceptions\client\BadRequestException;
     use features\exceptions\client\NotFoundException;
+    use features\exceptions\client\TooManyRequestsException;
     use features\exceptions\client\ValidationException;
+    use features\exceptions\ErrorResponse;
     use features\logging\Logger;
     use features\middleware\MiddlewareHandler;
     use features\middleware\MiddlewareHandlerInterface;
@@ -178,23 +180,20 @@ namespace shani\launcher {
             try {
                 return $this->handleRequestFlow($middleware, $userMiddleware);
             } catch (NotFoundException $ex) {
-                $this->response->setStatus(HttpStatus::NOT_FOUND);
-                return $this->handleException($ex, $middleware);
+                return $this->handleException(HttpStatus::NOT_FOUND, $ex, $middleware);
             } catch (BadRequestException $ex) {
-                $this->response->setStatus(HttpStatus::BAD_REQUEST);
-                return $this->handleException($ex, $middleware);
+                return $this->handleException(HttpStatus::BAD_REQUEST, $ex, $middleware);
             } catch (ValidationException $ex) {
-                $this->response->setStatus(HttpStatus::UNPROCESSABLE_ENTITY);
-                return $this->handleException($ex, $middleware);
-            } catch (AccessGrantException $ex) {
-                $this->response->setStatus(HttpStatus::FORBIDDEN);
-                return $this->handleException($ex, $middleware);
+                return $this->handleException(HttpStatus::UNPROCESSABLE_ENTITY, $ex, $middleware);
             } catch (AuthorizationException $ex) {
-                $this->response->setStatus(HttpStatus::UNAUTHORIZED);
-                return $this->handleException($ex, $middleware);
+                return $this->handleException(HttpStatus::FORBIDDEN, $ex, $middleware);
+            } catch (AuthenticationException $ex) {
+                return $this->handleException(HttpStatus::UNAUTHORIZED, $ex, $middleware);
+            } catch (TooManyRequestsException $ex) {
+                return $this->handleException(HttpStatus::TOO_MANY_REQUESTS, $ex, $middleware);
             } catch (\Throwable $ex) {
-                $this->response->setStatusIf(HttpStatus::INTERNAL_SERVER_ERROR, fn(HttpStatus $status) => !$status->isError());
-                return $this->handleException($ex, $middleware);
+                $status = $this->response->status();
+                return $this->handleException($status->isError() ? $status : HttpStatus::INTERNAL_SERVER_ERROR, $ex, $middleware);
             }
         }
 
@@ -332,14 +331,15 @@ namespace shani\launcher {
             return $this->lang;
         }
 
-        private function handleException(\Throwable $ex, MiddlewareHandler $middleware): ?HttpResponse
+        private function handleException(HttpStatus $status, \Throwable $ex, MiddlewareHandler $middleware): ?HttpResponse
         {
+            $this->response->setStatus($status);
             $fallbackRoute = $this->config->errorHandler($ex);
             if ($fallbackRoute !== null) {
                 $this->request->changeRoute($fallbackRoute);
                 return $this->handleRequest($middleware);
             }
-            return null;
+            return HttpResponse::withBody(ErrorResponse::create($status->value, $ex->getMessage()));
         }
     }
 

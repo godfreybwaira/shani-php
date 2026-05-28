@@ -28,8 +28,8 @@ namespace shani\config {
     {
 
         /**
-         * Enable/disable user authorization on restricted resources.
-         * (Permanent skipping authorization is not recommended in production environment)
+         * Enable/disable user authentication. Permanent skipping authentication
+         * is not recommended in production environment.
          *
          * @var bool
          */

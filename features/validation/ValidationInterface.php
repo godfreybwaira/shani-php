@@ -24,10 +24,10 @@ namespace features\validation {
          * @param string|int $key   The identifier of the field or file being validated.
          * @param mixed      $value The value to validate (e.g., request body field, file object).
          *
-         * @return ValidationError|null Returns a ValidationError if validation fails,
-         *                              or null if validation passes successfully.
+         * @return string|null Returns a Validation error if validation fails,
+         * or null if validation passes successfully.
          */
-        public function validate(string|int $key, mixed $value): ?ValidationError;
+        public function validate(string|int $key, mixed $value): ?string;
     }
 
 }

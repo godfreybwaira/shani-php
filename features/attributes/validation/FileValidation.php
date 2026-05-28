@@ -11,7 +11,6 @@ namespace features\attributes\validation {
 
     use features\exceptions\client\NotFoundException;
     use features\exceptions\client\ValidationException;
-    use features\validation\ValidationError;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
 
@@ -114,15 +113,13 @@ namespace features\attributes\validation {
             }
             $errors = [];
             if ($file->size > $this->maxSize) {
-                $description = 'File size exceed maximum size of ' . number_format($this->maxSize, 0, ',') . ' bytes';
-                $errors[] = new ValidationError($this->name, null, $this->maxSize, $file->size, $description);
+                $errors[] = 'File size exceed maximum size of ' . number_format($this->maxSize, 0, ',') . ' bytes';
             }
             if (!in_array($file->type, $this->types)) {
-                $description = 'Required file types are: ' . implode(', ', $this->types) . ', but ' . $file->type . ' provided';
-                $errors[] = new ValidationError($this->name, null, $this->types, $file->type, $description);
+                $errors[] = 'Required file types are: ' . implode(', ', $this->types) . ', but ' . $file->type . ' provided';
             }
             if (!empty($errors)) {
-                throw new ValidationException(json_encode(['errors' => $errors]));
+                throw new ValidationException(implode(PHP_EOL, $errors));
             }
         }
     }

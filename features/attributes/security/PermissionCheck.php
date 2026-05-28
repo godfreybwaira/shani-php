@@ -3,15 +3,15 @@
 namespace features\attributes\security {
 
     use features\assets\StaticAssetOwnership;
-    use features\exceptions\client\AccessGrantException;
+    use features\exceptions\client\AuthorizationException;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
 
     /**
      * PermissionCheck Attribute
      *
-     * Used to control access to controller methods based on user authentication
-     * and permission rules. Can be applied to individual methods.
+     * Check if the current authenticated user has sufficient privileges to access
+     * the given resource.
      *
      * @author     Goddy
      * @created    May 18, 2026
@@ -42,12 +42,19 @@ namespace features\attributes\security {
          *
          * @param App $app The application instance
          * @return void
-         * @throws AccessGrantException When access is denied
+         * @throws AuthorizationException When access is denied
          */
         #[\Override]
         public function execute(App $app): void
         {
-            if ($this->exempted || $app->auth->accessGranted()) {
+            if ($this->exempted || $app->config->accessingPublicResource() || $app->auth->accessGranted()) {
+                return;
+            }
+            if ($app->config->accessingGuestResource()) {
+                if ($app->auth->loggedIn()) {
+                    $route = RequestRoute::fromPath($app->config->pathConfig()->homePath);
+                    $app->request->changeRoute($route);
+                }
                 return;
             }
 
@@ -58,7 +65,7 @@ namespace features\attributes\security {
                 }
             }
 
-            throw new AccessGrantException('Access Denied');
+            throw new AuthorizationException('Not authorized to access this resource.');
         }
     }
 

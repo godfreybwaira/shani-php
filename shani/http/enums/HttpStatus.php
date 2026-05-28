@@ -50,6 +50,7 @@ namespace shani\http\enums {
         case LOCKED = 423;
         case FAILED_DEPENDENCY = 424;
         case UPGRADE_REQUIRED = 426;
+        case TOO_MANY_REQUESTS = 429;
         case INTERNAL_SERVER_ERROR = 500;
         case NOT_IMPLEMENTED = 501;
         case BAD_GATEWAY = 502;

@@ -9,13 +9,13 @@
 
 namespace apps\demo\v1\modules\oauth2\logic\controllers\get {
 
-    use features\attributes\security\AuthorizationCheck;
+    use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\PermissionCheck;
     use gui\WebUIBuilder;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
-    #[AuthorizationCheck(exempted: true)]
+    #[AuthenticationCheck(exempted: true)]
     #[PermissionCheck(exempted: true)]
     final class Oauth2Controller
     {

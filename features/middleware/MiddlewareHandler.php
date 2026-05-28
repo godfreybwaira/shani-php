@@ -9,7 +9,7 @@
 
 namespace features\middleware {
 
-    use features\attributes\security\AuthorizationCheck;
+    use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\CsrfCheck;
     use features\attributes\security\PermissionCheck;
     use features\cache\CacheFactory;
@@ -82,7 +82,7 @@ namespace features\middleware {
         {
             return [
                 CsrfCheck::class => [],
-                AuthorizationCheck::class => [],
+                AuthenticationCheck::class => [],
                 PermissionCheck::class => [],
             ];
         }

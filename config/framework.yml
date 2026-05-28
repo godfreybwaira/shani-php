@@ -2,7 +2,7 @@
 ---
 # Display all application errors and server errors. This variable can be
 # overridden by application.
-display_errors: true
+display_errors: false
 time_zone: Africa/Dar_Es_Salaam
 # Maximum payload size in MB allowed to upload.
 max_payload_size: 100
@@ -21,5 +21,7 @@ cache:
     file:
       # File cache stores data on disk.
       # Useful for small apps or development environments.
+    memory:
+      # In memory cache storage, persist as per request cycle
     auto:
       # Let the framework choose the best available driver.

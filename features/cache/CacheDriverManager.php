@@ -5,6 +5,7 @@ namespace features\cache {
     use features\cache\clients\ApcuCache;
     use features\cache\clients\FileCache;
     use features\cache\clients\MemcachedCache;
+    use features\storage\InMemoryDataStorage;
     use features\storage\StorageInterface;
 
     /**
@@ -54,6 +55,7 @@ namespace features\cache {
                     'memcached' => new MemcachedCache($prefix, $this->host, $this->port),
                     'apcu' => new ApcuCache($prefix),
                     'file' => new FileCache($prefix),
+                    'memory' => new InMemoryDataStorage($prefix),
                     'auto' => self::resolveDriver($prefix),
                     default => throw new \InvalidArgumentException('Unsupported cache driver "' . $this->driverName . '"')
                 };
@@ -66,7 +68,11 @@ namespace features\cache {
             try {
                 return new ApcuCache($prefix);
             } catch (\RuntimeException) {
-                return new FileCache($prefix);
+                try {
+                    return new FileCache($prefix);
+                } catch (\Throwable) {
+                    return new InMemoryDataStorage($prefix);
+                }
             }
         }
     }
