@@ -31,7 +31,7 @@ namespace apps\demo\v1\config {
             $claim = new JWTClaim(subject: 'user12331', issuer: new URI('http://dev.shani.v2.local'), audience: [
                 'http://abc.com', 'https://api.def.co.tz'
             ]);
-            $key = '-----BEGIN PRIVATE KEY-----' . PHP_EOL . 'MC4CAQAwBQYDK2VwBCIEIBpkBt3k+jLpRo/Tx173KqSY0DBujsL7XANV7KGW1T+x';
+            $key = '-----BEGIN PRIVATE KEY-----' . PHP_EOL . 'MC4CAQAwBQYDK2VwBCIEIJSxh/iy0iGxirtYZOEQiwFQx3R3WJXg1PPxY/0xypBK';
             $key .= PHP_EOL . '-----END PRIVATE KEY-----';
             $algorithm = JWTAlgorithm::EdDSA;
             return new AccessTokenDto($clientId, $claim->asToken($key, $algorithm), $userId, $scope, $expiresIn);

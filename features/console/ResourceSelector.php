@@ -2,11 +2,14 @@
 
 namespace features\console {
 
+    use Closure;
     use features\console\builders\ModuleBuilder;
     use features\console\builders\ProjectBuilder;
     use features\console\builders\ProjectVersionBuilder;
+    use features\console\helpers\AsymmetricKeyPairType;
     use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
+    use features\crypto\CryptoAlgorithm;
     use shani\launcher\Framework;
 
     /**
@@ -33,11 +36,11 @@ namespace features\console {
          *
          * @param array   $availableResources List of resources to choose from.
          * @param bool    $required           Whether selection is mandatory.
-         * @param \Closure $cleaner           Function to clean/format resource names.
+         * @param Closure $cleaner           Function to clean/format resource names.
          *
          * @return string|null The selected resource name or null if skipped.
          */
-        private static function chooser(array $availableResources, bool $required, \Closure $cleaner): ?string
+        private static function chooser(array $availableResources, bool $required, Closure $cleaner): ?string
         {
             $id = 0;
             $resources = [];
@@ -73,6 +76,28 @@ namespace features\console {
             $projects = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
             $this->projectName = self::chooser($projects, $required, fn(string $s) => $s);
             return $this->projectName;
+        }
+
+        public static function selectCipherAlgorithm(bool $required = true): ?string
+        {
+            if ($required) {
+                ConsoleIO::output('Select a cipher algorithm:');
+            } else {
+                ConsoleIO::output('Select a cipher algorithm or press ENTER to skip:');
+            }
+            $algorithms = openssl_get_cipher_methods();
+            return self::chooser($algorithms, $required, fn($s) => $s);
+        }
+
+        public static function selectCryptoAlgorithm(bool $required = true): ?string
+        {
+            if ($required) {
+                ConsoleIO::output('Select a cryptographic algorithm:');
+            } else {
+                ConsoleIO::output('Select a cryptographic algorithm or press ENTER to skip:');
+            }
+            $algorithms = CryptoAlgorithm::cases();
+            return self::chooser($algorithms, $required, fn(CryptoAlgorithm $s) => $s->value);
         }
 
         /**
@@ -183,6 +208,28 @@ namespace features\console {
             }
             $this->requestMethod = self::chooser($methods, $required, fn(string $s) => $s);
             return $this->requestMethod;
+        }
+
+        public static function selectKeyPairType(bool $required = true): ?AsymmetricKeyPairType
+        {
+            if ($required) {
+                ConsoleIO::output('Select a key pair:');
+            } else {
+                ConsoleIO::output('Select a key pair or press ENTER to skip:');
+            }
+            $keyPairs = AsymmetricKeyPairType::cases();
+            $type = self::chooser($keyPairs, $required, fn(AsymmetricKeyPairType $s) => $s->value);
+            return AsymmetricKeyPairType::tryFrom($type);
+        }
+
+        public static function selectCurveName(bool $required = true): ?string
+        {
+            if ($required) {
+                ConsoleIO::output('Select a curve name:');
+            } else {
+                ConsoleIO::output('Select a curve name or press ENTER to skip:');
+            }
+            return self::chooser(openssl_get_curve_names(), $required, fn($s) => $s);
         }
     }
 

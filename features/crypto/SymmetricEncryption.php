@@ -14,15 +14,15 @@ namespace features\crypto {
 
         /**
          * Cipher key object
-         * @var CipherKey
+         * @var SymmetricCipherKey
          */
-        public readonly CipherKey $cipher;
+        public readonly SymmetricCipherKey $cipher;
 
         /**
          * Encrypt/decrypt data using symmetric keys
-         * @param CipherKey $cipher Cipher key object
+         * @param SymmetricCipherKey $cipher Cipher key object
          */
-        public function __construct(CipherKey $cipher)
+        public function __construct(SymmetricCipherKey $cipher)
         {
             $this->cipher = $cipher;
         }

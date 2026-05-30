@@ -2,7 +2,7 @@
 
 /**
  *
- * Final class CipherKey
+ * Final class SymmetricCipherKey
  *
  * Generates and encapsulates cryptographic key material for symmetric encryption.
  * Provides a randomly generated password (key), initialization vector (IV),
@@ -21,7 +21,7 @@ namespace features\crypto {
 
     use features\crypto\exceptions\AlgorithmException;
 
-    final class CipherKey
+    final class SymmetricCipherKey
     {
 
         /**
@@ -62,13 +62,13 @@ namespace features\crypto {
          * @param string $algorithm The OpenSSL-supported cipher algorithm. Defaults to `aes-256-cbc`.
          *
          * @throws RuntimeException If the algorithm is unsupported or key/IV generation fails.
-         * @return CipherKey Cipher key object
+         * @return SymmetricCipherKey Cipher key object
          */
-        public static function create(string $algorithm = 'aes-256-cbc'): CipherKey
+        public static function create(string $algorithm = 'aes-256-cbc'): SymmetricCipherKey
         {
             $keyLen = openssl_cipher_key_length($algorithm);
             $ivLen = openssl_cipher_iv_length($algorithm);
-            if ($keyLen === false || $ivLen === false) {
+            if (empty($keyLen) || empty($ivLen)) {
                 throw new AlgorithmException('Unsupported cipher algorithm: ' . $algorithm);
             }
             $passwordBase64 = base64_encode(openssl_random_pseudo_bytes($keyLen));
@@ -82,11 +82,11 @@ namespace features\crypto {
          * Length depends on the chosen algorithm.
          * @param string $initVector    Base64-encoded random initialization vector (IV). Length depends on the chosen algorithm.
          * @param string $algorithm The encryption algorithm used.
-         * @return CipherKey Cipher key object
+         * @return SymmetricCipherKey Cipher key object
          */
-        public static function createFromValues(string $password, string $initVector, string $algorithm): CipherKey
+        public static function createFromValues(string $password, string $initVector, string $algorithm): SymmetricCipherKey
         {
-            return new CipherKey($password, $initVector, $algorithm);
+            return new SymmetricCipherKey($password, $initVector, $algorithm);
         }
     }
 

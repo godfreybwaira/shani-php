@@ -130,6 +130,10 @@ namespace features\console {
             //Routes
             yield new commands\routes\ListModuleRoutesCommand($this);
 
+            //Keygen
+            yield new commands\keygen\SymmetricKeyGenCommand($this);
+            yield new commands\keygen\AsymmetricKeyGenCommand($this);
+
             //Misc
             yield new commands\misc\FrameworkVersionCommand($this);
             yield new commands\misc\StartServerCommand($this);

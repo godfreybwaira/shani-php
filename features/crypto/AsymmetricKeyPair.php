@@ -9,7 +9,7 @@
 
 namespace features\crypto {
 
-    final class KeyPair implements \JsonSerializable
+    final class AsymmetricKeyPair implements \JsonSerializable
     {
 
         /**
@@ -25,37 +25,45 @@ namespace features\crypto {
         public readonly string $publicKey;
 
         /**
+         * Private key type.
+         * @var string|null
+         */
+        private readonly ?string $keyType;
+
+        /**
          * Create an asymmetric key-pair object
          * @param string $privateKey Secret key used on decryption.
          * @param string $publicKey Used for encryption.
+         * @param int|null $keyType Private key type.
          */
-        public function __construct(string $privateKey, string $publicKey)
+        public function __construct(string $privateKey, string $publicKey, ?int $keyType = null)
         {
             $this->privateKey = $privateKey;
             $this->publicKey = $publicKey;
+            $this->keyType = self::getKeyType($keyType);
         }
 
         /**
          * Generates asymmetric key pairs (Private & Public keys .pem files).
          * @param array $configs
-         * @return KeyPair
+         * @return AsymmetricKeyPair
          */
-        private static function generate(array $configs): KeyPair
+        private static function generate(array $configs): AsymmetricKeyPair
         {
             $privateKey = null;
             $resource = openssl_pkey_new($configs);
             openssl_pkey_export($resource, $privateKey);
             $publicKey = openssl_pkey_get_details($resource)['key'];
-            return new KeyPair($privateKey, $publicKey);
+            return new AsymmetricKeyPair($privateKey, $publicKey, $configs['private_key_type']);
         }
 
         /**
          * Generate an <code>ED25519</code> asymmetric key pair
          *
          * Built for modern cryptographic needs, balancing speed, security, and simplicity.
-         * @return KeyPair
+         * @return AsymmetricKeyPair
          */
-        public static function ed25519(): KeyPair
+        public static function ed25519(): AsymmetricKeyPair
         {
             if (!defined('OPENSSL_KEYTYPE_ED25519')) {
                 define('OPENSSL_KEYTYPE_ED25519', 5); // 5 is the expected internal value for Ed25519
@@ -66,23 +74,24 @@ namespace features\crypto {
         /**
          * Generate an <code>RSA</code> asymmetric key pair
          *
-         * @param int $keySize Key size. Must be a multiple of 128, higher value
-         * means more secure but slower.
-         * @param CryptoAlgorithm $algorithm The hashing algorithm.
-         * @return KeyPair
+         * @param int|null $keySize Key size. Must be a multiple of 128, higher value
+         * means more secure but slower. Default is 2048
+         * @param CryptoAlgorithm|null $algorithm The hashing algorithm. Default is sha256
+         * @return AsymmetricKeyPair
          * @throws \InvalidArgumentException
          */
-        public static function rsa(int $keySize = 2048, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256): KeyPair
+        public static function rsa(?int $keySize = null, ?CryptoAlgorithm $algorithm = null): AsymmetricKeyPair
         {
-            if ($keySize % 128 !== 0) {
+            $length = $keySize ?? 2048;
+            if ($length % 128 !== 0) {
                 throw new \InvalidArgumentException('Key size must be a multiple of 128.');
             }
             if (!defined('OPENSSL_KEYTYPE_RSA')) {
                 define('OPENSSL_KEYTYPE_RSA', 0); // The integer value for OPENSSL_KEYTYPE_RSA is 0
             }
             $configs = [
-                'digest_alg' => $algorithm->value,
-                'private_key_bits' => $keySize,
+                'digest_alg' => $algorithm?->value ?? CryptoAlgorithm::SHA256->value,
+                'private_key_bits' => $length,
                 'private_key_type' => OPENSSL_KEYTYPE_RSA
             ];
             return self::generate($configs);
@@ -91,18 +100,18 @@ namespace features\crypto {
         /**
          * Generate an <code>ECDSA</code> asymmetric key pair
          *
-         * @param string $curveName Curve name
-         * @return KeyPair
+         * @param string|null $curveName Curve name. Default is prime256v1
+         * @return AsymmetricKeyPair
          *
          * @see openssl_get_curve_names()
          */
-        public static function ecdsa(string $curveName = 'prime256v1'): KeyPair
+        public static function ecdsa(?string $curveName = null): AsymmetricKeyPair
         {
             if (!defined('OPENSSL_KEYTYPE_EC')) {
                 define('OPENSSL_KEYTYPE_EC', 3); // The integer value for OPENSSL_KEYTYPE_EC is 3
             }
             $configs = [
-                'curve_name' => $curveName,
+                'curve_name' => $curveName ?? 'prime256v1',
                 'private_key_type' => OPENSSL_KEYTYPE_EC
             ];
             return self::generate($configs);
@@ -112,8 +121,20 @@ namespace features\crypto {
         {
             return [
                 'private_key' => $this->privateKey,
-                'public_key' => $this->publicKey
+                'public_key' => $this->publicKey,
+                'key_type' => $this->keyType
             ];
+        }
+
+        private static function getKeyType(?int $keyType): ?string
+        {
+            return match ($keyType) {
+                3 => 'ecdsa',
+                0 => 'rsa',
+                5 => 'ed25519',
+                null => null,
+                default => throw new \Exception('Unsupported key type')
+            };
         }
     }
 

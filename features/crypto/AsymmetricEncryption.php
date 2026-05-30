@@ -12,13 +12,13 @@ namespace features\crypto {
     final class AsymmetricEncryption implements Encryption
     {
 
-        public readonly KeyPair $keys;
+        public readonly AsymmetricKeyPair $keys;
 
         /**
          * Encrypt/decrypt data using asymmetric keys
-         * @param KeyPair $keys Key-pair object
+         * @param AsymmetricKeyPair $keys Key-pair object
          */
-        public function __construct(KeyPair $keys)
+        public function __construct(AsymmetricKeyPair $keys)
         {
             $this->keys = $keys;
         }

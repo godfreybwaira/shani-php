@@ -14,17 +14,17 @@ namespace features\crypto {
     final class AsymmetricSignature implements DigitalSignature
     {
 
-        public readonly KeyPair $keys;
+        public readonly AsymmetricKeyPair $keys;
         public readonly CryptoAlgorithm $algorithm;
 
         /**
          * This class provides methods to sign and verify digital signatures
          * using OpenSSL. It uses asymmetric cryptography with a private and
          * public key pair for secure authentication.
-         * @param KeyPair           $keys key pair object.
+         * @param AsymmetricKeyPair           $keys key pair object.
          * @param CryptoAlgorithm   $algorithm Cryptographic algorithm
          */
-        public function __construct(KeyPair $keys, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256)
+        public function __construct(AsymmetricKeyPair $keys, CryptoAlgorithm $algorithm = CryptoAlgorithm::SHA256)
         {
             $this->keys = $keys;
             $this->algorithm = $algorithm;

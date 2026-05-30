@@ -37,7 +37,7 @@ namespace apps\demo\v1\config\auth {
             if (empty($token)) {
                 return null;
             }
-            $claim = JWTClaim::fromToken($token, 'key123');
+            $claim = JWTClaim::fromToken($token, 'MCowBQYDK2VwAyEAKaA5Dmite1sGhNXMfFZPpGarV7/Yg63Fplolwbw7Pn0=', \features\jwt\JWTAlgorithm::EdDSA);
             $access = $claim->payload?->getOne('access');
             $user = new UserDetailsDto($subject, $access, false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
             return new AuthenticationResult($user, rememberUser: false);
