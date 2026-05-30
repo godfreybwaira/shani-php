@@ -193,7 +193,7 @@ namespace features\jwt {
         {
             $parts = explode('.', $token);
             if (count($parts) !== JWTClaim::LENGTH) {
-                throw new JWTFormatException('Invalid token structure.');
+                throw new JWTFormatException('Invalid token structure');
             }
             list($headB64, $payloadB64, $sigB64) = $parts;
             $dataToVerify = $headB64 . '.' . $payloadB64;
