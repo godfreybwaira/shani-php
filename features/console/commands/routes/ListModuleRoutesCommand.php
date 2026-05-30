@@ -58,7 +58,7 @@ namespace features\console\commands\routes {
                     $registry,
                     'list:route',
                     'project_name@version_number[@module_name]',
-                    'List module routes if module name is provided, else all routes will be listed.',
+                    'List module routes if module name is provided, else all routes will be listed',
                     'blog@v1@posts'
             );
         }

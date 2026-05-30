@@ -24,7 +24,7 @@ namespace features\console\commands\keygen {
         {
             parent::__construct(
                     $registry, 'keygen:sym', 'alg:<algorithm>',
-                    'Generates a random base64 encoded password and initialization vector based on the specified algorithm.',
+                    'Generates a random base64 encoded password and initialization vector based on the specified algorithm',
                     'alg:aes-256-cbc'
             );
         }

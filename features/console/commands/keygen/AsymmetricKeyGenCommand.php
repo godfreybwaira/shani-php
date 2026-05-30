@@ -30,7 +30,7 @@ namespace features\console\commands\keygen {
         {
             parent::__construct(
                     $registry, 'keygen:asym', 'type:ecdsa|rsa|ed25519[ alg:<algorithm>[ curve:<curve_name>[ len:<int>]]',
-                    'Generates an asymmetric key-pair for asymmetric encryption and descryption',
+                    'Generates an asymmetric key-pair for asymmetric encryption and decryption',
                     'type:rsa alg:sha256 len:2048'
             );
         }
