@@ -20,7 +20,6 @@ namespace apps\demo\v1\config {
     use features\oauth2\Oauth2GrantType;
     use features\oauth2\Oauth2Repository;
     use features\utils\Duration;
-    use features\utils\URI;
 
     final class Oauth2Client implements Oauth2Repository
     {
@@ -30,12 +29,11 @@ namespace apps\demo\v1\config {
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {
             $ttl = Duration::ofMinutes(5);
-            $claim = new JWTClaim(subject: 'user12331', ttl: $ttl, issuer: new URI('http://dev.shani.v2.local'),
-                    audience: ['http://abc.com', 'https://api.def.co.tz'], payload: ['access' => '24354fed,5ca2536e']
-            );
+            $jwt = new JWTClaim(JWTAlgorithm::EdDSA);
+            $jwt->setClaim('access', '24354fed,5ca2536e');
             $key = '-----BEGIN PRIVATE KEY-----' . PHP_EOL . 'MC4CAQAwBQYDK2VwBCIEIJSxh/iy0iGxirtYZOEQiwFQx3R3WJXg1PPxY/0xypBK';
             $key .= PHP_EOL . '-----END PRIVATE KEY-----';
-            return new AccessTokenDto($clientId, $claim->asToken($key, JWTAlgorithm::EdDSA), $userId, $scope, $ttl->fromNow());
+            return new AccessTokenDto($clientId, $jwt->getToken($key), $userId, $scope, $ttl->fromNow());
         }
 
         public function generateRefreshToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 2592000): RefreshTokenDto

@@ -1,175 +1,206 @@
 <?php
 
-/**
- * Description of JWTClaim
- * @author goddy
- *
- * Created on: Mar 26, 2026 at 12:17:10 PM
- */
-
 namespace features\jwt {
 
-    use features\ds\map\ReadableMap;
     use features\jwt\exceptions\JWTAlgorithmException;
     use features\jwt\exceptions\JWTExpirationException;
     use features\jwt\exceptions\JWTFormatException;
     use features\jwt\exceptions\JWTSignatureException;
     use features\oauth2\PKCEGenerator;
     use features\utils\Duration;
-    use features\utils\URI;
 
-    final class JWTClaim implements \JsonSerializable
+    /**
+     * Class JWTClaim
+     *
+     * Represents a set of claims for a JSON Web Token (JWT).
+     * Provides methods to set standard claims (iss, sub, aud, exp, nbf, iat, jti),
+     * add custom claims, generate signed JWT tokens, and validate existing tokens.
+     *
+     * @package features\jwt
+     * @author goddy
+     * @created Mar 26, 2026 at 12:17:10 PM
+     */
+    final class JWTClaim
     {
 
         /**
-         * Identifies the principal that issued, and sign (if applicable) the JWT.
-         * @var URI
+         * @var array<string, mixed> Claims stored in the JWT payload.
          */
-        public readonly URI $issuer;
+        private array $claims = [];
 
         /**
-         * Unique identifier for the JWT (useful for preventing replay attacks).
-         * MUST be unique with negligible collision probability
-         * @var string
+         * @var JWTAlgorithm Algorithm used for signing/verifying JWT.
          */
-        public readonly string $jwtId;
+        private readonly JWTAlgorithm $algorithm;
 
         /**
-         * Time before which the JWT MUST NOT be accepted. Current time MUST be
-         * after or equal to this value
-         * @var \DateTimeInterface
-         */
-        public readonly \DateTimeInterface $notBefore;
-
-        /**
-         * Time at which the JWT was issued. Can be used to calculate token age
-         * @var \DateTimeInterface
-         */
-        public readonly \DateTimeInterface $issuedAt;
-
-        /**
-         * Identifies the principal that is the subject of the JWT. MUST be locally
-         * or globally unique in issuer context. Example: "userId123"
-         * @var string|null
-         */
-        public readonly ?string $subject;
-
-        /**
-         * Identifies the recipients that the JWT is intended for. If present,
-         * processor MUST match one of the values or reject the JWT
-         * @var array
-         */
-        public readonly array $audience;
-
-        /**
-         * Time after which the JWT MUST NOT be accepted. Current time MUST be
-         * before exp (small leeway allowed)
-         * @var \DateTimeInterface
-         */
-        public readonly \DateTimeInterface $expiresIn;
-
-        /**
-         * JWT data
-         * @var ReadableMap|null
-         */
-        public readonly ?ReadableMap $payload;
-
-        /**
-         * JWT parts
-         */
-        public const LENGTH = 3;
-
-        /**
+         * Construct a new JWTClaim instance.
+         * Initializes default claims: issued-at (iat), not-before (nbf),
+         * expiration (exp, default 15 minutes), and unique ID (jti).
          *
-         * @param URI $issuer Identifies the principal that issued, and sign (if applicable) the JWT.
-         * @param array|null $payload JWT data
-         * @param string|null $subject Identifies the principal that is the subject of the JWT.
-         * MUST be locally or globally unique in issuer context. Example: "userId123"
-         * @param array $audience Identifies the recipients that the JWT is intended for.
-         * If present, processor MUST match one of the values or reject the JWT.
-         * @param Duration $ttl Time after which the JWT MUST NOT be accepted. Current time MUST be
-         * before exp
-         * @param string|null $jwtId Unique identifier for the JWT (useful for preventing replay attacks).
-         * MUST be unique with negligible collision probability
-         * @param \DateTimeInterface|null $issuedAt  Time at which the JWT was issued. Can be used to calculate token age.
-         * @param \DateTimeInterface|null $notBefore  Time before which the JWT MUST NOT be accepted.
-         * Current time MUST be after or equal to this value
+         * @param JWTAlgorithm $algorithm JWT signature algorithm (default HS256).
          */
-        public function __construct(
-                URI $issuer, ?array $payload = null, ?string $subject = null,
-                array $audience = [], Duration $ttl = null, ?string $jwtId = null,
-                ?\DateTimeInterface $issuedAt = null, ?\DateTimeInterface $notBefore = null
-        )
+        public function __construct(JWTAlgorithm $algorithm = JWTAlgorithm::HS256)
         {
-
-            $duration = $ttl ?? Duration::ofMinutes(15);
-            $this->issuedAt = $issuedAt ?? new \DateTimeImmutable();
-            $this->jwtId = $jwtId ?? bin2hex(random_bytes(16));
-            $this->expiresIn = Duration::fromTimestamp($this->issuedAt->getTimestamp() + $duration->fromNow())->toDateTime();
-            $this->notBefore = $notBefore ?? $this->issuedAt;
-            $this->issuer = $issuer;
-            $this->subject = $subject;
-            $this->audience = $audience;
-            $this->payload = $payload !== null ? new ReadableMap($payload) : null;
-        }
-
-        #[\Override]
-        public function jsonSerialize(): array
-        {
-            return [
-                'jti' => $this->jwtId,
-                'sub' => $this->subject,
-                'iss' => $this->issuer->asString(),
-                'aud' => $this->audience,
-                'exp' => $this->expiresIn->getTimestamp(),
-                'nbf' => $this->notBefore->getTimestamp(),
-                'iat' => $this->issuedAt->getTimestamp(),
-                'payload' => $this->payload
-            ];
+            $this->algorithm = $algorithm;
+            $now = new \DateTimeImmutable();
+            $this->setIssuedAt($now)->setNotBefore($now);
+            $duration = Duration::ofMinutes(15);
+            $this->setExpire($duration)->setId(bin2hex(random_bytes(8)));
         }
 
         /**
-         * Tells whether a JWT token is still valid i.e not expired and it is ready for use.
-         * @return bool True if the token is valid, false otherwise
+         * Set the JWT ID (jti).
+         *
+         * @param string $jwtId Unique identifier for the token.
+         * @return JWTClaim
+         */
+        public function setId(string $jwtId): JWTClaim
+        {
+            $this->claims['jti'] = $jwtId;
+            return $this;
+        }
+
+        /**
+         * Set the subject (sub).
+         *
+         * @param string $subject Subject of the token (e.g., user ID).
+         * @return JWTClaim
+         */
+        public function setSubject(string $subject): JWTClaim
+        {
+            $this->claims['sub'] = $subject;
+            return $this;
+        }
+
+        /**
+         * Set the issuer (iss).
+         *
+         * @param string $issuer Issuer of the token.
+         * @return JWTClaim
+         */
+        public function setIssuer(string $issuer): JWTClaim
+        {
+            $this->claims['iss'] = $issuer;
+            return $this;
+        }
+
+        /**
+         * Set the audience (aud).
+         *
+         * @param array|string $audience Audience(s) for the token.
+         * @return JWTClaim
+         */
+        public function setAudience(array|string $audience): JWTClaim
+        {
+            $this->claims['aud'] = $audience;
+            return $this;
+        }
+
+        /**
+         * Set the expiration time (exp).
+         *
+         * @param Duration $ttl Time-to-live duration.
+         * @return JWTClaim
+         */
+        public function setExpire(Duration $ttl): JWTClaim
+        {
+            $this->claims['exp'] = $ttl->toDateTime()->getTimestamp();
+            return $this;
+        }
+
+        /**
+         * Set the not-before time (nbf).
+         *
+         * @param \DateTimeInterface $notBefore Time before which token is invalid.
+         * @return JWTClaim
+         */
+        public function setNotBefore(\DateTimeInterface $notBefore): JWTClaim
+        {
+            $this->claims['nbf'] = $notBefore->getTimestamp();
+            return $this;
+        }
+
+        /**
+         * Set the issued-at time (iat).
+         *
+         * @param \DateTimeInterface $issuedAt Time when token was issued.
+         * @return JWTClaim
+         */
+        public function setIssuedAt(\DateTimeInterface $issuedAt): JWTClaim
+        {
+            $this->claims['iat'] = $issuedAt->getTimestamp();
+            return $this;
+        }
+
+        /**
+         * Set a custom claim.
+         *
+         * @param string $key Claim name.
+         * @param mixed $value Claim value.
+         * @return JWTClaim
+         */
+        public function setClaim(string $key, mixed $value): JWTClaim
+        {
+            $this->claims[$key] = $value;
+            return $this;
+        }
+
+        /**
+         * Retrieve a claim value.
+         *
+         * @param string $key Claim name.
+         * @param mixed|null $default Default value if claim not found.
+         * @return mixed Claim value or default.
+         */
+        public function getClaim(string $key, mixed $default = null): mixed
+        {
+            return $this->claims[$key] ?? $default;
+        }
+
+        /**
+         * Check if the token is valid (not expired and not-before satisfied).
+         *
+         * @return bool True if valid, false otherwise.
          */
         public function isValid(): bool
         {
-            $now = time();
-            return $this->expiresIn->getTimestamp() >= $now && $now >= $this->notBefore->getTimestamp();
+            $moment = (new \DateTimeImmutable())->getTimestamp();
+            return ($this->claims['exp'] ?? 0) >= $moment && $moment >= ($this->claims['nbf'] ?? 0);
         }
 
         /**
-         * Get the remaining time (seconds) before token has expired.
-         * @return int
+         * Get remaining time-to-live in seconds.
+         *
+         * @return int Remaining seconds before expiration.
          */
         public function getRemainingTtl(): int
         {
-            return max(0, $this->expiresIn->getTimestamp() - time());
+            return max(0, ($this->claims['exp'] ?? 0) - (new \DateTimeImmutable())->getTimestamp());
         }
 
         /**
-         * Convert a JWT claim object to a valid JWT token string.
-         * @param string $secretKey Secret key for signing a JWT token
-         * @param JWTAlgorithm $algorithm JWT signature algorithm
-         * @return string JWT token string
-         * @throws JWTFormatException
+         * Generate a signed JWT token string from claims.
+         *
+         * @param string $secretKey Secret key for signing.
+         * @return string JWT token string.
+         * @throws JWTFormatException If signature generation fails.
          */
-        public function asToken(string $secretKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): string
+        public function getToken(string $secretKey): string
         {
-            $header = ['typ' => 'JWT', 'alg' => $algorithm->name];
+            $header = ['typ' => 'JWT', 'alg' => $this->algorithm->name];
             $segments = [
                 self::base64UrlEncode(json_encode($header)),
-                self::base64UrlEncode(json_encode($this))
+                self::base64UrlEncode(json_encode($this->claims))
             ];
 
             $dataToSign = implode('.', $segments);
             $signature = null;
-            if ($algorithm->isSymmetric()) {
-                $signature = hash_hmac($algorithm->getValue(), $dataToSign, $secretKey, true);
+            if ($this->algorithm->isSymmetric()) {
+                $signature = hash_hmac($this->algorithm->getValue(), $dataToSign, $secretKey, true);
             } else {
-                openssl_sign($dataToSign, $signature, $secretKey, $algorithm->getValue());
-                // ES256 Fix: Convert DER signature to Raw R+S
-                if ($algorithm->isEllipticCurve()) {
+                openssl_sign($dataToSign, $signature, $secretKey, $this->algorithm->getValue());
+                if ($this->algorithm->isEllipticCurve()) {
                     $signature = ECDSAHelper::der2Sig($signature);
                 }
             }
@@ -181,22 +212,21 @@ namespace features\jwt {
         }
 
         /**
-         * Create a JWT Claim object from a valid JWT token
-         * @param string $token JWT token string
-         * @param string $verificationKey Key for verifying a JWT signature. For
-         * Asymmetric algorithms, it is the public key, for Symmetric algorithms,
-         * it is the same key used to sign a JWT
-         * @param JWTAlgorithm $algorithm JWT signature algorithm
-         * @return JWTClaim JWTClaim object
-         * @throws JWTFormatException
-         * @throws JWTAlgorithmException
-         * @throws JWTSignatureException
-         * @throws JWTExpirationException
+         * Parse and validate a JWT token string into a JWTClaim object.
+         *
+         * @param string $token JWT token string.
+         * @param string $verificationKey Key for verifying signature.
+         * @param JWTAlgorithm $algorithm Expected algorithm.
+         * @return JWTClaim Parsed JWTClaim object.
+         * @throws JWTFormatException If token format is invalid.
+         * @throws JWTAlgorithmException If algorithm mismatch occurs.
+         * @throws JWTSignatureException If signature verification fails.
+         * @throws JWTExpirationException If token is expired.
          */
-        public static function fromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): JWTClaim
+        public static function fromToken(string $token, string $verificationKey, JWTAlgorithm $algorithm): JWTClaim
         {
             $parts = explode('.', $token);
-            if (count($parts) !== JWTClaim::LENGTH) {
+            if (count($parts) !== 3) {
                 throw new JWTFormatException('Invalid token structure');
             }
             list($headB64, $payloadB64, $sigB64) = $parts;
@@ -225,28 +255,39 @@ namespace features\jwt {
             if (Duration::expired($payload['exp'] ?? 0)) {
                 throw new JWTExpirationException('Token expired');
             }
-            return self::payload2Claim($payload);
-        }
-
-        private static function payload2Claim(array $payload): JWTClaim
-        {
-            $expiresIn = $payload['exp'] ?? 0;
-            $issuedAt = $payload['iat'] ?? 0;
-            return new JWTClaim(
-                    new URI($payload['iss']),
-                    !empty($payload['payload']) ? $payload['payload'] : null,
-                    $payload['sub'] ?? null,
-                    (array) ($payload['aud'] ?? []),
-                    Duration::ofSeconds($expiresIn - $issuedAt),
-                    $payload['jti'] ?? null,
-                    !empty($payload['iat']) ? \DateTimeImmutable::createFromFormat('U', $payload['iat']) : null,
-                    !empty($payload['nbf']) ? \DateTimeImmutable::createFromFormat('U', $payload['nbf']) : null
-            );
+            return self::payload2Claim($algorithm, $payload);
         }
 
         /**
-         * Standard Base64 encoding isn't URL-safe.
-         * We need to replace +, /, and remove padding =.
+         * Convert payload array into a JWTClaim object.
+         *
+         * @param JWTAlgorithm $algorithm Algorithm used
+         * @param array<string, mixed> $payload Token payload
+         * @return JWTClaim
+         */
+        private static function payload2Claim(JWTAlgorithm $algorithm, array $payload): JWTClaim
+        {
+            $jwt = new JWTClaim($algorithm);
+            foreach ($payload as $key => $value) {
+                $jwt->setClaim($key, $value);
+            }
+            if (!empty($payload['iat'])) {
+                if (!empty($payload['exp'])) {
+                    $jwt->setExpire(Duration::ofSeconds($payload['exp'] - $payload['iat']));
+                }
+                $jwt->setIssuedAt(Duration::fromTimestamp($payload['iat'])->toDateTime());
+            }
+            if (!empty($payload['nbf'])) {
+                $jwt->setNotBefore(Duration::fromTimestamp($payload['nbf'])->toDateTime());
+            }
+            return $jwt;
+        }
+
+        /**
+         * Encode data using URL-safe Base64.
+         *
+         * @param string $data Raw data
+         * @return string URL-safe Base64 encoded string
          */
         private static function base64UrlEncode(string $data): string
         {
@@ -254,7 +295,10 @@ namespace features\jwt {
         }
 
         /**
-         * Decodes a Base64URL string back to original data.
+         * Decode a URL-safe Base64 string.
+         *
+         * @param string $data Encoded data
+         * @return string Decoded raw data
          */
         private static function base64UrlDecode(string $data): string
         {
