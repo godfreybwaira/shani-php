@@ -52,6 +52,19 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $student = $this->service->getById($id);
             return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
         }
+
+        #[\features\attributes\security\PermissionCheck(exempted: true)]
+        #[\features\attributes\security\AuthenticationCheck(exempted: true)]
+        public function mail(): ?HttpResponse
+        {
+            $mail = new \features\smtp\SMTPClient('localhost:1025');
+            $mail->from('mia@mail.com')->setBody(null, 'helooo');
+            $message = null;
+            $mail->subject('testing...')->send(function (mixed $code, mixed $msg) use (&$message) {
+                $message = $msg;
+            });
+            return HttpResponse::withBody($message);
+        }
     }
 
 }

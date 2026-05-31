@@ -13,8 +13,8 @@ namespace features\smtp {
     {
 
         private $socket;
-        private bool $secure;
-        private string $host;
+        private readonly bool $secure;
+        private readonly string $host;
         private ?int $errorCode;
         private ?string $lastReply = null, $errorMsg;
 
@@ -36,19 +36,17 @@ namespace features\smtp {
         public function __construct(string $host, ?SMTPSecurity $security, int $retries, int $timeout)
         {
             $count = 0;
-            $socket = $errorCode = $errorMsg = null;
+            $socket = null;
+            $this->host = $host;
+            $this->secure = $security !== null;
             while ($count < $retries) {
-                $socket = stream_socket_client($host, $errorCode, $errorMsg, $timeout, self::FLAGS);
+                $socket = stream_socket_client($host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS);
                 if (is_resource($socket)) {
-                    $this->errorCode = $errorCode;
-                    $this->errorMsg = $errorMsg;
                     $this->socket = $socket;
-                    $this->host = $host;
-                    $this->secure = $security !== null;
                     break;
                 }
                 $count++;
-                usleep($count * 100000);
+                usleep($count * 20_000);
             }
         }
 

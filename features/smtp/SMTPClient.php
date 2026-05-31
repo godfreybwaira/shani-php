@@ -17,9 +17,8 @@ namespace features\smtp {
         private ?string $body = null, $subject = null, $from = null, $replyTo = null;
         private ?string $password = null, $headerLine = null, $token = null;
         private array $files = [], $headers = [], $rcpt = [];
-        private SMTPConnection $conn;
-        private string $boundary, $host;
-        private int $retries, $timeout;
+        private readonly string $boundary, $host;
+        private readonly int $retries, $timeout;
         private ?SMTPSecurity $security = null;
 
         public function __construct(string $host, int $retries = 3, int $timeout = 500)
@@ -221,20 +220,18 @@ namespace features\smtp {
          */
         public function send(\Closure $callback = null): void
         {
-            \lib\Concurrency::parallel(function () use ($callback) {
-                $this->conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
-                $success = $this->conn->initialize($this->from, $this->password, $this->token);
-                if ($success) {
-                    $socket = $this->conn->getSocket();
-                    $this->conn->setRecipients($this->rcpt);
-                    $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
-                    fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
-                    $this->conn->quit();
-                }
-                if ($callback !== null) {
-                    $callback($this->conn->errorCode(), $this->conn->errorMessage());
-                }
-            });
+            $conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
+            $success = $conn->initialize($this->from, $this->password, $this->token);
+            if ($success) {
+                $socket = $conn->getSocket();
+                $conn->setRecipients($this->rcpt);
+                $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
+                fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
+                $conn->quit();
+            }
+            if ($callback !== null) {
+                $callback($conn->errorCode(), $conn->errorMessage());
+            }
         }
 
         private function sendHeader(&$socket): self
