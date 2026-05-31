@@ -14,8 +14,6 @@ namespace apps\demo\v1\config\auth {
     use features\authentication\UserDetailsDto;
     use features\jwt\JWTAlgorithm;
     use features\jwt\JWTClaim;
-    use features\utils\Duration;
-    use features\utils\URI;
     use shani\launcher\App;
 
     final class JwtAuthenticator implements AuthenticationStrategy

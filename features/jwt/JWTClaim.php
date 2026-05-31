@@ -152,6 +152,7 @@ namespace features\jwt {
          * @param string $secretKey Secret key for signing a JWT token
          * @param JWTAlgorithm $algorithm JWT signature algorithm
          * @return string JWT token string
+         * @throws JWTFormatException
          */
         public function asToken(string $secretKey, JWTAlgorithm $algorithm = JWTAlgorithm::HS256): string
         {
@@ -172,8 +173,11 @@ namespace features\jwt {
                     $signature = ECDSAHelper::der2Sig($signature);
                 }
             }
-            $segments[] = self::base64UrlEncode($signature);
-            return implode('.', $segments);
+            if (!empty($signature)) {
+                $segments[] = self::base64UrlEncode($signature);
+                return implode('.', $segments);
+            }
+            throw new JWTFormatException('Invalid JWT signature');
         }
 
         /**
