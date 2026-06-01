@@ -1,0 +1,25 @@
+These are my headers when sending email
+From: FromMia<mia@mail.com>
+To: ToWendy<wendi@mail.ca>
+Cc: <cc1@email.ca>
+Cc: My new CC name<cc2@mail.ca>
+Subject: testing...
+MIME-Version: 1.0
+Date: Mon, 01 Jun 2026 15:40:04 +0000
+Message-ID: <340499657305279a3f24031143>
+Content-Type: multipart/mixed; boundary="340499657305279a3f24031143"
+
+
+but mailpit generate the following headers
+From: FromMia<mia@mail.com>
+To: ToWendy<wendi@mail.ca>
+Cc: <cc1@email.ca>
+Cc: My new CC name<cc2@mail.ca>
+Subject: testing...
+MIME-Version: 1.0
+Date: Mon, 01 Jun 2026 15:40:04 +0000
+Message-ID: <340499657305279a3f24031143>
+Content-Type: multipart/mixed; boundary="340499657305279a3f24031143"
+
+
+What is wrong here?

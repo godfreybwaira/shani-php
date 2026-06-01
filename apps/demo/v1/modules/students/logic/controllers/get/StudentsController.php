@@ -12,6 +12,10 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
     use apps\demo\v1\modules\students\data\dto\StudentDto;
     use apps\demo\v1\modules\students\data\dto\StudentListDto;
     use apps\demo\v1\modules\students\logic\services\StudentService;
+    use features\attributes\security\AuthenticationCheck;
+    use features\attributes\security\PermissionCheck;
+    use features\smtp\SMTPClient;
+    use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
@@ -53,17 +57,26 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
         }
 
-        #[\features\attributes\security\PermissionCheck(exempted: true)]
-        #[\features\attributes\security\AuthenticationCheck(exempted: true)]
+        #[PermissionCheck(exempted: true)]
+        #[AuthenticationCheck(exempted: true)]
         public function mail(): ?HttpResponse
         {
-            $mail = new \features\smtp\SMTPClient('localhost:1025');
-            $mail->from('mia@mail.com')->setBody(null, 'helooo');
-            $message = null;
-            $mail->subject('testing...')->send(function (mixed $code, mixed $msg) use (&$message) {
-                $message = $msg;
-            });
-            return HttpResponse::withBody($message);
+            $storage = SHANI_SERVER_ROOT . '/apps/demo/v1/modules/students/logic/controllers/get';
+            $mail = new SMTPClient('localhost:1025');
+            $path = new File($storage . '/picha.png');
+            $pdf = new File($storage . '/in.pdf');
+            $file = new File($storage . '/file.txt');
+            $chi = new File($storage . '/chi.webp');
+            $tmpl = $storage . '/tmpl.php';
+            $mail->from('mia@mail.com', 'FromMia')->to('wendi@mail.ca', 'ToWendy')->attachments($file)
+                    ->bcc('bcc@email.ca')
+                    ->bcc('bcc2@email.ca')
+                    ->cc('cc1@email.ca')
+                    ->cc('cc2@mail.ca', 'My new CC name')->setBody($tmpl, [
+                'title' => 'Heloooo', 'name' => "goddy"
+            ]);
+            $mail->subject('testing...')->send();
+            return null;
         }
     }
 

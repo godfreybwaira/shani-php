@@ -180,11 +180,10 @@ namespace features\smtp {
 
         private function getReply(): ?string
         {
-            while ($line = fgets($this->socket)) {
-                $str = trim($line);
-                if (!empty($str)) {
-                    $this->lastReply = $str;
-                }
+            $line = fgets($this->socket);
+            $str = trim($line);
+            if (!empty($str)) {
+                $this->lastReply = $str;
             }
             return $this->lastReply;
         }

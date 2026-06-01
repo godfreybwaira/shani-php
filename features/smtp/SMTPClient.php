@@ -9,6 +9,8 @@
 
 namespace features\smtp {
 
+    use features\exceptions\client\BadRequestException;
+    use features\utils\File;
     use shani\launcher\Framework;
 
     final class SMTPClient
@@ -29,7 +31,7 @@ namespace features\smtp {
             $this->timeout = $timeout;
             $this->headers = [
                 'MIME-Version' => '1.0', 'Date' => gmdate('r'),
-                'Message-ID' => '<' . $this->boundary . '>'
+                'Message-ID' => '<' . uniqid() . '>'
             ];
         }
 
@@ -40,7 +42,7 @@ namespace features\smtp {
          */
         public function security(SMTPSecurity $security): self
         {
-            $this->security = $security->value;
+            $this->security = $security;
             return $this;
         }
 
@@ -65,7 +67,7 @@ namespace features\smtp {
         {
             if ($this->replyTo === null && self::validEmail($email)) {
                 $this->replyTo = $email;
-                $this->headerLine .= 'Reply-To: ' . $name . '<' . $email . '>' . SMTPConnection::EOL;
+                $this->headerLine .= 'Reply-To: "' . $name . '" <' . $email . '>' . SMTPConnection::EOL;
             }
             return $this;
         }
@@ -99,7 +101,7 @@ namespace features\smtp {
         {
             if ($this->from === null && self::validEmail($email)) {
                 $this->from = $email;
-                $this->headerLine .= 'From: ' . $name . '<' . $this->from . '>' . SMTPConnection::EOL;
+                $this->headerLine .= 'From: "' . $name . '" <' . $this->from . '>' . SMTPConnection::EOL;
             }
             return $this;
         }
@@ -123,7 +125,7 @@ namespace features\smtp {
          */
         public function cc(string $email, string $name = null): self
         {
-            return $this->addRcpt($email, $name, 'Cc');
+            return $this->addRcpt($email, $name, 'Cc'); //cc should be separated by comma
         }
 
         /**
@@ -134,7 +136,7 @@ namespace features\smtp {
          */
         public function bcc(string $email, string $name = null): self
         {
-            return $this->addRcpt($email, $name, 'Bcc');
+            return $this->addRcpt($email, $name);
         }
 
         private function addRcpt(string $email, string $name = null, string $type = null): self
@@ -142,7 +144,7 @@ namespace features\smtp {
             if (!in_array($email, $this->rcpt) && self::validEmail($email)) {
                 $this->rcpt[] = $email;
                 if ($type !== null) {
-                    $this->headerLine .= $type . ': ' . $name . '<' . $email . '>' . SMTPConnection::EOL;
+                    $this->headerLine .= $type . ': "' . $name . '" <' . $email . '>' . SMTPConnection::EOL;
                 }
             }
             return $this;
@@ -160,16 +162,15 @@ namespace features\smtp {
         }
 
         /**
-         * Add path to file as attachment to e-mail
-         * @param string $path Path to a valid file to be send as attachment
-         * @param string $filename Name of a file as it will appear to recipient.
-         * @param string $mime File mime type. If not provided file mime will be used instead
+         * Add a file as attachment to e-mail
+         * @param File $file A file object to be send as attachment
          * @return self
          */
-        public function attachment(string $path, string $filename = null, string $mime = null): self
+        public function attachments(File ...$files): self
         {
-            $mime ??= \lib\MediaType::fromFilename($path) ?? 'application/octet-stream';
-            $this->files[md5($path)] = ['path' => $path, 'mime' => $mime, 'name' => $filename];
+            foreach ($files as $file) {
+                $this->files[md5($file->path)] = $file;
+            }
             return $this;
         }
 
@@ -223,8 +224,11 @@ namespace features\smtp {
             $conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
             $success = $conn->initialize($this->from, $this->password, $this->token);
             if ($success) {
-                $socket = $conn->getSocket();
+                if (empty($this->rcpt)) {
+                    throw new BadRequestException('At least one recipient field (To) is required.');
+                }
                 $conn->setRecipients($this->rcpt);
+                $socket = $conn->getSocket();
                 $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
                 fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
                 $conn->quit();
@@ -260,13 +264,12 @@ namespace features\smtp {
         private function sendAttachments(&$socket): self
         {
             foreach ($this->files as $file) {
-                $name = $file['name'] ?? basename($file['path']);
-                $src = fopen($file['path'], 'rb');
+                $src = fopen($file->path, 'rb');
                 $content = '--' . $this->boundary . SMTPConnection::EOL;
-                $content .= 'Content-Type: ' . $file['mime'] . '; ' . chunk_split('name="' . $name . '"');
+                $content .= 'Content-Type: ' . $file->type . '; ' . chunk_split('name="' . $file->name . '"');
                 $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL;
-                $content .= 'Content-Length: ' . fstat($src)['size'] . SMTPConnection::EOL;
-                $content .= 'Content-Disposition: attachment; ' . chunk_split('filename="' . $name . '"');
+//                $content .= 'Content-Length: ' . $file->size . SMTPConnection::EOL;
+                $content .= 'Content-Disposition: attachment; ' . chunk_split('filename="' . $file->name . '"');
                 fwrite($socket, $content . SMTPConnection::EOL);
                 self::copyFile($src, $socket);
                 fclose($src);
