@@ -9,9 +9,9 @@
 
 namespace features\jwt\exceptions {
 
-    use features\exceptions\client\BadRequestException;
+    use features\exceptions\client\AuthenticationException;
 
-    final class JWTExpirationException extends BadRequestException
+    final class JWTExpirationException extends AuthenticationException
     {
 //put your code here
     }

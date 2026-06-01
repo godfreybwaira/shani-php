@@ -38,14 +38,14 @@ namespace features\jwt {
          * Initializes default claims: issued-at (iat), not-before (nbf),
          * expiration (exp, default 15 minutes), and unique ID (jti).
          *
-         * @param JWTAlgorithm $algorithm JWT signature algorithm (default HS256).
+         * @param JWTAlgorithm $algorithm JWT signature algorithm.
          */
-        public function __construct(JWTAlgorithm $algorithm = JWTAlgorithm::HS256)
+        public function __construct(JWTAlgorithm $algorithm)
         {
             $this->algorithm = $algorithm;
             $now = new \DateTimeImmutable();
             $this->setIssuedAt($now)->setNotBefore($now);
-            $duration = Duration::ofMinutes(15);
+            $duration = Duration::ofMinutes(10);
             $this->setExpire($duration)->setId(bin2hex(random_bytes(8)));
         }
 
@@ -253,7 +253,7 @@ namespace features\jwt {
             }
             $payload = json_decode(self::base64UrlDecode($payloadB64), true);
             if (Duration::expired($payload['exp'] ?? 0)) {
-                throw new JWTExpirationException('Token expired');
+                throw new JWTExpirationException('Your session has expired. Please get a new token');
             }
             return self::payload2Claim($algorithm, $payload);
         }
