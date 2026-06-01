@@ -10,18 +10,22 @@
 namespace features\smtp {
 
     use features\exceptions\client\BadRequestException;
+    use features\smtp\values\Email;
     use features\utils\File;
     use shani\launcher\Framework;
 
     final class SMTPClient
     {
 
-        private ?string $body = null, $subject = null, $from = null, $replyTo = null;
-        private ?string $password = null, $headerLine = null, $token = null;
-        private array $files = [], $headers = [], $rcpt = [];
+        private ?string $body = null, $subject = null;
+        private ?Email $replyTo = null;
+        private readonly Email $from;
+        private ?string $password = null, $token = null;
+        private array $files = [], $headers = [];
         private readonly string $boundary, $host;
         private readonly int $retries, $timeout;
         private ?SMTPSecurity $security = null;
+        private array $toList = [], $ccList = [], $bccList = [];
 
         public function __construct(string $host, int $retries = 3, int $timeout = 500)
         {
@@ -59,16 +63,12 @@ namespace features\smtp {
 
         /**
          * Set e-mail to reply to
-         * @param string $email Reply-to e-mail
-         * @param string $name Reply-to name
+         * @param Email $email Reply-to e-mail
          * @return self
          */
-        public function replyTo(string $email, string $name = null): self
+        public function replyTo(Email $email): self
         {
-            if ($this->replyTo === null && self::validEmail($email)) {
-                $this->replyTo = $email;
-                $this->headerLine .= 'Reply-To: "' . $name . '" <' . $email . '>' . SMTPConnection::EOL;
-            }
+            $this->replyTo = $email;
             return $this;
         }
 
@@ -83,69 +83,52 @@ namespace features\smtp {
             return $this;
         }
 
-        private static function validEmail(string $email): bool
-        {
-            if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
-                return true;
-            }
-            throw new \InvalidArgumentException('Invalid email address ' . $email);
-        }
-
         /**
          * Set e-mail sender
-         * @param string $email sender e-mail
-         * @param string $name sender name
+         * @param Email $email sender e-mail
          * @return self
          */
-        public function from(string $email, string $name = null): self
+        public function from(Email $email): self
         {
-            if ($this->from === null && self::validEmail($email)) {
-                $this->from = $email;
-                $this->headerLine .= 'From: "' . $name . '" <' . $this->from . '>' . SMTPConnection::EOL;
-            }
+            $this->from = $email;
             return $this;
         }
 
         /**
          * Set e-mail recipient
-         * @param string $email Recipient e-mail
-         * @param string $name Recipient name
+         * @param Email $email Recipient e-mail
          * @return self
          */
-        public function to(string $email, string $name = null): self
+        public function to(Email $email): self
         {
-            return $this->addRcpt($email, $name, 'To');
+            if (!isset($this->toList[$email->value])) {
+                $this->toList[$email->value] = $email;
+            }
+            return $this;
         }
 
         /**
          * Set CC (Carbon Copy) to e-mail
-         * @param string $email Recipient e-mail
-         * @param string $name Recipient name
+         * @param Email $email Recipient e-mail
          * @return self
          */
-        public function cc(string $email, string $name = null): self
+        public function cc(Email $email): self
         {
-            return $this->addRcpt($email, $name, 'Cc'); //cc should be separated by comma
+            if (!isset($this->ccList[$email->value])) {
+                $this->ccList[$email->value] = $email;
+            }
+            return $this;
         }
 
         /**
          * Set BCC (Blind Carbon Copy) to e-mail
-         * @param string $email Recipient e-mail
-         * @param string $name Recipient name
+         * @param Email $email Recipient e-mail
          * @return self
          */
-        public function bcc(string $email, string $name = null): self
+        public function bcc(Email $email): self
         {
-            return $this->addRcpt($email, $name);
-        }
-
-        private function addRcpt(string $email, string $name = null, string $type = null): self
-        {
-            if (!in_array($email, $this->rcpt) && self::validEmail($email)) {
-                $this->rcpt[] = $email;
-                if ($type !== null) {
-                    $this->headerLine .= $type . ': "' . $name . '" <' . $email . '>' . SMTPConnection::EOL;
-                }
+            if (!isset($this->bccList[$email->value])) {
+                $this->bccList[$email->value] = $email;
             }
             return $this;
         }
@@ -222,12 +205,13 @@ namespace features\smtp {
         public function send(\Closure $callback = null): void
         {
             $conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
-            $success = $conn->initialize($this->from, $this->password, $this->token);
+            $success = $conn->initialize($this->from->value, $this->password, $this->token);
             if ($success) {
-                if (empty($this->rcpt)) {
+                if (empty($this->toList)) {
                     throw new BadRequestException('At least one recipient field (To) is required.');
                 }
-                $conn->setRecipients($this->rcpt);
+                $recipients = array_merge($this->toList, $this->ccList, $this->bccList);
+                $conn->setRecipients(array_keys($recipients));
                 $socket = $conn->getSocket();
                 $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
                 fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
@@ -240,7 +224,17 @@ namespace features\smtp {
 
         private function sendHeader(&$socket): self
         {
-            $content = $this->headerLine . $this->subject;
+            $emails = 'From: ' . $this->from . SMTPConnection::EOL;
+            if (!empty($this->replyTo)) {
+                $emails .= 'Reply-To: ' . $this->replyTo . SMTPConnection::EOL;
+            }
+            if (!empty($this->toList)) {
+                $emails .= 'To: ' . implode(', ', $this->toList) . SMTPConnection::EOL;
+            }
+            if (!empty($this->ccList)) {
+                $emails .= 'Cc: ' . implode(', ', $this->ccList) . SMTPConnection::EOL;
+            }
+            $content = $emails . $this->subject;
             foreach ($this->headers as $key => $value) {
                 $content .= ucwords($key, '-') . ': ' . $value . SMTPConnection::EOL;
             }

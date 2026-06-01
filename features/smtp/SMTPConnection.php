@@ -46,7 +46,7 @@ namespace features\smtp {
                     break;
                 }
                 $count++;
-                usleep($count * 20_000);
+                usleep($count * 90_000);
             }
         }
 

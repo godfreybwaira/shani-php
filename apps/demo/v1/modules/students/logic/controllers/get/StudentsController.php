@@ -15,6 +15,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\PermissionCheck;
     use features\smtp\SMTPClient;
+    use features\smtp\values\Email;
     use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
@@ -64,17 +65,19 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $storage = SHANI_SERVER_ROOT . '/apps/demo/v1/modules/students/logic/controllers/get';
             $mail = new SMTPClient('localhost:1025');
             $path = new File($storage . '/picha.png');
-            $pdf = new File($storage . '/in.pdf');
             $file = new File($storage . '/file.txt');
             $chi = new File($storage . '/chi.webp');
             $tmpl = $storage . '/tmpl.php';
-            $mail->from('mia@mail.com', 'FromMia')->to('wendi@mail.ca', 'ToWendy')->attachments($file)
-                    ->bcc('bcc@email.ca')
-                    ->bcc('bcc2@email.ca')
-                    ->cc('cc1@email.ca')
-                    ->cc('cc2@mail.ca', 'My new CC name')->setBody($tmpl, [
-                'title' => 'Heloooo', 'name' => "goddy"
-            ]);
+            $mail->from(new Email('mia@mail.com', 'Miambili'))
+                    ->attachments($file, $path, $chi)
+                    ->to(new Email('wendy@mail.com', 'Tu Wendy'))
+                    ->to(new Email('mikaow@mail.ca', 'Michael Chambi'))
+                    ->bcc(new Email('bcc@email.ca', 'BBC Word'))
+                    ->bcc(new Email('bcc2@email.ca'))
+                    ->cc(new Email('cc1@email.ca'))
+                    ->replyTo(new Email('reply.email@email.ca', 'Joh'))
+                    ->cc(new Email('cc2@mail.ca', 'My new CC name'))
+                    ->setBody($tmpl, ['title' => 'Heloooo', 'name' => "goddy"]);
             $mail->subject('testing...')->send();
             return null;
         }
