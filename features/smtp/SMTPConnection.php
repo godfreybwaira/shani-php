@@ -130,7 +130,7 @@ namespace features\smtp {
         public function setRecipients(array $recipients): self
         {
             foreach ($recipients as $email) {
-                $res = $this->sendCommand('RCPT TO:<' . $email . '>', 250);
+                $this->sendCommand('RCPT TO:<' . $email . '>', 250);
             }
             $this->sendCommand('DATA', 354);
             return $this;
