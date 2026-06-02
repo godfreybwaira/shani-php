@@ -40,8 +40,15 @@ namespace features\smtp {
             $socket = null;
             $this->host = $host . ':' . $port;
             $this->secure = $security !== null;
+            $context = stream_context_create([
+                'ssl' => [
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                ]
+            ]);
             while ($count < $retries) {
-                $socket = stream_socket_client($this->host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS);
+                $socket = stream_socket_client($this->host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS, $context);
                 if (is_resource($socket)) {
                     $this->socket = $socket;
                     break;
@@ -123,7 +130,7 @@ namespace features\smtp {
         public function setRecipients(array $recipients): self
         {
             foreach ($recipients as $email) {
-                $this->sendCommand('RCPT TO:<' . $email . '>', 250);
+                $res = $this->sendCommand('RCPT TO:<' . $email . '>', 250);
             }
             $this->sendCommand('DATA', 354);
             return $this;
@@ -157,7 +164,7 @@ namespace features\smtp {
                 $this->errorCode = $code;
                 $this->errorMsg = substr($line, $len + 1);
             }
-            return true;
+            return false;
         }
 
         public function __destruct()
@@ -181,11 +188,18 @@ namespace features\smtp {
 
         private function getReply(): ?string
         {
-            $line = fgets($this->socket);
-            $str = trim($line);
-            if (!empty($str)) {
+            while (($line = fgets($this->socket)) !== false) {
+                $str = trim($line);
+                if (empty($str)) {
+                    continue;
+                }
                 $this->lastReply = $str;
+                // If the 4th character is a space (e.g. "250 "), it means it's the final line
+                if (isset($line[3]) && $line[3] === ' ') {
+                    break;
+                }
             }
+
             return $this->lastReply;
         }
 

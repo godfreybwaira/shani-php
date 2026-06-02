@@ -16,13 +16,6 @@ namespace features\console\helpers {
      * Includes helpers for aligning text (center, left, right), formatting sentences,
      * and trimming suffixes.
      *
-     * @example
-     * ```php
-     * echo Formatter::formatSentence("Project", "Created");
-     * echo Formatter::placeCenter("Welcome", underline: true);
-     * echo Formatter::placeLeft("Error", underline: true);
-     * echo Formatter::placeRight("Success");
-     * ```
      */
     final class Formatter
     {

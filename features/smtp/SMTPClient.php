@@ -18,13 +18,13 @@ namespace features\smtp {
     {
 
         private ?string $body = null, $subject = null;
-        private ?Email $replyTo = null;
-        private readonly Email $from;
         private ?string $password = null, $token = null;
-        private array $files = [], $headers = [];
+        private readonly Email $from;
         private readonly string $boundary, $host;
         private readonly int $port, $retries, $timeout;
+        private ?Email $replyTo = null;
         private ?SMTPSecurity $security = null;
+        private array $files = [], $headers = [];
         private array $toList = [], $ccList = [], $bccList = [];
 
         public function __construct(string $host, int $port, int $retries = 3, int $timeout = 50)
@@ -75,7 +75,7 @@ namespace features\smtp {
          * @param string $password Password to be used in authentication
          * @return self
          */
-        public function auth(string $password): self
+        public function password(string $password): self
         {
             $this->password = $password;
             return $this;
@@ -182,7 +182,7 @@ namespace features\smtp {
          * then template as <code>$data</code>
          * @return self
          */
-        public function setBody(?string $template, $data = null): self
+        public function setContent(?string $template, $data = null): self
         {
             if ($template !== null) {
                 ob_start();
@@ -222,17 +222,17 @@ namespace features\smtp {
 
         private function sendHeader(&$socket): self
         {
-            $emails = 'From: ' . $this->from . SMTPConnection::EOL;
-            if (!empty($this->replyTo)) {
-                $emails .= 'Reply-To: ' . $this->replyTo . SMTPConnection::EOL;
-            }
+            $content = 'From: ' . $this->from . SMTPConnection::EOL;
             if (!empty($this->toList)) {
-                $emails .= 'To: ' . implode(', ', $this->toList) . SMTPConnection::EOL;
+                $content .= 'To: ' . implode(', ', $this->toList) . SMTPConnection::EOL;
+            }
+            if (!empty($this->replyTo)) {
+                $content .= 'Reply-To: ' . $this->replyTo . SMTPConnection::EOL;
             }
             if (!empty($this->ccList)) {
-                $emails .= 'Cc: ' . implode(', ', $this->ccList) . SMTPConnection::EOL;
+                $content .= 'Cc: ' . implode(', ', $this->ccList) . SMTPConnection::EOL;
             }
-            $content = $emails . 'Subject: ' . $this->subject . SMTPConnection::EOL;
+            $content .= 'Subject: ' . $this->subject . SMTPConnection::EOL;
             $this->headers['Message-ID'] = '<' . uniqid() . '@' . $this->from->domain . '>';
             foreach ($this->headers as $key => $value) {
                 $content .= ucwords($key, '-') . ': ' . $value . SMTPConnection::EOL;

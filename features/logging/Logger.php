@@ -51,7 +51,7 @@ namespace features\logging {
             $text = LogStructure::NOW . $space;
             $text .= '[ ' . ConsolePrinter::colorText($structure->level, $textColor) . ' ]';
             if (PHP_SAPI === 'cli') {
-                echo $text . $space . $structure->message . PHP_EOL;
+                fwrite(STDOUT, $text . $space . $structure->message . PHP_EOL);
             }
             return $this;
         }

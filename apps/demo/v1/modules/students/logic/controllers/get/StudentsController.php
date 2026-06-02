@@ -57,6 +57,24 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $student = $this->service->getById($id);
             return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
         }
+
+        #[PermissionCheck(exempted: true)]
+        #[AuthenticationCheck(exempted: true)]
+        public function mail(): ?HttpResponse
+        {
+            $storage = SHANI_SERVER_ROOT . '/apps/demo/v1/modules/students/logic/controllers/get';
+            $mail = new SMTPClient('localhost', 1025);
+            $path = new File($storage . '/picha.png');
+            $file = new File($storage . '/file.txt');
+            $tmpl = $storage . '/tmpl.php';
+            $mail->from(new Email('qfadat@mail.com', 'Miambili'))
+                    ->attachments($file, $path)
+                    ->cc(new Email('cc2@mail.ca', 'My new CC name'))
+                    ->to(new Email('to@mail.cc', 'Tu Wendy'))
+                    ->setContent($tmpl, ['title' => 'Hello 👋', 'name' => "goddy"]);
+            $mail->subject('testing...')->send();
+            return null;
+        }
     }
 
 }
