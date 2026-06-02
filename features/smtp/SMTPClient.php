@@ -23,20 +23,18 @@ namespace features\smtp {
         private ?string $password = null, $token = null;
         private array $files = [], $headers = [];
         private readonly string $boundary, $host;
-        private readonly int $retries, $timeout;
+        private readonly int $port, $retries, $timeout;
         private ?SMTPSecurity $security = null;
         private array $toList = [], $ccList = [], $bccList = [];
 
-        public function __construct(string $host, int $retries = 3, int $timeout = 500)
+        public function __construct(string $host, int $port, int $retries = 3, int $timeout = 50)
         {
             $this->boundary = hrtime(true) . substr(md5(random_bytes(9)), 0, 12);
             $this->host = $host;
+            $this->port = $port;
             $this->retries = $retries;
             $this->timeout = $timeout;
-            $this->headers = [
-                'MIME-Version' => '1.0', 'Date' => gmdate('r'),
-                'Message-ID' => '<' . uniqid() . '>'
-            ];
+            $this->headers = ['MIME-Version' => '1.0', 'Date' => gmdate('r')];
         }
 
         /**
@@ -140,7 +138,7 @@ namespace features\smtp {
          */
         public function subject(string $content): self
         {
-            $this->subject = chunk_split('Subject: ' . $content);
+            $this->subject = $content;
             return $this;
         }
 
@@ -180,8 +178,8 @@ namespace features\smtp {
          * Set the message body for an email.
          * @param string|null $template If provided then the body will rendered
          * from template
-         * @param type $data The data to send. This data will be available to template
-         * if the template was set.
+         * @param type $data The data to send. These data will be available to
+         * then template as <code>$data</code>
          * @return self
          */
         public function setBody(?string $template, $data = null): self
@@ -204,7 +202,7 @@ namespace features\smtp {
          */
         public function send(\Closure $callback = null): void
         {
-            $conn = new SMTPConnection($this->host, $this->security, $this->retries, $this->timeout);
+            $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->retries, $this->timeout);
             $success = $conn->initialize($this->from->value, $this->password, $this->token);
             if ($success) {
                 if (empty($this->toList)) {
@@ -234,7 +232,8 @@ namespace features\smtp {
             if (!empty($this->ccList)) {
                 $emails .= 'Cc: ' . implode(', ', $this->ccList) . SMTPConnection::EOL;
             }
-            $content = $emails . $this->subject;
+            $content = $emails . 'Subject: ' . $this->subject . SMTPConnection::EOL;
+            $this->headers['Message-ID'] = '<' . uniqid() . '@' . $this->from->domain . '>';
             foreach ($this->headers as $key => $value) {
                 $content .= ucwords($key, '-') . ': ' . $value . SMTPConnection::EOL;
             }
@@ -258,25 +257,24 @@ namespace features\smtp {
         private function sendAttachments(&$socket): self
         {
             foreach ($this->files as $file) {
-                $src = fopen($file->path, 'rb');
                 $content = '--' . $this->boundary . SMTPConnection::EOL;
-                $content .= 'Content-Type: ' . $file->type . '; ' . chunk_split('name="' . $file->name . '"');
+                $content .= 'Content-Type: ' . $file->type . '; name="' . $file->name . '"' . SMTPConnection::EOL;
                 $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL;
-//                $content .= 'Content-Length: ' . $file->size . SMTPConnection::EOL;
-                $content .= 'Content-Disposition: attachment; ' . chunk_split('filename="' . $file->name . '"');
+                $content .= 'Content-Disposition: attachment; filename="' . $file->name . '"' . SMTPConnection::EOL;
                 fwrite($socket, $content . SMTPConnection::EOL);
-                self::copyFile($src, $socket);
-                fclose($src);
+                self::copyFile($file, $socket);
             }
             return $this;
         }
 
-        private static function copyFile(&$src, &$dst): void
+        private static function copyFile(File $file, &$dst): void
         {
+            $src = fopen($file->path, 'rb');
             stream_filter_append($src, 'convert.base64-encode');
             while (!feof($src)) {
                 fwrite($dst, chunk_split(fread($src, Framework::BUFFER_SIZE)));
             }
+            fclose($src);
         }
     }
 

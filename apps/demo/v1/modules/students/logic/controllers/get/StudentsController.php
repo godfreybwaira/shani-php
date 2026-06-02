@@ -63,10 +63,10 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
         public function mail(): ?HttpResponse
         {
             $storage = SHANI_SERVER_ROOT . '/apps/demo/v1/modules/students/logic/controllers/get';
-            $mail = new SMTPClient('localhost:1025');
+            $mail = new SMTPClient('localhost', 1025);
             $path = new File($storage . '/picha.png');
             $file = new File($storage . '/file.txt');
-            $chi = new File($storage . '/chi.webp');
+            $chi = new File($storage . '/chi.jpg');
             $tmpl = $storage . '/tmpl.php';
             $mail->from(new Email('mia@mail.com', 'Miambili'))
                     ->attachments($file, $path, $chi)
@@ -77,7 +77,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
                     ->cc(new Email('cc1@email.ca'))
                     ->replyTo(new Email('reply.email@email.ca', 'Joh'))
                     ->cc(new Email('cc2@mail.ca', 'My new CC name'))
-                    ->setBody($tmpl, ['title' => 'Heloooo', 'name' => "goddy"]);
+                    ->setBody($tmpl, ['title' => 'Hello 👋', 'name' => "goddy"]);
             $mail->subject('testing...')->send();
             return null;
         }

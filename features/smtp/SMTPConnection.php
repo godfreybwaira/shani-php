@@ -29,18 +29,19 @@ namespace features\smtp {
         /**
          * Creating SMTP connection to remote host
          * @param string $host Remote host address
+         * @param string $port Remote host port
          * @param SMTPSecurity|null $security SMTP security
          * @param int $retries Number of retries before failing
          * @param int $timeout Timeout before failing
          */
-        public function __construct(string $host, ?SMTPSecurity $security, int $retries, int $timeout)
+        public function __construct(string $host, int $port, ?SMTPSecurity $security, int $retries, int $timeout)
         {
             $count = 0;
             $socket = null;
-            $this->host = $host;
+            $this->host = $host . ':' . $port;
             $this->secure = $security !== null;
             while ($count < $retries) {
-                $socket = stream_socket_client($host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS);
+                $socket = stream_socket_client($this->host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS);
                 if (is_resource($socket)) {
                     $this->socket = $socket;
                     break;
