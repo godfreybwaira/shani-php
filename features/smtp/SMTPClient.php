@@ -270,10 +270,12 @@ namespace features\smtp {
         private static function copyFile(File $file, &$dst): void
         {
             $src = fopen($file->path, 'rb');
-            stream_filter_append($src, 'convert.base64-encode');
-            while (!feof($src)) {
-                fwrite($dst, chunk_split(fread($src, Framework::BUFFER_SIZE)));
-            }
+            stream_filter_append($src, 'convert.base64-encode', STREAM_FILTER_READ, [
+                'line-length' => 76,
+                'line-break' => SMTPConnection::EOL
+            ]);
+            stream_copy_to_stream($src, $dst);
+            fwrite($dst, SMTPConnection::EOL);
             fclose($src);
         }
     }
