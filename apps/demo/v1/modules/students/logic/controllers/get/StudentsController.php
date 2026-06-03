@@ -71,10 +71,10 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $path = new File($storage . '/picha.png');
             $file = new File($storage . '/file.txt');
             $tmpl = $storage . '/tmpl.php';
-            $mail->from(new Email('qfadat@gmail.com', 'Miambili'))
+            $mail->from(new Email('shani@mail.com', 'Miambili'))
                     ->attachments($file, $path)
                     ->cc(new Email('cc2@mail.ca', 'My new CC name'))
-                    ->to(new Email('godfrey.bwaira@uchukuzi.go.tz', 'Tu Wendy'))
+                    ->to(new Email('to@mail.cc', 'Tu Wendy'))
                     ->setContent($tmpl, ['title' => 'Hello 👋', 'name' => "goddy"]);
             $mail->subject('testing...')->send();
             return null;

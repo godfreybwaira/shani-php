@@ -96,39 +96,45 @@ namespace features\smtp {
 
         /**
          * Set e-mail recipient
-         * @param Email $email Recipient e-mail
+         * @param Email $emails Recipient e-mail
          * @return self
          */
-        public function to(Email $email): self
+        public function to(Email ...$emails): self
         {
-            if (!isset($this->toList[$email->value])) {
-                $this->toList[$email->value] = $email;
+            foreach ($emails as $email) {
+                if (!isset($this->toList[$email->value])) {
+                    $this->toList[$email->value] = $email;
+                }
             }
             return $this;
         }
 
         /**
          * Set CC (Carbon Copy) to e-mail
-         * @param Email $email Recipient e-mail
+         * @param Email $emails Recipient e-mail
          * @return self
          */
-        public function cc(Email $email): self
+        public function cc(Email ...$emails): self
         {
-            if (!isset($this->ccList[$email->value])) {
-                $this->ccList[$email->value] = $email;
+            foreach ($emails as $email) {
+                if (!isset($this->ccList[$email->value])) {
+                    $this->ccList[$email->value] = $email;
+                }
             }
             return $this;
         }
 
         /**
          * Set BCC (Blind Carbon Copy) to e-mail
-         * @param Email $email Recipient e-mail
+         * @param Email $emails Recipient e-mail
          * @return self
          */
-        public function bcc(Email $email): self
+        public function bcc(Email ...$emails): self
         {
-            if (!isset($this->bccList[$email->value])) {
-                $this->bccList[$email->value] = $email;
+            foreach ($emails as $email) {
+                if (!isset($this->bccList[$email->value])) {
+                    $this->bccList[$email->value] = $email;
+                }
             }
             return $this;
         }
@@ -180,11 +186,11 @@ namespace features\smtp {
          * Set the message body for an email.
          * @param string|null $template If provided then the body will rendered
          * from template
-         * @param type $data The data to send. These data will be available to
+         * @param mixed $data The data to send. These data will be available to
          * then template as <code>$data</code>
          * @return self
          */
-        public function setContent(?string $template, $data = null): self
+        public function setContent(?string $template, mixed $data = null): self
         {
             if ($template !== null) {
                 ob_start();
@@ -198,28 +204,24 @@ namespace features\smtp {
 
         /**
          * Send e-mail to destination(s)
-         * @param \Closure $callback A callback for error handling with the following
-         * signature <code>$callback(int|null $errorCode, string|null $errorMessage):void</code>
          * @return void
          */
-        public function send(\Closure $callback = null): void
+        public function send(): void
         {
             $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->timeout, $this->retries);
             $success = $conn->initialize($this->from->value, $this->password, $this->token);
-            if ($success) {
-                if (empty($this->toList)) {
-                    throw new BadRequestException('At least one recipient field (To) is required.');
-                }
-                $recipients = array_merge($this->toList, $this->ccList, $this->bccList);
-                $conn->setRecipients(array_keys($recipients));
-                $socket = $conn->getSocket();
-                $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
-                fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
-                $conn->quit();
+            if (!$success) {
+                return;
             }
-            if ($callback !== null) {
-                $callback($conn->errorCode(), $conn->errorMessage());
+            if (empty($this->toList)) {
+                throw new BadRequestException('At least one recipient field (To) is required.');
             }
+            $recipients = array_merge($this->toList, $this->ccList, $this->bccList);
+            $conn->setRecipients(array_keys($recipients));
+            $socket = $conn->getSocket();
+            $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
+            fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
+            $conn->quit();
         }
 
         private function sendHeader(&$socket): self
