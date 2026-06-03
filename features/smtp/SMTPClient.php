@@ -27,6 +27,7 @@ namespace features\smtp {
         private SMTPSecurity $security;
         private array $files = [], $headers = [];
         private array $toList = [], $ccList = [], $bccList = [];
+        private ?string $username = null;
 
         public function __construct(string $host, int $port, Duration $timeout = null, int $retries = 3)
         {
@@ -73,12 +74,14 @@ namespace features\smtp {
         }
 
         /**
-         * Set authentication password if you are authenticate using username and password
+         * Set authentication credentials if you are authenticate using username and password
+         * @param string $username Username to be used in authentication
          * @param string $password Password to be used in authentication
          * @return self
          */
-        public function password(string $password): self
+        public function login(string $username, string $password): self
         {
+            $this->username = $username;
             $this->password = $password;
             return $this;
         }
@@ -209,7 +212,7 @@ namespace features\smtp {
         public function send(): void
         {
             $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->timeout, $this->retries);
-            $success = $conn->initialize($this->from->value, $this->password, $this->token);
+            $success = $conn->initialize($this->username ?? $this->from->value, $this->password, $this->token);
             if (!$success) {
                 return;
             }

@@ -76,7 +76,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
                     ->cc(new Email('cc2@mail.ca', 'My new CC name'))
                     ->to(new Email('to@mail.cc', 'Tu Wendy'))
                     ->setContent($tmpl, ['title' => 'Hello 👋', 'name' => "goddy"]);
-            $mail->subject('testing...')->send();
+            $mail->subject('Testing Email...')->send();
             return null;
         }
     }
