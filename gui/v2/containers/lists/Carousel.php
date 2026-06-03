@@ -66,7 +66,7 @@ namespace gui\v2\containers\lists {
         public function addItem(Component $item): self
         {
             if ($item->getTag() !== 'li') {
-                throw new \Exception('Invalid list item. Must has "li" tag.');
+                throw new \RuntimeException('Invalid list item. Must has "li" tag.');
             }
             $this->body->appendChild($item);
             return $this;

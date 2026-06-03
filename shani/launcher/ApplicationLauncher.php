@@ -78,7 +78,7 @@ namespace shani\launcher {
                 $host = file_get_contents($alias);
                 return static::getHostConfigurations(trim($host));
             }
-            throw new \Exception('Host "' . $hostName . '" not found');
+            throw new \RuntimeException('Host "' . $hostName . '" not found');
         }
 
         /**

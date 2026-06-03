@@ -33,7 +33,7 @@ namespace features\crypto {
             if ($result !== false) {
                 return $result;
             }
-            throw new \Exception('Failed to encrypt data');
+            throw new \RuntimeException('Failed to encrypt data');
         }
 
         public function decrypt(string $payload): string
@@ -42,7 +42,7 @@ namespace features\crypto {
             if ($result !== false) {
                 return $result;
             }
-            throw new \Exception('Failed to decrypt data');
+            throw new \RuntimeException('Failed to decrypt data');
         }
     }
 

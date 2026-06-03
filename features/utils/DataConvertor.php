@@ -271,7 +271,7 @@ namespace features\utils {
             for ($i = 0; $i < $strLen; $i++) {
                 $position = strpos(self::BASE32_CHARS, $b32[$i]);
                 if ($position === false) {
-                    throw new \Exception('Invalid character found');
+                    throw new \RuntimeException('Invalid character found');
                 }
                 $binary .= str_pad(decbin($position), 5, '0', STR_PAD_LEFT);
             }

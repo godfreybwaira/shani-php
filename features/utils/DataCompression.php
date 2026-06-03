@@ -43,7 +43,7 @@ namespace features\utils {
             if (str_contains($encoding, 'compress')) {
                 return gzuncompress($data);
             }
-            throw new \Exception('Encoding algorithm not supported.');
+            throw new \InvalidArgumentException('Encoding algorithm not supported.');
         }
 
         /**
@@ -68,7 +68,7 @@ namespace features\utils {
             if (str_contains($encoding, 'compress')) {
                 return gzcompress($data, $level->value);
             }
-            throw new \Exception('Encoding algorithm not supported.');
+            throw new \InvalidArgumentException('Encoding algorithm not supported.');
         }
 
         /**

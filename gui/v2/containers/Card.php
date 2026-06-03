@@ -34,7 +34,7 @@ namespace gui\v2\containers {
         public function setImage(Component $image): self
         {
             if ($image->getTag() !== 'img') {
-                throw new \Exception('Invalid card image');
+                throw new \RuntimeException('Invalid card image');
             }
             $this->appendChild($image);
             return $this;

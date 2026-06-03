@@ -241,7 +241,7 @@ namespace features\utils {
                 usleep($retry * 100000);
             }
             if ($curl === false) {
-                throw new \Exception('Connection to a host machine failed.');
+                throw new \RuntimeException('Connection to a host machine failed.');
             }
             $builder = (new RequestEntityBuilder())
                     ->headers($this->requestHeader)->files($this->files)->uri($uri)
@@ -274,7 +274,7 @@ namespace features\utils {
             ]);
             curl_setopt_array($curl, $this->curlOptions);
             if (curl_exec($curl) === false) {
-                throw new \Exception('Failed to execute command. ' . curl_error($curl));
+                throw new \RuntimeException('Failed to execute command. ' . curl_error($curl));
             }
             curl_close($curl);
         }
@@ -509,7 +509,7 @@ namespace features\utils {
                     CURLOPT_FILE => fopen($destination, 'a+b')
                 ]);
             } else {
-                throw new \Exception('Destination file "' . $destination . '" is not writable.');
+                throw new \RuntimeException('Destination file "' . $destination . '" is not writable.');
             }
             if ($progress !== null) {
                 $this->setOptions([
@@ -576,7 +576,7 @@ namespace features\utils {
         {
             $this->encoding = DataCompression::algorithm($algorithm);
             if ($this->encoding === null) {
-                throw new \Exception('Encoding algorithm not supported');
+                throw new \InvalidArgumentException('Encoding algorithm not supported');
             }
             $this->compressionMinSize = $minSize;
             $this->compression = $level ?? DataCompression::BEST;

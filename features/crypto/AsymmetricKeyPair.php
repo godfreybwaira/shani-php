@@ -133,7 +133,7 @@ namespace features\crypto {
                 0 => 'rsa',
                 5 => 'ed25519',
                 null => null,
-                default => throw new \Exception('Unsupported key type')
+                default => throw new \InvalidArgumentException('Unsupported key type')
             };
         }
     }

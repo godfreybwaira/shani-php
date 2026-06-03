@@ -9,16 +9,18 @@
 
 namespace features\smtp {
 
+    use features\utils\Duration;
+    use features\utils\URI;
+
     final class SMTPConnection
     {
 
         private $socket;
-        private readonly bool $secure;
-        private readonly string $host;
         private ?int $errorCode;
+        private readonly URI $host;
+        private readonly SMTPSecurity $security;
         private ?string $lastReply = null, $errorMsg;
 
-        private const FLAGS = STREAM_CLIENT_ASYNC_CONNECT | STREAM_CLIENT_PERSISTENT;
         private const STATUS_CODE_LENGTH = 4;
 
         /**
@@ -30,38 +32,38 @@ namespace features\smtp {
          * Creating SMTP connection to remote host
          * @param string $host Remote host address
          * @param string $port Remote host port
-         * @param SMTPSecurity|null $security SMTP security
+         * @param SMTPSecurity $security SMTP security
+         * @param Duration $timeout Timeout before failing
          * @param int $retries Number of retries before failing
-         * @param int $timeout Timeout before failing
          */
-        public function __construct(string $host, int $port, ?SMTPSecurity $security, int $retries, int $timeout)
+        public function __construct(string $host, int $port, SMTPSecurity $security, Duration $timeout, int $retries)
         {
             $count = 0;
             $socket = null;
-            $this->host = $host . ':' . $port;
-            $this->secure = $security !== null;
-            $context = stream_context_create([
-                'ssl' => [
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                    'allow_self_signed' => true
-                ]
-            ]);
+            $this->security = $security;
+            $this->host = new URI($security->getProtocol() . $host . ':' . $port);
+            $flags = STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT;
+            $context = $security->getContext();
             while ($count < $retries) {
-                $socket = stream_socket_client($this->host, $this->errorCode, $this->errorMsg, $timeout, self::FLAGS, $context);
+                $socket = stream_socket_client($this->host->asString(), $this->errorCode, $this->errorMsg, $timeout->fromNow(), $flags, $context);
                 if (is_resource($socket)) {
                     $this->socket = $socket;
+                    stream_set_timeout($this->socket, $timeout->fromNow());
                     break;
                 }
                 $count++;
                 usleep($count * 90_000);
+            }
+            if ($this->socket === null) {
+                throw new \RuntimeException('Could not connect to ' . $this->host . ' for unknown reason.');
             }
         }
 
         private function enableTLS(): bool
         {
             if ($this->sendCommand('STARTTLS', 220)) {
-                $result = stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+                $cryptoMethod = STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT | STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+                $result = stream_socket_enable_crypto($this->socket, true, $cryptoMethod);
                 return $result === true && $this->sayHello();
             }
             return false;
@@ -78,10 +80,10 @@ namespace features\smtp {
 
         private function sayHello(): bool
         {
-            if ($this->sendCommand('EHLO ' . $this->host, 250)) {
+            if ($this->sendCommand('EHLO ' . $this->host->hostname(), 250)) {
                 return true;
             }
-            return $this->sendCommand('HELO ' . $this->host, 250);
+            return $this->sendCommand('HELO ' . $this->host->hostname(), 250);
         }
 
         private function login(string $uname, ?string $password, ?string $token): bool
@@ -113,7 +115,12 @@ namespace features\smtp {
          */
         public function initialize(string $uname, ?string $password, ?string $token): bool
         {
-            if (!$this->sayHello() || $this->secure && !$this->enableTLS()) {
+            // Read initial connection greeting banner (e.g., 220 Ready)
+            if ($this->getReply() === null) {
+                return false;
+            }
+
+            if (!$this->sayHello() || $this->security->type === SMTPSecurityType::TLS && !$this->enableTLS()) {
                 return false;
             }
             if ($this->login($uname, $password, $token)) {
@@ -146,6 +153,10 @@ namespace features\smtp {
             $this->sendCommand('QUIT', 221);
         }
 
+        /**
+         * Sends an SMTP raw command string, captures response, and enforces valid return checks
+         * @return bool True if command executed successfully, false otherwise.
+         */
         private function sendCommand(string $command, int $expectedCodes): bool
         {
             if (!$this->connected()) {
@@ -186,6 +197,11 @@ namespace features\smtp {
             return false;
         }
 
+        /**
+         * Consumes the network stream completely, managing multi-line SMTP responses safely
+         *
+         * @return string|null Last reply or null of none
+         */
         private function getReply(): ?string
         {
             while (($line = fgets($this->socket)) !== false) {
@@ -199,7 +215,6 @@ namespace features\smtp {
                     break;
                 }
             }
-
             return $this->lastReply;
         }
 

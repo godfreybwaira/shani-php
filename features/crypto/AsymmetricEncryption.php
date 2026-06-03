@@ -35,7 +35,7 @@ namespace features\crypto {
             if (openssl_public_encrypt($payload, $result, $this->keys->publicKey)) {
                 return base64_encode($result);
             }
-            throw new \Exception('Failed to encrypt data');
+            throw new \RuntimeException('Failed to encrypt data');
         }
 
         /**
@@ -50,7 +50,7 @@ namespace features\crypto {
             if (openssl_private_decrypt(base64_decode($payload), $result, $this->keys->privateKey)) {
                 return $result;
             }
-            throw new \Exception('Failed to decrypt data');
+            throw new \RuntimeException('Failed to decrypt data');
         }
     }
 

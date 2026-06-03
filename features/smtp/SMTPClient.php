@@ -11,8 +11,8 @@ namespace features\smtp {
 
     use features\exceptions\client\BadRequestException;
     use features\smtp\values\Email;
+    use features\utils\Duration;
     use features\utils\File;
-    use shani\launcher\Framework;
 
     final class SMTPClient
     {
@@ -21,24 +21,26 @@ namespace features\smtp {
         private ?string $password = null, $token = null;
         private readonly Email $from;
         private readonly string $boundary, $host;
-        private readonly int $port, $retries, $timeout;
+        private readonly int $port, $retries;
+        private readonly Duration $timeout;
         private ?Email $replyTo = null;
-        private ?SMTPSecurity $security = null;
+        private SMTPSecurity $security;
         private array $files = [], $headers = [];
         private array $toList = [], $ccList = [], $bccList = [];
 
-        public function __construct(string $host, int $port, int $retries = 3, int $timeout = 50)
+        public function __construct(string $host, int $port, Duration $timeout = null, int $retries = 3)
         {
-            $this->boundary = hrtime(true) . substr(md5(random_bytes(9)), 0, 12);
             $this->host = $host;
             $this->port = $port;
             $this->retries = $retries;
-            $this->timeout = $timeout;
+            $this->timeout = $timeout ?? Duration::ofSeconds(15);
+            $this->security = new SMTPSecurity(SMTPSecurityType::NONE);
             $this->headers = ['MIME-Version' => '1.0', 'Date' => gmdate('r')];
+            $this->boundary = hrtime(true) . substr(md5(random_bytes(9)), 0, 12);
         }
 
         /**
-         * Choose security mechanism to use when transporting e-mail
+         * Choose security mechanism to use during email transportation
          * @param SMTPSecurity $security Security mechanism
          * @return self
          */
@@ -202,7 +204,7 @@ namespace features\smtp {
          */
         public function send(\Closure $callback = null): void
         {
-            $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->retries, $this->timeout);
+            $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->timeout, $this->retries);
             $success = $conn->initialize($this->from->value, $this->password, $this->token);
             if ($success) {
                 if (empty($this->toList)) {
