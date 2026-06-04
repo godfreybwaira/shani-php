@@ -211,28 +211,76 @@ namespace features\smtp {
          */
         public function send(): void
         {
-            $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->timeout, $this->retries);
-            $success = $conn->initialize($this->username ?? $this->from->value, $this->password, $this->token);
-            if (!$success) {
-                return;
+            $sender = $this->username ?? $this->from->value;
+            $conn = $this->initializeSMTP($sender);
+            $conn->startEnvelope($sender);
+            $recipients = array_merge($this->toList, $this->ccList, $this->bccList);
+            $conn->setRecipients(...array_keys($recipients))->startData();
+            $socket = $conn->getSocket();
+            ///////////////////////
+            $headerString = 'From: ' . $this->from . SMTPConnection::EOL;
+            $headerString .= 'To: ' . implode(', ', $this->toList) . SMTPConnection::EOL;
+            $headerString .= $this->serializeCommonHeaders();
+            fwrite($socket, $headerString);
+            ///////////////////////
+            if ($this->body !== null) {
+                fwrite($socket, $this->getSerializedBody());
             }
+            $this->sendAttachments($socket);
+            $this->close($conn, true, $socket);
+        }
+
+        /**
+         * Send mass mailings using persistent socket recycling. Every recipient
+         * should get their own distinct email envelope. This ensures that recipients
+         * don't see each other's email addresses in the To: header.
+         *
+         * @return void
+         */
+        public function sendBulk(): void
+        {
+            $commonHeaders = $this->serializeCommonHeaders();
+            $sender = $this->username ?? $this->from->value;
+            $conn = $this->initializeSMTP($sender);
+            $socket = $conn->getSocket();
+            $body = $this->body !== null ? $this->getSerializedBody() : null;
+            foreach ($this->toList as $recipient) {
+                $conn->startEnvelope($sender);
+                $conn->setRecipients($recipient->value)->startData();
+                ///////////////////////
+                $headerString = 'From: ' . $this->from . SMTPConnection::EOL;
+                $headerString .= 'To: ' . $recipient . SMTPConnection::EOL;
+                fwrite($socket, $headerString . $commonHeaders);
+                if ($body !== null) {
+                    fwrite($socket, $body);
+                }
+                $this->sendAttachments($socket);
+                $conn->commit();
+                $conn->reset();
+            }
+            $this->close($conn, false, $socket);
+        }
+
+        private function close(SMTPConnection $conn, bool $commit, $socket): void
+        {
+            fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
+            $conn->quit($commit);
+        }
+
+        private function initializeSMTP(string $sender): SMTPConnection
+        {
             if (empty($this->toList)) {
                 throw new BadRequestException('At least one recipient field (To) is required.');
             }
-            $recipients = array_merge($this->toList, $this->ccList, $this->bccList);
-            $conn->setRecipients(array_keys($recipients));
-            $socket = $conn->getSocket();
-            $this->sendHeader($socket)->sendBody($socket)->sendAttachments($socket);
-            fwrite($socket, '--' . $this->boundary . '--' . SMTPConnection::EOL);
-            $conn->quit();
+            $conn = new SMTPConnection($this->host, $this->port, $this->security, $this->timeout, $this->retries);
+            if (!$conn->initialize($sender, $this->password, $this->token)) {
+                throw new \RuntimeException('SMTP initalization failed.');
+            }
+            return $conn;
         }
 
-        private function sendHeader(&$socket): self
+        private function serializeCommonHeaders(): string
         {
-            $content = 'From: ' . $this->from . SMTPConnection::EOL;
-            if (!empty($this->toList)) {
-                $content .= 'To: ' . implode(', ', $this->toList) . SMTPConnection::EOL;
-            }
             if (!empty($this->replyTo)) {
                 $content .= 'Reply-To: ' . $this->replyTo . SMTPConnection::EOL;
             }
@@ -245,20 +293,15 @@ namespace features\smtp {
                 $content .= ucwords($key, '-') . ': ' . $value . SMTPConnection::EOL;
             }
             $content .= 'Content-Type: multipart/mixed; boundary="' . $this->boundary . '"';
-            fwrite($socket, $content . SMTPConnection::EOL . SMTPConnection::EOL);
-            return $this;
+            return $content . SMTPConnection::EOL . SMTPConnection::EOL;
         }
 
-        private function sendBody(&$socket): self
+        private function getSerializedBody(): ?string
         {
-            if ($this->body !== null) {
-                $content = '--' . $this->boundary . SMTPConnection::EOL;
-                $content .= 'Content-Type: text/html; charset=utf-8' . SMTPConnection::EOL;
-                $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL . SMTPConnection::EOL;
-                $content .= chunk_split(base64_encode($this->body));
-                fwrite($socket, $content);
-            }
-            return $this;
+            $content = '--' . $this->boundary . SMTPConnection::EOL;
+            $content .= 'Content-Type: text/html; charset=utf-8' . SMTPConnection::EOL;
+            $content .= 'Content-Transfer-Encoding: base64' . SMTPConnection::EOL . SMTPConnection::EOL;
+            return $content . chunk_split(base64_encode($this->body));
         }
 
         private function sendAttachments(&$socket): self

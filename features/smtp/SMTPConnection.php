@@ -55,7 +55,7 @@ namespace features\smtp {
                 usleep($count * 90_000);
             }
             if ($this->socket === null) {
-                throw new \RuntimeException('Could not connect to ' . $this->host . ' for unknown reason.');
+                throw new \RuntimeException('Could not connect to ' . $this->host . ', reason: ' . $this->errorMsg ?? 'unknown');
             }
         }
 
@@ -123,34 +123,71 @@ namespace features\smtp {
             if (!$this->sayHello() || $this->security->type === SMTPSecurityType::TLS && !$this->enableTLS()) {
                 return false;
             }
-            if ($this->login($uname, $password, $token)) {
-                return $this->sendCommand('MAIL FROM:<' . $uname . '>', 250);
-            }
-            return false;
+            return $this->login($uname, $password, $token);
+        }
+
+        /**
+         * Initiates a clean mail transaction envelope.
+         * @param string $from Sender email address.
+         * @return bool
+         */
+        public function startEnvelope(string $from): bool
+        {
+            return $this->sendCommand('MAIL FROM:<' . $from . '>', 250);
         }
 
         /**
          * Set e-mail recipient(s)
-         * @param array $recipients Emails of recipient(s)
+         * @param string $recipients Emails of recipient(s)
          * @return self
          */
-        public function setRecipients(array $recipients): self
+        public function setRecipients(string ...$recipients): self
         {
             foreach ($recipients as $email) {
                 $this->sendCommand('RCPT TO:<' . $email . '>', 250);
             }
-            $this->sendCommand('DATA', 354);
             return $this;
         }
 
         /**
+         * Puts the server into intermediate stream DATA transmission mode.
+         * @return bool
+         */
+        public function startData(): bool
+        {
+            return $this->sendCommand('DATA', 354);
+        }
+
+        /**
          * Close SMTP session
+         * @param bool $commit Whether to end raw body transmission segment.
          * @return void
          */
-        public function quit(): void
+        public function quit(bool $commit): void
         {
-            $this->sendCommand('.', 250);
+            if ($commit) {
+                $this->commit();
+            }
             $this->sendCommand('QUIT', 221);
+        }
+
+        /**
+         * Ends the raw body payload data transmission segment.
+         * * @return bool
+         */
+        public function commit(): bool
+        {
+            return $this->sendCommand('.', 250);
+        }
+
+        /**
+         * Resets the current SMTP server session buffer without dropping the TCP connection.
+         * This clears out the previous MAIL, RCPT, and DATA states.
+         * * @return bool True if the server accepted the reset command.
+         */
+        public function reset(): bool
+        {
+            return $this->sendCommand('RSET', 250);
         }
 
         /**

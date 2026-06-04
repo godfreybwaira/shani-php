@@ -12,13 +12,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
     use apps\demo\v1\modules\students\data\dto\StudentDto;
     use apps\demo\v1\modules\students\data\dto\StudentListDto;
     use apps\demo\v1\modules\students\logic\services\StudentService;
-    use features\attributes\security\AuthenticationCheck;
-    use features\attributes\security\PermissionCheck;
-    use features\smtp\SMTPClient;
-    use features\smtp\SMTPSecurity;
-    use features\smtp\SMTPSecurityType;
-    use features\smtp\values\Email;
-    use features\utils\File;
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
@@ -58,26 +51,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
             return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
-        }
-
-        #[PermissionCheck(exempted: true)]
-        #[AuthenticationCheck(exempted: true)]
-        public function mail(): ?HttpResponse
-        {
-            $host = 'localhost'; //smtp.gmail.com
-            $port = 1025; // 465; //587;
-            $storage = SHANI_SERVER_ROOT . '/apps/demo/v1/modules/students/logic/controllers/get';
-            $mail = new SMTPClient($host, $port);
-            $path = new File($storage . '/picha.png');
-            $file = new File($storage . '/file.txt');
-            $tmpl = $storage . '/tmpl.php';
-            $mail->from(new Email('shani@mail.com', 'Miambili'))
-                    ->attachments($file, $path)
-                    ->cc(new Email('cc2@mail.ca', 'My new CC name'))
-                    ->to(new Email('to@mail.cc', 'Tu Wendy'))
-                    ->setContent($tmpl, ['title' => 'Hello 👋', 'name' => "goddy"]);
-            $mail->subject('Testing Email...')->send();
-            return null;
         }
     }
 
