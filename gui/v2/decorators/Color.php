@@ -4,7 +4,7 @@
  * Informative colors
  * @author coder
  *
- * Created on: May 24, 2025 at 4:33:02 PM
+ * @since May 24, 2025 at 4:33:02 PM
  */
 
 namespace gui\v2\decorators {

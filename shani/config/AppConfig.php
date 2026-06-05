@@ -4,7 +4,7 @@
  * Description of AppConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 4:41:24 PM
+ * @since Apr 24, 2026 at 4:41:24 PM
  */
 
 namespace shani\config {

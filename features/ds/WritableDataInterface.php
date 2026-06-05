@@ -4,7 +4,7 @@
  * Description of WritableDataInterface
  * @author coder
  *
- * Created on: May 8, 2025 at 6:45:17 PM
+ * @since May 8, 2025 at 6:45:17 PM
  */
 
 namespace features\ds {

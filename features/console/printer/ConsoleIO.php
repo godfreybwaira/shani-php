@@ -4,7 +4,7 @@
  * Description of ConsoleInput
  * @author goddy
  *
- * Created on: May 5, 2026 at 6:06:56 PM
+ * @since May 5, 2026 at 6:06:56 PM
  */
 
 namespace features\console\printer {

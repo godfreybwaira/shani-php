@@ -4,7 +4,7 @@
  * Description of ErrorResponse
  * @author goddy
  *
- * Created on: May 28, 2026 at 8:09:44 PM
+ * @since May 28, 2026 at 8:09:44 PM
  */
 
 namespace features\exceptions {

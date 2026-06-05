@@ -4,7 +4,7 @@
  * Description of ModalWrapper
  * @author coder
  *
- * Created on: May 16, 2025 at 9:09:35 PM
+ * @since May 16, 2025 at 9:09:35 PM
  */
 
 namespace gui\v2\containers\modals {

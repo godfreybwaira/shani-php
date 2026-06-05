@@ -4,7 +4,7 @@
  * Description of DigestedEndpoint
  * @author goddy
  *
- * Created on: May 11, 2026 at 2:52:51 PM
+ * @since May 11, 2026 at 2:52:51 PM
  */
 
 namespace features\documentation {

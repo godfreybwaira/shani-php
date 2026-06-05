@@ -6,7 +6,7 @@
  * Cryptographic algorithm supported by both <code>openssl_get_md_methods()</code> and <code>hash_hmac_algos()</code>
  * @author goddy
  *
- * Created on: Mar 28, 2026 at 11:52:50 AM
+ * @since Mar 28, 2026 at 11:52:50 AM
  */
 
 namespace features\crypto {

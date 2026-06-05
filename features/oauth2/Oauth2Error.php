@@ -4,7 +4,7 @@
  * Description of Oauth2Error
  * @author goddy
  *
- * Created on: Mar 9, 2026 at 12:11:01 PM
+ * @since Mar 9, 2026 at 12:11:01 PM
  */
 
 namespace features\oauth2 {

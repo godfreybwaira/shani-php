@@ -4,7 +4,7 @@
  * Middleware registration point.
  * @author coder
  *
- * Created on: Feb 13, 2024 at 8:55:03 AM
+ * @since Feb 13, 2024 at 8:55:03 AM
  */
 
 namespace features\middleware {

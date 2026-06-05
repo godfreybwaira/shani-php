@@ -4,7 +4,7 @@
  * Description of ContentSecurityPolicy
  * @author coder
  *
- * Created on: Apr 11, 2025 at 4:43:09 PM
+ * @since Apr 11, 2025 at 4:43:09 PM
  */
 
 namespace features\middleware\web {

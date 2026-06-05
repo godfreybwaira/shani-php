@@ -4,7 +4,7 @@
  * Description of newPHPClass
  * @author goddy
  *
- * Created on: Apr 8, 2026 at 1:27:25 PM
+ * @since Apr 8, 2026 at 1:27:25 PM
  */
 
 namespace features\pwa {

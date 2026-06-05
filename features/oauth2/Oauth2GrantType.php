@@ -4,7 +4,7 @@
  * Description of Oauth2GrantType
  * @author goddy
  *
- * Created on: Mar 9, 2026 at 3:09:44 PM
+ * @since Mar 9, 2026 at 3:09:44 PM
  */
 
 namespace features\oauth2 {

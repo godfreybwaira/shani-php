@@ -4,7 +4,7 @@
  * Description of HttpResponse
  * @author goddy
  *
- * Created on: Apr 25, 2026 at 2:56:45 PM
+ * @since Apr 25, 2026 at 2:56:45 PM
  */
 
 namespace shani\http {

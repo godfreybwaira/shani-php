@@ -4,7 +4,7 @@
  * ECDSA Helpers for DER/Raw Conversion
  * @author goddy
  *
- * Created on: Mar 30, 2026 at 12:19:26 AM
+ * @since Mar 30, 2026 at 12:19:26 AM
  */
 
 namespace features\jwt {

@@ -4,7 +4,7 @@
  * Description of ServiceUnavailableException
  * @author goddy
  *
- * Created on: May 17, 2026 at 8:23:31 PM
+ * @since May 17, 2026 at 8:23:31 PM
  */
 
 namespace features\exceptions\server {

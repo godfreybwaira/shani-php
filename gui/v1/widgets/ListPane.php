@@ -6,7 +6,7 @@
  * items, such as links, text, cards, or images, in a clean and organized way.
  * @author coder
  *
- * Created on: May 11, 2024 at 8:05:45 PM
+ * @since May 11, 2024 at 8:05:45 PM
  */
 
 namespace gui\v1\widgets {

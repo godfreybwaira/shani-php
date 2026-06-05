@@ -4,7 +4,7 @@
  * Description of SubjectDto
  * @author coder
  *
- * Created on: Feb 22, 2025 at 10:29:03 AM
+ * @since Feb 22, 2025 at 10:29:03 AM
  */
 
 namespace apps\demo\v1\modules\students\data\dto {

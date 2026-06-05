@@ -4,7 +4,7 @@
  * Description of Card
  * @author coder
  *
- * Created on: May 24, 2025 at 11:06:35 PM
+ * @since May 24, 2025 at 11:06:35 PM
  */
 
 namespace gui\v2\containers {

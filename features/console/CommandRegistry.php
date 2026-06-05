@@ -4,7 +4,7 @@
  * Description of CommandRegistry
  * @author goddy
  *
- * Created on: May 3, 2026 at 7:41:04 PM
+ * @since May 3, 2026 at 7:41:04 PM
  */
 
 namespace features\console {

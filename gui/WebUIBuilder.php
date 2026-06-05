@@ -4,7 +4,7 @@
  * Description of WebUIBuilder
  * @author goddy
  *
- * Created on: Oct 18, 2025 at 2:11:32 PM
+ * @since Oct 18, 2025 at 2:11:32 PM
  */
 
 namespace gui {

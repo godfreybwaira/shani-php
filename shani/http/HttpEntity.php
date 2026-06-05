@@ -4,7 +4,7 @@
  * Description of HttpEntity
  * @author coder
  *
- * Created on: Feb 28, 2025 at 11:54:08 PM
+ * @since Feb 28, 2025 at 11:54:08 PM
  */
 
 namespace shani\http {

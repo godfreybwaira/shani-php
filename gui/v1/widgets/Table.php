@@ -5,7 +5,7 @@
  * and display information in a grid format.
  * @author coder
  *
- * Created on: May 6, 2024 at 10:40:52 PM
+ * @since May 6, 2024 at 10:40:52 PM
  */
 
 namespace gui\v1\widgets {

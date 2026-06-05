@@ -4,7 +4,7 @@
  * Description of MemcachedConnectionDto
  * @author goddy
  *
- * Created on: Apr 6, 2026 at 10:58:39 AM
+ * @since Apr 6, 2026 at 10:58:39 AM
  */
 
 namespace features\session\dto {

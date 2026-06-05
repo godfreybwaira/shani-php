@@ -5,7 +5,7 @@
  * generation that use a builder design pattern.
  * @author coder
  *
- * Created on: May 5, 2024 at 8:21:34 PM
+ * @since May 5, 2024 at 8:21:34 PM
  */
 
 namespace gui\v1 {

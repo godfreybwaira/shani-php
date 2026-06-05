@@ -4,7 +4,7 @@
  * Media represent any component with caption, example video or image component.
  * @author coder
  *
- * Created on: May 16, 2024 at 4:14:01 PM
+ * @since May 16, 2024 at 4:14:01 PM
  */
 
 namespace gui\v1\widgets {

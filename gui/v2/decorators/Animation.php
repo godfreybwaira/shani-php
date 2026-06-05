@@ -4,7 +4,7 @@
  * Description of Animation
  * @author coder
  *
- * Created on: Apr 21, 2025 at 3:43:58 PM
+ * @since Apr 21, 2025 at 3:43:58 PM
  */
 
 namespace gui\v2\decorators {

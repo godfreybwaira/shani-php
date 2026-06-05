@@ -4,7 +4,7 @@
  * Description of DatabaseInterface
  * @author goddy
  *
- * Created on: Apr 18, 2026 at 8:04:10 AM
+ * @since Apr 18, 2026 at 8:04:10 AM
  */
 
 namespace features\persistence {
@@ -43,19 +43,19 @@ namespace features\persistence {
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
          * @param \JsonSerializable $object New data
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause|null $where Query parameters (key => value pair)
          * @return int Number of modified documents
          */
-        public function update(string $collection, \JsonSerializable $object, array $where = []): int;
+        public function update(string $collection, \JsonSerializable $object, ?FilterClause $where = null): int;
 
         /**
          * Delete documents/records
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause $where Query parameters (key => value pair)
          * @return int Number of deleted documents
          */
-        public function delete(string $collection, array $where): int;
+        public function delete(string $collection, FilterClause $where): int;
 
         /**
          * Execute SQL query and fetch all rows (if available). This method is memory
@@ -89,45 +89,39 @@ namespace features\persistence {
          * Find documents/records
          *
          * @param string $collection
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause|null $where Query parameters (key => value pair)
          * @param int|null $limit Number of rows to fetch
          * @param int $skip Number of rows to skip
          * @return \Generator Generator of results
          */
-        public function find(string $collection, array $where = [], ?int $limit = null, int $skip = 0): \Generator;
+        public function find(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): \Generator;
 
         /**
          * Find documents/records
          *
          * @param string $collection
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause|null $where Query parameters (key => value pair)
          * @param int|null $limit Number of rows to fetch
          * @param int $skip Number of rows to skip
          * @return array Rows of ReadMap object returned as the result of the query.
          */
-        public function findAll(string $collection, array $where = [], ?int $limit = null, int $skip = 0): array;
+        public function findAll(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): array;
 
         /**
          * Execute query and returns a single row.
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause|null $where Query parameters (key => value pair)
          * @return ReadMap|null A single row returned as the result of the query
          * or null if no result found.
          * @see self::findAll
          */
-        public function findOne(string $collection, array $where = []): ?ReadMap;
-
-        /**
-         * Count matching records/documents
-         * @param array $where Query parameters (key => value pair)
-         */
-        public function count(string $collection, array $where = []): int;
+        public function findOne(string $collection, ?FilterClause $where = null): ?ReadMap;
 
         /**
          * Check if at least one record/document exists. More efficient than count() > 0 in many cases
-         * @param array $where Query parameters (key => value pair)
+         * @param FilterClause|null $where Query parameters (key => value pair)
          */
-        public function exists(string $collection, array $where = []): bool;
+        public function exists(string $collection, ?FilterClause $where = null): bool;
 
         /**
          * Whether to escape HTML characters on result set or not.
@@ -166,6 +160,20 @@ namespace features\persistence {
          * Rollback the current transaction
          */
         public function rollback(): void;
+
+        /**
+         * Create a new aggregate query builder for the given collection.
+         *
+         * This method initializes an AggregateInterface instance bound to the
+         * specified collection. It allows you to build aggregate queries with
+         * metrics, filters, grouping, rollups, and ordering in a fluent style.
+         *
+         * @param string $collection The name of the collection (e.g., table) to aggregate.
+         *
+         * @return AggregateInterface Returns an aggregate query builder instance
+         *                            for chaining aggregate operations.
+         */
+        public function aggregate(string $collection): AggregateInterface;
     }
 
 }

@@ -4,7 +4,7 @@
  * Description of Sequence
  * @author coder
  *
- * Created on: Aug 31, 2020 at 8:20:08 PM
+ * @since Aug 31, 2020 at 8:20:08 PM
  */
 
 namespace features\validation {

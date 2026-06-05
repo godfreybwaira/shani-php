@@ -4,7 +4,7 @@
  * Description of Oauth2Client
  * @author goddy
  *
- * Created on: Mar 13, 2026 at 4:31:15 PM
+ * @since Mar 13, 2026 at 4:31:15 PM
  */
 
 namespace apps\demo\v1\config {

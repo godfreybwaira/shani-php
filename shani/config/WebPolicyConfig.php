@@ -4,7 +4,7 @@
  * Description of WebPolicyConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 4:18:38 PM
+ * @since Apr 24, 2026 at 4:18:38 PM
  */
 
 namespace shani\config {

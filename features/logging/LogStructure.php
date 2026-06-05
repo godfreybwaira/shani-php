@@ -4,7 +4,7 @@
  * Description of LogStructure
  * @author coder
  *
- * Created on: Apr 7, 2025 at 4:40:54 PM
+ * @since Apr 7, 2025 at 4:40:54 PM
  */
 
 namespace features\logging {

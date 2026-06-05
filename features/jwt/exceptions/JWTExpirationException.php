@@ -4,7 +4,7 @@
  * Description of JWTExpirationException
  * @author goddy
  *
- * Created on: Mar 27, 2026 at 1:19:07 PM
+ * @since Mar 27, 2026 at 1:19:07 PM
  */
 
 namespace features\jwt\exceptions {

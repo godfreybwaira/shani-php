@@ -4,7 +4,7 @@
  * Description of PwaIcon
  * @author goddy
  *
- * Created on: Apr 8, 2026 at 1:51:22 PM
+ * @since Apr 8, 2026 at 1:51:22 PM
  */
 
 namespace features\pwa {

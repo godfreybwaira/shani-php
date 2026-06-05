@@ -4,7 +4,7 @@
  * Description of AuthenticationConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 12:31:28 PM
+ * @since Apr 24, 2026 at 12:31:28 PM
  */
 
 namespace shani\config {

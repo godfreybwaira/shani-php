@@ -4,7 +4,7 @@
  * Description of Oauth2ResponseType
  * @author goddy
  *
- * Created on: Mar 18, 2026 at 9:20:01 AM
+ * @since Mar 18, 2026 at 9:20:01 AM
  */
 
 namespace features\oauth2 {

@@ -4,7 +4,7 @@
  * Description of AuthenticationCheck
  * @author goddy
  *
- * Created on: May 18, 2026 at 9:11:41 AM
+ * @since May 18, 2026 at 9:11:41 AM
  */
 
 namespace features\attributes\security {

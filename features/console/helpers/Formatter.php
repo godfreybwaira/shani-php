@@ -4,7 +4,7 @@
  * Description of Formatter
  * @author goddy
  *
- * Created on: May 3, 2026 at 3:55:59 PM
+ * @since May 3, 2026 at 3:55:59 PM
  */
 
 namespace features\console\helpers {

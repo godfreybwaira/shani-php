@@ -4,7 +4,7 @@
  * Description of HttpWriter
  * @author goddy
  *
- * Created on: Oct 18, 2025 at 12:53:44 PM
+ * @since Oct 18, 2025 at 12:53:44 PM
  */
 
 namespace shani\http {

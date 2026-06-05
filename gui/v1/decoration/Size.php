@@ -4,7 +4,7 @@
  * Description of Size
  * @author coder
  *
- * Created on: Mar 25, 2025 at 10:43:44 AM
+ * @since Mar 25, 2025 at 10:43:44 AM
  */
 
 namespace gui\v1\decoration {

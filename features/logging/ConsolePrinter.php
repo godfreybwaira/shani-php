@@ -4,7 +4,7 @@
  * Description of ConsolePrinter
  * @author coder
  *
- * Created on: Apr 9, 2025 at 4:59:02 PM
+ * @since Apr 9, 2025 at 4:59:02 PM
  */
 
 namespace features\logging {

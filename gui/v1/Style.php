@@ -4,7 +4,7 @@
  * Description of Style
  * @author coder
  *
- * Created on: Jul 14, 2024 at 1:36:13 PM
+ * @since Jul 14, 2024 at 1:36:13 PM
  */
 
 namespace gui\v1 {

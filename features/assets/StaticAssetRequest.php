@@ -4,7 +4,7 @@
  * Description of StaticAssetProperties
  * @author goddy
  *
- * Created on: Apr 26, 2026 at 5:06:34 PM
+ * @since Apr 26, 2026 at 5:06:34 PM
  */
 
 namespace features\assets {

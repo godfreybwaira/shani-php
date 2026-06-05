@@ -4,7 +4,7 @@
  * Description of SessionConnectionInterface
  * @author goddy
  *
- * Created on: Apr 6, 2026 at 12:08:05 PM
+ * @since Apr 6, 2026 at 12:08:05 PM
  */
 
 namespace features\session {

@@ -4,7 +4,7 @@
  * Description of Endpoints
  * @author goddy
  *
- * Created on: Jul 29, 2025 at 11:29:43 AM
+ * @since Jul 29, 2025 at 11:29:43 AM
  */
 
 namespace features\documentation\scanners {

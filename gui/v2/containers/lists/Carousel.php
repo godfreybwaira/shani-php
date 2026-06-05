@@ -4,7 +4,7 @@
  * Description of Carousel
  * @author coder
  *
- * Created on: May 27, 2025 at 9:14:34 AM
+ * @since May 27, 2025 at 9:14:34 AM
  */
 
 namespace gui\v2\containers\lists {

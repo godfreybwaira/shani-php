@@ -4,7 +4,7 @@
  * Description of OAuth2TokenAuthorizer
  * @author goddy
  *
- * Created on: Mar 9, 2026 at 11:25:31 AM
+ * @since Mar 9, 2026 at 11:25:31 AM
  */
 
 namespace features\oauth2 {

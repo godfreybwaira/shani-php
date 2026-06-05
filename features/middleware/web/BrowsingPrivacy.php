@@ -4,7 +4,7 @@
  * Description of BrowsingPrivacy
  * @author coder
  *
- * Created on: Mar 25, 2025 at 9:46:10 AM
+ * @since Mar 25, 2025 at 9:46:10 AM
  */
 
 namespace features\middleware\web {

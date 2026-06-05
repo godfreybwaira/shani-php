@@ -4,7 +4,7 @@
  * Description of SMTPClient
  * @author coder
  *
- * Created on: Apr 2, 2024 at 12:59:02 PM
+ * @since Apr 2, 2024 at 12:59:02 PM
  */
 
 namespace features\smtp {

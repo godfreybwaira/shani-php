@@ -4,7 +4,7 @@
  * Description of ApplicationLauncher
  * @author coder
  *
- * Created on: Mar 6, 2024 at 4:06:33 PM
+ * @since Mar 6, 2024 at 4:06:33 PM
  */
 
 namespace shani\launcher {

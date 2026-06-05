@@ -6,7 +6,7 @@
  * fashion, one at a time. Users can navigate through the items manually or automatically.
  * @author coder
  *
- * Created on: May 12, 2024 at 4:33:17 PM
+ * @since May 12, 2024 at 4:33:17 PM
  */
 
 namespace gui\v1\widgets {

@@ -4,7 +4,7 @@
  * Description of FileConnectionDto
  * @author goddy
  *
- * Created on: Apr 6, 2026 at 12:06:35 PM
+ * @since Apr 6, 2026 at 12:06:35 PM
  */
 
 namespace features\session\dto {

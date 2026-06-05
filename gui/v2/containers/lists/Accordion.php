@@ -4,7 +4,7 @@
  * Description of Accordion
  * @author coder
  *
- * Created on: May 23, 2025 at 11:38:14 PM
+ * @since May 23, 2025 at 11:38:14 PM
  */
 
 namespace gui\v2\containers\lists {

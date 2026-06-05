@@ -5,7 +5,7 @@
  * a server for further processing. This component has no default styles.
  * @author coder
  *
- * Created on: Jul 19, 2024 at 7:02:10 PM
+ * @since Jul 19, 2024 at 7:02:10 PM
  */
 
 namespace gui\v1\widgets {

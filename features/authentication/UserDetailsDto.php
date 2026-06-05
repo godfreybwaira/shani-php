@@ -4,7 +4,7 @@
  * Registered system end-user.
  * @author goddy
  *
- * Created on: Mar 16, 2026 at 2:33:41 PM
+ * @since Mar 16, 2026 at 2:33:41 PM
  */
 
 namespace features\authentication {

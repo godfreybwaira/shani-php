@@ -4,7 +4,7 @@
  * Represent iterable data set with unique values
  * @author coder
  *
- * Created on: Mar 26, 2025 at 9:00:14 AM
+ * @since Mar 26, 2025 at 9:00:14 AM
  */
 
 namespace features\ds\set {

@@ -4,7 +4,7 @@
  * Description of PwaDimension
  * @author goddy
  *
- * Created on: Apr 9, 2026 at 1:28:14 PM
+ * @since Apr 9, 2026 at 1:28:14 PM
  */
 
 namespace features\pwa {

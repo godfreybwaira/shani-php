@@ -4,7 +4,7 @@
  * Description of PwaCategory
  * @author goddy
  *
- * Created on: Apr 8, 2026 at 2:34:31 PM
+ * @since Apr 8, 2026 at 2:34:31 PM
  */
 
 namespace features\pwa\enums {

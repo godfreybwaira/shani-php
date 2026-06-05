@@ -4,7 +4,7 @@
  * Description of RedisConnectionDto
  * @author goddy
  *
- * Created on: Apr 6, 2026 at 11:00:56 AM
+ * @since Apr 6, 2026 at 11:00:56 AM
  */
 
 namespace features\session\dto {

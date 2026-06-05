@@ -4,7 +4,7 @@
  * Description of JwtAuthenticator
  * @author goddy
  *
- * Created on: Apr 7, 2026 at 12:32:19 PM
+ * @since Apr 7, 2026 at 12:32:19 PM
  */
 
 namespace apps\demo\v1\config\auth {

@@ -4,7 +4,7 @@
  * Description of TooManyRequestsException
  * @author goddy
  *
- * Created on: May 23, 2026 at 9:58:37 AM
+ * @since May 23, 2026 at 9:58:37 AM
  */
 
 namespace features\exceptions\client {

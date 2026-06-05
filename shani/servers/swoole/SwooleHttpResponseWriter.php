@@ -4,7 +4,7 @@
  * Description of SwooleResponseWriter
  * @author coder
  *
- * Created on: Mar 25, 2024 at 1:26:42 PM
+ * @since Mar 25, 2024 at 1:26:42 PM
  */
 
 namespace shani\servers\swoole {

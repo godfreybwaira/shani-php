@@ -4,7 +4,7 @@
  * Description of CsrfConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 2:51:54 PM
+ * @since Apr 24, 2026 at 2:51:54 PM
  */
 
 namespace shani\config {

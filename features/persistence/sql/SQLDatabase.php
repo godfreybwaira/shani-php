@@ -6,9 +6,13 @@
  * @author coder
  */
 
-namespace features\persistence {
+namespace features\persistence\sql {
 
     use features\ds\map\ReadMap;
+    use features\persistence\AggregateInterface;
+    use features\persistence\DatabaseDriver;
+    use features\persistence\DatabaseInterface;
+    use features\persistence\FilterClause;
 
     final class SQLDatabase implements DatabaseInterface
     {
@@ -48,18 +52,6 @@ namespace features\persistence {
             };
         }
 
-        private static function createClause(array $params, string $clause, string $join, ?string $prefix = null): ?string
-        {
-            $filters = [];
-            foreach ($params as $key => $value) {
-                $filters[] = $key . '=:' . $prefix . $key;
-            }
-            if (!empty($filters)) {
-                return " $clause " . implode($join, $filters);
-            }
-            return null;
-        }
-
         private function processQuery(string &$query, ?array $params): \PDOStatement
         {
             $statement = $this->pdo->prepare($query);
@@ -94,14 +86,13 @@ namespace features\persistence {
             $this->pdo->rollBack();
         }
 
-        public function delete(string $collection, array $where, ?int $limit = null): int
+        public function delete(string $collection, FilterClause $where, ?int $limit = null): int
         {
-            $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'DELETE FROM ' . $collection . $whereClause;
+            $sql = 'DELETE FROM ' . $collection . $where;
             if (!empty($limit)) {
                 $sql .= ' LIMIT ' . $limit;
             }
-            return $this->run($sql, $where);
+            return $this->run($sql, $where?->getValuePair());
         }
 
         public function escapeHtml(bool $escape): DatabaseInterface
@@ -175,17 +166,16 @@ namespace features\persistence {
             return $statement->rowCount();
         }
 
-        public function find(string $collection, array $where = [], ?int $limit = null, int $skip = 0): \Generator
+        public function find(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): \Generator
         {
-            $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'SELECT * FROM ' . $collection . $whereClause;
+            $sql = 'SELECT * FROM ' . $collection . $where;
             if (!empty($limit)) {
                 $sql .= ' LIMIT ' . $limit . ' OFFSET ' . $skip;
             }
-            return $this->query($sql, $where);
+            return $this->query($sql, $where?->getValuePair());
         }
 
-        public function findAll(string $collection, array $where = [], ?int $limit = null, int $skip = 0): array
+        public function findAll(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): array
         {
             $rows = [];
             $results = $this->find($collection, $where, $limit, $skip);
@@ -195,7 +185,7 @@ namespace features\persistence {
             return $rows;
         }
 
-        public function findOne(string $collection, array $where = []): ?ReadMap
+        public function findOne(string $collection, ?FilterClause $where = null): ?ReadMap
         {
             foreach ($this->find($collection, $where, limit: 1) as $row) {
                 return $row;
@@ -203,20 +193,19 @@ namespace features\persistence {
             return null;
         }
 
-        public function update(string $collection, \JsonSerializable $object, array $where = [], ?int $limit = null): int
+        public function update(string $collection, \JsonSerializable $object, ?FilterClause $where = null, ?int $limit = null): int
         {
             $data = $object->jsonSerialize();
             if (empty($data)) {
                 return 0;
             }
             $setPrefix = 's_';
-            $wherePrefix = 'w_';
-            $set = self::createClause($data, 'SET', ',', $setPrefix);
-            $whereClause = self::createClause($where, 'WHERE', ' AND ', $wherePrefix);
-            $sql = 'UPDATE ' . $collection . $set . $whereClause;
+            $set = SQLClause::createClause($data, 'SET', ',', $setPrefix);
+            $sql = 'UPDATE ' . $collection . $set . $where;
             $filters = [];
-            foreach ($where as $key => $value) {
-                $filters[$wherePrefix . $key] = $value;
+            $values = $where?->getValuePair() ?? [];
+            foreach ($values as $key => $value) {
+                $filters[$key] = $value;
             }
             foreach ($data as $key => $value) {
                 $filters[$setPrefix . $key] = $value;
@@ -227,20 +216,16 @@ namespace features\persistence {
             return $this->run($sql, $filters);
         }
 
-        public function count(string $collection, array $where = []): int
+        public function exists(string $collection, ?FilterClause $where = null): bool
         {
-            $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'SELECT COUNT(*) AS c FROM ' . $collection . $whereClause;
-            $statement = $this->processQuery($sql, $where);
-            return (int) $statement->fetchColumn();
+            $sql = 'SELECT 1 FROM ' . $collection . $where . ' LIMIT 1';
+            $statement = $this->processQuery($sql, $where?->getValuePair());
+            return (bool) $statement->fetchColumn();
         }
 
-        public function exists(string $collection, array $where = []): bool
+        public function aggregate(string $collection): AggregateInterface
         {
-            $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'SELECT 1 FROM ' . $collection . $whereClause . ' LIMIT 1';
-            $statement = $this->processQuery($sql, $where);
-            return (bool) $statement->fetchColumn();
+            return SQLAggregate::getInstance($this, $collection);
         }
     }
 

@@ -4,7 +4,7 @@
  * Description of AuthenticationManager
  * @author goddy
  *
- * Created on: Apr 7, 2026 at 9:14:26 AM
+ * @since Apr 7, 2026 at 9:14:26 AM
  */
 
 namespace features\authentication {

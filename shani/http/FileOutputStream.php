@@ -4,7 +4,7 @@
  * Description of FileOutputStream
  * @author goddy
  *
- * Created on: Oct 18, 2025 at 11:45:58 AM
+ * @since Oct 18, 2025 at 11:45:58 AM
  */
 
 namespace shani\http {

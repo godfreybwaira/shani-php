@@ -4,7 +4,7 @@
  * ResponseWriter class represent a class capable of writing output to a client.
  * @author coder
  *
- * Created on: Mar 25, 2024 at 1:31:32 PM
+ * @since Mar 25, 2024 at 1:31:32 PM
  */
 
 namespace shani\contracts {

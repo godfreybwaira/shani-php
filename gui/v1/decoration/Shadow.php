@@ -4,7 +4,7 @@
  * Description of Shadow
  * @author coder
  *
- * Created on: Mar 25, 2025 at 11:22:37 AM
+ * @since Mar 25, 2025 at 11:22:37 AM
  */
 
 namespace gui\v1\decoration {

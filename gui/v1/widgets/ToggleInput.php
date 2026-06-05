@@ -5,7 +5,7 @@
  * two states, such as on/off or true/false.
  * @author coder
  *
- * Created on: May 13, 2024 at 3:23:35 PM
+ * @since May 13, 2024 at 3:23:35 PM
  */
 
 namespace gui\v1\widgets {

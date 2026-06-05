@@ -5,7 +5,7 @@
  * rem or em (1rem = 16px)
  * @author coder
  *
- * Created on: Jul 26, 2024 at 7:00:12 PM
+ * @since Jul 26, 2024 at 7:00:12 PM
  */
 
 namespace gui\v2\props {

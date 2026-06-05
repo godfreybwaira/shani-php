@@ -4,7 +4,7 @@
  * Description of CgiHttpResponseWriter
  * @author coder
  *
- * Created on: May 22, 2025 at 9:45:50 AM
+ * @since May 22, 2025 at 9:45:50 AM
  */
 
 namespace shani\servers\cgi {

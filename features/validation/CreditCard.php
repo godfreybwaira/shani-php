@@ -4,7 +4,7 @@
  * Description of CreditCard
  * @author coder
  *
- * Created on: Sep 1, 2020 at 12:34:13 AM
+ * @since Sep 1, 2020 at 12:34:13 AM
  */
 
 namespace features\validation {

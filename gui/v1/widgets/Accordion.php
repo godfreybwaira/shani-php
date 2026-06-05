@@ -6,7 +6,7 @@
  * to reveal the content associated with that item.
  * @author coder
  *
- * Created on: May 13, 2024 at 11:47:22 PM
+ * @since May 13, 2024 at 11:47:22 PM
  */
 
 namespace gui\v1\widgets {

@@ -4,7 +4,7 @@
  * Description of Class
  * @author coder
  *
- * Created on: Apr 22, 2025 at 9:36:08 AM
+ * @since Apr 22, 2025 at 9:36:08 AM
  */
 
 namespace gui\v2\props {

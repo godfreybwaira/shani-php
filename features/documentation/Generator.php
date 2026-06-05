@@ -4,7 +4,7 @@
  * User application documentation generator
  * @author coder
  *
- * Created on: May 30, 2024 at 4:31:29 PM
+ * @since May 30, 2024 at 4:31:29 PM
  */
 
 namespace features\documentation {

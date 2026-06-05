@@ -4,7 +4,7 @@
  * Description of ResponseEntity
  * @author coder
  *
- * Created on: Feb 26, 2025 at 5:10:06 PM
+ * @since Feb 26, 2025 at 5:10:06 PM
  */
 
 namespace shani\http {

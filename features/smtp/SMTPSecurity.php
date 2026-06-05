@@ -8,7 +8,7 @@ namespace features\smtp {
      * for secure SMTP stream connections.
      *
      * @author goddy
-     * Created on: Jun 3, 2026 at 11:51:04 AM
+     * @since Jun 3, 2026 at 11:51:04 AM
      */
     final class SMTPSecurity
     {

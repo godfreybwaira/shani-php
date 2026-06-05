@@ -4,7 +4,7 @@
  * Description of TabPosition
  * @author coder
  *
- * Created on: May 19, 2025 at 10:12:01 AM
+ * @since May 19, 2025 at 10:12:01 AM
  */
 
 namespace gui\v2\decorators {

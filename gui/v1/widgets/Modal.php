@@ -6,7 +6,7 @@
  * interaction with the rest of the page until the user addresses the modal's content.
  * @author coder
  *
- * Created on: May 16, 2024 at 10:09:03 PM
+ * @since May 16, 2024 at 10:09:03 PM
  */
 
 namespace gui\v1\widgets {

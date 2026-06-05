@@ -4,7 +4,7 @@
  * SameSite controls whether a cookie is sent on cross‑site requests.
  * @author goddy
  *
- * Created on: Apr 3, 2026 at 6:13:26 PM
+ * @since Apr 3, 2026 at 6:13:26 PM
  */
 
 namespace shani\http\enums {

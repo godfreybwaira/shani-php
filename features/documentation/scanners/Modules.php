@@ -4,7 +4,7 @@
  * Description of Modules
  * @author goddy
  *
- * Created on: Jul 29, 2025 at 2:22:42 PM
+ * @since Jul 29, 2025 at 2:22:42 PM
  */
 
 namespace features\documentation\scanners {

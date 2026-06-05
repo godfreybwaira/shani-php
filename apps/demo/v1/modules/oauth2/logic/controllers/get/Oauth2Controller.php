@@ -4,7 +4,7 @@
  * Description of Oauth2Controller
  * @author goddy
  *
- * Created on: Mar 18, 2026 at 10:52:52 AM
+ * @since Mar 18, 2026 at 10:52:52 AM
  */
 
 namespace apps\demo\v1\modules\oauth2\logic\controllers\get {

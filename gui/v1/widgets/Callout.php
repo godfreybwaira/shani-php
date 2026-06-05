@@ -6,7 +6,7 @@
  * out from the rest of the content to grab the user's attention.
  * @author coder
  *
- * Created on: May 12, 2024 at 9:45:13 AM
+ * @since May 12, 2024 at 9:45:13 AM
  */
 
 namespace gui\v1\widgets {

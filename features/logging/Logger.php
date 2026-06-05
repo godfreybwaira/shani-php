@@ -4,7 +4,7 @@
  * Description of Logger
  * @author coder
  *
- * Created on: Apr 7, 2025 at 3:14:22 PM
+ * @since Apr 7, 2025 at 3:14:22 PM
  */
 
 namespace features\logging {

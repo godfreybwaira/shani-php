@@ -4,7 +4,7 @@
  * Description of SessionStorage
  * @author goddy
  *
- * Created on: Apr 17, 2026 at 9:35:22 AM
+ * @since Apr 17, 2026 at 9:35:22 AM
  */
 
 namespace features\session {

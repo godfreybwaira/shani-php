@@ -4,7 +4,7 @@
  * Description of PathConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 1:26:35 PM
+ * @since Apr 24, 2026 at 1:26:35 PM
  */
 
 namespace shani\config {

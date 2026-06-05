@@ -4,7 +4,7 @@
  * Represents Oauth2 response returned during oauth2 handling
  * @author goddy
  *
- * Created on: Mar 9, 2026 at 11:55:57 AM
+ * @since Mar 9, 2026 at 11:55:57 AM
  */
 
 namespace features\oauth2 {

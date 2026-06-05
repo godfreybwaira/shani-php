@@ -4,7 +4,7 @@
  * Used for the Device Authorization Grant (smart TVs, CLI tools, etc.).
  * @author goddy
  *
- * Created on: Mar 11, 2026 at 12:22:18 PM
+ * @since Mar 11, 2026 at 12:22:18 PM
  */
 
 namespace features\oauth2\dto {

@@ -4,7 +4,7 @@
  * Description of RequestConfig
  * @author goddy
  *
- * Created on: Apr 24, 2026 at 3:21:06 PM
+ * @since Apr 24, 2026 at 3:21:06 PM
  */
 
 namespace shani\config {

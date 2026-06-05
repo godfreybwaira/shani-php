@@ -4,7 +4,7 @@
  * Create and manage HTTP Cookie
  * @author coder
  *
- * Created on: Mar 27, 2024 at 1:44:06 PM
+ * @since Mar 27, 2024 at 1:44:06 PM
  */
 
 namespace shani\http {

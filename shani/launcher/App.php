@@ -5,7 +5,7 @@
  * application. This is where application execution and routing takes place
  * @author coder
  *
- * Created on: Feb 11, 2024 at 6:50:02 PM
+ * @since Feb 11, 2024 at 6:50:02 PM
  */
 
 namespace shani\launcher {

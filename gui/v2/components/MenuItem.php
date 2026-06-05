@@ -4,7 +4,7 @@
  * Description of MenuItem
  * @author coder
  *
- * Created on: May 19, 2025 at 11:55:16 AM
+ * @since May 19, 2025 at 11:55:16 AM
  */
 
 namespace gui\v2\components {

@@ -4,7 +4,7 @@
  * Avatar is a graphical representation of a user or their alter ego or character.
  * @author coder
  *
- * Created on: May 12, 2024 at 9:00:15 AM
+ * @since May 12, 2024 at 9:00:15 AM
  */
 
 namespace gui\v1\widgets {

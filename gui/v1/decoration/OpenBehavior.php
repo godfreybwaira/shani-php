@@ -4,7 +4,7 @@
  * Description of OpenBehavior
  * @author coder
  *
- * Created on: Mar 25, 2025 at 12:00:54 PM
+ * @since Mar 25, 2025 at 12:00:54 PM
  */
 
 namespace gui\v1\decoration {

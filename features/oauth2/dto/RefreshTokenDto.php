@@ -4,7 +4,7 @@
  * Description of RefreshTokenDto
  * @author goddy
  *
- * Created on: Mar 12, 2026 at 1:08:18 PM
+ * @since Mar 12, 2026 at 1:08:18 PM
  */
 
 namespace features\oauth2\dto {

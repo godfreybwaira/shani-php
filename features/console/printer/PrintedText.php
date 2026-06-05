@@ -4,7 +4,7 @@
  * Description of PrintedText
  * @author goddy
  *
- * Created on: May 4, 2026 at 6:41:51 PM
+ * @since May 4, 2026 at 6:41:51 PM
  */
 
 namespace features\console\printer {

@@ -4,7 +4,7 @@
  * Description of PwaRelatedApplication
  * @author goddy
  *
- * Created on: Apr 8, 2026 at 2:29:42 PM
+ * @since Apr 8, 2026 at 2:29:42 PM
  */
 
 namespace features\pwa {
