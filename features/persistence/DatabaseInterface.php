@@ -141,9 +141,21 @@ namespace features\persistence {
          *
          * All subsequent CRUD operations will be part of this transaction
          * until commit() or rollback() is called.
-         * @return DatabaseInterface Database object
+         * @return bool True if transaction started successfully, false otherwise
          */
-        public function beginTransaction(): DatabaseInterface;
+        public function beginTransaction(): bool;
+
+        /**
+         * Ends the current database transaction based on a given condition.
+         *
+         * If a transaction is active:
+         * - Commits the transaction when $condition is true.
+         * - Rolls back the transaction when $condition is false.
+         *
+         * @param bool $condition Determines whether to commit (true) or rollback (false).
+         * @return bool Returns the same condition value passed in, indicating the outcome.
+         */
+        public function endTransaction(bool $condition): bool;
 
         /**
          * Commit the current transaction
@@ -154,11 +166,6 @@ namespace features\persistence {
          * Rollback the current transaction
          */
         public function rollback(): void;
-
-        /**
-         * Check if currently inside a transaction
-         */
-        public function inTransaction(): bool;
     }
 
 }

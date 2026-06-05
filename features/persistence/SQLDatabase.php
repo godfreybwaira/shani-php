@@ -67,10 +67,21 @@ namespace features\persistence {
             return $statement;
         }
 
-        public function beginTransaction(): DatabaseInterface
+        public function beginTransaction(): bool
         {
-            $this->pdo->beginTransaction();
-            return $this;
+            return $this->pdo->inTransaction() || $this->pdo->beginTransaction();
+        }
+
+        public function endTransaction(bool $condition): bool
+        {
+            if ($this->pdo->inTransaction()) {
+                if ($condition) {
+                    $this->commit();
+                } else {
+                    $this->rollback();
+                }
+            }
+            return $condition;
         }
 
         public function commit(): void
@@ -78,10 +89,18 @@ namespace features\persistence {
             $this->pdo->commit();
         }
 
-        public function delete(string $collection, array $where): int
+        public function rollback(): void
+        {
+            $this->pdo->rollBack();
+        }
+
+        public function delete(string $collection, array $where, ?int $limit = null): int
         {
             $whereClause = self::createClause($where, 'WHERE', ' AND ');
             $sql = 'DELETE FROM ' . $collection . $whereClause;
+            if (!empty($limit)) {
+                $sql .= ' LIMIT ' . $limit;
+            }
             return $this->run($sql, $where);
         }
 
@@ -89,11 +108,6 @@ namespace features\persistence {
         {
             $this->escape = $escape;
             return $this;
-        }
-
-        public function inTransaction(): bool
-        {
-            return $this->pdo->inTransaction();
         }
 
         public function insert(string $collection, \JsonSerializable $object): string|int
@@ -123,21 +137,9 @@ namespace features\persistence {
             }
             $colList = implode(',', $columns);
             $sql = 'INSERT INTO ' . $collection . '(' . $colList . ')VALUES' . implode(',', $valueSets);
-            $transact = !$this->inTransaction();
-            if ($transact) {
-                $this->beginTransaction();
-            }
-            $statement = $this->processQuery($sql, $params);
-            $result = $statement->rowCount() === count($object);
-            $statement->closeCursor();
-            if ($transact) {
-                if ($result) {
-                    $this->commit();
-                } else {
-                    $this->rollback();
-                }
-            }
-            return $result;
+            $this->beginTransaction();
+            $result = $this->run($sql, $params) === count($object);
+            return $this->endTransaction($result);
         }
 
         public function query(string $query, array $params = []): \Generator
@@ -164,11 +166,6 @@ namespace features\persistence {
             }
             $statement->closeCursor();
             return $results;
-        }
-
-        public function rollback(): void
-        {
-            $this->pdo->rollBack();
         }
 
         public function run(string $query, array $params = []): int
@@ -206,7 +203,7 @@ namespace features\persistence {
             return null;
         }
 
-        public function update(string $collection, \JsonSerializable $object, array $where = []): int
+        public function update(string $collection, \JsonSerializable $object, array $where = [], ?int $limit = null): int
         {
             $data = $object->jsonSerialize();
             if (empty($data)) {
@@ -224,6 +221,9 @@ namespace features\persistence {
             foreach ($data as $key => $value) {
                 $filters[$setPrefix . $key] = $value;
             }
+            if (!empty($limit)) {
+                $sql .= ' LIMIT ' . $limit;
+            }
             return $this->run($sql, $filters);
         }
 
@@ -238,7 +238,7 @@ namespace features\persistence {
         public function exists(string $collection, array $where = []): bool
         {
             $whereClause = self::createClause($where, 'WHERE', ' AND ');
-            $sql = 'SELECT 1 FROM ' . $collection . $whereClause;
+            $sql = 'SELECT 1 FROM ' . $collection . $whereClause . ' LIMIT 1';
             $statement = $this->processQuery($sql, $where);
             return (bool) $statement->fetchColumn();
         }
