@@ -13,7 +13,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
     use apps\demo\v1\modules\students\logic\services\StudentService;
     use features\attributes\security\CsrfCheck;
     use features\attributes\validation\FileValidation;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\exceptions\server\ServerException;
     use features\utils\File;
     use shani\http\HttpResponse;
@@ -52,7 +52,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
             $s0 = $this->app->storage->share2group($copy);
             $s1 = $this->app->storage->share2group($copy, 'grp001');
             $s2 = $this->app->storage->share2other($copy, 'user02222');
-            return HttpResponse::withBody(new ReadableMap([
+            return HttpResponse::withBody(new ReadMap([
                                 'pa' => $this->app->storage->uri($path)->asString(),
                                 's0' => $this->app->storage->uri($s0)->asString(),
                                 's1' => $this->app->storage->uri($s1)->asString(),

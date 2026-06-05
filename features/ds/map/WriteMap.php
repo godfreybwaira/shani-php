@@ -12,7 +12,7 @@ namespace features\ds\map {
     use features\ds\WritableDataInterface;
     use features\utils\Duration;
 
-    class WritableMap extends ReadableMap implements WritableDataInterface
+    class WriteMap extends ReadMap implements WritableDataInterface
     {
 
         /**
@@ -63,7 +63,7 @@ namespace features\ds\map {
             return $this;
         }
 
-        public function addMap(ReadableMap $map): self
+        public function addMap(ReadMap $map): self
         {
             return $this->addAll($map->toArray());
         }

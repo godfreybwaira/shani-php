@@ -29,7 +29,7 @@ namespace apps\demo\v1\config {
         public function generateAccessToken(string $clientId, ?string $scope, ?string $userId, int $expiresIn = 9): AccessTokenDto
         {
             $ttl = Duration::ofMinutes(5);
-            $jwt = new JWTClaim(JWTAlgorithm::ED25519);
+            $jwt = new JWTClaim(JWTAlgorithm::EdDSA);
             $jwt->setClaim('access', '24354fed,5ca2536e');
             $key = '-----BEGIN PRIVATE KEY-----' . PHP_EOL . 'MC4CAQAwBQYDK2VwBCIEIJSxh/iy0iGxirtYZOEQiwFQx3R3WJXg1PPxY/0xypBK';
             $key .= PHP_EOL . '-----END PRIVATE KEY-----';

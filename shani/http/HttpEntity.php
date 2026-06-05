@@ -9,7 +9,7 @@
 
 namespace shani\http {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     /**
      * HttpEntity is an abstract base class representing common HTTP entity data.
@@ -33,18 +33,18 @@ namespace shani\http {
 
         /**
          * HTTP cookies
-         * @var ReadableMap
+         * @var ReadMap
          */
-        public readonly ReadableMap $cookie;
+        public readonly ReadMap $cookie;
 
         /**
          * Construct a new HttpEntity
          *
          * @param HttpHeader $headers HTTP headers
-         * @param ReadableMap $cookies HTTP cookies
+         * @param ReadMap $cookies HTTP cookies
          * @param string $protocol Protocol string (e.g., "HTTP/1.1")
          */
-        protected function __construct(HttpHeader $headers, ReadableMap $cookies, string $protocol)
+        protected function __construct(HttpHeader $headers, ReadMap $cookies, string $protocol)
         {
             $this->headers = $headers;
             $this->protocol = $protocol;

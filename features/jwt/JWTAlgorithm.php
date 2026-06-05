@@ -27,12 +27,12 @@ namespace features\jwt {
         case ES256;
         case ES384;
         case ES512;
-        /////EdDSA: Modern, Fastest, smallest keys
-        case ED25519;
+        /////ED25519: Modern, Fastest, smallest keys
+        case EdDSA;
 
         public function getValue(): ?string
         {
-            if ($this === self::ED25519) {
+            if ($this === self::EdDSA) {
                 return null;
             }
             return 'sha' . substr($this->name, 2);

@@ -9,7 +9,7 @@
 
 namespace features\session {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
     use features\storage\StorageInterface;
     use shani\launcher\App;
 
@@ -33,10 +33,10 @@ namespace features\session {
             return isset($_SESSION[$cartName]);
         }
 
-        public function container(string $cartName): WritableMap
+        public function container(string $cartName): WriteMap
         {
             if (!isset($this->carts[$cartName])) {
-                $this->carts[$cartName] = new WritableMap($_SESSION[$cartName] ?? []);
+                $this->carts[$cartName] = new WriteMap($_SESSION[$cartName] ?? []);
             }
             return $this->carts[$cartName];
         }

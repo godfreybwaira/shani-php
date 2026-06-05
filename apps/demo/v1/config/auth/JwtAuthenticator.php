@@ -35,7 +35,7 @@ namespace apps\demo\v1\config\auth {
             }
             $publicKey = '-----BEGIN PUBLIC KEY-----' . PHP_EOL . 'MCowBQYDK2VwAyEAKaA5Dmite1sGhNXMfFZPpGarV7/Yg63Fplolwbw7Pn0=';
             $publicKey .= PHP_EOL . '-----END PUBLIC KEY-----';
-            $claim = JWTClaim::fromToken($token, $publicKey, JWTAlgorithm::ED25519);
+            $claim = JWTClaim::fromToken($token, $publicKey, JWTAlgorithm::EdDSA);
             $access = $claim->getClaim('access');
             $user = new UserDetailsDto($subject, $access, false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
             return new AuthenticationResult($user, rememberUser: false);

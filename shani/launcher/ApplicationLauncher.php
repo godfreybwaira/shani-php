@@ -10,7 +10,7 @@
 namespace shani\launcher {
 
     use features\cache\CacheFactory;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\Concurrency;
     use features\utils\Duration;
     use features\utils\Event;
@@ -107,7 +107,7 @@ namespace shani\launcher {
             new Concurrency($server->getConcurrencyHandler());
             Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriterInterface $writer, Framework $framework) {
-                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadableMap());
+                $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadMap());
                 $preference = self::host($request->uri->hostname(), $request->header());
                 if ($preference === null) {
                     $response->setStatus(HttpStatus::BAD_REQUEST)->setBody('Unsupported application version');

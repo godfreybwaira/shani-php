@@ -13,7 +13,7 @@ namespace features\ds\map {
     use features\exceptions\client\ValidationException;
     use features\utils\DataConvertor;
 
-    class ReadableMap extends ReadableData
+    class ReadMap extends ReadableData
     {
 
         public function exists(string|int ...$key): bool

@@ -11,7 +11,7 @@ namespace features\utils {
 
     use shani\http\HttpHeader;
     use shani\http\RequestEntity;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     final class RequestEntityBuilder
     {
@@ -21,16 +21,16 @@ namespace features\utils {
         private array $files = [];
         private ?HttpHeader $headers;
         private ?string $method, $ip, $protocol, $rawBody;
-        private ReadableMap $cookies, $queries, $body;
+        private ReadMap $cookies, $queries, $body;
 
         public function __construct()
         {
             $this->time = time();
             $this->rawBody = $this->method = $this->ip = $this->protocol = null;
             $this->headers = new HttpHeader();
-            $this->body = new ReadableMap();
-            $this->queries = new ReadableMap();
-            $this->cookies = new ReadableMap();
+            $this->body = new ReadMap();
+            $this->queries = new ReadMap();
+            $this->cookies = new ReadMap();
         }
 
         public function rawBody(?string $body): self
@@ -44,7 +44,7 @@ namespace features\utils {
         public function body(?array $body): self
         {
             if (!empty($body)) {
-                $this->body = new ReadableMap($body);
+                $this->body = new ReadMap($body);
             }
             return $this;
         }
@@ -52,7 +52,7 @@ namespace features\utils {
         public function query(?array $values): self
         {
             if (!empty($values)) {
-                $this->queries = new ReadableMap($values);
+                $this->queries = new ReadMap($values);
             }
             return $this;
         }
@@ -86,7 +86,7 @@ namespace features\utils {
         public function cookies(?array $cookies): self
         {
             if (!empty($cookies)) {
-                $this->cookies = new ReadableMap($cookies);
+                $this->cookies = new ReadMap($cookies);
             }
             return $this;
         }

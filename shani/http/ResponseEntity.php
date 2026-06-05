@@ -11,7 +11,7 @@ namespace shani\http {
 
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\DataCompression;
     use features\utils\DataConvertor;
     use features\utils\MediaType;
@@ -28,7 +28,7 @@ namespace shani\http {
         public readonly RequestEntity $request;
         private ?string $statusMessage = null, $rawBody = null;
 
-        public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers, ReadableMap $cookies)
+        public function __construct(RequestEntity $request, HttpStatus $status, HttpHeader $headers, ReadMap $cookies)
         {
             parent::__construct($headers, $cookies, $request->protocol);
             $this->status = $status;

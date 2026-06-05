@@ -2,7 +2,7 @@
 
 namespace {namespace} {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use gui\WebUIBuilder;
     use shani\http\HttpResponse;
     use shani\launcher\App;
@@ -19,7 +19,7 @@ namespace {namespace} {
 
         public function {fn_name}(): HttpResponse
         {
-            $data = new ReadableMap([
+            $data = new ReadMap([
                 'name' => get_current_user(),
                 'title' => 'developer'
             ]);

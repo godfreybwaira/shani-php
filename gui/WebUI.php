@@ -9,8 +9,8 @@
 
 namespace gui {
 
-    use features\ds\map\ReadableMap;
-    use features\ds\map\WritableMap;
+    use features\ds\map\ReadMap;
+    use features\ds\map\WriteMap;
     use shani\launcher\App;
     use shani\launcher\Framework;
 
@@ -19,9 +19,9 @@ namespace gui {
 
         /**
          * Iterable MutableMap representing UIBilder attributes object
-         * @var WritableMap
+         * @var WriteMap
          */
-        public readonly WritableMap $attr;
+        public readonly WriteMap $attr;
         private readonly WebUIBuilder $builder;
         private readonly App $app;
 
@@ -68,9 +68,9 @@ namespace gui {
 
         /**
          * Get dictionary object of the current web view
-         * @return ReadableMap Dictionary object
+         * @return ReadMap Dictionary object
          */
-        public function dictionary(): ReadableMap
+        public function dictionary(): ReadMap
         {
             return $this->app->dictionary($this->builder->getDictionaryData(), $this->builder->getView());
         }

@@ -12,7 +12,7 @@ namespace features\ds\set {
     use features\utils\DataConvertor;
     use features\ds\ReadableData;
 
-    class ReadableSet extends ReadableData
+    class ReadSet extends ReadableData
     {
 
         public function exists(string|int ...$values): bool

@@ -18,7 +18,7 @@
 
 namespace features\cache {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
     use features\storage\StorageInterface;
 
     /**
@@ -50,9 +50,9 @@ namespace features\cache {
          * Retrieve the active cache container. This is the default framework cache.
          * Do not use it for your own stuffs.
          *
-         * @return WritableMap The active cache data.
+         * @return WriteMap The active cache data.
          */
-        public static function container(): WritableMap
+        public static function container(): WriteMap
         {
             return self::createNew(self::CACHE_NAME)->container(self::CART_NAME);
         }

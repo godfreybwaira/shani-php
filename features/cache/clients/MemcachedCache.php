@@ -2,7 +2,7 @@
 
 namespace features\cache\clients {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
     use features\storage\StorageInterface;
 
     /**
@@ -20,7 +20,7 @@ namespace features\cache\clients {
 
         private bool $closed = false;
 
-        /** @var array<string, WritableMap> */
+        /** @var array<string, WriteMap> */
         private array $carts = [];
         private readonly string $prefix;
         private readonly \Memcached $client;
@@ -40,11 +40,11 @@ namespace features\cache\clients {
             register_shutdown_function([$this, 'close']);
         }
 
-        public function container(string $name): WritableMap
+        public function container(string $name): WriteMap
         {
             if (!isset($this->carts[$name])) {
                 $value = $this->getValue($name);
-                $this->carts[$name] = new WritableMap($value ?? []);
+                $this->carts[$name] = new WriteMap($value ?? []);
             }
             return $this->carts[$name];
         }

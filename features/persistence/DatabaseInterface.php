@@ -9,7 +9,7 @@
 
 namespace features\persistence {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     /**
      * Unified Database Interface for PHP
@@ -62,7 +62,7 @@ namespace features\persistence {
          * efficient as it fetches rows on demand
          * @param string $query A query to execute
          * @param array $params Query parameters (key => value pair)
-         * @return \Generator Iterable object of ReadableMap contains rows returned as the result of SQL query.
+         * @return \Generator Iterable object of ReadMap contains rows returned as the result of SQL query.
          * @see self::findAll
          */
         public function query(string $query, array $params = []): \Generator;
@@ -72,7 +72,7 @@ namespace features\persistence {
          * use <code>query</code> for efficiency.
          * @param string $query A query to execute
          * @param array $params Query parameters (key => value pair)
-         * @return array Rows of readableMap object returned as the result of the query.
+         * @return array Rows of ReadMap object returned as the result of the query.
          * @see self::generateAll
          */
         public function queryAll(string $query, array $params = []): array;
@@ -103,7 +103,7 @@ namespace features\persistence {
          * @param array $where Query parameters (key => value pair)
          * @param int|null $limit Number of rows to fetch
          * @param int $skip Number of rows to skip
-         * @return array Rows of ReadableMap object returned as the result of the query.
+         * @return array Rows of ReadMap object returned as the result of the query.
          */
         public function findAll(string $collection, array $where = [], ?int $limit = null, int $skip = 0): array;
 
@@ -111,11 +111,11 @@ namespace features\persistence {
          * Execute query and returns a single row.
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
          * @param array $where Query parameters (key => value pair)
-         * @return ReadableMap|null A single row returned as the result of the query
+         * @return ReadMap|null A single row returned as the result of the query
          * or null if no result found.
          * @see self::findAll
          */
-        public function findOne(string $collection, array $where = []): ?ReadableMap;
+        public function findOne(string $collection, array $where = []): ?ReadMap;
 
         /**
          * Count matching records/documents

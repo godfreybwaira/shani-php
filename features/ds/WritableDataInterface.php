@@ -9,7 +9,7 @@
 
 namespace features\ds {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     interface WritableDataInterface
     {
@@ -29,10 +29,10 @@ namespace features\ds {
 
         /**
          * Add a key-value pairs of items
-         * @param ReadableMap $map Map items to add
+         * @param ReadMap $map Map items to add
          * @return self
          */
-        public function addMap(ReadableMap $map): self;
+        public function addMap(ReadMap $map): self;
 
         /**
          * Add a Json serializable object to a map

@@ -11,7 +11,7 @@ namespace features\utils {
 
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\Concurrency;
     use features\utils\DataCompression;
     use features\utils\File;
@@ -265,7 +265,7 @@ namespace features\utils {
                 CURLOPT_HTTPHEADER => $this->requestHeader->map(fn($name, $value) => $name . ':' . implode(',', $value))->toArray(),
                 CURLOPT_WRITEFUNCTION => function (\CurlHandle $curl, string $content) use ($request, $callback) {
                     $status = HttpStatus::from(curl_getinfo($curl, CURLINFO_HTTP_CODE));
-                    $cookies = new ReadableMap($this->responseHeader->cookies());
+                    $cookies = new ReadMap($this->responseHeader->cookies());
                     $response = new ResponseEntity($request, $status, $this->responseHeader, $cookies);
                     $response->setBody($content);
                     $callback($response);

@@ -11,7 +11,7 @@ namespace shani\http {
 
     use features\crypto\DigitalSignature;
     use features\crypto\Encryption;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\DataCompression;
     use features\utils\File;
     use features\utils\MediaType;
@@ -70,34 +70,34 @@ namespace shani\http {
 
         /**
          * Represents request body
-         * @var ReadableMap
+         * @var ReadMap
          */
-        private ReadableMap $body;
+        private ReadMap $body;
 
         /**
          * Represents request Query string
-         * @var ReadableMap
+         * @var ReadMap
          */
-        public readonly ReadableMap $query;
+        public readonly ReadMap $query;
 
         /**
          * Construct a new RequestEntity
          *
          * @param URI $uri Request URI
          * @param HttpHeader $headers HTTP headers
-         * @param ReadableMap $body Request body
-         * @param ReadableMap $cookies Request cookies
+         * @param ReadMap $body Request body
+         * @param ReadMap $cookies Request cookies
          * @param array[File] $files Uploaded files
          * @param string $method HTTP method
          * @param string $ip Client IP address
          * @param int $time Request timestamp
-         * @param ReadableMap $queries Query parameters
+         * @param ReadMap $queries Query parameters
          * @param string $protocol Protocol used (HTTP/HTTPS)
          * @param string|null $rawBody Raw request body (optional)
          */
         public function __construct(
-                URI $uri, HttpHeader $headers, ReadableMap $body, ReadableMap $cookies,
-                array $files, string $method, string $ip, int $time, ReadableMap $queries,
+                URI $uri, HttpHeader $headers, ReadMap $body, ReadMap $cookies,
+                array $files, string $method, string $ip, int $time, ReadMap $queries,
                 string $protocol, ?string $rawBody = null
         )
         {
@@ -127,10 +127,10 @@ namespace shani\http {
 
         /**
          * Replace request body with new map
-         * @param ReadableMap $body New body
+         * @param ReadMap $body New body
          * @return self
          */
-        public function withBody(ReadableMap $body): self
+        public function withBody(ReadMap $body): self
         {
             $this->body = $body;
             return $this;
@@ -147,9 +147,9 @@ namespace shani\http {
 
         /**
          * Get request body
-         * @return ReadableMap
+         * @return ReadMap
          */
-        public function body(): ReadableMap
+        public function body(): ReadMap
         {
             return $this->body;
         }

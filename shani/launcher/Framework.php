@@ -11,7 +11,7 @@ namespace shani\launcher {
 
     use features\cache\CacheDriverManager;
     use features\cache\CacheFactory;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     /**
      * Core configuration class for the Shani framework.
@@ -133,9 +133,9 @@ namespace shani\launcher {
         /**
          * Framework configuration map.
          *
-         * @var ReadableMap
+         * @var ReadMap
          */
-        public readonly ReadableMap $config;
+        public readonly ReadMap $config;
 
         /**
          * Constructor for Framework.
@@ -155,7 +155,7 @@ namespace shani\launcher {
             date_default_timezone_set($config['time_zone']);
 
             $config['max_payload_size'] *= self::MB_1;
-            $this->config = new ReadableMap($config);
+            $this->config = new ReadMap($config);
         }
 
         private static function initializeCacheManager(array $config): void

@@ -13,8 +13,8 @@ namespace shani\launcher {
     use features\assets\StaticAssetRequest;
     use features\assets\StaticAssetServers;
     use features\authentication\AuthenticationManager;
-    use features\ds\map\ReadableMap;
-    use features\ds\map\WritableMap;
+    use features\ds\map\ReadMap;
+    use features\ds\map\WriteMap;
     use features\exceptions\client\AuthenticationException;
     use features\exceptions\client\AuthorizationException;
     use features\exceptions\client\BadRequestException;
@@ -213,7 +213,7 @@ namespace shani\launcher {
             return $response;
         }
 
-        public function csrfToken(): WritableMap
+        public function csrfToken(): WriteMap
         {
             return $this->session->container('fiJ9Gce5osud7s');
         }
@@ -247,19 +247,19 @@ namespace shani\launcher {
          * @param array $data Optional data, will be available in the dictionary
          * file using $data object
          * @param string $name Dictionary directory name
-         * @return ReadableMap An object of words in the dictionary file.
+         * @return ReadMap An object of words in the dictionary file.
          */
-        public function dictionary(array $data = null, string $name = null): ReadableMap
+        public function dictionary(array $data = null, string $name = null): ReadMap
         {
             $route = $this->request->route();
             $file = $this->module() . $this->path->languages . '/';
             $file .= ($name ?? $route->action) . '/' . $this->language() . '.php';
-            return self::getFile($file, new ReadableMap($data));
+            return self::getFile($file, new ReadMap($data));
         }
 
-        private static function getFile(string $loadedFile, ReadableMap $data): ReadableMap
+        private static function getFile(string $loadedFile, ReadMap $data): ReadMap
         {
-            return new ReadableMap(require $loadedFile);
+            return new ReadMap(require $loadedFile);
         }
 
         /**

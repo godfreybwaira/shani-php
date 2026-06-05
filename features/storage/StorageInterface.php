@@ -2,7 +2,7 @@
 
 namespace features\storage {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
 
     /**
      * StorageInterface
@@ -14,7 +14,7 @@ namespace features\storage {
      * This interface provides:
      * - Controlled lifecycle (start, close, destroy)
      * - Safe refresh/regeneration to mitigate stale or insecure identifiers
-     * - Multiple named containers stored as WritableMap objects (data persisted via toArray())
+     * - Multiple named containers stored as WriteMap objects (data persisted via toArray())
      *
      * Key Design Principles:
      * - Supports a "disabled" mode for testing, CLI, or async environments
@@ -84,18 +84,18 @@ namespace features\storage {
         public function refresh(): StorageInterface;
 
         /**
-         * Returns (and lazily initializes) a named container as a WritableMap.
+         * Returns (and lazily initializes) a named container as a WriteMap.
          *
          * If the container does not exist in the current request or storage,
-         * a new empty WritableMap is created.
+         * a new empty WriteMap is created.
          *
          * Multiple containers can coexist (e.g., 'cart', 'wishlist', 'cache_bucket').
          *
          * @param string $name Unique name of the container.
          *
-         * @return WritableMap The container instance
+         * @return WriteMap The container instance
          */
-        public function container(string $name): WritableMap;
+        public function container(string $name): WriteMap;
 
         /**
          * Checks whether a container with the given name exists in the current storage.

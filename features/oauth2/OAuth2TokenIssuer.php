@@ -9,7 +9,7 @@
 
 namespace features\oauth2 {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\MediaType;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
@@ -19,7 +19,7 @@ namespace features\oauth2 {
     {
 
         private readonly App $app;
-        private readonly ReadableMap $body;
+        private readonly ReadMap $body;
         private readonly Oauth2Repository $repo;
         private readonly ?Oauth2GrantType $grantType;
         private readonly ?string $clientId, $clientSecret;

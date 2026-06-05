@@ -8,7 +8,7 @@
 
 namespace features\persistence {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
 
     final class SQLDatabase implements DatabaseInterface
     {
@@ -149,7 +149,7 @@ namespace features\persistence {
                 if ($this->escape) {
                     self::escapeHtmlChars($row);
                 }
-                yield new ReadableMap($row);
+                yield new ReadMap($row);
             }
             $statement->closeCursor();
         }
@@ -162,7 +162,7 @@ namespace features\persistence {
                 if ($this->escape) {
                     self::escapeHtmlChars($row);
                 }
-                $results[] = new ReadableMap($row);
+                $results[] = new ReadMap($row);
             }
             $statement->closeCursor();
             return $results;
@@ -195,7 +195,7 @@ namespace features\persistence {
             return $rows;
         }
 
-        public function findOne(string $collection, array $where = []): ?ReadableMap
+        public function findOne(string $collection, array $where = []): ?ReadMap
         {
             foreach ($this->find($collection, $where, limit: 1) as $row) {
                 return $row;

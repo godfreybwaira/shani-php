@@ -9,7 +9,7 @@
 
 namespace shani\utils {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use shani\launcher\Framework;
 
     /**
@@ -38,9 +38,9 @@ namespace shani\utils {
         /**
          * Virtual host configurations parsed from YAML.
          *
-         * @var ReadableMap
+         * @var ReadMap
          */
-        public readonly ReadableMap $vhost;
+        public readonly ReadMap $vhost;
 
         /**
          * Host configuration from host file.
@@ -65,7 +65,7 @@ namespace shani\utils {
             $configFile .= DIRECTORY_SEPARATOR . $mapper->supportedVersions[$selectedVersion]['config'];
             $this->versionNumber = $selectedVersion;
             $configs = yaml_parse_file($configFile);
-            $this->vhost = new ReadableMap($configs);
+            $this->vhost = new ReadMap($configs);
             $this->mapper = $mapper;
         }
     }

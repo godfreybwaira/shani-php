@@ -9,9 +9,9 @@
 
 namespace gui\v2\props {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
 
-    final class InlineStyle extends WritableMap
+    final class InlineStyle extends WriteMap
     {
 
         public function asString(): string

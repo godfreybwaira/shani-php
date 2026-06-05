@@ -9,10 +9,10 @@
 
 namespace features\ds\set {
 
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\ds\WritableDataInterface;
 
-    class WritableSet extends ReadableSet implements WritableDataInterface
+    class WriteSet extends ReadSet implements WritableDataInterface
     {
 
         /**
@@ -108,7 +108,7 @@ namespace features\ds\set {
             return $this->addAll(array_values($json->jsonSerialize()));
         }
 
-        public function addMap(ReadableMap $map): self
+        public function addMap(ReadMap $map): self
         {
             return $this->addAll($map->values());
         }

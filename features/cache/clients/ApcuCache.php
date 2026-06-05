@@ -13,7 +13,7 @@
 
 namespace features\cache\clients {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
     use features\storage\StorageInterface;
 
     /**
@@ -38,12 +38,12 @@ namespace features\cache\clients {
         /**
          * In‑memory collection of named containers.
          *
-         * Each entry is a WritableMap instance representing a
+         * Each entry is a WriteMap instance representing a
          * logical cache bucket (e.g., cart, wishlist, comparison).
          * These are lazily initialized and persisted to storage
          * when close() is invoked.
          *
-         * @var array<string, WritableMap>
+         * @var array<string, WriteMap>
          */
         private array $carts = [];
 
@@ -68,11 +68,11 @@ namespace features\cache\clients {
             register_shutdown_function([$this, 'close']);
         }
 
-        public function container(string $name): WritableMap
+        public function container(string $name): WriteMap
         {
             if (!isset($this->carts[$name])) {
                 $value = $this->getValue($name);
-                $this->carts[$name] = new WritableMap($value ?? []);
+                $this->carts[$name] = new WriteMap($value ?? []);
             }
             return $this->carts[$name];
         }

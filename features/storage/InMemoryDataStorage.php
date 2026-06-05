@@ -9,7 +9,7 @@
 
 namespace features\storage {
 
-    use features\ds\map\WritableMap;
+    use features\ds\map\WriteMap;
     use features\storage\StorageInterface;
 
     final class InMemoryDataStorage implements StorageInterface
@@ -18,12 +18,12 @@ namespace features\storage {
         /**
          * In‑memory collection of named containers.
          *
-         * Each entry is a WritableMap instance representing a
+         * Each entry is a WriteMap instance representing a
          * logical cache bucket (e.g., cart, wishlist, comparison).
          * These are lazily initialized and persisted to storage
          * when close() is invoked.
          *
-         * @var array<string, WritableMap>
+         * @var array<string, WriteMap>
          */
         private array $carts = [];
 
@@ -49,10 +49,10 @@ namespace features\storage {
             return isset($this->carts[$this->prefix][$cartName]);
         }
 
-        public function container(string $cartName): WritableMap
+        public function container(string $cartName): WriteMap
         {
             if (!isset($this->carts[$this->prefix][$cartName])) {
-                $this->carts[$this->prefix][$cartName] = new WritableMap();
+                $this->carts[$this->prefix][$cartName] = new WriteMap();
             }
             return $this->carts[$this->prefix][$cartName];
         }

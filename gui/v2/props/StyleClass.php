@@ -9,9 +9,9 @@
 
 namespace gui\v2\props {
 
-    use features\ds\set\WritableSet;
+    use features\ds\set\WriteSet;
 
-    final class StyleClass extends WritableSet
+    final class StyleClass extends WriteSet
     {
 
         /**

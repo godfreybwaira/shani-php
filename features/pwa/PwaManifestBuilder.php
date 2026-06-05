@@ -15,7 +15,7 @@ namespace features\pwa {
     use features\pwa\enums\PwaFormFactor;
     use features\pwa\enums\PwaOrientation;
     use features\pwa\enums\PwaTextDirection;
-    use features\ds\map\ReadableMap;
+    use features\ds\map\ReadMap;
     use features\utils\MediaType;
     use features\utils\URI;
 
@@ -234,14 +234,14 @@ namespace features\pwa {
         }
 
         /**
-         * Filters the data and returns a ReadableMap for final JSON encoding.
+         * Filters the data and returns a ReadMap for final JSON encoding.
          * * Removes null/empty values to keep the manifest file concise while
          * preserving valid falsy values (like false or 0).
          */
-        public function build(): ReadableMap
+        public function build(): ReadMap
         {
             $data = array_filter($this->data, fn($value) => $value !== null && $value !== []);
-            return new ReadableMap($data);
+            return new ReadMap($data);
         }
     }
 
