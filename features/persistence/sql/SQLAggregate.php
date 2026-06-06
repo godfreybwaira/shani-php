@@ -140,7 +140,7 @@ namespace features\persistence\sql {
          *
          * @return GroupClause Aggregate clause object.
          */
-        public function count(string $columnName, ?FilterClause $where = null): GroupClause
+        public function countOf(string $columnName, ?FilterClause $where = null): GroupClause
         {
             return new SQLClause('COUNT', $this, $columnName, $where);
         }

@@ -139,10 +139,11 @@ namespace features\persistence {
         public function getValuePair(): array;
 
         /**
-         * Get a filter type
+         * Set a filter type
+         * @param FilterType $type Filter type
          * @return FilterType
          */
-        public function getFilterType(): FilterType;
+        public function setFilterType(FilterType $type): FilterClause;
     }
 
 }

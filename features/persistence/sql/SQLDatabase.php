@@ -133,7 +133,7 @@ namespace features\persistence\sql {
             return $this->endTransaction($result);
         }
 
-        public function query(string $query, array $params = []): \Generator
+        public function query(string $query, ?array $params = []): \Generator
         {
             $statement = $this->processQuery($query, $params);
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -145,7 +145,7 @@ namespace features\persistence\sql {
             $statement->closeCursor();
         }
 
-        public function queryAll(string $query, array $params = []): array
+        public function queryAll(string $query, ?array $params = []): array
         {
             $results = [];
             $statement = $this->processQuery($query, $params);
@@ -159,7 +159,7 @@ namespace features\persistence\sql {
             return $results;
         }
 
-        public function run(string $query, array $params = []): int
+        public function run(string $query, ?array $params = []): int
         {
             $statement = $this->processQuery($query, $params);
             $statement->closeCursor();

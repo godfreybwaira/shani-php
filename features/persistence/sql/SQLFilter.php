@@ -17,11 +17,13 @@ namespace features\persistence\sql {
 
         private array $conditions = [];
         private array $valuePairs = [];
-        private readonly FilterType $filter;
+        private readonly string $suffix;
+        private FilterType $filter;
 
-        public function __construct(FilterType $filter = null)
+        public function __construct()
         {
-            $this->filter = $filter ?? FilterType::WHERE;
+            $this->filter = FilterType::WHERE;
+            $this->suffix = substr($this->filter->name, 0, 1);
         }
 
         public function eq(string $column, mixed $value): FilterClause
@@ -101,12 +103,12 @@ namespace features\persistence\sql {
             $parts = [];
             foreach ($this->valuePairs as $column => [$operator, $value]) {
                 if ($operator === 'IN' || $operator === 'NOT IN') {
-                    $placeholders = implode(',', array_map(fn($k) => ":{$column}_$k", array_keys($value)));
+                    $placeholders = implode(',', array_map(fn($k) => ":{$column}_$k{$this->suffix}", array_keys($value)));
                     $parts[] = "$column $operator($placeholders)";
                 } elseif ($operator === 'BETWEEN' || $operator === 'NOT BETWEEN') {
-                    $parts[] = "$column $operator :{$column}_0 AND :{$column}_1";
+                    $parts[] = "$column $operator :{$column}_0{$this->suffix} AND :{$column}_1{$this->suffix}";
                 } else {
-                    $parts[] = "$column $operator :" . $column;
+                    $parts[] = "$column $operator :$column";
                 }
             }
             $str = implode(' AND ', $parts);
@@ -127,7 +129,7 @@ namespace features\persistence\sql {
             foreach ($this->valuePairs as $column => [$operator, $value]) {
                 if (is_array($value)) {
                     foreach ($value as $k => $v) {
-                        $pairs["{$column}_$k"] = $v;
+                        $pairs["{$column}_$k{$this->suffix}"] = $v;
                     }
                 } else {
                     $pairs[$column] = $value;
@@ -136,9 +138,10 @@ namespace features\persistence\sql {
             return $pairs;
         }
 
-        public function getFilterType(): FilterType
+        public function setFilterType(FilterType $type): FilterClause
         {
-            return $this->filter;
+            $this->filter = $type;
+            return $this;
         }
     }
 

@@ -10,6 +10,7 @@
 namespace features\persistence\sql {
 
     use features\persistence\FilterClause;
+    use features\persistence\FilterType;
     use features\persistence\GroupClause;
 
     /**
@@ -120,9 +121,10 @@ namespace features\persistence\sql {
             if (empty($this->groups)) {
                 throw new \RuntimeException('Group-by clause is empty.');
             }
+            $having->setFilterType(FilterType::HAVING);
             $values = array_keys($having->getValuePair());
             foreach ($values as $column) {
-                if (!isset($this->groups[$column])) {
+                if (!array_key_exists($column, $this->groups)) {
                     throw new \RuntimeException('Column "' . $column . '" is not in group-by clause.');
                 }
             }
@@ -137,7 +139,9 @@ namespace features\persistence\sql {
          */
         public function run(): array
         {
-            return $this->aggregate->db->query($this, $this->where?->getValuePair() ?? []);
+            $whereParams = $this->where?->getValuePair() ?? [];
+            $havingParams = $this->having?->getValuePair() ?? [];
+            return $this->aggregate->db->queryAll($this, array_merge($whereParams, $havingParams));
         }
 
         /**

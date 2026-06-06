@@ -31,6 +31,16 @@ namespace shani\http {
             $this->writer = $writer;
         }
 
+        private function collection(array $contents, string $subtype): void
+        {
+            $this->app->response->setStatus(HttpStatus::OK);
+            $this->writer->sendHeaders($this->app->response);
+            foreach ($contents as $output) {
+                $this->decisionTree($output, $subtype);
+                $this->writer->sendBody($this->app->response);
+            }
+        }
+
         private function stream(\Closure $callback, string $subtype): void
         {
             $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
@@ -165,6 +175,9 @@ namespace shani\http {
                 return false;
             } elseif ($content instanceof \Closure) {
                 $this->stream($content, $subtype);
+                return false;
+            } elseif (is_array($content)) {
+                $this->collection($content, $subtype);
                 return false;
             }
             return true;

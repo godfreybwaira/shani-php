@@ -20,7 +20,7 @@ namespace features\persistence {
 
         public function minOf(string $columnName, ?FilterClause $where = null): GroupClause;
 
-        public function count(string $columnName, ?FilterClause $where = null): GroupClause;
+        public function countOf(string $columnName, ?FilterClause $where = null): GroupClause;
     }
 
 }

@@ -61,29 +61,29 @@ namespace features\persistence {
          * Execute SQL query and fetch all rows (if available). This method is memory
          * efficient as it fetches rows on demand
          * @param string $query A query to execute
-         * @param array $params Query parameters (key => value pair)
+         * @param array|null $params Query parameters (key => value pair)
          * @return \Generator Iterable object of ReadMap contains rows returned as the result of SQL query.
          * @see self::findAll
          */
-        public function query(string $query, array $params = []): \Generator;
+        public function query(string $query, ?array $params = []): \Generator;
 
         /**
          * Execute query and returns all rows (if available) found. For a large data set
          * use <code>query</code> for efficiency.
          * @param string $query A query to execute
-         * @param array $params Query parameters (key => value pair)
+         * @param array|null $params Query parameters (key => value pair)
          * @return array Rows of ReadMap object returned as the result of the query.
          * @see self::generateAll
          */
-        public function queryAll(string $query, array $params = []): array;
+        public function queryAll(string $query, ?array $params = []): array;
 
         /**
          * Execute a query and return number of rows affected.
          * @param string $query A query to execute
-         * @param array $params Query parameters (key => value pair)
+         * @param array|null $params Query parameters (key => value pair)
          * @return int Number of rows affected
          */
-        public function run(string $query, array $params = []): int;
+        public function run(string $query, ?array $params = []): int;
 
         /**
          * Find documents/records
