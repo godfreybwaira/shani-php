@@ -26,6 +26,18 @@ namespace features\persistence\sql {
             $this->suffix = substr($this->filter->name, 0, 1);
         }
 
+        public function like(string $column, mixed $value): FilterClause
+        {
+            $this->valuePairs[$column] = ['LIKE', $value];
+            return $this;
+        }
+
+        public function notLike(string $column, mixed $value): FilterClause
+        {
+            $this->valuePairs[$column] = ['NOT LIKE', $value];
+            return $this;
+        }
+
         public function eq(string $column, mixed $value): FilterClause
         {
             $this->valuePairs[$column] = ['=', $value];
@@ -131,6 +143,8 @@ namespace features\persistence\sql {
                     foreach ($value as $k => $v) {
                         $pairs["{$column}_$k{$this->suffix}"] = $v;
                     }
+                } elseif ($operator === 'LIKE' || $operator === 'NOT LIKE') {
+                    $pairs[$column] = "%{$value}%";
                 } else {
                     $pairs[$column] = $value;
                 }

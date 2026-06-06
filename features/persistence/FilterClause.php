@@ -25,6 +25,24 @@ namespace features\persistence {
     {
 
         /**
+         * Add a LIKE operator condition (column LIKE %value%).
+         *
+         * @param string $column Column name.
+         * @param mixed  $value  Value to compare.
+         * @return FilterClause Fluent interface.
+         */
+        public function like(string $column, mixed $value): FilterClause;
+
+        /**
+         * Add a NOT LIKE operator condition (column NOT LIKE %value%).
+         *
+         * @param string $column Column name.
+         * @param mixed  $value  Value to compare.
+         * @return FilterClause Fluent interface.
+         */
+        public function notLike(string $column, mixed $value): FilterClause;
+
+        /**
          * Add an equality condition (column = value).
          *
          * @param string $column Column name.

@@ -28,9 +28,9 @@ namespace shani\http {
          * - FileOutputStream: A stream for file output
          * - string: A plain string response body
          *
-         * @var \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string|array
+         * @var \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string
          */
-        public readonly \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string|array $body;
+        public readonly \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body;
 
         /**
          * The HTTP connection associated with this response.
@@ -50,14 +50,14 @@ namespace shani\http {
         /**
          * Constructs a HttpResponse::withBody instance.
          *
-         * @param \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string|array $body
+         * @param \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body
          *        The response body, which may be a closure, JSON-serializable object,
          *        web UI builder, file output stream, or string.
          * @param HttpConnection|null $connection
          *        The HTTP connection. If null, defaults to HttpConnection::AUTO.
          */
         public static function withBody(
-                \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string|array $body,
+                \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body,
                 HttpConnection $connection = null): HttpResponse
         {
             return new HttpResponse($body, $connection ?? HttpConnection::AUTO);
