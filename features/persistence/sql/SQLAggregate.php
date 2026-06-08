@@ -9,9 +9,9 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\AggregateInterface;
-    use features\persistence\FilterClause;
-    use features\persistence\GroupClause;
+    use features\persistence\DBAggregateInterface;
+    use features\persistence\DBFilterInterface;
+    use features\persistence\DBResultGroupInterface;
 
     /**
      * SQLAggregate
@@ -22,7 +22,7 @@ namespace features\persistence\sql {
      * @author goddy
      * * @since  Jun 5, 2026
      */
-    final class SQLAggregate implements AggregateInterface
+    final class SQLAggregate implements DBAggregateInterface
     {
 
         /**
@@ -31,9 +31,9 @@ namespace features\persistence\sql {
         public readonly string $tableName;
 
         /**
-         * @var SQLDatabase $db Reference to the SQLDatabase instance.
+         * @var SQLQuery $db Reference to the SQLDatabase instance.
          */
-        public readonly SQLDatabase $db;
+        public readonly SQLQuery $db;
 
         /**
          * @var array<string,self> $tables Cached instances of SQLAggregate per table.
@@ -43,10 +43,10 @@ namespace features\persistence\sql {
         /**
          * Private constructor to enforce singleton per table.
          *
-         * @param SQLDatabase $db        Database connection instance.
+         * @param SQLQuery $db        Database connection instance.
          * @param string      $tableName Name of the table to aggregate.
          */
-        private function __construct(SQLDatabase $db, string $tableName)
+        private function __construct(SQLQuery $db, string $tableName)
         {
             $this->tableName = $tableName;
             $this->db = $db;
@@ -55,12 +55,12 @@ namespace features\persistence\sql {
         /**
          * Get or create a SQLAggregate instance for a given table.
          *
-         * @param SQLDatabase $db        Database connection instance.
+         * @param SQLQuery $db        Database connection instance.
          * @param string      $tableName Name of the table to aggregate.
          *
          * @return self Singleton instance bound to the specified table.
          */
-        public static function getInstance(SQLDatabase $db, string $tableName): self
+        public static function getInstance(SQLQuery $db, string $tableName): self
         {
             if (!isset(self::$tables[$tableName])) {
                 self::$tables[$tableName] = new self($db, $tableName);
@@ -68,81 +68,29 @@ namespace features\persistence\sql {
             return self::$tables[$tableName];
         }
 
-        /**
-         * Build a WHERE clause string from parameters.
-         *
-         * @param array<string,mixed> $params Key-value pairs for filtering.
-         *
-         * @return string|null SQL WHERE clause or null if no params.
-         */
-        private static function getWhereClause(array $params): ?string
+        public function avgOf(string $columnName, string $displayName = null): DBResultGroupInterface
         {
-            return SQLDatabase::createClause($params, 'WHERE', ' AND ');
+            return new SQLResultGroup('AVG', $this, $columnName, $displayName);
         }
 
-        /**
-         * Create an AVG aggregate clause.
-         *
-         * @param string              $columnName Column to average.
-         * @param FilterClause|null $where      Optional filters.
-         *
-         * @return GroupClause Aggregate clause object.
-         */
-        public function avgOf(string $columnName, ?FilterClause $where = null): GroupClause
+        public function maxOf(string $columnName, string $displayName = null): DBResultGroupInterface
         {
-            return new SQLClause('AVG', $this, $columnName, $where);
+            return new SQLResultGroup('MAX', $this, $columnName, $displayName);
         }
 
-        /**
-         * Create a MAX aggregate clause.
-         *
-         * @param string              $columnName Column to find maximum.
-         * @param FilterClause|null $where      Optional filters.
-         *
-         * @return GroupClause Aggregate clause object.
-         */
-        public function maxOf(string $columnName, ?FilterClause $where = null): GroupClause
+        public function minOf(string $columnName, string $displayName = null): DBResultGroupInterface
         {
-            return new SQLClause('MAX', $this, $columnName, $where);
+            return new SQLResultGroup('MIN', $this, $columnName, $displayName);
         }
 
-        /**
-         * Create a MIN aggregate clause.
-         *
-         * @param string              $columnName Column to find minimum.
-         * @param FilterClause|null $where      Optional filters.
-         *
-         * @return GroupClause Aggregate clause object.
-         */
-        public function minOf(string $columnName, ?FilterClause $where = null): GroupClause
+        public function sumOf(string $columnName, string $displayName = null): DBResultGroupInterface
         {
-            return new SQLClause('MIN', $this, $columnName, $where);
+            return new SQLResultGroup('SUM', $this, $columnName, $displayName);
         }
 
-        /**
-         * Create a SUM aggregate clause.
-         *
-         * @param string              $columnName Column to sum.
-         * @param FilterClause|null $where      Optional filters.
-         *
-         * @return GroupClause Aggregate clause object.
-         */
-        public function sumOf(string $columnName, ?FilterClause $where = null): GroupClause
+        public function countOf(string $columnName, string $displayName = null): DBResultGroupInterface
         {
-            return new SQLClause('SUM', $this, $columnName, $where);
-        }
-
-        /**
-         * Create a COUNT aggregate clause.
-         *
-         * @param string              $columnName Column to count.
-         * @param FilterClause|null $where      Optional filters.
-         *
-         * @return GroupClause Aggregate clause object.
-         */
-        public function countOf(string $columnName, ?FilterClause $where = null): GroupClause
-        {
-            return new SQLClause('COUNT', $this, $columnName, $where);
+            return new SQLResultGroup('COUNT', $this, $columnName, $displayName);
         }
     }
 

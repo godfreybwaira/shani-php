@@ -15,7 +15,7 @@ namespace shani\contracts {
     use features\logging\LoggingLevel;
     use features\middleware\MiddlewareHandlerInterface;
     use features\oauth2\Oauth2Repository;
-    use features\persistence\DatabaseInterface;
+    use features\persistence\DBInterface;
     use features\storage\LocalStorage;
     use features\storage\StorageMediaInterface;
     use shani\config\AppConfig;
@@ -282,9 +282,9 @@ namespace shani\contracts {
         /**
          * Get database connection object.
          *
-         * @return DatabaseInterface|null Database object or null
+         * @return DBInterface|null Database object or null
          */
-        public function getDatabase(): ?DatabaseInterface
+        public function getDatabase(): ?DBInterface
         {
             return null;
         }

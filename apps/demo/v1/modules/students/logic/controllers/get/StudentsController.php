@@ -42,10 +42,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             return HttpResponse::withBody('Cart is empty. Come back next time.');
         }
 
-        /**
-         * My good function.
-         * Returns nothing
-         */
         public function one(): ?HttpResponse
         {
             $id = (int) $this->app->request->params(3);

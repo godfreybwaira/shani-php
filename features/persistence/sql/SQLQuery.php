@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SQLDatabase
+ * Description of SQLQuery
  *
  * @author coder
  */
@@ -9,18 +9,18 @@
 namespace features\persistence\sql {
 
     use features\ds\map\ReadMap;
-    use features\persistence\AggregateInterface;
-    use features\persistence\DatabaseDriver;
-    use features\persistence\DatabaseInterface;
-    use features\persistence\FilterClause;
+    use features\persistence\DBAggregateInterface;
+    use features\persistence\DBDriver;
+    use features\persistence\DBInterface;
+    use features\persistence\DBFilterInterface;
 
-    final class SQLDatabase implements DatabaseInterface
+    final class SQLQuery implements DBInterface
     {
 
         public readonly \PDO $pdo;
         private bool $escape = true;
 
-        public function __construct(DatabaseDriver $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
+        public function __construct(DBDriver $driver, string $database, string $host = null, ?int $port = null, ?string $username = null, ?string $password = null)
         {
             $connectionString = self::getConnectionString($driver, $database, $host, $port);
             $this->pdo = new \PDO($connectionString, $username, $password);
@@ -37,18 +37,18 @@ namespace features\persistence\sql {
             }
         }
 
-        private static function getConnectionString(DatabaseDriver $driver, string $database, ?string $host, ?int $port): string
+        private static function getConnectionString(DBDriver $driver, string $database, ?string $host, ?int $port): string
         {
             return match ($driver) {
-                DatabaseDriver::MYSQL,
-                DatabaseDriver::POSTGRES,
-                DatabaseDriver::SYBASE,
-                DatabaseDriver::DBLIB,
-                DatabaseDriver::MSSQL => $driver->value . ':host=' . $host . ':' . $port . ';dbname=' . $database,
-                DatabaseDriver::ORACLE => $driver->value . ':dbname=//' . $host . ':' . $port . '/' . $database,
-                DatabaseDriver::SQLITE => $driver->value . ':' . $database,
-                DatabaseDriver::SQL_SERVER => $driver->value . ':Server=' . $host . ',' . $port . ';Database=' . $database,
-                DatabaseDriver::ODBC => $driver->value . ':Driver=FreeTDS;Server=' . $host . ',' . $port . ';Database=' . $database
+                DBDriver::MYSQL,
+                DBDriver::POSTGRES,
+                DBDriver::SYBASE,
+                DBDriver::DBLIB,
+                DBDriver::MSSQL => $driver->value . ':host=' . $host . ':' . $port . ';dbname=' . $database,
+                DBDriver::ORACLE => $driver->value . ':dbname=//' . $host . ':' . $port . '/' . $database,
+                DBDriver::SQLITE => $driver->value . ':' . $database,
+                DBDriver::SQL_SERVER => $driver->value . ':Server=' . $host . ',' . $port . ';Database=' . $database,
+                DBDriver::ODBC => $driver->value . ':Driver=FreeTDS;Server=' . $host . ',' . $port . ';Database=' . $database
             };
         }
 
@@ -86,16 +86,16 @@ namespace features\persistence\sql {
             $this->pdo->rollBack();
         }
 
-        public function delete(string $collection, FilterClause $where, ?int $limit = null): int
+        public function delete(string $collection, DBFilterInterface $where, ?int $limit = null): int
         {
             $sql = 'DELETE FROM ' . $collection . $where;
             if (!empty($limit)) {
                 $sql .= ' LIMIT ' . $limit;
             }
-            return $this->run($sql, $where?->getValuePair());
+            return $this->run($sql, $where?->getBindings());
         }
 
-        public function escapeHtml(bool $escape): DatabaseInterface
+        public function escapeHtml(bool $escape): DBInterface
         {
             $this->escape = $escape;
             return $this;
@@ -166,16 +166,16 @@ namespace features\persistence\sql {
             return $statement->rowCount();
         }
 
-        public function find(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): \Generator
+        public function find(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): \Generator
         {
             $sql = 'SELECT * FROM ' . $collection . $where;
             if (!empty($limit)) {
                 $sql .= ' LIMIT ' . $limit . ' OFFSET ' . $skip;
             }
-            return $this->query($sql, $where?->getValuePair());
+            return $this->query($sql, $where?->getBindings());
         }
 
-        public function findAll(string $collection, ?FilterClause $where = null, ?int $limit = null, int $skip = 0): array
+        public function findAll(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): array
         {
             $rows = [];
             $results = $this->find($collection, $where, $limit, $skip);
@@ -185,7 +185,7 @@ namespace features\persistence\sql {
             return $rows;
         }
 
-        public function findOne(string $collection, ?FilterClause $where = null): ?ReadMap
+        public function findOne(string $collection, ?DBFilterInterface $where = null): ?ReadMap
         {
             foreach ($this->find($collection, $where, limit: 1) as $row) {
                 return $row;
@@ -193,17 +193,17 @@ namespace features\persistence\sql {
             return null;
         }
 
-        public function update(string $collection, \JsonSerializable $object, ?FilterClause $where = null, ?int $limit = null): int
+        public function update(string $collection, \JsonSerializable $object, ?DBFilterInterface $where = null, ?int $limit = null): int
         {
             $data = $object->jsonSerialize();
             if (empty($data)) {
                 return 0;
             }
             $setPrefix = 's_';
-            $set = SQLClause::createClause($data, 'SET', ',', $setPrefix);
+            $set = SQLResultGroup::createClause($data, 'SET', ',', $setPrefix);
             $sql = 'UPDATE ' . $collection . $set . $where;
             $filters = [];
-            $values = $where?->getValuePair() ?? [];
+            $values = $where?->getBindings() ?? [];
             foreach ($values as $key => $value) {
                 $filters[$key] = $value;
             }
@@ -216,14 +216,14 @@ namespace features\persistence\sql {
             return $this->run($sql, $filters);
         }
 
-        public function exists(string $collection, ?FilterClause $where = null): bool
+        public function exists(string $collection, ?DBFilterInterface $where = null): bool
         {
             $sql = 'SELECT 1 FROM ' . $collection . $where . ' LIMIT 1';
-            $statement = $this->processQuery($sql, $where?->getValuePair());
+            $statement = $this->processQuery($sql, $where?->getBindings());
             return (bool) $statement->fetchColumn();
         }
 
-        public function aggregate(string $collection): AggregateInterface
+        public function aggregate(string $collection): DBAggregateInterface
         {
             return SQLAggregate::getInstance($this, $collection);
         }

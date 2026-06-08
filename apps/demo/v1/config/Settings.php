@@ -11,9 +11,9 @@ namespace apps\demo\v1\config {
 
     use features\assets\StaticAssetServers;
     use features\oauth2\Oauth2Repository;
-    use features\persistence\DatabaseDriver;
-    use features\persistence\DatabaseInterface;
-    use features\persistence\sql\SQLDatabase;
+    use features\persistence\DBDriver;
+    use features\persistence\DBInterface;
+    use features\persistence\sql\SQLQuery;
     use shani\config\AuthenticationConfig;
     use shani\config\CsrfConfig;
     use shani\config\PathConfig;
@@ -58,9 +58,9 @@ namespace apps\demo\v1\config {
             return [];
         }
 
-        public function getDatabase(): ?DatabaseInterface
+        public function getDatabase(): ?DBInterface
         {
-            return new SQLDatabase(DatabaseDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
+            return new SQLQuery(DBDriver::MYSQL, 'test', 'localhost', 3306, 'testuser', 'test123');
         }
 
         public function getOauth2Repository(): Oauth2Repository

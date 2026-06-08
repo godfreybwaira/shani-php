@@ -9,7 +9,7 @@
 
 namespace features\persistence {
 
-    enum DatabaseDriver: string
+    enum DBDriver: string
     {
 
         /**

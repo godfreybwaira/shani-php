@@ -9,125 +9,142 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\FilterClause;
-    use features\persistence\FilterType;
+    use features\persistence\DBDatePartInterface;
+    use features\persistence\DBFilterInterface;
+    use features\persistence\DBFilterType;
 
-    final class SQLFilter implements FilterClause
+    final class SQLFilter implements DBFilterInterface
     {
 
-        private array $conditions = [];
-        private array $valuePairs = [];
-        private readonly string $suffix;
-        private FilterType $filter;
+        private array $clauses = [];
+        private array $bindings = [];
+        private readonly string $prefix;
+        private DBFilterType $filter;
+        private int $counter = 0;
 
         public function __construct()
         {
-            $this->filter = FilterType::WHERE;
-            $this->suffix = substr($this->filter->name, 0, 1);
+            $this->filter = DBFilterType::WHERE;
+            $this->prefix = substr($this->filter->name, 0, 1);
         }
 
-        public function like(string $column, mixed $value): FilterClause
+        private static function getAlias($column): string
         {
-            $this->valuePairs[$column] = ['LIKE', $value];
+            return $column instanceof DBDatePartInterface ? $column->getColumnName() : $column;
+        }
+
+        public function like(string $column, mixed $value): DBFilterInterface
+        {
+            $this->clauses[$column] = 'LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function notLike(string $column, mixed $value): FilterClause
+        public function notLike(string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['NOT LIKE', $value];
+            $this->clauses[$column] = 'NOT LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function eq(string $column, mixed $value): FilterClause
+        public function eq(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['=', $value];
+            $this->clauses[(string) $column] = '= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function neq(string $column, mixed $value): FilterClause
+        public function neq(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['<>', $value];
+            $this->clauses[(string) $column] = '<> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gt(string $column, mixed $value): FilterClause
+        public function gt(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['>', $value];
+            $this->clauses[(string) $column] = '> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gte(string $column, mixed $value): FilterClause
+        public function gte(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['>=', $value];
+            $this->clauses[(string) $column] = '>= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lt(string $column, mixed $value): FilterClause
+        public function lt(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['<', $value];
+            $this->clauses[(string) $column] = '< ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lte(string $column, mixed $value): FilterClause
+        public function lte(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['<=', $value];
+            $this->clauses[(string) $column] = '<= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function btw(string $column, mixed $start, mixed $end): FilterClause
+        public function btw(DBDatePartInterface|string $column, mixed $start, mixed $end): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['BETWEEN', [$start, $end]];
+            $this->clauses[(string) $column] = 'BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function notBtw(string $column, mixed $start, mixed $end): FilterClause
+        public function notBtw(DBDatePartInterface|string $column, mixed $start, mixed $end): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['NOT BETWEEN', [$start, $end]];
+            $this->clauses[(string) $column] = 'NOT BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function in(string $column, array $values): FilterClause
+        public function in(DBDatePartInterface|string $column, array $values): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['IN', $values];
+            $this->clauses[(string) $column] = 'IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function notIn(string $column, array $values): FilterClause
+        public function notIn(DBDatePartInterface|string $column, array $values): DBFilterInterface
         {
-            $this->valuePairs[$column] = ['NOT IN', $values];
+            $this->clauses[(string) $column] = 'NOT IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function or(FilterClause $other): FilterClause
+        public function or(DBFilterInterface $other): DBFilterInterface
         {
-            $this->conditions[] = ['OR', $other];
-            return $this;
+            return $this->join($other, 'OR');
         }
 
-        public function and(FilterClause $other): FilterClause
+        public function and(DBFilterInterface $other): DBFilterInterface
         {
-            $this->conditions[] = ['AND', $other];
-            return $this;
+            return $this->join($other, 'AND');
+        }
+
+        private function join(DBFilterInterface $other, string $connector): DBFilterInterface
+        {
+            $filter = new self();
+            if (!empty($this->clauses)) {
+                $thisSQL = '(' . $this->asString() . ')';
+                $otherSQL = '(' . $other->asString() . ')';
+                $filter->clauses = [$thisSQL . " $connector " . $otherSQL];
+                $filter->bindings = array_merge($this->bindings, $other->getBindings());
+            }
+            return $filter;
+        }
+
+        private function bindValue(mixed $value): string
+        {
+            $param = $this->prefix . ($this->counter++);
+            $this->bindings[$param] = $value;
+            return ':' . $param;
         }
 
         private function asString(): string
         {
             $parts = [];
-            foreach ($this->valuePairs as $column => [$operator, $value]) {
-                if ($operator === 'IN' || $operator === 'NOT IN') {
-                    $placeholders = implode(',', array_map(fn($k) => ":{$column}_$k{$this->suffix}", array_keys($value)));
-                    $parts[] = "$column $operator($placeholders)";
-                } elseif ($operator === 'BETWEEN' || $operator === 'NOT BETWEEN') {
-                    $parts[] = "$column $operator :{$column}_0{$this->suffix} AND :{$column}_1{$this->suffix}";
+            foreach ($this->clauses as $column => $value) {
+                if (is_int($column)) {
+                    $parts[] = $value;
                 } else {
-                    $parts[] = "$column $operator :$column";
+                    $parts[] = $column . ' ' . $value;
                 }
             }
-            $str = implode(' AND ', $parts);
-            foreach ($this->conditions as [$operator, $filter]) {
-                $str = "($str) $operator (" . $filter->asString() . ')';
-            }
-            return $str;
+            return implode(' AND ', $parts);
         }
 
         public function __toString(): string
@@ -135,24 +152,12 @@ namespace features\persistence\sql {
             return ' ' . $this->filter->name . ' ' . $this->asString();
         }
 
-        public function getValuePair(): array
+        public function getBindings(): array
         {
-            $pairs = [];
-            foreach ($this->valuePairs as $column => [$operator, $value]) {
-                if (is_array($value)) {
-                    foreach ($value as $k => $v) {
-                        $pairs["{$column}_$k{$this->suffix}"] = $v;
-                    }
-                } elseif ($operator === 'LIKE' || $operator === 'NOT LIKE') {
-                    $pairs[$column] = "%{$value}%";
-                } else {
-                    $pairs[$column] = $value;
-                }
-            }
-            return $pairs;
+            return $this->bindings;
         }
 
-        public function setFilterType(FilterType $type): FilterClause
+        public function setFilterType(DBFilterType $type): DBFilterInterface
         {
             $this->filter = $type;
             return $this;
