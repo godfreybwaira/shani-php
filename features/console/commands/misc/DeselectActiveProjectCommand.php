@@ -21,7 +21,7 @@ namespace features\console\commands\misc {
         {
             parent::__construct(
                     $registry,
-                    'deselect',
+                    'deselect:project',
                     null,
                     'Unset the current active project, project version, and project module',
                     null

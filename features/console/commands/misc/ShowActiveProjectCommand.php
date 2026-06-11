@@ -26,7 +26,7 @@ namespace features\console\commands\misc {
         {
             parent::__construct(
                     $registry,
-                    'show:select',
+                    'show:project',
                     null,
                     'Show the selected working project, optional version number, and optional module name',
                     null

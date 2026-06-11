@@ -36,7 +36,7 @@ namespace features\console {
         public function __construct()
         {
             $selector = SelectedProjectResource::getInstance();
-            $this->ctName = $selector->projectName;
+            $this->projectName = $selector->projectName;
             $this->versionNumber = $selector->versionNumber;
             $this->moduleName = $selector->moduleName;
             $this->selected = $selector->projectName !== null;
