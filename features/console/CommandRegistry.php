@@ -139,6 +139,9 @@ namespace features\console {
             yield new commands\misc\StartServerCommand($this);
             yield new commands\misc\DeleteCacheCommand($this);
             yield new commands\misc\HelpCommand($this);
+            yield new commands\misc\SelectActiveProjectCommand($this);
+            yield new commands\misc\ShowActiveProjectCommand($this);
+            yield new commands\misc\DeselectActiveProjectCommand($this);
         }
 
         /**

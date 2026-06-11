@@ -60,10 +60,10 @@ namespace features\console\commands\version {
         {
             $project = ProjectBuilder::fromName($this->projectName);
             $versions = $project->getVersions();
-            $this->registry->addResult(Formatter::formatSentence('#. PROJECT', 'STATUS', separator: ' '));
+            $this->registry->addResult(Formatter::formatSentence('#. PROJECT[ version ]', 'STATUS', separator: ' '));
             foreach ($versions as $key => $version) {
                 $status = $version->configExists() ? 'OK' : 'No config file';
-                $message = ($key + 1) . '. ' . $this->projectName . '[' . $version->versionNumber . ']';
+                $message = ($key + 1) . '. ' . $this->projectName . '[ ' . $version->versionNumber . ' ]';
                 $this->registry->addResult(Formatter::formatSentence($message, $status));
             }
         }

@@ -86,6 +86,13 @@ namespace features\console\commands\dto {
             $dto->build(fn($s) => $this->registry->addResult($s));
         }
 
+        private function initializeFromSelector(ResourceSelector $selector): void
+        {
+            $this->projectName = $selector->selectProject();
+            $this->versionNumber = $selector->selectProjectVersion();
+            $this->moduleName = $selector->selectModule();
+        }
+
         /**
          * Parses command arguments or prompts the user interactively.
          *
@@ -102,21 +109,26 @@ namespace features\console\commands\dto {
          */
         public function parse(string ...$args): ?string
         {
+            $selector = new ResourceSelector();
             if (empty($args)) {
-                $selector = new ResourceSelector();
-                $this->projectName = $selector->selectProject();
-                $this->versionNumber = $selector->selectProjectVersion();
-                $this->moduleName = $selector->selectModule();
+                $this->initializeFromSelector($selector);
                 $this->dtoName = ModuleName::create(ConsoleIO::read('Enter the DTO name:', $this->validIdentifier))->className;
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
-                if (count($values) < 4) {
+                if (count($values) === 1) {
+                    if (!$selector->wasSelected()) {
+                        throw new \ArgumentCountError('No selected resource available.');
+                    }
+                    $this->initializeFromSelector($selector);
+                    $this->dtoName = ModuleName::create($values[0])->className;
+                } else if (count($values) >= 4) {
+                    $this->projectName = ResourceName::create($values[0])->shortName;
+                    $this->versionNumber = ResourceName::create($values[1])->shortName;
+                    $this->moduleName = ModuleName::create($values[2]);
+                    $this->dtoName = ModuleName::create($values[3])->className;
+                } else {
                     throw new \ArgumentCountError('At least four arguments are required.');
                 }
-                $this->projectName = ResourceName::create($values[0])->shortName;
-                $this->versionNumber = ResourceName::create($values[1])->shortName;
-                $this->moduleName = ModuleName::create($values[2]);
-                $this->dtoName = ModuleName::create($values[3])->className;
             }
             $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;
             $parameters .= self::SEPARATOR . $this->moduleName->originalValue;

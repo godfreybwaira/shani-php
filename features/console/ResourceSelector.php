@@ -8,6 +8,7 @@ namespace features\console {
     use features\console\builders\ProjectVersionBuilder;
     use features\console\helpers\AsymmetricKeyPairType;
     use features\console\helpers\ModuleName;
+    use features\console\helpers\SelectedProjectResource;
     use features\console\printer\ConsoleIO;
     use features\crypto\CryptoAlgorithm;
     use shani\launcher\Framework;
@@ -24,12 +25,27 @@ namespace features\console {
     final class ResourceSelector
     {
 
-        private readonly ?string $projectName;
-        private readonly ?string $versionNumber;
-        private readonly ?ModuleName $moduleName;
+        private ?string $projectName;
+        private ?string $versionNumber;
+        private ?ModuleName $moduleName;
         private readonly ?string $requestMethod;
         private readonly ?string $hostName;
         private readonly ?string $aliasName;
+        private readonly bool $selected;
+
+        public function __construct()
+        {
+            $selector = SelectedProjectResource::getInstance();
+            $this->ctName = $selector->projectName;
+            $this->versionNumber = $selector->versionNumber;
+            $this->moduleName = $selector->moduleName;
+            $this->selected = $selector->projectName !== null;
+        }
+
+        public function wasSelected(): bool
+        {
+            return $this->selected;
+        }
 
         /**
          * Displays a list of resources and prompts the user to choose one.
@@ -68,6 +84,9 @@ namespace features\console {
          */
         public function selectProject(bool $required = true): ?string
         {
+            if (!empty($this->projectName)) {
+                return $this->projectName;
+            }
             if ($required) {
                 ConsoleIO::output('Select a project:');
             } else {
@@ -147,6 +166,9 @@ namespace features\console {
          */
         public function selectProjectVersion(bool $required = true): ?string
         {
+            if (!empty($this->versionNumber)) {
+                return $this->versionNumber;
+            }
             if ($required) {
                 ConsoleIO::output('Select the project version:');
             } else {
@@ -170,6 +192,9 @@ namespace features\console {
          */
         public function selectModule(bool $required = true): ?ModuleName
         {
+            if (!empty($this->moduleName)) {
+                return $this->moduleName;
+            }
             if ($required) {
                 ConsoleIO::output('Select the module:');
             } else {
