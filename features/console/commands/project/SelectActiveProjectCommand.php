@@ -31,7 +31,7 @@ namespace features\console\commands\project {
                     $registry,
                     'select:project',
                     'project_name[@version_number[@module_name]]',
-                    'Select the current working project, optional version number, and optional module name',
+                    'Select the current active project, optional version number, and optional module name',
                     'blog@v1@posts'
             );
         }

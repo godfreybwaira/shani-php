@@ -28,7 +28,7 @@ namespace features\console\commands\project {
                     $registry,
                     'active:project',
                     null,
-                    'Show the selected working project, optional version number, and optional module name',
+                    'Show the selected active project, optional version number, and optional module name',
                     null
             );
         }
