@@ -14,7 +14,7 @@ namespace features\persistence {
      *
      * @since Apr 18, 2026 at 8:04:10 AM
      */
-    interface DBInterface
+    interface QueryInterface
     {
 
         /**
@@ -40,19 +40,19 @@ namespace features\persistence {
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
          * @param \JsonSerializable $object New data
-         * @param DBFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
          * @return int Number of modified documents
          */
-        public function update(string $collection, \JsonSerializable $object, ?DBFilterInterface $where = null): int;
+        public function update(string $collection, \JsonSerializable $object, ?QueryFilterInterface $where = null): int;
 
         /**
          * Delete documents/records
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param DBFilterInterface $where Query parameters (key => value pair)
+         * @param QueryFilterInterface $where Query parameters (key => value pair)
          * @return int Number of deleted documents
          */
-        public function delete(string $collection, DBFilterInterface $where): int;
+        public function delete(string $collection, QueryFilterInterface $where): int;
 
         /**
          * Execute SQL query and fetch all rows (if available). This method is memory
@@ -65,16 +65,6 @@ namespace features\persistence {
         public function query(string $query, ?array $params = []): \Generator;
 
         /**
-         * Execute query and returns all rows (if available) found. For a large data set
-         * use <code>query</code> for efficiency.
-         * @param string $query A query to execute
-         * @param array|null $params Query parameters (key => value pair)
-         * @return array Rows of ReadMap object returned as the result of the query.
-         * @see self::generateAll
-         */
-        public function queryAll(string $query, ?array $params = []): array;
-
-        /**
          * Execute a query and return number of rows affected.
          * @param string $query A query to execute
          * @param array|null $params Query parameters (key => value pair)
@@ -83,49 +73,39 @@ namespace features\persistence {
         public function run(string $query, ?array $params = []): int;
 
         /**
-         * Find documents/records
+         * Find documents in a given collection with optional filtering, pagination, and limits.
          *
-         * @param string $collection
-         * @param DBFilterInterface|null $where Query parameters (key => value pair)
-         * @param int|null $limit Number of rows to fetch
-         * @param int $skip Number of rows to skip
-         * @return \Generator Generator of results
-         */
-        public function find(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): \Generator;
-
-        /**
-         * Find documents/records
+         * @param string $collection The name of the collection to query.
+         * @param QueryFilterInterface|null $where Optional filter criteria to apply to the query.
+         * @param int|null $limit Optional maximum number of results to return.
+         * @param int $page The page number for paginated results (default is 1).
          *
-         * @param string $collection
-         * @param DBFilterInterface|null $where Query parameters (key => value pair)
-         * @param int|null $limit Number of rows to fetch
-         * @param int $skip Number of rows to skip
-         * @return array Rows of ReadMap object returned as the result of the query.
+         * @return \Generator Yields the matching documents from the collection.
          */
-        public function findAll(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): array;
+        public function find(string $collection, ?QueryFilterInterface $where = null, ?int $limit = null, int $page = 1): \Generator;
 
         /**
          * Execute query and returns a single row.
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param DBFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
          * @return ReadMap|null A single row returned as the result of the query
          * or null if no result found.
          * @see self::findAll
          */
-        public function findOne(string $collection, ?DBFilterInterface $where = null): ?ReadMap;
+        public function findOne(string $collection, ?QueryFilterInterface $where = null): ?ReadMap;
 
         /**
          * Check if at least one record/document exists. More efficient than count() > 0 in many cases
-         * @param DBFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
          */
-        public function exists(string $collection, ?DBFilterInterface $where = null): bool;
+        public function exists(string $collection, ?QueryFilterInterface $where = null): bool;
 
         /**
          * Whether to escape HTML characters on result set or not.
          * @param bool $escape When true, HTML characters will be escaped
-         * @return DBInterface
+         * @return QueryInterface
          */
-        public function escapeHtml(bool $escape): DBInterface;
+        public function escapeHtml(bool $escape): QueryInterface;
 
         /**
          * Start a new transaction
@@ -163,14 +143,14 @@ namespace features\persistence {
          *
          * This method initializes an AggregateInterface instance bound to the
          * specified collection. It allows you to build aggregate queries with
-         * metrics, filters, grouping, rollups, and ordering in a fluent style.
+         * metrics, filters, grouping, and ordering in a fluent style.
          *
          * @param string $collection The name of the collection (e.g., table) to aggregate.
          *
-         * @return DBAggregateInterface Returns an aggregate query builder instance
+         * @return QueryAggregateInterface Returns an aggregate query builder instance
          *                            for chaining aggregate operations.
          */
-        public function aggregate(string $collection): DBAggregateInterface;
+        public function aggregate(string $collection): QueryAggregateInterface;
     }
 
 }

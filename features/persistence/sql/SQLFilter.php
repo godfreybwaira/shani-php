@@ -9,113 +9,113 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\DBDatePartInterface;
-    use features\persistence\DBFilterInterface;
-    use features\persistence\DBFilterType;
+    use features\persistence\QueryDatePartInterface;
+    use features\persistence\QueryFilterInterface;
+    use features\persistence\QueryFilterType;
 
-    final class SQLFilter implements DBFilterInterface
+    final class SQLFilter implements QueryFilterInterface
     {
 
         private array $clauses = [];
         private array $bindings = [];
         private readonly string $prefix;
-        private DBFilterType $filter;
+        private QueryFilterType $filter;
         private int $counter = 0;
 
         public function __construct()
         {
-            $this->filter = DBFilterType::WHERE;
+            $this->filter = QueryFilterType::WHERE;
             $this->prefix = substr($this->filter->name, 0, 1);
         }
 
         private static function getAlias($column): string
         {
-            return $column instanceof DBDatePartInterface ? $column->getColumnName() : $column;
+            return $column instanceof QueryDatePartInterface ? $column->getColumnName() : $column;
         }
 
-        public function like(string $column, mixed $value): DBFilterInterface
+        public function like(string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[$column] = 'LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function notLike(string $column, mixed $value): DBFilterInterface
+        public function notLike(string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[$column] = 'NOT LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function eq(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function eq(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function neq(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function neq(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '<> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gt(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function gt(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gte(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function gte(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '>= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lt(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function lt(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '< ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lte(DBDatePartInterface|string $column, mixed $value): DBFilterInterface
+        public function lte(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
         {
             $this->clauses[(string) $column] = '<= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function btw(DBDatePartInterface|string $column, mixed $start, mixed $end): DBFilterInterface
+        public function btw(QueryDatePartInterface|string $column, mixed $start, mixed $end): QueryFilterInterface
         {
             $this->clauses[(string) $column] = 'BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function notBtw(DBDatePartInterface|string $column, mixed $start, mixed $end): DBFilterInterface
+        public function notBtw(QueryDatePartInterface|string $column, mixed $start, mixed $end): QueryFilterInterface
         {
             $this->clauses[(string) $column] = 'NOT BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function in(DBDatePartInterface|string $column, array $values): DBFilterInterface
+        public function in(QueryDatePartInterface|string $column, array $values): QueryFilterInterface
         {
             $this->clauses[(string) $column] = 'IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function notIn(DBDatePartInterface|string $column, array $values): DBFilterInterface
+        public function notIn(QueryDatePartInterface|string $column, array $values): QueryFilterInterface
         {
             $this->clauses[(string) $column] = 'NOT IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function or(DBFilterInterface $other): DBFilterInterface
+        public function or(QueryFilterInterface $other): QueryFilterInterface
         {
             return $this->join($other, 'OR');
         }
 
-        public function and(DBFilterInterface $other): DBFilterInterface
+        public function and(QueryFilterInterface $other): QueryFilterInterface
         {
             return $this->join($other, 'AND');
         }
 
-        private function join(DBFilterInterface $other, string $connector): DBFilterInterface
+        private function join(QueryFilterInterface $other, string $connector): QueryFilterInterface
         {
             $filter = new self();
             if (!empty($this->clauses)) {
@@ -157,7 +157,7 @@ namespace features\persistence\sql {
             return $this->bindings;
         }
 
-        public function setFilterType(DBFilterType $type): DBFilterInterface
+        public function setFilterType(QueryFilterType $type): QueryFilterInterface
         {
             $this->filter = $type;
             return $this;

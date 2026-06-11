@@ -9,9 +9,9 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\DBDatePartInterface;
+    use features\persistence\QueryDatePartInterface;
 
-    final class SQLDatePart implements DBDatePartInterface
+    final class SQLDatePart implements QueryDatePartInterface
     {
 
         private readonly string $unit;
@@ -33,22 +33,22 @@ namespace features\persistence\sql {
             return $this->columnName;
         }
 
-        public static function getMonth(string $dateColumn): DBDatePartInterface
+        public static function getMonth(string $dateColumn): QueryDatePartInterface
         {
             return new SQLDatePart('MONTH', $dateColumn);
         }
 
-        public static function getQuarter(string $dateColumn): DBDatePartInterface
+        public static function getQuarter(string $dateColumn): QueryDatePartInterface
         {
             return new SQLDatePart('QUARTER', $dateColumn);
         }
 
-        public static function getWeek(string $dateColumn): DBDatePartInterface
+        public static function getWeek(string $dateColumn): QueryDatePartInterface
         {
             return new SQLDatePart('WEEK', $dateColumn);
         }
 
-        public static function getYear(string $dateColumn): DBDatePartInterface
+        public static function getYear(string $dateColumn): QueryDatePartInterface
         {
             return new SQLDatePart('YEAR', $dateColumn);
         }

@@ -9,9 +9,9 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\DBAggregateInterface;
-    use features\persistence\DBFilterInterface;
-    use features\persistence\DBResultGroupInterface;
+    use features\persistence\QueryAggregateInterface;
+    use features\persistence\QueryFilterInterface;
+    use features\persistence\ResultGroupInterface;
 
     /**
      * SQLAggregate
@@ -22,7 +22,7 @@ namespace features\persistence\sql {
      * @author goddy
      * * @since  Jun 5, 2026
      */
-    final class SQLAggregate implements DBAggregateInterface
+    final class SQLAggregate implements QueryAggregateInterface
     {
 
         /**
@@ -68,27 +68,27 @@ namespace features\persistence\sql {
             return self::$tables[$tableName];
         }
 
-        public function avgOf(string $columnName, string $displayName = null): DBResultGroupInterface
+        public function avgOf(string $columnName, string $displayName = null): ResultGroupInterface
         {
             return new SQLResultGroup('AVG', $this, $columnName, $displayName);
         }
 
-        public function maxOf(string $columnName, string $displayName = null): DBResultGroupInterface
+        public function maxOf(string $columnName, string $displayName = null): ResultGroupInterface
         {
             return new SQLResultGroup('MAX', $this, $columnName, $displayName);
         }
 
-        public function minOf(string $columnName, string $displayName = null): DBResultGroupInterface
+        public function minOf(string $columnName, string $displayName = null): ResultGroupInterface
         {
             return new SQLResultGroup('MIN', $this, $columnName, $displayName);
         }
 
-        public function sumOf(string $columnName, string $displayName = null): DBResultGroupInterface
+        public function sumOf(string $columnName, string $displayName = null): ResultGroupInterface
         {
             return new SQLResultGroup('SUM', $this, $columnName, $displayName);
         }
 
-        public function countOf(string $columnName, string $displayName = null): DBResultGroupInterface
+        public function countOf(string $columnName, string $displayName = null): ResultGroupInterface
         {
             return new SQLResultGroup('COUNT', $this, $columnName, $displayName);
         }

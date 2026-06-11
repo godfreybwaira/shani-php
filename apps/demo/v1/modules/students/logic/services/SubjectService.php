@@ -10,20 +10,20 @@
 namespace apps\demo\v1\modules\students\logic\services {
 
     use apps\demo\v1\modules\students\data\entities\SubjectEntity;
-    use features\persistence\DBInterface;
+    use features\persistence\QueryInterface;
 
     final class SubjectService
     {
 
         private static SubjectService $object;
-        private readonly DBInterface $db;
+        private readonly QueryInterface $db;
 
-        private function __construct(DBInterface $database)
+        private function __construct(QueryInterface $database)
         {
             $this->db = $database;
         }
 
-        public static function getObject(DBInterface $database): SubjectService
+        public static function getObject(QueryInterface $database): SubjectService
         {
             if (!isset(self::$object)) {
                 self::$object = new self($database);

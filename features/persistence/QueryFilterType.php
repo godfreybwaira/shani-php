@@ -3,7 +3,7 @@
 namespace features\persistence {
 
     /**
-     * DBFilterType enum
+     * QueryFilterType enum
      *
      * Provides constants for SQL filter clause contexts:
      * - WHERE: Used for filtering rows before grouping.
@@ -12,7 +12,7 @@ namespace features\persistence {
      * @author goddy
      * @since v1.0: Jun 5, 2026 at 10:47:15 PM
      */
-    enum DBFilterType
+    enum QueryFilterType
     {
 
         /**

@@ -10,7 +10,7 @@
 
 namespace features\persistence {
 
-    interface DBDatePartInterface extends \Stringable
+    interface QueryDatePartInterface extends \Stringable
     {
 
         /**
@@ -24,36 +24,36 @@ namespace features\persistence {
          *
          * @param string $dateColumn Date column to extract the year from.
          *
-         * @return DBDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePartInterface Fluent interface for chaining.
          */
-        public static function getYear(string $dateColumn): DBDatePartInterface;
+        public static function getYear(string $dateColumn): QueryDatePartInterface;
 
         /**
          * Extract the quarter from a date column.
          *
          * @param string $dateColumn Date column to extract the quarter from.
          *
-         * @return DBDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePartInterface Fluent interface for chaining.
          */
-        public static function getQuarter(string $dateColumn): DBDatePartInterface;
+        public static function getQuarter(string $dateColumn): QueryDatePartInterface;
 
         /**
          * Extract the month from a date column.
          *
          * @param string $dateColumn Date column to extract the month from.
          *
-         * @return DBDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePartInterface Fluent interface for chaining.
          */
-        public static function getMonth(string $dateColumn): DBDatePartInterface;
+        public static function getMonth(string $dateColumn): QueryDatePartInterface;
 
         /**
          * Extract the week from a date column.
          *
          * @param string $dateColumn Date column to extract the week from.
          *
-         * @return DBDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePartInterface Fluent interface for chaining.
          */
-        public static function getWeek(string $dateColumn): DBDatePartInterface;
+        public static function getWeek(string $dateColumn): QueryDatePartInterface;
     }
 
 }

@@ -9,12 +9,12 @@
 namespace features\persistence\sql {
 
     use features\ds\map\ReadMap;
-    use features\persistence\DBAggregateInterface;
+    use features\persistence\QueryAggregateInterface;
     use features\persistence\DBDriver;
-    use features\persistence\DBInterface;
-    use features\persistence\DBFilterInterface;
+    use features\persistence\QueryInterface;
+    use features\persistence\QueryFilterInterface;
 
-    final class SQLQuery implements DBInterface
+    final class SQLQuery implements QueryInterface
     {
 
         public readonly \PDO $pdo;
@@ -86,7 +86,7 @@ namespace features\persistence\sql {
             $this->pdo->rollBack();
         }
 
-        public function delete(string $collection, DBFilterInterface $where, ?int $limit = null): int
+        public function delete(string $collection, QueryFilterInterface $where, ?int $limit = null): int
         {
             $sql = 'DELETE FROM ' . $collection . $where;
             if (!empty($limit)) {
@@ -95,7 +95,7 @@ namespace features\persistence\sql {
             return $this->run($sql, $where?->getBindings());
         }
 
-        public function escapeHtml(bool $escape): DBInterface
+        public function escapeHtml(bool $escape): QueryInterface
         {
             $this->escape = $escape;
             return $this;
@@ -120,7 +120,7 @@ namespace features\persistence\sql {
             foreach ($object as $index => $row) {
                 $placeholders = [];
                 foreach ($columns as $col) {
-                    $paramName = ':' . $col . $index;
+                    $paramName = ':p' . $index;
                     $placeholders[] = $paramName;
                     $params[$paramName] = $row->jsonSerialize()[$col] ?? null;
                 }
@@ -145,20 +145,6 @@ namespace features\persistence\sql {
             $statement->closeCursor();
         }
 
-        public function queryAll(string $query, ?array $params = []): array
-        {
-            $results = [];
-            $statement = $this->processQuery($query, $params);
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                if ($this->escape) {
-                    self::escapeHtmlChars($row);
-                }
-                $results[] = new ReadMap($row);
-            }
-            $statement->closeCursor();
-            return $results;
-        }
-
         public function run(string $query, ?array $params = []): int
         {
             $statement = $this->processQuery($query, $params);
@@ -166,26 +152,17 @@ namespace features\persistence\sql {
             return $statement->rowCount();
         }
 
-        public function find(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): \Generator
+        public function find(string $collection, ?QueryFilterInterface $where = null, ?int $limit = null, int $page = 1): \Generator
         {
             $sql = 'SELECT * FROM ' . $collection . $where;
-            if (!empty($limit)) {
-                $sql .= ' LIMIT ' . $limit . ' OFFSET ' . $skip;
+            if (!empty($limit) && $page > 0) {
+                $pageNumber = ($page - 1) * $limit;
+                $sql .= ' LIMIT ' . $limit . ' OFFSET ' . $pageNumber;
             }
             return $this->query($sql, $where?->getBindings());
         }
 
-        public function findAll(string $collection, ?DBFilterInterface $where = null, ?int $limit = null, int $skip = 0): array
-        {
-            $rows = [];
-            $results = $this->find($collection, $where, $limit, $skip);
-            foreach ($results as $row) {
-                $rows[] = $row;
-            }
-            return $rows;
-        }
-
-        public function findOne(string $collection, ?DBFilterInterface $where = null): ?ReadMap
+        public function findOne(string $collection, ?QueryFilterInterface $where = null): ?ReadMap
         {
             foreach ($this->find($collection, $where, limit: 1) as $row) {
                 return $row;
@@ -193,7 +170,7 @@ namespace features\persistence\sql {
             return null;
         }
 
-        public function update(string $collection, \JsonSerializable $object, ?DBFilterInterface $where = null, ?int $limit = null): int
+        public function update(string $collection, \JsonSerializable $object, ?QueryFilterInterface $where = null, ?int $limit = null): int
         {
             $data = $object->jsonSerialize();
             if (empty($data)) {
@@ -216,14 +193,14 @@ namespace features\persistence\sql {
             return $this->run($sql, $filters);
         }
 
-        public function exists(string $collection, ?DBFilterInterface $where = null): bool
+        public function exists(string $collection, ?QueryFilterInterface $where = null): bool
         {
             $sql = 'SELECT 1 FROM ' . $collection . $where . ' LIMIT 1';
             $statement = $this->processQuery($sql, $where?->getBindings());
             return (bool) $statement->fetchColumn();
         }
 
-        public function aggregate(string $collection): DBAggregateInterface
+        public function aggregate(string $collection): QueryAggregateInterface
         {
             return SQLAggregate::getInstance($this, $collection);
         }
