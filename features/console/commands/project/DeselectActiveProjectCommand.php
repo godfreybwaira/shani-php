@@ -33,7 +33,9 @@ namespace features\console\commands\project {
             if (SelectedProjectResource::deselect()) {
                 $this->registry->addResult(PrintedText::success('Active project deselected'));
             } else {
-                $this->registry->addResult(PrintedText::error('Active project already deselected'));
+                $info = PrintedText::info('[ INFO ] ');
+                $infoMsg = $this->registry->options->noColor ? $info->plainText : $info->coloredText;
+                $this->registry->addResult(PrintedText::plain($infoMsg . 'Active project already deselected'));
             }
         }
 
