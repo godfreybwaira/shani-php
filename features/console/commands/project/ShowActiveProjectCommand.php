@@ -7,7 +7,7 @@
  * @since v1.0: Jun 11, 2026 at 9:44:35 AM
  */
 
-namespace features\console\commands\misc {
+namespace features\console\commands\project {
 
     use features\console\CommandContract;
     use features\console\CommandRegistry;
@@ -26,7 +26,7 @@ namespace features\console\commands\misc {
         {
             parent::__construct(
                     $registry,
-                    'show:project',
+                    'active:project',
                     null,
                     'Show the selected working project, optional version number, and optional module name',
                     null

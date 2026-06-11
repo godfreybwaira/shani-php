@@ -7,7 +7,7 @@
  * @since v1.0: Jun 11, 2026 at 9:44:35 AM
  */
 
-namespace features\console\commands\misc {
+namespace features\console\commands\project {
 
     use features\console\CommandContract;
     use features\console\CommandRegistry;

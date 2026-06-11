@@ -73,6 +73,9 @@ namespace features\console {
             yield new commands\project\ListProjectCommand($this);
             yield new commands\project\LocateProjectCommand($this);
             yield new commands\project\DeleteProjectCommand($this);
+            yield new commands\project\SelectActiveProjectCommand($this);
+            yield new commands\project\ShowActiveProjectCommand($this);
+            yield new commands\project\DeselectActiveProjectCommand($this);
 //
             //Version
             yield new commands\version\CreateVersionCommand($this);
@@ -139,9 +142,6 @@ namespace features\console {
             yield new commands\misc\StartServerCommand($this);
             yield new commands\misc\DeleteCacheCommand($this);
             yield new commands\misc\HelpCommand($this);
-            yield new commands\misc\SelectActiveProjectCommand($this);
-            yield new commands\misc\ShowActiveProjectCommand($this);
-            yield new commands\misc\DeselectActiveProjectCommand($this);
         }
 
         /**
