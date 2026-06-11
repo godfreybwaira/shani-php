@@ -18,10 +18,6 @@ namespace features\console\commands\project {
     final class ShowActiveProjectCommand extends CommandContract
     {
 
-        private ?string $projectName = null;
-        private ?string $versionNumber = null;
-        private ?ModuleName $moduleName = null;
-
         public function __construct(CommandRegistry $registry)
         {
             parent::__construct(
