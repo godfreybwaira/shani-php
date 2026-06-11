@@ -308,6 +308,17 @@ namespace shani\contracts {
         {
             return StaticAssetServers::SHANI;
         }
+
+        /**
+         * Transform the response content before leaving the application. if the
+         * output has to be encrypted, singed, or compressed then this is the right place.
+         * @param string|null $content
+         * @return string|null Transformed string (or null)
+         */
+        public function responseTransform(?string $content): ?string
+        {
+            return $content;
+        }
     }
 
 }

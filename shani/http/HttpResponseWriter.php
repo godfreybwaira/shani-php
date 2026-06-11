@@ -53,7 +53,8 @@ namespace shani\http {
             if ($subtype === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($content, $subtype);
             } else {
-                $this->app->response->setBody(DataConvertor::convertTo($content, $subtype), $subtype);
+                $body = $this->app->config->responseTransform(DataConvertor::convertTo($content, $subtype));
+                $this->app->response->setBody($body, $subtype);
             }
         }
 
@@ -61,7 +62,7 @@ namespace shani\http {
         {
             if ($subtype === DataConvertor::TYPE_HTML) {
                 $content = WebUI::render($this->app, $builder);
-                $this->app->response->setBody($content, $subtype);
+                $this->app->response->setBody($this->app->config->responseTransform($content), $subtype);
             } else if ($subtype === DataConvertor::TYPE_SSE) {
                 $content = WebUI::render($this->app, $builder);
                 $this->sendSse($content, $subtype);
@@ -121,13 +122,14 @@ namespace shani\http {
         private function sendJsonp(?array $content, string $subtype): void
         {
             $callback = $this->app->request->query->getOne('callback', 'callback');
-            $data = $callback . '(' . json_encode($content, JSON_UNESCAPED_SLASHES) . ');';
-            $this->app->response->setBody($data, $subtype);
+            $data = $this->app->config->responseTransform(json_encode($content, JSON_UNESCAPED_SLASHES));
+            $this->app->response->setBody($callback . '(' . $data . ');', $subtype);
         }
 
         private function sendSse(string $content, string $subtype): void
         {
-            $this->app->response->setBody(DataConvertor::toEventStream($content), $subtype)
+            $data = $this->app->config->responseTransform($content);
+            $this->app->response->setBody(DataConvertor::toEventStream($data), $subtype)
                     ->header()->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache');
         }
 
@@ -159,7 +161,7 @@ namespace shani\http {
             } elseif ($content instanceof \JsonSerializable) {
                 $this->handleSerializableOutput($content, $subtype);
             } elseif (is_string($content)) {
-                $this->app->response->setBody($content, $subtype);
+                $this->app->response->setBody($this->app->config->responseTransform($content), $subtype);
             } elseif ($content instanceof FileOutputStream) {
                 $this->handleFileStreaming($content);
                 return false;

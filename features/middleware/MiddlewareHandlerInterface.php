@@ -20,8 +20,7 @@ namespace features\middleware {
         public function preRequest(): void;
 
         /**
-         * Run middlewares before the response is being sent. Here is where you
-         * can even change the response object.
+         * Run middlewares before the response is being sent.
          * @return void
          */
         public function preResponse(): void;
