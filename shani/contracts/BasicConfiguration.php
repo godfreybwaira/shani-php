@@ -315,7 +315,7 @@ namespace shani\contracts {
          * @param string|null $content
          * @return string|null Transformed string (or null)
          */
-        public function responseTransform(?string $content): ?string
+        public function responseTransformer(?string $content): ?string
         {
             return $content;
         }

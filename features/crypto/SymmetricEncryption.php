@@ -29,7 +29,10 @@ namespace features\crypto {
 
         public function encrypt(string $payload): string
         {
-            $result = openssl_encrypt($payload, $this->cipher->algorithm, $this->cipher->password, 0, $this->cipher->initVector);
+            $result = openssl_encrypt($payload, $this->cipher->algorithm,
+                    base64_decode($this->cipher->password), 0,
+                    base64_decode($this->cipher->initVector)
+            );
             if ($result !== false) {
                 return $result;
             }
@@ -38,7 +41,10 @@ namespace features\crypto {
 
         public function decrypt(string $payload): string
         {
-            $result = openssl_decrypt($payload, $this->cipher->algorithm, $this->cipher->password, 0, $this->cipher->initVector);
+            $result = openssl_decrypt($payload, $this->cipher->algorithm,
+                    base64_decode($this->cipher->password), 0,
+                    base64_decode($this->cipher->initVector)
+            );
             if ($result !== false) {
                 return $result;
             }

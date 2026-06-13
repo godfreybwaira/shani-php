@@ -55,7 +55,7 @@ namespace features\console\commands\keygen {
 
         private function rsa(): AsymmetricKeyPair
         {
-            return AsymmetricKeyPair::rsa($this->length, CryptoAlgorithm::from($this->algorithm));
+            return AsymmetricKeyPair::rsa($this->length, CryptoAlgorithm::tryFrom($this->algorithm));
         }
 
         private static function collectArgs(array $args): array

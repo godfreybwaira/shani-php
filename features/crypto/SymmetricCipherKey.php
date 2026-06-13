@@ -35,9 +35,9 @@ namespace features\crypto {
         /**
          * Base64-encoded random initialization vector (IV). Length depends on the chosen algorithm.
          *
-         * @var string
+         * @var string|null
          */
-        public readonly string $initVector;
+        public readonly ?string $initVector;
 
         /**
          * The encryption algorithm used (default: `aes-256-cbc`).
@@ -46,7 +46,7 @@ namespace features\crypto {
          */
         public readonly string $algorithm;
 
-        private function __construct(string $password, string $initVector, string $algorithm)
+        private function __construct(string $password, string $algorithm, ?string $initVector = null)
         {
             $this->algorithm = $algorithm;
             $this->password = $password;
@@ -73,20 +73,21 @@ namespace features\crypto {
             }
             $passwordBase64 = base64_encode(openssl_random_pseudo_bytes($keyLen));
             $initVectorBase64 = base64_encode(openssl_random_pseudo_bytes($ivLen));
-            return self::createFromValues($passwordBase64, $initVectorBase64, $algorithm);
+            return self::createFromValues($passwordBase64, $algorithm, $initVectorBase64);
         }
 
         /**
          *
-         * @param string $password  Base64-encoded random key generated using `openssl_random_pseudo_bytes()`.
-         * Length depends on the chosen algorithm.
-         * @param string $initVector    Base64-encoded random initialization vector (IV). Length depends on the chosen algorithm.
-         * @param string $algorithm The encryption algorithm used.
-         * @return SymmetricCipherKey Cipher key object
+         * @param string                    $password  Base64-encoded random key
+         * generated using `openssl_random_pseudo_bytes()`. Length depends on the chosen algorithm.
+         * @param string $algorithm         The encryption algorithm used.
+         * @param string|null $initVector   Base64-encoded random initialization
+         * vector (IV). Length depends on the chosen algorithm.
+         * @return SymmetricCipherKey       Cipher key object
          */
-        public static function createFromValues(string $password, string $initVector, string $algorithm): SymmetricCipherKey
+        public static function createFromValues(string $password, string $algorithm, ?string $initVector = null): SymmetricCipherKey
         {
-            return new SymmetricCipherKey($password, $initVector, $algorithm);
+            return new SymmetricCipherKey($password, $algorithm, $initVector);
         }
     }
 
