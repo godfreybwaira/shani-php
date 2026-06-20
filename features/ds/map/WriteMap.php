@@ -88,7 +88,7 @@ namespace features\ds\map {
         {
             if ($this->exists($key)) {
                 $stored = $this->getOne($key);
-                if (!isset($stored['_value_'])) {
+                if (!array_key_exists('_value_', $stored)) {
                     return $stored;
                 }
                 if (!Duration::expired($stored['_expires_'])) {

@@ -95,7 +95,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
         {
             $builder = new WebUIBuilder();
             $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            return $builder;
+            return HttpResponse::withBody($builder);
         }
 
         public function toaster(): HttpResponse

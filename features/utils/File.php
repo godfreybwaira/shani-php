@@ -113,7 +113,7 @@ namespace features\utils {
                 ?int $error = null
         )
         {
-            if (is_readable($path)) {
+            if (is_file($path)) {
                 $stat = stat($path);
                 $this->path = $path;
                 $this->name = $name ?? basename($path);
@@ -124,7 +124,7 @@ namespace features\utils {
                 $this->shortName = $this->extension !== null ? substr($this->name, 0, strrpos($this->name, '.')) : $this->name;
                 $this->type = $type ?? MediaType::fromExtension($this->extension);
             } else {
-                throw new NotFoundException('File is not readable.');
+                throw new NotFoundException('File is not readable or exists.');
             }
         }
 

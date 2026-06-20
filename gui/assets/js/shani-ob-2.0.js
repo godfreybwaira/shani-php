@@ -31,6 +31,10 @@
                     console.warn(name + ' already exists.');
                 }
             },
+            package(name, callback) {
+                const map = callback();
+                map.forEach((cb, n) => this.add(name + '.' + n, cb));
+            },
             get: name => acts[name],
             asList(phrase) {
                 const keys = Object.keys(acts);
@@ -414,6 +418,40 @@
         const flipValue = val => typeof val === 'boolean' ? !val : '';
         const cast = val => val === 'true' || (val === 'false' ? false : val);
         return{
+            compute(lval, nv, sign) {
+                const rval = (typeof nv === 'string' && nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
+                switch (sign) {
+                    case '+':
+                        return lval + rval;
+                    case '-':
+                        return lval - rval;
+                    case '*':
+                        return lval * rval;
+                    case '/':
+                        return lval / rval;
+                    case '%':
+                        return lval % rval;
+                    case '^':
+                        return Math.pow(lval, rval);
+                    default:
+                        throw new Error('Valid math operators are: +-*/%^');
+                }
+            },
+            compare(obj, cb, defval) {
+                for (const node of obj.targets) {
+                    const p = Parser.params(node, obj.paramstr);
+                    const evaluator = Utils.comparator(p.operator);
+                    const lval = cb(p.lvalue || defval), rval = cb(p.rvalue || defval);
+                    if (['btw', 'nbtw'].includes(p.operator)) {
+                        if (!evaluator(lval, cb(p.input), rval)) {
+                            return false;
+                        }
+                    } else if (!evaluator(lval, rval)) {
+                        return false;
+                    }
+                }
+                return true;
+            },
             date2ms(date) {
                 if (typeof date === 'number') {
                     return date;
@@ -814,24 +852,28 @@
             on('close', e => Utils.trigger(shani, END_EVENT));
         };
         /** ==============HTTP=============*/
-        Action.add('http.pull', function (obj) {
-            if (this.history === true) {
-                history.pushState(null, '', this.url);
-            }
-            sendReq(this, 'GET', obj);
-        });
-        Action.add('http.push', function (obj) {
-            sendReq(this, 'POST', obj);
-        });
-        Action.add('http.abort', obj => {
-            Utils.traverse(obj, p => {
-                if (p.name) {
-                    return closeConn(p.name);
+        Action.package('http', () => {
+            const m = new Map();
+            m.set('pull', function (obj) {
+                if (this.history === true) {
+                    history.pushState(null, '', this.url);
                 }
-                for (const key in Utils.connection) {
-                    closeConn(key);
-                }
+                sendReq(this, 'GET', obj);
             });
+            m.set('push', function (obj) {
+                sendReq(this, 'POST', obj);
+            });
+            m.set('abort', obj => {
+                Utils.traverse(obj, p => {
+                    if (p.name) {
+                        return closeConn(p.name);
+                    }
+                    for (const key in Utils.connection) {
+                        closeConn(key);
+                    }
+                });
+            });
+            return m;
         });
     })();
     const FetchClient = (() => {
@@ -923,20 +965,31 @@
             }
         };
     })();
-    const _CSS = (() => {
-        Action.add('class.add', obj => {
+    Action.add('file.saveas', obj => {
+        Utils.traverse(obj, p => {
+            const a = doc.createElement('a');
+            const type = p.type || obj.data.headers.get('content-type');
+            a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
+            a.download = p.name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+    });
+    Action.package('class', () => {
+        const m = new Map();
+        m.set('add', obj => {
             Utils.walk(obj, (node, key) => node.classList.add(key));
         });
-        Action.add('class.rmv', obj => {
+        m.set('rmv', obj => {
             Utils.walk(obj, (node, key) => node.classList.remove(key));
         });
-        Action.add('class.replace', obj => {
+        m.set('replace', obj => {
             Utils.walk(obj, (node, key, val) => node.classList.replace(key, val));
         });
-        Action.add('class.toggle', obj => {
+        m.set('toggle', obj => {
             Utils.walk(obj, (node, key) => node.classList.toggle(key));
         });
-        Action.add('class.exists', obj => {
+        m.set('exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 for (const key in p) {
@@ -947,10 +1000,12 @@
             }
             return true;
         });
-    })();
-    const _Props = (() => {
-        Action.add('prop.rmv', obj => Utils.walk(obj, Utils.removeNodeKey));
-        Action.add('prop.exists', obj => {
+        return m;
+    });
+    Action.package('prop', () => {
+        const m = new Map();
+        m.set('rmv', obj => Utils.walk(obj, Utils.removeNodeKey));
+        m.set('exists', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 for (const k in p) {
@@ -961,7 +1016,7 @@
             }
             return true;
         });
-        Action.add('prop.toggle', obj => {
+        m.set('toggle', obj => {
             Utils.walk(obj, (node, key, val) => {
                 const oldval = Utils.getNodeValue(node, key);
                 const arr = Parser.toArray(val, SEP_LIST);
@@ -972,32 +1027,28 @@
                 }
             });
         });
-        Action.add('prop.bind', obj => {
+        m.set('bind', obj => {
             Utils.walk(obj, (node, key, val) => Parser.bindProperty(node, key, val));
         });
-    })();
-    const _Others = (() => {
-        Action.add('util.call', obj => {
+        return m;
+    });
+    Action.package('util', () => {
+        const m = new Map();
+        m.set('call', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = Utils.calludf(p.fn, [p, node]);
                 result === undefined || Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.add('util.trigger', function (obj) {
+        m.set('trigger', function (obj) {
             const data = Utils.object({shani: this, data: obj.data});
             Utils.walk(obj, (node, key) => node.dispatchEvent(new CustomEvent(key, {detail: data, bubbles: true})));
         });
-        Action.add('file.saveas', obj => {
-            Utils.traverse(obj, p => {
-                const a = doc.createElement('a');
-                const type = p.type || obj.data.headers.get('content-type');
-                a.href = URL.createObjectURL(new Blob([obj.data.body], {type}));
-                a.download = p.name;
-                a.click();
-                URL.revokeObjectURL(a.href);
-            });
-        });
-        Action.add('str.insert', obj => {
+        return m;
+    });
+    Action.package('str', () => {
+        const m = new Map();
+        m.set('insert', obj => {
             Utils.traverse(obj, (p, node) => {
                 let value = p.input, pos = parseInt(p.pos) - 1;
                 if (pos < value.length && value.charAt(pos) !== p.char) {
@@ -1006,19 +1057,19 @@
                 Utils.setNodeValue(node, p.output, value);
             });
         });
-        Action.add('str.concat', obj => {
+        m.set('concat', obj => {
             Utils.traverse(obj, (p, node) => {
                 const values = p.props.split(p.separator || SEP_LIST).map(s => Utils.getNodeValue(node, s.trim()));
                 Utils.setNodeValue(node, p.output, values.join(p.char || ''));
             });
         });
-        Action.add('str.affix', obj => {
+        m.set('affix', obj => {
             Utils.traverse(obj, (p, node) => {
                 const prefix = p.prefix || '', suffix = p.suffix || '';
                 Utils.setNodeValue(node, p.output, prefix + p.input + suffix);
             });
         });
-        Action.add('str.compare', obj => {
+        m.set('compare', obj => {
             for (const node of obj.targets) {
                 const p = Parser.params(node, obj.paramstr);
                 const evaluator = Utils.comparator(p.operator);
@@ -1029,8 +1080,9 @@
             }
             return true;
         });
-    })();
-    const _Node = (() => {
+        return m;
+    });
+    Action.package('node', () => {
         const moveNode = (target, parent, paramstr) => {
             const p = Parser.params(target, paramstr);
             const pos = parseInt(p.pos), kids = parent.children;
@@ -1048,24 +1100,25 @@
             }
             return str.toLowerCase();
         };
-        Action.add('node.rmv', obj => obj.targets.forEach(node => node.remove()));
-        Action.add('node.empty', obj => {
+        const m = new Map();
+        m.set('rmv', obj => obj.targets.forEach(node => node.remove()));
+        m.set('empty', obj => {
             obj.targets.forEach(node => {
                 while (node.lastChild) {
                     node.lastChild.remove();
                 }
             });
         });
-        Action.add('node.copy', function (obj) {
+        m.set('copy', function (obj) {
             Utils.traverse(obj, (p, node) => moveNode(this.emitter.cloneNode(true), node, obj.paramstr));
         });
-        Action.add('node.move', function (obj) {
+        m.set('move', function (obj) {
             Utils.traverse(obj, (p, node) => moveNode(this.emitter, node, obj.paramstr));
         });
-        Action.add('node.replace', function (obj) {
+        m.set('replace', function (obj) {
             Utils.traverse(obj, (p, node) => node.replaceWith(this.emitter));
         });
-        Action.add('node.swap', function (obj) {
+        m.set('swap', function (obj) {
             Utils.traverse(obj, (p, node) => {
                 const placeholder = doc.createTextNode('');
                 this.emitter.replaceWith(placeholder);
@@ -1073,7 +1126,7 @@
                 placeholder.replaceWith(node);
             });
         });
-        Action.add('node.walk', function (obj) {
+        m.set('walk', function (obj) {
             const me = this.emitter, p = Parser.params(me, obj.paramstr);
             const parent = me.parentNode;
             if (p.direction === 'prev') {
@@ -1085,7 +1138,7 @@
                 parent.insertBefore(me, next);
             }
         });
-        Action.add('node.shuffle', obj => {
+        m.set('shuffle', obj => {
             Utils.traverse(obj, (p, node) => {
                 const rows = Utils.shuffle(Array.from(node.children));
                 const df = doc.createDocumentFragment();
@@ -1093,7 +1146,7 @@
                 node.appendChild(df);
             });
         });
-        Action.add('node.sort', function (obj) {
+        m.set('sort', function (obj) {
             const rows = [];
             Utils.traverse(obj, (p, node) => {
                 rows.push({
@@ -1113,27 +1166,9 @@
             rows.forEach(row => df.appendChild(row.node));
             tbody.appendChild(df);
         });
-    })();
-    const _Number = (() => {
-        const compute = (lval, nv, sign) => {
-            const rval = (typeof nv === 'string' && nv.endsWith('%') ? lval * 0.01 : 1) * parseFloat(nv);
-            switch (sign) {
-                case '+':
-                    return lval + rval;
-                case '-':
-                    return lval - rval;
-                case '*':
-                    return lval * rval;
-                case '/':
-                    return lval / rval;
-                case '%':
-                    return lval % rval;
-                case '^':
-                    return Math.pow(lval, rval);
-                default:
-                    throw new Error('Valid math operators are: +-*/%^');
-            }
-        };
+        return m;
+    });
+    Action.package('number', () => {
         const parseNumber = (val, allowPercent) => {
             if (typeof val === 'number') {
                 return val;
@@ -1145,39 +1180,24 @@
             }
             throw new Error('Invalid number "' + val + '"');
         };
-        const compare = (obj, cb, defval) => {
-            for (const node of obj.targets) {
-                const p = Parser.params(node, obj.paramstr);
-                const evaluator = Utils.comparator(p.operator);
-                const lval = cb(p.lvalue || defval), rval = cb(p.rvalue || defval);
-                if (['btw', 'nbtw'].includes(p.operator)) {
-                    if (!evaluator(lval, cb(p.input), rval)) {
-                        return false;
-                    }
-                } else if (!evaluator(lval, rval)) {
-                    return false;
-                }
-            }
-            return true;
-        };
-        const timestamp2unit = (ts, unit) => Math.floor(ts / (Utils.TIME_UNITS[unit] * 1000));
-        Action.add('number.calc', obj => {
+        const m = new Map();
+        m.set('calc', obj => {
             Utils.traverse(obj, (p, node) => {
                 const lval = parseNumber(p.lvalue), rval = parseNumber(p.rvalue, true);
-                const result = compute(lval, rval, p.operator) || 0;
+                const result = Utils.compute(lval, rval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.add('number.accumulate', function (obj) {
+        m.set('accumulate', function (obj) {
             const p = Parser.params(this.emitter, obj.paramstr);
             let result = parseNumber(p.initial) || 0;
             Utils.traverse(obj, param => {
                 const value = parseNumber(param.input, true);
-                result = compute(result, value, param.operator);
+                result = Utils.compute(result, value, param.operator);
             });
             Utils.setNodeValue(this.emitter, p.output, result);
         });
-        Action.add('number.format', obj => {
+        m.set('format', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = parseNumber(p.input).toLocaleString(undefined, {
                     maximumFractionDigits: p.maxdecimals || 2,
@@ -1186,52 +1206,59 @@
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.add('number.compare', obj => compare(obj, parseNumber));
-        Action.add('date.compare', obj => compare(obj, Utils.date2ms, Date.now()));
-        Action.add('date.diff', obj => {
+        m.set('compare', obj => Utils.compare(obj, parseNumber));
+        return m;
+    });
+    Action.package('date', () => {
+        const timestamp2unit = (ts, unit) => Math.floor(ts / (Utils.TIME_UNITS[unit] * 1000));
+        const m = new Map();
+        m.set('compare', obj => Utils.compare(obj, Utils.date2ms, Date.now()));
+        m.set('diff', obj => {
             const now = Date.now();
             Utils.traverse(obj, (p, node) => {
                 const lvalue = Utils.date2ms(p.lvalue || now), rvalue = Utils.date2ms(p.rvalue || now);
                 Utils.setNodeValue(node, p.output, timestamp2unit(lvalue - rvalue, p.unit || 'd'));
             });
         });
-        Action.add('date.now', Date.now);
-        Action.add('date.calc', obj => {
+        m.set('now', Date.now);
+        m.set('calc', obj => {
             const now = Date.now();
             Utils.traverse(obj, (p, node) => {
                 const input = Utils.date2ms(p.input || now), interval = Utils.time2ms(p.interval);
-                const result = compute(input, interval, p.operator) || 0;
+                const result = Utils.compute(input, interval, p.operator) || 0;
                 Utils.setNodeValue(node, p.output, new Date(result).toISOString());
             });
         });
-    })();
-    const _Random = (() => {
+        return m;
+    });
+    Action.package('random', () => {
         const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
         const randDate = (min, max) => {
             const timestamp = min.getTime() + Math.random() * (max.getTime() - min.getTime());
             return new Date(timestamp);
         };
-        Action.add('random.int', obj => {
+        const m = new Map();
+        m.set('int', obj => {
             Utils.traverse(obj, (p, node) => {
                 const result = randInt(Math.ceil(p.min), Math.floor(p.max));
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.add('random.float', obj => {
+        m.set('float', obj => {
             Utils.traverse(obj, (p, node) => {
                 const min = parseFloat(p.min), max = parseFloat(p.max);
                 const result = Math.random() * (max - min) + min;
                 Utils.setNodeValue(node, p.output, result);
             });
         });
-        Action.add('random.date', obj => {
+        m.set('date', obj => {
             Utils.traverse(obj, (p, node) => {
                 const min = new Date(Utils.date2ms(p.min)), max = new Date(Utils.date2ms(p.max));
                 const date = randDate(min, max).toISOString();
                 Utils.setNodeValue(node, p.output, date.slice(0, date.indexOf('T')));
             });
         });
-        Action.add('random.time', obj => {
+        m.set('time', obj => {
             Utils.traverse(obj, (p, node) => {
                 const tmin = p.min.split(':'), tmax = p.max.split(':'), today = new Date();
                 const min = new Date(today.setHours(parseInt(tmin[0]), parseInt(tmin[1]), parseInt(tmin[2]) || 0));
@@ -1240,7 +1267,7 @@
                 Utils.setNodeValue(node, p.output, time);
             });
         });
-        Action.add('random.str', obj => {
+        m.set('str', obj => {
             Utils.traverse(obj, (p, node) => {
                 let str = '';
                 const min = parseInt(p.min), max = parseInt(p.max), limit = randInt(min, max);
@@ -1251,21 +1278,42 @@
                 Utils.setNodeValue(node, p.output, str);
             });
         });
-        Action.add('random.value', obj => {
+        m.set('value', obj => {
             Utils.traverse(obj, (p, node) => {
                 const sep = p.separator || SEP_LIST, values = p.values.split(sep);
                 const idx = randInt(0, values.length - 1);
                 Utils.setNodeValue(node, p.output, values[idx].trim());
             });
         });
-        Action.add('random.shuffle', obj => {
+        m.set('shuffle', obj => {
             Utils.traverse(obj, (p, node) => {
                 const sep = p.separator || SEP_LIST, values = Utils.shuffle(p.values.split(sep));
                 Utils.setNodeValue(node, p.output, values.join(sep));
             });
         });
-    })();
-    const _UI = (() => {
+        return m;
+    });
+    Action.package('ui', () => {
+        const UI = new Map();
+        const getCover = (target, pageSize, fontSize) => {
+            const id = Utils.getId(), style = doc.createElement('style');
+            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;';
+            s += 'font-size:' + (fontSize || 100) + '%}body>:not(#' + id + '){display:none}';
+            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
+            s += '@page{margin:0;page-break-after:always;break-after:page}';
+            style.type = 'text/css';
+            style.textContent = s;
+            const cover = doc.createElement('div');
+            const df = doc.createDocumentFragment();
+            df.appendChild(style);
+            cover.id = id;
+            for (const t of target) {
+                df.appendChild(t.cloneNode(true));
+            }
+            cover.appendChild(df);
+            doc.body.insertBefore(cover, doc.body.firstChild);
+            return cover;
+        };
         const Carousel = (() => {
             const rotateItems = (params, node) => {
                 const cls = params['active-class'];
@@ -1289,8 +1337,8 @@
                 next: (total, idx) => (idx + 1) % total,
                 prev: (total, idx) => (idx - 1 + total) % total
             };
-            Action.add('ui.carousel', obj => Utils.traverse(obj, rotateItems));
-            Action.add('ui.select', function (obj) {
+            UI.set('carousel', obj => Utils.traverse(obj, rotateItems));
+            UI.set('select', function (obj) {
                 const node = this.event.detail.shani.emitter;
                 const children = this.emitter.children;
                 if (Array.from(children).includes(node)) {
@@ -1303,7 +1351,7 @@
                 }
             });
         })();
-        const Modal = (() => {
+        UI.set('modal', obj => {
             const COVER = 'modal-background';
             const getCloseBtn = classList => {
                 if (classList) {
@@ -1315,52 +1363,31 @@
                     return btn;
                 }
             };
-            Action.add('ui.modal', obj => {
-                Utils.traverse(obj, p => {
-                    const mdbg = doc.createElement('div'), modal = doc.createElement('div');
-                    const wrapper = doc.createElement('div');
-                    wrapper.id = p.id;
-                    wrapper.className = 'full-size';
-                    if ('close-btn' in p) {
-                        const btn = getCloseBtn(p['close-btn']);
-                        btn.style.margin = 'var(--spacing)';
-                        modal.appendChild(btn);
-                    }
-                    modal.className = p.classes;
-                    modal.appendChild(wrapper);
-                    mdbg.className = COVER;
-                    mdbg.appendChild(modal);
-                    doc.body.appendChild(mdbg);
-                });
+            Utils.traverse(obj, p => {
+                const mdbg = doc.createElement('div'), modal = doc.createElement('div');
+                const wrapper = doc.createElement('div');
+                wrapper.id = p.id;
+                wrapper.className = 'full-size';
+                if ('close-btn' in p) {
+                    const btn = getCloseBtn(p['close-btn']);
+                    btn.style.margin = 'var(--spacing)';
+                    modal.appendChild(btn);
+                }
+                modal.className = p.classes;
+                modal.appendChild(wrapper);
+                mdbg.className = COVER;
+                mdbg.appendChild(modal);
+                doc.body.appendChild(mdbg);
             });
-        })();
-        const getCover = (target, pageSize, fontSize) => {
-            const id = Utils.getId(), style = doc.createElement('style');
-            let s = '#' + id + '{width:100%;min-height:100%;padding:1rem;overflow-y:auto;';
-            s += 'font-size:' + (fontSize || 100) + '%}body>:not(#' + id + '){display:none}';
-            s += '@media print{#' + id + '{padding:12mm;print-color-adjust:exact;' + pageSize + '}}';
-            s += '@page{margin:0;page-break-after:always;break-after:page}';
-            style.type = 'text/css';
-            style.textContent = s;
-            const cover = doc.createElement('div');
-            const df = doc.createDocumentFragment();
-            df.appendChild(style);
-            cover.id = id;
-            for (const t of target) {
-                df.appendChild(t.cloneNode(true));
-            }
-            cover.appendChild(df);
-            doc.body.insertBefore(cover, doc.body.firstChild);
-            return cover;
-        };
-        Action.add('ui.close', function (obj) {
+        });
+        UI.set('close', function (obj) {
             if (obj.selector) {
                 const selector = Utils.resolveVariable(this.emitter, obj.selector);
                 const parent = Utils.getParentNode(this.emitter, selector);
                 parent ? parent.remove() : obj.targets.forEach(node => node.remove());
             }
         });
-        Action.add('ui.print', function (obj) {
+        UI.set('print', function (obj) {
             if (window.print instanceof Function) {
                 const p = Parser.params(this.emitter, obj.paramstr), title = doc.title;
                 const cover = getCover(obj.targets, 'size:' + (p.size || 'auto'));
@@ -1370,7 +1397,7 @@
                 cover.remove();
             }
         });
-        Action.add('input.search', function (obj) {
+        UI.set('search', function (obj) {
             const text = this.emitter.value.trim().toLowerCase();
             obj.targets.forEach(node => {
                 for (const row of node.children) {
@@ -1378,7 +1405,7 @@
                 }
             });
         });
-        Action.add('ui.fscreen', obj => {
+        UI.set('fscreen', obj => {
             if (doc.fullscreenEnabled) {
                 const cover = getCover(obj.targets, '', 135);
                 doc.documentElement.requestFullscreen().then(() => {
@@ -1388,12 +1415,12 @@
                 }).catch(() => cover.remove());
             }
         });
-        Action.add('ui.copy', obj => {
+        UI.set('copy', obj => {
             if (navigator.clipboard) {
                 Utils.traverse(obj, p => navigator.clipboard.writeText(p.input.trim()).catch(e => null));
             }
         });
-        Action.add('ui.loader', obj => {
+        UI.set('loader', obj => {
             Utils.traverse(obj, (p, node) => {
                 !p.color || node.style.setProperty('--loader-color', p.color);
                 !p.size || node.style.setProperty('--loader-size', p.size);
@@ -1401,12 +1428,13 @@
                 node.classList.add(p.name);
             });
         });
-        Action.add('ui.loader.rmv', obj => {
+        UI.set('loader.rmv', obj => {
             const props = ['--loader-color', '--loader-size', '--loader-thickness'];
             Utils.traverse(obj, (p, node) => {
                 props.forEach(pr => node.style.removeProperty(pr));
                 node.classList.remove(p.name);
             });
         });
-    })();
+        return UI;
+    });
 })(document);

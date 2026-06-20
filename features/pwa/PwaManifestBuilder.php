@@ -212,12 +212,12 @@ namespace features\pwa {
 
         /**
          * Tells the browser to suggest a native app instead of the PWA if available.
-         * @param bool $prefer Whether to prioritize the native app.
+         * @param bool $preferNativeApp Whether to prioritize the native app.
          * @param PwaRelatedApplication ...$apps List of platform-specific app store entries.
          */
-        public function setRelatedApplications(bool $prefer, PwaRelatedApplication ...$apps): self
+        public function setRelatedApplications(bool $preferNativeApp, PwaRelatedApplication ...$apps): self
         {
-            $this->data['prefer_related_applications'] = $prefer;
+            $this->data['prefer_related_applications'] = $preferNativeApp;
             $this->data['related_applications'] = array_map(fn(PwaRelatedApplication $a) => $a->toArray(), $apps);
             return $this;
         }

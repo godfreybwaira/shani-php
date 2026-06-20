@@ -69,19 +69,18 @@ namespace features\console\commands\misc {
          */
         private function help(): void
         {
-            $width = 150;
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
-            $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: $width) . PHP_EOL);
+            $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: 150) . PHP_EOL);
             $this->registry->addResult('For help type help COMMAND' . PHP_EOL);
             if ($this->userCommand === null) {
-                $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', sentenceWidth: $width, separator: ' '));
+                $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', separator: ' '));
                 $commands = $this->registry->commandList();
                 foreach ($commands as $index => $cmd) {
-                    $message = Formatter::formatSentence(($index + 1) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $width);
+                    $message = Formatter::formatSentence(($index + 1) . '. ' . $cmd->commandName, $cmd->description);
                     $this->registry->addResult($message);
                 }
             } else {
-                $this->searchCommand($width);
+                $this->searchCommand();
             }
         }
 
@@ -91,20 +90,18 @@ namespace features\console\commands\misc {
          * - If the command exists, shows its name, syntax, example, and description.
          * - If not found, attempts partial matches against command names and descriptions.
          * - Throws an exception if no matches are found.
-         *
-         * @param int $sentenceWidth The width used for formatting output.
-         *
+
          * @return void
          *
          * @throws \InvalidArgumentException If the command is not found.
          */
-        private function searchCommand(int $sentenceWidth): void
+        private function searchCommand(): void
         {
             $command = $this->registry->getCommandByName($this->userCommand);
             if ($command !== null) {
-                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->commandName, sentenceWidth: $sentenceWidth));
-                $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax, sentenceWidth: $sentenceWidth));
-                $this->registry->addResult(Formatter::formatSentence('EXAMPLE:', $command->example, sentenceWidth: $sentenceWidth));
+                $this->registry->addResult(Formatter::formatSentence('COMMAND:', $command->commandName));
+                $this->registry->addResult(Formatter::formatSentence('SYNTAX:', $command->syntax));
+                $this->registry->addResult(Formatter::formatSentence('EXAMPLE:', $command->example));
                 $this->registry->addResult('DESCRIPTION:' . PHP_EOL . $command->description);
                 return;
             }
@@ -116,7 +113,7 @@ namespace features\console\commands\misc {
             foreach ($commands as $cmd) {
                 if (str_contains($cmd->commandName, $this->userCommand)) {
                     $excluded[$cmd->commandName] = 1;
-                    $message = Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $sentenceWidth);
+                    $message = Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description);
                     $this->registry->addResult($message);
                 }
             }
@@ -124,7 +121,7 @@ namespace features\console\commands\misc {
             $commands2 = $this->registry->commandList();
             foreach ($commands2 as $cmd) {
                 if (!isset($excluded[$cmd->commandName]) && str_contains(strtolower($cmd->description), $this->userCommand)) {
-                    $message = Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description, sentenceWidth: $sentenceWidth);
+                    $message = Formatter::formatSentence(($index++) . '. ' . $cmd->commandName, $cmd->description);
                     $this->registry->addResult($message);
                 }
             }

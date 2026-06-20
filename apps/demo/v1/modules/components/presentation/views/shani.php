@@ -1,16 +1,17 @@
 <div class="tab tab-pos-b">
-    <div class="tab-menu menubar">
-        <a href="/components/0/redirect" shani-on="click->ui.select active-class:active;ui.select->http.pull>>#shani_demo;" class="active menu-item">
+    <div class="tab-menu menubar" id="parent1322" shani-on="ui-select->ui.select active-class:active">
+        <a href="/components/0/redirect"
+           shani-on="click->util.trigger ui-select>>#parent1322;util.trigger->http.pull>>#shani_demo;" class="active menu-item">
             <i class="mdi mdi-refresh-auto"></i>
             <span class="font-sm menu-label">Redirect</span>
         </a>
         <a href="/components/0/containers"
-           shani-on="click->ui.select active-class:active;ui.select->http.pull>>#shani_demo;" class="menu-item">
+           shani-on="click->util.trigger ui-select>>#parent1322;util.trigger->http.pull>>#shani_demo;" class="menu-item">
             <i class="mdi mdi-rectangle"></i>
             <span class="font-sm menu-label">Containers</span>
         </a>
         <a href="/components/0/inputs"
-           shani-on="click->ui.select active-class:active;ui.select->http.pull>>#shani_demo;" class="menu-item">
+           shani-on="click->util.trigger ui-select>>#parent1322;util.trigger->http.pull>>#shani_demo;" class="menu-item">
             <i class="mdi mdi-inbox-full"></i>
             <span class="font-sm menu-label">Inputs</span>
         </a>

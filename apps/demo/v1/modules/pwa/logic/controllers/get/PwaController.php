@@ -10,6 +10,8 @@
 namespace apps\demo\v1\modules\pwa\logic\controllers\get {
 
     use features\assets\StaticAssetRequest;
+    use features\attributes\security\AuthenticationCheck;
+    use features\attributes\security\PermissionCheck;
     use features\pwa\enums\PwaAppPlatform;
     use features\pwa\enums\PwaCategory;
     use features\pwa\enums\PwaDisplayMode;
@@ -27,6 +29,8 @@ namespace apps\demo\v1\modules\pwa\logic\controllers\get {
     use shani\http\HttpResponse;
     use shani\launcher\App;
 
+    #[AuthenticationCheck(true)]
+    #[PermissionCheck(true)]
     final class PwaController
     {
 

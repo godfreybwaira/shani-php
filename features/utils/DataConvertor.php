@@ -198,6 +198,9 @@ namespace features\utils {
             foreach ($obj as $values) {
                 $row = null;
                 foreach ($values as $val) {
+                    if ($val instanceof \JsonSerializable) {
+                        $val = $val->jsonSerialize();
+                    }
                     $value = is_array($val) ? implode('|', $val) : $val;
                     $row .= $separator . '"' . str_replace(self::SEARCH_STR, self::REPLACE_STR, $value) . '"';
                 }

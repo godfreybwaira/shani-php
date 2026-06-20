@@ -23,20 +23,27 @@ namespace features\console\helpers {
         /**
          * Format a sentence with a separator filling the gap between input and result.
          *
-         * Example: "Project .... Created"
+         * Example: "Project ____ Created"
          *
          * @param string $inputText   The left-hand text.
          * @param string $resultText  The right-hand text.
-         * @param int    $sentenceWidth Total width of the formatted sentence (default 100).
          * @param string $separator   Character(s) used to fill the gap (default '.').
          *
          * @return string The formatted sentence with separators.
          */
-        public static function formatSentence(string $inputText, string $resultText, int $sentenceWidth = 100, string $separator = '.'): string
+        public static function formatSentence(string $inputText, string $resultText, string $separator = '_'): string
         {
+
+            $maxInputLength = 30;
             $inputLength = mb_strlen($inputText);
-            $resultLength = mb_strlen($resultText);
-            $multiplier = $sentenceWidth - ($inputLength + $resultLength + 2);
+            $multiplier = $maxInputLength - $inputLength;
+            if ($inputLength > $maxInputLength) {
+                $sentenceWidth = 100;
+                $multiplier = $sentenceWidth - ($inputLength + mb_strlen($resultText) + 2);
+            }
+            if ($multiplier < 1) {
+                $multiplier = 5;
+            }
             return $inputText . ' ' . str_repeat($separator, $multiplier) . ' ' . $resultText;
         }
 
