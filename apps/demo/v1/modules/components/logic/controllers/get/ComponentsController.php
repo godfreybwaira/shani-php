@@ -52,11 +52,11 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
         public function stream(): HttpResponse
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $cb = function () {
-                $db = $this->app->config->getDatabase();
-                $rows = $db->find('users');
+            $db = $this->app->config->getDatabase();
+            $rows = $db->find('users');
+            $cb = function () use ($rows) {
                 while (true) {
-                    sleep(1);
+                    usleep(500_000);
                     if ($rows->valid()) {
                         yield $rows->current();
                         $rows->next();
