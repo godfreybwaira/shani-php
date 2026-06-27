@@ -8,7 +8,7 @@
     $angle_size: var.$spacing;
     $left_pos: var.$spacing * 2;
     $before_width:fn.px2rem(2px);
-    $after_left_pos: ($angle_size + math.div($before_width,2)) * -2.325;
+    $after_left_pos: math.div($angle_size,-0.365);
     counter-reset: num;
     padding-left: var(--spacing);
     @extend %position_relative;
@@ -22,6 +22,7 @@
     }
     @extend %list_reset;
     &>*{
+        $after_size: $angle_size * 1.5;
         background: var(--bg-color);
         box-shadow: var(--shadow-sm);
         border-radius: var(--radius-sm);
@@ -29,17 +30,19 @@
         @extend %padding_xy, %margin_x, %position_relative,%zoomOut;
         &:before{
             content: '';
+            width: $angle_size;
+            height: $angle_size;
             background: inherit;
             border: var(--thin-border);
             transform: rotate(45deg);
         }
         &:before, &:after{
-            width: $angle_size;
-            height: $angle_size;
             @extend %position_absolute;
         }
         &:after{
             display: flex;
+            width: $after_size;
+            height: $after_size;
             background: inherit;
             counter-increment: num;
             content: counter(num, decimal);
@@ -53,7 +56,7 @@
                 left: math.div($angle_size,-2);
             }
             &:after{
-                top: var(--spacing);
+                top: math.div($after_size,2);
                 left: $after_left_pos;
             }
         }
