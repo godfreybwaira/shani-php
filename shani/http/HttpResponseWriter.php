@@ -157,8 +157,6 @@ namespace shani\http {
         {
             if ($content instanceof WebUIBuilder) {
                 $this->handleUIBuilderOutput($content, $subtype);
-            } elseif ($content instanceof \JsonSerializable) {
-                $this->handleArrayOutput($content->jsonSerialize(), $subtype);
             } elseif (is_array($content)) {
                 $this->handleArrayOutput($content, $subtype);
             } elseif (is_scalar($content)) {
