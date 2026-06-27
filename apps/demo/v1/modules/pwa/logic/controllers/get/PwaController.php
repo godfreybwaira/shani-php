@@ -12,6 +12,7 @@ namespace apps\demo\v1\modules\pwa\logic\controllers\get {
     use features\assets\StaticAssetRequest;
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\PermissionCheck;
+    use features\ds\map\ReadMap;
     use features\pwa\enums\PwaAppPlatform;
     use features\pwa\enums\PwaCategory;
     use features\pwa\enums\PwaDisplayMode;
@@ -24,9 +25,8 @@ namespace apps\demo\v1\modules\pwa\logic\controllers\get {
     use features\pwa\PwaManifestBuilder;
     use features\pwa\PwaRelatedApplication;
     use features\utils\File;
-    use shani\http\FileOutputStream;
+    use shani\http\FileOutput;
     use shani\http\HttpHeader;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     #[AuthenticationCheck(true)]
@@ -41,7 +41,7 @@ namespace apps\demo\v1\modules\pwa\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function manifest(): HttpResponse
+        public function manifest(): ReadMap
         {
             $builder = new PwaManifestBuilder('Shani yangu maanani', 'Shani', $this->app->request->uri);
             $dimension = new PwaDimension(1024);
@@ -66,14 +66,14 @@ namespace apps\demo\v1\modules\pwa\logic\controllers\get {
                     ->setScope('/')
                     ->setTextDirection(PwaTextDirection::AUTO)
                     ->setThemeColor('#aaccbb');
-            return HttpResponse::withBody($builder->build());
+            return $builder->build();
         }
 
-        public function serviceWorker(): HttpResponse
+        public function serviceWorker(): FileOutput
         {
             $file = new File(StaticAssetRequest::assetPath('/js/pwa-sw.js'));
             $this->app->response->header()->addOne(HttpHeader::SERVICE_WORKER_ALLOWED, '/');
-            return HttpResponse::withBody(new FileOutputStream($file));
+            return new FileOutput($file);
         }
     }
 

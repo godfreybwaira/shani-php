@@ -33,7 +33,6 @@ namespace shani\launcher {
     use shani\contracts\BasicConfiguration;
     use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpStatus;
-    use shani\http\HttpResponse;
     use shani\http\HttpResponseWriter;
     use shani\http\RequestEntity;
     use shani\http\ResponseEntity;
@@ -172,7 +171,7 @@ namespace shani\launcher {
             $userMiddleware?->afterResponse();
         }
 
-        private function runWithErrorHandling(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): ?HttpResponse
+        private function runWithErrorHandling(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): mixed
         {
             if ($this->framework->config->isTruthy('display_errors')) {
                 return $this->handleRequestFlow($middleware, $userMiddleware);
@@ -197,7 +196,7 @@ namespace shani\launcher {
             }
         }
 
-        private function handleRequestFlow(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): ?HttpResponse
+        private function handleRequestFlow(MiddlewareHandler $middleware, ?MiddlewareHandlerInterface $userMiddleware): mixed
         {
             // Step 1: pre-request hooks
             $middleware->preRequest();
@@ -286,9 +285,9 @@ namespace shani\launcher {
          *
          * @param MiddlewareHandler $middleware Middleware handler object
          *
-         * @return HttpResponse|null
+         * @return mixed
          */
-        private function handleRequest(MiddlewareHandler $middleware): ?HttpResponse
+        private function handleRequest(MiddlewareHandler $middleware): mixed
         {
             $classPath = $this->getClassPath();
             if (!is_file(SHANI_SERVER_ROOT . $classPath . '.php')) {
@@ -331,7 +330,7 @@ namespace shani\launcher {
             return $this->lang;
         }
 
-        private function handleException(HttpStatus $status, \Throwable $ex, MiddlewareHandler $middleware): ?HttpResponse
+        private function handleException(HttpStatus $status, \Throwable $ex, MiddlewareHandler $middleware): mixed
         {
             $this->response->setStatus($status);
             $fallbackRoute = $this->config->errorHandler($ex);
@@ -339,7 +338,7 @@ namespace shani\launcher {
                 $this->request->changeRoute($fallbackRoute);
                 return $this->handleRequest($middleware);
             }
-            return HttpResponse::withBody(ErrorResponse::create($status->value, $ex->getMessage()));
+            return ErrorResponse::create($status->value, $ex->getMessage());
         }
     }
 

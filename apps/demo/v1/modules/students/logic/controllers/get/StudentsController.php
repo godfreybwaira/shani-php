@@ -12,7 +12,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
     use apps\demo\v1\modules\students\data\dto\StudentDto;
     use apps\demo\v1\modules\students\data\dto\StudentListDto;
     use apps\demo\v1\modules\students\logic\services\StudentService;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class StudentsController
@@ -27,7 +26,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        public function index(): HttpResponse
+        public function index(): mixed
         {
             $students = $this->service->getAll();
             $dtos = new StudentListDto();
@@ -36,17 +35,17 @@ namespace apps\demo\v1\modules\students\logic\controllers\get {
             }
             $cart = $this->app->session->container('user');
             if (!$cart->isEmpty()) {
-                return HttpResponse::withBody($dtos);
+                return $dtos;
             }
             $cart->add($dtos);
-            return HttpResponse::withBody('Cart is empty. Come back next time.');
+            return 'Cart is empty. Come back next time.';
         }
 
-        public function one(): ?HttpResponse
+        public function one(): ?StudentDto
         {
             $id = (int) $this->app->request->params(3);
             $student = $this->service->getById($id);
-            return $student !== null ? HttpResponse::withBody(StudentDto::toDto($student)) : null;
+            return $student !== null ? StudentDto::toDto($student) : null;
         }
     }
 

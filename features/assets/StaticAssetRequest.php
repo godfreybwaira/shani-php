@@ -11,10 +11,9 @@ namespace features\assets {
 
     use features\utils\File;
     use shani\http\enums\HttpStatus;
-    use shani\http\FileOutputStream;
+    use shani\http\FileOutput;
     use shani\http\HttpCache;
     use shani\http\HttpHeader;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
     use shani\launcher\Framework;
     use shani\utils\VirtualHostMapper;
@@ -79,9 +78,9 @@ namespace features\assets {
          *
          * @param App $app The application context.
          *
-         * @return HttpResponse|null The HTTP response, or null if not served.
+         * @return FileOutput|null The HTTP response, or null if not served.
          */
-        public function handleRequest(App $app): ?HttpResponse
+        public function handleRequest(App $app): ?FileOutput
         {
             $filepath = match ($this->accessType) {
                 StaticAssetAccessType::PUBLIC_ACCESS => self::assetPath(substr($this->uriPath, strlen($this->bucket))),
@@ -96,9 +95,9 @@ namespace features\assets {
          * @param App   $app    The application context.
          * @param File  $file   File object.
          *
-         * @return HttpResponse|null The HTTP response, or null if not served.
+         * @return FileOutput|null The HTTP response, or null if not served.
          */
-        private function sendFile(App $app, File $file): ?HttpResponse
+        private function sendFile(App $app, File $file): ?FileOutput
         {
             $assetServer = $app->config->getStaticAssetServer();
             $etag = md5($this->filename);
@@ -121,11 +120,11 @@ namespace features\assets {
          *
          * @param File $file File object.
          *
-         * @return HttpResponse The HTTP response.
+         * @return FileOutput The HTTP response.
          */
-        private static function delegateToShani(File $file): HttpResponse
+        private static function delegateToShani(File $file): FileOutput
         {
-            return HttpResponse::withBody(new FileOutputStream($file));
+            return new FileOutput($file);
         }
 
         /**
@@ -135,9 +134,9 @@ namespace features\assets {
          * @param File      $file   File object.
          * @param string    $bucket File storage area
          *
-         * @return HttpResponse|null The HTTP response, or null if delegated.
+         * @return null
          */
-        private static function delegateToNginx(App $app, File $file, string $bucket): ?HttpResponse
+        private static function delegateToNginx(App $app, File $file, string $bucket): mixed
         {
             $filepath = match ($bucket) {
                 $app->preference->mapper->publicBucket => substr($file->path, strlen(Framework::DIR_ASSETS)),
@@ -156,9 +155,9 @@ namespace features\assets {
          * @param App   $app    Application object.
          * @param File  $file   File object.
          *
-         * @return HttpResponse|null The HTTP response, or null if delegated.
+         * @return null
          */
-        private static function delegateToApache(App $app, File $file): ?HttpResponse
+        private static function delegateToApache(App $app, File $file): mixed
         {
             $app->response->header()->addAll([
                 'X-Sendfile' => $file->path,

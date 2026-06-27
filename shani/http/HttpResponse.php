@@ -9,7 +9,6 @@
 
 namespace shani\http {
 
-    use gui\WebUIBuilder;
     use shani\http\enums\HttpConnection;
 
     /**
@@ -21,16 +20,9 @@ namespace shani\http {
         /**
          * The response body.
          *
-         * Can be one of the following types:
-         * - \Closure: A callback function to generate the body dynamically
-         * - \JsonSerializable: An object that can be serialized to JSON
-         * - WebUIBuilder: A builder for rendering web UI components
-         * - FileOutputStream: A stream for file output
-         * - string: A plain string response body
-         *
-         * @var \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string
+         * @var mixed
          */
-        public readonly \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body;
+        public readonly mixed $body;
 
         /**
          * The HTTP connection associated with this response.
@@ -50,15 +42,10 @@ namespace shani\http {
         /**
          * Constructs a HttpResponse::withBody instance.
          *
-         * @param \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body
-         *        The response body, which may be a closure, JSON-serializable object,
-         *        web UI builder, file output stream, or string.
-         * @param HttpConnection|null $connection
-         *        The HTTP connection. If null, defaults to HttpConnection::AUTO.
+         * @param mixed $body The response body.
+         * @param HttpConnection|null $connection The HTTP connection. If null, defaults to HttpConnection::AUTO.
          */
-        public static function withBody(
-                \Closure|\JsonSerializable|WebUIBuilder|FileOutputStream|string $body,
-                HttpConnection $connection = null): HttpResponse
+        public static function withBody(mixed $body, HttpConnection $connection = null): HttpResponse
         {
             return new HttpResponse($body, $connection ?? HttpConnection::AUTO);
         }

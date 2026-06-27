@@ -12,9 +12,9 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\CsrfCheck;
     use features\attributes\security\PermissionCheck;
+    use features\authentication\UserDetailsDto;
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     #[AuthenticationCheck(exempted: true)]
@@ -30,41 +30,41 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
             $this->app = $app;
         }
 
-        public function token(): HttpResponse
+        public function token(): \JsonSerializable
         {
             $issuer = new OAuth2TokenIssuer($this->app);
             $response = $issuer->handleRequest();
-            return HttpResponse::withBody($response->body);
+            return $response->body;
         }
 
-        public function authorize(): HttpResponse
+        public function authorize(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleGeneralAuthorization();
-            return HttpResponse::withBody($response?->body);
+            return $response?->body;
         }
 
-        public function deviceAuthorization(): HttpResponse
+        public function deviceAuthorization(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $response = $authorizer->handleDeviceAuthorization();
-            return HttpResponse::withBody($response?->body);
+            return $response?->body;
         }
 
-        public function device(): HttpResponse
+        public function device(): ?\JsonSerializable
         {
             $authorizer = new OAuth2TokenAuthorizer($this->app);
             $body = $this->app->request->body();
             $userCode = $body->getOne('user_code');
             $deviceCode = $body->getOne('device_code');
             $response = $authorizer->handleDeviceVerification($userCode, $deviceCode);
-            return HttpResponse::withBody($response?->body);
+            return $response?->body;
         }
 
-        public function login(): HttpResponse
+        public function login(): UserDetailsDto
         {
             $result = $this->app->auth->login();
-            return HttpResponse::withBody($result->user);
+            return $result->user;
         }
     }
 

@@ -18,7 +18,6 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
     use features\utils\URI;
     use gui\WebUIBuilder;
     use shani\http\HttpHeader;
-    use shani\http\HttpResponse;
     use shani\http\ResponseEntity;
     use shani\launcher\App;
 
@@ -34,22 +33,22 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function index(): HttpResponse
+        public function index(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Home Page II')
                     ->setPwaBuilder(new PwaBuilder($this->app->storage->uri('/pwa/0/manifest.json'), $this->app->storage->uri('/pwa/0/service-worker.js')))
                     ->view('/body');
-            return HttpResponse::withBody($builder);
+            return $builder;
         }
 
-        public function all(): HttpResponse
+        public function all(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function stream(): HttpResponse
+        public function stream(): \Generator
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $db = $this->app->config->getDatabase();
@@ -65,82 +64,76 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
                     }
                 }
             };
-            return HttpResponse::withBody($cb);
+            return $cb();
         }
 
-        public function users(): HttpResponse
+        public function users(): \Generator
         {
             $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            $rows = $db->find('users');
-            $cb = function () use ($rows) {
-                foreach ($rows as $row) {
-                    yield $row;
-                }
-            };
-            return HttpResponse::withBody($cb);
+            return $db->find('users');
         }
 
-        public function inputs(): HttpResponse
+        public function inputs(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function containers(): HttpResponse
+        public function containers(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function modals(): HttpResponse
+        public function modals(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->attr->addIfAbsent('type', $this->app->request->query->getOne('type'));
-            return HttpResponse::withBody($builder);
+            return $builder;
         }
 
-        public function toaster(): HttpResponse
+        public function toaster(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function timeline(): HttpResponse
+        public function timeline(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function shani(): HttpResponse
+        public function shani(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function redirect(): HttpResponse
+        public function redirect(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function generator(): HttpResponse
+        public function generator(): Documentation
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $docs = new Documentation($this->app->config->pathConfig());
-            return HttpResponse::withBody($docs);
+            return $docs;
         }
 
-        public function card(): HttpResponse
+        public function card(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function bindings(): HttpResponse
+        public function bindings(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function nodes(): HttpResponse
+        public function nodes(): WebUIBuilder
         {
-            return HttpResponse::withBody(new WebUIBuilder());
+            return new WebUIBuilder();
         }
 
-        public function client(): HttpResponse
+        public function client(): \Generator
         {
             $client = new HttpClient(new URI('https://dev.shani.v2.local'));
             $client->enableAsync(false)->enableSSLVerification(false);
@@ -150,7 +143,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
                     yield $res->body();
                 };
             });
-            return HttpResponse::withBody($cb);
+            return $cb();
         }
     }
 

@@ -12,7 +12,6 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\get {
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\PermissionCheck;
     use gui\WebUIBuilder;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     #[AuthenticationCheck(exempted: true)]
@@ -27,28 +26,27 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\get {
             $this->app = $app;
         }
 
-        public function authorize(): HttpResponse
+        public function authorize(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            return HttpResponse::withBody($builder);
+            return $builder;
         }
 
-        public function device(): HttpResponse
+        public function device(): WebUIBuilder
         {
             $builder = new WebUIBuilder();
             $builder->description('Shani web framework')
                     ->title('Oauth 2.0 implementation')
             ->attr->addOne('url', $this->app->request->uri);
-            return HttpResponse::withBody($builder);
+            return $builder;
         }
 
-        public function logout(): HttpResponse
+        public function logout(): string
         {
-            $msg = $this->app->auth->logout() ? 'Success' : 'Failed';
-            return HttpResponse::withBody($msg);
+            return $this->app->auth->logout() ? 'Success' : 'Failed';
         }
     }
 

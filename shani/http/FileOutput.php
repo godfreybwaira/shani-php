@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of FileOutputStream
+ * Description of FileOutput
  * @author goddy
  *
  * @since Oct 18, 2025 at 11:45:58 AM
@@ -16,7 +16,7 @@ namespace shani\http {
      * Represents a file output stream for sending or downloading files
      * in chunks to the client application.
      */
-    final class FileOutputStream
+    final class FileOutput
     {
 
         /**
@@ -41,7 +41,7 @@ namespace shani\http {
         public readonly File $file;
 
         /**
-         * Constructs a new FileOutputStream instance.
+         * Constructs a new FileOutput instance.
          *
          * @param File      $file           Absolute path to an existing file.
          * @param bool      $downloadable   Whether to download a file to stream it.

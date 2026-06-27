@@ -15,7 +15,7 @@ namespace shani\http {
     use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpConnection;
     use shani\http\enums\HttpStatus;
-    use shani\http\FileOutputStream;
+    use shani\http\FileOutput;
     use shani\http\HttpHeader;
     use shani\launcher\App;
 
@@ -31,14 +31,14 @@ namespace shani\http {
             $this->writer = $writer;
         }
 
-        private function stream(\Closure $callback, string $subtype): void
+        private function stream(\Generator $generator, string $subtype): void
         {
             $this->app->response->setStatus(HttpStatus::PARTIAL_CONTENT);
             $this->app->response->header()
                     ->addIfAbsent(HttpHeader::CACHE_CONTROL, 'no-cache')
-                    ->addOne('X-Accel-Buffering', 'no'); //disable buffering on nginx
+                    ->addIfAbsent('X-Accel-Buffering', 'no'); //disable buffering on nginx
             $this->writer->sendHeaders($this->app->response);
-            foreach ($callback() as $output) {
+            foreach ($generator as $output) {
                 if ($output === null) {
                     break;
                 }
@@ -47,9 +47,8 @@ namespace shani\http {
             }
         }
 
-        private function handleSerializableOutput(?\JsonSerializable $data, string $subtype): void
+        private function handleArrayOutput(?array $content, string $subtype): void
         {
-            $content = $data?->jsonSerialize();
             if ($subtype === DataConvertor::TYPE_JS) {
                 $this->sendJsonp($content, $subtype);
             } else {
@@ -67,16 +66,16 @@ namespace shani\http {
                 $content = WebUI::render($this->app, $builder);
                 $this->sendSse($content, $subtype);
             } else {
-                $this->handleSerializableOutput($builder->getData(), $subtype);
+                $this->handleArrayOutput($builder->getData()?->jsonSerialize(), $subtype);
             }
         }
 
         /**
          * Stream a file as HTTP response
-         * @param FileOutputStream $output
+         * @param FileOutput $output
          * @return void
          */
-        private function handleFileStreaming(FileOutputStream $output): void
+        private function handleFileOutput(FileOutput $output): void
         {
             if ($output->downloadable) {
                 $this->app->response->saveAs($output->file->name);
@@ -99,7 +98,7 @@ namespace shani\http {
             $this->streamFile($output, $output->file->size, $startPos, $endPos);
         }
 
-        private function streamFile(FileOutputStream $output, int $filesize, int $startPos, int $endPos): void
+        private function streamFile(FileOutput $output, int $filesize, int $startPos, int $endPos): void
         {
             $length = $endPos - $startPos + 1;
             if ($length > 0 && $length <= $filesize) {
@@ -159,24 +158,33 @@ namespace shani\http {
             if ($content instanceof WebUIBuilder) {
                 $this->handleUIBuilderOutput($content, $subtype);
             } elseif ($content instanceof \JsonSerializable) {
-                $this->handleSerializableOutput($content, $subtype);
-            } elseif (is_string($content)) {
+                $this->handleArrayOutput($content->jsonSerialize(), $subtype);
+            } elseif (is_array($content)) {
+                $this->handleArrayOutput($content, $subtype);
+            } elseif (is_scalar($content)) {
                 $this->app->response->setBody($this->app->config->responseTransformer($content), $subtype);
-            } elseif ($content instanceof FileOutputStream) {
-                $this->handleFileStreaming($content);
+            } elseif ($content instanceof FileOutput) {
+                $this->handleFileOutput($content);
                 return false;
-            } elseif ($content instanceof \Closure) {
+            } elseif ($content instanceof \Generator) {
                 $this->stream($content, $subtype);
                 return false;
+            } elseif ($content !== null) {
+                $body = DataConvertor::convertFrom(json_encode($content), DataConvertor::TYPE_JSON);
+                $this->handleArrayOutput($body, $subtype);
             }
             return true;
         }
 
-        public function handleResponse(?HttpResponse $response): void
+        public function handleResponse(mixed $response): void
         {
             $subtype = $this->app->response->subtype();
-            if ($this->decisionTree($response?->body, $subtype)) {
-                $this->write($response?->connection);
+            if ($response instanceof HttpResponse) {
+                if ($this->decisionTree($response->body, $subtype)) {
+                    $this->write($response->connection);
+                }
+            } else if ($this->decisionTree($response, $subtype)) {
+                $this->write(null);
             }
         }
     }

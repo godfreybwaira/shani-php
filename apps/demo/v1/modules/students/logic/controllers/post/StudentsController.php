@@ -16,7 +16,6 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
     use features\ds\map\ReadMap;
     use features\exceptions\server\ServerException;
     use features\utils\File;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class StudentsController
@@ -31,7 +30,7 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
             $this->service = StudentService::getObject($app->config->getDatabase());
         }
 
-        public function index(): HttpResponse
+        public function index(): StudentDto
         {
             $data = $this->app->request->body()->getAll(['firstName', 'id', 'lastName', 'age', 'subjects']);
             $dto = StudentDto::fromArray($data);
@@ -39,12 +38,12 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
             if ($student === null) {
                 throw new ServerException('Could not save student');
             }
-            return HttpResponse::withBody(StudentDto::toDto($student));
+            return StudentDto::toDto($student);
         }
 
         #[CsrfCheck(exempted: true)]
         #[FileValidation(optional: false, name: 'f1', maxSize: 200_000, types: ['image/png'])]
-        public function upload(): ?HttpResponse
+        public function upload(): ?ReadMap
         {
             $file = $this->app->request->file('f1');
             $path = $this->app->storage->save($file);
@@ -52,12 +51,12 @@ namespace apps\demo\v1\modules\students\logic\controllers\post {
             $s0 = $this->app->storage->share2group($copy);
             $s1 = $this->app->storage->share2group($copy, 'grp001');
             $s2 = $this->app->storage->share2other($copy, 'user02222');
-            return HttpResponse::withBody(new ReadMap([
-                                'pa' => $this->app->storage->uri($path)->asString(),
-                                's0' => $this->app->storage->uri($s0)->asString(),
-                                's1' => $this->app->storage->uri($s1)->asString(),
-                                's2' => $this->app->storage->uri($s2)->asString(),
-            ]));
+            return new ReadMap([
+                'pa' => $this->app->storage->uri($path)->asString(),
+                's0' => $this->app->storage->uri($s0)->asString(),
+                's1' => $this->app->storage->uri($s1)->asString(),
+                's2' => $this->app->storage->uri($s2)->asString(),
+            ]);
         }
     }
 
