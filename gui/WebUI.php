@@ -175,9 +175,9 @@ namespace gui {
 
         /**
          * Get data passed via WebUIBuilder constructor
-         * @return \JsonSerializable|null
+         * @return mixed
          */
-        public function data(): ?\JsonSerializable
+        public function data(): mixed
         {
             return $this->builder->getData();
         }

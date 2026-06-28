@@ -66,7 +66,7 @@ namespace shani\http {
                 $content = WebUI::render($this->app, $builder);
                 $this->sendSse($content, $subtype);
             } else {
-                $this->handleArrayOutput($builder->getData()?->jsonSerialize(), $subtype);
+                $this->decisionTree($builder->getData(), $subtype);
             }
         }
 

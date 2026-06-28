@@ -24,12 +24,12 @@ namespace gui {
         public readonly WriteMap $attr;
         private ?array $dictionary = null;
         private ?string $viewPath, $title;
-        private ?\JsonSerializable $data;
+        private readonly mixed $data;
         private ?PwaBuilder $pwaBuilder = null;
         private array $scripts, $styles;
         private array $metadata = [], $links = [];
 
-        public function __construct(\JsonSerializable $data = null)
+        public function __construct(mixed $data = null)
         {
             $this->data = $data;
             $this->title = null;
@@ -61,9 +61,9 @@ namespace gui {
 
         /**
          * Get immutable data object.
-         * @return \JsonSerializable|null
+         * @return mixed
          */
-        public function getData(): ?\JsonSerializable
+        public function getData(): mixed
         {
             return $this->data;
         }

@@ -4,7 +4,6 @@ namespace {namespace} {
 
     use features\ds\map\ReadMap;
     use gui\WebUIBuilder;
-    use shani\http\HttpResponse;
     use shani\launcher\App;
 
     final class {controller_name}
@@ -17,7 +16,7 @@ namespace {namespace} {
             $this->app = $app;
         }
 
-        public function {fn_name}(): HttpResponse
+        public function {fn_name}(): WebUIBuilder
         {
             $data = new ReadMap([
                 'name' => get_current_user(),
@@ -29,7 +28,7 @@ namespace {namespace} {
             ->description('Description of {module_name}')
             ->attr->addOne('name', $data->getOne('name'));
 
-            return HttpResponse::withBody($builder);
+            return $builder;
         }
     }
 

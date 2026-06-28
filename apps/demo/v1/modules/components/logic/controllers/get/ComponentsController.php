@@ -35,7 +35,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
 
         public function index(): WebUIBuilder
         {
-            $builder = new WebUIBuilder();
+            $builder = new WebUIBuilder(['name' => 'shani', 'version' => '1.0']);
             $builder->description('Shani web framework')
                     ->title('Home Page II')
                     ->setPwaBuilder(new PwaBuilder($this->app->storage->uri('/pwa/0/manifest.json'), $this->app->storage->uri('/pwa/0/service-worker.js')))
