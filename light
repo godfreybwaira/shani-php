@@ -5,13 +5,8 @@ use features\console\CommandRegistry;
 use features\console\printer\ConsoleColor;
 use features\console\printer\ConsoleIO;
 use features\console\printer\PrintedText;
-use shani\utils\ShaniUtils;
 
-set_include_path(get_include_path() . PATH_SEPARATOR . 'vendor');
-spl_autoload_register(function (string $class) {
-    require_once str_replace('\\', '/', $class) . '.php';
-});
-ShaniUtils::define(__DIR__);
+require_once 'classloader.php';
 
 (function (array $arguments) {
     $command = !isset($arguments[1]) ? 'help' : $arguments[1];
