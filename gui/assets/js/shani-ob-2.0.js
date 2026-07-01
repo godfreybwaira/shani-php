@@ -1437,4 +1437,55 @@
         });
         return UI;
     });
+    const createStorage = ST => {
+        const listOf = (obj, cb) => {
+            const values = [];
+            for (let i = 0; i < ST.length; i++) {
+                values.push(cb(ST.key(i)));
+            }
+            Utils.traverse(obj, (p, node) => Utils.setNodeValue(node, p.output, values.join(p.separator || SEP_LIST)));
+        };
+        const m = new Map();
+        m.set('get', obj => {
+            Utils.traverse(obj, (p, node) => {
+                const value = ST.getItem(p.key);
+                Utils.setNodeValue(node, p.output, value !== null ? value : p.default);
+            });
+        });
+        m.set('clear', () => ST.clear());
+        m.set('keys', obj => listOf(obj, key => key));
+        m.set('values', obj => listOf(obj, key => ST.getItem(key)));
+        m.set('delete', obj => Utils.walk(obj, (_, key) => ST.removeItem(key)));
+        m.set('replace', obj => Utils.walk(obj, (_, key, val) => ST.setItem(key, val)));
+        m.set('json', obj => {
+            const values = Utils.object();
+            for (let i = 0; i < ST.length; i++) {
+                const k = ST.key(i);
+                values[k] = ST.getItem(k);
+            }
+            Utils.traverse(obj, (p, node) => Utils.setNodeValue(node, p.output, JSON.stringify(values)));
+        });
+        m.set('set', obj => {
+            Utils.walk(obj, (_, key, val) => {
+                if (ST.key(key) === null) {
+                    ST.setItem(key, val);
+                }
+            });
+        });
+        m.set('has', function (obj) {
+            const keys = Object.keys(Parser.params(this.emitter, obj.paramstr));
+            for (const k of keys) {
+                if (ST.key(k) === null) {
+                    return false;
+                }
+            }
+            return keys.length > 0;
+        });
+        m.set('size', obj => {
+            Utils.traverse(obj, (p, node) => Utils.setNodeValue(node, p.output, ST.length));
+        });
+        return m;
+    };
+    Action.package('storage', () => createStorage(localStorage));
+    Action.package('session', () => createStorage(sessionStorage));
 })(document);
