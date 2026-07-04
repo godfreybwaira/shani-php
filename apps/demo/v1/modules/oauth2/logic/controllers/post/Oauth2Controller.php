@@ -12,7 +12,7 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\CsrfCheck;
     use features\attributes\security\PermissionCheck;
-    use features\authentication\UserDetailsDto;
+    use features\authentication\AuthenticationResult;
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
     use shani\launcher\App;
@@ -61,10 +61,9 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
             return $response?->body;
         }
 
-        public function login(): UserDetailsDto
+        public function login(): ?AuthenticationResult
         {
-            $result = $this->app->auth->login();
-            return $result->user;
+            return $this->app->auth->login();
         }
     }
 

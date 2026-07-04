@@ -52,7 +52,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
         {
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
             $db = $this->app->config->getDatabase();
-            $rows = $db->find('users');
+            $rows = $db->findAll('users');
             $cb = function () use ($rows) {
                 while (true) {
                     usleep(500_000);
@@ -71,7 +71,7 @@ namespace apps\demo\v1\modules\components\logic\controllers\get {
         {
             $db = $this->app->config->getDatabase();
             $this->app->response->header()->addOne(HttpHeader::CONTENT_TYPE, MediaType::JSON);
-            return $db->find('users');
+            return $db->findAll('users');
         }
 
         public function inputs(): WebUIBuilder

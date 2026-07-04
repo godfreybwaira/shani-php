@@ -214,7 +214,7 @@
                    --set-pos1 name:--set-pos5->str.insert pos:5&char:@data-rbr&input:@value&output:value;
                    --set-pos5 name:--set-pos9->str.insert pos:9&char:@data-dash&input:@value&output:value;
                    --set-pos9 name:--set-pos13->str.insert pos:13&char:@data-dash&input:@value&output:value;"
-                   placeholder="Start typing or paste some contennt...">
+                   placeholder="Start typing or paste some content...">
         </div>
     </div>
 </div>

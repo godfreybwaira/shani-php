@@ -9,9 +9,9 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\QueryAggregateInterface;
-    use features\persistence\QueryFilterInterface;
-    use features\persistence\ResultGroupInterface;
+    use features\persistence\QueryAggregate;
+    use features\persistence\QueryFilter;
+    use features\persistence\ResultGroup;
 
     /**
      * SQLAggregate
@@ -22,7 +22,7 @@ namespace features\persistence\sql {
      * @author goddy
      * * @since  Jun 5, 2026
      */
-    final class SQLAggregate implements QueryAggregateInterface
+    final class SQLAggregate implements QueryAggregate
     {
 
         /**
@@ -68,27 +68,27 @@ namespace features\persistence\sql {
             return self::$tables[$tableName];
         }
 
-        public function avgOf(string $columnName, string $displayName = null): ResultGroupInterface
+        public function avgOf(string $columnName, string $displayName = null): ResultGroup
         {
             return new SQLResultGroup('AVG', $this, $columnName, $displayName);
         }
 
-        public function maxOf(string $columnName, string $displayName = null): ResultGroupInterface
+        public function maxOf(string $columnName, string $displayName = null): ResultGroup
         {
             return new SQLResultGroup('MAX', $this, $columnName, $displayName);
         }
 
-        public function minOf(string $columnName, string $displayName = null): ResultGroupInterface
+        public function minOf(string $columnName, string $displayName = null): ResultGroup
         {
             return new SQLResultGroup('MIN', $this, $columnName, $displayName);
         }
 
-        public function sumOf(string $columnName, string $displayName = null): ResultGroupInterface
+        public function sumOf(string $columnName, string $displayName = null): ResultGroup
         {
             return new SQLResultGroup('SUM', $this, $columnName, $displayName);
         }
 
-        public function countOf(string $columnName, string $displayName = null): ResultGroupInterface
+        public function countOf(string $columnName, string $displayName = null): ResultGroup
         {
             return new SQLResultGroup('COUNT', $this, $columnName, $displayName);
         }

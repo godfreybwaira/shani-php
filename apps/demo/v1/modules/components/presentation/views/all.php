@@ -1,4 +1,4 @@
-<div class="divider">Pills</div>
+<div class="divider" shani-on="load->session.get key:username&output:textContent>>.divider">Pills</div>
 <div class="grid">
     <a href="#" class="pill">My awesome pill</a>
     <a href="#" class="pill">My pill</a>

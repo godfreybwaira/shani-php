@@ -10,6 +10,7 @@
 namespace features\authentication {
 
     use features\documentation\scanners\Endpoints;
+    use features\exceptions\client\AuthenticationException;
     use shani\http\RequestRoute;
     use shani\launcher\App;
 
@@ -150,13 +151,16 @@ namespace features\authentication {
 
         /**
          * Tries to check authenticity of a user (user is logged in). If fails,
-         * it tries to login (assuming that the current user request comes with credentials).
+         * it tries to login (assuming that the current user's request comes with credentials).
          * If it also fails it return false, otherwise true.
-         * @var bool True if authenticated, false otherwise
+         * @throws AuthenticationException
+         * @return void
          */
-        public function attemptAuthentication(): bool
+        public function attemptAuthentication(): void
         {
-            return $this->loggedIn() || $this->login() !== null;
+            if (!$this->loggedIn() && $this->login() === null) {
+                throw new AuthenticationException('Not authenticated. Please login first.');
+            }
         }
 
         /**

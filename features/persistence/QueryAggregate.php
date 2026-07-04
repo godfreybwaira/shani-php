@@ -10,7 +10,7 @@
 
 namespace features\persistence {
 
-    interface QueryAggregateInterface
+    interface QueryAggregate
     {
 
         /**
@@ -19,14 +19,14 @@ namespace features\persistence {
          * @param string                 $columnName Column to aggregate.
          * @param string $displayName Optional display name.
          *
-         * @return ResultGroupInterface Fluent interface for chaining.
+         * @return ResultGroup Fluent interface for chaining.
          *
          * @example
          * SELECT SUM(total) AS sum_total
          * FROM sales
          * WHERE region = 'East';
          */
-        public function sumOf(string $columnName, string $displayName = null): ResultGroupInterface;
+        public function sumOf(string $columnName, string $displayName = null): ResultGroup;
 
         /**
          * Calculate the AVG (average) of values in a column, optionally filtered.
@@ -34,14 +34,14 @@ namespace features\persistence {
          * @param string                 $columnName Column to aggregate.
          * @param string $displayName Optional display name.
          *
-         * @return ResultGroupInterface Fluent interface for chaining.
+         * @return ResultGroup Fluent interface for chaining.
          *
          * @example
          * SELECT AVG(price) AS avg_price
          * FROM products
          * WHERE category = 'Electronics';
          */
-        public function avgOf(string $columnName, string $displayName = null): ResultGroupInterface;
+        public function avgOf(string $columnName, string $displayName = null): ResultGroup;
 
         /**
          * Calculate the MAX (maximum) value in a column, optionally filtered.
@@ -49,14 +49,14 @@ namespace features\persistence {
          * @param string                 $columnName Column to aggregate.
          * @param string $displayName Optional display name.
          *
-         * @return ResultGroupInterface Fluent interface for chaining.
+         * @return ResultGroup Fluent interface for chaining.
          *
          * @example
          * SELECT MAX(salary) AS max_salary
          * FROM employees
          * WHERE department = 'HR';
          */
-        public function maxOf(string $columnName, string $displayName = null): ResultGroupInterface;
+        public function maxOf(string $columnName, string $displayName = null): ResultGroup;
 
         /**
          * Calculate the MIN (minimum) value in a column, optionally filtered.
@@ -64,14 +64,14 @@ namespace features\persistence {
          * @param string                 $columnName Column to aggregate.
          * @param string $displayName Optional display name.
          *
-         * @return ResultGroupInterface Fluent interface for chaining.
+         * @return ResultGroup Fluent interface for chaining.
          *
          * @example
          * SELECT MIN(order_date) AS min_order
          * FROM orders
          * WHERE customer_id = 123;
          */
-        public function minOf(string $columnName, string $displayName = null): ResultGroupInterface;
+        public function minOf(string $columnName, string $displayName = null): ResultGroup;
 
         /**
          * Calculate the COUNT of rows or values in a column, optionally filtered.
@@ -79,14 +79,14 @@ namespace features\persistence {
          * @param string                 $columnName Column to count.
          * @param string $displayName Optional display name.
          *
-         * @return ResultGroupInterface Fluent interface for chaining.
+         * @return ResultGroup Fluent interface for chaining.
          *
          * @example
          * SELECT COUNT(order_id) AS count_order
          * FROM orders
          * WHERE status = 'Completed';
          */
-        public function countOf(string $columnName, string $displayName = null): ResultGroupInterface;
+        public function countOf(string $columnName, string $displayName = null): ResultGroup;
     }
 
 }

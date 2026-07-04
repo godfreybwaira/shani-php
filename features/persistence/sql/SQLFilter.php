@@ -9,11 +9,11 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\QueryDatePartInterface;
-    use features\persistence\QueryFilterInterface;
+    use features\persistence\QueryDatePart;
+    use features\persistence\QueryFilter;
     use features\persistence\QueryFilterType;
 
-    final class SQLFilter implements QueryFilterInterface
+    final class SQLFilter implements QueryFilter
     {
 
         private array $clauses = [];
@@ -30,92 +30,92 @@ namespace features\persistence\sql {
 
         private static function getAlias($column): string
         {
-            return $column instanceof QueryDatePartInterface ? $column->getColumnName() : $column;
+            return $column instanceof QueryDatePart ? $column->getColumnName() : $column;
         }
 
-        public function like(string $column, mixed $value): QueryFilterInterface
+        public function like(string $column, mixed $value): QueryFilter
         {
             $this->clauses[$column] = 'LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function notLike(string $column, mixed $value): QueryFilterInterface
+        public function notLike(string $column, mixed $value): QueryFilter
         {
             $this->clauses[$column] = 'NOT LIKE ' . $this->bindValue($value);
             return $this;
         }
 
-        public function eq(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function eq(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function neq(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function neq(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '<> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gt(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function gt(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '> ' . $this->bindValue($value);
             return $this;
         }
 
-        public function gte(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function gte(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '>= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lt(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function lt(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '< ' . $this->bindValue($value);
             return $this;
         }
 
-        public function lte(QueryDatePartInterface|string $column, mixed $value): QueryFilterInterface
+        public function lte(QueryDatePart|string $column, mixed $value): QueryFilter
         {
             $this->clauses[(string) $column] = '<= ' . $this->bindValue($value);
             return $this;
         }
 
-        public function btw(QueryDatePartInterface|string $column, mixed $start, mixed $end): QueryFilterInterface
+        public function btw(QueryDatePart|string $column, mixed $start, mixed $end): QueryFilter
         {
             $this->clauses[(string) $column] = 'BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function notBtw(QueryDatePartInterface|string $column, mixed $start, mixed $end): QueryFilterInterface
+        public function notBtw(QueryDatePart|string $column, mixed $start, mixed $end): QueryFilter
         {
             $this->clauses[(string) $column] = 'NOT BETWEEN ' . $this->bindValue($start) . ' AND ' . $this->bindValue($end);
             return $this;
         }
 
-        public function in(QueryDatePartInterface|string $column, array $values): QueryFilterInterface
+        public function in(QueryDatePart|string $column, array $values): QueryFilter
         {
             $this->clauses[(string) $column] = 'IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function notIn(QueryDatePartInterface|string $column, array $values): QueryFilterInterface
+        public function notIn(QueryDatePart|string $column, array $values): QueryFilter
         {
             $this->clauses[(string) $column] = 'NOT IN(' . implode(',', array_map(fn($v) => $this->bindValue($v), $values)) . ')';
             return $this;
         }
 
-        public function or(QueryFilterInterface $other): QueryFilterInterface
+        public function or(QueryFilter $other): QueryFilter
         {
             return $this->join($other, 'OR');
         }
 
-        public function and(QueryFilterInterface $other): QueryFilterInterface
+        public function and(QueryFilter $other): QueryFilter
         {
             return $this->join($other, 'AND');
         }
 
-        private function join(QueryFilterInterface $other, string $connector): QueryFilterInterface
+        private function join(QueryFilter $other, string $connector): QueryFilter
         {
             $filter = new self();
             if (!empty($this->clauses)) {
@@ -157,7 +157,7 @@ namespace features\persistence\sql {
             return $this->bindings;
         }
 
-        public function setFilterType(QueryFilterType $type): QueryFilterInterface
+        public function setFilterType(QueryFilterType $type): QueryFilter
         {
             $this->filter = $type;
             return $this;

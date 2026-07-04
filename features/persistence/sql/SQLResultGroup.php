@@ -9,9 +9,9 @@
 
 namespace features\persistence\sql {
 
-    use features\persistence\QueryFilterInterface;
+    use features\persistence\QueryFilter;
     use features\persistence\QueryFilterType;
-    use features\persistence\ResultGroupInterface;
+    use features\persistence\ResultGroup;
 
     /**
      * SQLResultGroup
@@ -37,7 +37,7 @@ namespace features\persistence\sql {
      * @author goddy
      * * @since  Jun 5, 2026
      */
-    final class SQLResultGroup implements ResultGroupInterface
+    final class SQLResultGroup implements ResultGroup
     {
 
         /**
@@ -51,14 +51,14 @@ namespace features\persistence\sql {
         private readonly SQLAggregate $aggregate;
 
         /**
-         * @var QueryFilterInterface|null $where Filter conditions for the clause.
+         * @var QueryFilter|null $where Filter conditions for the clause.
          */
-        private ?QueryFilterInterface $where = null;
+        private ?QueryFilter $where = null;
 
         /**
-         * @var QueryFilterInterface|null $having Filter conditions for the clause.
+         * @var QueryFilter|null $having Filter conditions for the clause.
          */
-        private ?QueryFilterInterface $having = null;
+        private ?QueryFilter $having = null;
 
         /**
          * @var array<string> $groups Grouping definitions.
@@ -106,42 +106,42 @@ namespace features\persistence\sql {
             return !empty($filters) ? " $clause " . implode($join, $filters) : null;
         }
 
-        public function filterBy(QueryFilterInterface $where): ResultGroupInterface
+        public function filterBy(QueryFilter $where): ResultGroup
         {
             $this->where = $where;
             return $this;
         }
 
-        public function groupBy(string $columnName, ?bool $sortAsc = null): ResultGroupInterface
+        public function groupBy(string $columnName, ?bool $sortAsc = null): ResultGroup
         {
             return $this->addGroupBy($columnName, null, $sortAsc);
         }
 
-        public function groupByYear(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroupInterface
+        public function groupByYear(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroup
         {
             $column = SQLDatePart::getYear($columnName);
             return $this->addGroupBy($column, $displayName ?? $column->getColumnName(), $ascending);
         }
 
-        public function groupByQuarter(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroupInterface
+        public function groupByQuarter(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroup
         {
             $column = SQLDatePart::getQuarter($columnName);
             return $this->addGroupBy($column, $displayName ?? $column->getColumnName(), $ascending);
         }
 
-        public function groupByMonth(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroupInterface
+        public function groupByMonth(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroup
         {
             $column = SQLDatePart::getMonth($columnName);
             return $this->addGroupBy($column, $displayName ?? $column->getColumnName(), $ascending);
         }
 
-        public function groupByWeek(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroupInterface
+        public function groupByWeek(string $columnName, string $displayName = null, ?bool $ascending = null): ResultGroup
         {
             $column = SQLDatePart::getWeek($columnName);
             return $this->addGroupBy($column, $displayName ?? $column->getColumnName(), $ascending);
         }
 
-        private function addGroupBy(string $columnName, ?string $alias, ?bool $ascending): ResultGroupInterface
+        private function addGroupBy(string $columnName, ?string $alias, ?bool $ascending): ResultGroup
         {
             if (!array_key_exists($columnName, $this->groups)) {
                 $this->groups[$columnName] = $alias;
@@ -152,7 +152,7 @@ namespace features\persistence\sql {
             return $this;
         }
 
-        public function having(QueryFilterInterface $having): ResultGroupInterface
+        public function having(QueryFilter $having): ResultGroup
         {
             if (empty($this->groups)) {
                 throw new \RuntimeException('Group-by clause is empty.');

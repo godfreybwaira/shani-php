@@ -10,7 +10,7 @@
 
 namespace features\persistence {
 
-    interface QueryDatePartInterface extends \Stringable
+    interface QueryDatePart extends \Stringable
     {
 
         /**
@@ -24,36 +24,36 @@ namespace features\persistence {
          *
          * @param string $dateColumn Date column to extract the year from.
          *
-         * @return QueryDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePart Fluent interface for chaining.
          */
-        public static function getYear(string $dateColumn): QueryDatePartInterface;
+        public static function getYear(string $dateColumn): QueryDatePart;
 
         /**
          * Extract the quarter from a date column.
          *
          * @param string $dateColumn Date column to extract the quarter from.
          *
-         * @return QueryDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePart Fluent interface for chaining.
          */
-        public static function getQuarter(string $dateColumn): QueryDatePartInterface;
+        public static function getQuarter(string $dateColumn): QueryDatePart;
 
         /**
          * Extract the month from a date column.
          *
          * @param string $dateColumn Date column to extract the month from.
          *
-         * @return QueryDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePart Fluent interface for chaining.
          */
-        public static function getMonth(string $dateColumn): QueryDatePartInterface;
+        public static function getMonth(string $dateColumn): QueryDatePart;
 
         /**
          * Extract the week from a date column.
          *
          * @param string $dateColumn Date column to extract the week from.
          *
-         * @return QueryDatePartInterface Fluent interface for chaining.
+         * @return QueryDatePart Fluent interface for chaining.
          */
-        public static function getWeek(string $dateColumn): QueryDatePartInterface;
+        public static function getWeek(string $dateColumn): QueryDatePart;
     }
 
 }

@@ -9,7 +9,6 @@
 
 namespace features\attributes\security {
 
-    use features\exceptions\client\AuthenticationException;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
 
@@ -33,9 +32,7 @@ namespace features\attributes\security {
             if ($this->exempted || $app->config->authenticationConfig()->skipAuthentication) {
                 return;
             }
-            if (!$app->auth->attemptAuthentication()) {
-                throw new AuthenticationException('Not authenticated. Please login first.');
-            }
+            $app->auth->attemptAuthentication();
         }
     }
 

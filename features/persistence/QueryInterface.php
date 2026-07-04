@@ -40,32 +40,32 @@ namespace features\persistence {
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
          * @param \JsonSerializable $object New data
-         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilter|null $where Query parameters (key => value pair)
          * @return int Number of modified documents
          */
-        public function update(string $collection, \JsonSerializable $object, ?QueryFilterInterface $where = null): int;
+        public function update(string $collection, \JsonSerializable $object, ?QueryFilter $where = null): int;
 
         /**
          * Delete documents/records
          *
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param QueryFilterInterface $where Query parameters (key => value pair)
+         * @param QueryFilter $where Query parameters (key => value pair)
          * @return int Number of deleted documents
          */
-        public function delete(string $collection, QueryFilterInterface $where): int;
+        public function delete(string $collection, QueryFilter $where): int;
 
         /**
-         * Execute SQL query and fetch all rows (if available). This method is memory
+         * Execute raw query and fetch all rows (if available). This method is memory
          * efficient as it fetches rows on demand
          * @param string $query A query to execute
          * @param array|null $params Query parameters (key => value pair)
-         * @return \Generator Iterable object of ReadMap contains rows returned as the result of SQL query.
+         * @return \Generator Iterable object of ReadMap contains rows returned as the result of query.
          * @see self::findAll
          */
         public function query(string $query, ?array $params = []): \Generator;
 
         /**
-         * Execute a query and return number of rows affected.
+         * Execute a raw query and return number of rows affected.
          * @param string $query A query to execute
          * @param array|null $params Query parameters (key => value pair)
          * @return int Number of rows affected
@@ -76,29 +76,41 @@ namespace features\persistence {
          * Find documents in a given collection with optional filtering, pagination, and limits.
          *
          * @param string $collection The name of the collection to query.
-         * @param QueryFilterInterface|null $where Optional filter criteria to apply to the query.
+         * @param QueryFilter|null $where Optional filter criteria to apply to the query.
          * @param int|null $limit Optional maximum number of results to return.
          * @param int $page The page number for paginated results (default is 1).
          *
          * @return \Generator Yields the matching documents from the collection.
          */
-        public function find(string $collection, ?QueryFilterInterface $where = null, ?int $limit = null, int $page = 1): \Generator;
+        public function findAll(string $collection, ?QueryFilter $where = null, ?int $limit = null, int $page = 1): \Generator;
+
+        /**
+         * Find documents in a given collection with optional filtering, pagination, and limits.
+         *
+         * @param string $collection The name of the collection to query.
+         * @param QueryFilter|null $where Optional filter criteria to apply to the query.
+         * @param int|null $limit Optional maximum number of results to return.
+         * @param int $page The page number for paginated results (default is 1).
+         *
+         * @return array Returns the matching documents from the collection.
+         */
+        public function getAll(string $collection, ?QueryFilter $where = null, ?int $limit = null, int $page = 1): array;
 
         /**
          * Execute query and returns a single row.
          * @param string $collection Table name (SQL) or Collection name (NoSQL)
-         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilter|null $where Query parameters (key => value pair)
          * @return ReadMap|null A single row returned as the result of the query
          * or null if no result found.
          * @see self::findAll
          */
-        public function findOne(string $collection, ?QueryFilterInterface $where = null): ?ReadMap;
+        public function getOne(string $collection, ?QueryFilter $where = null): ?ReadMap;
 
         /**
          * Check if at least one record/document exists. More efficient than count() > 0 in many cases
-         * @param QueryFilterInterface|null $where Query parameters (key => value pair)
+         * @param QueryFilter|null $where Query parameters (key => value pair)
          */
-        public function exists(string $collection, ?QueryFilterInterface $where = null): bool;
+        public function exists(string $collection, ?QueryFilter $where = null): bool;
 
         /**
          * Whether to escape HTML characters on result set or not.
@@ -147,10 +159,10 @@ namespace features\persistence {
          *
          * @param string $collection The name of the collection (e.g., table) to aggregate.
          *
-         * @return QueryAggregateInterface Returns an aggregate query builder instance
+         * @return QueryAggregate Returns an aggregate query builder instance
          *                            for chaining aggregate operations.
          */
-        public function aggregate(string $collection): QueryAggregateInterface;
+        public function aggregate(string $collection): QueryAggregate;
     }
 
 }
