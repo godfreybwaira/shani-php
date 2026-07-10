@@ -126,8 +126,7 @@ namespace features\persistence\sql {
                 }
                 $valueSets[] = '(' . implode(',', $placeholders) . ')';
             }
-            $colList = implode(',', $columns);
-            $sql = 'INSERT INTO ' . $collection . '(' . $colList . ')VALUES' . implode(',', $valueSets);
+            $sql = 'INSERT INTO ' . $collection . '(' . implode(',', $columns) . ')VALUES' . implode(',', $valueSets);
             $this->beginTransaction();
             $result = $this->run($sql, $params) === count($object);
             return $this->endTransaction($result);
