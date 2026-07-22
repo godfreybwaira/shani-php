@@ -9,14 +9,14 @@
 
 namespace features\exceptions {
 
-    use features\exceptions\client\MethodArgumentNotValidException;
+    use features\exceptions\client\ValidationException;
 
     final class ErrorResponse
     {
 
         public static function create(int $errorCode, \Throwable $ex): array
         {
-            $message = $ex instanceof MethodArgumentNotValidException ? json_decode($ex->getMessage(), true) : $ex->getMessage();
+            $message = $ex instanceof ValidationException ? json_decode($ex->getMessage(), true) : $ex->getMessage();
             return [
                 'error_code' => $errorCode,
                 'error_description' => $message,

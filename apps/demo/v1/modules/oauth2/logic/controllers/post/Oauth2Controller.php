@@ -61,6 +61,7 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
             return $response?->body;
         }
 
+        #[\features\attributes\validation\RequestBody(ValidLogin::class)]
         public function login(): ?AuthenticationResult
         {
             return $this->app->auth->login();

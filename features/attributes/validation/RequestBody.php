@@ -3,7 +3,7 @@
 namespace features\attributes\validation {
 
     use features\exceptions\client\BadRequestException;
-    use features\exceptions\client\MethodArgumentNotValidException;
+    use features\exceptions\client\ValidationException;
     use features\validation\ValidationInterface;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
@@ -85,7 +85,7 @@ namespace features\attributes\validation {
             });
 
             if (!empty($errors)) {
-                throw new MethodArgumentNotValidException(json_encode($errors));
+                throw new ValidationException(json_encode($errors));
             }
         }
     }

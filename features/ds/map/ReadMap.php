@@ -242,7 +242,7 @@ namespace features\ds\map {
         {
             $value = $this->getOne($key);
             if (!$validator($value)) {
-                throw new ValidationException($errorMessage);
+                throw new ValidationException(json_encode([$key => $errorMessage]));
             }
             return $this;
         }

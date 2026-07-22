@@ -113,13 +113,13 @@ namespace features\attributes\validation {
             }
             $errors = [];
             if ($file->size > $this->maxSize) {
-                $errors[] = 'File size exceed maximum size of ' . number_format($this->maxSize, 0, ',') . ' bytes';
+                $errors[$this->name]['size'] = 'File size exceed maximum size of ' . number_format($this->maxSize, 0, ',') . ' bytes';
             }
             if (!in_array($file->type, $this->types)) {
-                $errors[] = 'Required file types are: ' . implode(', ', $this->types) . ', but ' . $file->type . ' provided';
+                $errors[$this->name]['type'] = 'Required file types are: ' . implode(', ', $this->types) . ', but ' . $file->type . ' provided';
             }
             if (!empty($errors)) {
-                throw new ValidationException(implode(PHP_EOL, $errors));
+                throw new ValidationException(json_encode($errors));
             }
         }
     }

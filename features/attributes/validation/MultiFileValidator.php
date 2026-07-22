@@ -80,12 +80,12 @@ namespace features\attributes\validation {
             foreach ($app->request->files as $name => $file) {
                 $result = $this->validator->validate($name, $file);
                 if ($result !== null) {
-                    $errors[] = $result;
+                    $errors[$name] = $result;
                 }
             }
 
             if (!empty($errors)) {
-                throw new ValidationException(implode(PHP_EOL, $errors));
+                throw new ValidationException(json_encode($errors));
             }
         }
     }
