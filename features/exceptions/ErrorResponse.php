@@ -9,31 +9,19 @@
 
 namespace features\exceptions {
 
-    final class ErrorResponse implements \JsonSerializable
+    use features\exceptions\client\MethodArgumentNotValidException;
+
+    final class ErrorResponse
     {
 
-        private readonly int $errorCode;
-        private readonly string $errorDescription;
-
-        private function __construct(int $errorCode, string $errorDescription)
+        public static function create(int $errorCode, \Throwable $ex): array
         {
-            $this->errorCode = $errorCode;
-            $this->errorDescription = $errorDescription;
-        }
-
-        #[\Override]
-        public function jsonSerialize(): array
-        {
+            $message = $ex instanceof MethodArgumentNotValidException ? json_decode($ex->getMessage(), true) : $ex->getMessage();
             return [
-                'error_code' => $this->errorCode,
-                'error_description' => $this->errorDescription,
+                'error_code' => $errorCode,
+                'error_description' => $message,
                 'timestamp' => SHANI_CURRENT_TIMESTAMP
             ];
-        }
-
-        public static function create(int $errorCode, string $errorDescription): self
-        {
-            return new self($errorCode, $errorDescription);
         }
     }
 

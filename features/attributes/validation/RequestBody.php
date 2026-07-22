@@ -3,7 +3,7 @@
 namespace features\attributes\validation {
 
     use features\exceptions\client\BadRequestException;
-    use features\exceptions\client\ValidationException;
+    use features\exceptions\client\MethodArgumentNotValidException;
     use features\validation\ValidationInterface;
     use shani\contracts\AttributeInterface;
     use shani\launcher\App;
@@ -40,7 +40,7 @@ namespace features\attributes\validation {
         /**
          * Constructs a new RequestBody attribute.
          *
-         * @param string $validator Fully qualified class name of a validator
+         * @param string $validator Fully qualified name of a validator class
          *                          implementing ValidationInterface.
          * @param bool   $required  Whether the request body is required (default true).
          *
@@ -78,14 +78,14 @@ namespace features\attributes\validation {
 
             $errors = [];
             $body->each(function (string|int $key, mixed $value) use (&$errors) {
-                $result = $this->validator->validate($key, $value);
-                if ($result !== null) {
-                    $errors[] = $result;
+                $message = $this->validator->validate($key, $value);
+                if ($message !== null) {
+                    $errors[$key] = $message;
                 }
             });
 
             if (!empty($errors)) {
-                throw new ValidationException(implode(PHP_EOL, $errors));
+                throw new MethodArgumentNotValidException(json_encode($errors));
             }
         }
     }

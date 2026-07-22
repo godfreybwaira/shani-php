@@ -89,12 +89,63 @@ namespace features\utils {
         }
 
         /**
-         * Get sanitized URL path
-         * @return string
+         * Get sanitized URL path (without query string or fragment)
+         * @return string URL path
          */
         public function path(): ?string
         {
             return $this->parts['path'] ?? null;
+        }
+
+        /**
+         * Get sanitized URL path (without query string or fragment) from $from
+         * inclusive (to $to inclusive)
+         * @return string A part of the URL path
+         */
+        public function pathFrom(string $from, ?string $to = null): ?string
+        {
+            $path = $this->path();
+            if ($path === null) {
+                return $path;
+            }
+            $startIdx = strpos($path, $from);
+            if ($startIdx === -1) {
+                return null;
+            }
+            if ($to === null) {
+                return substr($path, $startIdx);
+            }
+            $endIdx = strpos($path, $to);
+            if ($endIdx > -1) {
+                return substr($path, $startIdx, $endIdx - $startIdx + strlen($to));
+            }
+            return null;
+        }
+
+        /**
+         * Get sanitized URL path (without query string or fragment) after $from
+         * (to $to exclusive)
+         * @return string A part of the URL path
+         */
+        public function pathAfter(string $from, ?string $to = null): ?string
+        {
+            $path = $this->path();
+            if ($path === null) {
+                return $path;
+            }
+            $startIdx = strpos($path, $from);
+            if ($startIdx === -1) {
+                return null;
+            }
+            $startPos = $startIdx + strlen($from);
+            if ($to === null) {
+                return substr($path, $startPos);
+            }
+            $endIdx = strpos($path, $to);
+            if ($endIdx > -1) {
+                return substr($path, $startPos, $endIdx - $startPos);
+            }
+            return null;
         }
 
         /**

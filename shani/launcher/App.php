@@ -338,7 +338,7 @@ namespace shani\launcher {
                 $this->request->changeRoute($fallbackRoute);
                 return $this->handleRequest($middleware);
             }
-            return ErrorResponse::create($status->value, $ex->getMessage());
+            return ErrorResponse::create($status->value, $ex);
         }
     }
 
