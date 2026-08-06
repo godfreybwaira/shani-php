@@ -34,7 +34,7 @@ namespace features\console\helpers {
         public static function formatSentence(string $inputText, string $resultText, string $separator = '_'): string
         {
 
-            $maxInputLength = 30;
+            $maxInputLength = 49;
             $inputLength = mb_strlen($inputText);
             $multiplier = $maxInputLength - $inputLength;
             if ($inputLength > $maxInputLength) {

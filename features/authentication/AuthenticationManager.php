@@ -87,11 +87,11 @@ namespace features\authentication {
             return null;
         }
 
-        public function register(): ?UserDetailsDto
+        public function registerUser(): ?UserDetailsDto
         {
             $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
-                $user = $strategy->register();
+                $user = $strategy->registerUser();
                 if ($user !== null) {
                     return $user;
                 }
@@ -99,22 +99,22 @@ namespace features\authentication {
             return null;
         }
 
-        public function unregister(): bool
+        public function unregisterUser(): bool
         {
             $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
-                if ($strategy->unregister()) {
+                if ($strategy->unregisterUser()) {
                     return true;
                 }
             }
             return false;
         }
 
-        public function update(): ?UserDetailsDto
+        public function updateUser(): ?UserDetailsDto
         {
             $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
             foreach ($strategies as $strategy) {
-                $user = $strategy->update();
+                $user = $strategy->updateUser();
                 if ($user !== null) {
                     return $user;
                 }

@@ -28,19 +28,19 @@ namespace features\authentication {
          * Register a new user.
          * @return UserDetailsDto|null Registered user details on success, null if registration failed.
          */
-        public function register(): ?UserDetailsDto;
+        public function registerUser(): ?UserDetailsDto;
 
         /**
          * Revoke (or delete) user registration
          * @return bool True on success, false otherwise.
          */
-        public function unregister(): bool;
+        public function unregisterUser(): bool;
 
         /**
          * Update user details.
          * @return UserDetailsDto|null New Updated details on success, null if update failed.
          */
-        public function update(): ?UserDetailsDto;
+        public function updateUser(): ?UserDetailsDto;
     }
 
 }

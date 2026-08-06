@@ -71,7 +71,7 @@ namespace features\console\commands\misc {
         {
             $text = Framework::NAME . ' v' . Framework::VERSION . ' Commandline Manual (Help)';
             $this->registry->addResult(Formatter::placeCenter($text, underline: true, sentenceWidth: 150) . PHP_EOL);
-            $this->registry->addResult('For help type help COMMAND' . PHP_EOL);
+            $this->registry->addResult('For help type help <command>' . PHP_EOL);
             if ($this->userCommand === null) {
                 $this->registry->addResult(Formatter::formatSentence('COMMAND', 'DESCRIPTION', separator: ' '));
                 $commands = $this->registry->commandList();

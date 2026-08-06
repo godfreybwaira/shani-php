@@ -41,17 +41,17 @@ namespace apps\demo\v1\config\auth {
             return new AuthenticationResult($user, rememberUser: false);
         }
 
-        public function register(): ?UserDetailsDto
+        public function registerUser(): ?UserDetailsDto
         {
             return null;
         }
 
-        public function update(): ?UserDetailsDto
+        public function updateUser(): ?UserDetailsDto
         {
             return null;
         }
 
-        public function unregister(): bool
+        public function unregisterUser(): bool
         {
             return true;
         }
