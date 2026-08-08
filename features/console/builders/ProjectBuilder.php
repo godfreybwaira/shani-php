@@ -102,7 +102,7 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 throw new \RuntimeException('Project "' . $this->metadata->projectName . '" already exists');
             }
             mkdir($this->metadata->projectDirectory, LocalStorage::FILE_MODE, true);
@@ -116,14 +116,14 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return $this->metadata->projectExists();
         }
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->metadata->projectDirectory);
             }
         }

@@ -16,7 +16,7 @@ namespace features\console\builders {
          * Check if the resource exists
          * @return bool True if exists, false otherwise.
          */
-        public function exists(): bool;
+        public function resourceExists(): bool;
 
         /**
          * Build the resource if it does not exists. If it does, nothing will be done.

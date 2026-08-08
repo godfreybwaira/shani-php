@@ -34,10 +34,10 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if (!$this->module->exists()) {
+            if (!$this->module->resourceExists()) {
                 throw new \RuntimeException('Could not create Service class "' . $this->serviceName . '", module "' . $this->module->moduleName . '" does not exists.');
             }
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 throw new \RuntimeException('Could not create Service class "' . $this->serviceName . '", it exists already.');
             }
             $search = ['{namespace}', '{class_name}'];
@@ -53,14 +53,14 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->rootPath);
             }
         }

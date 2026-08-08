@@ -47,7 +47,7 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 throw new \RuntimeException('Host name "' . $this->metadata->hostName . '" already exists');
             }
             if (AliasBuilder::existsByName($this->metadata->hostName)) {
@@ -69,7 +69,7 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return $this->metadata->hostExists();
         }
@@ -84,7 +84,7 @@ namespace features\console\builders {
 
         public function delete(\Closure $progressTracker): void
         {
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 $progressTracker(Formatter::formatSentence('Host "' . $this->metadata->hostName . '" does not exists', 'Failed'));
                 return;
             }
@@ -101,18 +101,18 @@ namespace features\console\builders {
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->metadata->hostPath);
             }
         }
 
         public function rename(string $newName, \Closure $progressTracker): void
         {
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 throw new \InvalidArgumentException('Host "' . $this->metadata->hostName . '" does not exists.');
             }
             $newVhost = self::fromMetaData($this->metadata->projectName, $newName);
-            if ($newVhost->exists()) {
+            if ($newVhost->resourceExists()) {
                 throw new \InvalidArgumentException('Host name "' . $newName . '" already exists.');
             }
             $intext = 'Renaming a host from "' . $this->metadata->hostName . '" to "' . $newVhost->metadata->hostName . '"';

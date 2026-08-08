@@ -36,7 +36,7 @@ namespace features\console\builders {
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->rootPath);
             }
         }
@@ -44,12 +44,12 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if (!$this->version->exists()) {
+            if (!$this->version->resourceExists()) {
                 $text = 'Could not create module "' . $this->moduleName->originalValue . '", project version "';
                 $text .= $this->version->versionNumber . '" does not exists.';
                 throw new \RuntimeException($text);
             }
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 $intext = 'Creating module directory "' . $this->moduleName->directoryName . '"';
                 $outtext = mkdir($this->rootPath, LocalStorage::FILE_MODE, true) ? 'Success' : 'Failed';
                 $progressTracker(Formatter::formatSentence($intext, $outtext));
@@ -67,7 +67,7 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return is_dir($this->rootPath);
         }
@@ -128,7 +128,7 @@ namespace features\console\builders {
 
         public function getRoutes(): \Generator
         {
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 throw new \InvalidArgumentException('Module "' . $this->moduleName->originalValue . '" does not exists.');
             }
             $controllerPath = $this->rootPath . $this->config->controllers;

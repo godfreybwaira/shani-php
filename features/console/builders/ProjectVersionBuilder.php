@@ -10,12 +10,16 @@
 namespace features\console\builders {
 
     use features\console\CommandContract;
+    use features\console\commands\CustomCommandsInterface;
     use features\console\helpers\Formatter;
     use features\console\helpers\ModuleName;
     use features\console\printer\ConsoleIO;
     use features\storage\LocalStorage;
     use features\test\TestRunnerInterface;
     use features\utils\Directory;
+    use InvalidArgumentException;
+    use Override;
+    use RuntimeException;
     use shani\config\PathConfig;
 
     final class ProjectVersionBuilder implements LightBuilderInterface
@@ -24,6 +28,7 @@ namespace features\console\builders {
         private const CONFIG_DIR = 'config';
         private const CONFIG_FILE = 'config.yml';
         private const TEST_DIR = 'tests';
+        private const COMMAND_DIR = 'commands';
         public const DEFAULT_MODULE = 'users';
 
         public readonly VirtualHostBuilder $vhost;
@@ -48,7 +53,7 @@ namespace features\console\builders {
         public function registerVersion(\Closure $progressTracker): void
         {
             if ($this->configExists()) {
-                throw new \RuntimeException('Project version "' . $this->versionNumber . '" already registered.');
+                throw new RuntimeException('Project version "' . $this->versionNumber . '" already registered.');
             }
 
             $versionTemplate = file_get_contents(CommandContract::ASSETS . '/version.yml');
@@ -61,7 +66,7 @@ namespace features\console\builders {
             $hostContent = str_replace($placeholder, $versionContent . PHP_EOL . $placeholder, $hostTemplate);
 
             if (file_put_contents($this->vhost->metadata->hostPath, $hostContent) === false) {
-                throw new \RuntimeException('Project version "' . $this->versionNumber . '" could not be created.');
+                throw new RuntimeException('Project version "' . $this->versionNumber . '" could not be created.');
             }
             $this->createConfigFile($progressTracker);
         }
@@ -84,7 +89,29 @@ namespace features\console\builders {
                 }
 
                 $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
-                $progressTracker(Formatter::formatSentence('Creating Test class: ' . $filename, $outtext));
+                $progressTracker(Formatter::formatSentence('Creating test class: ' . $filename, $outtext));
+            }
+        }
+
+        private function createCustomCommandFile(\Closure $progressTracker): void
+        {
+            $filename = 'CustomCommands';
+            $testDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::COMMAND_DIR;
+            $filepath = $testDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
+
+            if (!is_file($filepath)) {
+
+                $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'command.txt';
+                $search = ['{namespace}', '{command_dir}', '{class_name}'];
+                $replace = [$this->namespace, self::COMMAND_DIR, $filename];
+                $testContent = str_replace($search, $replace, file_get_contents($testTemplate));
+
+                if (!is_dir($testDirectory)) {
+                    mkdir($testDirectory, LocalStorage::FILE_MODE, true);
+                }
+
+                $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating custom command class: ' . $filename, $outtext));
             }
         }
 
@@ -92,8 +119,8 @@ namespace features\console\builders {
         {
             if (!$this->configExists()) {
                 $template = CommandContract::ASSETS . DIRECTORY_SEPARATOR . self::CONFIG_FILE;
-                $search = ['{namespace}', '{config_dir}', '{test_dir}'];
-                $replace = [$this->namespace, self::CONFIG_DIR, self::TEST_DIR];
+                $search = ['{namespace}', '{config_dir}', '{test_dir}', '{command_dir}'];
+                $replace = [$this->namespace, self::CONFIG_DIR, self::TEST_DIR, self::COMMAND_DIR];
                 $templateContent = str_replace($search, $replace, file_get_contents($template));
 
                 if (!is_dir($this->vhost->metadata->hostDirectory)) {
@@ -127,38 +154,39 @@ namespace features\console\builders {
             }
         }
 
-        #[\Override]
+        #[Override]
         public function build(\Closure $progressTracker): self
         {
-            if ($this->exists()) {
-                throw new \RuntimeException('Project version "' . $this->versionNumber . '" already exists');
+            if ($this->resourceExists()) {
+                throw new RuntimeException('Project version "' . $this->versionNumber . '" already exists');
             }
             $this->registerVersion($progressTracker);
             $this->prepareSettings($progressTracker);
             $this->createTestFile($progressTracker);
+            $this->createCustomCommandFile($progressTracker);
 
             $module = new ModuleBuilder($this->defaultModule, $this);
             $module->build($progressTracker);
             return $this;
         }
 
-        #[\Override]
-        public function exists(): bool
+        #[Override]
+        public function resourceExists(): bool
         {
             return is_dir($this->rootPath);
         }
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->rootPath);
             }
         }
 
         public function delete(\Closure $progressTracker): void
         {
-            if (!$this->exists()) {
-                throw new \InvalidArgumentException('Project version "' . $this->versionNumber . '" does not exists.');
+            if (!$this->resourceExists()) {
+                throw new InvalidArgumentException('Project version "' . $this->versionNumber . '" does not exists.');
             }
             $intext = 'Deleting project version "' . $this->versionNumber . '"';
             $outtext = Directory::delete($this->rootPath) ? 'Success' : 'Failed';
@@ -191,8 +219,8 @@ namespace features\console\builders {
 
         public function getModules(): \Generator
         {
-            if (!$this->exists()) {
-                throw new \InvalidArgumentException('No module found for version "' . $this->versionNumber . '"');
+            if (!$this->resourceExists()) {
+                throw new InvalidArgumentException('No module found for version "' . $this->versionNumber . '"');
             }
             $config = $this->getPathConfig();
             $folders = array_diff(scandir($this->rootPath . $config->modules), ['.', '..']);
@@ -206,11 +234,11 @@ namespace features\console\builders {
             $filename = $this->vhost->getConfigurations()->getConfigFileName($this->versionNumber);
             $filePath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $filename;
             if (!is_file($filePath)) {
-                throw new \RuntimeException('Test could not start because Test runner file could not be not found.');
+                throw new RuntimeException('Test could not start because Test runner file could not be not found.');
             }
             $config = yaml_parse_file($filePath);
             if (empty($config['test'])) {
-                throw new \RuntimeException('Your project version does not support test.');
+                throw new RuntimeException('Your project version does not support test.');
             }
             $test = new $config['test']();
             if ($test instanceof TestRunnerInterface) {
@@ -219,7 +247,7 @@ namespace features\console\builders {
                 $test->afterTest($result);
                 return $result->getResult();
             }
-            throw new \RuntimeException($config['test'] . ' must implements ' . TestRunnerInterface::class);
+            throw new RuntimeException($config['test'] . ' must implements ' . TestRunnerInterface::class);
         }
 
         public function stop(\Closure $progressTracker): void
@@ -243,6 +271,24 @@ namespace features\console\builders {
             $oldContent = file_get_contents($this->configFilepath);
             $newContent = str_replace('running: ' . $oldStatus, 'running: ' . $newStatus, $oldContent);
             return file_put_contents($this->configFilepath, $newContent) !== false;
+        }
+
+        public function callUserCommand(string $label): bool
+        {
+            $filename = $this->vhost->getConfigurations()->getConfigFileName($this->versionNumber);
+            $filePath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $filename;
+            if (!is_file($filePath)) {
+                throw new RuntimeException('Could not call a custom command because the configuration file could not be found.');
+            }
+            $config = yaml_parse_file($filePath);
+            if (empty($config['custom_command'])) {
+                throw new RuntimeException('Your project version does not support custom command.');
+            }
+            $cmd = new $config['custom_command']();
+            if ($cmd instanceof CustomCommandsInterface) {
+                return $cmd->callCommand($label);
+            }
+            throw new RuntimeException($config['custom_command'] . ' must implements ' . CustomCommandsInterface::class);
         }
     }
 

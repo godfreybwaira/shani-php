@@ -1,11 +1,11 @@
 # Must extends shani\contracts\BasicConfiguration
-config: \{namespace}\{config_dir}\Settings
+config: \apps\tinker\v1\config\Settings
 
 # Test file runner implements features\test\TestRunnerInterface
-test: \{namespace}\{test_dir}\TestRunner
+test: \apps\tinker\v1\tests\TestRunner
 
 # A php class file implements features\console\commands\CustomCommandsInterface
-custom_command: \{namespace}\{command_dir}\CustomCommands
+custom_command: \apps\tinker\v1\commands\CustomCommands
 
 # Active configuration profile. The framework does not provide any logic regarding
 # this variable. You should handle the logic manually

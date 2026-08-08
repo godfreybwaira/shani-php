@@ -34,10 +34,10 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if (!$this->entity->module->exists()) {
+            if (!$this->entity->module->resourceExists()) {
                 throw new \RuntimeException('Could not create DTO "' . $this->dtoName . '", module "' . $this->entity->module->moduleName . '" does not exists.');
             }
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 throw new \RuntimeException('Could not create DTO "' . $this->dtoName . '", it exists already.');
             }
             $search = ['{namespace}', '{dto_name}', '{entity_name}', '{entity_ns}'];
@@ -53,14 +53,14 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->rootPath);
             }
         }

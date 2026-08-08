@@ -29,7 +29,7 @@ namespace features\console\builders {
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->aliasPath);
             }
         }
@@ -37,17 +37,17 @@ namespace features\console\builders {
         public function delete(\Closure $progressTracker): void
         {
             $intext = 'Deleting alias "' . $this->aliasName . '"';
-            $outtext = $this->exists() && unlink($this->aliasPath) ? 'Success' : 'Failed';
+            $outtext = $this->resourceExists() && unlink($this->aliasPath) ? 'Success' : 'Failed';
             $progressTracker(Formatter::formatSentence($intext, $outtext));
         }
 
         public function rename(string $newName, \Closure $progressTracker): void
         {
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" does not exists.');
             }
             $newAlias = new AliasBuilder($this->vhost, $newName);
-            if ($newAlias->exists()) {
+            if ($newAlias->resourceExists()) {
                 throw new \InvalidArgumentException('Alias name "' . $newName . '" already exists.');
             }
             $intext = 'Renaming alias from "' . $this->aliasName . '" to "' . $newAlias->aliasName . '"';
@@ -68,12 +68,12 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if (!$this->vhost->exists()) {
+            if (!$this->vhost->resourceExists()) {
                 $errorMsg = 'Could not create alias "' . $this->aliasName . '", host "';
                 $errorMsg .= $this->vhost->metadata->hostName . '" does not exists.';
                 throw new \RuntimeException($errorMsg);
             }
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 throw new \InvalidArgumentException('Alias "' . $this->aliasName . '" already exists.');
             }
             if (VirtualHostBuilder::existsByName($this->aliasName)) {
@@ -86,7 +86,7 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return self::existsByName($this->aliasName);
         }

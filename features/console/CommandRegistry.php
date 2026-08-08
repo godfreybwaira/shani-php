@@ -142,6 +142,7 @@ namespace features\console {
             yield new commands\misc\StartServerCommand($this);
             yield new commands\misc\DeleteCacheCommand($this);
             yield new commands\misc\HelpCommand($this);
+            yield new commands\misc\CallCustomCommand($this);
         }
 
         /**

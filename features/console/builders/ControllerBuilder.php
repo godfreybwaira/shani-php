@@ -65,12 +65,12 @@ namespace features\console\builders {
         #[\Override]
         public function build(\Closure $progressTracker): self
         {
-            if (!$this->module->exists()) {
+            if (!$this->module->resourceExists()) {
                 $message = 'Could not create Controller class "' . $this->controllerName;
                 $message .= '", module "' . $this->module->moduleName->originalValue . '" does not exists.';
                 throw new \RuntimeException($message);
             }
-            if (!$this->exists()) {
+            if (!$this->resourceExists()) {
                 $progressTracker($this->createViews());
                 $progressTracker($this->createLanguage());
                 ///////////////////////////////////////////
@@ -90,14 +90,14 @@ namespace features\console\builders {
         }
 
         #[\Override]
-        public function exists(): bool
+        public function resourceExists(): bool
         {
             return is_file($this->rootPath);
         }
 
         public function locate(): void
         {
-            if ($this->exists()) {
+            if ($this->resourceExists()) {
                 ConsoleIO::output($this->rootPath);
             }
         }
