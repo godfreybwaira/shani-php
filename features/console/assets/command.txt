@@ -9,7 +9,7 @@ namespace {namespace}\{command_dir} {
 
 
         #[\Override]
-        public function callCommand(string $label): bool
+        public function callCommand(string $label, string ...$args): bool
         {
             //TODO implement custom command call based on a given $label.
 

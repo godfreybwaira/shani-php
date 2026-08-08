@@ -43,6 +43,13 @@ namespace features\console\commands\misc {
         private readonly string $versionNumber;
 
         /**
+         * List of user arguments
+         *
+         * @var array
+         */
+        private readonly array $argsList;
+
+        /**
          * Constructor.
          *
          * Registers the command with the given registry.
@@ -57,7 +64,7 @@ namespace features\console\commands\misc {
         public function execute(): void
         {
             $version = ProjectVersionBuilder::fromProjectName($this->projectName, $this->versionNumber);
-            if ($version->callUserCommand($this->label)) {
+            if ($version->callUserCommand($this->label, $this->argsList)) {
                 $this->registry->addResult(PrintedText::success('Command completed successfully.'));
             } else {
                 $this->registry->addResult(PrintedText::error('Command failed.'));
@@ -68,9 +75,11 @@ namespace features\console\commands\misc {
         {
             if (empty($args)) {
                 $selector = new ResourceSelector();
-                $this->projectName = $selector->selectProject();
-                $this->versionNumber = $selector->selectProjectVersion();
+                $this->projectName = $selector->selectProject(true);
+                $this->versionNumber = $selector->selectProjectVersion(true);
                 $this->label = ConsoleIO::read('Enter the command label:', fn(string $s) => true);
+                $list = ConsoleIO::read('Enter optional arguments or press enter to ignore:', fn(string $s) => true);
+                $this->argsList = empty($list) ? [] : explode(' ', $list);
             } else {
                 $values = explode(self::SEPARATOR, $args[0]);
                 if (count($values) < 3) {
@@ -79,6 +88,7 @@ namespace features\console\commands\misc {
                 $this->projectName = ResourceName::create($values[0])->shortName;
                 $this->versionNumber = ModuleName::create($values[1])->directoryName;
                 $this->label = $values[2];
+                $this->argsList = array_slice($args, 1);
             }
             return $this->projectName . self::SEPARATOR . $this->versionNumber . self::SEPARATOR . $this->label;
         }

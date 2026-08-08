@@ -273,7 +273,7 @@ namespace features\console\builders {
             return file_put_contents($this->configFilepath, $newContent) !== false;
         }
 
-        public function callUserCommand(string $label): bool
+        public function callUserCommand(string $label, array $args): bool
         {
             $filename = $this->vhost->getConfigurations()->getConfigFileName($this->versionNumber);
             $filePath = $this->vhost->metadata->hostDirectory . DIRECTORY_SEPARATOR . $filename;
@@ -286,7 +286,7 @@ namespace features\console\builders {
             }
             $cmd = new $config['custom_command']();
             if ($cmd instanceof CustomCommandsInterface) {
-                return $cmd->callCommand($label);
+                return $cmd->callCommand($label, ...$args);
             }
             throw new RuntimeException($config['custom_command'] . ' must implements ' . CustomCommandsInterface::class);
         }

@@ -15,9 +15,10 @@ namespace features\console\commands {
         /**
          * Call a custom user command
          * @param string $label command label to decide which custom command to call
+         * @param string $args Optional arguments
          * @return bool Return true if command executed successfully, false otherwise
          */
-        public function callCommand(string $label): bool;
+        public function callCommand(string $label, string ...$args): bool;
     }
 
 }
