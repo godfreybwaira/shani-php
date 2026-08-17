@@ -29,6 +29,8 @@ namespace features\console\builders {
         private const CONFIG_FILE = 'config.yml';
         private const TEST_DIR = 'tests';
         private const COMMAND_DIR = 'commands';
+        private const MIDDLEWARE_DIR = 'middlewares';
+        private const MIDDLEWARE_NAME = 'MiddlewareHandler';
         public const DEFAULT_MODULE = 'users';
 
         public readonly VirtualHostBuilder $vhost;
@@ -78,7 +80,6 @@ namespace features\console\builders {
             $filepath = $testDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
 
             if (!is_file($filepath)) {
-
                 $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'test.txt';
                 $search = ['{namespace}', '{test_dir}', '{class_name}'];
                 $replace = [$this->namespace, self::TEST_DIR, $filename];
@@ -100,7 +101,6 @@ namespace features\console\builders {
             $filepath = $testDirectory . DIRECTORY_SEPARATOR . $filename . '.php';
 
             if (!is_file($filepath)) {
-
                 $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'command.txt';
                 $search = ['{namespace}', '{command_dir}', '{class_name}'];
                 $replace = [$this->namespace, self::COMMAND_DIR, $filename];
@@ -112,6 +112,26 @@ namespace features\console\builders {
 
                 $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
                 $progressTracker(Formatter::formatSentence('Creating custom command class: ' . $filename, $outtext));
+            }
+        }
+
+        private function createMiddlewareHandler(\Closure $progressTracker): void
+        {
+            $testDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::MIDDLEWARE_DIR;
+            $filepath = $testDirectory . DIRECTORY_SEPARATOR . self::MIDDLEWARE_NAME . '.php';
+
+            if (!is_file($filepath)) {
+                $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'mw.txt';
+                $search = ['{namespace}', '{middleware_dir}', '{middleware_name}'];
+                $replace = [$this->namespace, self::MIDDLEWARE_DIR, self::MIDDLEWARE_NAME];
+                $testContent = str_replace($search, $replace, file_get_contents($testTemplate));
+
+                if (!is_dir($testDirectory)) {
+                    mkdir($testDirectory, LocalStorage::FILE_MODE, true);
+                }
+
+                $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
+                $progressTracker(Formatter::formatSentence('Creating middleware class: ' . self::MIDDLEWARE_NAME, $outtext));
             }
         }
 
@@ -141,8 +161,14 @@ namespace features\console\builders {
             if (!is_file($filepath)) {
 
                 $settingTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . 'settings.txt';
-                $search = ['{namespace}', '{config_dir}', '{home_path}', '{file_name}', '{default_module}'];
-                $replace = [$this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName, $filename, self::DEFAULT_MODULE];
+                $search = [
+                    '{namespace}', '{config_dir}', '{home_path}', '{file_name}',
+                    '{default_module}', '{middleware_name}', '{middleware_dir}'
+                ];
+                $replace = [
+                    $this->namespace, self::CONFIG_DIR, $this->defaultModule->pathName,
+                    $filename, self::DEFAULT_MODULE, self::MIDDLEWARE_NAME, self::MIDDLEWARE_DIR
+                ];
                 $settingContent = str_replace($search, $replace, file_get_contents($settingTemplate));
 
                 if (!is_dir($configDirectory)) {
@@ -163,6 +189,7 @@ namespace features\console\builders {
             $this->registerVersion($progressTracker);
             $this->prepareSettings($progressTracker);
             $this->createTestFile($progressTracker);
+            $this->createMiddlewareHandler($progressTracker);
             $this->createCustomCommandFile($progressTracker);
 
             $module = new ModuleBuilder($this->defaultModule, $this);

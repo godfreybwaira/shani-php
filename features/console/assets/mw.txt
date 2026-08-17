@@ -1,0 +1,30 @@
+<?php
+
+namespace {namespace}\{middleware_dir} {
+
+    use features\middleware\MiddlewareHandlerInterface;
+
+    final class {middleware_name} implements MiddlewareHandlerInterface
+    {
+
+        #[\Override]
+        public function afterResponse(): void
+        {
+            //TODO
+        }
+
+        #[\Override]
+        public function preRequest(): void
+        {
+            //TODO
+        }
+
+        #[\Override]
+        public function preResponse(): void
+        {
+            //TODO
+        }
+    }
+
+}
+

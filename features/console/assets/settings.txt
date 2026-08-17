@@ -4,12 +4,15 @@ namespace {namespace}\{config_dir} {
 
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
+    use features\middleware\MiddlewareHandlerInterface;
+    use {namespace}\{middleware_dir}\{middleware_name};
     use shani\launcher\App;
 
     final class {file_name} extends BasicConfiguration
     {
 
         private readonly PathConfig $pathConfig;
+        private readonly {middleware_name} $middleware;
 
         public function __construct(App $app)
         {
@@ -30,6 +33,12 @@ namespace {namespace}\{config_dir} {
         public function isAsync(): bool
         {
             return $this->app->request->header()->getOne('X-Request-Mode') === 'async';
+        }
+
+        #[\Override]
+        public function getMiddlewareHandler(): ?MiddlewareHandlerInterface
+        {
+            return $this->middleware ??= new {middleware_name}();
         }
     }
 
