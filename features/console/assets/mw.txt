@@ -2,10 +2,18 @@
 
 namespace {namespace}\{middleware_dir} {
 
+    use shani\launcher\App;
     use features\middleware\MiddlewareHandlerInterface;
 
     final class {middleware_name} implements MiddlewareHandlerInterface
     {
+
+        private readonly App $app;
+
+        public function __construct(App $app)
+        {
+            $this->app = $app;
+        }
 
         #[\Override]
         public function afterResponse(): void

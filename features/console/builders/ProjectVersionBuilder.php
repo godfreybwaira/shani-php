@@ -30,7 +30,7 @@ namespace features\console\builders {
         private const TEST_DIR = 'tests';
         private const COMMAND_DIR = 'commands';
         private const MIDDLEWARE_DIR = 'middlewares';
-        private const MIDDLEWARE_NAME = 'MiddlewareHandler';
+        private const MIDDLEWARE_NAME = 'CustomMiddlewareHandler';
         public const DEFAULT_MODULE = 'users';
 
         public readonly VirtualHostBuilder $vhost;
