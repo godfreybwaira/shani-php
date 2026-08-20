@@ -7,6 +7,7 @@ namespace features\console {
     use features\console\builders\ProjectBuilder;
     use features\console\builders\ProjectVersionBuilder;
     use features\console\helpers\AsymmetricKeyPairType;
+    use features\console\helpers\AuthType;
     use features\console\helpers\ModuleName;
     use features\console\helpers\SelectedProjectResource;
     use features\console\printer\ConsoleIO;
@@ -31,6 +32,7 @@ namespace features\console {
         private readonly ?string $requestMethod;
         private readonly ?string $hostName;
         private readonly ?string $aliasName;
+        private readonly ?string $authType;
         private readonly bool $selected;
 
         public function __construct()
@@ -233,6 +235,17 @@ namespace features\console {
             }
             $this->requestMethod = self::chooser($methods, $required, fn(string $s) => $s);
             return $this->requestMethod;
+        }
+
+        public function selectAuthType(bool $required = true): ?string
+        {
+            if ($required) {
+                ConsoleIO::output('Select authentication type:');
+            } else {
+                ConsoleIO::output('Select authentication type or press ENTER to skip:');
+            }
+            $this->authType = self::chooser(AuthType::cases(), $required, fn(AuthType $a) => $a->value);
+            return $this->authType;
         }
 
         public static function selectKeyPairType(bool $required = true): ?AsymmetricKeyPairType

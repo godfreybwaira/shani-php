@@ -60,9 +60,6 @@ namespace gui {
             $route = $this->app->request->route();
             $file = ($path ?? '/' . $route->action) . '.php';
             $appPath = $this->app->config->pathConfig();
-            if ($moduleName === null) {
-                return $this->app->module() . $appPath->views . '/' . $file;
-            }
             return $this->app->module($moduleName) . $appPath->views . $file;
         }
 

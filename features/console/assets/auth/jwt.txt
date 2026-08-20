@@ -1,13 +1,7 @@
 <?php
 
-/**
- * Description of JwtAuthenticator
- * @author goddy
- *
- * @since Apr 7, 2026 at 12:32:19 PM
- */
 
-namespace apps\demo\v1\config\auth {
+namespace {namespace}\{auth_dir} {
 
     use features\authentication\AuthenticationResult;
     use features\authentication\AuthenticationStrategy;
@@ -16,7 +10,7 @@ namespace apps\demo\v1\config\auth {
     use features\jwt\JWTClaim;
     use shani\launcher\App;
 
-    final class JwtAuthenticator implements AuthenticationStrategy
+    final class {class_name} implements AuthenticationStrategy
     {
 
         private readonly App $app;
@@ -26,40 +20,44 @@ namespace apps\demo\v1\config\auth {
             $this->app = $app;
         }
 
+        #[\override]
         public function login(): ?AuthenticationResult
         {
-            $subject = 'id' . rand(10, 1000);
             $token = $this->app->request->header()->getBearerToken();
             if (empty($token)) {
                 return null;
             }
-            $publicKey = '-----BEGIN PUBLIC KEY-----' . PHP_EOL . 'MCowBQYDK2VwAyEAKaA5Dmite1sGhNXMfFZPpGarV7/Yg63Fplolwbw7Pn0=';
-            $publicKey .= PHP_EOL . '-----END PUBLIC KEY-----';
-            $claim = JWTClaim::fromToken($token, $publicKey, JWTAlgorithm::EdDSA);
-            $access = $claim->getClaim('access');
-            $user = new UserDetailsDto($subject, $access, false, '79a7ac18440680f461b', '16e9a5ecb65264ebbfd');
-            return new AuthenticationResult($user, rememberUser: false);
+            //TODO
         }
 
+        #[\override]
         public function registerUser(): ?UserDetailsDto
         {
+            //TODO
             return null;
         }
 
+        #[\override]
         public function updateUser(): ?UserDetailsDto
         {
+            //TODO
             return null;
         }
 
+        #[\override]
         public function unregisterUser(): bool
         {
+            //TODO
             return true;
         }
 
+        #[\override]
         public function logout(): bool
         {
+            //TODO
             return true;
         }
     }
 
 }
+

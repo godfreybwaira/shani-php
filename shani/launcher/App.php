@@ -263,10 +263,10 @@ namespace shani\launcher {
 
         /**
          * Get path to a module directory
-         * @param string $name Module name or default current module if null is provided.
+         * @param string|null $name Module name or default current module if null is provided.
          * @return string Path to a module directory
          */
-        public function module(string $name = null): string
+        public function module(?string $name = null): string
         {
             return $this->path->root . $this->path->modules . ($name ?? '/' . $this->request->route()->module);
         }

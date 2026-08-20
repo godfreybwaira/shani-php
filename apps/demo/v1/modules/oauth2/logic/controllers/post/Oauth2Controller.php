@@ -12,9 +12,9 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
     use features\attributes\security\AuthenticationCheck;
     use features\attributes\security\CsrfCheck;
     use features\attributes\security\PermissionCheck;
-    use features\authentication\AuthenticationResult;
     use features\oauth2\OAuth2TokenAuthorizer;
     use features\oauth2\OAuth2TokenIssuer;
+    use gui\WebUIBuilder;
     use shani\launcher\App;
 
     #[AuthenticationCheck(exempted: true)]
@@ -61,9 +61,16 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\post {
             return $response?->body;
         }
 
-        public function login(): ?AuthenticationResult
+        public function login()
         {
-            return $this->app->auth->login();
+            $result = $this->app->auth->login();
+            if ($result === null) {
+                $builder = new WebUIBuilder();
+                $builder->description('Shani web framework')->title('Login');
+                $builder->attr->addOne('error', 'Invalid credentials provided. Please retry.');
+                return $builder;
+            }
+            $this->app->response->redirect($this->app->config->pathConfig()->homePath);
         }
     }
 

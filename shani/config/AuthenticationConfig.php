@@ -9,6 +9,8 @@
 
 namespace shani\config {
 
+    use features\authentication\AuthenticationStrategy;
+
     /**
      * Defines default authentication policies for an application.
      *
@@ -55,7 +57,7 @@ namespace shani\config {
          *     A list of authentication strategy objects implementing AuthenticationStrategy.
          *     Defaults to an empty array.
          */
-        public function __construct(bool $skipAuthentication = false, array $authenticationStrategies = [])
+        public function __construct(bool $skipAuthentication = false, AuthenticationStrategy ...$authenticationStrategies)
         {
             $this->skipAuthentication = $skipAuthentication;
             $this->authenticationStrategies = $authenticationStrategies;

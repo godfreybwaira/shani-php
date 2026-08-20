@@ -38,7 +38,7 @@ namespace {namespace}\{config_dir} {
         #[\Override]
         public function getMiddlewareHandler(): ?MiddlewareHandlerInterface
         {
-            return $this->middleware ??= new {middleware_name}();
+            return $this->middleware ??= new {middleware_name}($this->app);
         }
     }
 

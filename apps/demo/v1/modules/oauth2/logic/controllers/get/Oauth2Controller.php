@@ -44,6 +44,13 @@ namespace apps\demo\v1\modules\oauth2\logic\controllers\get {
             return $builder;
         }
 
+        public function login(): WebUIBuilder
+        {
+            $builder = new WebUIBuilder();
+            $builder->description('Shani web framework')->title('Login');
+            return $builder;
+        }
+
         public function logout(): string
         {
             return $this->app->auth->logout() ? 'Success' : 'Failed';

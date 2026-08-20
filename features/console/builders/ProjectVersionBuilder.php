@@ -21,11 +21,13 @@ namespace features\console\builders {
     use Override;
     use RuntimeException;
     use shani\config\PathConfig;
+    use shani\launcher\Framework;
 
     final class ProjectVersionBuilder implements LightBuilderInterface
     {
 
         private const CONFIG_DIR = 'config';
+        private const AUTH_DIR = self::CONFIG_DIR . '/auth';
         private const CONFIG_FILE = 'config.yml';
         private const TEST_DIR = 'tests';
         private const COMMAND_DIR = 'commands';
@@ -111,7 +113,7 @@ namespace features\console\builders {
                 }
 
                 $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
-                $progressTracker(Formatter::formatSentence('Creating custom command class: ' . $filename, $outtext));
+                $progressTracker(Formatter::formatSentence('Creating command class: ' . $filename, $outtext));
             }
         }
 
@@ -131,8 +133,31 @@ namespace features\console\builders {
                 }
 
                 $outtext = file_put_contents($filepath, $testContent) !== false ? 'Success' : 'Failed';
-                $progressTracker(Formatter::formatSentence('Creating middleware class: ' . self::MIDDLEWARE_NAME, $outtext));
+                $progressTracker(Formatter::formatSentence('Creating middleware: ' . self::MIDDLEWARE_NAME, $outtext));
             }
+        }
+
+        public function createAuthenticator(string $filename, string $className): ?string
+        {
+            $authDirectory = $this->rootPath . DIRECTORY_SEPARATOR . self::AUTH_DIR;
+            $filepath = $authDirectory . DIRECTORY_SEPARATOR . $className . '.php';
+            $shortPath = substr($filepath, strlen(Framework::DIR_APPS) + 1);
+
+            if (is_file($filepath)) {
+                throw new \RuntimeException('File "' . $shortPath . '" exists. Nothing was done');
+            }
+            $testTemplate = CommandContract::ASSETS . DIRECTORY_SEPARATOR . $filename;
+            $search = ['{namespace}', '{class_name}', '{auth_dir}'];
+            $replace = [$this->namespace, $className, str_replace('/', '\\', self::AUTH_DIR)];
+            $testContent = str_replace($search, $replace, file_get_contents($testTemplate));
+
+            if (!is_dir($authDirectory)) {
+                mkdir($authDirectory, LocalStorage::FILE_MODE, true);
+            }
+            if (file_put_contents($filepath, $testContent) !== false) {
+                return $shortPath;
+            }
+            return null;
         }
 
         private function createConfigFile(\Closure $progressTracker): void

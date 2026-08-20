@@ -137,6 +137,9 @@ namespace features\console {
             yield new commands\keygen\SymmetricKeyGenCommand($this);
             yield new commands\keygen\AsymmetricKeyGenCommand($this);
 
+            //Authentication
+            yield new commands\auth\CreateAuthCommand($this);
+
             //Misc
             yield new commands\misc\FrameworkVersionCommand($this);
             yield new commands\misc\StartServerCommand($this);

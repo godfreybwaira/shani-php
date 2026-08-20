@@ -75,10 +75,10 @@ namespace apps\demo\v1\config {
 
         public function authenticationConfig(): AuthenticationConfig
         {
-            return $this->authenticationConfig ??= new AuthenticationConfig(authenticationStrategies: [
-                new auth\BasicAuthenticator($this->app),
-                new auth\JwtAuthenticator($this->app),
-                    ], skipAuthentication: false);
+            return $this->authenticationConfig ??= new AuthenticationConfig(false,
+                    new auth\BasicAuthenticator($this->app),
+                    new auth\JwtAuthenticator($this->app)
+            );
         }
 
         public function sessionConfig(): SessionConfig
