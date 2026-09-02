@@ -127,7 +127,7 @@ namespace features\console\commands\dto {
                     $this->moduleName = ModuleName::create($values[2]);
                     $this->dtoName = ModuleName::create($values[3])->className;
                 } else {
-                    throw new \ArgumentCountError('At least four arguments are required.');
+                    throw new \ArgumentCountError('At least one or four arguments are required.');
                 }
             }
             $parameters = $this->projectName . self::SEPARATOR . $this->versionNumber;

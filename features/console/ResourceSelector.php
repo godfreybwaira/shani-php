@@ -58,7 +58,7 @@ namespace features\console {
          *
          * @return string|null The selected resource name or null if skipped.
          */
-        private static function chooser(array $availableResources, bool $required, Closure $cleaner): ?string
+        private static function resourceChooser(array $availableResources, bool $required, Closure $cleaner): ?string
         {
             $id = 0;
             $resources = [];
@@ -95,7 +95,7 @@ namespace features\console {
                 ConsoleIO::output('Select a project or press ENTER to skip:');
             }
             $projects = array_diff(scandir(Framework::DIR_APPS), ['.', '..']);
-            $this->projectName = self::chooser($projects, $required, fn(string $s) => $s);
+            $this->projectName = self::resourceChooser($projects, $required, fn(string $s) => $s);
             return $this->projectName;
         }
 
@@ -107,7 +107,7 @@ namespace features\console {
                 ConsoleIO::output('Select a cipher algorithm or press ENTER to skip:');
             }
             $algorithms = openssl_get_cipher_methods();
-            return self::chooser($algorithms, $required, fn($s) => $s);
+            return self::resourceChooser($algorithms, $required, fn($s) => $s);
         }
 
         public static function selectCryptoAlgorithm(bool $required = true): ?string
@@ -118,7 +118,7 @@ namespace features\console {
                 ConsoleIO::output('Select a cryptographic algorithm or press ENTER to skip:');
             }
             $algorithms = CryptoAlgorithm::cases();
-            return self::chooser($algorithms, $required, fn(CryptoAlgorithm $s) => $s->value);
+            return self::resourceChooser($algorithms, $required, fn(CryptoAlgorithm $s) => $s->value);
         }
 
         /**
@@ -136,7 +136,7 @@ namespace features\console {
                 ConsoleIO::output('Select a host or press ENTER to skip:');
             }
             $hosts = glob(Framework::DIR_HOSTS . '/*.yml');
-            $this->hostName = self::chooser($hosts, $required, fn(string $s) => basename($s, '.yml'));
+            $this->hostName = self::resourceChooser($hosts, $required, fn(string $s) => basename($s, '.yml'));
             return $this->hostName;
         }
 
@@ -155,7 +155,7 @@ namespace features\console {
                 ConsoleIO::output('Select a host alias or press ENTER to skip:');
             }
             $aliases = glob(Framework::DIR_HOSTS . '/*.alias');
-            $this->aliasName = self::chooser($aliases, $required, fn(string $s) => basename($s, '.alias'));
+            $this->aliasName = self::resourceChooser($aliases, $required, fn(string $s) => basename($s, '.alias'));
             return $this->aliasName;
         }
 
@@ -181,7 +181,7 @@ namespace features\console {
             foreach ($generator as $version) {
                 $versions[] = $version->versionNumber;
             }
-            $this->versionNumber = self::chooser($versions, $required, fn(string $s) => $s);
+            $this->versionNumber = self::resourceChooser($versions, $required, fn(string $s) => $s);
             return $this->versionNumber;
         }
 
@@ -208,7 +208,7 @@ namespace features\console {
             foreach ($generator as $module) {
                 $modules[] = $module->moduleName;
             }
-            $name = self::chooser($modules, $required, fn(ModuleName $s) => $s->originalValue);
+            $name = self::resourceChooser($modules, $required, fn(ModuleName $s) => $s->originalValue);
             $this->moduleName = ModuleName::create($name);
             return $this->moduleName;
         }
@@ -233,7 +233,7 @@ namespace features\console {
             foreach ($controllers as $controller) {
                 $methods[] = strtoupper($controller->requestMethod);
             }
-            $this->requestMethod = self::chooser($methods, $required, fn(string $s) => $s);
+            $this->requestMethod = self::resourceChooser($methods, $required, fn(string $s) => $s);
             return $this->requestMethod;
         }
 
@@ -244,7 +244,7 @@ namespace features\console {
             } else {
                 ConsoleIO::output('Select authentication type or press ENTER to skip:');
             }
-            $this->authType = self::chooser(AuthType::cases(), $required, fn(AuthType $a) => $a->value);
+            $this->authType = self::resourceChooser(AuthType::cases(), $required, fn(AuthType $a) => $a->value);
             return $this->authType;
         }
 
@@ -256,7 +256,7 @@ namespace features\console {
                 ConsoleIO::output('Select a key pair or press ENTER to skip:');
             }
             $keyPairs = AsymmetricKeyPairType::cases();
-            $type = self::chooser($keyPairs, $required, fn(AsymmetricKeyPairType $s) => $s->value);
+            $type = self::resourceChooser($keyPairs, $required, fn(AsymmetricKeyPairType $s) => $s->value);
             return AsymmetricKeyPairType::tryFrom($type);
         }
 
@@ -267,7 +267,7 @@ namespace features\console {
             } else {
                 ConsoleIO::output('Select a curve name or press ENTER to skip:');
             }
-            return self::chooser(openssl_get_curve_names(), $required, fn($s) => $s);
+            return self::resourceChooser(openssl_get_curve_names(), $required, fn($s) => $s);
         }
     }
 
