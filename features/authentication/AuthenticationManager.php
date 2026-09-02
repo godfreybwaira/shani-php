@@ -87,41 +87,6 @@ namespace features\authentication {
             return null;
         }
 
-        public function registerUser(): ?UserDetailsDto
-        {
-            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
-            foreach ($strategies as $strategy) {
-                $user = $strategy->registerUser();
-                if ($user !== null) {
-                    return $user;
-                }
-            }
-            return null;
-        }
-
-        public function unregisterUser(): bool
-        {
-            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
-            foreach ($strategies as $strategy) {
-                if ($strategy->unregisterUser()) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public function updateUser(): ?UserDetailsDto
-        {
-            $strategies = $this->app->config->authenticationConfig()->authenticationStrategies;
-            foreach ($strategies as $strategy) {
-                $user = $strategy->updateUser();
-                if ($user !== null) {
-                    return $user;
-                }
-            }
-            return null;
-        }
-
         public function logout(): bool
         {
             if ($this->loggedIn() || $this->app->session->containerExists(self::METADATA_CART)) {

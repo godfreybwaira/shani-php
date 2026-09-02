@@ -31,27 +31,6 @@ namespace {namespace}\{auth_dir} {
         }
 
         #[\override]
-        public function registerUser(): ?UserDetailsDto
-        {
-            //TODO
-            return null;
-        }
-
-        #[\override]
-        public function updateUser(): ?UserDetailsDto
-        {
-            //TODO
-            return null;
-        }
-
-        #[\override]
-        public function unregisterUser(): bool
-        {
-            //TODO
-            return true;
-        }
-
-        #[\override]
         public function logout(): bool
         {
             //TODO

@@ -10,8 +10,8 @@
 namespace gui\v2\components {
 
     use gui\v2\Component;
-    use gui\v2\decoration\Animation;
-    use gui\v2\decoration\Position;
+    use gui\v2\decorators\Animation;
+    use gui\v2\decorators\Position;
 
     final class Toaster extends Component
     {

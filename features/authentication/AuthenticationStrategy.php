@@ -23,24 +23,6 @@ namespace features\authentication {
          * @return bool True on success, false otherwise.
          */
         public function logout(): bool;
-
-        /**
-         * Register a new user.
-         * @return UserDetailsDto|null Registered user details on success, null if registration failed.
-         */
-        public function registerUser(): ?UserDetailsDto;
-
-        /**
-         * Revoke (or delete) user registration
-         * @return bool True on success, false otherwise.
-         */
-        public function unregisterUser(): bool;
-
-        /**
-         * Update user details.
-         * @return UserDetailsDto|null New Updated details on success, null if update failed.
-         */
-        public function updateUser(): ?UserDetailsDto;
     }
 
 }
