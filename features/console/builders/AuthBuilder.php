@@ -59,7 +59,8 @@ namespace features\console\builders {
             $className = match ($type) {
                 AuthType::AUTH_DEFAULT => 'DefaultAuthenticator',
                 AuthType::AUTH_JWT => 'JwtAuthenticator',
-                AuthType::AUTH_BASIC => 'BasicAuthenticator'
+                AuthType::AUTH_BASIC => 'BasicAuthenticator',
+                default => throw new \RuntimeException('Unsupported authentication type "' . $type->value . '"')
             };
             return $version->createAuthenticator($filename, $className);
         }
