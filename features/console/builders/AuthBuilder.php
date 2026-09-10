@@ -26,18 +26,42 @@ namespace features\console\builders {
 
         public function build(\Closure $progressTracker): LightBuilderInterface
         {
-            $filename = 'auth' . DIRECTORY_SEPARATOR . $this->type->value . '.txt';
-            $className = match ($this->type) {
-                AuthType::AUTH_DEFAULT => 'DefaultAuthenticator',
-                AuthType::AUTH_JWT => 'JwtAuthenticator',
-                AuthType::AUTH_BASIC => 'BasicAuthenticator'
-            };
-            $path = $this->version->createAuthenticator($filename, $className);
+            if ($this->type === AuthType::AUTH_ALL) {
+                return $this->createAllAuthTypes(AuthType::cases(), $progressTracker);
+            }
+            $path = self::createAuthMthod($this->version, $this->type);
             if ($path === null) {
                 throw new \RuntimeException('Authentication type "' . $this->type->value . '" could not be created. Check if it exists.');
             }
             $progressTracker(Formatter::formatSentence('Creating class "' . $path . '"', 'Success'));
             return $this;
+        }
+
+        private function createAllAuthTypes(array $authTypes, \Closure $progressTracker): LightBuilderInterface
+        {
+            foreach ($authTypes as $type) {
+                if ($type === AuthType::AUTH_ALL) {
+                    continue;
+                }
+                $path = self::createAuthMthod($this->version, $type);
+                if ($path === null) {
+                    $progressTracker(Formatter::formatSentence('Creating Authentication type "' . $type->value . '"', 'Failed'));
+                } else {
+                    $progressTracker(Formatter::formatSentence('Creating class "' . $path . '"', 'Success'));
+                }
+            }
+            return $this;
+        }
+
+        private static function createAuthMthod(ProjectVersionBuilder $version, AuthType $type): ?string
+        {
+            $filename = 'auth' . DIRECTORY_SEPARATOR . $type->value . '.txt';
+            $className = match ($type) {
+                AuthType::AUTH_DEFAULT => 'DefaultAuthenticator',
+                AuthType::AUTH_JWT => 'JwtAuthenticator',
+                AuthType::AUTH_BASIC => 'BasicAuthenticator'
+            };
+            return $version->createAuthenticator($filename, $className);
         }
 
         public function resourceExists(): bool

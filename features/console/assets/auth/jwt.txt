@@ -28,6 +28,7 @@ namespace {namespace}\{auth_dir} {
                 return null;
             }
             //TODO
+            return null;
         }
 
         #[\override]

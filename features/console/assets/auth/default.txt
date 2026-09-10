@@ -21,6 +21,7 @@ namespace {namespace}\{auth_dir} {
         public function login(): ?AuthenticationResult
         {
             //TODO
+            return null;
         }
 
         #[\override]
