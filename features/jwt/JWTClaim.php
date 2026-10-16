@@ -134,7 +134,7 @@ namespace features\jwt {
         }
 
         /**
-         * Set a custom claim.
+         * Set a custom claim using key-value pair.
          *
          * @param string $key Claim name.
          * @param mixed $value Claim value.
@@ -147,7 +147,7 @@ namespace features\jwt {
         }
 
         /**
-         * Retrieve a claim value.
+         * Retrieve a claim value by a key.
          *
          * @param string $key Claim name.
          * @param mixed|null $default Default value if claim not found.

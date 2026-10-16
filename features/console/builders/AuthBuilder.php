@@ -27,7 +27,7 @@ namespace features\console\builders {
         public function build(\Closure $progressTracker): LightBuilderInterface
         {
             if ($this->type === AuthType::AUTH_ALL) {
-                return $this->createAllAuthTypes(AuthType::cases(), $progressTracker);
+                return $this->createAllAuthTypes($progressTracker);
             }
             $path = self::createAuthMthod($this->version, $this->type);
             if ($path === null) {
@@ -37,19 +37,18 @@ namespace features\console\builders {
             return $this;
         }
 
-        private function createAllAuthTypes(array $authTypes, \Closure $progressTracker): LightBuilderInterface
+        private function createAllAuthTypes(\Closure $progressTracker): LightBuilderInterface
         {
-            foreach ($authTypes as $type) {
-                if ($type === AuthType::AUTH_ALL) {
-                    continue;
+            array_map(function (AuthType $type)use (&$progressTracker) {
+                if ($type !== AuthType::AUTH_ALL) {
+                    $path = self::createAuthMthod($this->version, $type);
+                    if ($path === null) {
+                        $progressTracker(Formatter::formatSentence('Creating Authentication type "' . $type->value . '"', 'Failed'));
+                    } else {
+                        $progressTracker(Formatter::formatSentence('Creating class "' . $path . '"', 'Success'));
+                    }
                 }
-                $path = self::createAuthMthod($this->version, $type);
-                if ($path === null) {
-                    $progressTracker(Formatter::formatSentence('Creating Authentication type "' . $type->value . '"', 'Failed'));
-                } else {
-                    $progressTracker(Formatter::formatSentence('Creating class "' . $path . '"', 'Success'));
-                }
-            }
+            }, AuthType::cases());
             return $this;
         }
 

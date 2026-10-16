@@ -15,7 +15,7 @@ namespace features\console\helpers {
         case AUTH_BASIC = 'basic';
         case AUTH_JWT = 'jwt';
         case AUTH_DEFAULT = 'default';
-        case AUTH_ALL = 'all';
+        case AUTH_ALL = '*';
     }
 
 }

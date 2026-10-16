@@ -178,7 +178,8 @@ namespace features\utils {
         }
 
         /**
-         * Get the URI path joined with query string.
+         * Get the URI path joined together with query string (if available) and
+         * URI fragment (if available).
          * @return string URI path joined with query string.
          */
         public function pathInfo(): string
