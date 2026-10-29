@@ -28,6 +28,7 @@ namespace shani\launcher {
     use features\session\SessionStorage;
     use features\storage\StorageInterface;
     use features\storage\StorageMediaInterface;
+    use features\utils\EventHandler;
     use shani\config\AppConfig;
     use shani\config\PathConfig;
     use shani\contracts\BasicConfiguration;
@@ -116,6 +117,12 @@ namespace shani\launcher {
         public readonly StorageMediaInterface $storage;
 
         /**
+         * Event handler object
+         * @var EventHandler
+         */
+        public readonly EventHandler $event;
+
+        /**
          * Application paths
          * @var PathConfig
          */
@@ -149,6 +156,7 @@ namespace shani\launcher {
             $this->path = $this->config->pathConfig();
             $this->preset = $this->config->appConfig();
             $this->storage = $this->config->getStorageMedia();
+            $this->event = new EventHandler();
         }
 
         /**

@@ -15,7 +15,6 @@ namespace shani\servers\cgi {
     use features\utils\MediaType;
     use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
-    use shani\contracts\EventHandler;
     use shani\servers\SupportedWebServer;
     use shani\launcher\Framework;
     use shani\launcher\ApplicationLauncher;
@@ -130,11 +129,6 @@ namespace shani\servers\cgi {
                 }
             }
             return $result;
-        }
-
-        public function getEventHandler(): EventHandler
-        {
-            return new CgiEvent();
         }
 
         public function getConcurrencyHandler(): ConcurrencyInterface

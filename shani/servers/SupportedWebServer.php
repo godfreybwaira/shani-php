@@ -10,7 +10,6 @@
 namespace shani\servers {
 
     use shani\contracts\ConcurrencyInterface;
-    use shani\contracts\EventHandler;
 
     interface SupportedWebServer
     {
@@ -28,12 +27,6 @@ namespace shani\servers {
          * @return ConcurrencyInterface
          */
         public function getConcurrencyHandler(): ConcurrencyInterface;
-
-        /**
-         * Return event handler
-         * @return EventHandler
-         */
-        public function getEventHandler(): EventHandler;
     }
 
 }

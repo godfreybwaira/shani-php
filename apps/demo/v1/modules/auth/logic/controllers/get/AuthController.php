@@ -35,6 +35,12 @@ namespace apps\demo\v1\modules\auth\logic\controllers\get {
 
         public function a()
         {
+            $this->app->event->on('click', function ($data) {
+
+            });
+            $this->app->event->off('click');
+            $this->app->event->trigger('click', $data);
+
             $payment = new PaymentCompletedWebhook([
                 'tanxId' => 344,
                 'status' => 'PAID'

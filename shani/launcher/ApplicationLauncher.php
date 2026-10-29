@@ -13,7 +13,6 @@ namespace shani\launcher {
     use features\ds\map\ReadMap;
     use features\utils\Concurrency;
     use features\utils\Duration;
-    use features\utils\Event;
     use shani\contracts\ResponseWriterInterface;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
@@ -105,7 +104,6 @@ namespace shani\launcher {
         public static function start(SupportedWebServer $server): void
         {
             new Concurrency($server->getConcurrencyHandler());
-            Event::setHandler($server->getEventHandler());
             $server->request(function (RequestEntity $request, ResponseWriterInterface $writer, Framework $framework) {
                 $response = new ResponseEntity($request, HttpStatus::OK, new HttpHeader(), new ReadMap());
                 $preference = self::host($request->uri->hostname(), $request->header());

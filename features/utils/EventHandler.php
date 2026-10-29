@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Event Listener class that provide capability for creation of user defined
+ * Event handler class that provide capability for creation of user defined
  * events and execute callbacks asynchronously.
  * @author coder
  *
@@ -10,23 +10,16 @@
 
 namespace features\utils {
 
-    use shani\contracts\EventHandler;
-
-    final class Event
+    final class EventHandler
     {
 
-        private $onDone = null;
-        private array $callbacks = [], $events;
-        private static EventHandler $handler;
+        private ?\Closure $onDone = null;
+        private array $callbacks = [];
+        private readonly array $events;
 
         public function __construct(array $supportedEvents = [])
         {
             $this->events = $supportedEvents;
-        }
-
-        public static function setHandler(EventHandler $handler): void
-        {
-            self::$handler = $handler;
         }
 
         /**
@@ -81,26 +74,24 @@ namespace features\utils {
 
         /**
          * Register a callback function to be triggered when an event is finished
-         * @param \Closure $cb A callback function
+         * @param \Closure $callback A callback function
          * @return self
          */
-        public function done(\Closure $cb): self
+        public function done(\Closure $callback): self
         {
-            $this->onDone = $cb;
+            $this->onDone = $callback;
             return $this;
         }
 
         /**
          * Execute callback function when the event is finished.
-         * @param string $event Event that was previously executed
          * @param \Closure|null $cb A callback function to execute
-         * @param type $data Data to pass on callback along with the event
          * @return void
          */
-        private static function finish(string $event, ?\Closure $cb, $data): void
+        private static function finish(?\Closure $cb): void
         {
             if ($cb !== null) {
-                $cb($event, $data);
+                $cb();
             }
         }
 
@@ -122,16 +113,27 @@ namespace features\utils {
          */
         public function trigger(string $event, ...$params): self
         {
-            $cb = $this->callbacks[$event] ?? null;
-            if (is_array($cb)) {
-                self::$handler->dispatch($cb, function ($data) use (&$event) {
-                    self::finish($event, $this->onDone, $data);
-                }, $params);
-            } elseif ($cb !== null) {
+            $handlers = $this->callbacks[$event] ?? null;
+            if (is_array($handlers)) {
+                foreach ($handlers as $cb) {
+                    $cb(...$params);
+                    self::finish($this->onDone);
+                }
+            } elseif ($handlers !== null) {
+                $cb(...$params);
+                self::finish($this->onDone);
                 $this->off($event);
-                Concurrency::async(fn() => self::finish($event, $this->onDone, $cb(...$params)));
             }
             return $this;
+        }
+
+        /**
+         * Get a list of all events registered to this event handler
+         * @return array|null A list of all events registered, or null if no events registered.
+         */
+        public function getEvents(): ?array
+        {
+            return empty($this->callbacks) ? null : array_keys($this->callbacks);
         }
     }
 

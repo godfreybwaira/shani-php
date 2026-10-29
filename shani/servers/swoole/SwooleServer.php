@@ -14,7 +14,6 @@ namespace shani\servers\swoole {
     use features\utils\MediaType;
     use features\utils\RequestEntityBuilder;
     use shani\contracts\ConcurrencyInterface;
-    use shani\contracts\EventHandler;
     use shani\http\enums\HttpStatus;
     use shani\http\HttpHeader;
     use shani\http\RequestEntity;
@@ -172,11 +171,6 @@ namespace shani\servers\swoole {
         public function getConcurrencyHandler(): ConcurrencyInterface
         {
             return new SwooleConcurrency();
-        }
-
-        public function getEventHandler(): EventHandler
-        {
-            return new SwooleEvent();
         }
     }
 

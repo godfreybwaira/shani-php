@@ -11,19 +11,19 @@ namespace features\tasks {
 
     use features\utils\Concurrency;
     use features\utils\Duration;
-    use features\utils\Event;
+    use features\utils\EventHandler;
 
     final class Task
     {
 
         private \Exception $exception;
-        private readonly Event $listener;
+        private readonly EventHandler $listener;
         private bool $paused = false, $cancelled = false;
         private int $frequency = 1, $steps = 1, $repeat = 0;
 
         public function __construct()
         {
-            $this->listener = new Event(array_map(fn(TaskEvent $e) => $e->name, TaskEvent::cases()));
+            $this->listener = new EventHandler(array_map(fn(TaskEvent $e) => $e->name, TaskEvent::cases()));
         }
 
         /**
@@ -38,7 +38,7 @@ namespace features\tasks {
 
         /**
          * Set handler for given task event
-         * @param TaskEvent $event Event name.
+         * @param TaskEvent $event The essvent name.
          * @param \Closure $callback Function to execute when event is triggered.
          * @return self
          */
